@@ -2,11 +2,12 @@
 
 import json
 import os
+import re
 import sys
 
 
 _ = r"""
-relocate/redirect incoming uploads according to file extension
+relocate/redirect incoming uploads according to file extension or name
 
 example usage as global config:
     --xbu j,c1,bin/hooks/reloc-by-ext.py
@@ -52,10 +53,18 @@ def main():
     try:
         fn, ext = fn.rsplit(".", 1)
     except:
-        # no file extension; abort
-        return
+        # no file extension; pretend it's "bin"
+        ext = "bin"
 
     ext = ext.lower()
+
+    # this function must end by printing the action to perform;
+    # that's handled by the print(json.dumps(... at the bottom
+    #
+    # the action can contain the following keys:
+    # "vp" is the folder URL to move the upload to,
+    # "ap" is the filesystem-path to move it to (but "vp" is safer),
+    # "fn" overrides the final filename to use
 
     ##
     ## some example actions to take; pick one by
@@ -80,11 +89,37 @@ def main():
     elif ext in MUSIC.split():
         by_category = {"vp": "/just/tunes"}
     else:
-        by_category = {}
+        by_category = {}  # no action
 
-    # now choose the effect to apply; can be any of these:
+    # now choose the default effect to apply; can be any of these:
     # into_subfolder  into_toplevel  into_sibling  by_category
-    effect = into_subfolder
+    effect = {"vp": "/junk"}
+
+    ##
+    ## but we can keep going, adding more speicifc rules
+    ## which can take precedence, replacing the fallback
+    ## effect we just specified:
+    ##
+
+    fn = fn.lower()  # lowercase filename to make this easier
+
+    if "screenshot" in fn:
+        effect = {"vp": "/ss"}
+    if "mpv_" in fn:
+        effect = {"vp": "/anishots"}
+    elif "debian" in fn or "biebian" in fn:
+        effect = {"vp": "/linux-ISOs"}
+    elif re.search(r"ep(isode |\.)?[0-9]", fn):
+        effect = {"vp": "/podcasts"}
+
+    # regex lets you grab a part of the matching
+    # text and use that in the upload path:
+    m = re.search(r"\b(op|ed)([^a-z]|$)", fn)
+    if m:
+        # the regex matched; use "anime-op" or "anime-ed"
+        effect = {"vp": "/anime-" + m[1]}
+
+    # aaand DO IT
     print(json.dumps({"reloc": effect}))
 
 

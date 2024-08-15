@@ -2564,7 +2564,10 @@ class Up2k(object):
 
         return ret
 
-    def _handle_json(self, cj: dict[str, Any]) -> dict[str, Any]:
+    def _handle_json(self, cj: dict[str, Any], depth: int = 1) -> dict[str, Any]:
+        if depth > 16:
+            raise Pebkac(500, "too many xbu relocs, giving up")
+
         ptop = cj["ptop"]
         if not self.register_vpath(ptop, cj["vcfg"]):
             if ptop not in self.registry:
@@ -2794,12 +2797,16 @@ class Up2k(object):
                             if hr.get("reloc"):
                                 x = pathmod(self.asrv.vfs, dst, vp, hr["reloc"])
                                 if x:
+                                    zvfs = vfs
                                     pdir, _, job["name"], (vfs, rem) = x
                                     dst = os.path.join(pdir, job["name"])
+                                    job["vcfg"] = vfs.flags
                                     job["ptop"] = vfs.realpath
                                     job["vtop"] = vfs.vpath
                                     job["prel"] = rem
-                                    bos.makedirs(pdir)
+                                    if zvfs.vpath != vfs.vpath:
+                                        self.log("xbu reloc %d..." % (depth,), 6)
+                                        return self._handle_json(job, depth + 1)
 
                         job["name"] = self._untaken(pdir, job, now)
 
@@ -2880,7 +2887,9 @@ class Up2k(object):
                         lut.add(k)
 
                 try:
-                    self._new_upload(job)
+                    ret = self._new_upload(job, vfs, depth)
+                    if ret:
+                        return ret  # xbu recursed
                 except:
                     self.registry[job["ptop"]].pop(job["wark"], None)
                     raise
@@ -4176,21 +4185,16 @@ class Up2k(object):
 
         return ret
 
-    def _new_upload(self, job: dict[str, Any]) -> None:
+    def _new_upload(self, job: dict[str, Any], vfs: VFS, depth: int) -> dict[str, str]:
         pdir = djoin(job["ptop"], job["prel"])
         if not job["size"]:
             try:
                 inf = bos.stat(djoin(pdir, job["name"]))
                 if stat.S_ISREG(inf.st_mode):
                     job["lmod"] = inf.st_size
-                    return
+                    return {}
             except:
                 pass
-
-        self.registry[job["ptop"]][job["wark"]] = job
-        job["name"] = self._untaken(pdir, job, job["t0"])
-        # if len(job["name"].split(".")) > 8:
-        #    raise Exception("aaa")
 
         xbu = self.flags[job["ptop"]].get("xbu")
         ap_chk = djoin(pdir, job["name"])
@@ -4220,10 +4224,18 @@ class Up2k(object):
             if hr.get("reloc"):
                 x = pathmod(self.asrv.vfs, ap_chk, vp_chk, hr["reloc"])
                 if x:
+                    zvfs = vfs
                     pdir, _, job["name"], (vfs, rem) = x
+                    job["vcfg"] = vfs.flags
                     job["ptop"] = vfs.realpath
                     job["vtop"] = vfs.vpath
                     job["prel"] = rem
+                    if zvfs.vpath != vfs.vpath:
+                        self.log("xbu reloc %d..." % (depth,), 6)
+                        return self._handle_json(job, depth + 1)
+
+        job["name"] = self._untaken(pdir, job, job["t0"])
+        self.registry[job["ptop"]][job["wark"]] = job
 
         tnam = job["name"] + ".PARTIAL"
         if self.args.dotpart:
@@ -4233,7 +4245,7 @@ class Up2k(object):
             job["tnam"] = tnam
             if not job["hash"]:
                 del self.registry[job["ptop"]][job["wark"]]
-            return
+            return {}
 
         if self.args.plain_ip:
             dip = job["addr"].replace(":", ".")
@@ -4292,6 +4304,8 @@ class Up2k(object):
 
         if not job["hash"]:
             self._finish_upload(job["ptop"], job["wark"])
+
+        return {}
 
     def _snapshot(self) -> None:
         slp = self.args.snap_wri
