@@ -2760,7 +2760,8 @@ class Up2k(object):
                         job = deepcopy(job)
                         job["wark"] = wark
                         job["at"] = cj.get("at") or time.time()
-                        for k in "lmod ptop vtop prel name host user addr".split():
+                        zs = "lmod ptop vtop prel name host user addr poke"
+                        for k in zs.split():
                             job[k] = cj.get(k) or ""
 
                         pdir = djoin(cj["ptop"], cj["prel"])
@@ -2805,7 +2806,9 @@ class Up2k(object):
                                     job["vtop"] = vfs.vpath
                                     job["prel"] = rem
                                     if zvfs.vpath != vfs.vpath:
-                                        self.log("xbu reloc %d..." % (depth,), 6)
+                                        # print(json.dumps(job, sort_keys=True, indent=4))
+                                        job["hash"] = cj["hash"]
+                                        self.log("xbu reloc1:%d..." % (depth,), 6)
                                         return self._handle_json(job, depth + 1)
 
                         job["name"] = self._untaken(pdir, job, now)
@@ -4231,7 +4234,7 @@ class Up2k(object):
                     job["vtop"] = vfs.vpath
                     job["prel"] = rem
                     if zvfs.vpath != vfs.vpath:
-                        self.log("xbu reloc %d..." % (depth,), 6)
+                        self.log("xbu reloc2:%d..." % (depth,), 6)
                         return self._handle_json(job, depth + 1)
 
         job["name"] = self._untaken(pdir, job, job["t0"])
