@@ -141,6 +141,9 @@ find -maxdepth 1 -printf '%s %p\n' | sort -n | awk '!/-([0-9a-zA-Z_-]{11})\.(mkv
 # unique stacks in a stackdump
 f=a; rm -rf stacks; mkdir stacks; grep -E '^#' $f | while IFS= read -r n; do awk -v n="$n" '!$0{o=0} o; $0==n{o=1}' <$f >stacks/f; h=$(sha1sum <stacks/f | cut -c-16); mv stacks/f stacks/$h-"$n"; done ; find stacks/ | sort | uniq -cw24
 
+# find unused css variables
+cat browser.css | sed -r 's/(var\()/\n\1/g' | awk '{sub(/:/," ")} $1~/^--/{d[$1]=1} /var\(/{sub(/.*var\(/,"");sub(/\).*/,"");u[$1]=1} END{for (x in u) delete d[x]; for (x in d) print x}' | tr '\n' '|'
+
 
 ##
 ## sqlite3 stuff

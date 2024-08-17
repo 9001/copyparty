@@ -10,7 +10,6 @@
 	--fg2-max: #fff;
 	--fg-weak: #bbb;
 
-	--bg-u7: #555;
 	--bg-u6: #4c4c4c;
 	--bg-u5: #444;
 	--bg-u4: #383838;
@@ -43,8 +42,14 @@
 	--btn-h-bg: #805;
 	--btn-1-fg: #400;
 	--btn-1-bg: var(--a);
+	--btn-h-bs: var(--btn-bs);
+	--btn-h-bb: var(--btn-bb);
+	--btn-1-bs: var(--btn-bs);
+	--btn-1-bb: var(--btn-bb);
 	--btn-1h-fg: var(--btn-1-fg);
 	--btn-1h-bg: #fe8;
+	--btn-1h-bs: var(--btn-1-bs);
+	--btn-1h-bb: var(--btn-1-bb);
 	--chk-fg: var(--tab-alt);
 	--txt-sh: var(--bg-d2);
 	--txt-bg: var(--btn-bg);
@@ -212,22 +217,19 @@ html.y {
 html.a {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
 
-	--u2-o-bg: #603;
-	--u2-o-b1: #a16;
-	--u2-o-sh: #a00;
-	--u2-o-h-bg: var(--u2-o-bg);
-	--u2-o-h-b1: #fb0;
-	--u2-o-h-sh: #fb0;
-	--u2-o-1-bg: #6a1;
-	--u2-o-1-b1: #efa;
-	--u2-o-1-sh: #0c0;
-	--u2-o-1h-bg: var(--u2-o-1-bg);
+	--btn-bs: 0 0 .2em var(--bg-d3);
+}
+html.az {
+	--btn-1-bs: 0 0 .1em var(--fg) inset;
 }
 html.ay {
 	--op-aa-sh: 0 .1em .2em #ccc;
 	--op-aa-bg: var(--bg-max);
 }
 html.b {
+	--btn-bs: 0 .05em 0 var(--bg-d3) inset;
+	--btn-1-bs: 0 .05em 0 var(--btn-1h-bg) inset;
+
 	--tree-bg: var(--bg);
 
 	--g-bg: var(--bg);
@@ -244,17 +246,13 @@ html.b {
 	--u2-b1-bg: rgba(128,128,128,0.15);
 	--u2-b2-bg: var(--u2-b1-bg);
 
-	--u2-o-bg: var(--btn-bg);
-	--u2-o-h-bg: var(--btn-h-bg);
-	--u2-o-1-bg: var(--a);
-	--u2-o-1h-bg: var(--a-hil);
-
 	--f-sh1: 0.1;
 	--mp-b-bg: transparent;
 }
 html.bz {
 	--fg: #cce;
 	--fg-weak: #bbd;
+
 	--bg-u5: #3b3f58;
 	--bg-u4: #1e2130;
 	--bg-u3: #1e2130;
@@ -266,12 +264,14 @@ html.bz {
 
 	--row-alt: #181a27;
 
+	--a-b: #fb4;
+
 	--btn-bg: #202231;
 	--btn-h-bg: #2d2f45;
-	--btn-1-bg: #ba2959;
-	--btn-1-is: #f59;
-	--btn-1-fg: #fff;
+	--btn-1-bg: #eb6;
+	--btn-1-fg: #000;
 	--btn-1h-fg: #000;
+	--btn-1h-bg: #ff9;
 	--txt-sh: a;
 
 	--u2-tab-b1: var(--bg-u5);
@@ -306,6 +306,7 @@ html.by {
 }
 html.c {
 	font-weight: bold;
+
 	--fg: #fff;
 	--fg-weak: #cef;
 	--bg-u5: #409;
@@ -326,16 +327,23 @@ html.c {
 	--chk-fg: #d90;
 
 	--op-aa-bg: #f9dd22;
-	--u2-o-1-bg: #4cf;
 
 	--srv-1: #ea0;
 	--mp-b-bg: transparent;
 }
 html.cz {
 	--bgg: var(--bg-u2);
+
 	--sel-bg: var(--bg-u5);
 	--sel-fg: var(--fg);
+
+	--btn-bb: .2em solid #709;
+	--btn-bs: 0 .1em .6em rgba(255,0,185,0.5);
+	--btn-1-bb: .2em solid #e90;
+	--btn-1-bs: 0 .1em .8em rgba(255,205,0,0.9);
+
 	--srv-3: #fff;
+
 	--u2-tab-b1: var(--bg-d3);
 }
 html.cy {
@@ -363,6 +371,7 @@ html.cy {
 	--btn-h-fg: #fff;
 	--btn-1-bg: #ff0;
 	--btn-1-fg: #000;
+	--btn-bs: 0 .25em 0 #f00;
 	--chk-fg: #fd0;
 
 	--srv-1: #f00;
@@ -371,8 +380,6 @@ html.cy {
 
 	--u2-b1-bg: #f00;
 	--u2-b2-bg: #f00;
-	--u2-o-bg: #ff0;
-	--u2-o-1-bg: #f00;
 }
 html.dz {
 	--fg: #4d4;
@@ -380,7 +387,6 @@ html.dz {
 	--fg2-max: #fff;
 	--fg-weak: #2a2;
 
-	--bg-u7: #020;
 	--bg-u6: #020;
 	--bg-u5: #050;
 	--bg-u4: #020;
@@ -413,6 +419,9 @@ html.dz {
 	--btn-1-bg: #4f4;
 	--btn-1h-fg: var(--btn-1-fg);
 	--btn-1h-bg: #3f3;
+	--btn-bs: 0 0 0 .1em #080 inset;
+	--btn-1-bs: a;
+
 	--chk-fg: var(--tab-alt);
 	--txt-sh: var(--bg-d2);
 	--txt-bg: var(--btn-bg);
@@ -434,12 +443,6 @@ html.dz {
 	--u2-b-fg: #fff;
 	--u2-b1-bg: #3a3;
 	--u2-b2-bg: #3a3;
-	--u2-o-bg: var(--btn-bg);
-	--u2-o-b1: var(--bg-u5);
-	--u2-o-h-bg: var(--fg-weak);
-	--u2-o-1-bg: var(--fg-weak);
-	--u2-o-1-b1: var(--a);
-	--u2-o-1h-bg: var(--a);
 	--u2-inf-bg: #07a;
 	--u2-inf-b1: #0be;
 	--u2-ok-bg: #380;
@@ -551,10 +554,6 @@ html.dy {
 	--u2-tab-1-bg: a;
 	--u2-b1-bg: #000;
 	--u2-b2-bg: #000;
-	--u2-o-h-bg: #999;
-	--u2-o-1h-bg: #999;
-	--u2-o-bg: #eee;
-	--u2-o-1-bg: #000;
 
 	--ud-b1: a;
 
@@ -963,6 +962,8 @@ html.y #path a:hover {
 #files tbody tr.play a:hover {
 	color: var(--btn-1h-fg);
 	background: var(--btn-1h-bg);
+	box-shadow: var(--btn-1h-bs);
+	border-bottom: var(--btn-1h-bb);
 }
 #ggrid {
 	margin: -.2em -.5em;
@@ -971,6 +972,7 @@ html.y #path a:hover {
 	overflow: hidden;
 	display: block;
 	display: -webkit-box;
+	line-clamp: var(--grid-ln);
 	-webkit-line-clamp: var(--grid-ln);
 	-webkit-box-orient: vertical;
 	padding-top: .3em;
@@ -1431,7 +1433,11 @@ input[type="checkbox"]+label {
 input[type="radio"]:checked+label,
 input[type="checkbox"]:checked+label {
 	color: #0e0;
-	color: var(--a);
+	color: var(--btn-1-bg);
+}
+input[type="checkbox"]:checked+label {
+	box-shadow: var(--btn-1-bs);
+	border-bottom: var(--btn-1-bb);
 }
 html.dz input {
 	font-family: 'scp', monospace, monospace;
@@ -1609,6 +1615,8 @@ html {
 	color: var(--btn-fg);
 	background: #eee;
 	background: var(--btn-bg);
+	box-shadow: var(--btn-bs);
+	border-bottom: var(--btn-bb);
 	border-radius: .3em;
 	padding: .2em .4em;
 	font-size: 1.2em;
@@ -1622,20 +1630,14 @@ html.c .btn,
 html.a .btn {
 	border-radius: .2em;
 }
-html.cz .btn {
-	box-shadow: 0 .1em .6em rgba(255,0,185,0.5);
-	border-bottom: .2em solid #709;
-}
 html.dz .btn {
 	font-size: 1em;
-	box-shadow: 0 0 0 .1em #080 inset;
-}
-html.dz .tgl.btn.on {
-	box-shadow: 0 0 0 .1em var(--btn-1-bg) inset;
 }
 .btn:hover {
 	color: var(--btn-h-fg);
 	background: var(--btn-h-bg);
+	box-shadow: var(--btn-h-bs);
+	border-bottom: var(--btn-h-bb);
 }
 .tgl.btn.on {
 	background: #000;
@@ -1643,14 +1645,14 @@ html.dz .tgl.btn.on {
 	color: #fff;
 	color: var(--btn-1-fg);
 	text-shadow: none;
-}
-html.cz .tgl.btn.on {
-	box-shadow: 0 .1em .8em rgba(255,205,0,0.9);
-	border-bottom: .2em solid #e90;
+	box-shadow: var(--btn-1-bs);
+	border-bottom: var(--btn-1-bb);
 }
 .tgl.btn.on:hover {
-	background: var(--btn-1h-bg);
 	color: var(--btn-1h-fg);
+	background: var(--btn-1h-bg);
+	box-shadow: var(--btn-1h-bs);
+	border-bottom: var(--btn-1h-bb);
 }
 #detree {
 	padding: .3em .5em;
@@ -2682,23 +2684,25 @@ html.b #u2conf a.b:hover {
 #u2conf input[type="checkbox"]:checked+label {
 	position: relative;
 	cursor: pointer;
-	background: var(--u2-o-bg);
-	border-bottom: .2em solid var(--u2-o-b1);
-	box-shadow: 0 .1em .3em var(--u2-o-sh) inset;
+	background: var(--btn-bg);
+	box-shadow: var(--btn-bs);
+	border-bottom: var(--btn-bb);
 	text-shadow: 1px 1px 1px #000, 1px -1px 1px #000, -1px -1px 1px #000, -1px 1px 1px #000;
 }
 #u2conf input[type="checkbox"]:checked+label {
-	background: var(--u2-o-1-bg);
-	border-bottom: .2em solid var(--u2-o-1-b1);
-	box-shadow: 0 .1em .5em var(--u2-o-1-sh);
+	background: var(--btn-1-bg);
+	box-shadow: var(--btn-1-bs);
+	border-bottom: var(--btn-1-bb);
 }
 #u2conf input[type="checkbox"]+label:hover {
-	box-shadow: 0 .1em .3em var(--u2-o-h-sh);
-	border-color: var(--u2-o-h-b1);
-	background: var(--u2-o-h-bg);
+	background: var(--btn-h-bg);
+	box-shadow: var(--btn-h-bs);
+	border-bottom: var(--btn-h-bb);
 }
 #u2conf input[type="checkbox"]:checked+label:hover {
-	background: var(--u2-o-1h-bg);
+	background: var(--btn-1h-bg);
+	box-shadow: var(--btn-1h-bs);
+	border-bottom: var(--btn-1h-bb);
 }
 #op_up2k.srch #u2conf td:nth-child(2)>*,
 #op_up2k.srch #u2conf td:nth-child(3)>* {
@@ -3057,14 +3061,6 @@ html.b #ggrid>a {
 }
 html.b .btn {
 	top: -.1em;
-}
-html.b .btn,
-html.b #u2conf a.b,
-html.b #u2conf input[type="checkbox"]:not(:checked)+label {
-	box-shadow: 0 .05em 0 var(--bg-d3) inset;
-}
-html.b .tgl.btn.on {
-	box-shadow: 0 .05em 0 var(--btn-1-is) inset;
 }
 html.b #op_up2k.srch sup {
 	color: #fc0;
