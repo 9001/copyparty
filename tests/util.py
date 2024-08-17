@@ -170,6 +170,7 @@ class Cfg(Namespace):
             s_wr_sz=256 * 1024,
             sort="href",
             srch_hits=99999,
+            SRS="/",
             th_covers=["folder.png"],
             th_coversd=["folder.png"],
             th_covers_set=set(["folder.png"]),

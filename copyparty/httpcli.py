@@ -968,10 +968,10 @@ class HttpCli(object):
         status: int = 200,
         use302: bool = False,
     ) -> bool:
-        vp = self.args.RS + vpath
+        vp = self.args.SRS + vpath
         html = self.j2s(
             "msg",
-            h2='<a href="/{}">{} /{}</a>'.format(
+            h2='<a href="%s">%s %s</a>' % (
                 quotep(vp) + suf, flavor, html_escape(vp, crlf=True) + suf
             ),
             pre=msg,
@@ -979,7 +979,7 @@ class HttpCli(object):
         ).encode("utf-8", "replace")
 
         if use302:
-            self.reply(html, status=302, headers={"Location": "/" + vpath})
+            self.reply(html, status=302, headers={"Location": vp})
         else:
             self.reply(html, status=status)
 
@@ -2407,7 +2407,7 @@ class HttpCli(object):
             if ok:
                 msg = "new password OK"
 
-        redir = "/?h" if ok else ""
+        redir = (self.args.SRS + "?h") if ok else ""
         html = self.j2s("msg", h1=msg, h2='<a href="/?h">ack</a>', redir=redir)
         self.reply(html.encode("utf-8"))
         return True
@@ -2512,7 +2512,7 @@ class HttpCli(object):
             except:
                 raise Pebkac(500, min_ex())
 
-        self.out_headers["X-New-Dir"] = quotep(vpath)
+        self.out_headers["X-New-Dir"] = quotep(self.args.RS + vpath)
 
         if dav:
             self.reply(b"", 201)
@@ -4102,7 +4102,9 @@ class HttpCli(object):
             dst = dst[len(top) + 1 :]
 
         ret = self.gen_tree(top, dst, self.uparam.get("k", ""))
-        if self.is_vproxied:
+        if self.is_vproxied and not self.uparam["tree"]:
+            # uparam is '' on initial load, which is
+            # the only time we gotta fill in the blanks
             parents = self.args.R.split("/")
             for parent in reversed(parents):
                 ret = {"k%s" % (parent,): ret, "a": []}
