@@ -2543,6 +2543,7 @@ function mpause(e) {
 			if (!dist || !mp.au)
 				return true;
 
+			dist *= -1;
 			mp.setvol(mp.vol + dist / 500);
 			vbar.draw();
 			ev(e);
