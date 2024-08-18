@@ -21,7 +21,7 @@
 			<p id="b">howdy stranger &nbsp; <small>(you're not logged in)</small></p>
 		{%- else %}
 			<a id="c" href="{{ r }}/?pw=x" class="logout">logout</a>
-			<p><span id="m">welcome back,</span> <strong>{{ this.uname }}</strong></p>
+			<p><span id="m">welcome back,</span> <strong>{{ this.uname|e }}</strong></p>
 		{%- endif %}
 
 		{%- if msg %}

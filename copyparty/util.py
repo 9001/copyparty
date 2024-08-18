@@ -1760,7 +1760,7 @@ def read_header(sr: Unrecv, t_idle: int, t_tot: int) -> list[str]:
 
         ofs = ret.find(b"\r\n\r\n")
         if ofs < 0:
-            if len(ret) > 1024 * 64:
+            if len(ret) > 1024 * 32:
                 raise Pebkac(400, "header 2big")
             else:
                 continue

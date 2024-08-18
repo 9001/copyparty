@@ -1,7 +1,7 @@
 ## devnotes toc
 
 * top
-* [future plans](#future-plans) - some improvement ideas
+* [future ideas](#future-ideas) - list of dreams which will probably never happen
 * [design](#design)
     * [up2k](#up2k) - quick outline of the up2k protocol
         * [why not tus](#why-not-tus) - I didn't know about [tus](https://tus.io/)
@@ -27,9 +27,9 @@
     * [discarded ideas](#discarded-ideas)
 
 
-# future plans
+# future ideas
 
-some improvement ideas
+list of dreams which will probably never happen
 
 * the JS is a mess -- a ~~preact~~ rewrite would be nice
   * preferably without build dependencies like webpack/babel/node.js, maybe a python thing to assemble js files into main.js

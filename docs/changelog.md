@@ -1,4 +1,48 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0813-0008  `v1.13.8`  hook into place
+
+## new features
+
+* #86 intentional side-effects from hooks 6c94a63f
+  * use hooks (plugins) to conditionally move uploads into another folder depending on filename, extension, uploader ip/name, file contents, ...
+  * hooks can create additional files and tell copyparty to index them immediately, or delete an existing file based on some condition
+  * only one example so far though, [reloc-by-ext](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks#before-upload) which was a feature-request to dodge [sharex#3992](https://github.com/ShareX/ShareX/issues/3992)
+* listen on unix-sockets ee9aad82
+  * `-i unix:/tmp/party.sock` stops listening on TCP ports entirely, and only listens on that unix-socket
+  * can be combined with regular sockets, `-i 127.0.0.1,unix:/tmp/a.sock`
+  * kinda buggy for now (need to `--xff-src=any` and doesn't let you set socket-perms yet), will be fixed in next ver
+  * makes it 10% faster, but more importantly offers tighter access control behind reverse-proxies
+    * inspired by https://www.oligo.security/blog/0-0-0-0-day-exploiting-localhost-apis-from-the-browser
+* up2k stitching:
+  * more optimal stitch sizes for max throughput across connections c862ec1b
+  * improve fat32 compatibility 373194c3
+* new option `--js-other` to load custom javascript dbd42bc6
+  * `--js-browser` affects the filebrowser page, `--js-other` does all the others
+  * endless possibilities, such as [adding a login-banner](https://github.com/9001/copyparty/blob/hovudstraum/contrib/plugins/banner.js) which [looks like this](https://github.com/user-attachments/assets/8ae8e087-b209-449c-b08d-74e040f0284b)
+* list detected optional dependencies on startup 3db117d8
+  * hopefully reduces the guesswork / jank factor by a tiny bit
+
+## bugfixes
+
+* up2k stitching:
+  * put the request headers on a diet so they fit through more reverse-proxies 0da719f4
+* fix deadlock on s390x (IBM mainframes) 250c8c56
+
+## other changes
+
+* add flags to disengage [features](https://github.com/9001/copyparty/tree/hovudstraum#feature-chickenbits) and [dependencies](https://github.com/9001/copyparty/tree/hovudstraum#dependency-chickenbits) in case they cause trouble 72361c99
+* optimizations
+  * 6% faster on average d5c9c8eb
+  * docker: reduce ram usage 98ffaadf
+  * python2: reduce ram usage ebb19818
+* docker: add [portainer howto](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/portainer.md) e136231c
+* update deps ca001c85
+  * pyftpdlib 1.5.10
+  * copyparty.exe: python 3.12.5
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0729-2028  `v1.13.6`  not that big
 
 ## new features
