@@ -309,6 +309,11 @@ var Ls = {
 		"fd_emore": "select at least one item to delete",
 		"fc_emore": "select at least one item to cut",
 
+		"fs_sc": "share the folder you're in",
+		"fs_ss": "share the selected file/folder",
+		"fs_just1": "select one or zero things to share",
+		"fs_ok": "<h6>share-URL created</h6>\npress <code>Enter/OK</code> to Clipboard\npress <code>ESC/Cancel</code> to Close\n\n",
+
 		"frt_dec": "may fix some cases of broken filenames\">url-decode",
 		"frt_rst": "reset modified filenames back to the original ones\">↺ reset",
 		"frt_abrt": "abort and close this window\">❌ cancel",
@@ -826,6 +831,11 @@ var Ls = {
 		"fd_emore": "velg minst én fil som skal slettes",
 		"fc_emore": "velg minst én fil som skal klippes ut",
 
+		"fs_sc": "del mappen du er i nå",
+		"fs_ss": "del den valgte filen/mappen",
+		"fs_just1": "velg 1 eller 0 ting å dele",
+		"fs_ok": "<h6>URL opprettet</h6>\ntrykk <code>Enter/OK</code> for å kopiere linken (for CTRL-V)\ntrykk <code>ESC/Avbryt</code> for å bare bekrefte\n\n",
+
 		"frt_dec": "kan korrigere visse ødelagte filnavn\">url-decode",
 		"frt_rst": "nullstiller endringer (tilbake til de originale filnavnene)\">↺ reset",
 		"frt_abrt": "avbryt og lukk dette vinduet\">❌ avbryt",
@@ -1089,6 +1099,7 @@ ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
 	'<span id="wfs"></span>' +
 	'<span id="wfm"><a' +
+	' href="#" id="fshr" tt="' + L.wt_shr + '">📨<span>share</span></a><a' +
 	' href="#" id="fren" tt="' + L.wt_ren + '">✎<span>name</span></a><a' +
 	' href="#" id="fdel" tt="' + L.wt_del + '">⌫<span>del.</span></a><a' +
 	' href="#" id="fcut" tt="' + L.wt_cut + '">✂<span>cut</span></a><a' +
@@ -3691,6 +3702,7 @@ var fileman = (function () {
 		bdel = ebi('fdel'),
 		bcut = ebi('fcut'),
 		bpst = ebi('fpst'),
+		bshr = ebi('fshr'),
 		t_paste,
 		r = {};
 
@@ -3705,17 +3717,33 @@ var fileman = (function () {
 			r.clip = jread('fman_clip', []).slice(1);
 
 		var sel = msel.getsel(),
-			nsel = sel.length;
+			nsel = sel.length,
+			enren = nsel,
+			endel = nsel,
+			encut = nsel,
+			enpst = r.clip && r.clip.length,
+			enshr = nsel < 2,
+			hren = !(have_mv && has(perms, 'write') && has(perms, 'move')),
+			hdel = !(have_del && has(perms, 'delete')),
+			hcut = !(have_mv && has(perms, 'move')),
+			hpst = !(have_mv && has(perms, 'write')),
+			hshr = !(have_shr && acct != '*' && (has(perms, 'read') || has(perms, 'write')));
 
-		clmod(bren, 'en', nsel);
-		clmod(bdel, 'en', nsel);
-		clmod(bcut, 'en', nsel);
-		clmod(bpst, 'en', r.clip && r.clip.length);
+		if (!(enren || endel || encut || enpst))
+			hren = hdel = hcut = hpst = true;
 
-		clmod(bren, 'hide', !(have_mv && has(perms, 'write') && has(perms, 'move')));
-		clmod(bdel, 'hide', !(have_del && has(perms, 'delete')));
-		clmod(bcut, 'hide', !(have_mv && has(perms, 'move')));
-		clmod(bpst, 'hide', !(have_mv && has(perms, 'write')));
+		clmod(bren, 'en', enren);
+		clmod(bdel, 'en', endel);
+		clmod(bcut, 'en', encut);
+		clmod(bpst, 'en', enpst);
+		clmod(bshr, 'en', enshr);
+
+		clmod(bren, 'hide', hren);
+		clmod(bdel, 'hide', hdel);
+		clmod(bcut, 'hide', hcut);
+		clmod(bpst, 'hide', hpst);
+		clmod(bshr, 'hide', hshr);
+
 		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
 
 		var wfs = ebi('wfs'), h = '';
@@ -3726,6 +3754,7 @@ var fileman = (function () {
 		clmod(wfs, 'act', h);
 
 		bpst.setAttribute('tt', L.ft_paste.format(r.clip.length));
+		bshr.setAttribute('tt', nsel ? L.fs_ss : L.fs_sc);
 	};
 
 	r.fsi = function (sel) {
@@ -3761,6 +3790,163 @@ var fileman = (function () {
 			ret += ' ' + s2ms(dur);
 
 		return ret;
+	};
+
+	r.share = function (e) {
+		ev(e);
+
+		var sel = msel.getsel();
+		if (sel.length > 1)
+			return toast.err(3, L.fs_just1);
+
+		var vp = get_evpath();
+		if (sel.length)
+			vp = sel[0].vp;
+
+		vp = uricom_dec(vp.split('?')[0]);
+
+		var shui = ebi('shui');
+		if (!shui) {
+			shui = mknod('div', 'shui');
+			document.body.appendChild(shui);
+		}
+		shui.style.display = 'block';
+
+		var html = [
+			'<div>',
+			'<table>',
+			'<tr><td colspan="2">',
+			'<button id="sh_abrt">❌ abort</button>',
+			'<button id="sh_rand">🎲 random</button>',
+			'<button id="sh_apply">✅ create share</button>',
+			'</td></tr>',
+			'<tr><td>name</td><td><input type="text" id="sh_k" ' + NOAC + ' tt="name your link" /></td></tr>',
+			'<tr><td>source</td><td><input type="text" id="sh_vp" ' + NOAC + ' readonly tt="the file or folder to share" /></td></tr>',
+			'<tr><td>passwd</td><td><input type="text" id="sh_pw" ' + NOAC + ' tt="optional password" /></td></tr>',
+			'<tr><td>expiry</td><td class="exs">',
+			'<input type="text" id="sh_exm" ' + NOAC + ' /> min / ',
+			'<input type="text" id="sh_exh" ' + NOAC + ' /> hours / ',
+			'<input type="text" id="sh_exd" ' + NOAC + ' /> days',
+			'</td></tr>',
+			'<tr><td>perms</td><td class="sh_axs">',
+		];
+		for (var a = 0; a < perms.length; a++)
+			if (perms[a] != 'admin')
+				html.push('<a href="#" class="tgl btn">' + perms[a] + '</a>');
+
+		html.push('</td></tr></div');
+		shui.innerHTML = html.join('\n');
+
+		var sh_rand = ebi('sh_rand'),
+			sh_abrt = ebi('sh_abrt'),
+			sh_apply = ebi('sh_apply'),
+			exm = ebi('sh_exm'),
+			exh = ebi('sh_exh'),
+			exd = ebi('sh_exd'),
+			sh_k = ebi('sh_k'),
+			sh_vp = ebi('sh_vp');
+			sh_pw = ebi('sh_pw');
+
+		function setexp(a, b) {
+			a = parseFloat(a);
+			if (!isNum(a))
+				return;
+
+			var v = a * b;
+			swrite('fsh_exp', v);
+
+			if (exm.value != v) exm.value = Math.round(v * 10) / 10; v /= 60;
+			if (exh.value != v) exh.value = Math.round(v * 10) / 10; v /= 24;
+			if (exd.value != v) exd.value = Math.round(v * 10) / 10;
+		}
+		function setdef() {
+			setexp(icfg_get('fsh_exp', 60 * 24), 1);
+		}
+		setdef();
+
+		exm.oninput = function () { setexp(this.value, 1); };
+		exh.oninput = function () { setexp(this.value, 60); };
+		exd.oninput = function () { setexp(this.value, 60 * 24); };
+		exm.onfocus = exh.onfocus = exd.onfocus = function () {
+			this.value = '';
+		};
+		exm.onblur = exh.onblur = exd.onblur = setdef;
+
+		exm.onkeydown = exh.onkeydown = exd.onkeydown =
+		sh_k.onkeydown = sh_pw.onkeydown = function (e) {
+			var kc = (e.code || e.key) + '';
+			if (kc.endsWith('Enter'))
+				sh_apply.click();
+		};
+
+		sh_abrt.onclick = function () {
+			shui.parentNode.removeChild(shui);
+		};
+		sh_rand.onclick = function () {
+			var v = randstr(12).replace(/l/g, 'n');
+			if (sel.length && !noq_href(ebi(sel[0].id)).endsWith('/'))
+				v += '.' + vp.split('.').pop();
+			sh_k.value = v;
+		};
+		tt.att(shui);
+
+		var pbtns = QSA('#shui .sh_axs a');
+		for (var a = 0; a < pbtns.length; a++)
+			pbtns[a].onclick = shspf;
+
+		function shspf() {
+			clmod(this, 'on', 't');
+		}
+		clmod(pbtns[0], 'on', 1);
+
+		sh_vp.value = vp;
+
+		sh_k.oninput = function (e) {
+			var v = this.value,
+				v2 = v.replace(/[^0-9a-zA-Z\.-]/g, '_');
+
+			if (v != v2)
+				this.value = v2;
+		};
+
+		function shr_cb() {
+			if (this.status !== 201) {
+				shui.style.display = 'block';
+				var msg = unpre(this.responseText);
+				toast.err(9, msg);
+				return;
+			}
+			var surl = this.responseText;
+			modal.confirm(L.fs_ok + esc(surl), function() {
+				cliptxt(surl, function () {
+					toast.ok(1, 'copied to clipboard');
+				});
+			});
+		}
+
+		sh_apply.onclick = function () {
+			if (!sh_k.value)
+				sh_rand.click();
+
+			var plist = [];
+			for (var a = 0; a < pbtns.length; a++)
+				if (clgot(pbtns[a], 'on'))
+					plist.push(pbtns[a].textContent);
+
+			shui.style.display = 'none';
+			var body = {
+				"k": sh_k.value,
+				"vp": sh_vp.value,
+				"pw": sh_pw.value,
+				"exp": exm.value,
+				"perms": plist,
+			};
+			var xhr = new XHR();
+			xhr.open('POST', SR + '/?share', true);
+			xhr.setRequestHeader('Content-Type', 'text/plain');
+			xhr.onload = xhr.onerror = shr_cb;
+			xhr.send(JSON.stringify(body));
+		};
 	};
 
 	r.rename = function (e) {
@@ -4339,6 +4525,7 @@ var fileman = (function () {
 	bdel.onclick = r.delete;
 	bcut.onclick = r.cut;
 	bpst.onclick = r.paste;
+	bshr.onclick = r.share;
 
 	return r;
 })();
@@ -5348,6 +5535,9 @@ var ahotkeys = function (e) {
 
 		if (ebi('rn_cancel'))
 			return ebi('rn_cancel').click();
+
+		if (ebi('sh_abrt'))
+			return ebi('sh_abrt').click();
 
 		if (QS('.opview.act'))
 			return QS('#ops>a').click();

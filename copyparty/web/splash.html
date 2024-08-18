@@ -76,8 +76,12 @@
 		</ul>
 		{%- endif %}
 
-		<h1 id="cc">client config:</h1>
+		<h1 id="cc">other stuff:</h1>
 		<ul>
+			{%- if this.uname != '*' and this.args.shr %}
+			<li><a id="y" href="{{ r }}/?shares">edit shares</a></li>
+			{% endif %}
+
 			{% if k304 or k304vis %}
 			{% if k304 %}
 			<li><a id="h" href="{{ r }}/?k304=n">disable k304</a> (currently enabled)

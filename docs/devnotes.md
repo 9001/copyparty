@@ -139,6 +139,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?tar&w` | pregenerate webp thumbnails |
 | GET | `?tar&j` | pregenerate jpg thumbnails |
 | GET | `?tar&p` | pregenerate audio waveforms |
+| GET | `?shares` | list your shared files/folders |
 | GET | `?ups` | show recent uploads from your IP |
 | GET | `?ups&filter=f` | ...where URL contains `f` |
 | GET | `?mime=foo` | specify return mimetype `foo` |
@@ -175,6 +176,8 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | mPOST | `?media` | `f=FILE` | ...and return medialink (not hotlink) |
 | mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
 | POST | `?delete` | | delete URL recursively |
+| POST | `?unshare` | | stop sharing a file/folder |
+| jPOST | `?share` | (complicated) | create temp URL for file/folder |
 | jPOST | `?delete` | `["/foo","/bar"]` | delete `/foo` and `/bar` recursively |
 | uPOST | | `msg=foo` | send message `foo` into server log |
 | mPOST | | `act=tput`, `body=TEXT` | overwrite markdown document at URL |

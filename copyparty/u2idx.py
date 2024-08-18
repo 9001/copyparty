@@ -59,6 +59,8 @@ class U2idx(object):
         self.mem_cur = sqlite3.connect(":memory:", check_same_thread=False).cursor()
         self.mem_cur.execute(r"create table a (b text)")
 
+        self.sh_cur: Optional["sqlite3.Cursor"] = None
+
         self.p_end = 0.0
         self.p_dur = 0.0
 
@@ -95,16 +97,30 @@ class U2idx(object):
         except:
             raise Pebkac(500, min_ex())
 
-    def get_cur(self, vn: VFS) -> Optional["sqlite3.Cursor"]:
-        if not HAVE_SQLITE3:
+    def get_shr(self) -> Optional["sqlite3.Cursor"]:
+        if self.sh_cur:
+            return self.sh_cur
+
+        if not HAVE_SQLITE3 or not self.args.shr:
             return None
 
+        assert sqlite3  # type: ignore
+
+        db = sqlite3.connect(self.args.shr_db, timeout=2, check_same_thread=False)
+        cur = db.cursor()
+        cur.execute('pragma table_info("sh")').fetchall()
+        self.sh_cur = cur
+        return cur
+
+    def get_cur(self, vn: VFS) -> Optional["sqlite3.Cursor"]:
         cur = self.cur.get(vn.realpath)
         if cur:
             return cur
 
-        if "e2d" not in vn.flags:
+        if not HAVE_SQLITE3 or "e2d" not in vn.flags:
             return None
+
+        assert sqlite3  # type: ignore
 
         ptop = vn.realpath
         histpath = self.asrv.vfs.histtab.get(ptop)

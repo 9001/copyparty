@@ -137,7 +137,7 @@ class Cfg(Namespace):
         ex = "db_act k304 loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg bname chpw_db doctitle df exit favico idp_h_usr html_head lg_sbf log_fk md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i tcolor textfiles unlist vname R RS SR"
+        ex = "ah_alg bname chpw_db doctitle df exit favico idp_h_usr html_head lg_sbf log_fk md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i shr tcolor textfiles unlist vname R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "grp on403 on404 xad xar xau xban xbd xbr xbu xiu xm"
@@ -233,7 +233,7 @@ class VHttpSrv(object):
         self.nreq = 0
         self.nsus = 0
 
-        aliases = ["splash", "browser", "browser2", "msg", "md", "mde"]
+        aliases = ["splash", "shares", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}
 
         self.gpwd = Garda("")

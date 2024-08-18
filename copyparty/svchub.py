@@ -219,6 +219,9 @@ class SvcHub(object):
             noch.update([x for x in zsl if x])
         args.chpw_no = noch
 
+        if args.shr:
+            self.setup_share_db()
+
         bri = "zy"[args.theme % 2 :][:1]
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
         args.theme = "{0}{1} {0} {1}".format(ch, bri)
@@ -363,6 +366,61 @@ class SvcHub(object):
             from .broker_thr import BrokerThr as Broker  # type: ignore
 
         self.broker = Broker(self)
+
+    def setup_share_db(self) -> None:
+        al = self.args
+        if not HAVE_SQLITE3:
+            self.log("root", "sqlite3 not available; disabling --shr", 1)
+            al.shr = ""
+            return
+
+        import sqlite3
+
+        al.shr = "/%s/" % (al.shr.strip("/"))
+
+        create = True
+        db_path = self.args.shr_db
+        self.log("root", "initializing shares-db %s" % (db_path,))
+        for n in range(2):
+            try:
+                db = sqlite3.connect(db_path)
+                cur = db.cursor()
+                try:
+                    cur.execute("select count(*) from sh").fetchone()
+                    create = False
+                    break
+                except:
+                    pass
+            except Exception as ex:
+                if n:
+                    raise
+                t = "shares-db corrupt; deleting and recreating: %r"
+                self.log("root", t % (ex,), 3)
+                try:
+                    cur.close()  # type: ignore
+                except:
+                    pass
+                try:
+                    db.close()  # type: ignore
+                except:
+                    pass
+                os.unlink(db_path)
+
+        assert db  # type: ignore
+        assert cur  # type: ignore
+        if create:
+            for cmd in [
+                # sharekey, password, src, perms, type, owner, created, expires
+                r"create table sh (k text, pw text, vp text, pr text, st int, un text, t0 int, t1 int)",
+                r"create table kv (k text, v int)",
+                r"insert into kv values ('sver', {})".format(1),
+            ]:
+                cur.execute(cmd)
+            db.commit()
+            self.log("root", "created new shares-db")
+
+        cur.close()
+        db.close()
 
     def start_ftpd(self) -> None:
         time.sleep(30)
@@ -832,7 +890,7 @@ class SvcHub(object):
                 return
             self.reloading = 2
             self.log("root", "reloading config")
-            self.asrv.reload()
+            self.asrv.reload(9 if up2k else 4)
             if up2k:
                 self.up2k.reload(rescan_all_vols)
             else:

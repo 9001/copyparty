@@ -38,6 +38,7 @@ from .util import (
     uncyg,
     undot,
     unhumanize,
+    vjoin,
     vsplit,
 )
 
@@ -342,6 +343,7 @@ class VFS(object):
         self.histtab: dict[str, str] = {}  # all realpath->histpath
         self.dbv: Optional[VFS] = None  # closest full/non-jump parent
         self.lim: Optional[Lim] = None  # upload limits; only set for dbv
+        self.shr_src: Optional[tuple[VFS, str]] = None  # source vfs+rem of a share
         self.aread: dict[str, list[str]] = {}
         self.awrite: dict[str, list[str]] = {}
         self.amove: dict[str, list[str]] = {}
@@ -365,6 +367,8 @@ class VFS(object):
             self.all_vols = {}
             self.all_aps = []
             self.all_vps = []
+
+        self.get_dbv = self._get_dbv
 
     def __repr__(self) -> str:
         return "VFS(%s)" % (
@@ -527,7 +531,15 @@ class VFS(object):
 
         return vn, rem
 
-    def get_dbv(self, vrem: str) -> tuple["VFS", str]:
+    def _get_share_src(self, vrem: str) -> tuple["VFS", str]:
+        src = self.shr_src
+        if not src:
+            return self._get_dbv(vrem)
+
+        shv, srem = src
+        return shv, vjoin(srem, vrem)
+
+    def _get_dbv(self, vrem: str) -> tuple["VFS", str]:
         dbv = self.dbv
         if not dbv:
             return self, vrem
@@ -1354,7 +1366,7 @@ class AuthSrv(object):
         flags[name] = vals
         self._e("volflag [{}] += {}  ({})".format(name, vals, desc))
 
-    def reload(self) -> None:
+    def reload(self, verbosity: int = 9) -> None:
         """
         construct a flat list of mountpoints and usernames
         first from the commandline arguments
@@ -1362,9 +1374,9 @@ class AuthSrv(object):
         before finally building the VFS
         """
         with self.mutex:
-            self._reload()
+            self._reload(verbosity)
 
-    def _reload(self) -> None:
+    def _reload(self, verbosity: int = 9) -> None:
         acct: dict[str, str] = {}  # username:password
         grps: dict[str, list[str]] = {}  # groupname:usernames
         daxs: dict[str, AXS] = {}
@@ -1459,9 +1471,8 @@ class AuthSrv(object):
             vfs = VFS(self.log_func, absreal("."), "", axs, {})
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
-            vfs = VFS(self.log_func, "", "", AXS(), {})
-            vfs.flags["tcolor"] = self.args.tcolor
-            vfs.flags["d2d"] = True
+            zsd = {"d2d": True, "tcolor": self.args.tcolor}
+            vfs = VFS(self.log_func, "", "", AXS(), zsd)
 
         maxdepth = 0
         for dst in sorted(mount.keys(), key=lambda x: (x.count("/"), len(x))):
@@ -1490,6 +1501,52 @@ class AuthSrv(object):
             vol.all_vps.sort(key=lambda x: len(x[0]), reverse=True)
             vol.root = vfs
 
+        enshare = self.args.shr
+        shr = enshare[1:-1]
+        shrs = enshare[1:]
+        if enshare:
+            import sqlite3
+
+            shv = VFS(self.log_func, "", shr, AXS(), {"d2d": True})
+            par = vfs.all_vols[""]
+
+            db_path = self.args.shr_db
+            db = sqlite3.connect(db_path)
+            cur = db.cursor()
+            now = time.time()
+            for row in cur.execute("select * from sh"):
+                s_k, s_pw, s_vp, s_pr, s_st, s_un, s_t0, s_t1 = row
+                if s_t1 and s_t1 < now:
+                    continue
+
+                if self.args.shr_v:
+                    t = "loading %s share [%s] by [%s] => [%s]"
+                    self.log(t % (s_pr, s_k, s_un, s_vp))
+
+                if s_pw:
+                    sun = "s_%s" % (s_k,)
+                    acct[sun] = s_pw
+                else:
+                    sun = "*"
+
+                s_axs = AXS(
+                    [sun] if "r" in s_pr else [],
+                    [sun] if "w" in s_pr else [],
+                    [sun] if "m" in s_pr else [],
+                    [sun] if "d" in s_pr else [],
+                )
+
+                # don't know the abspath yet + wanna ensure the user
+                # still has the privs they granted, so nullmap it
+                shv.nodes[s_k] = VFS(
+                    self.log_func, "", "%s/%s" % (shr, s_k), s_axs, par.flags.copy()
+                )
+
+            vfs.nodes[shr] = vfs.all_vols[shr] = shv
+            for vol in shv.nodes.values():
+                vfs.all_vols[vol.vpath] = vol
+                vol.get_dbv = vol._get_share_src
+
         zss = set(acct)
         zss.update(self.idp_accs)
         zss.discard("*")
@@ -1508,7 +1565,7 @@ class AuthSrv(object):
             for usr in unames:
                 for vp, vol in vfs.all_vols.items():
                     zx = getattr(vol.axs, axs_key)
-                    if usr in zx:
+                    if usr in zx and (not enshare or not vp.startswith(shrs)):
                         umap[usr].append(vp)
                 umap[usr].sort()
             setattr(vfs, "a" + perm, umap)
@@ -1558,6 +1615,8 @@ class AuthSrv(object):
 
         for usr in acct:
             if usr not in associated_users:
+                if enshare and usr.startswith("s_"):
+                    continue
                 if len(vfs.all_vols) > 1:
                     # user probably familiar enough that the verbose message is not necessary
                     t = "account [%s] is not mentioned in any volume definitions; see --help-accounts"
@@ -1993,7 +2052,7 @@ class AuthSrv(object):
         have_e2t = False
         t = "volumes and permissions:\n"
         for zv in vfs.all_vols.values():
-            if not self.warn_anonwrite:
+            if not self.warn_anonwrite or verbosity < 5:
                 break
 
             t += '\n\033[36m"/{}"  \033[33m{}\033[0m'.format(zv.vpath, zv.realpath)
@@ -2022,7 +2081,7 @@ class AuthSrv(object):
 
             t += "\n"
 
-        if self.warn_anonwrite:
+        if self.warn_anonwrite and verbosity > 4:
             if not self.args.no_voldump:
                 self.log(t)
 
@@ -2046,7 +2105,7 @@ class AuthSrv(object):
 
         try:
             zv, _ = vfs.get("", "*", False, True, err=999)
-            if self.warn_anonwrite and os.getcwd() == zv.realpath:
+            if self.warn_anonwrite and verbosity > 4 and os.getcwd() == zv.realpath:
                 t = "anyone can write to the current directory: {}\n"
                 self.log(t.format(zv.realpath), c=1)
 
@@ -2093,6 +2152,51 @@ class AuthSrv(object):
                 ext, mime = zs.split("=", 1)
                 MIMES[ext] = mime
             EXTS.update({v: k for k, v in MIMES.items()})
+
+        if enshare:
+            # hide shares from controlpanel
+            vfs.all_vols = {
+                x: y
+                for x, y in vfs.all_vols.items()
+                if x != shr and not x.startswith(shrs)
+            }
+
+            assert cur  # type: ignore
+            assert shv  # type: ignore
+            for row in cur.execute("select * from sh"):
+                s_k, s_pw, s_vp, s_pr, s_st, s_un, s_t0, s_t1 = row
+                shn = shv.nodes.get(s_k, None)
+                if not shn:
+                    continue
+
+                try:
+                    s_vfs, s_rem = vfs.get(
+                        s_vp, s_un, "r" in s_pr, "w" in s_pr, "m" in s_pr, "d" in s_pr
+                    )
+                except Exception as ex:
+                    t = "removing share [%s] by [%s] to [%s] due to %r"
+                    self.log(t % (s_k, s_un, s_vp, ex), 3)
+                    shv.nodes.pop(s_k)
+                    continue
+
+                shn.shr_src = (s_vfs, s_rem)
+                shn.realpath = s_vfs.canonical(s_rem)
+
+                if self.args.shr_v:
+                    t = "mapped %s share [%s] by [%s] => [%s] => [%s]"
+                    self.log(t % (s_pr, s_k, s_un, s_vp, shn.realpath))
+
+            # transplant shadowing into shares
+            for vn in shv.nodes.values():
+                svn, srem = vn.shr_src  # type: ignore
+                if srem:
+                    continue  # free branch, safe
+                ap = svn.canonical(srem)
+                if bos.path.isfile(ap):
+                    continue  # also fine
+                for zs in svn.nodes.keys():
+                    # hide subvolume
+                    vn.nodes[zs] = VFS(self.log_func, "", "", AXS(), {})
 
     def chpw(self, broker: Optional["BrokerCli"], uname, pw) -> tuple[bool, str]:
         if not self.args.chpw:

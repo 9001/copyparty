@@ -972,6 +972,15 @@ def add_fs(ap):
     ap2.add_argument("--mtab-age", metavar="SEC", type=int, default=60, help="rebuild mountpoint cache every \033[33mSEC\033[0m to keep track of sparse-files support; keep low on servers with removable media")
 
 
+def add_share(ap):
+    db_path = os.path.join(E.cfg, "shares.db")
+    ap2 = ap.add_argument_group('share-url options')
+    ap2.add_argument("--shr", metavar="URL", default="", help="base url for shared files, for example [\033[32m/share\033[0m] (must be a toplevel subfolder)")
+    ap2.add_argument("--shr-db", metavar="PATH", default=db_path, help="database to store shares in")
+    ap2.add_argument("--shr-adm", metavar="U,U", default="", help="comma-separated list of users allowed to view/delete any share")
+    ap2.add_argument("--shr-v", action="store_true", help="debug")
+
+
 def add_upload(ap):
     ap2 = ap.add_argument_group('upload options')
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless \033[33m-ed\033[0m")
@@ -1489,6 +1498,7 @@ def run_argparse(
     add_zc_mdns(ap)
     add_zc_ssdp(ap)
     add_fs(ap)
+    add_share(ap)
     add_upload(ap)
     add_db_general(ap, hcores)
     add_db_metadata(ap)

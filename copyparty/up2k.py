@@ -454,11 +454,16 @@ class Up2k(object):
             cooldown = now + 3
             # self.log("SR", 5)
 
-            if self.args.no_lifetime:
+            if self.args.no_lifetime and not self.args.shr:
                 timeout = now + 9001
             else:
                 # important; not deferred by db_act
                 timeout = self._check_lifetimes()
+                try:
+                    timeout = min(self._check_shares(), timeout)
+                except Exception as ex:
+                    t = "could not check for expiring shares: %r"
+                    self.log(t % (ex,), 1)
 
             try:
                 timeout = min(timeout, now + self._check_xiu())
@@ -558,6 +563,34 @@ class Up2k(object):
 
             if hits:
                 timeout = min(timeout, now + lifetime - (now - hits[0]))
+
+        return timeout
+
+    def _check_shares(self) -> float:
+        assert sqlite3  # type: ignore
+
+        now = time.time()
+        timeout = now + 9001
+
+        db = sqlite3.connect(self.args.shr_db, timeout=2)
+        cur = db.cursor()
+
+        q = "select k from sh where t1 and t1 <= ?"
+        rm = [x[0] for x in cur.execute(q, (now,))]
+        if rm:
+            self.log("forgetting expired shares %s" % (rm,))
+            q = "delete from sh where k=?"
+            cur.executemany(q, [(x,) for x in rm])
+            db.commit()
+            Daemon(self.hub._reload_blocking, "sharedrop", (False, False))
+
+        q = "select min(t1) from sh where t1 > 1"
+        (earliest,) = cur.execute(q).fetchone()
+        if earliest:
+            timeout = earliest - now
+
+        cur.close()
+        db.close()
 
         return timeout
 
@@ -2534,6 +2567,10 @@ class Up2k(object):
             pass
 
         cur.connection.commit()
+
+    def wake_rescanner(self):
+        with self.rescan_cond:
+            self.rescan_cond.notify_all()
 
     def handle_json(
         self, cj: dict[str, Any], busy_aps: dict[str, int]

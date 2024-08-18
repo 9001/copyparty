@@ -42,6 +42,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [self-destruct](#self-destruct) - uploads can be given a lifetime
         * [race the beam](#race-the-beam) - download files while they're still uploading ([demo video](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm))
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
+    * [shares](#shares) - share a file or folder by creating a temporary link
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
     * [media player](#media-player) - plays almost every audio format there is
         * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
@@ -743,6 +744,33 @@ file selection: click somewhere on the line (not the link itsef), then:
 * rename: `F2`
 
 you can move files across browser tabs (cut in one tab, paste in another)
+
+
+## shares
+
+share a file or folder by creating a temporary link
+
+when enabled in the server settings (`--shr`), click the bottom-right `share` button to share the folder you're currently in, or select a file first to share only that file
+
+this feature was made with [identity providers](#identity-providers) in mind -- configure your reverseproxy to skip the IdP's access-control for a given URL prefix and use that to safely share specific files/folders sans the usual auth checks
+
+when creating a share, the creator can choose any of the following options:
+
+* password-protection
+* expire after a certain time
+* allow visitors to upload (if the user who creates the share has write-access)
+
+semi-intentional limitations:
+
+* cleanup of expired shares only works when global option `e2d` is set, and/or at least one volume on the server has volflag `e2d`
+* only folders from the same volume are shared; if you are sharing a folder which contains other volumes, then the contents of those volumes will not be available
+* no option to "delete after first access" because tricky
+  * when linking something to discord (for example) it'll get accessed by their scraper and that would count as a hit
+  * browsers wouldn't be able to resume a broken download unless the requester's IP gets allowlisted for X minutes (ref. tricky)
+
+the links are created inside a specific toplevel folder which must be specified with server-config `--shr`, for example `--shr /share/` (this also enables the feature)
+
+users can delete their own shares in the controlpanel, and a list of privileged users (`--shr-adm`) are allowed to see and/or delet any share on the server
 
 
 ## batch rename

@@ -1147,6 +1147,7 @@ html.y #widget.open {
 	width: 100%;
 	height: 100%;
 }
+#fshr,
 #wtgrid,
 #wtico {
 	position: relative;
@@ -1333,6 +1334,7 @@ html.y #widget.open {
 #widget.cmp #wtoggle {
 	font-size: 1.2em;
 }
+#widget.cmp #fshr,
 #widget.cmp #wtgrid {
 	display: none;
 }
@@ -1857,6 +1859,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 #unpost td:nth-child(4) {
 	text-align: right;
 }
+#shui,
 #rui {
 	background: #fff;
 	background: var(--bg);
@@ -1872,13 +1875,25 @@ html.y #tree.nowrap .ntree a+a:hover {
 	padding: 1em;
 	z-index: 765;
 }
+#shui div+div,
 #rui div+div {
 	margin-top: 1em;
 }
+#shui table,
 #rui table {
 	width: 100%;
 	border-collapse: collapse;
 }
+#shui button {
+	margin: 0 1em 0 0;
+}
+#shui .btn {
+	font-size: 1em;
+}
+#shui td {
+	padding: .8em 0;
+}
+#shui td+td,
 #rui td+td {
 	padding: .2em 0 .2em .5em;
 }
@@ -1886,9 +1901,14 @@ html.y #tree.nowrap .ntree a+a:hover {
 	font-family: 'scp', monospace, monospace;
 	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
+#shui td+td,
 #rui td+td,
+#shui td input[type="text"],
 #rui td input[type="text"] {
 	width: 100%;
+}
+#shui td.exs input[type="text"] {
+	width: 3em;
 }
 #rn_f.m td:first-child {
 	white-space: nowrap;

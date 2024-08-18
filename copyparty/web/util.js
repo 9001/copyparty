@@ -473,6 +473,24 @@ function crc32(str) {
 }
 
 
+function randstr(len) {
+    var ret = '';
+    try {
+        var ar = new Uint32Array(Math.floor((len + 3) / 4));
+        crypto.getRandomValues(ar);
+        for (var a = 0; a < ar.length; a++)
+            ret += ('000' + ar[a].toString(36)).slice(-4);
+        return ret.slice(0, len);
+    }
+    catch (ex) {
+        console.log('using unsafe randstr because ' + ex);
+        while (ret.length < len)
+            ret += ('000' + Math.floor(Math.random() * 1679616).toString(36)).slice(-4);
+        return ret.slice(0, len);
+    }
+}
+
+
 function clmod(el, cls, add) {
     if (!el)
         return false;

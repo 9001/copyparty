@@ -45,6 +45,7 @@ from .util import unquote  # type: ignore
 from .util import (
     APPLESAN_RE,
     BITNESS,
+    HAVE_SQLITE3,
     HTTPCODE,
     META_NOBOTS,
     UTC,
@@ -454,7 +455,7 @@ class HttpCli(object):
                 t = "incorrect --rp-loc or webserver config; expected vpath starting with [{}] but got [{}]"
                 self.log(t.format(self.args.R, vpath), 1)
 
-        self.ouparam = {k: zs for k, zs in uparam.items()}
+        self.ouparam = uparam.copy()
 
         if self.args.rsp_slp:
             time.sleep(self.args.rsp_slp)
@@ -971,7 +972,7 @@ class HttpCli(object):
         vp = self.args.SRS + vpath
         html = self.j2s(
             "msg",
-            h2='<a href="%s">%s %s</a>' % (
+            h2='<a href="{}">{} {}</a>'.format(
                 quotep(vp) + suf, flavor, html_escape(vp, crlf=True) + suf
             ),
             pre=msg,
@@ -1141,7 +1142,7 @@ class HttpCli(object):
             if "move" in self.uparam:
                 return self.handle_mv()
 
-        if not self.vpath:
+        if not self.vpath and self.ouparam:
             if "reload" in self.uparam:
                 return self.handle_reload()
 
@@ -1163,22 +1164,11 @@ class HttpCli(object):
             if "hc" in self.uparam:
                 return self.tx_svcs()
 
+            if "shares" in self.uparam:
+                return self.tx_shares()
+
         if "h" in self.uparam:
             return self.tx_mounts()
-
-        # conditional redirect to single volumes
-        if not self.vpath and not self.ouparam:
-            nread = len(self.rvol)
-            nwrite = len(self.wvol)
-            if nread + nwrite == 1 or (self.rvol == self.wvol and nread == 1):
-                if nread == 1:
-                    vpath = self.rvol[0]
-                else:
-                    vpath = self.wvol[0]
-
-                if self.vpath != vpath:
-                    self.redirect(vpath, flavor="redirecting to", use302=True)
-                    return True
 
         return self.tx_browser()
 
@@ -1617,6 +1607,9 @@ class HttpCli(object):
 
         if "delete" in self.uparam:
             return self.handle_rm([])
+
+        if "unshare" in self.uparam:
+            return self.handle_unshare()
 
         if "application/octet-stream" in ctype:
             return self.handle_post_binary()
@@ -2150,6 +2143,9 @@ class HttpCli(object):
         if "srch" in self.uparam or "srch" in body:
             return self.handle_search(body)
 
+        if "share" in self.uparam:
+            return self.handle_share(body)
+
         if "delete" in self.uparam:
             return self.handle_rm(body)
 
@@ -2206,7 +2202,9 @@ class HttpCli(object):
     def handle_search(self, body: dict[str, Any]) -> bool:
         idx = self.conn.get_u2idx()
         if not idx or not hasattr(idx, "p_end"):
-            raise Pebkac(500, "server busy, or sqlite3 not available; cannot search")
+            if not HAVE_SQLITE3:
+                raise Pebkac(500, "sqlite3 not found on server; search is disabled")
+            raise Pebkac(500, "server busy, cannot search; please retry in a bit")
 
         vols: list[VFS] = []
         seen: dict[VFS, bool] = {}
@@ -4179,7 +4177,9 @@ class HttpCli(object):
     def tx_ups(self) -> bool:
         idx = self.conn.get_u2idx()
         if not idx or not hasattr(idx, "p_end"):
-            raise Pebkac(500, "sqlite3 is not available on the server; cannot unpost")
+            if not HAVE_SQLITE3:
+                raise Pebkac(500, "sqlite3 not found on server; unpost is disabled")
+            raise Pebkac(500, "server busy, cannot unpost; please retry in a bit")
 
         filt = self.uparam.get("filter") or ""
         lm = "ups [{}]".format(filt)
@@ -4266,6 +4266,137 @@ class HttpCli(object):
         zi = len(uret.split('\n"pd":')) - 1
         self.log("%s #%d+%d %.2fsec" % (lm, zi, len(ret), time.time() - t0))
         self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
+        return True
+
+    def tx_shares(self) -> bool:
+        if self.uname == "*":
+            self.loud_reply("you're not logged in")
+            return True
+
+        idx = self.conn.get_u2idx()
+        if not idx or not hasattr(idx, "p_end"):
+            if not HAVE_SQLITE3:
+                raise Pebkac(500, "sqlite3 not found on server; sharing is disabled")
+            raise Pebkac(500, "server busy, cannot list shares; please retry in a bit")
+
+        cur = idx.get_shr()
+        if not cur:
+            raise Pebkac(400, "huh, sharing must be disabled in the server config...")
+
+        rows = cur.execute("select * from sh").fetchall()
+        rows = [list(x) for x in rows]
+
+        if self.uname != self.args.shr_adm:
+            rows = [x for x in rows if x[5] == self.uname]
+
+        for x in rows:
+            x[1] = "yes" if x[1] else ""
+
+        html = self.j2s(
+            "shares", this=self, shr=self.args.shr, rows=rows, now=int(time.time())
+        )
+        self.reply(html.encode("utf-8"), status=200)
+        return True
+
+    def handle_unshare(self) -> bool:
+        idx = self.conn.get_u2idx()
+        if not idx or not hasattr(idx, "p_end"):
+            if not HAVE_SQLITE3:
+                raise Pebkac(500, "sqlite3 not found on server; sharing is disabled")
+            raise Pebkac(500, "server busy, cannot create share; please retry in a bit")
+
+        if self.args.shr_v:
+            self.log("handle_unshare: " + self.req)
+
+        cur = idx.get_shr()
+        if not cur:
+            raise Pebkac(400, "huh, sharing must be disabled in the server config...")
+
+        skey = self.vpath.split("/")[-1]
+
+        uns = cur.execute("select un from sh where k = ?", (skey,)).fetchall()
+        un = uns[0][0] if uns and uns[0] else ""
+
+        if not un:
+            raise Pebkac(400, "that sharekey didn't match anything")
+
+        if un != self.uname and self.uname != self.args.shr_adm:
+            t = "your username (%r) does not match the sharekey's owner (%r) and you're not admin"
+            raise Pebkac(400, t % (self.uname, un))
+
+        cur.execute("delete from sh where k = ?", (skey,))
+        cur.connection.commit()
+
+        self.redirect(self.args.SRS + "?shares")
+        return True
+
+    def handle_share(self, req: dict[str, str]) -> bool:
+        idx = self.conn.get_u2idx()
+        if not idx or not hasattr(idx, "p_end"):
+            if not HAVE_SQLITE3:
+                raise Pebkac(500, "sqlite3 not found on server; sharing is disabled")
+            raise Pebkac(500, "server busy, cannot create share; please retry in a bit")
+
+        if self.args.shr_v:
+            self.log("handle_share: " + json.dumps(req, indent=4))
+
+        skey = req["k"]
+        vp = req["vp"].strip("/")
+        if self.is_vproxied and (vp == self.args.R or vp.startswith(self.args.RS)):
+            vp = vp[len(self.args.RS) :]
+
+        m = re.search(r"([^0-9a-zA-Z_\.-]|\.\.|^\.)", skey)
+        if m:
+            raise Pebkac(400, "sharekey has illegal character [%s]" % (m[1],))
+
+        if vp.startswith(self.args.shr[1:]):
+            raise Pebkac(400, "yo dawg...")
+
+        cur = idx.get_shr()
+        if not cur:
+            raise Pebkac(400, "huh, sharing must be disabled in the server config...")
+
+        q = "select * from sh where k = ?"
+        qr = cur.execute(q, (skey,)).fetchall()
+        if qr and qr[0]:
+            self.log("sharekey taken by %r" % (qr,))
+            raise Pebkac(400, "sharekey [%s] is already in use" % (skey,))
+
+        # ensure user has requested perms
+        s_rd = "read" in req["perms"]
+        s_wr = "write" in req["perms"]
+        s_mv = "move" in req["perms"]
+        s_del = "delete" in req["perms"]
+        try:
+            vfs, rem = self.asrv.vfs.get(vp, self.uname, s_rd, s_wr, s_mv, s_del)
+        except:
+            raise Pebkac(400, "you dont have all the perms you tried to grant")
+
+        ap = vfs.canonical(rem)
+        st = bos.stat(ap)
+        ist = 2 if stat.S_ISDIR(st.st_mode) else 1
+
+        pw = req.get("pw") or ""
+        now = int(time.time())
+        sexp = req["exp"]
+        exp = now + int(sexp) * 60 if sexp else 0
+        pr = "".join(zc for zc, zb in zip("rwmd", (s_rd, s_wr, s_mv, s_del)) if zb)
+
+        q = "insert into sh values (?,?,?,?,?,?,?,?)"
+        cur.execute(q, (skey, pw, vp, pr, ist, self.uname, now, exp))
+        cur.connection.commit()
+
+        self.conn.hsrv.broker.ask("_reload_blocking", False, False).get()
+        self.conn.hsrv.broker.ask("up2k.wake_rescanner").get()
+
+        surl = "%s://%s%s%s%s" % (
+            "https" if self.is_https else "http",
+            self.host,
+            self.args.SR,
+            self.args.shr,
+            skey,
+        )
+        self.loud_reply(surl, status=201)
         return True
 
     def handle_rm(self, req: list[str]) -> bool:
@@ -4666,6 +4797,7 @@ class HttpCli(object):
             "have_mv": (not self.args.no_mv),
             "have_del": (not self.args.no_del),
             "have_zip": (not self.args.no_zip),
+            "have_shr": self.args.shr,
             "have_unpost": int(self.args.unpost),
             "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
             "dgrid": "grid" in vf,

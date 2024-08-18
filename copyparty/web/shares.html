@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>{{ s_doctitle }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<meta name="theme-color" content="#{{ tcolor }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/shares.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
+{{ html_head }}
+</head>
+
+<body>
+	<div id="wrap">
+		<a id="a" href="{{ r }}/?shares" class="af">refresh</a>
+		<a id="a" href="{{ r }}/?h" class="af">controlpanel</a>
+
+        <span>axs = perms (read,write,move,delet)</span>
+        <span>st 1=file 2=dir</span>
+        <span>min/hrs = time left</span>
+
+        <table><tr>
+            <th>delete</th>
+            <th>sharekey</th>
+            <th>pw</th>
+            <th>source</th>
+            <th>axs</th>
+            <th>st</th>
+            <th>user</th>
+            <th>created</th>
+            <th>expires</th>
+            <th>min</th>
+            <th>hrs</th>
+        </tr>
+        {% for k, pw, vp, pr, st, un, t0, t1 in rows %}
+        <tr>
+            <td><a href="#" k="{{ k }}">delete</a></td>
+            <td><a href="{{ r }}{{ shr }}{{ k }}">{{ k }}</a></td>
+            <td>{{ pw }}</td>
+            <td><a href="{{ r }}/{{ vp|e }}">{{ vp|e }}</a></td>
+            <td>{{ pr }}</td>
+            <td>{{ st }}</td>
+            <td>{{ un|e }}</td>
+            <td>{{ t0 }}</td>
+            <td>{{ t1 }}</td>
+            <td>{{ (t1 - now) // 60 if t1 else "never" }}</td>
+            <td>{{ (t1 - now) // 3600 if t1 else "never" }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+        {% if not rows %}
+        (you don't have any active shares btw)
+        {% endif %}
+	<script>
+
+var SR = {{ r|tojson }},
+    shr="{{ shr }}",
+	lang="{{ lang }}",
+	dfavico="{{ favico }}";
+
+var STG = window.localStorage;
+document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme }}";
+
+</script>
+<script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+<script src="{{ r }}/.cpr/shares.js?_={{ ts }}"></script>
+{%- if js %}
+<script src="{{ js }}_={{ ts }}"></script>
+{%- endif %}
+</body>
+</html>
+
