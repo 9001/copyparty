@@ -460,7 +460,8 @@ class Up2k(object):
                 # important; not deferred by db_act
                 timeout = self._check_lifetimes()
                 try:
-                    timeout = min(self._check_shares(), timeout)
+                    if self.args.shr:
+                        timeout = min(self._check_shares(), timeout)
                 except Exception as ex:
                     t = "could not check for expiring shares: %r"
                     self.log(t % (ex,), 1)
