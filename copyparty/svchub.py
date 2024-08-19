@@ -376,7 +376,13 @@ class SvcHub(object):
 
         import sqlite3
 
-        al.shr = "/%s/" % (al.shr.strip("/"))
+        al.shr = al.shr.strip("/")
+        if "/" in al.shr:
+            t = "config error: --shr must be the name of a virtual toplevel directory to put shares inside"
+            self.log("root", t, 1)
+            raise Exception(t)
+
+        al.shr = "/%s/" % (al.shr,)
 
         create = True
         db_path = self.args.shr_db

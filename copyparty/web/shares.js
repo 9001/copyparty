@@ -17,3 +17,21 @@ function cb() {
     
     document.location = '?shares';
 }
+
+(function() {
+    var tab = ebi('tab').tBodies[0],
+        tr = Array.prototype.slice.call(tab.rows, 0);
+
+    var buf = [];
+    for (var a = 0; a < tr.length; a++)
+        for (var b = 7; b < 9; b++)
+            buf.push(parseInt(tr[a].cells[b].innerHTML));
+
+    var ibuf = 0;
+    for (var a = 0; a < tr.length; a++)
+        for (var b = 7; b < 9; b++) {
+            var v = buf[ibuf++];
+            tr[a].cells[b].innerHTML =
+                v ? unix2iso(v).replace(' ', ',&nbsp;') : 'never';
+        }
+})();

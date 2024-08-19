@@ -757,7 +757,7 @@ this feature was made with [identity providers](#identity-providers) in mind -- 
 when creating a share, the creator can choose any of the following options:
 
 * password-protection
-* expire after a certain time
+* expire after a certain time; `0` or blank means infinite
 * allow visitors to upload (if the user who creates the share has write-access)
 
 semi-intentional limitations:
@@ -768,7 +768,10 @@ semi-intentional limitations:
   * when linking something to discord (for example) it'll get accessed by their scraper and that would count as a hit
   * browsers wouldn't be able to resume a broken download unless the requester's IP gets allowlisted for X minutes (ref. tricky)
 
-the links are created inside a specific toplevel folder which must be specified with server-config `--shr`, for example `--shr /share/` (this also enables the feature)
+specify `--shr /foobar` to enable this feature; a toplevel virtual folder named `foobar` is then created, and that's where all the shares will be served from
+
+* you can name it whatever, `foobar` is just an example
+* if you're using config files, put `shr: /foobar` inside the `[global]` section instead
 
 users can delete their own shares in the controlpanel, and a list of privileged users (`--shr-adm`) are allowed to see and/or delet any share on the server
 

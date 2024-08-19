@@ -15,13 +15,13 @@
 <body>
 	<div id="wrap">
 		<a id="a" href="{{ r }}/?shares" class="af">refresh</a>
-		<a id="a" href="{{ r }}/?h" class="af">controlpanel</a>
+		<a id="a" href="{{ r }}/?h" class="af">control-panel</a>
 
         <span>axs = perms (read,write,move,delet)</span>
         <span>st 1=file 2=dir</span>
         <span>min/hrs = time left</span>
 
-        <table><tr>
+        <table id="tab"><thead><tr>
             <th>delete</th>
             <th>sharekey</th>
             <th>pw</th>
@@ -33,7 +33,7 @@
             <th>expires</th>
             <th>min</th>
             <th>hrs</th>
-        </tr>
+        </tr></thead><tbody>
         {% for k, pw, vp, pr, st, un, t0, t1 in rows %}
         <tr>
             <td><a href="#" k="{{ k }}">delete</a></td>
@@ -45,11 +45,11 @@
             <td>{{ un|e }}</td>
             <td>{{ t0 }}</td>
             <td>{{ t1 }}</td>
-            <td>{{ (t1 - now) // 60 if t1 else "never" }}</td>
-            <td>{{ (t1 - now) // 3600 if t1 else "never" }}</td>
+            <td>{{ ((t1 - now) / 60)   | round(1) if t1 else "inf" }}</td>
+            <td>{{ ((t1 - now) / 3600) | round(1) if t1 else "inf" }}</td>
         </tr>
         {% endfor %}
-        </table>
+        </tbody></table>
         {% if not rows %}
         (you don't have any active shares btw)
         {% endif %}

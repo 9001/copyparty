@@ -58,6 +58,9 @@ td, th {
 	text-align: left;
 	white-space: nowrap;
 }
+td+td+td+td+td+td+td+td {
+	font-family: var(--font-mono), monospace, monospace;
+}
 
 
 

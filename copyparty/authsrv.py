@@ -1508,7 +1508,6 @@ class AuthSrv(object):
             import sqlite3
 
             shv = VFS(self.log_func, "", shr, AXS(), {"d2d": True})
-            par = vfs.all_vols[""]
 
             db_path = self.args.shr_db
             db = sqlite3.connect(db_path)
@@ -1539,7 +1538,7 @@ class AuthSrv(object):
                 # don't know the abspath yet + wanna ensure the user
                 # still has the privs they granted, so nullmap it
                 shv.nodes[s_k] = VFS(
-                    self.log_func, "", "%s/%s" % (shr, s_k), s_axs, par.flags.copy()
+                    self.log_func, "", "%s/%s" % (shr, s_k), s_axs, shv.flags.copy()
                 )
 
             vfs.nodes[shr] = vfs.all_vols[shr] = shv

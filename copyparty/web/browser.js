@@ -3820,13 +3820,14 @@ var fileman = (function () {
 			'<button id="sh_rand">🎲 random</button>',
 			'<button id="sh_apply">✅ create share</button>',
 			'</td></tr>',
-			'<tr><td>name</td><td><input type="text" id="sh_k" ' + NOAC + ' tt="name your link" /></td></tr>',
+			'<tr><td>name</td><td><input type="text" id="sh_k" ' + NOAC + ' placeholder="optional link name; will be random if blank" /></td></tr>',
 			'<tr><td>source</td><td><input type="text" id="sh_vp" ' + NOAC + ' readonly tt="the file or folder to share" /></td></tr>',
-			'<tr><td>passwd</td><td><input type="text" id="sh_pw" ' + NOAC + ' tt="optional password" /></td></tr>',
+			'<tr><td>passwd</td><td><input type="text" id="sh_pw" ' + NOAC + ' placeholder="optional password" /></td></tr>',
 			'<tr><td>expiry</td><td class="exs">',
 			'<input type="text" id="sh_exm" ' + NOAC + ' /> min / ',
 			'<input type="text" id="sh_exh" ' + NOAC + ' /> hours / ',
-			'<input type="text" id="sh_exd" ' + NOAC + ' /> days',
+			'<input type="text" id="sh_exd" ' + NOAC + ' /> days / ',
+			'<button id="sh_noex">never</button>',
 			'</td></tr>',
 			'<tr><td>perms</td><td class="sh_axs">',
 		];
@@ -3840,11 +3841,12 @@ var fileman = (function () {
 		var sh_rand = ebi('sh_rand'),
 			sh_abrt = ebi('sh_abrt'),
 			sh_apply = ebi('sh_apply'),
+			sh_noex = ebi('sh_noex'),
 			exm = ebi('sh_exm'),
 			exh = ebi('sh_exh'),
 			exd = ebi('sh_exd'),
 			sh_k = ebi('sh_k'),
-			sh_vp = ebi('sh_vp');
+			sh_vp = ebi('sh_vp'),
 			sh_pw = ebi('sh_pw');
 
 		function setexp(a, b) {
@@ -3869,6 +3871,9 @@ var fileman = (function () {
 		exd.oninput = function () { setexp(this.value, 60 * 24); };
 		exm.onfocus = exh.onfocus = exd.onfocus = function () {
 			this.value = '';
+		};
+		sh_noex.onclick = function () {
+			setexp(0, 1);
 		};
 		exm.onblur = exh.onblur = exd.onblur = setdef;
 
@@ -3910,6 +3915,7 @@ var fileman = (function () {
 		};
 
 		function shr_cb() {
+			toast.hide();
 			if (this.status !== 201) {
 				shui.style.display = 'block';
 				var msg = unpre(this.responseText);
@@ -3919,7 +3925,7 @@ var fileman = (function () {
 			var surl = this.responseText;
 			modal.confirm(L.fs_ok + esc(surl), function() {
 				cliptxt(surl, function () {
-					toast.ok(1, 'copied to clipboard');
+					toast.ok(2, 'copied to clipboard');
 				});
 			});
 		}
@@ -3934,6 +3940,8 @@ var fileman = (function () {
 					plist.push(pbtns[a].textContent);
 
 			shui.style.display = 'none';
+			toast.inf(30, "creating share...");
+
 			var body = {
 				"k": sh_k.value,
 				"vp": sh_vp.value,

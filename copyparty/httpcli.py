@@ -3958,6 +3958,7 @@ class HttpCli(object):
             rvol=rvol,
             wvol=wvol,
             avol=avol,
+            in_shr=self.args.shr and self.vpath.startswith(self.args.shr[1:]),
             vstate=vstate,
             scanning=vs["scanning"],
             hashq=vs["hashq"],
@@ -4006,10 +4007,10 @@ class HttpCli(object):
     def tx_404(self, is_403: bool = False) -> bool:
         rc = 404
         if self.args.vague_403:
-            t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p id="o">or maybe you don\'t have access -- try logging in or <a href="{}/?h">go home</a></p>'
-            pt = "404 not found  ┐( ´ -`)┌   (or maybe you don't have access -- try logging in)"
+            t = '<h1 id="n">404 not found &nbsp;┐( ´ -`)┌</h1><p id="o">or maybe you don\'t have access -- try a password or <a href="{}/?h">go home</a></p>'
+            pt = "404 not found  ┐( ´ -`)┌   (or maybe you don't have access -- try a password)"
         elif is_403:
-            t = '<h1 id="p">403 forbiddena &nbsp;~┻━┻</h1><p id="q">you\'ll have to log in or <a href="{}/?h">go home</a></p>'
+            t = '<h1 id="p">403 forbiddena &nbsp;~┻━┻</h1><p id="q">use a password or <a href="{}/?h">go home</a></p>'
             pt = "403 forbiddena ~┻━┻   (you'll have to log in)"
             rc = 403
         else:
@@ -4026,7 +4027,8 @@ class HttpCli(object):
 
         t = t.format(self.args.SR)
         qv = quotep(self.vpaths) + self.ourlq()
-        html = self.j2s("splash", this=self, qvpath=qv, msg=t)
+        in_shr = self.args.shr and self.vpath.startswith(self.args.shr[1:])
+        html = self.j2s("splash", this=self, qvpath=qv, in_shr=in_shr, msg=t)
         self.reply(html.encode("utf-8"), status=rc)
         return True
 
@@ -4382,7 +4384,8 @@ class HttpCli(object):
         pw = req.get("pw") or ""
         now = int(time.time())
         sexp = req["exp"]
-        exp = now + int(sexp) * 60 if sexp else 0
+        exp = int(sexp) if sexp else 0
+        exp = now + exp * 60 if exp else 0
         pr = "".join(zc for zc, zb in zip("rwmd", (s_rd, s_wr, s_mv, s_del)) if zb)
 
         q = "insert into sh values (?,?,?,?,?,?,?,?)"
