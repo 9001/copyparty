@@ -42,15 +42,51 @@ var Ls = {
 		"ta1": "fill in your new password first",
 		"ta2": "repeat to confirm new password:",
 		"ta3": "found a typo; please try again",
+	},
+
+	"chi": {
+		"a1": "更新",
+		"b1": "你好 &nbsp; <small>(你尚未登录)</small>",
+		"c1": "登出",
+		"d1": "状态",
+		"d2": "显示所有活动线程的状态",
+		"e1": "重新加载配置",
+		"e2": "重新加载配置文件（账户/卷/卷标），$N并重新扫描所有 e2ds 卷$N$N注意：任何全局设置的更改$N都需要完全重启才能生效",
+		"f1": "你可以查看：",
+		"g1": "你可以上传到：",
+		"cc1": "开关等",
+		"h1": "关闭 k304",
+		"i1": "开启 k304",
+		"j1": "k304 会在每个 HTTP 304 时断开连接。这有助于避免某些代理服务器卡住或突然停止加载页面，但也会显著降低性能。",
+		"k1": "重置设置",
+		"l1": "登录：",
+		"m1": "欢迎回来，",
+		"n1": "404: 文件不存在 &nbsp;┐( ´ -`)┌",
+		"o1": '或者你可能没有权限？尝试输入密码或 <a href="' + SR + '/?h">回家</a>',
+		"p1": "403: 访问被拒绝 &nbsp;~┻━┻",
+		"q1": '尝试输入密码或 <a href="' + SR + '/?h">回家</a>',
+		"r1": "回家",
+		".s1": "映射",
+		"t1": "操作",
+		"u2": "自上次服务器写入的时间$N( 上传 / 重命名 / ... )$N$N17d = 17 天$N1h23 = 1 小时 23 分钟$N4m56 = 4 分钟 56 秒",
+		"v1": "连接",
+		"v2": "将此服务器用作本地硬盘$N$N警告：这将显示你的密码！",
+		"w1": "切换到 https",
+		"x1": "更改密码",
+		"y1": "你的分享",
+		"z1": "解锁区域",
+		"ta1": "请先输入新密码",
+		"ta2": "重复以确认新密码：",
+		"ta3": "发现拼写错误；请重试",
 	}
 };
 
-var LANGS = ["eng", "nor"];
+var LANGS = ["eng", "nor", "chi"];
 
 if (window.langmod)
 	langmod();
 
-var d = Ls[sread("cpp_lang", LANGS) || lang] || Ls.eng || Ls.nor;
+var d = Ls[sread("cpp_lang", LANGS) || lang] || Ls.eng || Ls.nor || Ls.chi;
 
 for (var k in (d || {})) {
 	var f = k.slice(-1),
