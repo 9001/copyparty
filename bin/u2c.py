@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.22"
-S_BUILD_DT = "2024-08-08"
+S_VERSION = "1.23"
+S_BUILD_DT = "2024-08-22"
 
 """
 u2c.py: upload to copyparty
@@ -1236,7 +1236,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-v", action="store_true", help="verbose")
     ap.add_argument("-a", metavar="PASSWD", help="password or $filepath")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
-    ap.add_argument("-x", type=unicode, metavar="REGEX", default="", help="skip file if filesystem-abspath matches REGEX, example: '.*/\\.hist/.*'")
+    ap.add_argument("-x", type=unicode, metavar="REGEX", action="append", help="skip file if filesystem-abspath matches REGEX (option can be repeated), example: '.*/\\.hist/.*'")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
     ap.add_argument("--touch", action="store_true", help="if last-modified timestamps differ, push local to server (need write+delete perms)")
     ap.add_argument("--ow", action="store_true", help="overwrite existing files instead of autorenaming")
@@ -1282,6 +1282,8 @@ source file/folder selection uses rsync syntax, meaning that:
 
     if ar.dr:
         ar.ow = True
+
+    ar.x = "|".join(ar.x or [])
 
     for k in "dl dr drd".split():
         errs = []
