@@ -626,6 +626,7 @@ pre, code, tt, #doc, #doc>code {
 	overflow: hidden;
 	width: 0;
 	height: 0;
+	color: var(--bg);
 }
 html .ayjump:focus {
 	z-index: 80386;
