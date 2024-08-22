@@ -3266,7 +3266,8 @@ class HttpCli(object):
                     raise Exception("not found in registry")
                 self.pipes.set(req_path, job)
             except Exception as ex:
-                self.log("will not pipe [%s]; %s" % (ap_data, ex), 6)
+                if getattr(ex, "errno", 0) != errno.ENOENT:
+                    self.log("will not pipe [%s]; %s" % (ap_data, ex), 6)
                 ptop = None
 
         #
