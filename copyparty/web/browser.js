@@ -312,6 +312,20 @@ var Ls = {
 		"fs_sc": "share the folder you're in",
 		"fs_ss": "share the selected file/folder",
 		"fs_just1": "select one or zero things to share",
+		"fs_abrt": "❌ abort",
+		"fs_rand": "🎲 rand.name",
+		"fs_go": "✅ create share",
+		"fs_name": "name",
+		"fs_src": "source",
+		"fs_pwd": "passwd",
+		"fs_exp": "expiry",
+		"fs_tmin": "min",
+		"fs_thrs": "hours",
+		"fs_tdays": "days",
+		"fs_never": "eternal",
+		"fs_pname": "optional link name; will be random if blank",
+		"fs_tsrc": "the file or folder to share",
+		"fs_ppwd": "optional password",
 		"fs_ok": "<h6>share-URL created</h6>\npress <code>Enter/OK</code> to Clipboard\npress <code>ESC/Cancel</code> to Close\n\n",
 
 		"frt_dec": "may fix some cases of broken filenames\">url-decode",
@@ -826,7 +840,7 @@ var Ls = {
 		"fr_eperm": 'kan ikke endre navn:\ndu har ikke “move”-rettigheten i denne mappen',
 		"fd_eperm": 'kan ikke slette:\ndu har ikke “delete”-rettigheten i denne mappen',
 		"fc_eperm": 'kan ikke klippe ut:\ndu har ikke “move”-rettigheten i denne mappen',
-		"fp_eperm": 'kan ikke lime inn:\ndu har ikke "write"-rettigheten i denne mappen',
+		"fp_eperm": 'kan ikke lime inn:\ndu har ikke “write”-rettigheten i denne mappen',
 		"fr_emore": "velg minst én fil som skal få nytt navn",
 		"fd_emore": "velg minst én fil som skal slettes",
 		"fc_emore": "velg minst én fil som skal klippes ut",
@@ -834,6 +848,20 @@ var Ls = {
 		"fs_sc": "del mappen du er i nå",
 		"fs_ss": "del den valgte filen/mappen",
 		"fs_just1": "velg 1 eller 0 ting å dele",
+		"fs_abrt": "❌ avbryt",
+		"fs_rand": "🎲 tilfeldig navn",
+		"fs_go": "✅ opprett deling",
+		"fs_name": "navn",
+		"fs_src": "kilde",
+		"fs_pwd": "passord",
+		"fs_exp": "varighet",
+		"fs_tmin": "min",
+		"fs_thrs": "timer",
+		"fs_tdays": "dager",
+		"fs_never": "for evig",
+		"fs_pname": "frivillig navn (blir noe tilfeldig ellers)",
+		"fs_tsrc": "fil/mappe som skal deles",
+		"fs_ppwd": "frivillig passord",
 		"fs_ok": "<h6>URL opprettet</h6>\ntrykk <code>Enter/OK</code> for å kopiere linken (for CTRL-V)\ntrykk <code>ESC/Avbryt</code> for å bare bekrefte\n\n",
 
 		"frt_dec": "kan korrigere visse ødelagte filnavn\">url-decode",
@@ -1049,6 +1077,7 @@ var Ls = {
 	},
 
 	"chi": {
+		// 以 //m 结尾的行是未经验证的机器翻译
 		"tt": "中文",
 		"cols": {
 			"c": "操作按钮",
@@ -1133,10 +1162,10 @@ var Ls = {
 		"m_ok": "确定",
 		"m_ng": "取消",
 
-		"ht_s": "秒!s",
-		"ht_m": "分!s",
-		"ht_h": "时!s",
-		"ht_d": "天!s",
+		"ht_s": "秒",
+		"ht_m": "分",
+		"ht_h": "时",
+		"ht_d": "天",
 		"ht_and": " 和 ",
 
 		"goh": "控制面板",
@@ -1239,19 +1268,19 @@ var Ls = {
 
 		"ct_grid": '网格视图',
 		"ct_thumb": '在网格视图中，切换图标或缩略图$N快捷键: T">🖼️ 缩略图',
-		"ct_csel": '在网格视图中使用 CTRL 和 SHIFT 进行文件选择">CTRL SHIFT',
+		"ct_csel": '在网格视图中使用 CTRL 和 SHIFT 进行文件选择">CTRL',
 		"ct_ihop": '当图像查看器关闭时，滚动到最后查看的文件">滚动',
 		"ct_dots": '显示隐藏文件（如果服务器允许）">隐藏文件',
 		"ct_dir1st": '在文件之前排序文件夹">📁 排序',
-		"ct_readme": '在文件夹列表中显示 README.md">📜 显示readme',
+		"ct_readme": '在文件夹列表中显示 README.md">📜 readme',
 		"ct_idxh": '显示 index.html 代替文件夹列表">htm',
 		"ct_sbars": '显示滚动条">⟊',
 
 		"cut_umod": "如果文件已存在于服务器上，将服务器的最后修改时间戳更新为与你的本地文件匹配（需要写入和删除权限）\">re📅",
 
-		"cut_turbo": "YOLO 按钮，你可能不想启用这个：$N$N如果你上传了大量文件并且由于某些原因需要重新启动，并且想要尽快继续上传，使用此选项$N$N这会用简单的 <em>&quot;服务器上的文件大小是否相同？&quot;</em> 替代哈希检查，因此如果文件内容不同，它将不会被上传$N$N上传完成后，你应该关闭此选项，然后重新&quot;上传&quot;相同的文件以让客户端验证它们\">加速",
+		"cut_turbo": "YOLO 按钮，你可能不想启用这个：$N$N如果你上传了大量文件并且由于某些原因需要重新启动，$N并且想要尽快继续上传，使用此选项$N$N这会用简单的 <em>&quot;服务器上的文件大小是否相同？&quot;</em> 替代哈希检查，$N因此如果文件内容不同，它将不会被上传$N$N上传完成后，你应该关闭此选项，$N然后重新&quot;上传&quot;相同的文件以让客户端验证它们\">加速",
 
-		"cut_datechk": "除非启用 turbo 按钮，否则没有效果$N$N略微减少 YOLO 因素；检查服务器上的文件时间戳是否与你的一致$N$N<em>理论上</em> 应该能捕捉到大多数未完成/损坏的上传，但不能替代之后禁用 turbo 进行的验证\">日期检查",
+		"cut_datechk": "除非启用「加速」按钮，否则没有效果$N$N略微减少 YOLO 因素；检查服务器上的文件时间戳是否与你的一致$N$N<em>理论上</em> 应该能捕捉到大多数未完成/损坏的上传，$N但不能替代之后禁用「加速」进行的验证\">日期检查",
 
 		"cut_u2sz": "每个上传块的大小（以 MiB 为单位）；较大的值跨大西洋传输效果更好。在非常不可靠的连接上尝试较小的值",
 
@@ -1294,7 +1323,7 @@ var Ls = {
 		"mt_fullpre": "尝试预加载整首歌；$N✅ 在 <b>不可靠</b> 连接上启用，$N❌ 可能在慢速连接上禁用\">加载整首歌",
 		"mt_fau": "在手机上，如果下一首歌未能快速预加载，防止音乐停止（可能导致标签显示异常）\">☕️",
 		"mt_waves": "波形进度条：$N显示音频幅度\">进度条",
-		"mt_npclip": "显示当前播放歌曲的剪贴板按钮\">/剪切板",
+		"mt_npclip": "显示当前播放歌曲的剪贴板按钮\">♪剪切板",
 		"mt_octl": "操作系统集成（媒体快捷键 / OSD）\">OSD",
 		"mt_oseek": "允许通过操作系统集成进行跳转$N$N注意：在某些设备（如 iPhone）上，$N这将替代下一首歌按钮\">seek",
 		"mt_oscv": "在 OSD 中显示专辑封面\">封面",
@@ -1315,7 +1344,7 @@ var Ls = {
 		"mp_breq": "需要 Firefox 82+ 或 Chrome 73+ 或 iOS 15+",
 		"mm_bload": "正在加载...",
 		"mm_bconv": "正在转换为 {0}，请稍等...",
-		"mm_opusen": "你的浏览器无法播放 aac / m4a 文件；$N现在启用转码为 opus",
+		"mm_opusen": "你的浏览器无法播放 aac / m4a 文件；\n现在启用转码为 opus",
 		"mm_playerr": "播放失败：",
 		"mm_eabrt": "播放尝试已取消",
 		"mm_enet": "你的互联网连接有问题",
@@ -1323,7 +1352,7 @@ var Ls = {
 		"mm_esupp": "你的浏览器不支持这个音频格式",
 		"mm_eunk": "未知错误",
 		"mm_e404": "无法播放音频；错误 404：文件未找到。",
-		"mm_e403": "无法播放音频；错误 403：访问被拒绝。$N$N尝试按 F5 重新加载，也许你已被注销",
+		"mm_e403": "无法播放音频；错误 403：访问被拒绝。\n\n尝试按 F5 重新加载，也许你已被注销",
 		"mm_e5xx": "无法播放音频；服务器错误",
 		"mm_nof": "附近找不到更多音频文件",
 		"mm_prescan": "正在寻找下一首音乐...",
@@ -1334,14 +1363,14 @@ var Ls = {
 		"im_hnf": "那张图片不再存在",
 
 		"f_empty": "该文件夹为空",
-		"f_chide": "这将隐藏列 «{0}»$N$N你可以在设置选项卡中重新显示列",
+		"f_chide": "这将隐藏列 «{0}»\n\n你可以在设置选项卡中重新显示列",
 		"f_bigtxt": "这个文件大小为 {0} MiB -- 真的以文本形式查看？",
 		"fbd_more": '<div id="blazy">显示 <code>{0}</code> 个文件中的 <code>{1}</code> 个；<a href="#" id="bd_more">显示 {2}</a> 或 <a href="#" id="bd_all">显示全部</a></div>',
 		"fbd_all": '<div id="blazy">显示 <code>{0}</code> 个文件中的 <code>{1}</code> 个；<a href="#" id="bd_all">显示全部</a></div>',
 
-		"f_dls": "当前文件夹中的文件链接已$N更改为下载链接",
+		"f_dls": "当前文件夹中的文件链接已\n更改为下载链接",
 
-		"f_partial": "要安全下载正在上传的文件，请点击没有 <code>.PARTIAL</code> 文件扩展名的同名文件。请按取消或 Escape 执行此操作。$N$N按 OK / Enter 将忽略此警告并继续下载 <code>.PARTIAL</code> 临时文件，这几乎肯定会导致数据损坏。",
+		"f_partial": "要安全下载正在上传的文件，请点击没有 <code>.PARTIAL</code> 文件扩展名的同名文件。请按取消或 Escape 执行此操作。\n\n按 OK / Enter 将忽略此警告并继续下载 <code>.PARTIAL</code> 临时文件，这几乎肯定会导致数据损坏。",
 
 		"ft_paste": "粘贴 {0} 项$N快捷键: ctrl-V",
 		"fr_eperm": '无法重命名：\n你在此文件夹中没有 “移动” 权限',
@@ -1355,13 +1384,27 @@ var Ls = {
 		"fs_sc": "分享你所在的文件夹",
 		"fs_ss": "分享选定的文件/文件夹",
 		"fs_just1": "选择一个或零个项目进行分享",
+		"fs_abrt": "❌ 取消",
+		"fs_rand": "🎲 随机名称", //m
+		"fs_go": "✅ 创建共享", //m
+		"fs_name": "名称", //m
+		"fs_src": "源", //m
+		"fs_pwd": "密码", //m
+		"fs_exp": "过期 时间", //m
+		"fs_tmin": "分",
+		"fs_thrs": "时",
+		"fs_tdays": "天",
+		"fs_never": "永存", //m
+		"fs_pname": "可选链接名称；如果为空则随机", //m
+		"fs_tsrc": "要共享的文件或文件夹", //m
+		"fs_ppwd": "可选密码", //m
 		"fs_ok": "<h6>分享链接已创建</h6>\n按 <code>Enter/OK</code> 复制到剪贴板\n按 <code>ESC/Cancel</code> 关闭\n\n",
 
 		"frt_dec": "可能修复一些损坏的文件名\">url-decode",
 		"frt_rst": "将修改后的文件名重置为原始文件名\">↺ 重置",
 		"frt_abrt": "中止并关闭此窗口\">❌ 取消",
 		"frb_apply": "应用重命名",
-		"fr_adv": "批量 / 元数据 / 模式重命名\n高级",
+		"fr_adv": "批量 / 元数据 / 模式重命名\">高级",
 		"fr_case": "区分大小写的正则表达式\">case",
 		"fr_win": "Windows 安全名称；将 <code>&lt;&gt;:&quot;\\|?*</code> 替换为日文全角字符\">win",
 		"fr_slash": "将 <code>/</code> 替换为不会导致新文件夹创建的字符\">不使用 /",
@@ -4337,18 +4380,18 @@ var fileman = (function () {
 			'<div>',
 			'<table>',
 			'<tr><td colspan="2">',
-			'<button id="sh_abrt">❌ abort</button>',
-			'<button id="sh_rand">🎲 random</button>',
-			'<button id="sh_apply">✅ create share</button>',
+			'<button id="sh_abrt">' + L.fs_abrt + '</button>',
+			'<button id="sh_rand">' + L.fs_rand + '</button>',
+			'<button id="sh_apply">' + L.fs_go + '</button>',
 			'</td></tr>',
-			'<tr><td>name</td><td><input type="text" id="sh_k" ' + NOAC + ' placeholder="optional link name; will be random if blank" /></td></tr>',
-			'<tr><td>source</td><td><input type="text" id="sh_vp" ' + NOAC + ' readonly tt="the file or folder to share" /></td></tr>',
-			'<tr><td>passwd</td><td><input type="text" id="sh_pw" ' + NOAC + ' placeholder="optional password" /></td></tr>',
-			'<tr><td>expiry</td><td class="exs">',
-			'<input type="text" id="sh_exm" ' + NOAC + ' /> min / ',
-			'<input type="text" id="sh_exh" ' + NOAC + ' /> hours / ',
-			'<input type="text" id="sh_exd" ' + NOAC + ' /> days / ',
-			'<button id="sh_noex">never</button>',
+			'<tr><td>' + L.fs_name + '</td><td><input type="text" id="sh_k" ' + NOAC + ' placeholder="' + L.fs_pname + '" /></td></tr>',
+			'<tr><td>' + L.fs_src + '</td><td><input type="text" id="sh_vp" ' + NOAC + ' readonly tt="' + L.fs_tsrc + '" /></td></tr>',
+			'<tr><td>' + L.fs_pwd + '</td><td><input type="text" id="sh_pw" ' + NOAC + ' placeholder="' + L.fs_ppwd + '" /></td></tr>',
+			'<tr><td>' + L.fs_exp + '</td><td class="exs">',
+			'<input type="text" id="sh_exm" ' + NOAC + ' /> ' + L.fs_tmin + ' / ',
+			'<input type="text" id="sh_exh" ' + NOAC + ' /> ' + L.fs_thrs + ' / ',
+			'<input type="text" id="sh_exd" ' + NOAC + ' /> ' + L.fs_tdays + ' / ',
+			'<button id="sh_noex">' + L.fs_never + '</button>',
 			'</td></tr>',
 			'<tr><td>perms</td><td class="sh_axs">',
 		];
@@ -8122,10 +8165,11 @@ var settheme = (function () {
 
 	function setlang(e) {
 		ev(e);
+		var t = L.lang_set;
 		L = Ls[this.textContent];
 		swrite("cpp_lang", this.textContent);
 		freshen();
-		modal.confirm(Ls.eng.lang_set + "\n\n" + Ls.nor.lang_set + "\n\n" + Ls.chi.lang_set, location.reload.bind(location), null);
+		modal.confirm(L.lang_set + "\n\n" + t, location.reload.bind(location), null);
 	};
 
 	freshen();
