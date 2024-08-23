@@ -310,8 +310,8 @@ var Ls = {
 		"fc_emore": "select at least one item to cut",
 
 		"fs_sc": "share the folder you're in",
-		"fs_ss": "share the selected file/folder",
-		"fs_just1": "select one or zero things to share",
+		"fs_ss": "share the selected files",
+		"fs_just1d": "you cannot select more than one folder,\nor mix flies and folders in one selection",
 		"fs_abrt": "❌ abort",
 		"fs_rand": "🎲 rand.name",
 		"fs_go": "✅ create share",
@@ -846,8 +846,8 @@ var Ls = {
 		"fc_emore": "velg minst én fil som skal klippes ut",
 
 		"fs_sc": "del mappen du er i nå",
-		"fs_ss": "del den valgte filen/mappen",
-		"fs_just1": "velg 1 eller 0 ting å dele",
+		"fs_ss": "del de valgte filene",
+		"fs_just1d": "du kan ikke markere flere mapper samtidig,\neller kombinere mapper og filer",
 		"fs_abrt": "❌ avbryt",
 		"fs_rand": "🎲 tilfeldig navn",
 		"fs_go": "✅ opprett deling",
@@ -1382,8 +1382,8 @@ var Ls = {
 		"fc_emore": "选择至少一个项目以剪切",
 
 		"fs_sc": "分享你所在的文件夹",
-		"fs_ss": "分享选定的文件/文件夹",
-		"fs_just1": "选择一个或零个项目进行分享",
+		"fs_ss": "分享选定的文件",
+		"fs_just1d": "你不能同时选择多个文件夹，也不能同时选择文件夹和文件",
 		"fs_abrt": "❌ 取消",
 		"fs_rand": "🎲 随机名称",
 		"fs_go": "✅ 创建分享",
@@ -4286,7 +4286,6 @@ var fileman = (function () {
 			endel = nsel,
 			encut = nsel,
 			enpst = r.clip && r.clip.length,
-			enshr = nsel < 2,
 			hren = !(have_mv && has(perms, 'write') && has(perms, 'move')),
 			hdel = !(have_del && has(perms, 'delete')),
 			hcut = !(have_mv && has(perms, 'move')),
@@ -4300,7 +4299,7 @@ var fileman = (function () {
 		clmod(bdel, 'en', endel);
 		clmod(bcut, 'en', encut);
 		clmod(bpst, 'en', enpst);
-		clmod(bshr, 'en', enshr);
+		clmod(bshr, 'en', 1);
 
 		clmod(bren, 'hide', hren);
 		clmod(bdel, 'hide', hdel);
@@ -4359,15 +4358,19 @@ var fileman = (function () {
 	r.share = function (e) {
 		ev(e);
 
-		var sel = msel.getsel();
-		if (sel.length > 1)
-			return toast.err(3, L.fs_just1);
+		var vp = uricom_dec(get_evpath()),
+			sel = msel.getsel(),
+			fns = [];
 
-		var vp = get_evpath();
-		if (sel.length)
-			vp = sel[0].vp;
+		for (var a = 0; a < sel.length; a++)
+			fns.push(uricom_dec(noq_href(ebi(sel[a].id))));
 
-		vp = uricom_dec(vp.split('?')[0]);
+		if (fns.length == 1 && fns[0].endsWith('/'))
+			vp = fns.pop();
+
+		for (var a = 0; a < fns.length; a++)
+			if (fns[a].endsWith('/'))
+				return toast.err(10, L.fs_just1d);
 
 		var shui = ebi('shui');
 		if (!shui) {
@@ -4384,9 +4387,9 @@ var fileman = (function () {
 			'<button id="sh_rand">' + L.fs_rand + '</button>',
 			'<button id="sh_apply">' + L.fs_go + '</button>',
 			'</td></tr>',
-			'<tr><td>' + L.fs_name + '</td><td><input type="text" id="sh_k" ' + NOAC + ' placeholder="' + L.fs_pname + '" /></td></tr>',
+			'<tr><td>' + L.fs_name + '</td><td><input type="text" id="sh_k" ' + NOAC + ' placeholder="  ' + L.fs_pname + '" /></td></tr>',
 			'<tr><td>' + L.fs_src + '</td><td><input type="text" id="sh_vp" ' + NOAC + ' readonly tt="' + L.fs_tsrc + '" /></td></tr>',
-			'<tr><td>' + L.fs_pwd + '</td><td><input type="text" id="sh_pw" ' + NOAC + ' placeholder="' + L.fs_ppwd + '" /></td></tr>',
+			'<tr><td>' + L.fs_pwd + '</td><td><input type="text" id="sh_pw" ' + NOAC + ' placeholder="  ' + L.fs_ppwd + '" /></td></tr>',
 			'<tr><td>' + L.fs_exp + '</td><td class="exs">',
 			'<input type="text" id="sh_exm" ' + NOAC + ' /> ' + L.fs_tmin + ' / ',
 			'<input type="text" id="sh_exh" ' + NOAC + ' /> ' + L.fs_thrs + ' / ',
@@ -4452,10 +4455,7 @@ var fileman = (function () {
 			shui.parentNode.removeChild(shui);
 		};
 		sh_rand.onclick = function () {
-			var v = randstr(12).replace(/l/g, 'n');
-			if (sel.length && !noq_href(ebi(sel[0].id)).endsWith('/'))
-				v += '.' + vp.split('.').pop();
-			sh_k.value = v;
+			sh_k.value = randstr(12).replace(/l/g, 'n');
 		};
 		tt.att(shui);
 
@@ -4468,11 +4468,17 @@ var fileman = (function () {
 		}
 		clmod(pbtns[0], 'on', 1);
 
-		sh_vp.value = vp;
+		var vpt = vp;
+		if (fns.length) {
+			vpt = fns.length + ' files in ' + vp + '  '
+			for (var a = 0; a < fns.length; a++)
+				vpt += '「' + fns[a].split('/').pop() + '」';
+		}
+		sh_vp.value = vpt;
 
 		sh_k.oninput = function (e) {
 			var v = this.value,
-				v2 = v.replace(/[^0-9a-zA-Z\.-]/g, '_');
+				v2 = v.replace(/[^0-9a-zA-Z-]/g, '_');
 
 			if (v != v2)
 				this.value = v2;
@@ -4480,13 +4486,14 @@ var fileman = (function () {
 
 		function shr_cb() {
 			toast.hide();
-			if (this.status !== 201) {
+			var surl = this.responseText;
+			if (this.status !== 201 || !/^created share:/.exec(surl)) {
 				shui.style.display = 'block';
-				var msg = unpre(this.responseText);
+				var msg = unpre(surl);
 				toast.err(9, msg);
 				return;
 			}
-			var surl = this.responseText;
+			surl = surl.slice(15);
 			modal.confirm(L.fs_ok + esc(surl), function() {
 				cliptxt(surl, function () {
 					toast.ok(2, 'copied to clipboard');
@@ -4508,7 +4515,7 @@ var fileman = (function () {
 
 			var body = {
 				"k": sh_k.value,
-				"vp": sh_vp.value,
+				"vp": fns.length ? fns : [sh_vp.value],
 				"pw": sh_pw.value,
 				"exp": exm.value,
 				"perms": plist,
@@ -4519,6 +4526,8 @@ var fileman = (function () {
 			xhr.onload = xhr.onerror = shr_cb;
 			xhr.send(JSON.stringify(body));
 		};
+
+		setTimeout(sh_pw.focus.bind(sh_pw), 1);
 	};
 
 	r.rename = function (e) {

@@ -35,6 +35,7 @@ from .util import (
     odfusion,
     relchk,
     statdir,
+    ub64enc,
     uncyg,
     undot,
     unhumanize,
@@ -344,6 +345,7 @@ class VFS(object):
         self.dbv: Optional[VFS] = None  # closest full/non-jump parent
         self.lim: Optional[Lim] = None  # upload limits; only set for dbv
         self.shr_src: Optional[tuple[VFS, str]] = None  # source vfs+rem of a share
+        self.shr_files: set[str] = set()  # filenames to include from shr_src
         self.aread: dict[str, list[str]] = {}
         self.awrite: dict[str, list[str]] = {}
         self.amove: dict[str, list[str]] = {}
@@ -369,6 +371,7 @@ class VFS(object):
             self.all_vps = []
 
         self.get_dbv = self._get_dbv
+        self.ls = self._ls
 
     def __repr__(self) -> str:
         return "VFS(%s)" % (
@@ -565,7 +568,26 @@ class VFS(object):
         ad, fn = os.path.split(ap)
         return os.path.join(absreal(ad), fn)
 
-    def ls(
+    def _ls_nope(
+        self, *a, **ka
+    ) -> tuple[str, list[tuple[str, os.stat_result]], dict[str, "VFS"]]:
+        raise Pebkac(500, "nope.avi")
+
+    def _ls_shr(
+        self,
+        rem: str,
+        uname: str,
+        scandir: bool,
+        permsets: list[list[bool]],
+        lstat: bool = False,
+    ) -> tuple[str, list[tuple[str, os.stat_result]], dict[str, "VFS"]]:
+        """replaces _ls for certain shares (single-file, or file selection)"""
+        vn, rem = self.shr_src  # type: ignore
+        abspath, real, _ = vn.ls(rem, "\n", scandir, permsets, lstat)
+        real = [x for x in real if os.path.basename(x[0]) in self.shr_files]
+        return abspath, real, {}
+
+    def _ls(
         self,
         rem: str,
         uname: str,
@@ -1512,9 +1534,10 @@ class AuthSrv(object):
             db_path = self.args.shr_db
             db = sqlite3.connect(db_path)
             cur = db.cursor()
+            cur2 = db.cursor()
             now = time.time()
             for row in cur.execute("select * from sh"):
-                s_k, s_pw, s_vp, s_pr, s_st, s_un, s_t0, s_t1 = row
+                s_k, s_pw, s_vp, s_pr, s_nf, s_un, s_t0, s_t1 = row
                 if s_t1 and s_t1 < now:
                     continue
 
@@ -1523,7 +1546,10 @@ class AuthSrv(object):
                     self.log(t % (s_pr, s_k, s_un, s_vp))
 
                 if s_pw:
-                    sun = "s_%s" % (s_k,)
+                    # gotta reuse the "account" for all shares with this pw,
+                    # so do a light scramble as this appears in the web-ui
+                    zs = ub64enc(hashlib.sha512(s_pw.encode("utf-8")).digest())[4:16]
+                    sun = "s_%s" % (zs.decode("utf-8"),)
                     acct[sun] = s_pw
                 else:
                     sun = "*"
@@ -1545,6 +1571,7 @@ class AuthSrv(object):
             for vol in shv.nodes.values():
                 vfs.all_vols[vol.vpath] = vol
                 vol.get_dbv = vol._get_share_src
+                vol.ls = vol._ls_nope
 
         zss = set(acct)
         zss.update(self.idp_accs)
@@ -2054,6 +2081,9 @@ class AuthSrv(object):
             if not self.warn_anonwrite or verbosity < 5:
                 break
 
+            if enshare and (zv.vpath == shr or zv.vpath.startswith(shrs)):
+                continue
+
             t += '\n\033[36m"/{}"  \033[33m{}\033[0m'.format(zv.vpath, zv.realpath)
             for txt, attr in [
                 ["  read", "uread"],
@@ -2160,10 +2190,9 @@ class AuthSrv(object):
                 if x != shr and not x.startswith(shrs)
             }
 
-            assert cur  # type: ignore
-            assert shv  # type: ignore
+            assert db and cur and cur2 and shv  # type: ignore
             for row in cur.execute("select * from sh"):
-                s_k, s_pw, s_vp, s_pr, s_st, s_un, s_t0, s_t1 = row
+                s_k, s_pw, s_vp, s_pr, s_nf, s_un, s_t0, s_t1 = row
                 shn = shv.nodes.get(s_k, None)
                 if not shn:
                     continue
@@ -2177,6 +2206,17 @@ class AuthSrv(object):
                     self.log(t % (s_k, s_un, s_vp, ex), 3)
                     shv.nodes.pop(s_k)
                     continue
+
+                fns = []
+                if s_nf:
+                    q = "select vp from sf where k = ?"
+                    for (s_fn,) in cur2.execute(q, (s_k,)):
+                        fns.append(s_fn)
+
+                    shn.shr_files = set(fns)
+                    shn.ls = shn._ls_shr
+                else:
+                    shn.ls = shn._ls
 
                 shn.shr_src = (s_vfs, s_rem)
                 shn.realpath = s_vfs.canonical(s_rem)
@@ -2196,6 +2236,10 @@ class AuthSrv(object):
                 for zs in svn.nodes.keys():
                     # hide subvolume
                     vn.nodes[zs] = VFS(self.log_func, "", "", AXS(), {})
+
+            cur2.close()
+            cur.close()
+            db.close()
 
     def chpw(self, broker: Optional["BrokerCli"], uname, pw) -> tuple[bool, str]:
         if not self.args.chpw:

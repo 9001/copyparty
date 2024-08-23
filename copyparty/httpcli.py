@@ -4347,11 +4347,31 @@ class HttpCli(object):
             self.log("handle_share: " + json.dumps(req, indent=4))
 
         skey = req["k"]
-        vp = req["vp"].strip("/")
+        vps = req["vp"]
+        fns = []
+        if len(vps) == 1:
+            vp = vps[0]
+            if not vp.endswith("/"):
+                vp, zs = vp.rsplit("/", 1)
+                fns = [zs]
+        else:
+            for zs in vps:
+                if zs.endswith("/"):
+                    t = "you cannot select more than one folder, or mix flies and folders in one selection"
+                    raise Pebkac(400, t)
+            vp = vps[0].rsplit("/", 1)[0]
+            for zs in vps:
+                vp2, fn = zs.rsplit("/", 1)
+                fns.append(fn)
+                if vp != vp2:
+                    t = "mismatching base paths in selection:\n  [%s]\n  [%s]"
+                    raise Pebkac(400, t % (vp, vp2))
+
+        vp = vp.strip("/")
         if self.is_vproxied and (vp == self.args.R or vp.startswith(self.args.RS)):
             vp = vp[len(self.args.RS) :]
 
-        m = re.search(r"([^0-9a-zA-Z_\.-]|\.\.|^\.)", skey)
+        m = re.search(r"([^0-9a-zA-Z_-])", skey)
         if m:
             raise Pebkac(400, "sharekey has illegal character [%s]" % (m[1],))
 
@@ -4378,9 +4398,13 @@ class HttpCli(object):
         except:
             raise Pebkac(400, "you dont have all the perms you tried to grant")
 
-        ap = vfs.canonical(rem)
-        st = bos.stat(ap)
-        ist = 2 if stat.S_ISDIR(st.st_mode) else 1
+        ap, reals, _ = vfs.ls(
+            rem, self.uname, not self.args.no_scandir, [[s_rd, s_wr, s_mv, s_del]]
+        )
+        rfns = set([x[0] for x in reals])
+        for fn in fns:
+            if fn not in rfns:
+                raise Pebkac(400, "selected file not found on disk: [%s]" % (fn,))
 
         pw = req.get("pw") or ""
         now = int(time.time())
@@ -4390,18 +4414,25 @@ class HttpCli(object):
         pr = "".join(zc for zc, zb in zip("rwmd", (s_rd, s_wr, s_mv, s_del)) if zb)
 
         q = "insert into sh values (?,?,?,?,?,?,?,?)"
-        cur.execute(q, (skey, pw, vp, pr, ist, self.uname, now, exp))
-        cur.connection.commit()
+        cur.execute(q, (skey, pw, vp, pr, len(fns), self.uname, now, exp))
 
+        q = "insert into sf values (?,?)"
+        for fn in fns:
+            cur.execute(q, (skey, fn))
+
+        cur.connection.commit()
         self.conn.hsrv.broker.ask("_reload_blocking", False, False).get()
         self.conn.hsrv.broker.ask("up2k.wake_rescanner").get()
 
-        surl = "%s://%s%s%s%s" % (
+        fn = quotep(fns[0]) if len(fns) == 1 else ""
+
+        surl = "created share: %s://%s%s%s%s/%s" % (
             "https" if self.is_https else "http",
             self.host,
             self.args.SR,
             self.args.shr,
             skey,
+            fn,
         )
         self.loud_reply(surl, status=201)
         return True

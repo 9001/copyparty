@@ -750,7 +750,9 @@ you can move files across browser tabs (cut in one tab, paste in another)
 
 share a file or folder by creating a temporary link
 
-when enabled in the server settings (`--shr`), click the bottom-right `share` button to share the folder you're currently in, or select a file first to share only that file
+when enabled in the server settings (`--shr`), click the bottom-right `share` button to share the folder you're currently in, or alternatively:
+* select a folder first to share that folder instead
+* select one or more files to share only those files
 
 this feature was made with [identity providers](#identity-providers) in mind -- configure your reverseproxy to skip the IdP's access-control for a given URL prefix and use that to safely share specific files/folders sans the usual auth checks
 
@@ -774,6 +776,8 @@ specify `--shr /foobar` to enable this feature; a toplevel virtual folder named 
 * if you're using config files, put `shr: /foobar` inside the `[global]` section instead
 
 users can delete their own shares in the controlpanel, and a list of privileged users (`--shr-adm`) are allowed to see and/or delet any share on the server
+
+**security note:** using this feature does not mean that you can skip the [accounts and volumes](#accounts-and-volumes) section -- you still need to restrict access to volumes that you do not intend to share with unauthenticated users! it is not sufficient to use rules in the reverseproxy to restrict access to just the `/share` folder.
 
 
 ## batch rename

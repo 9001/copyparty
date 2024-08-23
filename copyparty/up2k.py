@@ -580,8 +580,8 @@ class Up2k(object):
         rm = [x[0] for x in cur.execute(q, (now,))]
         if rm:
             self.log("forgetting expired shares %s" % (rm,))
-            q = "delete from sh where k=?"
-            cur.executemany(q, [(x,) for x in rm])
+            cur.executemany("delete from sh where k=?", [(x,) for x in rm])
+            cur.executemany("delete from sf where k=?", [(x,) for x in rm])
             db.commit()
             Daemon(self.hub._reload_blocking, "sharedrop", (False, False))
 

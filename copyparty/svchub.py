@@ -377,7 +377,7 @@ class SvcHub(object):
         import sqlite3
 
         al.shr = al.shr.strip("/")
-        if "/" in al.shr:
+        if "/" in al.shr or not al.shr:
             t = "config error: --shr must be the name of a virtual toplevel directory to put shares inside"
             self.log("root", t, 1)
             raise Exception(t)
@@ -385,8 +385,9 @@ class SvcHub(object):
         al.shr = "/%s/" % (al.shr,)
 
         create = True
+        modified = False
         db_path = self.args.shr_db
-        self.log("root", "initializing shares-db %s" % (db_path,))
+        self.log("root", "opening shares-db %s" % (db_path,))
         for n in range(2):
             try:
                 db = sqlite3.connect(db_path)
@@ -412,18 +413,43 @@ class SvcHub(object):
                     pass
                 os.unlink(db_path)
 
+        sch1 = [
+            r"create table kv (k text, v int)",
+            r"create table sh (k text, pw text, vp text, pr text, st int, un text, t0 int, t1 int)",
+            # sharekey, password, src, perms, numFiles, owner, created, expires
+        ]
+        sch2 = [
+            r"create table sf (k text, vp text)",
+            r"create index sf_k on sf(k)",
+            r"create index sh_k on sh(k)",
+            r"create index sh_t1 on sh(t1)",
+        ]
+
         assert db  # type: ignore
         assert cur  # type: ignore
         if create:
+            dver = 2
+            modified = True
+            for cmd in sch1 + sch2:
+                cur.execute(cmd)
+            self.log("root", "created new shares-db")
+        else:
+            (dver,) = cur.execute("select v from kv where k = 'sver'").fetchall()[0]
+
+        if dver == 1:
+            modified = True
+            for cmd in sch2:
+                cur.execute(cmd)
+            cur.execute("update sh set st = 0")
+            self.log("root", "shares-db schema upgrade ok")
+
+        if modified:
             for cmd in [
-                # sharekey, password, src, perms, type, owner, created, expires
-                r"create table sh (k text, pw text, vp text, pr text, st int, un text, t0 int, t1 int)",
-                r"create table kv (k text, v int)",
-                r"insert into kv values ('sver', {})".format(1),
+                r"delete from kv where k = 'sver'",
+                r"insert into kv values ('sver', %d)" % (2,),
             ]:
                 cur.execute(cmd)
             db.commit()
-            self.log("root", "created new shares-db")
 
         cur.close()
         db.close()
