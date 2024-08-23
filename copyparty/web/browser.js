@@ -1362,13 +1362,13 @@ var Ls = {
 
 		"im_hnf": "那张图片不再存在",
 
-		"f_empty": "该文件夹为空",
-		"f_chide": "这将隐藏列 «{0}»\n\n你可以在设置选项卡中重新显示列",
+		"f_empty": '该文件夹为空',
+		"f_chide": '隐藏列 «{0}»\n\n你可以在设置选项卡中重新显示列',
 		"f_bigtxt": "这个文件大小为 {0} MiB -- 真的以文本形式查看？",
 		"fbd_more": '<div id="blazy">显示 <code>{0}</code> 个文件中的 <code>{1}</code> 个；<a href="#" id="bd_more">显示 {2}</a> 或 <a href="#" id="bd_all">显示全部</a></div>',
 		"fbd_all": '<div id="blazy">显示 <code>{0}</code> 个文件中的 <code>{1}</code> 个；<a href="#" id="bd_all">显示全部</a></div>',
 
-		"f_dls": "当前文件夹中的文件链接已\n更改为下载链接",
+		"f_dls": '当前文件夹中的文件链接已\n更改为下载链接',
 
 		"f_partial": "要安全下载正在上传的文件，请点击没有 <code>.PARTIAL</code> 文件扩展名的同名文件。请按取消或 Escape 执行此操作。\n\n按 OK / Enter 将忽略此警告并继续下载 <code>.PARTIAL</code> 临时文件，这几乎肯定会导致数据损坏。",
 
@@ -1385,19 +1385,19 @@ var Ls = {
 		"fs_ss": "分享选定的文件/文件夹",
 		"fs_just1": "选择一个或零个项目进行分享",
 		"fs_abrt": "❌ 取消",
-		"fs_rand": "🎲 随机名称", //m
-		"fs_go": "✅ 创建共享", //m
-		"fs_name": "名称", //m
-		"fs_src": "源", //m
-		"fs_pwd": "密码", //m
-		"fs_exp": "过期 时间", //m
+		"fs_rand": "🎲 随机名称",
+		"fs_go": "✅ 创建分享",
+		"fs_name": "名称",
+		"fs_src": "源",
+		"fs_pwd": "密码",
+		"fs_exp": "过期",
 		"fs_tmin": "分",
 		"fs_thrs": "时",
 		"fs_tdays": "天",
-		"fs_never": "永存", //m
-		"fs_pname": "可选链接名称；如果为空则随机", //m
-		"fs_tsrc": "要共享的文件或文件夹", //m
-		"fs_ppwd": "可选密码", //m
+		"fs_never": "永久",
+		"fs_pname": "链接名称可选；如果为空则随机",
+		"fs_tsrc": "共享的文件或文件夹",
+		"fs_ppwd": "密码可选",
 		"fs_ok": "<h6>分享链接已创建</h6>\n按 <code>Enter/OK</code> 复制到剪贴板\n按 <code>ESC/Cancel</code> 关闭\n\n",
 
 		"frt_dec": "可能修复一些损坏的文件名\">url-decode",
@@ -1427,7 +1427,7 @@ var Ls = {
 		"fd_warn2": "<b>最后机会！</b> 无法撤销。删除？",
 
 		"fc_ok": "剪切 {0} 项",
-		"fc_warn": "剪切 {0} 项\n\n但：只有 <b>这个</b> 浏览器标签页可以粘贴它们\n（因为选择非常庞大）",
+		"fc_warn": '剪切 {0} 项\n\n但：只有 <b>这个</b> 浏览器标签页可以粘贴它们\n（因为选择非常庞大）',
 
 		"fp_ecut": "首先剪切一些文件/文件夹以粘贴/移动\n\n注意：你可以在不同的浏览器标签页之间剪切/粘贴",
 		"fp_ename": "这些 {0} 项不能移动到这里（名称已存在）：",
