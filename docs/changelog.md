@@ -1,4 +1,43 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0819-0014  `v1.14.1`  one step forward
+
+[if i turn back now, then this will always follow... one step forward, forward](https://youtu.be/xe3Wkzc0O3k?t=27)
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` in case of future important updates, such as [vulnerabilities](https://github.com/9001/copyparty/security) (most recently 2023-07-23)
+
+## new features
+
+* #92 users can change their own passwords 83fb569d 00da7440
+  * this feature is default-disabled; see [readme](https://github.com/9001/copyparty#user-changeable-passwords)
+* #84 share files/folders by creating a temporary url 7c2beba5
+  * inspired by other file servers; click the share-button to create a link like `example.com/share/enkz8g374o8g`
+    * primary usecase is to sneak past authentication services (see issue description)
+  * the create-share UI has options to accept uploads into the share, and/or set expiration time
+  * this feature is default-disabled; see [readme](https://github.com/9001/copyparty#shares)
+
+## bugfixes
+
+* #93 fixes for vproxy / location-based / not-vhost-based reverse-proxying 0b46b1a6
+  * using `--rp-loc` to reverse-proxy from a subfolder made some UI stuff break
+* listening on unix-sockets: 687df2fa
+  * fix `x-forwarded-for` support, and avoid a possible container-specific collision
+  * new syntax which allows setting unix-permissions and unix-group
+    * `-i unix:770:www:/tmp/party.sock` (see `--help-bind` for more examples)
+* using relocation hooks (introduced in previous ver) could cause dedup issues c8f4aeae b0af4b37
+* custom fonts using `@import` css statements 5a62cb48
+* invert volume scrollwheel 7d8d9438
+
+## other changes
+
+* changed the button colors in theme 2 (pm-monokai) from red to yellow 5153db6b
+  * the red buttons look better, but are too confusing because usually red means off
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0813-0008  `v1.13.8`  hook into place
 
 ## new features
