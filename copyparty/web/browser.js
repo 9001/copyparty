@@ -1618,7 +1618,12 @@ var LANGS = ["eng", "nor", "chi"];
 if (window.langmod)
 	langmod();
 
-var L = Ls[sread("cpp_lang", LANGS) || lang] || Ls.eng || Ls.nor || Ls.chi;
+for (var a = LANGS.length; a > 0;)
+	if (!Ls[LANGS[--a]])
+		LANGS.splice(a, 1);
+
+var L = Ls[sread("cpp_lang", LANGS) || lang] ||
+			Ls.eng || Ls.nor || Ls.chi;
 
 for (var a = 0; a < LANGS.length; a++) {
 	for (var b = a + 1; b < LANGS.length; b++) {

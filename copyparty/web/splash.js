@@ -81,12 +81,11 @@ var Ls = {
 	}
 };
 
-var LANGS = ["eng", "nor", "chi"];
-
 if (window.langmod)
 	langmod();
 
-var d = Ls[sread("cpp_lang", LANGS) || lang] || Ls.eng || Ls.nor || Ls.chi;
+var d = Ls[sread("cpp_lang", Object.keys(Ls)) || lang] ||
+			Ls.eng || Ls.nor || Ls.chi;
 
 for (var k in (d || {})) {
 	var f = k.slice(-1),

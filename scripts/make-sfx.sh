@@ -3,6 +3,7 @@ set -e
 echo
 
 berr() { p=$(head -c 72 </dev/zero | tr '\0' =); printf '\n%s\n\n' $p; cat; printf '\n%s\n\n' $p; }
+aerr() { printf '%s\n' "$*" | berr; }
 
 help() { exec cat <<'EOF'
 
@@ -28,9 +29,11 @@ help() { exec cat <<'EOF'
 #
 # `no-tfp` saves ~10k by removing the tftp server, disabling --tftp
 #
+# `no-zm` saves ~7k by removing the zeroconf mDNS server
+#
 # `no-smb` saves ~3.5k by removing the smb / cifs server
 #
-# `no-zm` saves ~k by removing the zeroconf mDNS server
+# `no-pf` saves ~2.8k by removing the option to download partyfuse
 #
 # _____________________________________________________________________
 # web features:
@@ -52,10 +55,15 @@ help() { exec cat <<'EOF'
 #
 # `ign-wd` allows building an sfx without webdeps
 #
-# ---------------------------------------------------------------------
-#
+# _____________________________________________________________________
 # if you are on windows, you can use msys2:
 #   PATH=/c/Users/$USER/AppData/Local/Programs/Python/Python310:"$PATH" ./make-sfx.sh fast
+#
+# _____________________________________________________________________
+# some usage examples:
+#   ./scripts/make-sfx.sh lang eng no-cm no-hl no-dd no-fnt no-smb no-pf
+#   ./scripts/rls.sh sfx  lang eng no-cm no-hl no-dd no-fnt no-smb no-pf
+#   (reduces v1.14.2 from 700k to 495k)
 
 EOF
 }
@@ -112,6 +120,7 @@ while [ ! -z "$1" ]; do
 		no-tfp) no_tfp=1 ; ;;
 		no-smb) no_smb=1 ; ;;
 		no-zm)  no_zm=1  ; ;;
+		no-pf)  no_pf=1  ; ;;
 		no-fnt) no_fnt=1 ; ;;
 		no-hl)  no_hl=1  ; ;;
 		no-dd)  no_dd=1  ; ;;
@@ -119,7 +128,6 @@ while [ ! -z "$1" ]; do
 		dl-wd)  dl_wd=1  ; ;;
 		ign-wd) ign_wd=1 ; ;;
 		fast)   zopf=    ; ;;
-		ultra)  ultra=1  ; ;;
 		lang)   shift;langs="$1"; ;;
 		*)      help     ; ;;
 	esac
@@ -428,6 +436,9 @@ rm -f ftp/pyftpdlib/{__main__,prefork}.py
 [ $no_zm ] &&
 	rm -rf copyparty/mdns.py copyparty/stolen/dnslib
 
+[ $no_pf ] &&
+	rm -rf copyparty/web/a/partyfuse.py
+
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
 	echo h > copyparty/web/mde.html
@@ -451,11 +462,16 @@ rm -f ftp/pyftpdlib/{__main__,prefork}.py
 	ised 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; s/[0-9]+% \{cursor:[^}]+\}//; s/animation: ?cursor[^};]+//' $f
 }
 
-[ $langs ] &&
+[ $langs ] && {
+	echo $langs | grep -q eng || {
+		langs="eng|$langs"
+		aerr "ERROR: removing english is not supported; will do this instead: $langs"
+	}
 	for f in copyparty/web/{browser.js,splash.js}; do
 		gzip -d "$f.gz" || true
-		iawk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' $f
+		iawk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} !l{next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' $f
 	done
+}
 
 [ ! $repack ] && {
 	# uncomment

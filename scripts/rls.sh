@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+# if specified, keep the following sfx flags last: gz gzz fast
+
 parallel=1
 
 [ -e make-sfx.sh ] || cd scripts
@@ -34,6 +36,14 @@ f=../dist/copyparty-sfx
 [ -e $f.py ] && s= || s=-gz
 
 $f$s.py --version >/dev/null
+
+while [ "$1" ]; do
+    case "$1" in
+        gz*) break;;
+        fast) break;;
+    esac
+    shift
+done
 
 [ $parallel -gt 1 ] && {
     printf '\033[%s' s 2r H "0;1;37;44mbruteforcing sfx size -- press enter to terminate" K u "7m $* " K $'27m\n'

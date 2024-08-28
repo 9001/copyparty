@@ -1,8 +1,8 @@
 (function() {
 
 // usage: copy this to '.banner.js' in your webroot,
-// and run copyparty with the following argument:
-// --body-foot '<script src="/.banner.js"></script>'
+// and run copyparty with the following arguments:
+// --js-browser /.banner.js  --js-other /.banner.js
 
 
 
