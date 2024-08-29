@@ -1,4 +1,6 @@
-# 💾🎉 copyparty
+<img src="docs/logo.svg" width="250" align="right"/>
+
+### 💾🎉 copyparty
 
 turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser
 
