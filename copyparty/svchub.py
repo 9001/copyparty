@@ -106,6 +106,7 @@ class SvcHub(object):
         self.no_ansi = args.no_ansi
         self.logf: Optional[typing.TextIO] = None
         self.logf_base_fn = ""
+        self.is_dut = False  # running in unittest; always False
         self.stop_req = False
         self.stopping = False
         self.stopped = False

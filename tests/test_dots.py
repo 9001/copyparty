@@ -24,6 +24,10 @@ def hdr(query, uname):
 
 
 class TestDots(unittest.TestCase):
+    def __init__(self, *a, **ka):
+        super(TestDots, self).__init__(*a, **ka)
+        self.is_dut = True
+
     def setUp(self):
         self.td = tu.get_ramdisk()
 

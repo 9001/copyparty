@@ -3,7 +3,6 @@
 from __future__ import print_function, unicode_literals
 
 import os
-import platform
 import re
 import shutil
 import socket
@@ -16,9 +15,7 @@ from argparse import Namespace
 
 import jinja2
 
-WINDOWS = platform.system() == "Windows"
-ANYWIN = WINDOWS or sys.platform in ["msys"]
-MACOS = platform.system() == "Darwin"
+from copyparty.__init__ import MACOS, WINDOWS, E
 
 J2_ENV = jinja2.Environment(loader=jinja2.BaseLoader)  # type: ignore
 J2_FILES = J2_ENV.from_string("{{ files|join('\n') }}\nJ2EOT")
@@ -42,10 +39,11 @@ if MACOS:
     # 25% faster; until any tests do symlink stuff
 
 
-from copyparty.__init__ import E
 from copyparty.__main__ import init_E
+from copyparty.broker_thr import BrokerThr
 from copyparty.ico import Ico
 from copyparty.u2idx import U2idx
+from copyparty.up2k import Up2k
 from copyparty.util import FHC, CachedDict, Garda, Unrecv
 
 init_E(E)
@@ -119,10 +117,10 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None, **ka0):
         ka = {}
 
-        ex = "chpw daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid gsel hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_dedup no_del no_dupe no_lifetime no_logues no_mv no_pipe no_poll no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw og og_no_head og_s_title q rand smb srch_dbg stats uqe vague_403 vc ver write_uplog xdev xlink xvol"
+        ex = "chpw daw dav_auth dav_inf dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid gsel hardlink ih ihead magic never_symlink nid nih no_acode no_athumb no_dav no_db_ip no_dedup no_del no_dupe no_lifetime no_logues no_mv no_pipe no_poll no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nw og og_no_head og_s_title q rand smb srch_dbg stats uqe vague_403 vc ver write_uplog xdev xlink xvol zs"
         ka.update(**{k: False for k in ex.split()})
 
-        ex = "dotpart dotsrch hook_v no_dhash no_fastboot no_rescan no_sendfile no_snap no_voldump re_dhash plain_ip"
+        ex = "dotpart dotsrch hook_v no_dhash no_fastboot no_fpool no_htp no_rescan no_sendfile no_snap no_voldump re_dhash plain_ip"
         ka.update(**{k: True for k in ex.split()})
 
         ex = "ah_cli ah_gen css_browser hist js_browser js_other mime mimes no_forget no_hash no_idx nonsus_urls og_tpl og_ua"
@@ -137,8 +135,11 @@ class Cfg(Namespace):
         ex = "db_act k304 loris re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg bname chpw_db doctitle df exit favico idp_h_usr html_head lg_sbf log_fk md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i shr tcolor textfiles unlist vname R RS SR"
+        ex = "ah_alg bname chpw_db doctitle df exit favico idp_h_usr ipa html_head lg_sbf log_fk md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i shr tcolor textfiles unlist vname xff_src R RS SR"
         ka.update(**{k: "" for k in ex.split()})
+
+        ex = "ban_403 ban_404 ban_422 ban_pw ban_url"
+        ka.update(**{k: "no" for k in ex.split()})
 
         ex = "grp on403 on404 xad xar xau xban xbd xbr xbu xiu xm"
         ka.update(**{k: [] for k in ex.split()})
@@ -221,11 +222,29 @@ class VSock(object):
         pass
 
 
+class VHub(object):
+    def __init__(self, args, asrv, log):
+        self.args = args
+        self.asrv = asrv
+        self.log = log
+        self.is_dut = True
+        self.up2k = Up2k(self)
+
+
+class VBrokerThr(BrokerThr):
+    def __init__(self, hub):
+        self.hub = hub
+        self.log = hub.log
+        self.args = hub.args
+        self.asrv = hub.asrv
+
+
 class VHttpSrv(object):
     def __init__(self, args, asrv, log):
         self.args = args
         self.asrv = asrv
         self.log = log
+        self.hub = None
 
         self.broker = NullBroker(args, asrv)
         self.prism = None
@@ -252,18 +271,25 @@ class VHttpSrv(object):
         return self.u2idx
 
 
+class VHttpSrvUp2k(VHttpSrv):
+    def __init__(self, args, asrv, log):
+        super(VHttpSrvUp2k, self).__init__(args, asrv, log)
+        self.hub = VHub(args, asrv, log)
+        self.broker = VBrokerThr(self.hub)
+
+
 class VHttpConn(object):
-    def __init__(self, args, asrv, log, buf):
+    def __init__(self, args, asrv, log, buf, use_up2k=False):
         self.t0 = time.time()
-        self.s = VSock(buf)
-        self.sr = Unrecv(self.s, None)  # type: ignore
         self.aclose = {}
         self.addr = ("127.0.0.1", "42069")
         self.args = args
         self.asrv = asrv
         self.bans = {}
         self.freshen_pwd = 0.0
-        self.hsrv = VHttpSrv(args, asrv, log)
+
+        Ctor = VHttpSrvUp2k if use_up2k else VHttpSrv
+        self.hsrv = Ctor(args, asrv, log)
         self.ico = Ico(args)
         self.ipa_nm = None
         self.lf_url = None
@@ -279,6 +305,12 @@ class VHttpConn(object):
         self.u2fh = FHC()
 
         self.get_u2idx = self.hsrv.get_u2idx
+        self.setbuf(buf)
+
+    def setbuf(self, buf):
+        self.s = VSock(buf)
+        self.sr = Unrecv(self.s, None)  # type: ignore
+        return self
 
 
 if WINDOWS:

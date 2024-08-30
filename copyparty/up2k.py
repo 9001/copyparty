@@ -236,6 +236,9 @@ class Up2k(object):
         if not self.pp and self.args.exit == "idx":
             return self.hub.sigterm()
 
+        if self.hub.is_dut:
+            return
+
         Daemon(self._snapshot, "up2k-snapshot")
         if have_e2d:
             Daemon(self._hasher, "up2k-hasher")
@@ -1405,7 +1408,7 @@ class Up2k(object):
                 if dts == lmod and dsz == sz and (nohash or dw[0] != "#" or not sz):
                     continue
 
-                t = "reindex [{}] => [{}] ({}/{}) ({}/{})".format(
+                t = "reindex [{}] => [{}] mtime({}/{}) size({}/{})".format(
                     top, rp, dts, lmod, dsz, sz
                 )
                 self.log(t)
@@ -2664,11 +2667,19 @@ class Up2k(object):
                         if stat.S_ISLNK(st.st_mode):
                             # broken symlink
                             raise Exception()
-                    except:
+                        if st.st_size != dsize:
+                            t = "candidate ignored (db/fs desync): {}, size fs={} db={}, mtime fs={} db={}, file: {}"
+                            t = t.format(
+                                wark, st.st_size, dsize, st.st_mtime, dtime, dp_abs
+                            )
+                            self.log(t)
+                            raise Exception("desync")
+                    except Exception as ex:
                         if n4g:
                             st = os.stat_result((0, -1, -1, 0, 0, 0, 0, 0, 0, 0))
                         else:
-                            lost.append((cur, dp_dir, dp_fn))
+                            if str(ex) != "desync":
+                                lost.append((cur, dp_dir, dp_fn))
                             continue
 
                     j = {
@@ -2726,13 +2737,16 @@ class Up2k(object):
             ptop = None  # use cj or job as appropriate
 
             if not job and wark in reg:
-                # ensure the files haven't been deleted manually
+                # ensure the files haven't been edited or deleted
+                path = ""
+                st = None
                 rj = reg[wark]
                 names = [rj[x] for x in ["name", "tnam"] if x in rj]
                 for fn in names:
                     path = djoin(rj["ptop"], rj["prel"], fn)
                     try:
-                        if bos.path.getsize(path) > 0 or not rj["need"]:
+                        st = bos.stat(path)
+                        if st.st_size > 0 or not rj["need"]:
                             # upload completed or both present
                             break
                     except:
@@ -2742,6 +2756,14 @@ class Up2k(object):
                             self.log(t.format(path))
                             del reg[wark]
                         break
+
+                if st and not self.args.nw and not n4g and st.st_size != rj["size"]:
+                    t = "will not dedup (fs index desync): {}, size fs={} db={}, mtime fs={} db={}, file: {}"
+                    t = t.format(
+                        wark, st.st_size, rj["size"], st.st_mtime, rj["lmod"], path
+                    )
+                    self.log(t)
+                    del reg[wark]
 
             if job or wark in reg:
                 job = job or reg[wark]
@@ -2850,6 +2872,7 @@ class Up2k(object):
                                         return self._handle_json(job, depth + 1)
 
                         job["name"] = self._untaken(pdir, job, now)
+                        dst = djoin(job["ptop"], job["prel"], job["name"])
 
                         if not self.args.nw:
                             dvf: dict[str, Any] = vfs.flags
