@@ -403,7 +403,7 @@ class Tftpd(object):
             bos.stat(ap)
             return True
         except:
-            return False
+            return vpath == "/"
 
     def _p_isdir(self, vpath: str) -> bool:
         try:
@@ -411,7 +411,7 @@ class Tftpd(object):
             ret = stat.S_ISDIR(st.st_mode)
             return ret
         except:
-            return False
+            return vpath == "/"
 
     def _hook(self, *a: Any, **ka: Any) -> None:
         src = inspect.currentframe().f_back.f_code.co_name
