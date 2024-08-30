@@ -385,6 +385,7 @@ html.y textarea:focus {
 }
 .mdo pre,
 .mdo code,
+.mdo code[class*="language-"],
 .mdo tt {
 	font-family: 'scp', monospace, monospace;
 	font-family: var(--font-mono), 'scp', monospace, monospace;
