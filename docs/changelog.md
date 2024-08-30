@@ -1,4 +1,31 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0823-2307  `v1.14.2`  bing chilling
+
+## new features
+
+* #94 @ultwcz translated the UI to Chinese (thx!)  92edea1d
+* #84 improvements to [shares](https://github.com/9001/copyparty#shares): 8122dded
+  * if one or more files are selected for sharing, they are placed into a virtual folder
+  * more appropriate password UI for accessing protected shares
+  * human-readable timestamps in shares listing
+* u2c (commandline uploader): support multiple exclusion patterns f356faa2
+
+## bugfixes
+
+* remove confusing logmessage when downloading a zerobyte file 9f034d9c
+* shares: 7ff46966
+  * fix crash if the root volume is unmapped
+  * log-spam on config reload
+  * password coalescing
+  * add chrome support
+
+## other changes
+
+* #93 add html IDs to the tabstrip 461f3158
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0819-0014  `v1.14.1`  one step forward
 
 [if i turn back now, then this will always follow... one step forward, forward](https://youtu.be/xe3Wkzc0O3k?t=27)
