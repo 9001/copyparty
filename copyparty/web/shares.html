@@ -33,6 +33,7 @@
             <th>expires</th>
             <th>min</th>
             <th>hrs</th>
+            <th>add time</th>
         </tr></thead><tbody>
         {% for k, pw, vp, pr, st, un, t0, t1 in rows %}
         <tr>
@@ -45,8 +46,9 @@
             <td>{{ un|e }}</td>
             <td>{{ t0 }}</td>
             <td>{{ t1 }}</td>
-            <td>{{ ((t1 - now) / 60)   | round(1) if t1 else "inf" }}</td>
-            <td>{{ ((t1 - now) / 3600) | round(1) if t1 else "inf" }}</td>
+            <td>{{ "inf" if not t1 else "dead" if t1 < now else ((t1 - now) / 60)   | round(1) }}</td>
+            <td>{{ "inf" if not t1 else "dead" if t1 < now else ((t1 - now) / 3600) | round(1) }}</td>
+            <td></td>
         </tr>
         {% endfor %}
         </tbody></table>

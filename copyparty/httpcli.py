@@ -1611,8 +1611,8 @@ class HttpCli(object):
         if "delete" in self.uparam:
             return self.handle_rm([])
 
-        if "unshare" in self.uparam:
-            return self.handle_unshare()
+        if "eshare" in self.uparam:
+            return self.handle_eshare()
 
         if "application/octet-stream" in ctype:
             return self.handle_post_binary()
@@ -4304,7 +4304,7 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"), status=200)
         return True
 
-    def handle_unshare(self) -> bool:
+    def handle_eshare(self) -> bool:
         idx = self.conn.get_u2idx()
         if not idx or not hasattr(idx, "p_end"):
             if not HAVE_SQLITE3:
@@ -4312,7 +4312,7 @@ class HttpCli(object):
             raise Pebkac(500, "server busy, cannot create share; please retry in a bit")
 
         if self.args.shr_v:
-            self.log("handle_unshare: " + self.req)
+            self.log("handle_eshare: " + self.req)
 
         cur = idx.get_shr()
         if not cur:
@@ -4320,18 +4320,36 @@ class HttpCli(object):
 
         skey = self.vpath.split("/")[-1]
 
-        uns = cur.execute("select un from sh where k = ?", (skey,)).fetchall()
-        un = uns[0][0] if uns and uns[0] else ""
+        rows = cur.execute("select un, t1 from sh where k = ?", (skey,)).fetchall()
+        un = rows[0][0] if rows and rows[0] else ""
 
         if not un:
             raise Pebkac(400, "that sharekey didn't match anything")
+
+        expiry = rows[0][1]
 
         if un != self.uname and self.uname != self.args.shr_adm:
             t = "your username (%r) does not match the sharekey's owner (%r) and you're not admin"
             raise Pebkac(400, t % (self.uname, un))
 
-        cur.execute("delete from sh where k = ?", (skey,))
+        reload = False
+        act = self.uparam["eshare"]
+        if act == "rm":
+            cur.execute("delete from sh where k = ?", (skey,))
+            if skey in self.asrv.vfs.nodes[self.args.shr.strip("/")].nodes:
+                reload = True
+        else:
+            now = time.time()
+            if expiry < now:
+                expiry = now
+                reload = True
+            expiry += int(act) * 60
+            cur.execute("update sh set t1 = ? where k = ?", (expiry, skey))
+
         cur.connection.commit()
+        if reload:
+            self.conn.hsrv.broker.ask("_reload_blocking", False, False).get()
+            self.conn.hsrv.broker.ask("up2k.wake_rescanner").get()
 
         self.redirect(self.args.SRS + "?shares")
         return True

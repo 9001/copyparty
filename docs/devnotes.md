@@ -176,7 +176,8 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | mPOST | `?media` | `f=FILE` | ...and return medialink (not hotlink) |
 | mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
 | POST | `?delete` | | delete URL recursively |
-| POST | `?unshare` | | stop sharing a file/folder |
+| POST | `?eshare=rm` | | stop sharing a file/folder |
+| POST | `?eshare=3` | | set expiration to 3 minutes |
 | jPOST | `?share` | (complicated) | create temp URL for file/folder |
 | jPOST | `?delete` | `["/foo","/bar"]` | delete `/foo` and `/bar` recursively |
 | uPOST | | `msg=foo` | send message `foo` into server log |

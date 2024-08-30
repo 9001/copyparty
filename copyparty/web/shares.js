@@ -3,7 +3,17 @@ for (var a = 0; a < t.length; a++)
     t[a].onclick = rm;
 
 function rm() {
-    var u = SR + shr + uricom_enc(this.getAttribute('k')) + '?unshare',
+    var u = SR + shr + uricom_enc(this.getAttribute('k')) + '?eshare=rm',
+        xhr = new XHR();
+
+    xhr.open('POST', u, true);
+    xhr.onload = xhr.onerror = cb;
+    xhr.send();
+}
+
+function bump() {
+    var k = this.closest('tr').getElementsByTagName('a')[0].getAttribute('k'),
+        u = SR + shr + uricom_enc(k) + '?eshare=' + this.value,
         xhr = new XHR();
 
     xhr.open('POST', u, true);
@@ -34,4 +44,13 @@ function cb() {
             tr[a].cells[b].innerHTML =
                 v ? unix2iso(v).replace(' ', ',&nbsp;') : 'never';
         }
+
+    for (var a = 0; a < tr.length; a++)
+        tr[a].cells[11].innerHTML =
+            '<button value="1">1min</button> ' +
+            '<button value="60">1h</button>';
+    
+    var btns = QSA('td button'), aa = btns.length;
+    for (var a = 0; a < aa; a++)
+        btns[a].onclick = bump;
 })();

@@ -435,13 +435,16 @@ class Up2k(object):
     def _sched_rescan(self) -> None:
         volage = {}
         cooldown = timeout = time.time() + 3.0
-        while True:
+        while not self.stop:
             now = time.time()
             timeout = max(timeout, cooldown)
             wait = timeout - time.time()
             # self.log("SR in {:.2f}".format(wait), 5)
             with self.rescan_cond:
                 self.rescan_cond.wait(wait)
+
+            if self.stop:
+                return
 
             now = time.time()
             if now < cooldown:
@@ -466,6 +469,7 @@ class Up2k(object):
                     if self.args.shr:
                         timeout = min(self._check_shares(), timeout)
                 except Exception as ex:
+                    timeout = min(timeout, now + 60)
                     t = "could not check for expiring shares: %r"
                     self.log(t % (ex,), 1)
 
@@ -575,26 +579,52 @@ class Up2k(object):
 
         now = time.time()
         timeout = now + 9001
+        maxage = self.args.shr_rt * 60
+        low = now - maxage
+
+        vn = self.asrv.vfs.nodes.get(self.args.shr.strip("/"))
+        active = vn and vn.nodes
 
         db = sqlite3.connect(self.args.shr_db, timeout=2)
         cur = db.cursor()
 
         q = "select k from sh where t1 and t1 <= ?"
-        rm = [x[0] for x in cur.execute(q, (now,))]
+        rm = [x[0] for x in cur.execute(q, (now,))] if active else []
+        if rm:
+            assert vn and vn.nodes  # type: ignore
+            # self.log("chk_shr: %d" % (len(rm),))
+            zss = set(rm)
+            rm = [zs for zs in vn.nodes if zs in zss]
+        reload = bool(rm)
+        if reload:
+            self.log("disabling expired shares %s" % (rm,))
+
+        rm = [x[0] for x in cur.execute(q, (low,))]
         if rm:
             self.log("forgetting expired shares %s" % (rm,))
             cur.executemany("delete from sh where k=?", [(x,) for x in rm])
             cur.executemany("delete from sf where k=?", [(x,) for x in rm])
             db.commit()
+
+        if reload:
             Daemon(self.hub._reload_blocking, "sharedrop", (False, False))
 
-        q = "select min(t1) from sh where t1 > 1"
-        (earliest,) = cur.execute(q).fetchone()
+        q = "select min(t1) from sh where t1 > ?"
+        (earliest,) = cur.execute(q, (1,)).fetchone()
         if earliest:
-            timeout = earliest - now
+            # deadline for revoking regular access
+            timeout = min(timeout, earliest + maxage)
+
+            (earliest,) = cur.execute(q, (now - 2,)).fetchone()
+            if earliest:
+                # deadline for revival; drop entirely
+                timeout = min(timeout, earliest)
 
         cur.close()
         db.close()
+
+        if self.args.shr_v:
+            self.log("next shr_chk = %d (%d)" % (timeout, timeout - time.time()))
 
         return timeout
 
