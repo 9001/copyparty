@@ -54,18 +54,23 @@ class TestDedup(unittest.TestCase):
         # 3072 uploads in total
         self.ctr = 3072
         self.conn = None
+        fstab = None
         for e2d in [True, False]:
+            self.args = Cfg(v=[".::A"], a=[], e2d=e2d)
             for dn1, fn1, f1 in product(dirnames, filenames, files):
                 for dn2, fn2, f2 in product(dirnames, filenames, files):
                     for dn3, fn3, f3 in product(dirnames, filenames, files):
                         self.reset()
                         if self.conn:
+                            fstab = self.conn.hsrv.hub.up2k.fstab
                             self.conn.hsrv.hub.up2k.shutdown()
-                        self.args = Cfg(v=[".::A"], a=[], e2d=e2d)
                         self.asrv = AuthSrv(self.args, self.log)
                         self.conn = tu.VHttpConn(
                             self.args, self.asrv, self.log, b"", True
                         )
+                        if fstab:
+                            self.conn.hsrv.hub.up2k.fstab = fstab
+
                         self.do_post(dn1, fn1, f1, True)
                         self.do_post(dn2, fn2, f2, False)
                         self.do_post(dn3, fn3, f3, False)

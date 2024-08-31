@@ -915,7 +915,6 @@ class ProgressPrinter(threading.Thread):
         self.msg = ""
         self.end = False
         self.n = -1
-        self.start()
 
     def run(self) -> None:
         sigblock()

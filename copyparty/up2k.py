@@ -749,6 +749,8 @@ class Up2k(object):
                     continue
 
                 self.pp = ProgressPrinter(self.log, self.args)
+                if not self.hub.is_dut:
+                    self.pp.start()
 
             break
 
@@ -2353,7 +2355,9 @@ class Up2k(object):
 
     def _open_db_wd(self, db_path: str) -> "sqlite3.Cursor":
         ok: list[int] = []
-        Daemon(self._open_db_timeout, "opendb_watchdog", [db_path, ok])
+        if not self.hub.is_dut:
+            Daemon(self._open_db_timeout, "opendb_watchdog", [db_path, ok])
+
         try:
             return self._open_db(db_path)
         finally:
