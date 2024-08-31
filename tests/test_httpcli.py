@@ -86,6 +86,7 @@ class TestHttpCli(unittest.TestCase):
 
             self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
             self.asrv = AuthSrv(self.args, self.log)
+            self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
             vfiles = [x for x in allfiles if x.startswith(top)]
             for fp in vfiles:
                 tctr += 1
@@ -204,14 +205,14 @@ class TestHttpCli(unittest.TestCase):
         buf = "PUT /{0} HTTP/1.1\r\nCookie: cppwd=o\r\nConnection: close\r\nContent-Length: {1}\r\n\r\nok {0}\n"
         buf = buf.format(url, len(url) + 4).encode("utf-8")
         print("PUT -->", buf)
-        conn = tu.VHttpConn(self.args, self.asrv, self.log, buf)
+        conn = self.conn.setbuf(buf)
         HttpCli(conn).run()
         ret = conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
         print("PUT <--", ret)
         return ret
 
     def curl(self, url, binary=False):
-        conn = tu.VHttpConn(self.args, self.asrv, self.log, hdr(url))
+        conn = self.conn.setbuf(hdr(url))
         HttpCli(conn).run()
         if binary:
             h, b = conn.s._reply.split(b"\r\n\r\n", 1)
