@@ -857,7 +857,7 @@ dnf install https://ocv.me/copyparty/fedora/39/python3-copyparty.fc39.noarch.rpm
 ## other changes
 * improved [systemd example](https://github.com/9001/copyparty/tree/hovudstraum/contrib/systemd) with hardening and a better example config
 * logfiles are flushed for every line written; can be disabled with `--no-logflush` for ~3% more performance best-case
-* iphones probably won't broadcast cover-art to car stereos over bluetooth anymore since the thingamajig in iOS that's in charge of that doesn't have cookie-access, and strapping in the auth is too funky so let's stop doing that b7723ac245b8b3e38d6410891ef1aa92d4772114
+* iphones probably won't broadcast cover-art to car stereos over bluetooth anymore since the thingamajig in iOS that's in charge of that doesn't have cookie-access, and strapping in the auth is too funky so let's stop doing that b7723ac2
   * can be remedied by enabling filekeys and granting unauthenticated people access that way, but that's too much effort for anyone to bother with I'm sure
 
 
@@ -1126,12 +1126,12 @@ okay, i swear this is the last version for weeks! probably
     * [r0c is much better](https://github.com/9001/r0c) than this joke
 
 ## bugfixes
-* 163e3fce46122d64bf824762b6733ff2c3551ba5 the `x-forwarded-for` header was ignored if the nearest reverse-proxy is not asking from 127.0.0.1, which broke client IPs in containerized deployments
+* 163e3fce the `x-forwarded-for` header was ignored if the nearest reverse-proxy is not asking from 127.0.0.1, which broke client IPs in containerized deployments
   * the serverlog will now explain how to trust the reverse-proxy to provide client IPs, but basically,
   * `--xff-hdr` specifies which header to read the client's real ip from
   * `--xff-src` is an allowlist of IP-addresses to trust that header from
-* a62f744a187bc9f821b540e8bb4e0b9a67bd01c8 if copyparty was started while an external HDD was not connected, and that volume's index was stored elsewhere, then the index would get wiped (since all the files are gone)
-* 3b8f66c0d5c27a68841814ec06f1758f146a5ff5 javascript could crash while uploading from a very unreliable internet connection
+* a62f744a if copyparty was started while an external HDD was not connected, and that volume's index was stored elsewhere, then the index would get wiped (since all the files are gone)
+* 3b8f66c0 javascript could crash while uploading from a very unreliable internet connection
 
 ## other changes
 * copyparty.exe: updated pillow to 10.0.1 which fixes the webp cve
@@ -1177,7 +1177,7 @@ hello! it's been a while, an entire day even...
   * default compression levels are gz:3, bz2:2, xz:1; override with `?tar=gz:9`
 
 # bugfixes
-* c1efd227b7377144a5760bc6cff64f4e87b626d9 symlink-deduplicated files got indexed with the wrong last-modified timestamp
+* c1efd227 symlink-deduplicated files got indexed with the wrong last-modified timestamp
   * mostly inconsequential; would cause the dupe's uploader-ip to be forgotten on the next server restart since it would reindex to "fix" the timestamp
 * when linking [a search query](https://a.ocv.me/pub/#q=tags%20like%20soundsho*) it loads the results faster
 
@@ -1192,12 +1192,12 @@ hello! it's been a while, an entire day even...
 
 ## new features
 * iPhones and iPads are now able to...
-  * 9986136dfb2364edb35aa9fbb87410641c6d6af3 play entire albums while the screen is off without the music randomly stopping
+  * 9986136d play entire albums while the screen is off without the music randomly stopping
     * apple keeps breaking AudioContext in new and interesting ways; time to give up (no more equalizer)
-  * 1c0d978979a703edeb792e552b18d3b7695b2d90 perform search queries and execude js code
+  * 1c0d9789 perform search queries and execude js code
     * by translating [smart-quotes](https://stackoverflow.com/questions/48678359/ios-11-safari-html-disable-smart-punctuation) into regular `'` and `"` characters
 * python 3.12 support
-  * technically a bugfix since it was added [a year ago](https://github.com/9001/copyparty/commit/32e22dfe84d5e0b13914b4d0e15c1b8c9725a76d) way before the first py3.12 alpha was released but turns out i botched it, oh well
+  * technically a bugfix since it was added [a year ago](https://github.com/9001/copyparty/commit/32e22dfe) way before the first py3.12 alpha was released but turns out i botched it, oh well
 * filter error messages so they never include the filesystem path where copyparty's python files reside
 * print more context in server logs if someone hits an unexpected permission-denied
 
@@ -1418,8 +1418,8 @@ Thanks for flying copyparty! And especially if you decide to continue doing so :
       ```bash
       (gzip -dc access.log.*.gz; cat access.log) | sed -r 's/" [0-9]+ .*//' | grep -E 'cpr/.*%2[^0]' | grep -vF data:image/svg
       ```
-* 77f1e5144455eb946db7368792ea11c934f0f6da fixes an extremely unlikely race-condition (see the commit for details)
-* 8f59afb1593a75b8ce8c91ceee304097a07aea6e fixes another race-condition which is a bit worse:
+* 77f1e514 fixes an extremely unlikely race-condition (see the commit for details)
+* 8f59afb1 fixes another race-condition which is a bit worse:
   * the unpost feature could collide with other database activity, with the worst-case outcome being aborted batch operations, for example a directory move or a batch-rename which stops halfways
 
 ----
@@ -1593,7 +1593,7 @@ don't get excited! nothing new and revolutionary, but `xvol` and `xdev` changed 
 # 2023-0426-2300  `v1.6.15`  unexpected boost
 
 ## new features
-* 30% faster folder listings due to [the very last thing](https://github.com/9001/copyparty/commit/55c74ad164633a0a64dceb51f7f534da0422cbb5) i'd ever expect to be a bottleneck, [thx perf](https://docs.python.org/3.12/howto/perf_profiling.html)
+* 30% faster folder listings due to [the very last thing](https://github.com/9001/copyparty/commit/55c74ad1) i'd ever expect to be a bottleneck, [thx perf](https://docs.python.org/3.12/howto/perf_profiling.html)
 * option to see the lastmod timestamps of symlinks instead of the target files
   * makes the turbo mode of [u2cli, the commandline uploader and folder-sync tool](https://github.com/9001/copyparty/blob/hovudstraum/bin/up2k.py) more turbo since copyparty dedupes uploads by symlinking to an existing copy and the symlink is stamped with the deduped file's lastmod
   * **webdav:** enabled by default (because rclone will want this), can be disabled with arg `--dav-rt` or volflag `davrt`
@@ -1797,7 +1797,7 @@ don't get excited! nothing new and revolutionary, but `xvol` and `xdev` changed 
 the commandline up2k upload / filesearch client, now as a standalone windows exe
 * based on python 3.7 so it runs on 32bit windows7 or anything newer
 * *no https support* (saves space + the python3.7 openssl is getting old)
-* built from b39ff92f34e3fca389c78109d20d5454af761f8e so it can do long filepaths and mojibake
+* built from b39ff92f so it can do long filepaths and mojibake
 
 ----
 
@@ -2004,7 +2004,7 @@ but nothing is affected (that i know of):
 * tar/zip-download of hidden folders
 * unpost filtering was buggy for non-ascii characters
 * moving a deduplicated file on a volume where deduplication was since disabled
-* improved the [linux 6.0.16](https://utcc.utoronto.ca/~cks/space/blog/linux/KernelBindBugIn6016) kernel bug [workaround](https://github.com/9001/copyparty/commit/9065226c3d634a9fc15b14a768116158bc1761ad) because there is similar funk in 5.x
+* improved the [linux 6.0.16](https://utcc.utoronto.ca/~cks/space/blog/linux/KernelBindBugIn6016) kernel bug [workaround](https://github.com/9001/copyparty/commit/9065226c) because there is similar funk in 5.x
 * add custom text selection colors because chrome is currently broken on fedora
 * blockdevs (`/dev/nvme0n1`) couldn't be downloaded as files
 * misc fixes for location-based reverse-proxying
@@ -2033,7 +2033,7 @@ hello from warsaw airport (goodbye japan ;_;)
 * browser ui didn't allow specifying number of threads for file search
 * dont panic if a digit key is pressed while viewing an image
 * workaround [linux kernel bug](https://utcc.utoronto.ca/~cks/space/blog/linux/KernelBindBugIn6016) causing log spam on dualstack
-  * ~~related issue (also mostly harmless) will be fixed next relese 010770684db95bece206943768621f2c7c27bace~~ 
+  * ~~related issue (also mostly harmless) will be fixed next relese 01077068~~ 
     * they fixed it in linux 6.1 so these workarounds will be gone too
 
 
@@ -2999,7 +2999,7 @@ fixed another dumdum, sorry for the spam
 * the ftp server is not compatible with python 3.12 (releasing october 2023)
   * will be fixed in a [future version of pyftpdlib](https://github.com/giampaolo/pyftpdlib/issues/560)
 
-the sfx was built from https://github.com/9001/copyparty/commit/39e7a7a2311ab8da43b2a9a18ae39d06202105e3
+the sfx was built from https://github.com/9001/copyparty/commit/39e7a7a2
 
 
 
@@ -3780,7 +3780,7 @@ we did it reddit 👉😎👉
 * latest gzip edition of the sfx: [v0.11.18](https://github.com/9001/copyparty/releases/tag/v0.11.18)
 * if upgrading from v0.11.x or before, see [v0.12.4](https://github.com/9001/copyparty/releases/tag/v0.12.4)
 
-note: `copyparty-sfx.py` is https://github.com/9001/copyparty/commit/5955940b82adddb7149125a60463aba22f1c8c31 which fixes upload eta
+note: `copyparty-sfx.py` is https://github.com/9001/copyparty/commit/5955940b which fixes upload eta
 
 ## new features
 * provide password using basic-authentication
@@ -5250,7 +5250,7 @@ nothing really important happened since [v0.11.6](https://github.com/9001/copypa
 * this release fixes a missing permission check which could allow users to download write-only folders
   * this bug was introduced 19 days ago, in `v0.10.17`
   * the requirement to be affected is write-only folders mounted within readable folders
-  * and the worst part is there was a unit-test exactly for this, https://github.com/9001/copyparty/commit/273ca0c8da0d94f9d06ca16bd86c0301d9d06455 way overdue
+  * and the worst part is there was a unit-test exactly for this, https://github.com/9001/copyparty/commit/273ca0c8 way overdue
 * also fixes minor bugs introduced in `v0.11.1`
 * this version is the same as `v0.11.5` on pypi
 
@@ -5434,8 +5434,8 @@ in other news, minor ui tweaks:
 * a few lightmode adjustments
 * less cpu usage? should be
 
-`copyparty-sfx.py` (latest) made from c5db7c1a0c8f6ab23138ad7ea7642a6260e7da9b (v0.10.15-15) fixes `-j` (multiprocessing/high-performance)
-`copyparty-sfx-5a579db.py` (old) made from 5a579dba52e46c202b79c3d80c3b1c996c7b2e4a (v0.10.15-5) reduced the size
+`copyparty-sfx.py` (latest) made from c5db7c1a (v0.10.15-15) fixes `-j` (multiprocessing/high-performance)
+`copyparty-sfx-5a579db.py` (old) made from 5a579dba (v0.10.15-5) reduced the size
 
 
 
@@ -5748,7 +5748,7 @@ and i just realized i never added runtime tag scanning so copyparty will have to
 
 use `-e2dsa` and `-e2ts` to enable the media tag features globally, or enable/disable them per-volume (see readme)
 
-**NOTE:** older fuse clients (from before 5e3775c1afc9438f9930080a9b8542a063ba1765  / older than v0.8.0) must be upgraded for this copyparty release, however the new client still supports connecting to old servers
+**NOTE:** older fuse clients (from before 5e3775c1  / older than v0.8.0) must be upgraded for this copyparty release, however the new client still supports connecting to old servers
 
 other changes include
 * support chunked PUT requests from curl
@@ -5968,7 +5968,7 @@ valvrave-stop.jpg
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2020-0818-1822  `v0.5.2`  da setter vi punktum
 
-full disclaimer: `copyparty-sfx.py` was built using `sfx.py` from ~~82e568d4c9f25bfdfd1bf5166f0ebedf058723ee~~ f550a8171d298992f4ef569d2fc99a6037a44ea8
+full disclaimer: `copyparty-sfx.py` was built using `sfx.py` from ~~82e568d4~~ f550a817
 
 
 
