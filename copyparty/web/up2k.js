@@ -2625,7 +2625,7 @@ function up2k_init(subtle) {
                 t.nojoin = t.nojoin || t.postlist.length;
                 console.log("ignoring dupe-segment with backoff", t.nojoin, t.name, t);
                 if (!toast.visible && st.todo.upload.length < 4)
-                    toast.msg(10, L.u_cbusy);
+                    toast.inf(10, L.u_cbusy);
             }
             else {
                 xhrchk(xhr, L.u_cuerr2.format(snpart, Math.ceil(t.size / chunksize), t.name), "404, target folder not found (???)", "warn", t);
