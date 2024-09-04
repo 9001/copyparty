@@ -152,13 +152,13 @@ function U2pvis(act, btns, uc, st) {
     r.mod0 = null;
 
     var markup = {
-        '404': '<span class="err">404</span>',
-        'ERROR': '<span class="err">ERROR</span>',
-        'OS-error': '<span class="err">OS-error</span>',
-        'found': '<span class="inf">found</span>',
-        'defer': '<span class="inf">defer</span>',
-        'YOLO': '<span class="inf">YOLO</span>',
-        'done': '<span class="ok">done</span>',
+        '404': '<span class="err">' + L.utl_404 + '</span>',
+        'ERROR': '<span class="err">' + L.utl_err + '</span>',
+        'OS-error': '<span class="err">' + L.utl_oserr + '</span>',
+        'found': '<span class="inf">' + L.utl_found + '</span>',
+        'defer': '<span class="inf">' + L.utl_defer + '</span>',
+        'YOLO': '<span class="inf">' + L.utl_yolo + '</span>',
+        'done': '<span class="ok">' + L.utl_done + '</span>',
     };
 
     r.addfile = function (entry, sz, draw) {
@@ -446,9 +446,7 @@ function U2pvis(act, btns, uc, st) {
             return;
 
         r.npotato = 0;
-        var html = [
-            "<p>files: &nbsp; <b>{0}</b> finished, &nbsp; <b>{1}</b> failed, &nbsp; <b>{2}</b> busy, &nbsp; <b>{3}</b> queued</p>".format(
-                r.ctr.ok, r.ctr.ng, r.ctr.bz, r.ctr.q)];
+        var html = [L.u_pott.format(r.ctr.ok, r.ctr.ng, r.ctr.bz, r.ctr.q)];
 
         while (r.head < r.tab.length && has(["ok", "ng"], r.tab[r.head].in))
             r.head++;
@@ -603,7 +601,7 @@ function U2pvis(act, btns, uc, st) {
             if (nf < 9000)
                 return go();
 
-            modal.confirm('about to show ' + nf + ' files\n\nthis may crash your browser, are you sure?', go, null);
+            modal.confirm(L.u_bigtab.format(nf), go, null);
         };
     }
 
@@ -1038,7 +1036,7 @@ function up2k_init(subtle) {
         }
         catch (ex) {
             document.body.ondragenter = document.body.ondragleave = document.body.ondragover = null;
-            return modal.alert('your browser does not support drag-and-drop uploading');
+            return modal.alert(L.u_nodrop);
         }
         if (btn)
             return;
@@ -1105,7 +1103,7 @@ function up2k_init(subtle) {
         }
 
         if (!good_files.length && bad_files.length)
-            return toast.err(30, "that's not a folder!\n\nyour browser is too old,\nplease try dragdrop instead");
+            return toast.err(30, L.u_notdir);
 
         return read_dirs(null, [], [], good_files, nil_files, bad_files);
     }
@@ -1123,7 +1121,7 @@ function up2k_init(subtle) {
         if (err)
             return modal.alert('sorry, ' + err);
 
-        toast.inf(0, 'Scanning files...');
+        toast.inf(0, L.u_scan);
 
         if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
             tgl_fsearch();
@@ -1211,7 +1209,7 @@ function up2k_init(subtle) {
                     match = false;
 
             if (match) {
-                var msg = ['directory iterator got stuck trying to access the following {0} items; will skip:<ul>'.format(missing.length)];
+                var msg = [L.u_dirstuck.format(missing.length) + '<ul>'];
                 for (var a = 0; a < Math.min(20, missing.length); a++)
                     msg.push('<li>' + esc(missing[a]) + '</li>');
 
@@ -1282,7 +1280,7 @@ function up2k_init(subtle) {
     }
 
     function gotallfiles(good_files, nil_files, bad_files) {
-        if (toast.txt == 'Scanning files...')
+        if (toast.txt == L.u_scan)
             toast.hide();
 
         if (uc.fsearch && !uc.turbo)
@@ -1438,7 +1436,7 @@ function up2k_init(subtle) {
             if (!actx || actx.state != 'suspended' || toast.visible)
                 return;
 
-            toast.warn(30, "<div onclick=\"start_actx();toast.inf(3,'thanks!')\">please click this text to<br />unlock full upload speed</div>");
+            toast.warn(30, "<div onclick=\"start_actx();toast.inf(3,'thanks!')\">" + L.u_actx + "</div>");
         }, 500);
     }
 
@@ -1480,7 +1478,7 @@ function up2k_init(subtle) {
         ev(e);
         var txt = linklist();
         cliptxt(txt + '\n', function () {
-            toast.inf(5, txt.split('\n').length + ' links copied to clipboard');
+            toast.inf(5, un_clip.format(txt.split('\n').length));
         });
     };
 
@@ -2282,7 +2280,8 @@ function up2k_init(subtle) {
                     apop(st.busy.handshake, t);
                     st.todo.handshake.unshift(t);
                     t.cooldown = Date.now() + 5000 + Math.floor(Math.random() * 3000);
-                    return toast.err(0, 'Handshake error; will retry...\n\n' + L.badreply + ':\n\n' + unpre(xhr.responseText));
+                    var txt = t.t_uploading ? L.u_ehsfin : t.srch ? L.u_ehssrch : L.u_ehsinit;
+                    return toast.err(0, txt + '\n\n' + L.badreply + ':\n\n' + unpre(xhr.responseText));
                 }
 
                 t.t_handshake = Date.now();

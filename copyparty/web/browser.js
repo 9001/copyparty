@@ -90,6 +90,10 @@ var Ls = {
 		"m_ok": "OK",
 		"m_ng": "Cancel",
 
+		"enable": "Enable",
+		"danger": "DANGER",
+		"clipped": "copied to clipboard",
+
 		"ht_s": "second!s",
 		"ht_m": "minute!s",
 		"ht_h": "hour!s",
@@ -170,6 +174,15 @@ var Ls = {
 		"utl_stat": "status",
 		"utl_prog": "progress",
 
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "ERROR",
+		"utl_oserr": "OS-error",
+		"utl_found": "found",
+		"utl_defer": "defer",
+		"utl_yolo": "YOLO",
+		"utl_done": "done",
+
 		"ul_flagblk": "the files were added to the queue</b><br>however there is a busy up2k in another browser tab,<br>so waiting for that to finish first",
 		"ul_btnlk": "the server configuration has locked this switch into this state",
 
@@ -195,6 +208,7 @@ var Ls = {
 		"cl_hcancel": "column hiding aborted",
 
 		"ct_grid": '田 the grid',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
@@ -326,6 +340,7 @@ var Ls = {
 		"fs_pname": "optional link name; will be random if blank",
 		"fs_tsrc": "the file or folder to share",
 		"fs_ppwd": "optional password",
+		"fs_w8": "creating share...",
 		"fs_ok": "<h6>share-URL created</h6>\npress <code>Enter/OK</code> to Clipboard\npress <code>ESC/Cancel</code> to Close\n\n",
 
 		"frt_dec": "may fix some cases of broken filenames\">url-decode",
@@ -336,6 +351,8 @@ var Ls = {
 		"fr_case": "case-sensitive regex\">case",
 		"fr_win": "windows-safe names; replace <code>&lt;&gt;:&quot;\\|?*</code> with japanese fullwidth characters\">win",
 		"fr_slash": "replace <code>/</code> with a character that doesn't cause new folders to be created\">no /",
+		"fr_re": "regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on",
+		"fr_fmt": "inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips [this] part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits",
 		"fr_pdel": "delete",
 		"fr_pnew": "save as",
 		"fr_pname": "provide a name for your new preset",
@@ -345,7 +362,7 @@ var Ls = {
 		"fr_tags": "tags for the selected files (read-only, just for reference):",
 		"fr_busy": "renaming {0} items...\n\n{1}",
 		"fr_efail": "rename failed:\n",
-		"fr_nchg": "{0} of the new names were altered due to <code>win</code> and/or <code>ikke /</code>\n\nOK to continue with these altered new names?",
+		"fr_nchg": "{0} of the new names were altered due to <code>win</code> and/or <code>no /</code>\n\nOK to continue with these altered new names?",
 
 		"fd_ok": "delete OK",
 		"fd_err": "delete failed:\n",
@@ -395,6 +412,7 @@ var Ls = {
 		"gt_c1": "truncate filenames more (show less)",
 		"gt_c2": "truncate filenames less (show more)",
 
+		"sm_w8": "searching...",
 		"sm_prev": "search results below are from a previous query:\n  ",
 		"sl_close": "close search results",
 		"sl_hits": "showing {0} hits",
@@ -467,16 +485,20 @@ var Ls = {
 		"un_del": "delete",
 		"un_m3": "loading your recent uploads...",
 		"un_busy": "deleting {0} files...",
+		"un_clip": "{0} links copied to clipboard",
 
 		"u_https1": "you should",
 		"u_https2": "switch to https",
 		"u_https3": "for better performance",
 		"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" onclick="goto(\'bup\')">use bup instead</a>',
 		"u_nowork": "need firefox 53+ or chrome 57+ or iOS 11+",
+		"u_nodrop": 'your browser is too old for drag-and-drop uploading',
+		"u_notdir": "that's not a folder!\n\nyour browser is too old,\nplease try dragdrop instead",
 		"u_uri": "to dragdrop images from other browser windows,\nplease drop it onto the big upload button",
 		"u_enpot": 'switch to <a href="#">potato UI</a> (may improve upload speed)',
 		"u_depot": 'switch to <a href="#">fancy UI</a> (may reduce upload speed)',
 		"u_gotpot": 'switching to the potato UI for improved upload speed,\n\nfeel free to disagree and switch back!',
+		"u_pott": "<p>files: &nbsp; <b>{0}</b> finished, &nbsp; <b>{1}</b> failed, &nbsp; <b>{2}</b> busy, &nbsp; <b>{3}</b> queued</p>",
 		"u_ever": "this is the basic uploader; up2k needs at least<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
 		"u_su2k": 'this is the basic uploader; <a href="#" id="u2yea">up2k</a> is better',
 		"u_ewrite": 'you do not have write-access to this folder',
@@ -489,11 +511,15 @@ var Ls = {
 		"u_up_life": "This upload will be deleted from the server\n{0} after it completes",
 		"u_asku": 'upload these {0} files to <code>{1}</code>',
 		"u_unpt": "you can undo / delete this upload using the top-left 🧯",
+		"u_bigtab": 'about to show {0} files\n\nthis may crash your browser, are you sure?',
+		"u_scan": 'Scanning files...',
+		"u_dirstuck": 'directory iterator got stuck trying to access the following {0} items; will skip:',
 		"u_etadone": 'Done ({0}, {1} files)',
 		"u_etaprep": '(preparing to upload)',
 		"u_hashdone": 'hashing done',
 		"u_hashing": 'hash',
 		"u_dupdefer": "duplicate; will be processed after all other files",
+		"u_actx": "click this text to prevent loss of<br />performance when switching to other windows/tabs",
 		"u_fixed": "OK!&nbsp; Fixed it 👍",
 		"u_cuerr": "failed to upload chunk {0} of {1};\nprobably harmless, continuing\n\nfile: {2}",
 		"u_cuerr2": "server rejected upload (chunk {0} of {1});\nwill retry later\n\nfile: {2}\n\nerror ",
@@ -627,6 +653,10 @@ var Ls = {
 		"m_ok": "OK",
 		"m_ng": "Avbryt",
 
+		"enable": "Aktiv",
+		"danger": "VARSKU",
+		"clipped": "kopiert til utklippstavlen",
+
 		"ht_s": "sekund!er",
 		"ht_m": "minutt!er",
 		"ht_h": "time!r",
@@ -707,6 +737,15 @@ var Ls = {
 		"utl_stat": "status",
 		"utl_prog": "fremdrift",
 
+		// må være korte:
+		"utl_404": "404",
+		"utl_err": "FEIL!",
+		"utl_oserr": "OS-feil",
+		"utl_found": "funnet",
+		"utl_defer": "senere",
+		"utl_yolo": "YOLO",
+		"utl_done": "ferdig",
+
 		"ul_flagblk": "filene har blitt lagt i køen</b><br>men det er en annen nettleserfane som holder på med befaring eller opplastning akkurat nå,<br>så venter til den er ferdig først",
 		"ul_btnlk": "bryteren har blitt låst til denne tilstanden i serverens konfigurasjon",
 
@@ -732,6 +771,7 @@ var Ls = {
 		"cl_hcancel": "kolonne-skjuling avbrutt",
 
 		"ct_grid": '田 ikoner',
+		"ct_ttips": 'hvis hjelpetekst ved å holde musen over ting">ℹ️ tips',
 		"ct_thumb": 'vis miniatyrbilder istedenfor ikoner$NSnarvei: T">🖼️ bilder',
 		"ct_csel": 'bruk tastene CTRL og SHIFT for markering av filer i ikonvisning">merk',
 		"ct_ihop": 'bla ned til sist viste bilde når bildeviseren lukkes">g⮯',
@@ -863,6 +903,7 @@ var Ls = {
 		"fs_pname": "frivillig navn (blir noe tilfeldig ellers)",
 		"fs_tsrc": "fil/mappe som skal deles",
 		"fs_ppwd": "frivillig passord",
+		"fs_w8": "oppretter deling...",
 		"fs_ok": "<h6>URL opprettet</h6>\ntrykk <code>Enter/OK</code> for å kopiere linken (for CTRL-V)\ntrykk <code>ESC/Avbryt</code> for å bare bekrefte\n\n",
 
 		"frt_dec": "kan korrigere visse ødelagte filnavn\">url-decode",
@@ -873,6 +914,8 @@ var Ls = {
 		"fr_case": "versalfølsomme uttrykk\">Aa",
 		"fr_win": "bytt ut bokstavene <code>&lt;&gt;:&quot;\\|?*</code> med$Ntilsvarende som windows ikke får panikk av\">win",
 		"fr_slash": "bytt ut bokstaven <code>/</code> slik at den ikke forårsaker at nye mapper opprettes\">ikke /",
+		"fr_re": "regex-mønster som kjøres på hvert filnavn. Grupper kan leses ut i format-feltet nedenfor, f.eks. &lt;code&gt;(1)&lt;/code&gt; og &lt;code&gt;(2)&lt;/code&gt; osv.",
+		"fr_fmt": "inspirert av foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; byttes ut med sangtittel,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; dropper [dette] hvis artist er blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; viser sangnr. med 2 siffer",
 		"fr_pdel": "slett",
 		"fr_pnew": "lagre som",
 		"fr_pname": "gi innstillingene dine et navn",
@@ -932,6 +975,7 @@ var Ls = {
 		"gt_c1": "reduser maks-lengde på filnavn",
 		"gt_c2": "øk maks-lengde på filnavn",
 
+		"sm_w8": "søker...",
 		"sm_prev": "søkeresultatene er fra et tidligere søk:\n  ",
 		"sl_close": "lukk søkeresultater",
 		"sl_hits": "viser {0} treff",
@@ -1004,16 +1048,20 @@ var Ls = {
 		"un_del": "slett",
 		"un_m3": "henter listen med nylig opplastede filer...",
 		"un_busy": "sletter {0} filer...",
+		"un_clip": "{0} lenker kopiert til utklippstavlen",
 
 		"u_https1": "du burde",
 		"u_https2": "bytte til https",
 		"u_https3": "for høyere hastighet",
 		"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup istedenfor</a>',
 		"u_nowork": "krever firefox 53+, chrome 57+, eller iOS 11+",
+		"u_nodrop": 'nettleseren din er for gammel til å laste opp filer ved å dra dem inn i vinduet',
+		"u_notdir": "mottok ikke mappen!\n\nnettleseren din er for gammel,\nprøv å dra mappen inn i vinduet istedenfor",
 		"u_uri": "for å laste opp bilder ifra andre nettleservinduer,\nslipp bildet rett på den store last-opp-knappen",
 		"u_enpot": 'bytt til <a href="#">enkelt UI</a> (gir sannsynlig raskere opplastning)',
 		"u_depot": 'bytt til <a href="#">snæsent UI</a> (gir sannsynlig tregere opplastning)',
 		"u_gotpot": 'byttet til et enklere UI for å laste opp raskere,\n\ndu kan gjerne bytte tilbake altså!',
+		"u_pott": "<p>filer: &nbsp; <b>{0}</b> ferdig, &nbsp; <b>{1}</b> feilet, &nbsp; <b>{2}</b> behandles, &nbsp; <b>{3}</b> i kø</p>",
 		"u_ever": "dette er den primitive opplasteren; up2k krever minst:<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
 		"u_su2k": 'dette er den primitive opplasteren; <a href="#" id="u2yea">up2k</a> er bedre',
 		"u_ewrite": 'du har ikke skrivetilgang i denne mappen',
@@ -1026,11 +1074,15 @@ var Ls = {
 		"u_up_life": "Filene slettes fra serveren {0}\netter at opplastningen er fullført",
 		"u_asku": 'Laste opp disse {0} filene til <code>{1}</code>',
 		"u_unpt": "Du kan angre / slette opplastningen med 🧯 oppe til venstre",
+		"u_bigtab": 'Vil nå vise {0} filer...\n\nDette kan krasje nettleseren din. Fortsette?',
+		"u_scan": 'Leser mappene...',
+		"u_dirstuck": 'Nettleseren din fikk ikke tilgang til å lese følgende {0} filer/mapper, så de blir hoppet over:',
 		"u_etadone": 'Ferdig ({0}, {1} filer)',
 		"u_etaprep": '(forbereder opplastning)',
 		"u_hashdone": 'befaring ferdig',
 		"u_hashing": 'les',
 		"u_dupdefer": "duplikat; vil bli håndtert til slutt",
+		"u_actx": "klikk her for å forhindre tap av<br />ytelse ved bytte til andre vinduer/faner",
 		"u_fixed": "OK!&nbsp; Løste seg 👍",
 		"u_cuerr": "kunne ikke laste opp del {0} av {1};\nsikkert greit, fortsetter\n\nfil: {2}",
 		"u_cuerr2": "server nektet opplastningen (del {0} av {1});\nprøver igjen senere\n\nfil: {2}\n\nerror ",
@@ -1164,6 +1216,10 @@ var Ls = {
 		"m_ok": "确定",
 		"m_ng": "取消",
 
+		"enable": "启用", //m
+		"danger": "危险", //m
+		"clipped": "已复制到剪贴板", //m
+
 		"ht_s": "秒",
 		"ht_m": "分",
 		"ht_h": "时",
@@ -1244,6 +1300,15 @@ var Ls = {
 		"utl_stat": "状态",
 		"utl_prog": "进度",
 
+		// 保持简短:
+		"utl_404": "404", //m
+		"utl_err": "故障", //m
+		"utl_oserr": "OS故障", //m
+		"utl_found": "已找到", //m
+		"utl_defer": "延期", //m
+		"utl_yolo": "加速", //m
+		"utl_done": "完成",
+
 		"ul_flagblk": "文件已添加到队列</b><br>但另一个浏览器标签中有一个繁忙的 up2k，<br>因此等待它完成",
 		"ul_btnlk": "服务器配置已将此开关锁定到此状态",
 
@@ -1269,6 +1334,7 @@ var Ls = {
 		"cl_hcancel": "列隐藏已取消",
 
 		"ct_grid": '网格视图',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ 工具提示', //m
 		"ct_thumb": '在网格视图中，切换图标或缩略图$N快捷键: T">🖼️ 缩略图',
 		"ct_csel": '在网格视图中使用 CTRL 和 SHIFT 进行文件选择">CTRL',
 		"ct_ihop": '当图像查看器关闭时，滚动到最后查看的文件">滚动',
@@ -1400,6 +1466,7 @@ var Ls = {
 		"fs_pname": "链接名称可选；如果为空则随机",
 		"fs_tsrc": "共享的文件或文件夹",
 		"fs_ppwd": "密码可选",
+		"fs_w8": "正在创建文件共享...", //m
 		"fs_ok": "<h6>分享链接已创建</h6>\n按 <code>Enter/OK</code> 复制到剪贴板\n按 <code>ESC/Cancel</code> 关闭\n\n",
 
 		"frt_dec": "可能修复一些损坏的文件名\">url-decode",
@@ -1410,6 +1477,8 @@ var Ls = {
 		"fr_case": "区分大小写的正则表达式\">case",
 		"fr_win": "Windows 安全名称；将 <code>&lt;&gt;:&quot;\\|?*</code> 替换为日文全角字符\">win",
 		"fr_slash": "将 <code>/</code> 替换为不会导致新文件夹创建的字符\">不使用 /",
+		"fr_re": "正则表达式搜索模式应用于原始文件名；$N可以在下面的格式字段中引用捕获组，如&lt;code&gt;(1)&lt;/code&gt;和&lt;code&gt;(2)&lt;/code&gt;等等。", //m
+		"fr_fmt": "受到 foobar2000 的启发：$N&lt;code&gt;(title)&lt;/code&gt; 被歌曲名称替换,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; 仅当歌曲艺术家不为空时才包含&lt;code&gt;[此]&lt;/code&gt;部分$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; 将曲目编号填充为 2 位数字", //m
 		"fr_pdel": "删除",
 		"fr_pnew": "另存为",
 		"fr_pname": "为你的新预设提供一个名称",
@@ -1419,7 +1488,7 @@ var Ls = {
 		"fr_tags": "选定文件的标签（只读，仅供参考）：",
 		"fr_busy": "正在重命名 {0} 项...\n\n{1}",
 		"fr_efail": "重命名失败：\n",
-		"fr_nchg": "{0} 个新名称由于 <code>win</code> 和/或 <code>ikke /</code> 被更改\n\n确定继续使用这些更改的新名称？",
+		"fr_nchg": "{0} 个新名称由于 <code>win</code> 和/或 <code>不使用 /</code> 被更改\n\n确定继续使用这些更改的新名称？",
 
 		"fd_ok": "删除成功",
 		"fd_err": "删除失败：\n",
@@ -1469,6 +1538,7 @@ var Ls = {
 		"gt_c1": "截断文件名更多（显示更少）",
 		"gt_c2": "截断文件名更少（显示更多）",
 
+		"sm_w8": "正在搜寻匹配...", //m
 		"sm_prev": "以下是来自先前查询的搜索结果：\n  ",
 		"sl_close": "关闭搜索结果",
 		"sl_hits": "显示 {0} 个结果",
@@ -1541,16 +1611,20 @@ var Ls = {
 		"un_del": "删除",
 		"un_m3": "正在加载你的近期上传...",
 		"un_busy": "正在删除 {0} 个文件...",
+		"un_clip": "{0} 个链接已复制到剪贴板", //m
 
 		"u_https1": "你应该",
 		"u_https2": "切换到 https",
 		"u_https3": "以获得更好的性能",
 		"u_ancient": '你的浏览器非常古老 -- 也许你应该 <a href="#" onclick="goto(\'bup\')">改用 bup</a>',
 		"u_nowork": "需要 Firefox 53+ 或 Chrome 57+ 或 iOS 11+",
+		"u_nodrop": '您的浏览器太旧，不支持通过拖动文件到窗口来上传文件', //m
+		"u_notdir": "未收到文件夹！\n\n您的浏览器太旧；\n请尝试将文件夹拖入窗口", //m
 		"u_uri": "要从其他浏览器窗口拖放图片，\n请将其拖放到大的上传按钮上",
 		"u_enpot": '切换到 <a href="#">简约 UI</a>（可能提高上传速度）',
 		"u_depot": '切换到 <a href="#">精美 UI</a>（可能降低上传速度）',
 		"u_gotpot": '切换到土豆 UI 以提高上传速度，\n\n随时可以不同意并切换回去！',
+		"u_pott": "<p>个文件： &nbsp; <b>{0}</b> 已完成， &nbsp; <b>{1}</b> 失败， &nbsp; <b>{2}</b> 正在处理， &nbsp; <b>{3}</b> 已排队</p>", //m
 		"u_ever": "这是基本的上传工具； up2k 需要至少<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
 		"u_su2k": '这是基本的上传工具；<a href="#" id="u2yea">up2k</a> 更好',
 		"u_ewrite": '你对这个文件夹没有写入权限',
@@ -1563,11 +1637,15 @@ var Ls = {
 		"u_up_life": "此上传将在 {0} 后从服务器删除",
 		"u_asku": '将这些 {0} 个文件上传到 <code>{1}</code>',
 		"u_unpt": "你可以使用左上角的 🧯 撤销/删除此上传",
+		"u_bigtab": '即将显示 {0} 个文件。这可能会导致您的浏览器崩溃。您确定吗？', //m
+		"u_scan": '正在扫描文件...', //m
+		"u_dirstuck": '您的浏览器无法访问以下 {0} 个文件/文件夹，因此它们将被跳过：', //m
 		"u_etadone": '完成 ({0}, {1} 个文件)',
 		"u_etaprep": '(准备上传)',
 		"u_hashdone": '哈希完成',
 		"u_hashing": '哈希',
 		"u_dupdefer": "这是一个重复文件。它将在所有其他文件上传后进行处理", //m
+		"u_actx": "单击此文本以防止切换到其他窗口/选项卡时性能下降", //m
 		"u_fixed": "好！&nbsp;已修复 👍",
 		"u_cuerr": "上传块 {0} 的 {1} 失败；\n可能无害，继续中\n\n文件：{2}",
 		"u_cuerr2": "服务器拒绝上传（块 {0} 的 {1}）；\n稍后重试\n\n文件：{2}\n\n错误 ",
@@ -1813,7 +1891,7 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3>' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="tooltips" class="tgl btn" href="#" tt="◔ ◡ ◔">ℹ️ tooltips</a>\n' +
+	'		<a id="tooltips" class="tgl btn" href="#" tt="' + L.ct_ttips + '</a>\n' +
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '</a>\n' +
 	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '</a>\n' +
@@ -2590,7 +2668,7 @@ var widget = (function () {
 		m += '[' + cv + s2ms(mp.au.currentTime) + ck + '/' + cv + s2ms(mp.au.duration) + ck + ']';
 
 		cliptxt(m, function () {
-			toast.ok(1, 'copied to clipboard', null, 'top');
+			toast.ok(1, L.clipped, null, 'top');
 		});
 	};
 	r.set(sread('au_open') == 1);
@@ -3610,7 +3688,7 @@ var afilt = (function () {
 	}
 
 	var html = ['<table><tr><td rowspan="4">',
-		'<a id="au_eq" class="tgl btn" href="#" tt="' + L.mt_eq + '">enable</a></td>'],
+		'<a id="au_eq" class="tgl btn" href="#" tt="' + L.mt_eq + '">' + L.enable + '</a></td>'],
 		h2 = [], h3 = [], h4 = [];
 
 	var vs = [];
@@ -3640,7 +3718,7 @@ var afilt = (function () {
 
 	h2 = [];
 	html = ['<table><tr><td rowspan="2">',
-		'<a id="au_drc" class="tgl btn" href="#" tt="' + L.mt_drc + '">enable</a></td>'];
+		'<a id="au_drc" class="tgl btn" href="#" tt="' + L.mt_drc + '">' + L.enable + '</a></td>'];
 
 	for (var a = 0; a < r.drch.length; a++) {
 		html.push('<td>' + r.drch[a] + '</td>');
@@ -4504,7 +4582,7 @@ var fileman = (function () {
 			surl = surl.slice(15);
 			modal.confirm(L.fs_ok + esc(surl), function() {
 				cliptxt(surl, function () {
-					toast.ok(2, 'copied to clipboard');
+					toast.ok(2, L.clipped);
 				});
 			});
 		}
@@ -4519,7 +4597,7 @@ var fileman = (function () {
 					plist.push(pbtns[a].textContent);
 
 			shui.style.display = 'none';
-			toast.inf(30, "creating share...");
+			toast.inf(30, L.fs_w8);
 
 			var body = {
 				"k": sh_k.value,
@@ -4607,8 +4685,8 @@ var fileman = (function () {
 			'<a id="rn_slash" class="tgl btn" href="#" tt="' + L.fr_slash + '</a>',
 			'</div>',
 			'<div id="rn_vadv"><table>',
-			'<tr><td>regex</td><td><input type="text" id="rn_re" ' + NOAC + ' tt="regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on" placeholder="^[0-9]+[\\. ]+(.*) - (.*)" /></td></tr>',
-			'<tr><td>format</td><td><input type="text" id="rn_fmt" ' + NOAC + ' tt="inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips the first part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits" placeholder="[(artist) - ](title).(ext)" /></td></tr>',
+			'<tr><td>regex</td><td><input type="text" id="rn_re" ' + NOAC + ' tt="' + L.fr_re + '" placeholder="^[0-9]+[\\. ]+(.*) - (.*)" /></td></tr>',
+			'<tr><td>format</td><td><input type="text" id="rn_fmt" ' + NOAC + ' tt="' + L.fr_fmt + '" placeholder="[(artist) - ](title).(ext)" /></td></tr>',
 			'<tr><td>preset</td><td><select id="rn_pre"></select>',
 			'<button id="rn_pdel">❌ ' + L.fr_pdel + '</button>',
 			'<button id="rn_pnew">💾 ' + L.fr_pnew + '</button>',
@@ -4616,7 +4694,9 @@ var fileman = (function () {
 			'</table></div>'
 		]);
 
-		var cheap = f.length > 500;
+		var cheap = f.length > 500,
+			t_rst = L.frt_rst.split('>').pop();
+
 		if (sel.length == 1)
 			html.push(
 				'<div><table id="rn_f">\n' +
@@ -4631,7 +4711,7 @@ var fileman = (function () {
 					'<tr><td>' +
 					(cheap ? '</td>' :
 						'<button class="rn_dec" n="' + a + '">decode</button>' +
-						'<button class="rn_reset" n="' + a + '">↺ reset</button></td>') +
+						'<button class="rn_reset" n="' + a + '">' + t_rst + '</button></td>') +
 					'<td><input type="text" id="rn_new" n="' + a + '" /></td>' +
 					'<td><input type="text" id="rn_old" n="' + a + '" readonly /></td></tr>');
 		}
@@ -4889,7 +4969,7 @@ var fileman = (function () {
 			deleter();
 		}
 
-		modal.confirm('<h6 style="color:#900">DANGER</h6>\n<b>' + L.fd_warn1.format(vps.length) + '</b><ul>' + uricom_adec(vps, true).join('') + '</ul>', function () {
+		modal.confirm('<h6 style="color:#900">' + L.danger + '</h6>\n<b>' + L.fd_warn1.format(vps.length) + '</b><ul>' + uricom_adec(vps, true).join('') + '</ul>', function () {
 			modal.confirm(L.fd_warn2, deleter, null);
 		}, null);
 	};
@@ -6505,7 +6585,7 @@ var ahotkeys = function (e) {
 
 	function do_search() {
 		search_in_progress = Date.now();
-		srch_msg(false, "searching...");
+		srch_msg(false, L.sm_w8);
 		clearTimeout(search_timeout);
 
 		var xhr = new XHR();
@@ -9115,7 +9195,7 @@ var unpost = (function () {
 		ev(e);
 		var txt = linklist();
 		cliptxt(txt + '\n', function () {
-			toast.inf(5, txt.split('\n').length + ' links copied to clipboard');
+			toast.inf(5, L.un_clip.format(txt.split('\n').length));
 		});
 	};
 
