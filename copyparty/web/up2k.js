@@ -156,6 +156,7 @@ function U2pvis(act, btns, uc, st) {
         'ERROR': '<span class="err">ERROR</span>',
         'OS-error': '<span class="err">OS-error</span>',
         'found': '<span class="inf">found</span>',
+        'defer': '<span class="inf">defer</span>',
         'YOLO': '<span class="inf">YOLO</span>',
         'done': '<span class="ok">done</span>',
     };
@@ -2460,6 +2461,7 @@ function up2k_init(subtle) {
                 pvis.seth(t.n, 2, L.u_ehstmp, t);
 
                 var err = "",
+                    cls = "ERROR",
                     rsp = unpre(xhr.responseText),
                     ofs = rsp.lastIndexOf('\nURL: ');
 
@@ -2489,6 +2491,8 @@ function up2k_init(subtle) {
                     if (!t.rechecks && (err_pend || err_srcb)) {
                         t.rechecks = 0;
                         t.want_recheck = true;
+                        err = L.u_dupdefer;
+                        cls = 'defer';
                     }
                 }
                 if (rsp.indexOf('server HDD is full') + 1)
@@ -2498,7 +2502,7 @@ function up2k_init(subtle) {
                     if (!t.t_uploading)
                         st.bytes.finished += t.size;
 
-                    pvis.seth(t.n, 1, "ERROR");
+                    pvis.seth(t.n, 1, cls);
                     pvis.seth(t.n, 2, err);
                     pvis.move(t.n, 'ng');
 

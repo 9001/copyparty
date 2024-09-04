@@ -493,6 +493,7 @@ var Ls = {
 		"u_etaprep": '(preparing to upload)',
 		"u_hashdone": 'hashing done',
 		"u_hashing": 'hash',
+		"u_dupdefer": "duplicate; will be processed after all other files",
 		"u_fixed": "OK!&nbsp; Fixed it 👍",
 		"u_cuerr": "failed to upload chunk {0} of {1};\nprobably harmless, continuing\n\nfile: {2}",
 		"u_cuerr2": "server rejected upload (chunk {0} of {1});\nwill retry later\n\nfile: {2}\n\nerror ",
@@ -1029,6 +1030,7 @@ var Ls = {
 		"u_etaprep": '(forbereder opplastning)',
 		"u_hashdone": 'befaring ferdig',
 		"u_hashing": 'les',
+		"u_dupdefer": "duplikat; vil bli håndtert til slutt",
 		"u_fixed": "OK!&nbsp; Løste seg 👍",
 		"u_cuerr": "kunne ikke laste opp del {0} av {1};\nsikkert greit, fortsetter\n\nfil: {2}",
 		"u_cuerr2": "server nektet opplastningen (del {0} av {1});\nprøver igjen senere\n\nfil: {2}\n\nerror ",
@@ -1565,6 +1567,7 @@ var Ls = {
 		"u_etaprep": '(准备上传)',
 		"u_hashdone": '哈希完成',
 		"u_hashing": '哈希',
+		"u_dupdefer": "这是一个重复文件。它将在所有其他文件上传后进行处理", //m
 		"u_fixed": "好！&nbsp;已修复 👍",
 		"u_cuerr": "上传块 {0} 的 {1} 失败；\n可能无害，继续中\n\n文件：{2}",
 		"u_cuerr2": "服务器拒绝上传（块 {0} 的 {1}）；\n稍后重试\n\n文件：{2}\n\n错误 ",
