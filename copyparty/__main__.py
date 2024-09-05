@@ -1285,6 +1285,7 @@ def add_logging(ap):
     ap2.add_argument("--ansi", action="store_true", help="force colors; overrides environment-variable NO_COLOR")
     ap2.add_argument("--no-logflush", action="store_true", help="don't flush the logfile after each write; tiny bit faster")
     ap2.add_argument("--no-voldump", action="store_true", help="do not list volumes and permissions on startup")
+    ap2.add_argument("--log-utc", action="store_true", help="do not use local timezone; assume the TZ env-var is UTC (tiny bit faster)")
     ap2.add_argument("--log-tdec", metavar="N", type=int, default=3, help="timestamp resolution / number of timestamp decimals")
     ap2.add_argument("--log-badpwd", metavar="N", type=int, default=1, help="log failed login attempt passwords: 0=terse, 1=plaintext, 2=hashed")
     ap2.add_argument("--log-conn", action="store_true", help="debug: print tcp-server msgs")

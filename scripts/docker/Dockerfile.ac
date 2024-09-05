@@ -8,7 +8,7 @@ LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
 ENV     XDG_CONFIG_HOME=/cfg
 
 RUN     apk --no-cache add !pyc \
-            wget \
+            tzdata wget \
             py3-jinja2 py3-argon2-cffi py3-pillow \
             ffmpeg
 

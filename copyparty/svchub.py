@@ -3,7 +3,6 @@ from __future__ import print_function, unicode_literals
 
 import argparse
 import base64
-import calendar
 import errno
 import gzip
 import logging
@@ -16,7 +15,7 @@ import string
 import sys
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # from inspect import currentframe
 # print(currentframe().f_lineno)
@@ -104,6 +103,7 @@ class SvcHub(object):
         self.argv = argv
         self.E: EnvParams = args.E
         self.no_ansi = args.no_ansi
+        self.tz = UTC if args.log_utc else None
         self.logf: Optional[typing.TextIO] = None
         self.logf_base_fn = ""
         self.is_dut = False  # running in unittest; always False
@@ -118,7 +118,8 @@ class SvcHub(object):
         self.httpsrv_up = 0
 
         self.log_mutex = threading.Lock()
-        self.next_day = 0
+        self.cday = 0
+        self.cmon = 0
         self.tstack = 0.0
 
         self.iphash = HMaccas(os.path.join(self.E.cfg, "iphash"), 8)
@@ -791,7 +792,7 @@ class SvcHub(object):
             self.args.nc = min(self.args.nc, soft // 2)
 
     def _logname(self) -> str:
-        dt = datetime.now(UTC)
+        dt = datetime.now(self.tz)
         fn = str(self.args.lo)
         for fs in "YmdHMS":
             fs = "%" + fs
@@ -1064,12 +1065,12 @@ class SvcHub(object):
             return
 
         with self.log_mutex:
-            zd = datetime.now(UTC)
+            dt = datetime.now(self.tz)
             ts = self.log_dfmt % (
-                zd.year,
-                zd.month * 100 + zd.day,
-                (zd.hour * 100 + zd.minute) * 100 + zd.second,
-                zd.microsecond // self.log_div,
+                dt.year,
+                dt.month * 100 + dt.day,
+                (dt.hour * 100 + dt.minute) * 100 + dt.second,
+                dt.microsecond // self.log_div,
             )
 
             if c and not self.args.no_ansi:
@@ -1090,41 +1091,26 @@ class SvcHub(object):
             if not self.args.no_logflush:
                 self.logf.flush()
 
-            now = time.time()
-            if int(now) >= self.next_day:
-                self._set_next_day()
+            if dt.day != self.cday or dt.month != self.cmon:
+                self._set_next_day(dt)
 
-    def _set_next_day(self) -> None:
-        if self.next_day and self.logf and self.logf_base_fn != self._logname():
+    def _set_next_day(self, dt: datetime) -> None:
+        if self.cday and self.logf and self.logf_base_fn != self._logname():
             self.logf.close()
             self._setup_logfile("")
 
-        dt = datetime.now(UTC)
-
-        # unix timestamp of next 00:00:00 (leap-seconds safe)
-        day_now = dt.day
-        while dt.day == day_now:
-            dt += timedelta(hours=12)
-
-        dt = dt.replace(hour=0, minute=0, second=0)
-        try:
-            tt = dt.utctimetuple()
-        except:
-            # still makes me hella uncomfortable
-            tt = dt.timetuple()
-
-        self.next_day = calendar.timegm(tt)
+        self.cday = dt.day
+        self.cmon = dt.month
 
     def _log_enabled(self, src: str, msg: str, c: Union[int, str] = 0) -> None:
         """handles logging from all components"""
         with self.log_mutex:
-            now = time.time()
-            if int(now) >= self.next_day:
-                dt = datetime.fromtimestamp(now, UTC)
+            dt = datetime.now(self.tz)
+            if dt.day != self.cday or dt.month != self.cmon:
                 zs = "{}\n" if self.no_ansi else "\033[36m{}\033[0m\n"
                 zs = zs.format(dt.strftime("%Y-%m-%d"))
                 print(zs, end="")
-                self._set_next_day()
+                self._set_next_day(dt)
                 if self.logf:
                     self.logf.write(zs)
 
@@ -1143,12 +1129,11 @@ class SvcHub(object):
                 else:
                     msg = "%s%s\033[0m" % (c, msg)
 
-            zd = datetime.fromtimestamp(now, UTC)
             ts = self.log_efmt % (
-                zd.hour,
-                zd.minute,
-                zd.second,
-                zd.microsecond // self.log_div,
+                dt.hour,
+                dt.minute,
+                dt.second,
+                dt.microsecond // self.log_div,
             )
             msg = fmt % (ts, src, msg)
             try:
