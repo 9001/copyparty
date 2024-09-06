@@ -1462,7 +1462,7 @@ class Up2k(object):
                     self.log("file: {}".format(abspath))
 
                 try:
-                    hashes = self._hashlist_from_file(
+                    hashes, _ = self._hashlist_from_file(
                         abspath, "a{}, ".format(self.pp.n)
                     )
                 except Exception as ex:
@@ -1711,7 +1711,7 @@ class Up2k(object):
                         self.log("file: {}".format(abspath))
 
                     try:
-                        hashes = self._hashlist_from_file(abspath, pf)
+                        hashes, _ = self._hashlist_from_file(abspath, pf)
                     except Exception as ex:
                         self.log("hash: {} @ [{}]".format(repr(ex), abspath))
                         continue
@@ -2670,6 +2670,9 @@ class Up2k(object):
             rand = vfs.flags.get("rand") or cj.get("rand")
             lost: list[tuple["sqlite3.Cursor", str, str]] = []
 
+            safe_dedup = vfs.flags.get("safededup") or 50
+            data_ok = safe_dedup < 10 or n4g
+
             vols = [(ptop, jcur)] if jcur else []
             if vfs.flags.get("xlink"):
                 vols += [(k, v) for k, v in self.cur.items() if k != ptop]
@@ -2677,7 +2680,7 @@ class Up2k(object):
                 # force upload time rather than last-modified
                 cj["lmod"] = int(time.time())
 
-            alts: list[tuple[int, int, dict[str, Any]]] = []
+            alts: list[tuple[int, int, dict[str, Any], "sqlite3.Cursor", str, str]] = []
             for ptop, cur in vols:
                 allv = self.asrv.vfs.all_vols
                 cvfs = next((v for v in allv.values() if v.realpath == ptop), vfs)
@@ -2707,13 +2710,12 @@ class Up2k(object):
                                 wark, st.st_size, dsize, st.st_mtime, dtime, dp_abs
                             )
                             self.log(t)
-                            raise Exception("desync")
+                            raise Exception()
                     except Exception as ex:
                         if n4g:
                             st = os.stat_result((0, -1, -1, 0, 0, 0, 0, 0, 0, 0))
                         else:
-                            if str(ex) != "desync":
-                                lost.append((cur, dp_dir, dp_fn))
+                            lost.append((cur, dp_dir, dp_fn))
                             continue
 
                     j = {
@@ -2736,18 +2738,42 @@ class Up2k(object):
                         if k in cj:
                             j[k] = cj[k]
 
+                    # offset of 1st diff in vpaths
+                    zig = (
+                        n + 1
+                        for n, (c1, c2) in enumerate(
+                            zip(dp_dir + "\r", cj["prel"] + "\n")
+                        )
+                        if c1 != c2
+                    )
                     score = (
-                        (3 if st.st_dev == dev else 0)
-                        + (2 if dp_dir == cj["prel"] else 0)
+                        (6969 if st.st_dev == dev else 0)
+                        + (3210 if dp_dir == cj["prel"] else next(zig))
                         + (1 if dp_fn == cj["name"] else 0)
                     )
-                    alts.append((score, -len(alts), j))
+                    alts.append((score, -len(alts), j, cur, dp_dir, dp_fn))
 
-            if alts:
-                best = sorted(alts, reverse=True)[0]
-                job = best[2]
-            else:
-                job = None
+            job = None
+            inc_ap = djoin(cj["ptop"], cj["prel"], cj["name"])
+            for dupe in sorted(alts, reverse=True):
+                rj = dupe[2]
+                orig_ap = djoin(rj["ptop"], rj["prel"], rj["name"])
+                if data_ok or inc_ap == orig_ap:
+                    data_ok = True
+                    job = rj
+                    break
+                else:
+                    self.log("asserting contents of %s" % (orig_ap,))
+                    dhashes, st = self._hashlist_from_file(orig_ap)
+                    dwark = up2k_wark_from_hashlist(self.salt, st.st_size, dhashes)
+                    if wark != dwark:
+                        t = "will not dedup (fs index desync): fs=%s, db=%s, file: %s"
+                        self.log(t % (dwark, wark, orig_ap))
+                        lost.append(dupe[3:])
+                        continue
+                    data_ok = True
+                    job = rj
+                    break
 
             if job and wark in reg:
                 # self.log("pop " + wark + "  " + job["name"] + " handle_json db", 4)
@@ -2756,7 +2782,7 @@ class Up2k(object):
             if lost:
                 c2 = None
                 for cur, dp_dir, dp_fn in lost:
-                    t = "forgetting deleted file: /{}"
+                    t = "forgetting desynced db entry: /{}"
                     self.log(t.format(vjoin(vjoin(vfs.vpath, dp_dir), dp_fn)))
                     self.db_rm(cur, dp_dir, dp_fn, cj["size"])
                     if c2 and c2 != cur:
@@ -2791,13 +2817,28 @@ class Up2k(object):
                             del reg[wark]
                         break
 
-                if st and not self.args.nw and not n4g and st.st_size != rj["size"]:
+                inc_ap = djoin(cj["ptop"], cj["prel"], cj["name"])
+                orig_ap = djoin(rj["ptop"], rj["prel"], rj["name"])
+
+                if self.args.nw or n4g or not st:
+                    pass
+
+                elif st.st_size != rj["size"]:
                     t = "will not dedup (fs index desync): {}, size fs={} db={}, mtime fs={} db={}, file: {}"
                     t = t.format(
                         wark, st.st_size, rj["size"], st.st_mtime, rj["lmod"], path
                     )
                     self.log(t)
                     del reg[wark]
+
+                elif inc_ap != orig_ap and not data_ok:
+                    self.log("asserting contents of %s" % (orig_ap,))
+                    dhashes, _ = self._hashlist_from_file(orig_ap)
+                    dwark = up2k_wark_from_hashlist(self.salt, st.st_size, dhashes)
+                    if wark != dwark:
+                        t = "will not dedup (fs index desync): fs=%s, idx=%s, file: %s"
+                        self.log(t % (dwark, wark, orig_ap))
+                        del reg[wark]
 
             if job or wark in reg:
                 job = job or reg[wark]
@@ -4246,8 +4287,11 @@ class Up2k(object):
 
         return wark
 
-    def _hashlist_from_file(self, path: str, prefix: str = "") -> list[str]:
-        fsz = bos.path.getsize(path)
+    def _hashlist_from_file(
+        self, path: str, prefix: str = ""
+    ) -> tuple[list[str], os.stat_result]:
+        st = bos.stat(path)
+        fsz = st.st_size
         csz = up2k_chunksize(fsz)
         ret = []
         suffix = " MB, {}".format(path)
@@ -4260,7 +4304,7 @@ class Up2k(object):
             while fsz > 0:
                 # same as `hash_at` except for `imutex` / bufsz
                 if self.stop:
-                    return []
+                    return [], st
 
                 if self.pp:
                     mb = fsz // (1024 * 1024)
@@ -4281,7 +4325,7 @@ class Up2k(object):
                 digest = base64.urlsafe_b64encode(digest)
                 ret.append(digest.decode("utf-8"))
 
-        return ret
+        return ret, st
 
     def _new_upload(self, job: dict[str, Any], vfs: VFS, depth: int) -> dict[str, str]:
         pdir = djoin(job["ptop"], job["prel"])
@@ -4582,7 +4626,7 @@ class Up2k(object):
                 self.salt, inf.st_size, int(inf.st_mtime), rd, fn
             )
         else:
-            hashes = self._hashlist_from_file(abspath)
+            hashes, _ = self._hashlist_from_file(abspath)
             if not hashes:
                 return False
 

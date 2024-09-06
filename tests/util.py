@@ -126,7 +126,7 @@ class Cfg(Namespace):
         ex = "ah_cli ah_gen css_browser hist js_browser js_other mime mimes no_forget no_hash no_idx nonsus_urls og_tpl og_ua"
         ka.update(**{k: None for k in ex.split()})
 
-        ex = "hash_mt srch_time u2abort u2j u2sz"
+        ex = "hash_mt safe_dedup srch_time u2abort u2j u2sz"
         ka.update(**{k: 1 for k in ex.split()})
 
         ex = "au_vol mtab_age reg_cap s_thead s_tbody th_convt"

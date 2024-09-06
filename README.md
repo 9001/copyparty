@@ -1978,7 +1978,7 @@ safety profiles:
   * `--hardlink` creates hardlinks instead of symlinks when deduplicating uploads, which is less maintenance
     * however note if you edit one file it will also affect the other copies
   * `--vague-403` returns a "404 not found" instead of "401 unauthorized" which is a common enterprise meme
-  * `--nih` removes the server hostname from directory listings
+  * `-nih` removes the server hostname from directory listings
 
 * option `-sss` is a shortcut for the above plus:
   * `--no-dav` disables webdav support
