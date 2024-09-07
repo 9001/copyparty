@@ -64,7 +64,7 @@
 	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u1));
 	--u2-tab-b1: rgba(128,128,128,0.8);
 	--u2-tab-1-fg: #fd7;
-	--u2-tab-1-bg: linear-gradient(to bottom, var(#353), var(--bg) 80%);
+	--u2-tab-1-bg: linear-gradient(to bottom, #353, var(--bg) 80%);
 	--u2-tab-1-b1: #7c5;
 	--u2-tab-1-b2: #583;
 	--u2-tab-1-sh: #280;
@@ -345,6 +345,7 @@ html.cz {
 	--srv-3: #fff;
 
 	--u2-tab-b1: var(--bg-d3);
+	--u2-tab-1-bg: a;
 }
 html.cy {
 	--fg: #fff;
@@ -374,12 +375,17 @@ html.cy {
 	--btn-bs: 0 .25em 0 #f00;
 	--chk-fg: #fd0;
 
+	--txt-bg: #000;
 	--srv-1: #f00;
 	--srv-3: #fff;
 	--op-aa-bg: #fff;
 
 	--u2-b1-bg: #f00;
 	--u2-b2-bg: #f00;
+
+	--g-sel-fg: #fff;
+	--g-sel-bg: #aaa;
+	--g-fsel-bg: #aaa;
 }
 html.dz {
 	--fg: #4d4;
@@ -436,7 +442,7 @@ html.dz {
 	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u1));
 	--u2-tab-b1: var(--fg-weak);
 	--u2-tab-1-fg: #fff;
-	--u2-tab-1-bg: linear-gradient(to bottom, var(#353), var(--bg) 80%);
+	--u2-tab-1-bg: linear-gradient(to bottom, #151, var(--bg) 80%);
 	--u2-tab-1-b1: #7c5;
 	--u2-tab-1-b2: #583;
 	--u2-tab-1-sh: #280;
@@ -3112,17 +3118,29 @@ html.by #u2cards a.act {
 
 
 
-html.cy #wrap {
-	color: #000;
-}
 html.cy .mdo a {
 	background: #f00;
 }
+html.cy #wrap,
+html.cy #acc_info a,
 html.cy #op_up2k,
 html.cy #files,
 html.cy #files a,
 html.cy #files tbody div a:last-child {
 	color: #000;
+}
+html.cy #u2tab a,
+html.cy #u2cards a {
+	color: #f00;
+}
+html.cy #unpost a {
+	color: #ff0;
+}
+html.cy #barbuf {
+	filter: hue-rotate(267deg) brightness(0.8) contrast(4);
+}
+html.cy #pvol {
+	filter: hue-rotate(4deg) contrast(2.2);
 }
 
 
