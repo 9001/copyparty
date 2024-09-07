@@ -3755,8 +3755,11 @@ class Up2k(object):
                     cur = None
                     try:
                         ptop = dbv.realpath
+                        xlink = bool(dbv.flags.get("xlink"))
                         cur, wark, _, _, _, _ = self._find_from_vpath(ptop, volpath)
-                        self._forget_file(ptop, volpath, cur, wark, True, st.st_size)
+                        self._forget_file(
+                            ptop, volpath, cur, wark, True, st.st_size, xlink
+                        )
                     finally:
                         if cur:
                             cur.connection.commit()
@@ -3980,13 +3983,15 @@ class Up2k(object):
             if c2 and c2 != c1:
                 self._copy_tags(c1, c2, w)
 
+            xlink = bool(svn.flags.get("xlink"))
+
             with self.reg_mutex:
                 has_dupes = self._forget_file(
-                    svn.realpath, srem, c1, w, is_xvol, fsize_ or fsize
+                    svn.realpath, srem, c1, w, is_xvol, fsize_ or fsize, xlink
                 )
 
             if not is_xvol:
-                has_dupes = self._relink(w, svn.realpath, srem, dabs)
+                has_dupes = self._relink(w, svn.realpath, srem, dabs, c1, xlink)
 
             curs.add(c1)
 
@@ -4129,6 +4134,7 @@ class Up2k(object):
         wark: Optional[str],
         drop_tags: bool,
         sz: int,
+        xlink: bool,
     ) -> bool:
         """
         mutex(main,reg) me
@@ -4140,7 +4146,7 @@ class Up2k(object):
         if wark and cur:
             self.log("found {} in db".format(wark))
             if drop_tags:
-                if self._relink(wark, ptop, vrem, ""):
+                if self._relink(wark, ptop, vrem, "", cur, xlink):
                     has_dupes = True
                     drop_tags = False
 
@@ -4172,7 +4178,15 @@ class Up2k(object):
 
         return has_dupes
 
-    def _relink(self, wark: str, sptop: str, srem: str, dabs: str) -> int:
+    def _relink(
+        self,
+        wark: str,
+        sptop: str,
+        srem: str,
+        dabs: str,
+        vcur: Optional["sqlite3.Cursor"],
+        xlink: bool,
+    ) -> int:
         """
         update symlinks from file at svn/srem to dabs (rename),
         or to first remaining full if no dabs (delete)
@@ -4188,6 +4202,8 @@ class Up2k(object):
             argv = (wark[:16], wark)
 
         for ptop, cur in self.cur.items():
+            if not xlink and cur and cur != vcur:
+                continue
             for rd, fn in cur.execute(q, argv):
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
