@@ -3111,9 +3111,17 @@ class Up2k(object):
         verbose: bool = True,
         rm: bool = False,
         lmod: float = 0,
+        fsrc: Optional[str] = None,
     ) -> None:
+        if src == dst or (fsrc and fsrc == dst):
+            t = "symlinking a file to itself?? orig(%s) fsrc(%s) link(%s)"
+            raise Exception(t % (src, fsrc, dst))
+
         if verbose:
-            self.log("linking dupe:\n  {0}\n  {1}".format(src, dst))
+            t = "linking dupe:\n  point-to: {0}\n  link-loc: {1}"
+            if fsrc:
+                t += "\n  data-src: {2}"
+            self.log(t.format(src, dst, fsrc))
 
         if self.args.nw:
             return
@@ -3121,7 +3129,7 @@ class Up2k(object):
         linked = False
         try:
             if "copydupes" in flags:
-                raise Exception("disabled in config")
+                raise Exception("dedup is disabled in config")
 
             lsrc = src
             ldst = dst
@@ -3177,7 +3185,15 @@ class Up2k(object):
                 linked = True
         except Exception as ex:
             self.log("cannot link; creating copy: " + repr(ex))
-            shutil.copy2(fsenc(src), fsenc(dst))
+            if bos.path.isfile(src):
+                csrc = src
+            elif fsrc and bos.path.isfile(fsrc):
+                csrc = fsrc
+            else:
+                t = "BUG: no valid sources to link from! orig(%s) fsrc(%s) link(%s)"
+                self.log(t, 1)
+                raise Exception(t % (src, fsrc, dst))
+            shutil.copy2(fsenc(csrc), fsenc(dst))
 
         if lmod and (not linked or SYMTIME):
             times = (int(time.time()), int(lmod))
@@ -4258,7 +4274,13 @@ class Up2k(object):
             except:
                 pass
 
-            self._symlink(dabs, alink, flags, False, lmod=lmod or 0)
+            # this creates a link pointing from dabs to alink; alink may
+            # not exist yet, which becomes problematic if the symlinking
+            # fails and it has to fall back on hardlinking/copying files
+            # (for example --no-dedup in a volume with symlinked dupes);
+            # fsrc=sabs is then a source that currently resolves to copy
+
+            self._symlink(dabs, alink, flags, False, lmod=lmod or 0, fsrc=sabs)
 
         return len(full) + len(links)
 

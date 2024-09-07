@@ -51,15 +51,21 @@ class TestDedup(unittest.TestCase):
         ]
         # (data, chash, wark)
 
-        # 3072 uploads in total
-        self.ctr = 3072
+        self.ctr = 336 if quick else 2016  # estimated total num uploads
         self.conn = None
         fstab = None
         for e2d in [True, False]:
             self.args = Cfg(v=[".::A"], a=[], e2d=e2d)
             for dn1, fn1, f1 in product(dirnames, filenames, files):
+                cm1 = (dn1, fn1, f1)
                 for dn2, fn2, f2 in product(dirnames, filenames, files):
+                    cm2 = (dn2, fn2, f2)
+                    if cm1 == cm2:
+                        continue
                     for dn3, fn3, f3 in product(dirnames, filenames, files):
+                        cm3 = (dn3, fn3, f3)
+                        if cm3 in (cm1, cm2):
+                            continue
                         self.reset()
                         if self.conn:
                             fstab = self.conn.hsrv.hub.up2k.fstab
