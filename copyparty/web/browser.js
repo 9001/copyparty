@@ -4032,11 +4032,12 @@ function eval_hash() {
 				break;
 			}
 
-		if (mi && img_re.exec(og_fn))
-			hash0 = '#g' + mi.id;
+		var ch = !mi ? '' :
+			img_re.exec(og_fn) ? 'g' :
+			ebi('a' + mi.id) ? 'a' :
+			'';
 
-		if (ebi('a' + mi.id))
-			hash0 = '#a' + mi.id;
+		hash0 = ch ? ('#' + ch + mi.id) : '';
 	}
 
 	var v = hash0;
@@ -4077,14 +4078,14 @@ function eval_hash() {
 		}
 	}
 
-	if (v.indexOf('#q=') === 0) {
+	if (v.startsWith('#q=')) {
 		goto('search');
 		var i = ebi('q_raw');
 		i.value = uricom_dec(v.slice(3));
 		return i.onkeydown({ 'key': 'Enter' });
 	}
 
-	if (v.indexOf('#v=') === 0) {
+	if (v.startsWith('#v=')) {
 		goto(v.slice(3));
 		return;
 	}
@@ -5243,6 +5244,12 @@ var showfile = (function () {
 	r.sname = function (srch) {
 		return srch.split(/[?&]doc=/)[1].split('&')[0];
 	};
+
+	if (window.og_fn) {
+		var ext = og_fn.split(/\./g).pop();
+		if (r.map['.' + ext])
+			hist_replace(get_evpath() + '?doc=' + og_fn);
+	}
 
 	window.Prism = { 'manual': true };
 	var em = QS('#bdoc>pre');
