@@ -1,4 +1,17 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0902-0108  `v1.14.4`  another
+
+## recent important news
+
+* [v1.14.3 (2024-08-30)](https://github.com/9001/copyparty/releases/tag/v1.14.3) fixed a bug that was introduced in v1.13.8 (2024-08-13); this bug could lead to **data loss** -- see the v1.14.3 release-notes for details
+
+## bugfixes
+
+* a network glitch could cause the uploader UI to panic d9e95262
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0830-2311  `v1.14.3`  important dedup fix
 
 <img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>

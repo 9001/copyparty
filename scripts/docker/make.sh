@@ -100,11 +100,11 @@ filt=
             aa="$(printf '%11s' $a-$i)"
 
             # arm takes forever so make it top priority
-            [ ${a::3} == arm ] && nice= || nice=nice
+            [ ${a::3} == arm ] && nice= || nice=-n20
 
             # --pull=never does nothing at all btw
             (set -x
-            $nice podman build \
+            nice $nice podman build \
                 --squash \
                 --pull=never \
                 --from localhost/alpine-$a \

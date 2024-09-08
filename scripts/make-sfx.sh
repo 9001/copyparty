@@ -609,7 +609,7 @@ pc="bzip2 -"; pe=bz2
 [ $use_gzz ] && pc="pigz -11 -I$use_gzz" && pe=gz
 
 echo compressing tar
-for n in {2..9}; do cp tar t.$n; nice $pc$n t.$n & done; wait
+for n in {2..9}; do cp tar t.$n; nice -n20 $pc$n t.$n & done; wait
 minf=$(for f in t.*.$pe; do
 	s1=$(wc -c <$f)
 	s2=$(tr -d '\r\n\0' <$f | wc -c)
