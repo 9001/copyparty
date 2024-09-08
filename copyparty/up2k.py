@@ -2681,7 +2681,7 @@ class Up2k(object):
             jcur = self.cur.get(ptop)
             reg = self.registry[ptop]
             vfs = self.asrv.vfs.all_vols[cj["vtop"]]
-            n4g = vfs.flags.get("noforget")
+            n4g = bool(vfs.flags.get("noforget"))
             rand = vfs.flags.get("rand") or cj.get("rand")
             lost: list[tuple["sqlite3.Cursor", str, str]] = []
 

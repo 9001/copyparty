@@ -518,6 +518,7 @@ var Ls = {
 		"u_etaprep": '(preparing to upload)',
 		"u_hashdone": 'hashing done',
 		"u_hashing": 'hash',
+		"u_hs": 'handshaking...',
 		"u_dupdefer": "duplicate; will be processed after all other files",
 		"u_actx": "click this text to prevent loss of<br />performance when switching to other windows/tabs",
 		"u_fixed": "OK!&nbsp; Fixed it 👍",
@@ -1081,6 +1082,7 @@ var Ls = {
 		"u_etaprep": '(forbereder opplastning)',
 		"u_hashdone": 'befaring ferdig',
 		"u_hashing": 'les',
+		"u_hs": 'serveren tenker...',
 		"u_dupdefer": "duplikat; vil bli håndtert til slutt",
 		"u_actx": "klikk her for å forhindre tap av<br />ytelse ved bytte til andre vinduer/faner",
 		"u_fixed": "OK!&nbsp; Løste seg 👍",
@@ -1644,6 +1646,7 @@ var Ls = {
 		"u_etaprep": '(准备上传)',
 		"u_hashdone": '哈希完成',
 		"u_hashing": '哈希',
+		"u_hs": '正在等待服务器...', //m
 		"u_dupdefer": "这是一个重复文件。它将在所有其他文件上传后进行处理", //m
 		"u_actx": "单击此文本以防止切换到其他窗口/选项卡时性能下降", //m
 		"u_fixed": "好！&nbsp;已修复 👍",

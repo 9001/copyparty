@@ -1745,14 +1745,6 @@ function up2k_init(subtle) {
 
                 var mou_ikkai = false;
 
-                if (st.busy.handshake.length &&
-                    st.busy.handshake[0].t_busied < now - 30 * 1000
-                ) {
-                    console.log("retrying stuck handshake");
-                    var t = st.busy.handshake.shift();
-                    st.todo.handshake.unshift(t);
-                }
-
                 var nprev = -1;
                 for (var a = 0; a < st.todo.upload.length; a++) {
                     var nf = st.todo.upload[a].nfile;
@@ -2254,6 +2246,9 @@ function up2k_init(subtle) {
         if (keepalive)
             console.log("sending keepalive handshake", t.name, t);
 
+        if (!t.srch && !t.t_handshake)
+            pvis.seth(t.n, 2, L.u_hs);
+
         var xhr = new XMLHttpRequest();
         xhr.onerror = xhr.ontimeout = function () {
             if (t.t_busied != me)  // t.done ok
@@ -2533,7 +2528,8 @@ function up2k_init(subtle) {
 
         xhr.open('POST', t.purl, true);
         xhr.responseType = 'text';
-        xhr.timeout = 42000;
+        xhr.timeout = 42000 + (t.srch || t.t_uploaded ? 0 :
+            (t.size / (1048 * 20))); // safededup 20M/s hdd
         xhr.send(JSON.stringify(req));
     }
 

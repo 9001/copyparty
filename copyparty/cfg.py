@@ -20,7 +20,6 @@ def vf_bmap() -> dict[str, str]:
         "no_thumb": "dthumb",
         "no_vthumb": "dvthumb",
         "no_athumb": "dathumb",
-        "safe_dedup": "safededup",
     }
     for k in (
         "dedup",
@@ -59,6 +58,7 @@ def vf_vmap() -> dict[str, str]:
         "no_hash": "nohash",
         "no_idx": "noidx",
         "re_maxage": "scan",
+        "safe_dedup": "safededup",
         "th_convt": "convt",
         "th_size": "thsize",
         "th_crop": "crop",
