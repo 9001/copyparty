@@ -1656,6 +1656,7 @@ class Up2k(object):
             qex = " where " + qex
 
         rewark: list[tuple[str, str, str, int, int]] = []
+        f404: list[tuple[str, str, str]] = []
 
         with self.mutex:
             b_left = 0
@@ -1672,7 +1673,8 @@ class Up2k(object):
                 if self.stop:
                     return -1
 
-                w, drd, dfn = zb[:-1].decode("utf-8").split("\x00")
+                zs = zb[:-1].decode("utf-8").replace("\x00\x02", "\n")
+                w, drd, dfn = zs.split("\x00\x01")
                 with self.mutex:
                     q = "select mt, sz from up where rd=? and fn=? and +w=?"
                     try:
@@ -1698,9 +1700,14 @@ class Up2k(object):
                 pf = "v{}, {:.0f}+".format(n_left, b_left / 1024 / 1024)
                 self.pp.msg = pf + abspath
 
-                # throws on broken symlinks (always did)
-                stl = bos.lstat(abspath)
-                st = bos.stat(abspath) if stat.S_ISLNK(stl.st_mode) else stl
+                try:
+                    stl = bos.lstat(abspath)
+                    st = bos.stat(abspath) if stat.S_ISLNK(stl.st_mode) else stl
+                except Exception as ex:
+                    self.log("missing file: %s" % (abspath,), 3)
+                    f404.append((drd, dfn, w))
+                    continue
+
                 mt2 = int(stl.st_mtime)
                 sz2 = st.st_size
 
@@ -1737,12 +1744,15 @@ class Up2k(object):
                 t = t.format(abspath, w, sz, mt, w2, sz2, mt2)
                 self.log(t, 1)
 
-        if e2vp and rewark:
+        if e2vp and (rewark or f404):
             self.hub.retcode = 1
             Daemon(self.hub.sigterm)
-            raise Exception("{} files have incorrect hashes".format(len(rewark)))
+            t = "in volume /%s:  %s files missing, %s files have incorrect hashes"
+            t = t % (vol.vpath, len(f404), len(rewark))
+            self.log(t, 1)
+            raise Exception(t)
 
-        if not e2vu or not rewark:
+        if not e2vu or (not rewark and not f404):
             return 0
 
         with self.mutex:
@@ -1750,9 +1760,13 @@ class Up2k(object):
                 q = "update up set w = ?, sz = ?, mt = ? where rd = ? and fn = ? limit 1"
                 cur.execute(q, (w, sz, int(mt), rd, fn))
 
+            for _, _, w in f404:
+                q = "delete from up where w = ? limit 1"
+                cur.execute(q, (w,))
+
             cur.connection.commit()
 
-        return len(rewark)
+        return len(rewark) + len(f404)
 
     def _build_tags_index(self, vol: VFS) -> tuple[int, int, bool]:
         ptop = vol.realpath
@@ -1967,7 +1981,8 @@ class Up2k(object):
                     if c2.execute(q, (row[0][:16],)).fetchone():
                         continue
 
-                gf.write(("%s\n" % ("\x00".join(row),)).encode("utf-8"))
+                zs = "\x00\x01".join(row).replace("\n", "\x00\x02")
+                gf.write((zs + "\n").encode("utf-8"))
                 n += 1
 
         c2.close()
