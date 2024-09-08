@@ -16,7 +16,7 @@ open up notepad and save the following as `c:\users\you\documents\party.conf` (f
 ```yaml
 [global]
   lo: ~/logs/cpp-%Y-%m%d.xz  # log to c:\users\you\logs\
-  e2dsa, e2ts, no-dedup, z   # sets 4 flags; see expl.
+  e2dsa, e2ts, z    # sets 3 flags; see explanation
   p: 80, 443  # listen on ports 80 and 443, not 3923
   theme: 2    # default theme: protonmail-monokai
   lang: nor   # default language: viking
@@ -46,11 +46,10 @@ open up notepad and save the following as `c:\users\you\documents\party.conf` (f
 
 ### config explained: [global]
 
-the `[global]` section accepts any config parameters [listed here](https://ocv.me/copyparty/helptext.html), also viewable by running copyparty (either the exe or the sfx.py) with `--help`, so this is the same as running copyparty with arguments `--lo c:\users\you\logs\copyparty-%Y-%m%d.xz -e2dsa -e2ts --no-dedup -z -p 80,443 --theme 2 --lang nor`
+the `[global]` section accepts any config parameters [listed here](https://ocv.me/copyparty/helptext.html), also viewable by running copyparty (either the exe or the sfx.py) with `--help`, so this is the same as running copyparty with arguments `--lo c:\users\you\logs\copyparty-%Y-%m%d.xz -e2dsa -e2ts -z -p 80,443 --theme 2 --lang nor`
 * `lo: ~/logs/cpp-%Y-%m%d.xz` writes compressed logs (the compression will make them delayed)
-* `e2dsa` enables the upload deduplicator and file indexer, which enables searching
+* `e2dsa` enables the file indexer, which enables searching and upload-undo
 * `e2ts` enables music metadata indexing, making albums / titles etc. searchable too
-* `no-dedup` writes full dupes to disk instead of symlinking, since lots of windows software doesn't handle symlinks well
   * but the improved upload speed from `e2dsa` is not affected
 * `z` enables zeroconf, making the server available at `http://HOSTNAME.local/` from any other machine in the LAN
 * `p: 80,443` listens on the ports `80` and `443` instead of the default `3923`

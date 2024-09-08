@@ -12,8 +12,7 @@ def vf_bmap() -> dict[str, str]:
         "dav_auth": "davauth",
         "dav_rt": "davrt",
         "ed": "dots",
-        "never_symlink": "neversymlink",
-        "no_dedup": "copydupes",
+        "hardlink_only": "hardlinkonly",
         "no_dupe": "nodupe",
         "no_forget": "noforget",
         "no_pipe": "nopipe",
@@ -24,6 +23,7 @@ def vf_bmap() -> dict[str, str]:
         "safe_dedup": "safededup",
     }
     for k in (
+        "dedup",
         "dotsrch",
         "e2d",
         "e2ds",
@@ -130,11 +130,11 @@ permdescs = {
 
 flagcats = {
     "uploads, general": {
-        "nodupe": "rejects existing files (instead of symlinking them)",
-        "hardlink": "does dedup with hardlinks instead of symlinks",
-        "neversymlink": "disables symlink fallback; full copy instead",
-        "copydupes": "disables dedup, always saves full copies of dupes",
+        "dedup": "enable symlink-based file deduplication",
+        "hardlink": "enable hardlink-based file deduplication,\nwith fallback on symlinks when that is impossible",
+        "hardlinkonly": "dedup with hardlink only, never symlink;\nmake a full copy if hardlink is impossible",
         "safededup": "verify on-disk data before using it for dedup",
+        "nodupe": "rejects existing files (instead of symlinking them)",
         "sparse": "force use of sparse files, mainly for s3-backed storage",
         "daw": "enable full WebDAV write support (dangerous);\nPUT-operations will now \033[1;31mOVERWRITE\033[0;35m existing files",
         "nosub": "forces all uploads into the top folder of the vfs",
@@ -161,7 +161,7 @@ flagcats = {
         "lifetime=3600": "uploads are deleted after 1 hour",
     },
     "database, general": {
-        "e2d": "enable database; makes files searchable + enables upload dedup",
+        "e2d": "enable database; makes files searchable + enables upload-undo",
         "e2ds": "scan writable folders for new files on startup; also sets -e2d",
         "e2dsa": "scans all folders for new files on startup; also sets -e2d",
         "e2t": "enable multimedia indexing; makes it possible to search for tags",
@@ -179,7 +179,7 @@ flagcats = {
         "noforget": "don't forget files when deleted from disk",
         "fat32": "avoid excessive reindexing on android sdcardfs",
         "dbd=[acid|swal|wal|yolo]": "database speed-durability tradeoff",
-        "xlink": "cross-volume dupe detection / linking",
+        "xlink": "cross-volume dupe detection / linking (dangerous)",
         "xdev": "do not descend into other filesystems",
         "xvol": "do not follow symlinks leaving the volume root",
         "dotsrch": "show dotfiles in search results",

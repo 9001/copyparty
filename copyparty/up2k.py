@@ -3143,7 +3143,7 @@ class Up2k(object):
 
         linked = False
         try:
-            if "copydupes" in flags:
+            if not flags.get("dedup"):
                 raise Exception("dedup is disabled in config")
 
             lsrc = src
@@ -3181,7 +3181,7 @@ class Up2k(object):
                     linked = True
             except Exception as ex:
                 self.log("cannot hardlink: " + repr(ex))
-                if "neversymlink" in flags:
+                if "hardlinkonly" in flags:
                     raise Exception("symlink-fallback disabled in cfg")
 
             if not linked:
@@ -4308,7 +4308,7 @@ class Up2k(object):
             # this creates a link pointing from dabs to alink; alink may
             # not exist yet, which becomes problematic if the symlinking
             # fails and it has to fall back on hardlinking/copying files
-            # (for example --no-dedup in a volume with symlinked dupes);
+            # (for example a volume with symlinked dupes but no --dedup);
             # fsrc=sabs is then a source that currently resolves to copy
 
             self._symlink(dabs, alink, flags, False, lmod=lmod or 0, fsrc=sabs)

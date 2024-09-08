@@ -20,7 +20,7 @@ cat $f | awk '
     o{next}
     /^#/{s=1;rs=0;pr()}
     /^#* *(nix package)/{rs=1}
-    /^#* *(install on android|dev env setup|just the sfx|complete release|optional gpl stuff|nixos module)|`$/{s=rs}
+    /^#* *(themes|install on android|dev env setup|just the sfx|complete release|optional gpl stuff|nixos module)|```/{s=rs}
     /^#/{
         lv=length($1);
         sub(/[^ ]+ /,"");

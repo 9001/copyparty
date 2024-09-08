@@ -65,7 +65,8 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [smb server](#smb-server) - unsafe, slow, not recommended for wan
     * [browser ux](#browser-ux) - tweaking the ui
     * [opengraph](#opengraph) - discord and social-media embeds
-    * [file indexing](#file-indexing) - enables dedup and music search ++
+    * [file deduplication](#file-deduplication) - enable symlink-based upload deduplication
+    * [file indexing](#file-indexing) - enable music search, upload-undo, and better dedup
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
         * [periodic rescan](#periodic-rescan) - filesystem monitoring
@@ -1155,9 +1156,41 @@ NOTE: because discord (and maybe others) strip query args such as `?raw` in open
 if you want to entirely replace the copyparty response with your own jinja2 template, give the template filepath to `--og-tpl` or volflag `og_tpl` (all members of `HttpCli` are available through the `this` object)
 
 
+## file deduplication
+
+enable symlink-based upload deduplication  globally with `--dedup` or per-volume with volflag `dedup`
+
+when someone tries to upload a file that already exists on the server, the upload will be politely declined and a symlink is created instead, pointing to the nearest copy on disk, thus reducinc disk space usage
+
+**warning:** when enabling dedup, you should also:
+* enable indexing with `-e2dsa` or volflag `e2dsa` (see [file indexing](#file-indexing) section below); strongly recommended
+* ...and/or `--hardlink-only` to use hardlink-based deduplication instead of symlinks; see explanation below
+
+it will not be safe to rename/delete files if you only enable dedup and none of the above; if you enable indexing then it is not *necessary* to also do hardlinks (but you may still want to)
+
+by default, deduplication is done based on symlinks (symbolic links); these are tiny files which are pointers to the nearest full copy of the file
+
+you can choose to use hardlinks instead of softlinks, globally with `--hardlink-only` or volflag `hardlinkonly`;
+
+advantages of using hardlinks:
+* hardlinks are more compatible with other software; they behave entirely like regular files
+* you can safely move and rename files using other file managers
+  * symlinks need to be managed by copyparty to ensure the destinations remain correct
+
+advantages of using symlinks (default):
+* each symlink can have its own last-modified timestamp, but a single timestamp is shared by all hardlinks
+* symlinks make it more obvious to other software that the file is not a regular file, so this can be less dangerous
+  * hardlinks look like regular files, so other software may assume they are safe to edit without affecting the other copies
+
+**warning:** if you edit the contents of a deduplicated file, then you will also edit all other copies of that file! This is especially surprising with hardlinks, because they look like regular files, but that same file exists in multiple locations
+
+global-option `--xlink` / volflag `xlink` additionally enables deduplication across volumes, but this is probably buggy and not recommended
+
+
+
 ## file indexing
 
-enables dedup and music search ++
+enable music search, upload-undo, and better dedup
 
 file indexing relies on two database tables, the up2k filetree (`-e2d`) and the metadata tags (`-e2t`), stored in `.hist/up2k.db`. Configuration can be done through arguments, volflags, or a mix of both.
 
@@ -1171,7 +1204,6 @@ through arguments:
 * `-e2v` verfies file integrity at startup, comparing hashes from the db
 * `-e2vu` patches the database with the new hashes from the filesystem
 * `-e2vp` panics and kills copyparty instead
-* `--xlink` enables deduplication across volumes
 
 the same arguments can be set as volflags, in addition to `d2d`, `d2ds`, `d2t`, `d2ts`, `d2v` for disabling:
 * `-v ~/music::r:c,e2ds,e2tsr` does a full reindex of everything on startup
@@ -1184,7 +1216,6 @@ note:
 * upload-times can be displayed in the file listing by enabling the `.up_at` metadata key, either globally with `-e2d -mte +.up_at` or per-volume with volflags `e2d,mte=+.up_at` (will have a ~17% performance impact on directory listings)
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
 * the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
-* deduplication is possible on windows if you run copyparty as administrator (not saying you should!)
 
 ### exclude-patterns
 

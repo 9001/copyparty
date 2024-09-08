@@ -992,10 +992,10 @@ def add_upload(ap):
     ap2.add_argument("--reg-cap", metavar="N", type=int, default=38400, help="max number of uploads to keep in memory when running without \033[33m-e2d\033[0m; roughly 1 MiB RAM per 600")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload (bad idea to enable this on windows and/or cow filesystems)")
     ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even when it might be dangerous (multiprocessing, filesystems lacking sparse-files support, ...)")
+    ap2.add_argument("--dedup", action="store_true", help="enable symlink-based upload deduplication (volflag=dedup)")
     ap2.add_argument("--safe-dedup", metavar="N", type=int, default=50, help="how careful to be when deduplicating files; [\033[32m1\033[0m] = just verify the filesize, [\033[32m50\033[0m] = verify file contents have not been altered (volflag=safededup)")
-    ap2.add_argument("--hardlink", action="store_true", help="prefer hardlinks instead of symlinks when possible (within same filesystem) (volflag=hardlink)")
-    ap2.add_argument("--never-symlink", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made (volflag=neversymlink)")
-    ap2.add_argument("--no-dedup", action="store_true", help="disable symlink/hardlink creation; copy file contents instead (volflag=copydupes)")
+    ap2.add_argument("--hardlink", action="store_true", help="enable hardlink-based dedup; will fallback on symlinks when that is impossible (across filesystems) (volflag=hardlink)")
+    ap2.add_argument("--hardlink-only", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made (volflag=hardlinkonly)")
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
     ap2.add_argument("--no-snap", action="store_true", help="disable snapshots -- forget unfinished uploads on shutdown; don't create .hist/up2k.snap files -- abandoned/interrupted uploads must be cleaned up manually")
     ap2.add_argument("--snap-wri", metavar="SEC", type=int, default=300, help="write upload state to ./hist/up2k.snap every \033[33mSEC\033[0m seconds; allows resuming incomplete uploads after a server crash")
@@ -1345,7 +1345,7 @@ def add_transcoding(ap):
 def add_db_general(ap, hcores):
     noidx = APPLESAN_TXT if MACOS else ""
     ap2 = ap.add_argument_group('general db options')
-    ap2.add_argument("-e2d", action="store_true", help="enable up2k database, making files searchable + enables upload deduplication")
+    ap2.add_argument("-e2d", action="store_true", help="enable up2k database; this enables file search, upload-undo, improves deduplication")
     ap2.add_argument("-e2ds", action="store_true", help="scan writable folders for new files on startup; sets \033[33m-e2d\033[0m")
     ap2.add_argument("-e2dsa", action="store_true", help="scans all folders on startup; sets \033[33m-e2ds\033[0m")
     ap2.add_argument("-e2v", action="store_true", help="verify file integrity; rehash all files and compare with db")
@@ -1358,7 +1358,7 @@ def add_db_general(ap, hcores):
     ap2.add_argument("--re-dhash", action="store_true", help="force a cache rebuild on startup; enable this once if it gets out of sync (should never be necessary)")
     ap2.add_argument("--no-forget", action="store_true", help="never forget indexed files, even when deleted from disk -- makes it impossible to ever upload the same file twice -- only useful for offloading uploads to a cloud service or something (volflag=noforget)")
     ap2.add_argument("--dbd", metavar="PROFILE", default="wal", help="database durability profile; sets the tradeoff between robustness and speed, see \033[33m--help-dbd\033[0m (volflag=dbd)")
-    ap2.add_argument("--xlink", action="store_true", help="on upload: check all volumes for dupes, not just the target volume (volflag=xlink)")
+    ap2.add_argument("--xlink", action="store_true", help="on upload: check all volumes for dupes, not just the target volume (probably buggy, not recommended) (volflag=xlink)")
     ap2.add_argument("--hash-mt", metavar="CORES", type=int, default=hcores, help="num cpu cores to use for file hashing; set 0 or 1 for single-core hashing")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="rescan filesystem for changes every \033[33mSEC\033[0m seconds; 0=off (volflag=scan)")
     ap2.add_argument("--db-act", metavar="SEC", type=float, default=10.0, help="defer any scheduled volume reindexing until \033[33mSEC\033[0m seconds after last db write (uploads, renames, ...)")
@@ -1621,6 +1621,7 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
         ("--hdr-au-usr", "--idp-h-usr"),
         ("--idp-h-sep", "--idp-gsep"),
         ("--th-no-crop", "--th-crop=n"),
+        ("--never-symlink", "--hardlink-only"),
     ]
     for dk, nk in deprecated:
         idx = -1
@@ -1645,7 +1646,7 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
             argv.extend(["--qr"])
             if ANYWIN or not os.geteuid():
                 # win10 allows symlinks if admin; can be unexpected
-                argv.extend(["-p80,443,3923", "--ign-ebind", "--no-dedup"])
+                argv.extend(["-p80,443,3923", "--ign-ebind"])
     except:
         pass
 

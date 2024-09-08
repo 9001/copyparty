@@ -260,6 +260,8 @@ IMPLICATIONS = [
     ["e2vu", "e2v"],
     ["e2vp", "e2v"],
     ["e2v", "e2d"],
+    ["hardlink_only", "hardlink"],
+    ["hardlink", "dedup"],
     ["tftpvv", "tftpv"],
     ["smbw", "smb"],
     ["smb1", "smb"],

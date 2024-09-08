@@ -1891,6 +1891,11 @@ class AuthSrv(object):
             if len(zs) == 3:  # fc5 => ffcc55
                 vol.flags["tcolor"] = "".join([x * 2 for x in zs])
 
+            if vol.flags.get("neversymlink"):
+                vol.flags["hardlinkonly"] = True  # was renamed
+            if vol.flags.get("hardlinkonly"):
+                vol.flags["hardlink"] = True
+
             for k1, k2 in IMPLICATIONS:
                 if k1 in vol.flags:
                     vol.flags[k2] = True
@@ -1995,9 +2000,6 @@ class AuthSrv(object):
                     for x in drop:
                         vol.flags.pop(x)
 
-            if vol.flags.get("neversymlink") and not vol.flags.get("hardlink"):
-                vol.flags["copydupes"] = True
-
             # verify tags mentioned by -mt[mp] are used by -mte
             local_mtp = {}
             local_only_mtp = {}
@@ -2076,6 +2078,8 @@ class AuthSrv(object):
 
         have_e2d = False
         have_e2t = False
+        have_dedup = False
+        unsafe_dedup = []
         t = "volumes and permissions:\n"
         for zv in vfs.all_vols.values():
             if not self.warn_anonwrite or verbosity < 5:
@@ -2108,6 +2112,11 @@ class AuthSrv(object):
             if "e2t" in zv.flags:
                 have_e2t = True
 
+            if "dedup" in zv.flags:
+                have_dedup = True
+                if "e2d" not in zv.flags and "hardlink" not in zv.flags:
+                    unsafe_dedup.append("/" + zv.vpath)
+
             t += "\n"
 
         if self.warn_anonwrite and verbosity > 4:
@@ -2120,10 +2129,17 @@ class AuthSrv(object):
                     self.log("\n\033[{}\033[0m\n".format(t))
 
                 if not have_e2t:
-                    t = "hint: argument -e2ts enables multimedia indexing (artist/title/...)"
+                    t = "hint: enable multimedia indexing (artist/title/...) with argument -e2ts"
                     self.log(t, 6)
             else:
-                t = "hint: argument -e2dsa enables searching, upload-undo, and better deduplication"
+                t = "hint: enable searching and upload-undo with argument -e2dsa"
+                self.log(t, 6)
+
+            if unsafe_dedup:
+                t = "WARNING: symlink-based deduplication is enabled for some volumes, but without indexing. Please enable -e2dsa and/or --hardlink to avoid problems when moving/renaming files. Affected volumes: %s"
+                self.log(t % (", ".join(unsafe_dedup)), 3)
+            elif not have_dedup:
+                t = "hint: enable upload deduplication with --dedup (but see readme for consequences)"
                 self.log(t, 6)
 
             zv, _ = vfs.get("/", "*", False, False)
