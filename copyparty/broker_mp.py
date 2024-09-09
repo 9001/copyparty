@@ -76,6 +76,10 @@ class BrokerMp(object):
         for _, proc in enumerate(self.procs):
             proc.q_pend.put((0, "reload", []))
 
+    def reload_sessions(self) -> None:
+        for _, proc in enumerate(self.procs):
+            proc.q_pend.put((0, "reload_sessions", []))
+
     def collector(self, proc: MProcess) -> None:
         """receive message from hub in other process"""
         while True:

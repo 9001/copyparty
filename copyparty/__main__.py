@@ -1067,6 +1067,7 @@ def add_cert(ap, cert_path):
 
 
 def add_auth(ap):
+    ses_db = os.path.join(E.cfg, "sessions.db")
     ap2 = ap.add_argument_group('IdP / identity provider / user authentication options')
     ap2.add_argument("--idp-h-usr", metavar="HN", type=u, default="", help="bypass the copyparty authentication checks and assume the request-header \033[33mHN\033[0m contains the username of the requesting user (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy")
     ap2.add_argument("--idp-h-grp", metavar="HN", type=u, default="", help="assume the request-header \033[33mHN\033[0m contains the groupname of the requesting user; can be referenced in config files for group-based access control")
@@ -1074,6 +1075,9 @@ def add_auth(ap):
     ap2.add_argument("--idp-gsep", metavar="RE", type=u, default="|:;+,", help="if there are multiple groups in \033[33m--idp-h-grp\033[0m, they are separated by one of the characters in \033[33mRE\033[0m")
     ap2.add_argument("--no-bauth", action="store_true", help="disable basic-authentication support; do not accept passwords from the 'Authenticate' header at all. NOTE: This breaks support for the android app")
     ap2.add_argument("--bauth-last", action="store_true", help="keeps basic-authentication enabled, but only as a last-resort; if a cookie is also provided then the cookie wins")
+    ap2.add_argument("--ses-db", metavar="PATH", type=u, default=ses_db, help="where to store the sessions database (if you run multiple copyparty instances, make sure they use different DBs)")
+    ap2.add_argument("--ses-len", metavar="CHARS", type=int, default=20, help="session key length; default is 120 bits ((20//4)*4*6)")
+    ap2.add_argument("--no-ses", action="store_true", help="disable sessions; use plaintext passwords in cookies")
 
 
 def add_chpw(ap):

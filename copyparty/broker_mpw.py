@@ -94,6 +94,10 @@ class MpWorker(BrokerCli):
                 self.asrv.reload()
                 self.logw("mpw.asrv reloaded")
 
+            elif dest == "reload_sessions":
+                with self.asrv.mutex:
+                    self.asrv.load_sessions()
+
             elif dest == "listen":
                 self.httpsrv.listen(args[0], args[1])
 

@@ -205,7 +205,8 @@ class HttpCli(object):
 
     def unpwd(self, m: Match[str]) -> str:
         a, b, c = m.groups()
-        return "%s\033[7m %s \033[27m%s" % (a, self.asrv.iacct[b], c)
+        uname = self.asrv.iacct.get(b) or self.asrv.sesa.get(b)
+        return "%s\033[7m %s \033[27m%s" % (a, uname, c)
 
     def _check_nonfatal(self, ex: Pebkac, post: bool) -> bool:
         if post:
@@ -504,6 +505,8 @@ class HttpCli(object):
                 zs = base64.b64decode(zb).decode("utf-8")
                 # try "pwd", "x:pwd", "pwd:x"
                 for bauth in [zs] + zs.split(":", 1)[::-1]:
+                    if bauth in self.asrv.sesa:
+                        break
                     hpw = self.asrv.ah.hash(bauth)
                     if self.asrv.iacct.get(hpw):
                         break
@@ -565,7 +568,11 @@ class HttpCli(object):
                 self.uname = "*"
         else:
             self.pw = uparam.get("pw") or self.headers.get("pw") or bauth or cookie_pw
-            self.uname = self.asrv.iacct.get(self.asrv.ah.hash(self.pw)) or "*"
+            self.uname = (
+                self.asrv.sesa.get(self.pw)
+                or self.asrv.iacct.get(self.asrv.ah.hash(self.pw))
+                or "*"
+            )
 
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
@@ -2088,6 +2095,9 @@ class HttpCli(object):
         if act == "chpw":
             return self.handle_chpw()
 
+        if act == "logout":
+            return self.handle_logout()
+
         raise Pebkac(422, 'invalid action "{}"'.format(act))
 
     def handle_zip_post(self) -> bool:
@@ -2409,7 +2419,8 @@ class HttpCli(object):
                 msg = "new password OK"
 
         redir = (self.args.SRS + "?h") if ok else ""
-        html = self.j2s("msg", h1=msg, h2='<a href="/?h">ack</a>', redir=redir)
+        h2 = '<a href="' + self.args.SRS + '?h">ack</a>'
+        html = self.j2s("msg", h1=msg, h2=h2, redir=redir)
         self.reply(html.encode("utf-8"))
         return True
 
@@ -2422,9 +2433,8 @@ class HttpCli(object):
             uhash = ""
         self.parser.drop()
 
-        self.out_headerlist = [
-            x for x in self.out_headerlist if x[0] != "Set-Cookie" or "cppw" != x[1][:4]
-        ]
+        if not pwd:
+            raise Pebkac(422, "password cannot be blank")
 
         dst = self.args.SRS
         if self.vpath:
@@ -2442,9 +2452,27 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"))
         return True
 
+    def handle_logout(self) -> bool:
+        assert self.parser
+        self.parser.drop()
+
+        self.log("logout " + self.uname)
+        self.asrv.forget_session(self.conn.hsrv.broker, self.uname)
+        self.get_pwd_cookie("x")
+
+        dst = self.args.SRS + "?h"
+        h2 = '<a href="' + dst + '">ack</a>'
+        html = self.j2s("msg", h1="ok bye", h2=h2, redir=dst)
+        self.reply(html.encode("utf-8"))
+        return True
+
     def get_pwd_cookie(self, pwd: str) -> tuple[bool, str]:
-        hpwd = self.asrv.ah.hash(pwd)
-        uname = self.asrv.iacct.get(hpwd)
+        uname = self.asrv.sesa.get(pwd)
+        if not uname:
+            hpwd = self.asrv.ah.hash(pwd)
+            uname = self.asrv.iacct.get(hpwd)
+            if uname:
+                pwd = self.asrv.ases.get(uname) or pwd
         if uname:
             msg = "hi " + uname
             dur = int(60 * 60 * self.args.logout)
@@ -2456,8 +2484,9 @@ class HttpCli(object):
                 zb = hashlib.sha512(pwd.encode("utf-8", "replace")).digest()
                 logpwd = "%" + base64.b64encode(zb[:12]).decode("utf-8")
 
-            self.log("invalid password: {}".format(logpwd), 3)
-            self.cbonk(self.conn.hsrv.gpwd, pwd, "pw", "invalid passwords")
+            if pwd != "x":
+                self.log("invalid password: {}".format(logpwd), 3)
+                self.cbonk(self.conn.hsrv.gpwd, pwd, "pw", "invalid passwords")
 
             msg = "naw dude"
             pwd = "x"  # nosec
@@ -2469,10 +2498,11 @@ class HttpCli(object):
             for k in ("cppwd", "cppws") if self.is_https else ("cppwd",):
                 ck = gencookie(k, pwd, self.args.R, False)
                 self.out_headerlist.append(("Set-Cookie", ck))
+            self.out_headers.pop("Set-Cookie", None)  # drop keepalive
         else:
             k = "cppws" if self.is_https else "cppwd"
             ck = gencookie(k, pwd, self.args.R, self.is_https, dur, "; HttpOnly")
-            self.out_headerlist.append(("Set-Cookie", ck))
+            self.out_headers["Set-Cookie"] = ck
 
         return dur > 0, msg
 

@@ -840,8 +840,10 @@ class AuthSrv(object):
 
         # fwd-decl
         self.vfs = VFS(log_func, "", "", AXS(), {})
-        self.acct: dict[str, str] = {}
-        self.iacct: dict[str, str] = {}
+        self.acct: dict[str, str] = {}  # uname->pw
+        self.iacct: dict[str, str] = {}  # pw->uname
+        self.ases: dict[str, str] = {}  # uname->session
+        self.sesa: dict[str, str] = {}  # session->uname
         self.defpw: dict[str, str] = {}
         self.grps: dict[str, list[str]] = {}
         self.re_pwd: Optional[re.Pattern] = None
@@ -2181,8 +2183,11 @@ class AuthSrv(object):
         self.grps = grps
         self.iacct = {v: k for k, v in acct.items()}
 
+        self.load_sessions()
+
         self.re_pwd = None
         pwds = [re.escape(x) for x in self.iacct.keys()]
+        pwds.extend(list(self.sesa))
         if pwds:
             if self.ah.on:
                 zs = r"(\[H\] pw:.*|[?&]pw=)([^&]+)"
@@ -2257,6 +2262,72 @@ class AuthSrv(object):
             cur.close()
             db.close()
 
+    def load_sessions(self, quiet=False) -> None:
+        # mutex me
+        if self.args.no_ses:
+            self.ases = {}
+            self.sesa = {}
+            return
+
+        import sqlite3
+
+        ases = {}
+        blen = (self.args.ses_len // 4) * 4  # 3 bytes in 4 chars
+        blen = (blen * 3) // 4  # bytes needed for ses_len chars
+
+        db = sqlite3.connect(self.args.ses_db)
+        cur = db.cursor()
+
+        for uname, sid in cur.execute("select un, si from us"):
+            if uname in self.acct:
+                ases[uname] = sid
+
+        n = []
+        q = "insert into us values (?,?,?)"
+        for uname in self.acct:
+            if uname not in ases:
+                sid = ub64enc(os.urandom(blen)).decode("utf-8")
+                cur.execute(q, (uname, sid, int(time.time())))
+                ases[uname] = sid
+                n.append(uname)
+
+        if n:
+            db.commit()
+
+        cur.close()
+        db.close()
+
+        self.ases = ases
+        self.sesa = {v: k for k, v in ases.items()}
+        if n and not quiet:
+            t = ", ".join(n[:3])
+            if len(n) > 3:
+                t += "..."
+            self.log("added %d new sessions (%s)" % (len(n), t))
+
+    def forget_session(self, broker: Optional["BrokerCli"], uname: str) -> None:
+        with self.mutex:
+            self._forget_session(uname)
+
+        if broker:
+            broker.ask("_reload_sessions").get()
+
+    def _forget_session(self, uname: str) -> None:
+        if self.args.no_ses:
+            return
+
+        import sqlite3
+
+        db = sqlite3.connect(self.args.ses_db)
+        cur = db.cursor()
+        cur.execute("delete from us where un = ?", (uname,))
+        db.commit()
+        cur.close()
+        db.close()
+
+        self.sesa.pop(self.ases.get(uname, ""), "")
+        self.ases.pop(uname, "")
+
     def chpw(self, broker: Optional["BrokerCli"], uname, pw) -> tuple[bool, str]:
         if not self.args.chpw:
             return False, "feature disabled in server config"
@@ -2276,7 +2347,7 @@ class AuthSrv(object):
         if hpw == self.acct[uname]:
             return False, "that's already your password my dude"
 
-        if hpw in self.iacct:
+        if hpw in self.iacct or hpw in self.sesa:
             return False, "password is taken"
 
         with self.mutex:

@@ -604,7 +604,7 @@ html.dy {
 	background: var(--sel-bg);
 	text-shadow: none;
 }
-html,body,tr,th,td,#files,a {
+html,body,tr,th,td,#files,a,#blogout {
 	color: inherit;
 	background: none;
 	font-weight: inherit;
@@ -687,11 +687,15 @@ html.y #path {
 #files tbody div a {
 	color: var(--tab-alt);
 }
-a, #files tbody div a:last-child {
+a, #blogout, #files tbody div a:last-child {
 	color: var(--a);
 	padding: .2em;
 	text-decoration: none;
 }
+#blogout {
+	margin: -.2em;
+}
+#blogout:hover,
 a:hover {
 	color: var(--a-hil);
 	background: var(--a-h-bg);
@@ -934,6 +938,9 @@ html.y #path a:hover {
 #acc_info span.warn {
 	color: var(--srv-3);
 	border-bottom: 1px solid var(--srv-3b);
+}
+#flogout {
+	display: inline;
 }
 #goh+span {
 	color: var(--bg-u5);

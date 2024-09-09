@@ -221,6 +221,9 @@ class SvcHub(object):
             noch.update([x for x in zsl if x])
         args.chpw_no = noch
 
+        if not self.args.no_ses:
+            self.setup_session_db()
+
         if args.shr:
             self.setup_share_db()
 
@@ -368,6 +371,64 @@ class SvcHub(object):
             from .broker_thr import BrokerThr as Broker  # type: ignore
 
         self.broker = Broker(self)
+
+    def setup_session_db(self) -> None:
+        if not HAVE_SQLITE3:
+            self.args.no_ses = True
+            t = "WARNING: sqlite3 not available; disabling sessions, will use plaintext passwords in cookies"
+            self.log("root", t, 3)
+            return
+
+        import sqlite3
+
+        create = True
+        db_path = self.args.ses_db
+        self.log("root", "opening sessions-db %s" % (db_path,))
+        for n in range(2):
+            try:
+                db = sqlite3.connect(db_path)
+                cur = db.cursor()
+                try:
+                    cur.execute("select count(*) from us").fetchone()
+                    create = False
+                    break
+                except:
+                    pass
+            except Exception as ex:
+                if n:
+                    raise
+                t = "sessions-db corrupt; deleting and recreating: %r"
+                self.log("root", t % (ex,), 3)
+                try:
+                    cur.close()  # type: ignore
+                except:
+                    pass
+                try:
+                    db.close()  # type: ignore
+                except:
+                    pass
+                os.unlink(db_path)
+
+        sch = [
+            r"create table kv (k text, v int)",
+            r"create table us (un text, si text, t0 int)",
+            # username, session-id, creation-time
+            r"create index us_un on us(un)",
+            r"create index us_si on us(si)",
+            r"create index us_t0 on us(t0)",
+            r"insert into kv values ('sver', 1)",
+        ]
+
+        assert db  # type: ignore
+        assert cur  # type: ignore
+        if create:
+            for cmd in sch:
+                cur.execute(cmd)
+            self.log("root", "created new sessions-db")
+            db.commit()
+
+        cur.close()
+        db.close()
 
     def setup_share_db(self) -> None:
         al = self.args
@@ -545,7 +606,7 @@ class SvcHub(object):
         fng = []
         t_ff = "transcode audio, create spectrograms, video thumbnails"
         to_check = [
-            (HAVE_SQLITE3, "sqlite", "file and media indexing"),
+            (HAVE_SQLITE3, "sqlite", "sessions and file/media indexing"),
             (HAVE_PIL, "pillow", "image thumbnails (plenty fast)"),
             (HAVE_VIPS, "vips", "image thumbnails (faster, eats more ram)"),
             (HAVE_WEBP, "pillow-webp", "create thumbnails as webp files"),
@@ -944,6 +1005,11 @@ class SvcHub(object):
         time.sleep(0.2)
 
         self._reload(rescan_all_vols=rescan_all_vols, up2k=up2k)
+
+    def _reload_sessions(self) -> None:
+        with self.asrv.mutex:
+            self.asrv.load_sessions(True)
+        self.broker.reload_sessions()
 
     def stop_thr(self) -> None:
         while not self.stop_req:

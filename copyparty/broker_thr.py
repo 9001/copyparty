@@ -34,6 +34,7 @@ class BrokerThr(BrokerCli):
         self.iphash = HMaccas(os.path.join(self.args.E.cfg, "iphash"), 8)
         self.httpsrv = HttpSrv(self, None)
         self.reload = self.noop
+        self.reload_sessions = self.noop
 
     def shutdown(self) -> None:
         # self.log("broker", "shutting down")
