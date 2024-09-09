@@ -1,4 +1,47 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0908-1925  `v1.15.0`  fill the drives
+
+## recent important news
+
+* [v1.15.0 (2024-09-08)](https://github.com/9001/copyparty/releases/tag/v1.15.0) changed upload deduplication to be default-disabled
+* [v1.14.3 (2024-08-30)](https://github.com/9001/copyparty/releases/tag/v1.14.3) fixed a bug that was introduced in v1.13.8 (2024-08-13); this bug could lead to **data loss** -- see the v1.14.3 release-notes for details
+
+# upload deduplication now disabled by default
+
+because many people found the behavior surprising. This also makes it easier to use copyparty together with other software, since there is no risk of damage to symlinks if there are no symlinks to damage
+
+to enable deduplication, use either `--dedup` (old-default, symlink-based), or `--hardlink` (will use hardlinks when possible), or `--hardlink-only` (disallow symlinks). To choose the approach that fits your usecase, see [file deduplication](https://github.com/9001/copyparty#file-deduplication) in the readme
+
+verification of local file consistency was also added; this happens when someone uploads a dupe, to ensure that no other software has modified the local file since last reindex. This unfortunately makes uploading of duplicate files much slower, and can be disabled with `--safe-dedup 1` if you know that only copyparty will be modifying the filesystem
+
+## new features
+
+* dedup improvements:
+  * verify consistency of local files before using them as dedup source 6e671c52
+    * if a local file has been altered by other software since the last reindexing, then this will now be detected
+* u2c (commandline uploader): add mode to print hashes of local files 08848be7
+  * if you've lost a file but you know its `wark` (file identifier), you can now use u2c.exe to scan your whole filesystem for it: `u2c - .`
+* #96 use local timezone in log messages b599fbae
+
+## bugfixes
+
+* dedup fixes:
+  * symlinks could break if moved/renamed inside a volume where deduplication was disabled after some files within had already been deduplicated 4401de04
+  * when moving/renaming, only consider symlinks between volumes if `xlink` volflag is set b5ad9369
+* database consistency verifier (`-e2vp`):
+  * support filenames with newlines, and warn about missing files b0de84cb
+* opengraph/`--og`: fix viewing textfiles e5a836cb
+* up2k.js: fix confusing message when uploading many copies of the same file f1130db1
+
+## other changes
+
+* disable upload deduplication by default a2e0f986
+* up2k.js: increase handshake timeout to several minutes because of the dedup changes c5988a04
+* copyparty.exe: update to python 3.12.6
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0902-0108  `v1.14.4`  another
 
 ## recent important news

@@ -1475,6 +1475,7 @@ def run_argparse(
 ) -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         formatter_class=formatter,
+        usage=argparse.SUPPRESS,
         prog="copyparty",
         description="http file sharing hub v{} ({})".format(S_VERSION, S_BUILD_DT),
     )
