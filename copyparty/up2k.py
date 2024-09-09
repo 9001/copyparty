@@ -2846,7 +2846,7 @@ class Up2k(object):
                     self.log(t)
                     del reg[wark]
 
-                elif inc_ap != orig_ap and not data_ok:
+                elif inc_ap != orig_ap and not data_ok and "done" in reg[wark]:
                     self.log("asserting contents of %s" % (orig_ap,))
                     dhashes, _ = self._hashlist_from_file(orig_ap)
                     dwark = up2k_wark_from_hashlist(self.salt, st.st_size, dhashes)
@@ -3107,7 +3107,22 @@ class Up2k(object):
         fp = djoin(fdir, fname)
         if job.get("replace") and bos.path.exists(fp):
             self.log("replacing existing file at {}".format(fp))
-            wunlink(self.log, fp, self.flags.get(job["ptop"]) or {})
+            cur = None
+            ptop = job["ptop"]
+            vf = self.flags.get(ptop) or {}
+            st = bos.stat(fp)
+            try:
+                vrel = vjoin(job["prel"], fname)
+                xlink = bool(vf.get("xlink"))
+                cur, wark, _, _, _, _ = self._find_from_vpath(ptop, vrel)
+                self._forget_file(ptop, vrel, cur, wark, True, st.st_size, xlink)
+            except Exception as ex:
+                self.log("skipping replace-relink: %r" % (ex,))
+            finally:
+                if cur:
+                    cur.connection.commit()
+
+            wunlink(self.log, fp, vf)
 
         if self.args.plain_ip:
             dip = ip.replace(":", ".")
