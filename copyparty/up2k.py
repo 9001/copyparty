@@ -268,19 +268,29 @@ class Up2k(object):
             if not self.stop:
                 self.log("uploads are now possible", 2)
 
-    def get_state(self) -> str:
+    def get_state(self, get_q: bool, uname: str) -> str:
         mtpq: Union[int, str] = 0
+        ups = []
+        up_en = not self.args.no_up_list
         q = "select count(w) from mt where k = 't:mtp'"
         got_lock = False if PY2 else self.mutex.acquire(timeout=0.5)
         if got_lock:
-            for cur in self.cur.values():
-                try:
-                    mtpq += cur.execute(q).fetchone()[0]
-                except:
-                    pass
-            self.mutex.release()
+            try:
+                for cur in self.cur.values() if get_q else []:
+                    try:
+                        mtpq += cur.execute(q).fetchone()[0]
+                    except:
+                        pass
+                if uname and up_en:
+                    ups = self._active_uploads(uname)
+            finally:
+                self.mutex.release()
         else:
             mtpq = "(?)"
+            if up_en:
+                ups = [(0, 0, time.time(), "cannot show list (server too busy)")]
+
+        ups.sort(reverse=True)
 
         ret = {
             "volstate": self.volstate,
@@ -288,12 +298,39 @@ class Up2k(object):
             "hashq": self.n_hashq,
             "tagq": self.n_tagq,
             "mtpq": mtpq,
+            "ups": ups,
             "dbwu": "{:.2f}".format(self.db_act),
             "dbwt": "{:.2f}".format(
                 min(1000 * 24 * 60 * 60 - 1, time.time() - self.db_act)
             ),
         }
         return json.dumps(ret, separators=(",\n", ": "))
+
+    def _active_uploads(self, uname: str) -> list[tuple[float, int, int, str]]:
+        ret = []
+        for vtop in self.asrv.vfs.aread[uname]:
+            vfs = self.asrv.vfs.all_vols.get(vtop)
+            if not vfs:  # dbv only
+                continue
+            ptop = vfs.realpath
+            tab = self.registry.get(ptop)
+            if not tab:
+                continue
+            for job in tab.values():
+                ineed = len(job["need"])
+                ihash = len(job["hash"])
+                if ineed == ihash or not ineed:
+                    continue
+
+                zt = (
+                    ineed / ihash,
+                    job["size"],
+                    int(job["t0"]),
+                    int(job["poke"]),
+                    djoin(vtop, job["prel"], job["name"]),
+                )
+                ret.append(zt)
+        return ret
 
     def find_job_by_ap(self, ptop: str, ap: str) -> str:
         try:
@@ -2910,9 +2947,12 @@ class Up2k(object):
                         job = deepcopy(job)
                         job["wark"] = wark
                         job["at"] = cj.get("at") or time.time()
-                        zs = "lmod ptop vtop prel name host user addr poke"
+                        zs = "vtop ptop prel name lmod host user addr poke"
                         for k in zs.split():
                             job[k] = cj.get(k) or ""
+                        for k in ("life", "replace"):
+                            if k in cj:
+                                job[k] = cj[k]
 
                         pdir = djoin(cj["ptop"], cj["prel"])
                         if rand:
@@ -3013,18 +3053,8 @@ class Up2k(object):
                     "busy": {},
                 }
                 # client-provided, sanitized by _get_wark: name, size, lmod
-                for k in [
-                    "host",
-                    "user",
-                    "addr",
-                    "vtop",
-                    "ptop",
-                    "prel",
-                    "name",
-                    "size",
-                    "lmod",
-                    "poke",
-                ]:
+                zs = "vtop ptop prel name size lmod host user addr poke"
+                for k in zs.split():
                     job[k] = cj[k]
 
                 for k in ["life", "replace"]:

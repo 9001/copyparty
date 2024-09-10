@@ -33,6 +33,7 @@ var Ls = {
 		"ta1": "du må skrive et nytt passord først",
 		"ta2": "gjenta for å bekrefte nytt passord:",
 		"ta3": "fant en skrivefeil; vennligst prøv igjen",
+		"aa1": "innkommende:",
 	},
 	"eng": {
 		"d2": "shows the state of all active threads",
@@ -78,6 +79,7 @@ var Ls = {
 		"ta1": "请先输入新密码",
 		"ta2": "重复以确认新密码：",
 		"ta3": "发现拼写错误；请重试",
+		"aa1": "正在接收的文件：", //m
 	}
 };
 

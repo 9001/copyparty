@@ -87,6 +87,7 @@ from .util import (
     relchk,
     ren_open,
     runhook,
+    s2hms,
     s3enc,
     sanitize_fn,
     sanitize_vpath,
@@ -3939,11 +3940,30 @@ class HttpCli(object):
             for y in [self.rvol, self.wvol, self.avol]
         ]
 
-        if self.avol and not self.args.no_rescan:
-            x = self.conn.hsrv.broker.ask("up2k.get_state")
+        ups = []
+        now = time.time()
+        get_vst = self.avol and not self.args.no_rescan
+        get_ups = self.rvol and not self.args.no_up_list and self.uname or ""
+        if get_vst or get_ups:
+            x = self.conn.hsrv.broker.ask("up2k.get_state", get_vst, get_ups)
             vs = json.loads(x.get())
             vstate = {("/" + k).rstrip("/") + "/": v for k, v in vs["volstate"].items()}
-        else:
+            try:
+                for rem, sz, t0, poke, vp in vs["ups"]:
+                    fdone = max(0.001, 1 - rem)
+                    td = max(0.1, now - t0)
+                    rd, fn = vsplit(vp.replace(os.sep, "/"))
+                    if not rd:
+                        rd = "/"
+                    erd = quotep(rd)
+                    rds = rd.replace("/", " / ")
+                    spd = humansize(sz * fdone / td, True) + "/s"
+                    eta = s2hms((td / fdone) - td, True)
+                    idle = s2hms(now - poke, True)
+                    ups.append((int(100 * fdone), spd, eta, idle, erd, rds, fn))
+            except Exception as ex:
+                self.log("failed to list upload progress: %r" % (ex,), 1)
+        if not get_vst:
             vstate = {}
             vs = {
                 "scanning": None,
@@ -3968,6 +3988,12 @@ class HttpCli(object):
                 for k in ["scanning", "hashq", "tagq", "mtpq", "dbwt"]:
                     txt += " {}({})".format(k, vs[k])
 
+            if ups:
+                txt += "\n\nincoming files:"
+                for zt in ups:
+                    txt += "\n%s" % (", ".join((str(x) for x in zt)),)
+                txt += "\n"
+
             if rvol:
                 txt += "\nyou can browse:"
                 for v in rvol:
@@ -3991,6 +4017,7 @@ class HttpCli(object):
             avol=avol,
             in_shr=self.args.shr and self.vpath.startswith(self.args.shr[1:]),
             vstate=vstate,
+            ups=ups,
             scanning=vs["scanning"],
             hashq=vs["hashq"],
             tagq=vs["tagq"],

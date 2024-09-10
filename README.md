@@ -43,6 +43,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [unpost](#unpost) - undo/delete accidental uploads
         * [self-destruct](#self-destruct) - uploads can be given a lifetime
         * [race the beam](#race-the-beam) - download files while they're still uploading ([demo video](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm))
+        * [incoming files](#incoming-files) - the control-panel shows the ETA for all incoming files
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
     * [shares](#shares) - share a file or folder by creating a temporary link
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
@@ -729,6 +730,13 @@ specifying a custom expiration time client-side will affect the timespan in whic
 download files while they're still uploading ([demo video](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm))  -- it's almost like peer-to-peer
 
 requires the file to be uploaded using up2k (which is the default drag-and-drop uploader), alternatively the command-line program
+
+
+### incoming files
+
+the control-panel shows the ETA for all incoming files  , but only for files being uploaded into volumes where you have read-access
+
+![copyparty-cpanel-upload-eta-or8](https://github.com/user-attachments/assets/fd275ffa-698c-4fca-a307-4d2181269a6a)
 
 
 ## file manager
