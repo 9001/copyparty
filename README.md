@@ -1,4 +1,4 @@
-<img src="docs/logo.svg" width="250" align="right"/>
+<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>
 
 ### 💾🎉 copyparty
 
@@ -1887,6 +1887,7 @@ interact with copyparty using non-browser clients
   * [rclone](https://rclone.org/) as client can give ~5x performance, see [./docs/rclone.md](docs/rclone.md)
 
 * sharex (screenshot utility): see [./contrib/sharex.sxcu](contrib/#sharexsxcu)
+  * and for screenshots on linux, see [./contrib/flameshot.sh](./contrib/flameshot.sh)
 
 * contextlet (web browser integration); see [contrib contextlet](contrib/#send-to-cppcontextletjson)
 

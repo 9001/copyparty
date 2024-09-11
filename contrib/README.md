@@ -19,6 +19,9 @@
 * the `act:bput` thing is optional since copyparty v1.9.29
 * using an older sharex version, maybe sharex v12.1.1 for example? dw fam i got your back 👉😎👉 [`sharex12.sxcu`](sharex12.sxcu)
 
+### [`flameshot.sh`](flameshot.sh)
+* takes a screenshot with [flameshot](https://flameshot.org/) on Linux, uploads it, and writes the URL to clipboard
+
 ### [`send-to-cpp.contextlet.json`](send-to-cpp.contextlet.json)
 * browser integration, kind of? custom rightclick actions and stuff
 * rightclick a pic and send it to copyparty straight from your browser
