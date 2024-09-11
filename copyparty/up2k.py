@@ -3343,19 +3343,30 @@ class Up2k(object):
 
         return chashes, chunksize, coffsets, path, job["lmod"], job["sprs"]
 
-    def release_chunks(self, ptop: str, wark: str, chashes: list[str]) -> bool:
-        with self.reg_mutex:
-            job = self.registry[ptop].get(wark)
-            if job:
-                for chash in chashes:
-                    job["busy"].pop(chash, None)
-
-        return True
+    def fast_confirm_chunks(
+        self, ptop: str, wark: str, chashes: list[str]
+    ) -> tuple[int, str]:
+        if not self.mutex.acquire(False):
+            return -1, ""
+        if not self.reg_mutex.acquire(False):
+            self.mutex.release()
+            return -1, ""
+        try:
+            return self._confirm_chunks(ptop, wark, chashes)
+        finally:
+            self.reg_mutex.release()
+            self.mutex.release()
 
     def confirm_chunks(
         self, ptop: str, wark: str, chashes: list[str]
     ) -> tuple[int, str]:
         with self.mutex, self.reg_mutex:
+            return self._confirm_chunks(ptop, wark, chashes)
+
+    def _confirm_chunks(
+        self, ptop: str, wark: str, chashes: list[str]
+    ) -> tuple[int, str]:
+        if True:
             self.db_act = self.vol_act[ptop] = time.time()
             try:
                 job = self.registry[ptop][wark]
@@ -3363,7 +3374,7 @@ class Up2k(object):
                 src = djoin(pdir, job["tnam"])
                 dst = djoin(pdir, job["name"])
             except Exception as ex:
-                return "confirm_chunk, wark(%r)" % (ex,)  # type: ignore
+                return -2, "confirm_chunk, wark(%r)" % (ex,)  # type: ignore
 
             for chash in chashes:
                 job["busy"].pop(chash, None)
@@ -3372,7 +3383,7 @@ class Up2k(object):
                 for chash in chashes:
                     job["need"].remove(chash)
             except Exception as ex:
-                return "confirm_chunk, chash(%s) %r" % (chash, ex)  # type: ignore
+                return -2, "confirm_chunk, chash(%s) %r" % (chash, ex)  # type: ignore
 
             ret = len(job["need"])
             if ret > 0:
