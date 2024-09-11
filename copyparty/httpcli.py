@@ -2311,6 +2311,7 @@ class HttpCli(object):
         locked = chashes  # remaining chunks to be received in this request
         written = []  # chunks written to disk, but not yet released by up2k
         num_left = -1  # num chunks left according to most recent up2k release
+        treport = time.time()  # ratelimit up2k reporting to reduce overhead
 
         try:
             if self.args.nw:
@@ -2356,11 +2357,8 @@ class HttpCli(object):
                     remains -= chunksize
 
                     if len(cstart) > 1 and path != os.devnull:
-                        self.log(
-                            "clone {} to {}".format(
-                                cstart[0], " & ".join(unicode(x) for x in cstart[1:])
-                            )
-                        )
+                        t = " & ".join(unicode(x) for x in cstart[1:])
+                        self.log("clone %s to %s" % (cstart[0], t))
                         ofs = 0
                         while ofs < chunksize:
                             bufsz = max(4 * 1024 * 1024, self.args.iobuf)
@@ -2378,6 +2376,10 @@ class HttpCli(object):
                     # be quick to keep the tcp winsize scale;
                     # if we can't confirm rn then that's fine
                     written.append(chash)
+                    now = time.time()
+                    if now - treport < 1:
+                        continue
+                    treport = now
                     x = broker.ask("up2k.fast_confirm_chunks", ptop, wark, written)
                     num_left, t = x.get()
                     if num_left < -1:
@@ -2385,8 +2387,9 @@ class HttpCli(object):
                         locked = written = []
                         return False
                     elif num_left >= 0:
-                        self.log("got %d chunks, %d left" % (len(written), num_left), 6)
-                        locked = locked[len(written):]
+                        t = "got %d more chunks, %d left"
+                        self.log(t % (len(written), num_left), 6)
+                        locked = locked[len(written) :]
                         written = []
 
                 if not fpool:
@@ -2406,6 +2409,8 @@ class HttpCli(object):
                 if num_left < 0:
                     self.loud_reply(t, status=500)
                     return False
+                t = "got %d more chunks, %d left"
+                self.log(t % (len(locked), num_left), 6)
 
         if num_left < 0:
             raise Pebkac(500, "unconfirmed; see serverlog")

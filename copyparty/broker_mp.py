@@ -9,14 +9,14 @@ import queue
 
 from .__init__ import CORES, TYPE_CHECKING
 from .broker_mpw import MpWorker
-from .broker_util import ExceptionalQueue, try_exec
+from .broker_util import ExceptionalQueue, NotExQueue, try_exec
 from .util import Daemon, mp
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
 
 if True:  # pylint: disable=using-constant-test
-    from typing import Any
+    from typing import Any, Union
 
 
 class MProcess(mp.Process):
@@ -108,7 +108,7 @@ class BrokerMp(object):
                 if retq_id:
                     proc.q_pend.put((retq_id, "retq", rv))
 
-    def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
+    def ask(self, dest: str, *args: Any) -> Union[ExceptionalQueue, NotExQueue]:
 
         # new non-ipc invoking managed service in hub
         obj = self.hub

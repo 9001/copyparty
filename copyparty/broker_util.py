@@ -33,6 +33,18 @@ class ExceptionalQueue(Queue, object):
         return rv
 
 
+class NotExQueue(object):
+    """
+    BrokerThr uses this instead of ExceptionalQueue; 7x faster
+    """
+
+    def __init__(self, rv: Any) -> None:
+        self.rv = rv
+
+    def get(self) -> Any:
+        return self.rv
+
+
 class BrokerCli(object):
     """
     helps mypy understand httpsrv.broker but still fails a few levels deeper,
@@ -48,7 +60,7 @@ class BrokerCli(object):
     def __init__(self) -> None:
         pass
 
-    def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
+    def ask(self, dest: str, *args: Any) -> Union[ExceptionalQueue, NotExQueue]:
         return ExceptionalQueue(1)
 
     def say(self, dest: str, *args: Any) -> None:

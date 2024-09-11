@@ -11,7 +11,7 @@ import queue
 
 from .__init__ import ANYWIN
 from .authsrv import AuthSrv
-from .broker_util import BrokerCli, ExceptionalQueue
+from .broker_util import BrokerCli, ExceptionalQueue, NotExQueue
 from .httpsrv import HttpSrv
 from .util import FAKE_MP, Daemon, HMaccas
 
@@ -114,7 +114,7 @@ class MpWorker(BrokerCli):
             else:
                 raise Exception("what is " + str(dest))
 
-    def ask(self, dest: str, *args: Any) -> ExceptionalQueue:
+    def ask(self, dest: str, *args: Any) -> Union[ExceptionalQueue, NotExQueue]:
         retq = ExceptionalQueue(1)
         retq_id = id(retq)
         with self.retpend_mutex:
