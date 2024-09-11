@@ -1218,9 +1218,9 @@ var Ls = {
 		"m_ok": "确定",
 		"m_ng": "取消",
 
-		"enable": "启用", //m
-		"danger": "危险", //m
-		"clipped": "已复制到剪贴板", //m
+		"enable": "启用",
+		"danger": "危险",
+		"clipped": "已复制到剪贴板",
 
 		"ht_s": "秒",
 		"ht_m": "分",
@@ -1303,12 +1303,12 @@ var Ls = {
 		"utl_prog": "进度",
 
 		// 保持简短:
-		"utl_404": "404", //m
-		"utl_err": "故障", //m
-		"utl_oserr": "OS故障", //m
-		"utl_found": "已找到", //m
-		"utl_defer": "延期", //m
-		"utl_yolo": "加速", //m
+		"utl_404": "404",
+		"utl_err": "错误",
+		"utl_oserr": "OS错误",
+		"utl_found": "已找到",
+		"utl_defer": "延期",
+		"utl_yolo": "加速",
 		"utl_done": "完成",
 
 		"ul_flagblk": "文件已添加到队列</b><br>但另一个浏览器标签中有一个繁忙的 up2k，<br>因此等待它完成",
@@ -1336,7 +1336,7 @@ var Ls = {
 		"cl_hcancel": "列隐藏已取消",
 
 		"ct_grid": '网格视图',
-		"ct_ttips": '◔ ◡ ◔">ℹ️ 工具提示', //m
+		"ct_ttips": '◔ ◡ ◔">ℹ️ 工具提示',
 		"ct_thumb": '在网格视图中，切换图标或缩略图$N快捷键: T">🖼️ 缩略图',
 		"ct_csel": '在网格视图中使用 CTRL 和 SHIFT 进行文件选择">CTRL',
 		"ct_ihop": '当图像查看器关闭时，滚动到最后查看的文件">滚动',
@@ -1468,7 +1468,7 @@ var Ls = {
 		"fs_pname": "链接名称可选；如果为空则随机",
 		"fs_tsrc": "共享的文件或文件夹",
 		"fs_ppwd": "密码可选",
-		"fs_w8": "正在创建文件共享...", //m
+		"fs_w8": "正在创建文件共享...",
 		"fs_ok": "<h6>分享链接已创建</h6>\n按 <code>Enter/OK</code> 复制到剪贴板\n按 <code>ESC/Cancel</code> 关闭\n\n",
 
 		"frt_dec": "可能修复一些损坏的文件名\">url-decode",
@@ -1479,8 +1479,8 @@ var Ls = {
 		"fr_case": "区分大小写的正则表达式\">case",
 		"fr_win": "Windows 安全名称；将 <code>&lt;&gt;:&quot;\\|?*</code> 替换为日文全角字符\">win",
 		"fr_slash": "将 <code>/</code> 替换为不会导致新文件夹创建的字符\">不使用 /",
-		"fr_re": "正则表达式搜索模式应用于原始文件名；$N可以在下面的格式字段中引用捕获组，如&lt;code&gt;(1)&lt;/code&gt;和&lt;code&gt;(2)&lt;/code&gt;等等。", //m
-		"fr_fmt": "受到 foobar2000 的启发：$N&lt;code&gt;(title)&lt;/code&gt; 被歌曲名称替换,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; 仅当歌曲艺术家不为空时才包含&lt;code&gt;[此]&lt;/code&gt;部分$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; 将曲目编号填充为 2 位数字", //m
+		"fr_re": "正则表达式搜索模式应用于原始文件名；$N可以在下面的格式字段中引用捕获组，如&lt;code&gt;(1)&lt;/code&gt;和&lt;code&gt;(2)&lt;/code&gt;等等。",
+		"fr_fmt": "受到 foobar2000 的启发：$N&lt;code&gt;(title)&lt;/code&gt; 被歌曲名称替换,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; 仅当歌曲艺术家不为空时才包含&lt;code&gt;[此]&lt;/code&gt;部分$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; 将曲目编号填充为 2 位数字",
 		"fr_pdel": "删除",
 		"fr_pnew": "另存为",
 		"fr_pname": "为你的新预设提供一个名称",
@@ -1540,8 +1540,8 @@ var Ls = {
 		"gt_c1": "截断文件名更多（显示更少）",
 		"gt_c2": "截断文件名更少（显示更多）",
 
-		"sm_w8": "正在搜寻匹配...", //m
-		"sm_prev": "以下是来自先前查询的搜索结果：\n  ",
+		"sm_w8": "正在搜索...",
+		"sm_prev": "上次查询的搜索结果：\n  ",
 		"sl_close": "关闭搜索结果",
 		"sl_hits": "显示 {0} 个结果",
 		"sl_moar": "加载更多",
@@ -1613,20 +1613,20 @@ var Ls = {
 		"un_del": "删除",
 		"un_m3": "正在加载你的近期上传...",
 		"un_busy": "正在删除 {0} 个文件...",
-		"un_clip": "{0} 个链接已复制到剪贴板", //m
+		"un_clip": "{0} 个链接已复制到剪贴板",
 
 		"u_https1": "你应该",
 		"u_https2": "切换到 https",
 		"u_https3": "以获得更好的性能",
 		"u_ancient": '你的浏览器非常古老 -- 也许你应该 <a href="#" onclick="goto(\'bup\')">改用 bup</a>',
 		"u_nowork": "需要 Firefox 53+ 或 Chrome 57+ 或 iOS 11+",
-		"u_nodrop": '您的浏览器太旧，不支持通过拖动文件到窗口来上传文件', //m
-		"u_notdir": "未收到文件夹！\n\n您的浏览器太旧；\n请尝试将文件夹拖入窗口", //m
+		"u_nodrop": '浏览器版本低，不支持通过拖动文件到窗口来上传文件',
+		"u_notdir": "不是文件夹！\n\n您的浏览器太旧；\n请尝试将文件夹拖入窗口",
 		"u_uri": "要从其他浏览器窗口拖放图片，\n请将其拖放到大的上传按钮上",
 		"u_enpot": '切换到 <a href="#">简约 UI</a>（可能提高上传速度）',
 		"u_depot": '切换到 <a href="#">精美 UI</a>（可能降低上传速度）',
-		"u_gotpot": '切换到土豆 UI 以提高上传速度，\n\n随时可以不同意并切换回去！',
-		"u_pott": "<p>个文件： &nbsp; <b>{0}</b> 已完成， &nbsp; <b>{1}</b> 失败， &nbsp; <b>{2}</b> 正在处理， &nbsp; <b>{3}</b> 已排队</p>", //m
+		"u_gotpot": '切换到简化UI以提高上传速度，\n\n随时可以不同意并切换回去！',
+		"u_pott": "<p>个文件： &nbsp; <b>{0}</b> 已完成， &nbsp; <b>{1}</b> 失败， &nbsp; <b>{2}</b> 正在处理， &nbsp; <b>{3}</b> 排队中</p>",
 		"u_ever": "这是基本的上传工具； up2k 需要至少<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
 		"u_su2k": '这是基本的上传工具；<a href="#" id="u2yea">up2k</a> 更好',
 		"u_ewrite": '你对这个文件夹没有写入权限',
@@ -1639,16 +1639,16 @@ var Ls = {
 		"u_up_life": "此上传将在 {0} 后从服务器删除",
 		"u_asku": '将这些 {0} 个文件上传到 <code>{1}</code>',
 		"u_unpt": "你可以使用左上角的 🧯 撤销/删除此上传",
-		"u_bigtab": '即将显示 {0} 个文件。这可能会导致您的浏览器崩溃。您确定吗？', //m
-		"u_scan": '正在扫描文件...', //m
-		"u_dirstuck": '您的浏览器无法访问以下 {0} 个文件/文件夹，因此它们将被跳过：', //m
+		"u_bigtab": '将显示 {0} 个文件,可能会导致您的浏览器崩溃。您确定吗？',
+		"u_scan": '正在扫描文件...',
+		"u_dirstuck": '您的浏览器无法访问以下 {0} 个文件/文件夹，它们将被跳过：',
 		"u_etadone": '完成 ({0}, {1} 个文件)',
 		"u_etaprep": '(准备上传)',
 		"u_hashdone": '哈希完成',
 		"u_hashing": '哈希',
-		"u_hs": '正在等待服务器...', //m
-		"u_dupdefer": "这是一个重复文件。它将在所有其他文件上传后进行处理", //m
-		"u_actx": "单击此文本以防止切换到其他窗口/选项卡时性能下降", //m
+		"u_hs": '正在等待服务器...',
+		"u_dupdefer": "这是一个重复文件。它将在所有其他文件上传后进行处理",
+		"u_actx": "单击此文本以防止切换到其他窗口/选项卡时性能下降",
 		"u_fixed": "好！&nbsp;已修复 👍",
 		"u_cuerr": "上传块 {0} 的 {1} 失败；\n可能无害，继续中\n\n文件：{2}",
 		"u_cuerr2": "服务器拒绝上传（块 {0} 的 {1}）；\n稍后重试\n\n文件：{2}\n\n错误 ",
