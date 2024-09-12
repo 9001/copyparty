@@ -63,6 +63,8 @@ add your own translations by using the english or norwegian one from `browser.js
 
 the easy way is to open up and modify `browser.js` in your own installation; depending on how you installed copyparty it might be named `browser.js.gz` instead, in which case just decompress it, restart copyparty, and start editing it anyways
 
+you will be delighted to see inline html in the translation strings; to help prevent syntax errors, there is [a very jank linux script](https://github.com/9001/copyparty/blob/hovudstraum/scripts/tlcheck.sh) which is slightly better than nothing -- just beware the false-positives, so even if it complains it's not necessarily wrong/bad
+
 if you're running `copyparty-sfx.py` then you'll find it at `/tmp/pe-copyparty.1000/copyparty/web` (on linux) or `%TEMP%\pe-copyparty\copyparty\web` (on windows)
 * make sure to keep backups of your work religiously! since that location is volatile af
 

@@ -241,7 +241,7 @@ also see [comparison to similar software](./docs/versus.md)
     * ☑ ...of videos using FFmpeg
     * ☑ ...of audio (spectrograms) using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
-  * ☑ multilingual UI (english, norwegian, [add your own](./docs/rice/#translations)))
+  * ☑ multilingual UI (english, norwegian, chinese, [add your own](./docs/rice/#translations)))
   * ☑ SPA (browse while uploading)
 * server indexing
   * ☑ [locate files by contents](#file-search)
@@ -1556,6 +1556,8 @@ you can either:
 * give copyparty its own domain or subdomain (recommended)
 * or do location-based proxying, using `--rp-loc=/stuff` to tell copyparty where it is mounted -- has a slight performance cost and higher chance of bugs
   * if copyparty says `incorrect --rp-loc or webserver config; expected vpath starting with [...]` it's likely because the webserver is stripping away the proxy location from the request URLs -- see the `ProxyPass` in the apache example below
+
+when running behind a reverse-proxy (this includes services like cloudflare), it is important to configure real-ip correctly, as many features rely on knowing the client's IP. Look out for red and yellow log messages which explain how to do this. But basically, set `--xff-hdr` to the name of the http header to read the IP from (usually `x-forwarded-for`, but cloudflare uses `cf-connecting-ip`), and then `--xff-src` to the IP of the reverse-proxy so copyparty will trust the xff-hdr. Note that `--rp-loc` in particular will not work at all unless you do this
 
 some reverse proxies (such as [Caddy](https://caddyserver.com/)) can automatically obtain a valid https/tls certificate for you, and some support HTTP/2 and QUIC which *could* be a nice speed boost, depending on a lot of factors
 * **warning:** nginx-QUIC (HTTP/3) is still experimental and can make uploads much slower, so HTTP/1.1 is recommended for now

@@ -255,6 +255,9 @@ cat copyparty/httpcli.py | awk '/^[^a-zA-Z0-9]+def / {printf "%s\n%s\n\n", f, pl
 # create a folder with symlinks to big files
 for d in /usr /var; do find $d -type f -size +30M 2>/dev/null; done | while IFS= read -r x; do ln -s "$x" big/; done
 
+# up2k worst-case testfiles: create 64 GiB (256 x 256 MiB) of sparse files; each file takes 1 MiB disk space; each 1 MiB chunk is globally unique
+for f in {0..255}; do echo $f; truncate -s 256M $f; b1=$(printf '%02x' $f); for o in {0..255}; do b2=$(printf '%02x' $o); printf "\x$b1\x$b2" | dd of=$f bs=2 seek=$((o*1024*1024)) conv=notrunc 2>/dev/null; done; done
+
 # py2 on osx
 brew install python@2
 pip install virtualenv
