@@ -128,7 +128,7 @@ class HttpCli(object):
     """
 
     def __init__(self, conn: "HttpConn") -> None:
-        assert conn.sr
+        assert conn.sr  # !rm
 
         self.t0 = time.time()
         self.conn = conn
@@ -1396,7 +1396,7 @@ class HttpCli(object):
         xroot = mkenod("D:orz")
         xroot.insert(0, parse_xml(txt))
         xprop = xroot.find(r"./{DAV:}propertyupdate/{DAV:}set/{DAV:}prop")
-        assert xprop
+        assert xprop  # !rm
         for ze in xprop:
             ze.clear()
 
@@ -1404,12 +1404,12 @@ class HttpCli(object):
         xroot = parse_xml(txt)
 
         el = xroot.find(r"./{DAV:}response")
-        assert el
+        assert el  # !rm
         e2 = mktnod("D:href", quotep(self.args.SRS + self.vpath))
         el.insert(0, e2)
 
         el = xroot.find(r"./{DAV:}response/{DAV:}propstat")
-        assert el
+        assert el  # !rm
         el.insert(0, xprop)
 
         ret = '<?xml version="1.0" encoding="{}"?>\n'.format(uenc)
@@ -1793,7 +1793,7 @@ class HttpCli(object):
             fn = os.devnull
 
         params.update(open_ka)
-        assert fn
+        assert fn  # !rm
 
         if not self.args.nw:
             if rnd:
@@ -2102,7 +2102,7 @@ class HttpCli(object):
         raise Pebkac(422, 'invalid action "{}"'.format(act))
 
     def handle_zip_post(self) -> bool:
-        assert self.parser
+        assert self.parser  # !rm
         try:
             k = next(x for x in self.uparam if x in ("zip", "tar"))
         except:
@@ -2430,7 +2430,7 @@ class HttpCli(object):
         return True
 
     def handle_chpw(self) -> bool:
-        assert self.parser
+        assert self.parser  # !rm
         pwd = self.parser.require("pw", 64)
         self.parser.drop()
 
@@ -2447,7 +2447,7 @@ class HttpCli(object):
         return True
 
     def handle_login(self) -> bool:
-        assert self.parser
+        assert self.parser  # !rm
         pwd = self.parser.require("cppwd", 64)
         try:
             uhash = self.parser.require("uhash", 256)
@@ -2475,7 +2475,7 @@ class HttpCli(object):
         return True
 
     def handle_logout(self) -> bool:
-        assert self.parser
+        assert self.parser  # !rm
         self.parser.drop()
 
         self.log("logout " + self.uname)
@@ -2529,7 +2529,7 @@ class HttpCli(object):
         return dur > 0, msg
 
     def handle_mkdir(self) -> bool:
-        assert self.parser
+        assert self.parser  # !rm
         new_dir = self.parser.require("name", 512)
         self.parser.drop()
 
@@ -2575,7 +2575,7 @@ class HttpCli(object):
         return True
 
     def handle_new_md(self) -> bool:
-        assert self.parser
+        assert self.parser  # !rm
         new_file = self.parser.require("name", 512)
         self.parser.drop()
 
@@ -2983,7 +2983,7 @@ class HttpCli(object):
         return True
 
     def handle_text_upload(self) -> bool:
-        assert self.parser
+        assert self.parser  # !rm
         try:
             cli_lastmod3 = int(self.parser.require("lastmod", 16))
         except:
@@ -3068,7 +3068,7 @@ class HttpCli(object):
                 pass
             wrename(self.log, fp, os.path.join(mdir, ".hist", mfile2), vfs.flags)
 
-        assert self.parser.gen
+        assert self.parser.gen  # !rm
         p_field, _, p_data = next(self.parser.gen)
         if p_field != "body":
             raise Pebkac(400, "expected body, got {}".format(p_field))
@@ -3169,7 +3169,7 @@ class HttpCli(object):
                 # some browser append "; length=573"
                 cli_lastmod = cli_lastmod.split(";")[0].strip()
                 cli_dt = parsedate(cli_lastmod)
-                assert cli_dt
+                assert cli_dt  # !rm
                 cli_ts = calendar.timegm(cli_dt)
                 return file_lastmod, int(file_ts) > int(cli_ts)
             except Exception as ex:

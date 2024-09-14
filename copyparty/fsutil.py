@@ -119,7 +119,7 @@ class Fstab(object):
         self.srctab = srctab
 
     def relabel(self, path: str, nval: str) -> None:
-        assert self.tab
+        assert self.tab  # !rm
         self.cache = {}
         if ANYWIN:
             path = self._winpath(path)
@@ -156,7 +156,7 @@ class Fstab(object):
                     self.log("failed to build tab:\n{}".format(min_ex()), 3)
                 self.build_fallback()
 
-        assert self.tab
+        assert self.tab  # !rm
         ret = self.tab._find(path)[0]
         if self.trusted or path == ret.vpath:
             return ret.realpath.split("/")[0]
@@ -167,6 +167,6 @@ class Fstab(object):
         if not self.tab:
             self.build_fallback()
 
-        assert self.tab
+        assert self.tab  # !rm
         ret = self.tab._find(path)[0]
         return ret.realpath

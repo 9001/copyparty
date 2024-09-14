@@ -479,7 +479,7 @@ class ThumbSrv(object):
                 if c == crops[-1]:
                     raise
 
-        assert img  # type: ignore
+        assert img  # type: ignore  # !rm
         img.write_to_file(tpath, Q=40)
 
     def conv_ffmpeg(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:

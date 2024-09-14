@@ -440,7 +440,7 @@ def py_desc() -> str:
 
 
 def _sqlite_ver() -> str:
-    assert sqlite3  # type: ignore
+    assert sqlite3  # type: ignore  # !rm
     try:
         co = sqlite3.connect(":memory:")
         cur = co.cursor()
@@ -1030,7 +1030,7 @@ class MTHash(object):
         if self.stop:
             return nch, "", ofs0, chunk_sz
 
-        assert f
+        assert f  # !rm
         hashobj = hashlib.sha512()
         while chunk_rem > 0:
             with self.imutex:
@@ -1448,7 +1448,7 @@ def ren_open(
 
             with fun(fsenc(fpath), *args, **kwargs) as f:
                 if b64:
-                    assert fdir
+                    assert fdir  # !rm
                     fp2 = "fn-trunc.%s.txt" % (b64,)
                     fp2 = os.path.join(fdir, fp2)
                     with open(fsenc(fp2), "wb") as f2:
@@ -1713,7 +1713,7 @@ class MultipartParser(object):
         returns the value of the next field in the multipart body,
         raises if the field name is not as expected
         """
-        assert self.gen
+        assert self.gen  # !rm
         p_field, p_fname, p_data = next(self.gen)
         if p_field != field_name:
             raise WrongPostKey(field_name, p_field, p_fname, p_data)
@@ -1722,7 +1722,7 @@ class MultipartParser(object):
 
     def drop(self) -> None:
         """discards the remaining multipart body"""
-        assert self.gen
+        assert self.gen  # !rm
         for _, _, data in self.gen:
             for _ in data:
                 pass
@@ -1815,7 +1815,7 @@ def gen_filekey_dbg(
 ) -> str:
     ret = gen_filekey(alg, salt, fspath, fsize, inode)
 
-    assert log_ptn
+    assert log_ptn  # !rm
     if log_ptn.search(fspath):
         try:
             import inspect
@@ -2401,7 +2401,7 @@ def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
 def get_df(abspath: str) -> tuple[Optional[int], Optional[int]]:
     try:
         # some fuses misbehave
-        assert ctypes
+        assert ctypes  # type: ignore  # !rm
         if ANYWIN:
             bfree = ctypes.c_ulonglong(0)
             ctypes.windll.kernel32.GetDiskFreeSpaceExW(  # type: ignore
@@ -2860,7 +2860,7 @@ def getalive(pids: list[int], pgid: int) -> list[int]:
                     alive.append(pid)
             else:
                 # windows doesn't have pgroups; assume
-                assert psutil
+                assert psutil  # type: ignore  # !rm
                 psutil.Process(pid)
                 alive.append(pid)
         except:
@@ -2878,7 +2878,7 @@ def killtree(root: int) -> None:
         pgid = 0
 
     if HAVE_PSUTIL:
-        assert psutil
+        assert psutil  # type: ignore  # !rm
         pids = [root]
         parent = psutil.Process(root)
         for child in parent.children(recursive=True):
@@ -3291,7 +3291,7 @@ def runhook(
     at: float,
     txt: str,
 ) -> dict[str, Any]:
-    assert broker or up2k
+    assert broker or up2k  # !rm
     asrv = (broker or up2k).asrv
     args = (broker or up2k).args
     vp = vp.replace("\\", "/")
@@ -3485,7 +3485,7 @@ def termsize() -> tuple[int, int]:
 def hidedir(dp) -> None:
     if ANYWIN:
         try:
-            assert ctypes
+            assert ctypes  # type: ignore  # !rm
             k32 = ctypes.WinDLL("kernel32")
             attrs = k32.GetFileAttributesW(dp)
             if attrs >= 0:

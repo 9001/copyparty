@@ -237,7 +237,7 @@ class HttpSrv(object):
         if self.args.log_htp:
             self.log(self.name, "workers -= {} = {}".format(n, self.tp_nthr), 6)
 
-        assert self.tp_q
+        assert self.tp_q  # !rm
         for _ in range(n):
             self.tp_q.put(None)
 
@@ -431,7 +431,7 @@ class HttpSrv(object):
         )
 
     def thr_poolw(self) -> None:
-        assert self.tp_q
+        assert self.tp_q  # !rm
         while True:
             task = self.tp_q.get()
             if not task:

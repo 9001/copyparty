@@ -104,7 +104,7 @@ class U2idx(object):
         if not HAVE_SQLITE3 or not self.args.shr:
             return None
 
-        assert sqlite3  # type: ignore
+        assert sqlite3  # type: ignore  # !rm
 
         db = sqlite3.connect(self.args.shr_db, timeout=2, check_same_thread=False)
         cur = db.cursor()
@@ -120,7 +120,7 @@ class U2idx(object):
         if not HAVE_SQLITE3 or "e2d" not in vn.flags:
             return None
 
-        assert sqlite3  # type: ignore
+        assert sqlite3  # type: ignore  # !rm
 
         ptop = vn.realpath
         histpath = self.asrv.vfs.histtab.get(ptop)
@@ -467,5 +467,5 @@ class U2idx(object):
                 return
 
         if identifier == self.active_id:
-            assert self.active_cur
+            assert self.active_cur  # !rm
             self.active_cur.connection.interrupt()

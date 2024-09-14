@@ -70,6 +70,10 @@ def uh2(fp):
             continue
 
         on = True
+
+        if "  # !rm" in ln:
+            continue
+
         lns.append(ln)
 
     cs = "\n".join(lns)

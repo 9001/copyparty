@@ -612,7 +612,7 @@ class Up2k(object):
         return timeout
 
     def _check_shares(self) -> float:
-        assert sqlite3  # type: ignore
+        assert sqlite3  # type: ignore  # !rm
 
         now = time.time()
         timeout = now + 9001
@@ -933,7 +933,7 @@ class Up2k(object):
             with self.mutex, self.reg_mutex:
                 reg = self.register_vpath(vol.realpath, vol.flags)
 
-            assert reg
+            assert reg  # !rm
             cur, _ = reg
             with self.mutex:
                 cur.connection.commit()
@@ -950,7 +950,7 @@ class Up2k(object):
                 reg = self.register_vpath(vol.realpath, vol.flags)
 
             try:
-                assert reg
+                assert reg  # !rm
                 cur, db_path = reg
                 if bos.path.getsize(db_path + "-wal") < 1024 * 1024 * 5:
                     continue
@@ -1185,7 +1185,7 @@ class Up2k(object):
             with self.reg_mutex:
                 reg = self.register_vpath(top, vol.flags)
 
-            assert reg and self.pp
+            assert reg and self.pp  # !rm
             cur, db_path = reg
 
             db = Dbw(cur, 0, time.time())
@@ -1306,7 +1306,7 @@ class Up2k(object):
         th_cvd = self.args.th_coversd
         th_cvds = self.args.th_coversd_set
 
-        assert self.pp and self.mem_cur
+        assert self.pp and self.mem_cur  # !rm
         self.pp.msg = "a%d %s" % (self.pp.n, cdir)
 
         rd = cdir[len(top) :].strip("/")
@@ -1547,7 +1547,7 @@ class Up2k(object):
             if n:
                 t = "forgetting {} shadowed autoindexed files in [{}] > [{}]"
                 self.log(t.format(n, top, sh_rd))
-                assert sh_erd  # type: ignore
+                assert sh_erd  # type: ignore  # !rm
 
                 q = "delete from dh where (d = ? or d like ?||'%')"
                 db.c.execute(q, (sh_erd, sh_erd + "/"))
@@ -2266,7 +2266,7 @@ class Up2k(object):
         # mp.pool.ThreadPool and concurrent.futures.ThreadPoolExecutor
         # both do crazy runahead so lets reinvent another wheel
         nw = max(1, self.args.mtag_mt)
-        assert self.mtag
+        assert self.mtag  # !rm
         if not self.mpool_used:
             self.mpool_used = True
             self.log("using {}x {}".format(nw, self.mtag.backend))
@@ -2340,7 +2340,7 @@ class Up2k(object):
         at: float,
     ) -> int:
         """will mutex(main)"""
-        assert self.mtag
+        assert self.mtag  # !rm
 
         try:
             st = bos.stat(abspath)
@@ -2372,7 +2372,7 @@ class Up2k(object):
         tags: dict[str, Union[str, float]],
     ) -> int:
         """mutex(main) me"""
-        assert self.mtag
+        assert self.mtag  # !rm
 
         if not bos.path.isfile(abspath):
             return 0
@@ -2842,7 +2842,7 @@ class Up2k(object):
 
                     c2 = cur
 
-                assert c2
+                assert c2  # !rm
                 c2.connection.commit()
 
             cur = jcur
@@ -3308,7 +3308,7 @@ class Up2k(object):
                     t = "that chunk is already being written to:\n  {}\n  {} {}/{}\n  {}"
                     raise Pebkac(400, t.format(wark, chash, idx, nh, job["name"]))
 
-            assert chash  # type: ignore
+            assert chash  # type: ignore  # !rm
             chunksize = up2k_chunksize(job["size"])
 
             coffsets = []
@@ -3532,7 +3532,7 @@ class Up2k(object):
             cur.connection.commit()
         except Exception as ex:
             x = self.register_vpath(ptop, {})
-            assert x
+            assert x  # !rm
             db_ex_chk(self.log, ex, x[1])
             raise
 
@@ -3547,7 +3547,7 @@ class Up2k(object):
         try:
             r = db.execute(sql, (rd, fn))
         except:
-            assert self.mem_cur
+            assert self.mem_cur  # !rm
             r = db.execute(sql, s3enc(self.mem_cur, rd, fn))
 
         if r.rowcount:
@@ -3585,7 +3585,7 @@ class Up2k(object):
         try:
             db.execute(sql, v)
         except:
-            assert self.mem_cur
+            assert self.mem_cur  # !rm
             rd, fn = s3enc(self.mem_cur, rd, fn)
             v = (wark, int(ts), sz, rd, fn, db_ip, int(at or 0))
             db.execute(sql, v)
@@ -3633,7 +3633,7 @@ class Up2k(object):
                 try:
                     db.execute(q, (cd, wark[:16], rd, fn))
                 except:
-                    assert self.mem_cur
+                    assert self.mem_cur  # !rm
                     rd, fn = s3enc(self.mem_cur, rd, fn)
                     db.execute(q, (cd, wark[:16], rd, fn))
 
@@ -4050,7 +4050,7 @@ class Up2k(object):
 
         has_dupes = False
         if w:
-            assert c1
+            assert c1  # !rm
             if c2 and c2 != c1:
                 self._copy_tags(c1, c2, w)
 
@@ -4188,7 +4188,7 @@ class Up2k(object):
         try:
             c = cur.execute(q, (rd, fn))
         except:
-            assert self.mem_cur
+            assert self.mem_cur  # !rm
             c = cur.execute(q, s3enc(self.mem_cur, rd, fn))
 
         hit = c.fetchone()

@@ -190,7 +190,7 @@ class HttpConn(object):
 
                 if self.args.ssl_dbg and hasattr(self.s, "shared_ciphers"):
                     ciphers = self.s.shared_ciphers()
-                    assert ciphers
+                    assert ciphers  # !rm
                     overlap = [str(y[::-1]) for y in ciphers]
                     self.log("TLS cipher overlap:" + "\n".join(overlap))
                     for k, v in [

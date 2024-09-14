@@ -419,8 +419,8 @@ class SvcHub(object):
             r"insert into kv values ('sver', 1)",
         ]
 
-        assert db  # type: ignore
-        assert cur  # type: ignore
+        assert db  # type: ignore  # !rm
+        assert cur  # type: ignore  # !rm
         if create:
             for cmd in sch:
                 cur.execute(cmd)
@@ -488,8 +488,8 @@ class SvcHub(object):
             r"create index sh_t1 on sh(t1)",
         ]
 
-        assert db  # type: ignore
-        assert cur  # type: ignore
+        assert db  # type: ignore  # !rm
+        assert cur  # type: ignore  # !rm
         if create:
             dver = 2
             modified = True
