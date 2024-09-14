@@ -204,7 +204,7 @@ def init_E(EE: EnvParams) -> None:
                         errs.append("Using [%s] instead" % (p,))
 
                     if errs:
-                        print("WARNING: " + ". ".join(errs))
+                        warn(". ".join(errs))
 
                     return p  # type: ignore
                 except Exception as ex:
@@ -234,7 +234,7 @@ def init_E(EE: EnvParams) -> None:
             raise
 
 
-def get_srvname() -> str:
+def get_srvname(verbose) -> str:
     try:
         ret: str = unicode(socket.gethostname()).split(".")[0]
     except:
@@ -244,7 +244,8 @@ def get_srvname() -> str:
         return ret
 
     fp = os.path.join(E.cfg, "name.txt")
-    lprint("using hostname from {}\n".format(fp))
+    if verbose:
+        lprint("using hostname from {}\n".format(fp))
     try:
         with open(fp, "rb") as f:
             ret = f.read().decode("utf-8", "replace").strip()
@@ -1472,7 +1473,7 @@ def add_debug(ap):
 
 
 def run_argparse(
-    argv: list[str], formatter: Any, retry: bool, nc: int
+    argv: list[str], formatter: Any, retry: bool, nc: int, verbose=True
 ) -> argparse.Namespace:
     ap = argparse.ArgumentParser(
         formatter_class=formatter,
@@ -1494,7 +1495,7 @@ def run_argparse(
 
     tty = os.environ.get("TERM", "").lower() == "linux"
 
-    srvname = get_srvname()
+    srvname = get_srvname(verbose)
 
     add_general(ap, nc, srvname)
     add_network(ap)
@@ -1674,7 +1675,7 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
     for fmtr in [RiceFormatter, RiceFormatter, Dodge11874, BasicDodge11874]:
         try:
             al = run_argparse(argv, fmtr, retry, nc)
-            dal = run_argparse([], fmtr, retry, nc)
+            dal = run_argparse([], fmtr, retry, nc, False)
             break
         except SystemExit:
             raise
