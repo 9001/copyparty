@@ -164,12 +164,8 @@ except ImportError:
 
 if not PY2:
     from io import BytesIO
-    from urllib.parse import quote_from_bytes as quote
-    from urllib.parse import unquote_to_bytes as unquote
 else:
     from StringIO import StringIO as BytesIO  # type: ignore
-    from urllib import quote  # type: ignore # pylint: disable=no-name-in-module
-    from urllib import unquote  # type: ignore # pylint: disable=no-name-in-module
 
 
 try:
@@ -486,19 +482,6 @@ VERSIONS = (
         S_VERSION, S_BUILD_DT, PY_DESC, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER
     )
 )
-
-
-_: Any = (mp, BytesIO, quote, unquote, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER)
-__all__ = [
-    "mp",
-    "BytesIO",
-    "quote",
-    "unquote",
-    "SQLITE_VER",
-    "JINJA_VER",
-    "PYFTPD_VER",
-    "PARTFTPY_VER",
-]
 
 
 class Daemon(threading.Thread):
@@ -2074,6 +2057,8 @@ def html_bescape(s: bytes, quot: bool = False, crlf: bool = False) -> bytes:
 
 def _quotep2(txt: str) -> str:
     """url quoter which deals with bytes correctly"""
+    if not txt:
+        return ""
     btxt = w8enc(txt)
     quot = quote(btxt, safe=b"/")
     return w8dec(quot.replace(b" ", b"+"))  # type: ignore
@@ -2081,18 +2066,61 @@ def _quotep2(txt: str) -> str:
 
 def _quotep3(txt: str) -> str:
     """url quoter which deals with bytes correctly"""
+    if not txt:
+        return ""
     btxt = w8enc(txt)
     quot = quote(btxt, safe=b"/").encode("utf-8")
     return w8dec(quot.replace(b" ", b"+"))
 
 
-quotep = _quotep3 if not PY2 else _quotep2
+if not PY2:
+    _uqsb = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-~/"
+    _uqtl = {
+        n: ("%%%02X" % (n,) if n not in _uqsb else chr(n)).encode("utf-8")
+        for n in range(256)
+    }
+    _uqtl[b" "] = b"+"
+
+    def _quotep3b(txt: str) -> str:
+        """url quoter which deals with bytes correctly"""
+        if not txt:
+            return ""
+        btxt = w8enc(txt)
+        if btxt.rstrip(_uqsb):
+            lut = _uqtl
+            btxt = b"".join([lut[ch] for ch in btxt])
+        return w8dec(btxt)
+
+    quotep = _quotep3b
+
+    _hexd = "0123456789ABCDEFabcdef"
+    _hex2b = {(a + b).encode(): bytes.fromhex(a + b) for a in _hexd for b in _hexd}
+
+    def unquote(btxt: bytes) -> bytes:
+        h2b = _hex2b
+        parts = iter(btxt.split(b"%"))
+        ret = [next(parts)]
+        for item in parts:
+            c = h2b.get(item[:2])
+            if c is None:
+                ret.append(b"%")
+                ret.append(item)
+            else:
+                ret.append(c)
+                ret.append(item[2:])
+        return b"".join(ret)
+
+    from urllib.parse import quote_from_bytes as quote
+else:
+    from urllib import quote  # type: ignore # pylint: disable=no-name-in-module
+    from urllib import unquote  # type: ignore # pylint: disable=no-name-in-module
+
+    quotep = _quotep2
 
 
 def unquotep(txt: str) -> str:
     """url unquoter which deals with bytes correctly"""
     btxt = w8enc(txt)
-    # btxt = btxt.replace(b"+", b" ")
     unq2 = unquote(btxt)
     return w8dec(unq2)
 
@@ -3521,3 +3549,16 @@ class WrongPostKey(Pebkac):
         self.got = got
         self.fname = fname
         self.datagen = datagen
+
+
+_: Any = (mp, BytesIO, quote, unquote, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER)
+__all__ = [
+    "mp",
+    "BytesIO",
+    "quote",
+    "unquote",
+    "SQLITE_VER",
+    "JINJA_VER",
+    "PYFTPD_VER",
+    "PARTFTPY_VER",
+]

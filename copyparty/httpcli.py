@@ -5143,7 +5143,6 @@ class HttpCli(object):
                 dirs.append(item)
             else:
                 files.append(item)
-                item["rd"] = rem
 
         if is_dk and not vf.get("dks"):
             dirs = []
@@ -5166,16 +5165,10 @@ class HttpCli(object):
         add_up_at = ".up_at" in mte
         is_admin = self.can_admin
         tagset: set[str] = set()
-        for fe in files:
+        rd = vrem
+        for fe in files if icur else []:
+            assert icur  # !rm
             fn = fe["name"]
-            rd = fe["rd"]
-            del fe["rd"]
-            if not icur:
-                continue
-
-            if vn != dbv:
-                _, rd = vn.get_dbv(rd)
-
             erd_efn = (rd, fn)
             q = "select mt.k, mt.v from up inner join mt on mt.w = substr(up.w,1,16) where up.rd = ? and up.fn = ? and +mt.k != 'x'"
             try:

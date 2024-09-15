@@ -1313,6 +1313,9 @@ class Up2k(object):
         if WINDOWS:
             rd = rd.replace("\\", "/").strip("/")
 
+        rds = rd + "/" if rd else ""
+        cdirs = cdir + os.sep
+
         g = statdir(self.log_func, not self.args.no_scandir, True, cdir)
         gl = sorted(g)
         partials = set([x[0] for x in gl if "PARTIAL" in x[0]])
@@ -1320,8 +1323,8 @@ class Up2k(object):
             if self.stop:
                 return -1
 
-            rp = vjoin(rd, iname)
-            abspath = os.path.join(cdir, iname)
+            rp = rds + iname
+            abspath = cdirs + iname
 
             if rei and rei.search(abspath):
                 unreg.append(rp)
@@ -1451,8 +1454,8 @@ class Up2k(object):
             if self.stop:
                 return -1
 
-            rp = vjoin(rd, fn)
-            abspath = os.path.join(cdir, fn)
+            rp = rds + fn
+            abspath = cdirs + fn
             nohash = reh.search(abspath) if reh else False
 
             sql = "select w, mt, sz, ip, at from up where rd = ? and fn = ?"
@@ -1536,7 +1539,7 @@ class Up2k(object):
         # drop shadowed folders
         for sh_rd in unreg:
             n = 0
-            q = "select count(w) from up where (rd = ? or rd like ?||'%') and at == 0"
+            q = "select count(w) from up where (rd=? or rd like ?||'%') and +at == 0"
             for sh_erd in [sh_rd, "//" + w8b64enc(sh_rd)]:
                 try:
                     n = db.c.execute(q, (sh_erd, sh_erd + "/")).fetchone()[0]
@@ -1552,7 +1555,7 @@ class Up2k(object):
                 q = "delete from dh where (d = ? or d like ?||'%')"
                 db.c.execute(q, (sh_erd, sh_erd + "/"))
 
-                q = "delete from up where (rd = ? or rd like ?||'%') and at == 0"
+                q = "delete from up where (rd=? or rd like ?||'%') and +at == 0"
                 db.c.execute(q, (sh_erd, sh_erd + "/"))
                 ret += n
 
@@ -1650,7 +1653,7 @@ class Up2k(object):
 
         # then covers
         n_rm3 = 0
-        qu = "select 1 from up where rd=? and +fn=? limit 1"
+        qu = "select 1 from up where rd=? and fn=? limit 1"
         q = "delete from cv where rd=? and dn=? and +fn=?"
         for crd, cdn, fn in cur.execute("select * from cv"):
             urd = vjoin(crd, cdn)
@@ -2471,12 +2474,10 @@ class Up2k(object):
                 self.log("WARN: failed to upgrade from v4", 3)
 
         if ver == DB_VER:
-            try:
-                self._add_cv_tab(cur)
-                self._add_xiu_tab(cur)
-                self._add_dhash_tab(cur)
-            except:
-                pass
+            self._add_dhash_tab(cur)
+            self._add_xiu_tab(cur)
+            self._add_cv_tab(cur)
+            self._add_idx_up_vp(cur, db_path)
 
             try:
                 nfiles = next(cur.execute("select count(w) from up"))[0]
@@ -2573,9 +2574,10 @@ class Up2k(object):
 
         for cmd in [
             r"create table up (w text, mt int, sz int, rd text, fn text, ip text, at int)",
-            r"create index up_rd on up(rd)",
+            r"create index up_vp on up(rd, fn)",
             r"create index up_fn on up(fn)",
             r"create index up_ip on up(ip)",
+            r"create index up_at on up(at)",
             idx,
             r"create table mt (w text, k text, v int)",
             r"create index mt_w on mt(w)",
@@ -2605,6 +2607,12 @@ class Up2k(object):
 
     def _add_dhash_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5 -> v5a
+        try:
+            cur.execute("select d, h from dh limit 1").fetchone()
+            return
+        except:
+            pass
+
         for cmd in [
             r"create table dh (d text, h text)",
             r"create index dh_d on dh(d)",
@@ -2657,6 +2665,24 @@ class Up2k(object):
             pass
 
         cur.connection.commit()
+
+    def _add_idx_up_vp(self, cur: "sqlite3.Cursor", db_path: str) -> None:
+        # v5c -> v5d
+        try:
+            cur.execute("drop index up_rd")
+        except:
+            return
+
+        for cmd in [
+            r"create index up_vp on up(rd, fn)",
+            r"create index up_at on up(at)",
+        ]:
+            self.log("upgrading db [%s]: %s" % (db_path, cmd[:18]))
+            cur.execute(cmd)
+
+        self.log("upgrading db [%s]: writing to disk..." % (db_path,))
+        cur.connection.commit()
+        cur.execute("vacuum")
 
     def wake_rescanner(self):
         with self.rescan_cond:

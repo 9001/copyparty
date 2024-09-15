@@ -3,6 +3,7 @@
 from __future__ import print_function, unicode_literals
 
 import os
+import random
 import re
 import shutil
 import socket
@@ -47,6 +48,10 @@ from copyparty.up2k import Up2k
 from copyparty.util import FHC, CachedDict, Garda, Unrecv
 
 init_E(E)
+
+
+def randbytes(n):
+    return random.getrandbits(n * 8).to_bytes(n, "little")
 
 
 def runcmd(argv):
