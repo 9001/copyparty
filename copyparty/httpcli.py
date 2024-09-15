@@ -5214,13 +5214,23 @@ class HttpCli(object):
             fe["tags"] = tags
 
         if icur:
+            for fe in dirs:
+                fe["tags"] = ODict()
+
             lmte = list(mte)
             if self.can_admin:
                 lmte.extend(("up_ip", ".up_at"))
 
+            if "nodirsz" not in vf:
+                tagset.add(".files")
+                vdir = "%s/" % (rd,) if rd else ""
+                q = "select sz, nf from ds where rd=? limit 1"
+                for fe in dirs:
+                    hit = icur.execute(q, (vdir + fe["name"],)).fetchone()
+                    if hit:
+                        (fe["sz"], fe["tags"][".files"]) = hit
+
             taglist = [k for k in lmte if k in tagset]
-            for fe in dirs:
-                fe["tags"] = ODict()
         else:
             taglist = list(tagset)
 

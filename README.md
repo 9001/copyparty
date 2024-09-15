@@ -1968,6 +1968,7 @@ below are some tweaks roughly ordered by usefulness:
   * and also makes thumbnails load faster, regardless of e2d/e2t
 * `--dedup` enables deduplication and thus avoids writing to the HDD if someone uploads a dupe
 * `--safe-dedup 1` makes deduplication much faster during upload by skipping verification of file contents; safe if there is no other software editing/moving the files in the volumes
+* `--no-dirsz` shows the size of folder inodes instead of the total size of the contents, giving about 30% faster folder listings
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
 * if your volumes are on a network-disk such as NFS / SMB / s3, specifying larger values for `--iobuf` and/or `--s-rd-sz` and/or `--s-wr-sz` may help; try setting all of them to `524288` or `1048576` or `4194304`
 * `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)

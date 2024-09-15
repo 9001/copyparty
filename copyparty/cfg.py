@@ -13,6 +13,7 @@ def vf_bmap() -> dict[str, str]:
         "dav_rt": "davrt",
         "ed": "dots",
         "hardlink_only": "hardlinkonly",
+        "no_dirsz": "nodirsz",
         "no_dupe": "nodupe",
         "no_forget": "noforget",
         "no_pipe": "nopipe",

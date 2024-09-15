@@ -1204,6 +1204,10 @@ class Up2k(object):
                 # ~/.wine/dosdevices/z:/ and such
                 excl.extend(("/dev", "/proc", "/run", "/sys"))
 
+            if self.args.re_dirsz:
+                db.c.execute("delete from ds")
+                db.n += 1
+
             rtop = absreal(top)
             n_add = n_rm = 0
             try:
@@ -1212,7 +1216,7 @@ class Up2k(object):
                     self.log(t % (vol.vpath, rtop), 6)
                     return True, False
 
-                n_add = self._build_dir(
+                n_add, _, _ = self._build_dir(
                     db,
                     top,
                     set(excl),
@@ -1286,17 +1290,18 @@ class Up2k(object):
         cst: os.stat_result,
         dev: int,
         xvol: bool,
-    ) -> int:
+    ) -> tuple[int, int, int]:
         if xvol and not rcdir.startswith(top):
             self.log("skip xvol: [{}] -> [{}]".format(cdir, rcdir), 6)
-            return 0
+            return 0, 0, 0
 
         if rcdir in seen:
             t = "bailing from symlink loop,\n  prev: {}\n  curr: {}\n  from: {}"
             self.log(t.format(seen[-1], rcdir, cdir), 3)
-            return 0
+            return 0, 0, 0
 
-        ret = 0
+        # total-files-added, total-num-files, recursive-size
+        tfa = tnf = rsz = 0
         seen = seen + [rcdir]
         unreg: list[str] = []
         files: list[tuple[int, int, str]] = []
@@ -1321,7 +1326,7 @@ class Up2k(object):
         partials = set([x[0] for x in gl if "PARTIAL" in x[0]])
         for iname, inf in gl:
             if self.stop:
-                return -1
+                return -1, 0, 0
 
             rp = rds + iname
             abspath = cdirs + iname
@@ -1358,7 +1363,7 @@ class Up2k(object):
                     continue
                 # self.log(" dir: {}".format(abspath))
                 try:
-                    ret += self._build_dir(
+                    i1, i2, i3 = self._build_dir(
                         db,
                         top,
                         excl,
@@ -1373,6 +1378,9 @@ class Up2k(object):
                         dev,
                         xvol,
                     )
+                    tfa += i1
+                    tnf += i2
+                    rsz += i3
                 except:
                     t = "failed to index subdir [{}]:\n{}"
                     self.log(t.format(abspath, min_ex()), c=1)
@@ -1391,6 +1399,7 @@ class Up2k(object):
                     # placeholder for unfinished upload
                     continue
 
+                rsz += sz
                 files.append((sz, lmod, iname))
                 liname = iname.lower()
                 if (
@@ -1411,6 +1420,15 @@ class Up2k(object):
                     )
                 ):
                     cv = iname
+
+        if not self.args.no_dirsz:
+            tnf += len(files)
+            q = "select sz, nf from ds where rd=? limit 1"
+            db_sz, db_nf = db.c.execute(q, (rd,)).fetchone() or (-1, -1)
+            if rsz != db_sz or tnf != db_nf:
+                db.c.execute("delete from ds where rd=?", (rd,))
+                db.c.execute("insert into ds values (?,?,?)", (rd, rsz, tnf))
+                db.n += 1
 
         # folder of 1000 files = ~1 MiB RAM best-case (tiny filenames);
         # free up stuff we're done with before dhashing
@@ -1435,7 +1453,7 @@ class Up2k(object):
                 c = db.c.execute(sql, (drd, dhash))
 
             if c.fetchone():
-                return ret
+                return tfa, tnf, rsz
 
         if cv and rd:
             # mojibake not supported (for performance / simplicity):
@@ -1452,7 +1470,7 @@ class Up2k(object):
         seen_files = set([x[2] for x in files])  # for dropcheck
         for sz, lmod, fn in files:
             if self.stop:
-                return -1
+                return -1, 0, 0
 
             rp = rds + fn
             abspath = cdirs + fn
@@ -1485,7 +1503,7 @@ class Up2k(object):
                 )
                 self.log(t)
                 self.db_rm(db.c, rd, fn, 0)
-                ret += 1
+                tfa += 1
                 db.n += 1
                 in_db = []
             else:
@@ -1510,7 +1528,7 @@ class Up2k(object):
                     continue
 
                 if not hashes:
-                    return -1
+                    return -1, 0, 0
 
                 wark = up2k_wark_from_hashlist(self.salt, sz, hashes)
 
@@ -1521,7 +1539,7 @@ class Up2k(object):
             # skip upload hooks by not providing vflags
             self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, "", "", ip, at)
             db.n += 1
-            ret += 1
+            tfa += 1
             td = time.time() - db.t
             if db.n >= 4096 or td >= 60:
                 self.log("commit {} new files".format(db.n))
@@ -1534,33 +1552,38 @@ class Up2k(object):
             db.c.execute("insert into dh values (?,?)", (drd, dhash))  # type: ignore
 
         if self.stop:
-            return -1
+            return -1, 0, 0
 
         # drop shadowed folders
         for sh_rd in unreg:
             n = 0
-            q = "select count(w) from up where (rd=? or rd like ?||'%') and +at == 0"
+            q = "select count(w) from up where (rd=? or rd like ?||'/%') and +at == 0"
             for sh_erd in [sh_rd, "//" + w8b64enc(sh_rd)]:
                 try:
-                    n = db.c.execute(q, (sh_erd, sh_erd + "/")).fetchone()[0]
+                    erd_erd = (sh_erd, sh_erd)
+                    n = db.c.execute(q, erd_erd).fetchone()[0]
                     break
                 except:
                     pass
 
+            assert erd_erd  # type: ignore  # !rm
+
             if n:
                 t = "forgetting {} shadowed autoindexed files in [{}] > [{}]"
                 self.log(t.format(n, top, sh_rd))
-                assert sh_erd  # type: ignore  # !rm
 
-                q = "delete from dh where (d = ? or d like ?||'%')"
-                db.c.execute(q, (sh_erd, sh_erd + "/"))
+                q = "delete from dh where (d = ? or d like ?||'/%')"
+                db.c.execute(q, erd_erd)
 
-                q = "delete from up where (rd=? or rd like ?||'%') and +at == 0"
-                db.c.execute(q, (sh_erd, sh_erd + "/"))
-                ret += n
+                q = "delete from up where (rd=? or rd like ?||'/%') and +at == 0"
+                db.c.execute(q, erd_erd)
+                tfa += n
+
+            q = "delete from ds where (rd=? or rd like ?||'/%')"
+            db.c.execute(q, erd_erd)
 
         if n4g:
-            return ret
+            return tfa, tnf, rsz
 
         # drop missing files
         q = "select fn from up where rd = ?"
@@ -1578,7 +1601,7 @@ class Up2k(object):
         if n_rm:
             self.log("forgot {} deleted files".format(n_rm))
 
-        return ret
+        return tfa, tnf, rsz
 
     def _drop_lost(self, cur: "sqlite3.Cursor", top: str, excl: list[str]) -> int:
         rm = []
@@ -1796,13 +1819,13 @@ class Up2k(object):
             return 0
 
         with self.mutex:
+            q = "update up set w=?, sz=?, mt=? where rd=? and fn=?"
             for rd, fn, w, sz, mt in rewark:
-                q = "update up set w = ?, sz = ?, mt = ? where rd = ? and fn = ? limit 1"
                 cur.execute(q, (w, sz, int(mt), rd, fn))
 
-            for _, _, w in f404:
-                q = "delete from up where w = ? limit 1"
-                cur.execute(q, (w,))
+            if f404:
+                q = "delete from up where rd=? and fn=? and +w=?"
+                cur.executemany(q, f404)
 
             cur.connection.commit()
 
@@ -2478,6 +2501,7 @@ class Up2k(object):
             self._add_xiu_tab(cur)
             self._add_cv_tab(cur)
             self._add_idx_up_vp(cur, db_path)
+            self._add_ds_tab(cur)
 
             try:
                 nfiles = next(cur.execute("select count(w) from up"))[0]
@@ -2591,6 +2615,7 @@ class Up2k(object):
         self._add_dhash_tab(cur)
         self._add_xiu_tab(cur)
         self._add_cv_tab(cur)
+        self._add_ds_tab(cur)
         self.log("created DB at {}".format(db_path))
         return cur
 
@@ -2683,6 +2708,22 @@ class Up2k(object):
         self.log("upgrading db [%s]: writing to disk..." % (db_path,))
         cur.connection.commit()
         cur.execute("vacuum")
+
+    def _add_ds_tab(self, cur: "sqlite3.Cursor") -> None:
+        # v5d -> v5e
+        try:
+            cur.execute("select rd, sz from ds limit 1").fetchone()
+            return
+        except:
+            pass
+
+        for cmd in [
+            r"create table ds (rd text, sz int, nf int)",
+            r"create index ds_rd on ds(rd)",
+        ]:
+            cur.execute(cmd)
+
+        cur.connection.commit()
 
     def wake_rescanner(self):
         with self.rescan_cond:
@@ -3692,6 +3733,19 @@ class Up2k(object):
                     db.execute("insert into cv values (?,?,?)", (crd, cdn, fn))
                 except:
                     pass
+
+        if "nodirsz" not in vflags:
+            try:
+                q = "update ds set nf=nf+1, sz=sz+? where rd=?"
+                q2 = "insert into ds values(?,?,1)"
+                while True:
+                    if not db.execute(q, (sz, rd)).rowcount:
+                        db.execute(q2, (rd, sz))
+                    if not rd:
+                        break
+                    rd = rd.rsplit("/", 1)[0] if "/" in rd else ""
+            except:
+                pass
 
     def handle_rm(
         self,

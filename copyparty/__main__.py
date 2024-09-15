@@ -1362,6 +1362,8 @@ def add_db_general(ap, hcores):
     ap2.add_argument("--hist", metavar="PATH", type=u, default="", help="where to store volume data (db, thumbs); default is a folder named \".hist\" inside each volume (volflag=hist)")
     ap2.add_argument("--no-hash", metavar="PTN", type=u, default="", help="regex: disable hashing of matching absolute-filesystem-paths during e2ds folder scans (volflag=nohash)")
     ap2.add_argument("--no-idx", metavar="PTN", type=u, default=noidx, help="regex: disable indexing of matching absolute-filesystem-paths during e2ds folder scans (volflag=noidx)")
+    ap2.add_argument("--no-dirsz", action="store_true", help="do not show total recursive size of folders in listings, show inode size instead; slightly faster (volflag=nodirsz)")
+    ap2.add_argument("--re-dirsz", action="store_true", help="if the directory-sizes in the UI are bonkers, use this along with \033[33m-e2dsa\033[0m to rebuild the index from scratch")
     ap2.add_argument("--no-dhash", action="store_true", help="disable rescan acceleration; do full database integrity check -- makes the db ~5%% smaller and bootup/rescans 3~10x slower")
     ap2.add_argument("--re-dhash", action="store_true", help="force a cache rebuild on startup; enable this once if it gets out of sync (should never be necessary)")
     ap2.add_argument("--no-forget", action="store_true", help="never forget indexed files, even when deleted from disk -- makes it impossible to ever upload the same file twice -- only useful for offloading uploads to a cloud service or something (volflag=noforget)")

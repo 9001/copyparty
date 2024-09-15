@@ -331,7 +331,7 @@ MAGIC_MAP = {"jpeg": "jpg"}
 
 DEF_EXP = "self.ip self.ua self.uname self.host cfg.name cfg.logout vf.scan vf.thsize hdr.cf_ipcountry srv.itime srv.htime"
 
-DEF_MTE = "circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash"
+DEF_MTE = ".files,circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash"
 
 DEF_MTH = ".vq,.aq,vc,ac,fmt,res,.fps"
 
@@ -482,8 +482,8 @@ VERSIONS = (
 
 
 try:
-    _b64_enc_tl = bytes.maketrans(b'+/', b'-_')
-    _b64_dec_tl = bytes.maketrans(b'-_', b'+/')
+    _b64_enc_tl = bytes.maketrans(b"+/", b"-_")
+    _b64_dec_tl = bytes.maketrans(b"-_", b"+/")
 
     def ub64enc(bs: bytes) -> bytes:
         x = binascii.b2a_base64(bs, newline=False)
