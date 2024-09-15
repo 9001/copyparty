@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals
 
 import argparse
-import base64
 import errno
 import gzip
 import logging
@@ -67,6 +66,7 @@ from .util import (
     pybin,
     start_log_thrs,
     start_stackmon,
+    ub64enc,
 )
 
 if TYPE_CHECKING:
@@ -1297,5 +1297,5 @@ class SvcHub(object):
         zs = "{}\n{}".format(VERSIONS, alltrace())
         zb = zs.encode("utf-8", "replace")
         zb = gzip.compress(zb)
-        zs = base64.b64encode(zb).decode("ascii")
+        zs = ub64enc(zb).decode("ascii")
         self.log("stacks", zs)

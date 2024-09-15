@@ -1,7 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import base64
 import math
 import os
 import re
@@ -75,6 +74,7 @@ from .util import (
     spack,
     start_log_thrs,
     start_stackmon,
+    ub64enc,
 )
 
 if TYPE_CHECKING:
@@ -543,8 +543,8 @@ class HttpSrv(object):
             except:
                 pass
 
-            v = base64.urlsafe_b64encode(spack(b">xxL", int(v)))
-            self.cb_v = v.decode("ascii")[-4:]
+            # spack gives 4 lsb, take 3 lsb, get 4 ch
+            self.cb_v = ub64enc(spack(b">L", int(v))[1:]).decode("ascii")
             self.cb_ts = time.time()
             return self.cb_v
 

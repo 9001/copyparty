@@ -19,6 +19,7 @@ if True:
     from typing import Any, Callable
 
 PY2 = sys.version_info < (3,)
+PY36 = sys.version_info > (3, 6)
 if not PY2:
     unicode: Callable[[Any], str] = str
 else:

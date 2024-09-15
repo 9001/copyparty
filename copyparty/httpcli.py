@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals
 
 import argparse  # typechk
-import base64
 import calendar
 import copy
 import errno
@@ -58,6 +57,7 @@ from .util import (
     absreal,
     alltrace,
     atomic_move,
+    b64dec,
     exclude_dotfiles,
     formatdate,
     fsenc,
@@ -503,7 +503,7 @@ class HttpCli(object):
         ):
             try:
                 zb = zso.split(" ")[1].encode("ascii")
-                zs = base64.b64decode(zb).decode("utf-8")
+                zs = b64dec(zb).decode("utf-8")
                 # try "pwd", "x:pwd", "pwd:x"
                 for bauth in [zs] + zs.split(":", 1)[::-1]:
                     if bauth in self.asrv.sesa:
@@ -2506,7 +2506,7 @@ class HttpCli(object):
                 logpwd = ""
             elif self.args.log_badpwd == 2:
                 zb = hashlib.sha512(pwd.encode("utf-8", "replace")).digest()
-                logpwd = "%" + base64.b64encode(zb[:12]).decode("utf-8")
+                logpwd = "%" + ub64enc(zb[:12]).decode("ascii")
 
             if pwd != "x":
                 self.log("invalid password: {}".format(logpwd), 3)
@@ -5364,7 +5364,7 @@ class HttpCli(object):
                 fmt = vn.flags.get("og_th", "j")
                 th_base = ujoin(url_base, quotep(thumb))
                 query = "th=%s&cache" % (fmt,)
-                query = ub64enc(query.encode("utf-8")).decode("utf-8")
+                query = ub64enc(query.encode("utf-8")).decode("ascii")
                 # discord looks at file extension, not content-type...
                 query += "/th.jpg" if "j" in fmt else "/th.webp"
                 j2a["og_thumb"] = "%s/.uqe/%s" % (th_base, query)
@@ -5373,7 +5373,7 @@ class HttpCli(object):
             j2a["og_file"] = file
             if og_fn:
                 og_fn_q = quotep(og_fn)
-                query = ub64enc(b"raw").decode("utf-8")
+                query = ub64enc(b"raw").decode("ascii")
                 query += "/%s" % (og_fn_q,)
                 j2a["og_url"] = ujoin(url_base, og_fn_q)
                 j2a["og_raw"] = j2a["og_url"] + "/.uqe/" + query

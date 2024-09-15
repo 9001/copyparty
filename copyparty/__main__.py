@@ -27,6 +27,7 @@ from .__init__ import (
     EXE,
     MACOS,
     PY2,
+    PY36,
     VT100,
     WINDOWS,
     E,
@@ -54,6 +55,7 @@ from .util import (
     Daemon,
     align_tab,
     ansi_re,
+    b64enc,
     dedent,
     min_ex,
     pybin,
@@ -267,7 +269,7 @@ def get_fk_salt() -> str:
         with open(fp, "rb") as f:
             ret = f.read().strip()
     except:
-        ret = base64.b64encode(os.urandom(18))
+        ret = b64enc(os.urandom(18))
         with open(fp, "wb") as f:
             f.write(ret + b"\n")
 
@@ -280,7 +282,7 @@ def get_dk_salt() -> str:
         with open(fp, "rb") as f:
             ret = f.read().strip()
     except:
-        ret = base64.b64encode(os.urandom(30))
+        ret = b64enc(os.urandom(30))
         with open(fp, "wb") as f:
             f.write(ret + b"\n")
 
@@ -293,7 +295,7 @@ def get_ah_salt() -> str:
         with open(fp, "rb") as f:
             ret = f.read().strip()
     except:
-        ret = base64.b64encode(os.urandom(18))
+        ret = b64enc(os.urandom(18))
         with open(fp, "wb") as f:
             f.write(ret + b"\n")
 
@@ -1759,7 +1761,7 @@ def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
         print("error: python2 cannot --smb")
         return
 
-    if sys.version_info < (3, 6):
+    if not PY36:
         al.no_scandir = True
 
     if not hasattr(os, "sendfile"):

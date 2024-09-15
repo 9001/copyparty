@@ -3,7 +3,7 @@ from __future__ import print_function, unicode_literals
 
 import argparse
 import base64
-import contextlib
+import binascii
 import errno
 import hashlib
 import hmac
@@ -30,12 +30,9 @@ from collections import Counter
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 from queue import Queue
 
-from .__init__ import ANYWIN, EXE, MACOS, PY2, TYPE_CHECKING, VT100, WINDOWS
+from .__init__ import ANYWIN, EXE, MACOS, PY2, PY36, TYPE_CHECKING, VT100, WINDOWS
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
-
-ub64dec = base64.urlsafe_b64decode
-ub64enc = base64.urlsafe_b64encode
 
 try:
     from datetime import datetime, timezone
@@ -64,7 +61,7 @@ if PY2:
 
 
 if sys.version_info >= (3, 7) or (
-    sys.version_info >= (3, 6) and platform.python_implementation() == "CPython"
+    PY36 and platform.python_implementation() == "CPython"
 ):
     ODict = dict
 else:
@@ -212,7 +209,7 @@ else:
     FS_ENCODING = sys.getfilesystemencoding()
 
 
-SYMTIME = sys.version_info > (3, 6) and os.utime in os.supports_follow_symlinks
+SYMTIME = PY36 and os.utime in os.supports_follow_symlinks
 
 META_NOBOTS = '<meta name="robots" content="noindex, nofollow">\n'
 
@@ -482,6 +479,38 @@ VERSIONS = (
         S_VERSION, S_BUILD_DT, PY_DESC, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER
     )
 )
+
+
+try:
+    _b64_enc_tl = bytes.maketrans(b'+/', b'-_')
+    _b64_dec_tl = bytes.maketrans(b'-_', b'+/')
+
+    def ub64enc(bs: bytes) -> bytes:
+        x = binascii.b2a_base64(bs, newline=False)
+        return x.translate(_b64_enc_tl)
+
+    def ub64dec(bs: bytes) -> bytes:
+        bs = bs.translate(_b64_dec_tl)
+        return binascii.a2b_base64(bs)
+
+    def b64enc(bs: bytes) -> bytes:
+        return binascii.b2a_base64(bs, newline=False)
+
+    def b64dec(bs: bytes) -> bytes:
+        return binascii.a2b_base64(bs)
+
+    zb = b">>>????"
+    zb2 = base64.urlsafe_b64encode(zb)
+    if zb2 != ub64enc(zb) or zb != ub64dec(zb2):
+        raise Exception("bad smoke")
+
+except Exception as ex:
+    ub64enc = base64.urlsafe_b64encode  # type: ignore
+    ub64dec = base64.urlsafe_b64decode  # type: ignore
+    b64enc = base64.b64encode  # type: ignore
+    b64dec = base64.b64decode  # type: ignore
+    if not PY36:
+        print("using fallback base64 codec due to %r" % (ex,))
 
 
 class Daemon(threading.Thread):
@@ -1028,7 +1057,7 @@ class MTHash(object):
             ofs += len(buf)
 
         bdig = hashobj.digest()[:33]
-        udig = base64.urlsafe_b64encode(bdig).decode("utf-8")
+        udig = ub64enc(bdig).decode("ascii")
         return nch, udig, ofs0, chunk_sz
 
 
@@ -1054,7 +1083,7 @@ class HMaccas(object):
                 self.cache = {}
 
             zb = hmac.new(self.key, msg, hashlib.sha512).digest()
-            zs = base64.urlsafe_b64encode(zb)[: self.retlen].decode("utf-8")
+            zs = ub64enc(zb)[: self.retlen].decode("ascii")
             self.cache[msg] = zs
             return zs
 
@@ -1459,8 +1488,7 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
 
         if not b64:
             zs = ("%s\n%s" % (orig_name, suffix)).encode("utf-8", "replace")
-            zs = hashlib.sha512(zs).digest()[:12]
-            b64 = base64.urlsafe_b64encode(zs).decode("utf-8")
+            b64 = ub64enc(hashlib.sha512(zs).digest()[:12]).decode("ascii")
 
         badlen = len(fname)
         while len(fname) >= badlen:
@@ -1766,9 +1794,8 @@ def rand_name(fdir: str, fn: str, rnd: int) -> str:
 
             nc = rnd + extra
             nb = (6 + 6 * nc) // 8
-            zb = os.urandom(nb)
-            zb = base64.urlsafe_b64encode(zb)
-            fn = zb[:nc].decode("utf-8") + ext
+            zb = ub64enc(os.urandom(nb))
+            fn = zb[:nc].decode("ascii") + ext
             ok = not os.path.exists(fsenc(os.path.join(fdir, fn)))
 
     return fn
@@ -1781,7 +1808,7 @@ def gen_filekey(alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str
         zs = "%s %s" % (salt, fspath)
 
     zb = zs.encode("utf-8", "replace")
-    return base64.urlsafe_b64encode(hashlib.sha512(zb).digest()).decode("ascii")
+    return ub64enc(hashlib.sha512(zb).digest()).decode("ascii")
 
 
 def gen_filekey_dbg(
@@ -2263,12 +2290,12 @@ w8enc = _w8enc3 if not PY2 else _w8enc2
 
 def w8b64dec(txt: str) -> str:
     """decodes base64(filesystem-bytes) to wtf8"""
-    return w8dec(base64.urlsafe_b64decode(txt.encode("ascii")))
+    return w8dec(ub64dec(txt.encode("ascii")))
 
 
 def w8b64enc(txt: str) -> str:
     """encodes wtf8 to base64(filesystem-bytes)"""
-    return base64.urlsafe_b64encode(w8enc(txt)).decode("ascii")
+    return ub64enc(w8enc(txt)).decode("ascii")
 
 
 if not PY2 and WINDOWS:
@@ -2644,8 +2671,7 @@ def hashcopy(
         if slp:
             time.sleep(slp)
 
-    digest = hashobj.digest()[:33]
-    digest_b64 = base64.urlsafe_b64encode(digest).decode("utf-8")
+    digest_b64 = ub64enc(hashobj.digest()[:33]).decode("ascii")
 
     return tlen, hashobj.hexdigest(), digest_b64
 

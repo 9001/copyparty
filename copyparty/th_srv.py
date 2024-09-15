@@ -1,7 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import base64
 import hashlib
 import logging
 import os
@@ -27,6 +26,7 @@ from .util import (
     min_ex,
     runcmd,
     statdir,
+    ub64enc,
     vsplit,
     wrename,
     wunlink,
@@ -109,6 +109,9 @@ except:
     HAVE_VIPS = False
 
 
+th_dir_cache = {}
+
+
 def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -> str:
     # base16 = 16 = 256
     # b64-lc = 38 = 1444
@@ -122,14 +125,20 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -
     if ext in ffa and fmt[:2] in ("wf", "jf"):
         fmt = fmt.replace("f", "")
 
-    rd += "\n" + fmt
-    h = hashlib.sha512(afsenc(rd)).digest()
-    b64 = base64.urlsafe_b64encode(h).decode("ascii")[:24]
-    rd = ("%s/%s/" % (b64[:2], b64[2:4])).lower() + b64
+    dcache = th_dir_cache
+    rd_key = rd + "\n" + fmt
+    rd = dcache.get(rd_key)
+    if not rd:
+        h = hashlib.sha512(afsenc(rd_key)).digest()
+        b64 = ub64enc(h).decode("ascii")[:24]
+        rd = ("%s/%s/" % (b64[:2], b64[2:4])).lower() + b64
+        if len(dcache) > 9001:
+            dcache.clear()
+        dcache[rd_key] = rd
 
     # could keep original filenames but this is safer re pathlen
     h = hashlib.sha512(afsenc(fn)).digest()
-    fn = base64.urlsafe_b64encode(h).decode("ascii")[:24]
+    fn = ub64enc(h).decode("ascii")[:24]
 
     if fmt in ("opus", "caf", "mp3"):
         cat = "ac"

@@ -855,6 +855,7 @@ class AuthSrv(object):
         self.idp_accs: dict[str, list[str]] = {}  # username->groupnames
         self.idp_usr_gh: dict[str, str] = {}  # username->group-header-value (cache)
 
+        self.hid_cache: dict[str, str] = {}
         self.mutex = threading.Lock()
         self.reload()
 
@@ -1550,8 +1551,8 @@ class AuthSrv(object):
                 if s_pw:
                     # gotta reuse the "account" for all shares with this pw,
                     # so do a light scramble as this appears in the web-ui
-                    zs = ub64enc(hashlib.sha512(s_pw.encode("utf-8")).digest())[4:16]
-                    sun = "s_%s" % (zs.decode("utf-8"),)
+                    zb = hashlib.sha512(s_pw.encode("utf-8")).digest()
+                    sun = "s_%s" % (ub64enc(zb)[4:16].decode("ascii"),)
                     acct[sun] = s_pw
                 else:
                     sun = "*"
@@ -1656,8 +1657,12 @@ class AuthSrv(object):
         promote = []
         demote = []
         for vol in vfs.all_vols.values():
-            zb = hashlib.sha512(afsenc(vol.realpath)).digest()
-            hid = base64.b32encode(zb).decode("ascii").lower()
+            hid = self.hid_cache.get(vol.realpath)
+            if not hid:
+                zb = hashlib.sha512(afsenc(vol.realpath)).digest()
+                hid = base64.b32encode(zb).decode("ascii").lower()
+                self.hid_cache[vol.realpath] = hid
+
             vflag = vol.flags.get("hist")
             if vflag == "-":
                 pass
@@ -2286,7 +2291,7 @@ class AuthSrv(object):
         q = "insert into us values (?,?,?)"
         for uname in self.acct:
             if uname not in ases:
-                sid = ub64enc(os.urandom(blen)).decode("utf-8")
+                sid = ub64enc(os.urandom(blen)).decode("ascii")
                 cur.execute(q, (uname, sid, int(time.time())))
                 ases[uname] = sid
                 n.append(uname)

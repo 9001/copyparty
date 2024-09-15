@@ -1,7 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
-import base64
 import errno
 import gzip
 import hashlib
@@ -61,6 +60,7 @@ from .util import (
     sfsenc,
     spack,
     statdir,
+    ub64enc,
     unhumanize,
     vjoin,
     vsplit,
@@ -1156,7 +1156,7 @@ class Up2k(object):
         zsl = [x[len(prefix) :] for x in zsl]
         zsl.sort()
         zb = hashlib.sha1("\n".join(zsl).encode("utf-8", "replace")).digest()
-        vcfg = base64.urlsafe_b64encode(zb[:18]).decode("ascii")
+        vcfg = ub64enc(zb[:18]).decode("ascii")
 
         c = cur.execute("select v from kv where k = 'volcfg'")
         try:
@@ -1425,7 +1425,7 @@ class Up2k(object):
 
             zh.update(cv.encode("utf-8", "replace"))
             zh.update(spack(b"<d", cst.st_mtime))
-            dhash = base64.urlsafe_b64encode(zh.digest()[:12]).decode("ascii")
+            dhash = ub64enc(zh.digest()[:12]).decode("ascii")
             sql = "select d from dh where d=? and +h=?"
             try:
                 c = db.c.execute(sql, (rd, dhash))
@@ -2431,7 +2431,7 @@ class Up2k(object):
     def _log_sqlite_incompat(self, db_path, t0) -> None:
         txt = t0 or ""
         digest = hashlib.sha512(db_path.encode("utf-8", "replace")).digest()
-        stackname = base64.urlsafe_b64encode(digest[:9]).decode("utf-8")
+        stackname = ub64enc(digest[:9]).decode("ascii")
         stackpath = os.path.join(E.cfg, "stack-%s.txt" % (stackname,))
 
         t = "  the filesystem at %s may not support locking, or is otherwise incompatible with sqlite\n\n  %s\n\n"
@@ -4458,8 +4458,7 @@ class Up2k(object):
                     rem -= len(buf)
 
                 digest = hashobj.digest()[:33]
-                digest = base64.urlsafe_b64encode(digest)
-                ret.append(digest.decode("utf-8"))
+                ret.append(ub64enc(digest).decode("ascii"))
 
         return ret, st
 
@@ -4923,11 +4922,10 @@ def up2k_wark_from_hashlist(salt: str, filesize: int, hashes: list[str]) -> str:
     vstr = "\n".join(values)
 
     wark = hashlib.sha512(vstr.encode("utf-8")).digest()[:33]
-    wark = base64.urlsafe_b64encode(wark)
-    return wark.decode("ascii")
+    return ub64enc(wark).decode("ascii")
 
 
 def up2k_wark_from_metadata(salt: str, sz: int, lastmod: int, rd: str, fn: str) -> str:
     ret = sfsenc("%s\n%d\n%d\n%s\n%s" % (salt, lastmod, sz, rd, fn))
-    ret = base64.urlsafe_b64encode(hashlib.sha512(ret).digest())
+    ret = ub64enc(hashlib.sha512(ret).digest())
     return ("#%s" % (ret.decode("ascii"),))[:44]
