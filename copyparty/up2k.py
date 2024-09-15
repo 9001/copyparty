@@ -3186,8 +3186,9 @@ class Up2k(object):
             dip = self.hub.iphash.s(ip)
 
         suffix = "-%.6f-%s" % (ts, dip)
-        with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as zfw:
-            return zfw["orz"][1]
+        f, ret = ren_open(fname, "wb", fdir=fdir, suffix=suffix)
+        f.close()
+        return ret
 
     def _symlink(
         self,
@@ -4530,8 +4531,8 @@ class Up2k(object):
             dip = self.hub.iphash.s(job["addr"])
 
         suffix = "-%.6f-%s" % (job["t0"], dip)
-        with ren_open(tnam, "wb", fdir=pdir, suffix=suffix) as zfw:
-            f, job["tnam"] = zfw["orz"]
+        f, job["tnam"] = ren_open(tnam, "wb", fdir=pdir, suffix=suffix)
+        try:
             abspath = djoin(pdir, job["tnam"])
             sprs = job["sprs"]
             sz = job["size"]
@@ -4578,6 +4579,8 @@ class Up2k(object):
             if job["hash"] and sprs:
                 f.seek(sz - 1)
                 f.write(b"e")
+        finally:
+            f.close()
 
         if not job["hash"]:
             self._finish_upload(job["ptop"], job["wark"])

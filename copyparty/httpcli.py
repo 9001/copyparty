@@ -1865,10 +1865,12 @@ class HttpCli(object):
                 # small toctou, but better than clobbering a hardlink
                 wunlink(self.log, path, vfs.flags)
 
-        with ren_open(fn, *open_a, **params) as zfw:
-            f, fn = zfw["orz"]
+        f, fn = ren_open(fn, *open_a, **params)
+        try:
             path = os.path.join(fdir, fn)
             post_sz, sha_hex, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
+        finally:
+            f.close()
 
         if lim:
             lim.nup(self.ip)
@@ -1907,8 +1909,8 @@ class HttpCli(object):
                     fn2 = fn.rsplit(".", 1)[0] + "." + ext
 
                 params["suffix"] = suffix[:-4]
-                with ren_open(fn, *open_a, **params) as zfw:
-                    f, fn = zfw["orz"]
+                f, fn2 = ren_open(fn2, *open_a, **params)
+                f.close()
 
                 path2 = os.path.join(fdir, fn2)
                 atomic_move(self.log, path, path2, vfs.flags)
@@ -2741,8 +2743,8 @@ class HttpCli(object):
                     bos.makedirs(fdir)
 
                     # reserve destination filename
-                    with ren_open(fname, "wb", fdir=fdir, suffix=suffix) as zfw:
-                        fname = zfw["orz"][1]
+                    f, fname = ren_open(fname, "wb", fdir=fdir, suffix=suffix)
+                    f.close()
 
                     tnam = fname + ".PARTIAL"
                     if self.args.dotpart:
@@ -2765,8 +2767,8 @@ class HttpCli(object):
                         v2 = lim.dfv - lim.dfl
                         max_sz = min(v1, v2) if v1 and v2 else v1 or v2
 
-                    with ren_open(tnam, "wb", self.args.iobuf, **open_args) as zfw:
-                        f, tnam = zfw["orz"]
+                    f, tnam = ren_open(tnam, "wb", self.args.iobuf, **open_args)
+                    try:
                         tabspath = os.path.join(fdir, tnam)
                         self.log("writing to {}".format(tabspath))
                         sz, sha_hex, sha_b64 = hashcopy(
@@ -2774,6 +2776,8 @@ class HttpCli(object):
                         )
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
+                    finally:
+                        f.close()
 
                     if lim:
                         lim.nup(self.ip)

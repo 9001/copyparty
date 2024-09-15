@@ -1385,18 +1385,13 @@ def min_ex(max_lines: int = 8, reverse: bool = False) -> str:
     return "\n".join(ex[-max_lines:][:: -1 if reverse else 1])
 
 
-@contextlib.contextmanager
-def ren_open(
-    fname: str, *args: Any, **kwargs: Any
-) -> Generator[dict[str, tuple[typing.IO[Any], str]], None, None]:
+def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str]:
     fun = kwargs.pop("fun", open)
     fdir = kwargs.pop("fdir", None)
     suffix = kwargs.pop("suffix", None)
 
     if fname == os.devnull:
-        with fun(fname, *args, **kwargs) as f:
-            yield {"orz": (f, fname)}
-            return
+        return fun(fname, *args, **kwargs), fname
 
     if suffix:
         ext = fname.split(".")[-1]
@@ -1418,6 +1413,7 @@ def ren_open(
     asciified = False
     b64 = ""
     while True:
+        f = None
         try:
             if fdir:
                 fpath = os.path.join(fdir, fname)
@@ -1429,19 +1425,20 @@ def ren_open(
                 fname += suffix
                 ext += suffix
 
-            with fun(fsenc(fpath), *args, **kwargs) as f:
-                if b64:
-                    assert fdir  # !rm
-                    fp2 = "fn-trunc.%s.txt" % (b64,)
-                    fp2 = os.path.join(fdir, fp2)
-                    with open(fsenc(fp2), "wb") as f2:
-                        f2.write(orig_name.encode("utf-8"))
+            f = fun(fsenc(fpath), *args, **kwargs)
+            if b64:
+                assert fdir  # !rm
+                fp2 = "fn-trunc.%s.txt" % (b64,)
+                fp2 = os.path.join(fdir, fp2)
+                with open(fsenc(fp2), "wb") as f2:
+                    f2.write(orig_name.encode("utf-8"))
 
-                yield {"orz": (f, fname)}
-                return
+            return f, fname
 
         except OSError as ex_:
             ex = ex_
+            if f:
+                f.close()
 
             # EPERM: android13
             if ex.errno in (errno.EINVAL, errno.EPERM) and not asciified:
