@@ -5301,8 +5301,12 @@ var showfile = (function () {
 
 			r.files.push({ 'id': link.id, 'name': uricom_dec(fn) });
 
-			var td = ebi(link.id).closest('tr').getElementsByTagName('td')[0];
+			var ah = ebi(link.id),
+				td = ah.closest('tr').getElementsByTagName('td')[0];
 
+			if (ah.textContent.endsWith('/'))
+				continue;
+	
 			if (lang == 'ts' || (lang == 'md' && td.textContent != '-'))
 				continue;
 

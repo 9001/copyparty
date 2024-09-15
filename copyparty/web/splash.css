@@ -53,7 +53,7 @@ a.r {
 	border-color: #c7a;
 }
 a.g {
-	color: #2b0;
+	color: #0a0;
 	border-color: #3a0;
 	box-shadow: 0 .3em 1em #4c0;
 }
@@ -152,11 +152,13 @@ pre b,
 code b {
 	color: #000;
 	font-weight: normal;
-	text-shadow: 0 0 .2em #0f0;
+	text-shadow: 0 0 .2em #3f3;
+	border-bottom: 1px solid #090;
 }
 html.z pre b,
 html.z code b {
 	color: #fff;
+	border-bottom: 1px solid #9f9;
 }
 
 

@@ -3941,6 +3941,9 @@ class HttpCli(object):
         vp = re.sub(r"[<>&$?`\"']", "_", self.uparam["hc"] or "").lstrip("/")
         pw = pw.replace(" ", "%20")
         vp = vp.replace(" ", "%20")
+        if pw in self.asrv.sesa:
+            pw = "pwd"
+
         html = self.j2s(
             "svcs",
             args=self.args,
