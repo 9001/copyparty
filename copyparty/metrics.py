@@ -88,7 +88,7 @@ class Metrics(object):
         addg("cpp_total_bans", str(self.hsrv.nban), t)
 
         if not args.nos_vst:
-            x = self.hsrv.broker.ask("up2k.get_state")
+            x = self.hsrv.broker.ask("up2k.get_state", True, "")
             vs = json.loads(x.get())
 
             nvidle = 0
