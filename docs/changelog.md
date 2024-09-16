@@ -1,4 +1,26 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0909-2343  `v1.15.1`  session
+
+<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>
+
+blessed by ⑨, this release is [certified strong](https://github.com/user-attachments/assets/05459032-736c-4b9a-9ade-a0044461194a) ([artist](https://x.com/hcnone))
+
+## new features
+
+* login sessions b5405174
+  * a random session cookie is generated for each known user, replacing the previous plaintext login cookie
+  * the logout button will nuke the session on all clients where that user is logged in
+  * the sessions are stored in the database at `--ses-db`, default `~/.config/copyparty/sessions.db` (docker uses `/cfg/sessions.db` similar to the other runtime configs)
+    * if you run multiple copyparty instances, much like [shares](https://github.com/9001/copyparty#shares) and [user-changeable passwords](https://github.com/9001/copyparty#user-changeable-passwords) you'll want to keep a separate db for each instance
+  * can be mostly disabled with `--no-ses` when it turns out to be buggy
+
+## bugfixes
+
+* v1.13.8 broke the u2c `--ow` option to replace/overwrite files on the server during upload 6eee6015
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0908-1925  `v1.15.0`  fill the drives
 
 ## recent important news
