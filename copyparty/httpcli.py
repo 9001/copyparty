@@ -3986,7 +3986,7 @@ class HttpCli(object):
                     erd = quotep(rd)
                     rds = rd.replace("/", " / ")
                     spd = humansize(sz * fdone / td, True) + "/s"
-                    eta = s2hms((td / fdone) - td, True)
+                    eta = s2hms((td / fdone) - td, True) if rem < 1 else "--"
                     idle = s2hms(now - poke, True)
                     ups.append((int(100 * fdone), spd, eta, idle, erd, rds, fn))
             except Exception as ex:

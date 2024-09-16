@@ -288,7 +288,7 @@ class Up2k(object):
         else:
             mtpq = "(?)"
             if up_en:
-                ups = [(0, 0, time.time(), "cannot show list (server too busy)")]
+                ups = [(1, 0, 0, time.time(), "cannot show list (server too busy)")]
 
         ups.sort(reverse=True)
 

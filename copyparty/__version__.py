@@ -1,6 +1,6 @@
 # coding: utf-8
 
-VERSION = (1, 15, 2)
+VERSION = (1, 15, 3)
 CODENAME = "fill the drives"
 BUILD_DT = (2024, 9, 16)
 
