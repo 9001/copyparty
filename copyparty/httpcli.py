@@ -5229,9 +5229,11 @@ class HttpCli(object):
                 vdir = "%s/" % (rd,) if rd else ""
                 q = "select sz, nf from ds where rd=? limit 1"
                 for fe in dirs:
-                    hit = icur.execute(q, (vdir + fe["name"],)).fetchone()
-                    if hit:
+                    try:
+                        hit = icur.execute(q, (vdir + fe["name"],)).fetchone()
                         (fe["sz"], fe["tags"][".files"]) = hit
+                    except:
+                        pass  # 404 or mojibake
 
             taglist = [k for k in lmte if k in tagset]
         else:

@@ -1424,11 +1424,14 @@ class Up2k(object):
         if not self.args.no_dirsz:
             tnf += len(files)
             q = "select sz, nf from ds where rd=? limit 1"
-            db_sz, db_nf = db.c.execute(q, (rd,)).fetchone() or (-1, -1)
-            if rsz != db_sz or tnf != db_nf:
-                db.c.execute("delete from ds where rd=?", (rd,))
-                db.c.execute("insert into ds values (?,?,?)", (rd, rsz, tnf))
-                db.n += 1
+            try:
+                db_sz, db_nf = db.c.execute(q, (rd,)).fetchone() or (-1, -1)
+                if rsz != db_sz or tnf != db_nf:
+                    db.c.execute("delete from ds where rd=?", (rd,))
+                    db.c.execute("insert into ds values (?,?,?)", (rd, rsz, tnf))
+                    db.n += 1
+            except:
+                pass  # mojibake rd
 
         # folder of 1000 files = ~1 MiB RAM best-case (tiny filenames);
         # free up stuff we're done with before dhashing
