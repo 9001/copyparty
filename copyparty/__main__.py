@@ -217,7 +217,7 @@ def init_E(EE: EnvParams) -> None:
 
         raise Exception("could not find a writable path for config")
 
-    E.pkg = __package__
+    E.pkg = sys.modules[__package__]
     E.mod = os.path.dirname(os.path.realpath(__file__))
     if E.mod.endswith("__init__"):
         E.mod = os.path.dirname(E.mod)
