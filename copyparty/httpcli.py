@@ -68,12 +68,15 @@ from .util import (
     get_spd,
     guess_mime,
     gzip_orig_sz,
+    gzip_file_orig_sz,
+    has_resource,
     hashcopy,
     hidedir,
     html_bescape,
     html_escape,
     humansize,
     ipnorm,
+    load_resource,
     loadpy,
     log_reloc,
     min_ex,
@@ -93,6 +96,7 @@ from .util import (
     sanitize_vpath,
     sendfile_kern,
     sendfile_py,
+    stat_resource,
     ub64dec,
     ub64enc,
     ujoin,
@@ -1093,12 +1097,11 @@ class HttpCli(object):
             if self.vpath == ".cpr/metrics":
                 return self.conn.hsrv.metrics.tx(self)
 
-            path_base = os.path.join(self.E.mod, "web")
-            static_path = absreal(os.path.join(path_base, self.vpath[5:]))
+            static_path = os.path.join("web", self.vpath[5:])
             if static_path in self.conn.hsrv.statics:
-                return self.tx_file(static_path)
+                return self.tx_res(static_path)
 
-            if not static_path.startswith(path_base):
+            if not undot(static_path).startswith("web"):
                 t = "malicious user; attempted path traversal [{}] => [{}]"
                 self.log(t.format(self.vpath, static_path), 1)
                 self.cbonk(self.conn.hsrv.gmal, self.req, "trav", "path traversal")
@@ -3300,6 +3303,129 @@ class HttpCli(object):
 
         return txt
 
+    def tx_res(self, req_path: str) -> bool:
+        status = 200
+        logmsg = "{:4} {} ".format("", self.req)
+        logtail = ""
+
+        editions = {}
+        file_ts = 0
+
+        if has_resource(self.E, req_path):
+            st = stat_resource(self.E, req_path)
+            if st:
+                file_ts = max(file_ts, st.st_mtime)
+            editions["plain"] = req_path
+
+        if has_resource(self.E, req_path + ".gz"):
+            st = stat_resource(self.E, req_path + ".gz")
+            if st:
+                file_ts = max(file_ts, st.st_mtime)
+            if not st or st.st_mtime > file_ts:
+                editions[".gz"] = req_path + ".gz"
+
+        if not editions:
+            return self.tx_404()
+
+        #
+        # if-modified
+
+        if file_ts > 0:
+            file_lastmod, do_send = self._chk_lastmod(int(file_ts))
+            self.out_headers["Last-Modified"] = file_lastmod
+            if not do_send:
+                status = 304
+
+            if self.can_write:
+                self.out_headers["X-Lastmod3"] = str(int(file_ts * 1000))
+        else:
+            do_send = True
+
+        #
+        # Accept-Encoding and UA decides which edition to send
+
+        decompress = False
+        supported_editions = [
+            x.strip()
+            for x in self.headers.get("accept-encoding", "").lower().split(",")
+        ]
+        if ".gz" in editions:
+            is_compressed = True
+            selected_edition = ".gz"
+
+            if "gzip" not in supported_editions:
+                decompress = True
+            else:
+                if re.match(r"MSIE [4-6]\.", self.ua) and " SV1" not in self.ua:
+                    decompress = True
+
+            if not decompress:
+                self.out_headers["Content-Encoding"] = "gzip"
+        else:
+            is_compressed = False
+            selected_edition = "plain"
+
+        res_path = editions[selected_edition]
+        logmsg += "{} ".format(selected_edition.lstrip("."))
+
+        res = load_resource(self.E, res_path)
+
+        if decompress:
+            file_sz = gzip_file_orig_sz(res)
+            res = gzip.open(res)
+        else:
+            res.seek(0, os.SEEK_END)
+            file_sz = res.tell()
+            res.seek(0, os.SEEK_SET)
+
+        #
+        # send reply
+
+        if is_compressed:
+            self.out_headers["Cache-Control"] = "max-age=604869"
+        else:
+            self.permit_caching()
+
+        if "txt" in self.uparam:
+            mime = "text/plain; charset={}".format(self.uparam["txt"] or "utf-8")
+        elif "mime" in self.uparam:
+            mime = str(self.uparam.get("mime"))
+        else:
+            mime = guess_mime(req_path)
+
+        logmsg += unicode(status) + logtail
+
+        if self.mode == "HEAD" or not do_send:
+            res.close()
+            if self.do_log:
+                self.log(logmsg)
+
+            self.send_headers(length=file_sz, status=status, mime=mime)
+            return True
+
+        ret = True
+        self.send_headers(length=file_sz, status=status, mime=mime)
+        remains = sendfile_py(
+            self.log,
+            0,
+            file_sz,
+            res,
+            self.s,
+            self.args.s_wr_sz,
+            self.args.s_wr_slp,
+            not self.args.no_poll,
+        )
+
+        if remains > 0:
+            logmsg += " \033[31m" + unicode(file_sz - remains) + "\033[0m"
+            ret = False
+
+        spd = self._spd(file_sz - remains)
+        if self.do_log:
+            self.log("{},  {}".format(logmsg, spd))
+
+        return ret
+
     def tx_file(self, req_path: str, ptop: Optional[str] = None) -> bool:
         status = 200
         logmsg = "{:4} {} ".format("", self.req)
@@ -3815,14 +3941,10 @@ class HttpCli(object):
                 return self.tx_404(True)
 
         tpl = "mde" if "edit2" in self.uparam else "md"
-        html_path = os.path.join(self.E.mod, "web", "{}.html".format(tpl))
         template = self.j2j(tpl)
 
         st = bos.stat(fs_path)
         ts_md = st.st_mtime
-
-        st = bos.stat(html_path)
-        ts_html = st.st_mtime
 
         max_sz = 1024 * self.args.txt_max
         sz_md = 0
@@ -3857,7 +3979,7 @@ class HttpCli(object):
             fullfile = html_bescape(fullfile)
             sz_md = len(lead) + len(fullfile)
 
-        file_ts = int(max(ts_md, ts_html, self.E.t0))
+        file_ts = int(max(ts_md, self.E.t0))
         file_lastmod, do_send = self._chk_lastmod(file_ts)
         self.out_headers["Last-Modified"] = file_lastmod
         self.out_headers.update(NO_CACHE)
@@ -3896,7 +4018,7 @@ class HttpCli(object):
         zs = template.render(**targs).encode("utf-8", "replace")
         html = zs.split(boundary.encode("utf-8"))
         if len(html) != 2:
-            raise Exception("boundary appears in " + html_path)
+            raise Exception("boundary appears in " + tpl)
 
         self.send_headers(sz_md + len(html[0]) + len(html[1]), status)
 

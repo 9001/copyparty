@@ -3417,9 +3417,14 @@ def loadpy(ap: str, hot: bool) -> Any:
 
 def gzip_orig_sz(fn: str) -> int:
     with open(fsenc(fn), "rb") as f:
-        f.seek(-4, 2)
-        rv = f.read(4)
-        return sunpack(b"I", rv)[0]  # type: ignore
+        return gzip_file_orig_sz(f)
+
+def gzip_file_orig_sz(f) -> int:
+    start = f.tell()
+    f.seek(-4, 2)
+    rv = f.read(4)
+    f.seek(start, 0)
+    return sunpack(b"I", rv)[0]  # type: ignore
 
 
 def align_tab(lines: list[str]) -> list[str]:
