@@ -57,6 +57,7 @@ from .util import (
     ansi_re,
     b64enc,
     dedent,
+    has_resource,
     min_ex,
     pybin,
     termsize,
@@ -325,8 +326,7 @@ def ensure_locale() -> None:
 
 
 def ensure_webdeps() -> None:
-    ap = os.path.join(E.mod, "web/deps/mini-fa.woff")
-    if os.path.exists(ap):
+    if has_resource(E, "web/deps/mini-fa.woff"):
         return
 
     warn(
