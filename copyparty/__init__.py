@@ -54,6 +54,7 @@ except:
 
 class EnvParams(object):
     def __init__(self) -> None:
+        self.pkg = ""
         self.t0 = time.time()
         self.mod = ""
         self.cfg = ""

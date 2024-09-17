@@ -3576,7 +3576,7 @@ def stat_resource(E: EnvParams, name: str):
 def has_resource(E: EnvParams, name: str):
     if impresources:
         try:
-            resources = impresources.files("copyparty")
+            resources = impresources.files(E.pkg)
         except ImportError:
             pass
         else:
@@ -3590,7 +3590,7 @@ def has_resource(E: EnvParams, name: str):
 def load_resource(E: EnvParams, name: str, mode="rb"):
     if impresources:
         try:
-            resources = impresources.files("copyparty")
+            resources = impresources.files(E.pkg)
         except ImportError:
             pass
         else:
@@ -3618,7 +3618,7 @@ def walk_resources(E: EnvParams, name: str):
 
     if impresources:
         try:
-            resources = impresources.files("copyparty").joinpath(name)
+            resources = impresources.files(E.pkg).joinpath(name)
         except ImportError:
             resources = None
     else:
