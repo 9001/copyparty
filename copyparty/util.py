@@ -3563,7 +3563,10 @@ def hidedir(dp) -> None:
 try:
     import importlib.resources as impresources
 except ImportError:
-    impresources = None
+    try:
+        import importlib_resources as impresources
+    except ImportError:
+        impresources = None
 
 
 def stat_resource(E: EnvParams, name: str):
