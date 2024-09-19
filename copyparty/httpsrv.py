@@ -68,13 +68,17 @@ from .util import (
     NetMap,
     absreal,
     build_netmap,
+    has_resource,
     ipnorm,
+    load_resource,
     min_ex,
     shut_socket,
     spack,
     start_log_thrs,
     start_stackmon,
+    stat_resource,
     ub64enc,
+    walk_resources,
 )
 
 if TYPE_CHECKING:
@@ -89,6 +93,10 @@ if PY2:
 
 if not hasattr(socket, "AF_UNIX"):
     setattr(socket, "AF_UNIX", -9001)
+
+
+def load_jinja2_resource(E: EnvParams, name: str):
+    return load_resource(E, os.path.join("web", name), "r").read()
 
 
 class HttpSrv(object):
@@ -153,7 +161,7 @@ class HttpSrv(object):
         self.u2idx_n = 0
 
         env = jinja2.Environment()
-        env.loader = jinja2.FileSystemLoader(os.path.join(self.E.mod, "web"))
+        env.loader = jinja2.FunctionLoader(lambda f: load_jinja2_resource(self.E, f))
         jn = [
             "splash",
             "shares",
@@ -166,8 +174,7 @@ class HttpSrv(object):
             "cf",
         ]
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
-        zs = os.path.join(self.E.mod, "web", "deps", "prism.js.gz")
-        self.prism = os.path.exists(zs)
+        self.prism = has_resource(self.E, os.path.join("web", "deps", "prism.js.gz"))
 
         self.ipa_nm = build_netmap(self.args.ipa)
         self.xff_nm = build_netmap(self.args.xff_src)
@@ -210,9 +217,9 @@ class HttpSrv(object):
             pass
 
     def _build_statics(self) -> None:
-        for dp, _, df in os.walk(os.path.join(self.E.mod, "web")):
+        for dp, _, df in walk_resources(self.E, "web"):
             for fn in df:
-                ap = absreal(os.path.join(dp, fn))
+                ap = os.path.join(dp, fn)
                 self.statics.add(ap)
                 if ap.endswith(".gz"):
                     self.statics.add(ap[:-3])
@@ -536,10 +543,20 @@ class HttpSrv(object):
 
             v = self.E.t0
             try:
-                with os.scandir(os.path.join(self.E.mod, "web")) as dh:
-                    for fh in dh:
-                        inf = fh.stat()
+                for (base, dirs, files) in walk_resources(self.E, "web"):
+                    inf = stat_resource(self.E, base)
+                    if inf:
                         v = max(v, inf.st_mtime)
+                    for d in dirs:
+                        inf = stat_resource(self.E, os.path.join(base, d))
+                        if inf:
+                            v = max(v, inf.st_mtime)
+                    for f in files:
+                        inf = stat_resource(self.E, os.path.join(base, e))
+                        if inf:
+                            v = max(v, inf.st_mtime)
+                    # only do top-level
+                    break
             except:
                 pass
 

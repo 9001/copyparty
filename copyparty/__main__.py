@@ -57,6 +57,7 @@ from .util import (
     ansi_re,
     b64enc,
     dedent,
+    has_resource,
     min_ex,
     pybin,
     termsize,
@@ -216,6 +217,7 @@ def init_E(EE: EnvParams) -> None:
 
         raise Exception("could not find a writable path for config")
 
+    E.pkg = sys.modules[__package__]
     E.mod = os.path.dirname(os.path.realpath(__file__))
     if E.mod.endswith("__init__"):
         E.mod = os.path.dirname(E.mod)
@@ -325,8 +327,7 @@ def ensure_locale() -> None:
 
 
 def ensure_webdeps() -> None:
-    ap = os.path.join(E.mod, "web/deps/mini-fa.woff")
-    if os.path.exists(ap):
+    if has_resource(E, "web/deps/mini-fa.woff"):
         return
 
     warn(

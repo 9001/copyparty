@@ -103,9 +103,6 @@ class HttpConn(object):
         self.log_src = ("%s \033[%dm%d" % (ip, color, self.addr[1])).ljust(26)
         return self.log_src
 
-    def respath(self, res_name: str) -> str:
-        return os.path.join(self.E.mod, "web", res_name)
-
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func(self.log_src, msg, c)
 
