@@ -77,11 +77,14 @@ excl=(
     email._header_value_parser
     email.header
     email.parser
+    importlib.resources
+    importlib_resources
     inspect
     multiprocessing
     packaging
     pdb
     pickle
+    pkg_resources
     PIL.EpsImagePlugin
     pyftpdlib.prefork
     urllib.request

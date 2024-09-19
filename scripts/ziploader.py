@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 
-import atexit
-import os
-import platform
 import sys
-import tarfile
-import tempfile
 import time
 import traceback
 
@@ -23,20 +18,6 @@ def msg(*a, **ka):
     print(*a, **ka)
 
 
-def utime(top):
-    # avoid cleaners
-    files = [os.path.join(dp, p) for dp, dd, df in os.walk(top) for p in dd + df]
-    try:
-        while True:
-            t = int(time.time())
-            for f in [top] + files:
-                os.utime(f, (t, t))
-
-            time.sleep(78123)
-    except Exception as ex:
-        print("utime:", ex, f)
-
-
 def confirm(rv):
     msg()
     msg("retcode", rv if rv else traceback.format_exc())
@@ -51,47 +32,17 @@ def confirm(rv):
 
 
 def run():
-    import copyparty
     from copyparty.__main__ import main as cm
 
-    td = tempfile.TemporaryDirectory(prefix="")
-    atexit.register(td.cleanup)
-    rsrc = td.name
-
-    try:
-        from importlib.resources import files
-
-        f = files(copyparty).joinpath("z.tar").open("rb")
-    except:
-        from importlib.resources import open_binary
-
-        f = open_binary("copyparty", "z.tar")
-
-    with tarfile.open(fileobj=f) as tf:
-        try:
-            tf.extractall(rsrc, filter="tar")
-        except TypeError:
-            tf.extractall(rsrc)  # nosec (archive is safe)
-
-    f.close()
-    f = None
-
-    msg("  rsrc dir:", rsrc)
-    msg()
-
-    sys.argv.append("--sfx-tpoke=" + rsrc)
-
-    cm(rsrc=rsrc)
+    cm()
 
 
 def main():
-    sysver = str(sys.version).replace("\n", "\n" + " " * 18)
     pktime = time.strftime("%Y-%m-%d, %H:%M:%S", time.gmtime(STAMP))
     msg()
-    msg("   this is: copyparty", VER)
-    msg(" packed at:", pktime, "UTC,", STAMP)
-    msg("python bin:", sys.executable)
-    msg("python ver:", platform.python_implementation(), sysver)
+    msg("build-time:", pktime, "UTC,", STAMP)
+    msg("python-bin:", sys.executable)
+    msg()
 
     try:
         run()

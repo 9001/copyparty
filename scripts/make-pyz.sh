@@ -42,12 +42,6 @@ ver="$(cat ../sfx/ver)"
 mkdir -p ../dist
 pyz_out=../dist/copyparty.pyz
 
-echo creating z.tar
-( cd copyparty
-  tar -cf z.tar "${targs[@]}" --numeric-owner web res
-  rm -rf web res
-)
-
 echo creating loader
 sed -r 's/^(VER = ).*/\1"'"$ver"'"/; s/^(STAMP = ).*/\1'$(date +%s)/ \
     <../scripts/ziploader.py \

@@ -7,7 +7,7 @@ import shutil
 import time
 
 from .__init__ import ANYWIN
-from .util import Netdev, runcmd, wrename, wunlink
+from .util import Netdev, load_resource, runcmd, wrename, wunlink
 
 HAVE_CFSSL = not os.environ.get("PRTY_NO_CFSSL")
 
@@ -29,13 +29,15 @@ def ensure_cert(log: "RootLogger", args) -> None:
 
     i feel awful about this and so should they
     """
-    cert_insec = os.path.join(args.E.mod, "res/insecure.pem")
+    with load_resource(args.E, "res/insecure.pem") as f:
+        cert_insec = f.read()
     cert_appdata = os.path.join(args.E.cfg, "cert.pem")
     if not os.path.isfile(args.cert):
         if cert_appdata != args.cert:
             raise Exception("certificate file does not exist: " + args.cert)
 
-        shutil.copy(cert_insec, args.cert)
+        with open(args.cert, "wb") as f:
+            f.write(cert_insec)
 
     with open(args.cert, "rb") as f:
         buf = f.read()
@@ -50,7 +52,9 @@ def ensure_cert(log: "RootLogger", args) -> None:
             raise Exception(m + "private key must appear before server certificate")
 
     try:
-        if filecmp.cmp(args.cert, cert_insec):
+        with open(args.cert, "rb") as f:
+            active_cert = f.read()
+        if active_cert == cert_insec:
             t = "using default TLS certificate; https will be insecure:\033[36m {}"
             log("cert", t.format(args.cert), 3)
     except:
@@ -151,14 +155,22 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
             raise Exception("no useable cert found")
 
         expired = time.time() + args.crt_sdays * 60 * 60 * 24 * 0.5 > expiry
-        cert_insec = os.path.join(args.E.mod, "res/insecure.pem")
+        if expired:
+            raise Exception("old server-cert has expired")
+
         for n in names:
             if n not in inf["sans"]:
                 raise Exception("does not have {}".format(n))
-        if expired:
-            raise Exception("old server-cert has expired")
-        if not filecmp.cmp(args.cert, cert_insec):
+
+        with load_resource(args.E, "res/insecure.pem") as f:
+            cert_insec = f.read()
+
+        with open(args.cert, "rb") as f:
+            active_cert = f.read()
+
+        if active_cert and active_cert != cert_insec:
             return
+
     except Exception as ex:
         log("cert", "will create new server-cert; {}".format(ex))
 

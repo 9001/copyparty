@@ -134,7 +134,7 @@ if True:  # pylint: disable=using-constant-test
     from collections.abc import Callable, Iterable
 
     import typing
-    from typing import Any, Generator, Optional, Pattern, Protocol, Union
+    from typing import Any, Generator, IO, Optional, Pattern, Protocol, Union
 
     try:
         from typing import LiteralString
@@ -3420,6 +3420,7 @@ def gzip_orig_sz(fn: str) -> int:
     with open(fsenc(fn), "rb") as f:
         return gzip_file_orig_sz(f)
 
+
 def gzip_file_orig_sz(f) -> int:
     start = f.tell()
     f.seek(-4, 2)
@@ -3582,144 +3583,95 @@ def _pkg_resource_exists(pkg: str, name: str) -> bool:
     except NotImplementedError:
         return False
 
+
 def stat_resource(E: EnvParams, name: str):
     path = os.path.join(E.mod, name)
     if os.path.exists(path):
         return os.stat(fsenc(path))
     return None
 
-def has_resource(E: EnvParams, name: str):
+
+def _find_impresource_cold(E: EnvParams, name: str):
+    global _rescache_imp, _find_impresource
+
+    assert impresources  # !rm
+    try:
+        _rescache_imp = impresources.files(E.pkg)
+    except ImportError:
+        return None
+
+    _find_impresource = _find_impresource_warm
+    return _find_impresource(E, name)
+
+
+def _find_impresource_warm(E: EnvParams, name: str):
+    if not _rescache_imp:
+        return None
+
+    try:
+        return _rescache_res[name]
+    except:
+        if len(_rescache_res) > 999:
+            _rescache_res.clear()
+        ret = _rescache_imp.joinpath(name)
+        _rescache_res[name] = ret
+        return ret
+
+
+_find_impresource = _find_impresource_cold
+_rescache_imp = None
+_rescache_has = {}
+_rescache_res = {}
+
+
+def _has_resource(E: EnvParams, name: str):
+    try:
+        return _rescache_has[name]
+    except:
+        pass
+
+    if len(_rescache_has) > 999:
+        _rescache_has.clear()
+
     if impresources:
-        try:
-            resources = impresources.files(E.pkg)
-        except ImportError:
-            pass
-        else:
-            res = resources.joinpath(name)
-            if res.is_file() or res.is_dir():
-                return True
+        res = _find_impresource(E, name)
+        if res and res.is_file():
+            _rescache_has[name] = True
+            return True
 
     if pkg_resources:
         if _pkg_resource_exists(E.pkg.__name__, name):
+            _rescache_has[name] = True
             return True
 
-    return os.path.exists(os.path.join(E.mod, name))
+    _rescache_has[name] = False
+    return False
 
 
-def load_resource(E: EnvParams, name: str, mode="rb"):
+def has_resource(E: EnvParams, name: str):
+    return _has_resource(E, name) or os.path.exists(os.path.join(E.mod, name))
+
+
+def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
+    enc = None if "b" in mode else "utf-8"
+
     if impresources:
-        try:
-            resources = impresources.files(E.pkg)
-        except ImportError:
-            pass
-        else:
-            res = resources.joinpath(name)
-            if res.is_file():
+        res = _find_impresource(E, name)
+        if res and res.is_file():
+            if enc:
+                return res.open(mode, encoding=enc)
+            else:
+                # throws if encoding= is mentioned at all
                 return res.open(mode)
 
     if pkg_resources:
-        if _pkg_resource_exists(E.pkg.__name__, name) and not pkg_resources.resource_isdir(E.pkg.__name__, name):
+        if _pkg_resource_exists(E.pkg.__name__, name):
             stream = pkg_resources.resource_stream(E.pkg.__name__, name)
-            if 'b' not in mode:
-                stream = io.TextIOWrapper(stream)
+            if enc:
+                stream = io.TextIOWrapper(stream, encoding=enc)
             return stream
 
-    return open(os.path.join(E.mod, name), mode)
-
-
-def walk_resources(E: EnvParams, name: str):
-    def walk_idirs(base, r):
-        queue = [(base, r)]
-        while queue:
-            (b, r) = queue.pop(0)
-            d = []
-            f = []
-            for e in r.iterdir():
-                if e.is_dir():
-                    d.append(e.name)
-                    queue.append((os.path.join(b, e.name), e))
-                elif e.is_file():
-                    f.append(e.name)
-            yield (b, d, f)
-
-    def walk_pdirs(base):
-        queue = [base]
-        while queue:
-            b = queue.pop(0)
-            d = []
-            f = []
-            for e in pkg_resources.resource_listdir(E.pkg.__name__, b):
-                if pkg_resources.resource_isdir(E.pkg.__name__, e):
-                    d.append(e)
-                    queue.append(os.path.join(b, e))
-                else:
-                    f.append(e)
-            yield (b, d, f)
-
-    if impresources:
-        try:
-            iresources = impresources.files(E.pkg)
-        except ImportError:
-            iresources = None
-    else:
-        iresources = None
-
-    base_path = os.path.join(E.mod, name)
-
-    def walk_single(base, dirs, files, normalize_base=False, skip_ires=False, skip_pres=False):
-        if normalize_base:
-            if base != base_path:
-                relbase = os.path.relpath(base, base_path)
-            else:
-                relbase = name
-        else:
-            relbase = base
-
-        ires_dirs = []
-        if not skip_ires and iresources:
-            iresbase = iresources.joinpath(relbase)
-            if iresbase.is_dir():
-                for ientry in iresbase.iterdir():
-                    if ientry.is_dir() and ientry.name not in dirs:
-                        dirs.append(ientry.name)
-                        ires_dirs.append(ientry.name)
-                    elif ientry.is_file() and ientry.name not in files:
-                        files.append(ientry.name)
-
-        pres_dirs = []
-        if not skip_pres and _pkg_resource_exists(E.pkg.__name__, relbase) and pkg_resources.resource_isdir(E.pkg.__name__, relbase):
-            for pentry in pkg_resources.resource_listdir(E.pkg.__name__, relbase):
-                ppath = os.path.join(relbase, pentry)
-                if pkg_resources.resource_isdir(E.pkg.__name__, ppath):
-                    if pentry not in dirs:
-                        dirs.append(pentry)
-                        pres_dirs.append(pentry)
-                else:
-                    if pentry not in files:
-                        files.append(pentry)
-
-        yield (base, dirs + ires_dirs + pres_dirs, files)
-        for d in ires_dirs:
-            for (ibase, idirs, ifiles) in walk_idirs(os.path.join(relbase, d), iresources.joinpath(relbase, d)):
-                yield from walk_single(ibase, idirs, ifiles, normalize_base=False, skip_ires=True, skip_pres=skip_pres)
-        for d in pres_dirs:
-            for (pbase, pdirs, pfiles) in walk_pdirs(os.path.join(relbase, d)):
-                yield (pbase, pdirs, pfiles)
-
-    normalize_base = False
-    skip_ires = skip_pres = False
-    if os.path.isdir(base_path):
-        walker = os.walk(base_path)
-        normalize_base = True
-    elif iresources and iresources.joinpath(name).is_dir():
-        walker = walk_idirs(name, iresources.joinpath(name))
-        skip_ires = True
-    elif pkg_resources and _pkg_resource_exists(E.pkg.__name__, name) and pkg_resources.resource_isdir(E.pkg.__name__, name):
-        walker = walk_pdirs(name)
-        skip_pres = True
-
-    for (base, dirs, files) in walker:
-        yield from walk_single(base, dirs, files, normalize_base=normalize_base, skip_ires=skip_ires, skip_pres=skip_pres)
+    return open(os.path.join(E.mod, name), mode, encoding=enc)
 
 
 class Pebkac(Exception):

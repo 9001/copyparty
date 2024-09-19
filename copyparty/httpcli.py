@@ -32,7 +32,7 @@ try:
 except:
     pass
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, EnvParams, unicode
+from .__init__ import ANYWIN, PY2, RES, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import VFS  # typechk
 from .bos import bos
@@ -67,8 +67,8 @@ from .util import (
     get_df,
     get_spd,
     guess_mime,
-    gzip_orig_sz,
     gzip_file_orig_sz,
+    gzip_orig_sz,
     has_resource,
     hashcopy,
     hidedir,
@@ -1097,13 +1097,17 @@ class HttpCli(object):
             if self.vpath == ".cpr/metrics":
                 return self.conn.hsrv.metrics.tx(self)
 
-            static_path = os.path.join("web", self.vpath[5:])
-            if static_path in self.conn.hsrv.statics:
-                return self.tx_res(static_path)
+            res_path = "web/" + self.vpath[5:]
+            if res_path in RES:
+                ap = os.path.join(self.E.mod, res_path)
+                if bos.path.exists(ap) or bos.path.exists(ap + ".gz"):
+                    return self.tx_file(ap)
+                else:
+                    return self.tx_res(res_path)
 
-            if not undot(static_path).startswith("web"):
+            if res_path != undot(res_path):
                 t = "malicious user; attempted path traversal [{}] => [{}]"
-                self.log(t.format(self.vpath, static_path), 1)
+                self.log(t.format(self.vpath, res_path), 1)
                 self.cbonk(self.conn.hsrv.gmal, self.req, "trav", "path traversal")
 
             self.tx_404()
@@ -3415,6 +3419,7 @@ class HttpCli(object):
             self.args.s_wr_slp,
             not self.args.no_poll,
         )
+        res.close()
 
         if remains > 0:
             logmsg += " \033[31m" + unicode(file_sz - remains) + "\033[0m"

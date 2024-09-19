@@ -66,7 +66,6 @@ from .util import (
     Magician,
     Netdev,
     NetMap,
-    absreal,
     build_netmap,
     has_resource,
     ipnorm,
@@ -76,9 +75,7 @@ from .util import (
     spack,
     start_log_thrs,
     start_stackmon,
-    stat_resource,
     ub64enc,
-    walk_resources,
 )
 
 if TYPE_CHECKING:
@@ -96,7 +93,7 @@ if not hasattr(socket, "AF_UNIX"):
 
 
 def load_jinja2_resource(E: EnvParams, name: str):
-    return load_resource(E, os.path.join("web", name), "r").read()
+    return load_resource(E, "web/" + name, "r").read()
 
 
 class HttpSrv(object):
@@ -174,14 +171,11 @@ class HttpSrv(object):
             "cf",
         ]
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
-        self.prism = has_resource(self.E, os.path.join("web", "deps", "prism.js.gz"))
+        self.prism = has_resource(self.E, "web/deps/prism.js.gz")
 
         self.ipa_nm = build_netmap(self.args.ipa)
         self.xff_nm = build_netmap(self.args.xff_src)
         self.xff_lan = build_netmap("lan")
-
-        self.statics: set[str] = set()
-        self._build_statics()
 
         self.ptn_cc = re.compile(r"[\x00-\x1f]")
         self.ptn_hsafe = re.compile(r"[\x00-\x1f<>\"'&]")
@@ -215,14 +209,6 @@ class HttpSrv(object):
             self.th_cfg = x.get()
         except:
             pass
-
-    def _build_statics(self) -> None:
-        for dp, _, df in walk_resources(self.E, "web"):
-            for fn in df:
-                ap = os.path.join(dp, fn)
-                self.statics.add(ap)
-                if ap.endswith(".gz"):
-                    self.statics.add(ap[:-3])
 
     def set_netdevs(self, netdevs: dict[str, Netdev]) -> None:
         ips = set()
@@ -543,20 +529,10 @@ class HttpSrv(object):
 
             v = self.E.t0
             try:
-                for (base, dirs, files) in walk_resources(self.E, "web"):
-                    inf = stat_resource(self.E, base)
-                    if inf:
+                with os.scandir(os.path.join(self.E.mod, "web")) as dh:
+                    for fh in dh:
+                        inf = fh.stat()
                         v = max(v, inf.st_mtime)
-                    for d in dirs:
-                        inf = stat_resource(self.E, os.path.join(base, d))
-                        if inf:
-                            v = max(v, inf.st_mtime)
-                    for f in files:
-                        inf = stat_resource(self.E, os.path.join(base, e))
-                        if inf:
-                            v = max(v, inf.st_mtime)
-                    # only do top-level
-                    break
             except:
                 pass
 

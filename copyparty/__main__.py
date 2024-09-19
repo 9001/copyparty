@@ -58,6 +58,7 @@ from .util import (
     b64enc,
     dedent,
     has_resource,
+    load_resource,
     min_ex,
     pybin,
     termsize,
@@ -217,6 +218,7 @@ def init_E(EE: EnvParams) -> None:
 
         raise Exception("could not find a writable path for config")
 
+    assert __package__  # !rm
     E.pkg = sys.modules[__package__]
     E.mod = os.path.dirname(os.path.realpath(__file__))
     if E.mod.endswith("__init__"):
@@ -520,13 +522,17 @@ def sfx_tpoke(top: str):
 
 
 def showlic() -> None:
-    p = os.path.join(E.mod, "res", "COPYING.txt")
-    if not os.path.exists(p):
+    try:
+        with load_resource(E, "res/COPYING.txt") as f:
+            buf = f.read()
+    except:
+        buf = b""
+
+    if buf:
+        print(buf.decode("utf-8", "replace"))
+    else:
         print("no relevant license info to display")
         return
-
-    with open(p, "rb") as f:
-        print(f.read().decode("utf-8", "replace"))
 
 
 def get_sects():
@@ -1567,15 +1573,12 @@ def run_argparse(
     return ret
 
 
-def main(argv: Optional[list[str]] = None, rsrc: Optional[str] = None) -> None:
+def main(argv: Optional[list[str]] = None) -> None:
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
         os.system("rem")  # enables colors
 
     init_E(E)
-
-    if rsrc:  # pyz
-        E.mod = rsrc
 
     if argv is None:
         argv = sys.argv
