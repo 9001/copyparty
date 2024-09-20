@@ -134,7 +134,7 @@ if True:  # pylint: disable=using-constant-test
     from collections.abc import Callable, Iterable
 
     import typing
-    from typing import Any, Generator, IO, Optional, Pattern, Protocol, Union
+    from typing import IO, Any, Generator, Optional, Pattern, Protocol, Union
 
     try:
         from typing import LiteralString

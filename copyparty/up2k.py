@@ -176,6 +176,7 @@ class Up2k(object):
         self.spools: set[tempfile.SpooledTemporaryFile[bytes]] = set()
         if HAVE_SQLITE3:
             # mojibake detector
+            assert sqlite3  # type: ignore  # !rm
             self.mem_cur = self._orz(":memory:")
             self.mem_cur.execute(r"create table a (b text)")
             self.sqlite_ver = tuple([int(x) for x in sqlite3.sqlite_version.split(".")])
@@ -2477,6 +2478,7 @@ class Up2k(object):
             raise Exception("%s\n%s\n%s" % (t, txt, t))
 
     def _orz(self, db_path: str) -> "sqlite3.Cursor":
+        assert sqlite3  # type: ignore  # !rm
         c = sqlite3.connect(
             db_path, timeout=self.timeout, check_same_thread=False
         ).cursor()
@@ -2539,6 +2541,7 @@ class Up2k(object):
     def _backup_db(
         self, db_path: str, cur: "sqlite3.Cursor", ver: Optional[int], msg: str
     ) -> "sqlite3.Cursor":
+        assert sqlite3  # type: ignore  # !rm
         bak = "{}.bak.{:x}.v{}".format(db_path, int(time.time()), ver)
         self.log(msg + bak)
         try:

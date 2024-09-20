@@ -162,6 +162,7 @@ class HttpConn(object):
 
             self.log_src = self.log_src.replace("[36m", "[35m")
             try:
+                assert ssl  # type: ignore  # !rm
                 ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
                 ctx.load_cert_chain(self.args.cert)
                 if self.args.ssl_ver:

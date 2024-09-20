@@ -1783,6 +1783,7 @@ class HttpCli(object):
                 open_ka["fun"] = gzip.GzipFile
                 open_a = ["wb", lv[alg], None, 0x5FEE6600]  # 2021-01-01
             elif alg == "xz":
+                assert lzma  # type: ignore  # !rm
                 open_ka = {"fun": lzma.open, "preset": lv[alg]}
                 open_a = ["wb"]
             else:
@@ -4127,6 +4128,8 @@ class HttpCli(object):
                 "mtpq": None,
                 "dbwt": None,
             }
+
+        assert vstate and vs  # type: ignore  # !rm
 
         fmt = self.uparam.get("ls", "")
         if not fmt and (self.ua.startswith("curl/") or self.ua.startswith("fetch")):

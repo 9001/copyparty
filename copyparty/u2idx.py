@@ -53,6 +53,8 @@ class U2idx(object):
             self.log("your python does not have sqlite3; searching will be disabled")
             return
 
+        assert sqlite3  # type: ignore  # !rm
+
         self.active_id = ""
         self.active_cur: Optional["sqlite3.Cursor"] = None
         self.cur: dict[str, "sqlite3.Cursor"] = {}

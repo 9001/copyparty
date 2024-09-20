@@ -157,6 +157,7 @@ class HttpSrv(object):
         self.u2idx_free: dict[str, U2idx] = {}
         self.u2idx_n = 0
 
+        assert jinja2  # type: ignore  # !rm
         env = jinja2.Environment()
         env.loader = jinja2.FunctionLoader(lambda f: load_jinja2_resource(self.E, f))
         jn = [
