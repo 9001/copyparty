@@ -43,13 +43,6 @@ fns=(
   pyinstaller_hooks_contrib-2024.8-py3-none-any.whl
   python-3.12.6-amd64.exe
 )
-[ $w7 ] && fns+=(  # u2c stuff
-  certifi-2024.2.2-py3-none-any.whl
-  charset_normalizer-3.3.2-cp37-cp37m-win32.whl
-  idna-3.6-py3-none-any.whl
-  requests-2.29.0-py3-none-any.whl
-  urllib3-1.26.19-py2.py3-none-any.whl
-)
 [ $w7 ] && fns+=(
   future-1.0.0-py3-none-any.whl
   importlib_metadata-6.7.0-py3-none-any.whl
@@ -96,12 +89,11 @@ python -m ensurepip &&
 { [ $w10 ] || python -m pip install --user -U pip-*.whl; } &&
 python -m pip install --user -U packaging-*.whl &&
 { [ $w7 ] || python -m pip install --user -U {setuptools,mutagen,pillow,jinja2,MarkupSafe}-*.whl; } &&
-{ [ $w10 ] || python -m pip install --user -U {requests,urllib3,charset_normalizer,certifi,idna}-*.whl; } &&
 { [ $w10 ] || python -m pip install --user -U future-*.whl importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl; } &&
 python -m pip install --user -U pyinstaller-*.whl pefile-*.whl pywin32_ctypes-*.whl pyinstaller_hooks_contrib-*.whl altgraph-*.whl &&
 sed -ri 's/--lzma/--best/' $appd/Python/Python$pyv/site-packages/pyinstaller/building/utils.py &&
 curl -fkLO https://192.168.123.1:3923/cpp/scripts/uncomment.py &&
-python uncomment.py 1 $(for d in $appd/Python/Python$pyv/site-packages/{requests,urllib3,charset_normalizer,certifi,idna,mutagen,PIL,jinja2,markupsafe}; do find $d -name \*.py; done) &&
+python uncomment.py 1 $(for d in $appd/Python/Python$pyv/site-packages/{mutagen,PIL,jinja2,markupsafe}; do find $d -name \*.py; done) &&
 cd &&
 rm -f build.sh &&
 curl -fkLO https://192.168.123.1:3923/cpp/scripts/pyinstaller/build.sh &&

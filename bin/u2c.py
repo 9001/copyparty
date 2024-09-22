@@ -1,34 +1,36 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "1.24"
-S_BUILD_DT = "2024-09-05"
+S_VERSION = "2.0"
+S_BUILD_DT = "2024-09-22"
 
 """
 u2c.py: upload to copyparty
 2021, ed <irc.rizon.net>, MIT-Licensed
 https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py
 
-- dependencies: requests
+- dependencies: no
 - supports python 2.6, 2.7, and 3.3 through 3.12
+   (for higher performance on 2.6 and 2.7, use u2c v1.x)
 - if something breaks just try again and it'll autoresume
 """
 
-import re
-import os
-import sys
-import stat
-import math
-import time
-import json
 import atexit
+import base64
+import binascii
+import datetime
+import hashlib
+import json
+import math
+import os
+import platform
+import re
 import signal
 import socket
-import base64
-import hashlib
-import platform
+import stat
+import sys
 import threading
-import datetime
+import time
 
 EXE = bool(getattr(sys, "frozen", False))
 
@@ -39,32 +41,10 @@ except:
     print(m)
     raise
 
-try:
-    import requests
 
-    req_ses = requests.Session()
-except ImportError as ex:
-    if "-" in sys.argv or "-h" in sys.argv:
-        m = ""
-    elif EXE:
-        raise
-    elif sys.version_info > (2, 7):
-        m = "\nERROR: need 'requests'{0}; please run this command:\n {1} -m pip install --user requests\n"
-    else:
-        m = "requests/2.18.4 urllib3/1.23 chardet/3.0.4 certifi/2020.4.5.1 idna/2.7"
-        m = ["   https://pypi.org/project/" + x + "/#files" for x in m.split()]
-        m = "\n  ERROR: need these{0}:\n" + "\n".join(m) + "\n"
-        m += "\n  for f in *.whl; do unzip $f; done; rm -r *.dist-info\n"
-
-    if m:
-        t = " when not running with '-h' or url '-'"
-        print(m.format(t, sys.executable), "\nspecifically,", ex)
-        sys.exit(1)
-
-
-# from copyparty/__init__.py
 PY2 = sys.version_info < (3,)
 if PY2:
+    import httplib as http_client
     from Queue import Queue
     from urllib import quote, unquote
     from urlparse import urlsplit, urlunsplit
@@ -72,10 +52,12 @@ if PY2:
     sys.dont_write_bytecode = True
     bytes = str
 else:
-    from queue import Queue
-    from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import quote_from_bytes as quote
+    from urllib.parse import unquote_to_bytes as unquote
     from urllib.parse import urlsplit, urlunsplit
+
+    import http.client as http_client
+    from queue import Queue
 
     unicode = str
 
@@ -100,6 +82,22 @@ except:
     UTC = _UTC()
 
 
+try:
+    _b64etl = bytes.maketrans(b"+/", b"-_")
+
+    def ub64enc(bs):
+        x = binascii.b2a_base64(bs, newline=False)
+        return x.translate(_b64etl)
+
+    ub64enc(b"a")
+except:
+    ub64enc = base64.urlsafe_b64encode
+
+
+class BadAuth(Exception):
+    pass
+
+
 class Daemon(threading.Thread):
     def __init__(self, target, name=None, a=None):
         threading.Thread.__init__(self, name=name)
@@ -115,6 +113,108 @@ class Daemon(threading.Thread):
             pass
 
         self.fun(*self.a)
+
+
+class HSQueue(Queue):
+    def _init(self, maxsize):
+        from collections import deque
+
+        self.q = deque()
+
+    def _qsize(self):
+        return len(self.q)
+
+    def _put(self, item):
+        if item and item.nhs:
+            self.q.appendleft(item)
+        else:
+            self.q.append(item)
+
+    def _get(self):
+        return self.q.popleft()
+
+
+class HCli(object):
+    def __init__(self, ar):
+        self.ar = ar
+        url = urlsplit(ar.url)
+        tls = url.scheme.lower() == "https"
+        try:
+            addr, port = url.netloc.split(":")
+        except:
+            addr = url.netloc
+            port = 443 if tls else 80
+
+        self.addr = addr
+        self.port = int(port)
+        self.tls = tls
+        self.verify = ar.te or not ar.td
+        self.conns = []
+        if tls:
+            import ssl
+
+            if not self.verify:
+                self.ctx = ssl._create_unverified_context()
+            elif self.verify is True:
+                self.ctx = None
+            else:
+                self.ctx = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                self.ctx.load_verify_locations(self.verify)
+
+        self.base_hdrs = {
+            "Accept": "*/*",
+            "Connection": "keep-alive",
+            "Host": url.netloc,
+            "Origin": self.ar.burl,
+            "User-Agent": "u2c/%s" % (S_VERSION,),
+        }
+
+    def _connect(self):
+        sbs = "blocksize"
+        args = {sbs: 1048576}
+        if not self.tls:
+            C = http_client.HTTPConnection
+        else:
+            C = http_client.HTTPSConnection
+            if self.ctx:
+                args = {"context": self.ctx}
+
+        for _ in range(2):
+            try:
+                return C(self.addr, self.port, timeout=999, **args)
+            except:
+                if sbs not in args:
+                    raise
+                del args[sbs]
+
+    def req(self, meth, vpath, hdrs, body=None, ctype=None):
+        hdrs.update(self.base_hdrs)
+        if self.ar.a:
+            hdrs["PW"] = self.ar.a
+        if ctype:
+            hdrs["Content-Type"] = ctype
+        if meth == "POST" and CLEN not in hdrs:
+            hdrs[CLEN] = (
+                0 if not body else body.len if hasattr(body, "len") else len(body)
+            )
+
+        c = self.conns.pop() if self.conns else self._connect()
+        try:
+            c.request(meth, vpath, body, hdrs)
+            rsp = c.getresponse()
+            data = rsp.read()
+            self.conns.append(c)
+            return rsp.status, data.decode("utf-8")
+        except:
+            c.close()
+            raise
+
+
+MJ = "application/json"
+MO = "application/octet-stream"
+CLEN = "Content-Length"
+
+web = None  # type: HCli
 
 
 class File(object):
@@ -148,9 +248,6 @@ class File(object):
         self.up_b = 0  # type: int
         self.up_c = 0  # type: int
         self.cd = 0  # type: int
-
-        # t = "size({}) lmod({}) top({}) rel({}) abs({}) name({})\n"
-        # eprint(t.format(self.size, self.lmod, self.top, self.rel, self.abs, self.name))
 
 
 class FileSlice(object):
@@ -284,8 +381,7 @@ class MTHash(object):
             chunk_rem -= len(buf)
             ofs += len(buf)
 
-        digest = hashobj.digest()[:33]
-        digest = base64.urlsafe_b64encode(digest).decode("utf-8")
+        digest = ub64enc(hashobj.digest()[:33]).decode("utf-8")
         return nch, digest, ofs0, chunk_sz
 
 
@@ -329,7 +425,9 @@ def termsize():
 
     def ioctl_GWINSZ(fd):
         try:
-            import fcntl, termios, struct
+            import fcntl
+            import struct
+            import termios
 
             r = struct.unpack(b"hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"AAAA"))
             return r[::-1]
@@ -387,8 +485,8 @@ class CTermsize(object):
             eprint("\033[s\033[r\033[u")
         else:
             self.g = 1 + self.h - margin
-            t = "{0}\033[{1}A".format("\n" * margin, margin)
-            eprint("{0}\033[s\033[1;{1}r\033[u".format(t, self.g - 1))
+            t = "%s\033[%dA" % ("\n" * margin, margin)
+            eprint("%s\033[s\033[1;%dr\033[u" % (t, self.g - 1))
 
 
 ss = CTermsize()
@@ -405,14 +503,14 @@ def undns(url):
     except KeyboardInterrupt:
         raise
     except:
-        t = "\n\033[31mfailed to resolve upload destination host;\033[0m\ngai={0}\n"
-        eprint(t.format(repr(gai)))
+        t = "\n\033[31mfailed to resolve upload destination host;\033[0m\ngai=%r\n"
+        eprint(t % (gai,))
         raise
 
     if usp.port:
-        hn = "{0}:{1}".format(hn, usp.port)
+        hn = "%s:%s" % (hn, usp.port)
     if usp.username or usp.password:
-        hn = "{0}:{1}@{2}".format(usp.username, usp.password, hn)
+        hn = "%s:%s@%s" % (usp.username, usp.password, hn)
 
     usp = usp._replace(netloc=hn)
     url = urlunsplit(usp)
@@ -577,8 +675,7 @@ def get_hashlist(file, pcb, mth):
                 hashobj.update(buf)
                 chunk_rem -= len(buf)
 
-            digest = hashobj.digest()[:33]
-            digest = base64.urlsafe_b64encode(digest).decode("utf-8")
+            digest = ub64enc(hashobj.digest()[:33]).decode("utf-8")
 
             ret.append([digest, file_ofs, chunk_sz])
             file_ofs += chunk_sz
@@ -603,9 +700,6 @@ def handshake(ar, file, search):
       otherwise, a list of chunks to upload
     """
 
-    url = ar.url
-    pw = ar.a
-
     req = {
         "hash": [x[0] for x in file.cids],
         "name": file.name,
@@ -620,28 +714,26 @@ def handshake(ar, file, search):
         if ar.ow:
             req["replace"] = True
 
-    headers = {"Content-Type": "text/plain"}  # <=1.5.1 compat
-    if pw:
-        headers["Cookie"] = "=".join(["cppwd", pw])
-
     file.recheck = False
     if file.url:
         url = file.url
-    elif b"/" in file.rel:
-        url += quotep(file.rel.rsplit(b"/", 1)[0]).decode("utf-8", "replace")
+    else:
+        if b"/" in file.rel:
+            url = quotep(file.rel.rsplit(b"/", 1)[0]).decode("utf-8", "replace")
+        else:
+            url = ""
+        url = ar.vtop + url
 
     while True:
         sc = 600
         txt = ""
         try:
             zs = json.dumps(req, separators=(",\n", ": "))
-            r = req_ses.post(url, headers=headers, data=zs)
-            sc = r.status_code
-            txt = r.text
+            sc, txt = web.req("POST", url, {}, zs.encode("utf-8"), MJ)
             if sc < 400:
                 break
 
-            raise Exception("http {0}: {1}".format(sc, txt))
+            raise Exception("http %d: %s" % (sc, txt))
 
         except Exception as ex:
             em = str(ex).split("SSLError(")[-1].split("\nURL: ")[0].strip()
@@ -655,35 +747,30 @@ def handshake(ar, file, search):
                 return [], False
             elif sc == 409 or "<pre>upload rejected, file already exists" in txt:
                 return [], False
-            elif "<pre>you don't have " in txt:
-                raise
+            elif sc == 403:
+                print("\nERROR: login required, or wrong password:\n%s" % (txt,))
+                raise BadAuth()
 
-            eprint("handshake failed, retrying: {0}\n  {1}\n\n".format(file.name, em))
+            eprint("handshake failed, retrying: %s\n  %s\n\n" % (file.name, em))
             time.sleep(ar.cd)
 
     try:
-        r = r.json()
+        r = json.loads(txt)
     except:
-        raise Exception(r.text)
+        raise Exception(txt)
 
     if search:
         return r["hits"], False
 
-    try:
-        pre, url = url.split("://")
-        pre += "://"
-    except:
-        pre = ""
-
-    file.url = pre + url.split("/")[0] + r["purl"]
+    file.url = r["purl"]
     file.name = r["name"]
     file.wark = r["wark"]
 
     return r["hash"], r["sprs"]
 
 
-def upload(fsl, pw, stats):
-    # type: (FileSlice, str, str) -> None
+def upload(fsl, stats):
+    # type: (FileSlice, str) -> None
     """upload a range of file data, defined by one or more `cid` (chunk-hash)"""
 
     ctxt = fsl.cids[0]
@@ -696,20 +783,15 @@ def upload(fsl, pw, stats):
     headers = {
         "X-Up2k-Hash": ctxt,
         "X-Up2k-Wark": fsl.file.wark,
-        "Content-Type": "application/octet-stream",
     }
 
     if stats:
         headers["X-Up2k-Stat"] = stats
 
-    if pw:
-        headers["Cookie"] = "=".join(["cppwd", pw])
-
     try:
-        r = req_ses.post(fsl.file.url, headers=headers, data=fsl)
+        sc, txt = web.req("POST", fsl.file.url, headers, fsl, MO)
 
-        if r.status_code == 400:
-            txt = r.text
+        if sc == 400:
             if (
                 "already being written" in txt
                 or "already got that" in txt
@@ -717,10 +799,8 @@ def upload(fsl, pw, stats):
             ):
                 fsl.file.nojoin = 1
 
-        if not r:
-            raise Exception(repr(r))
-
-        _ = r.content
+        if sc >= 400:
+            raise Exception("http %s: %s" % (sc, txt))
     finally:
         fsl.f.close()
 
@@ -733,7 +813,7 @@ class Ctl(object):
 
     def _scan(self):
         ar = self.ar
-        eprint("\nscanning {0} locations\n".format(len(ar.files)))
+        eprint("\nscanning %d locations\n" % (len(ar.files),))
         nfiles = 0
         nbytes = 0
         err = []
@@ -745,14 +825,14 @@ class Ctl(object):
             nbytes += inf.st_size
 
         if err:
-            eprint("\n# failed to access {0} paths:\n".format(len(err)))
+            eprint("\n# failed to access %d paths:\n" % (len(err),))
             for ap, msg in err:
                 if ar.v:
-                    eprint("{0}\n `-{1}\n\n".format(ap.decode("utf-8", "replace"), msg))
+                    eprint("%s\n `-%s\n\n" % (ap.decode("utf-8", "replace"), msg))
                 else:
                     eprint(ap.decode("utf-8", "replace") + "\n")
 
-            eprint("^ failed to access those {0} paths ^\n\n".format(len(err)))
+            eprint("^ failed to access those %d paths ^\n\n" % (len(err),))
 
             if not ar.v:
                 eprint("hint: set -v for detailed error messages\n")
@@ -761,11 +841,12 @@ class Ctl(object):
                 eprint("hint: aborting because --ok is not set\n")
                 return
 
-        eprint("found {0} files, {1}\n\n".format(nfiles, humansize(nbytes)))
+        eprint("found %d files, %s\n\n" % (nfiles, humansize(nbytes)))
         return nfiles, nbytes
 
     def __init__(self, ar, stats=None):
         self.ok = False
+        self.panik = 0
         self.errs = 0
         self.ar = ar
         self.stats = stats or self._scan()
@@ -773,13 +854,6 @@ class Ctl(object):
             return
 
         self.nfiles, self.nbytes = self.stats
-
-        if ar.td:
-            requests.packages.urllib3.disable_warnings()
-            req_ses.verify = False
-        if ar.te:
-            req_ses.verify = ar.te
-
         self.filegen = walkdirs([], ar.files, ar.x)
         self.recheck = []  # type: list[File]
 
@@ -808,7 +882,7 @@ class Ctl(object):
             self.exit_cond = threading.Condition()
             self.uploader_alive = ar.j
             self.handshaker_alive = ar.j
-            self.q_handshake = Queue()  # type: Queue[File]
+            self.q_handshake = HSQueue()  # type: Queue[File]
             self.q_upload = Queue()  # type: Queue[FileSlice]
 
             self.st_hash = [None, "(idle, starting...)"]  # type: tuple[File, int]
@@ -823,24 +897,29 @@ class Ctl(object):
     def _safe(self):
         """minimal basic slow boring fallback codepath"""
         search = self.ar.s
-        for nf, (top, rel, inf) in enumerate(self.filegen):
+        nf = 0
+        for top, rel, inf in self.filegen:
             if stat.S_ISDIR(inf.st_mode) or not rel:
                 continue
 
+            nf += 1
             file = File(top, rel, inf.st_size, inf.st_mtime)
             upath = file.abs.decode("utf-8", "replace")
 
-            print("{0} {1}\n  hash...".format(self.nfiles - nf, upath))
+            print("%d %s\n  hash..." % (self.nfiles - nf, upath))
             get_hashlist(file, None, None)
 
-            burl = self.ar.url[:12] + self.ar.url[8:].split("/")[0] + "/"
             while True:
                 print("  hs...")
-                hs, _ = handshake(self.ar, file, search)
+                try:
+                    hs, _ = handshake(self.ar, file, search)
+                except BadAuth:
+                    sys.exit(1)
+
                 if search:
                     if hs:
                         for hit in hs:
-                            print("  found: {0}{1}".format(burl, hit["rp"]))
+                            print("  found: %s/%s" % (self.ar.burl, hit["rp"]))
                     else:
                         print("  NOT found")
                     break
@@ -849,13 +928,13 @@ class Ctl(object):
                 if not hs:
                     break
 
-                print("{0} {1}".format(self.nfiles - nf, upath))
+                print("%d %s" % (self.nfiles - nf, upath))
                 ncs = len(hs)
                 for nc, cid in enumerate(hs):
-                    print("  {0} up {1}".format(ncs - nc, cid))
-                    stats = "{0}/0/0/{1}".format(nf, self.nfiles - nf)
+                    print("  %d up %s" % (ncs - nc, cid))
+                    stats = "%d/0/0/%d" % (nf, self.nfiles - nf)
                     fslice = FileSlice(file, [cid])
-                    upload(fslice, self.ar.a, stats)
+                    upload(fslice, stats)
 
             print("  ok!")
             if file.recheck:
@@ -866,7 +945,7 @@ class Ctl(object):
 
         eprint("finalizing %d duplicate files\n" % (len(self.recheck),))
         for file in self.recheck:
-            handshake(self.ar, file, search)
+            handshake(self.ar, file, False)
 
     def _fancy(self):
         if VT100 and not self.ar.ns:
@@ -881,6 +960,8 @@ class Ctl(object):
         while True:
             with self.exit_cond:
                 self.exit_cond.wait(0.07)
+            if self.panik:
+                sys.exit(1)
             with self.mutex:
                 if not self.handshaker_alive and not self.uploader_alive:
                     break
@@ -889,15 +970,15 @@ class Ctl(object):
 
             if VT100 and not self.ar.ns:
                 maxlen = ss.w - len(str(self.nfiles)) - 14
-                txt = "\033[s\033[{0}H".format(ss.g)
+                txt = "\033[s\033[%dH" % (ss.g,)
                 for y, k, st, f in [
                     [0, "hash", st_hash, self.hash_f],
                     [1, "send", st_up, self.up_f],
                 ]:
-                    txt += "\033[{0}H{1}:".format(ss.g + y, k)
+                    txt += "\033[%dH%s:" % (ss.g + y, k)
                     file, arg = st
                     if not file:
-                        txt += " {0}\033[K".format(arg)
+                        txt += " %s\033[K" % (arg,)
                     else:
                         if y:
                             p = 100 * file.up_b / file.size
@@ -906,12 +987,11 @@ class Ctl(object):
 
                         name = file.abs.decode("utf-8", "replace")[-maxlen:]
                         if "/" in name:
-                            name = "\033[36m{0}\033[0m/{1}".format(*name.rsplit("/", 1))
+                            name = "\033[36m%s\033[0m/%s" % tuple(name.rsplit("/", 1))
 
-                        t = "{0:6.1f}% {1} {2}\033[K"
-                        txt += t.format(p, self.nfiles - f, name)
+                        txt += "%6.1f%% %d %s\033[K" % (p, self.nfiles - f, name)
 
-                txt += "\033[{0}H ".format(ss.g + 2)
+                txt += "\033[%dH " % (ss.g + 2,)
             else:
                 txt = " "
 
@@ -929,7 +1009,7 @@ class Ctl(object):
             nleft = self.nfiles - self.up_f
             tail = "\033[K\033[u" if VT100 and not self.ar.ns else "\r"
 
-            t = "{0} eta @ {1}/s, {2}, {3}# left".format(self.eta, spd, sleft, nleft)
+            t = "%s eta @ %s/s, %s, %d# left\033[K" % (self.eta, spd, sleft, nleft)
             eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(t, tail))
 
         if self.hash_b and self.at_hash:
@@ -965,20 +1045,18 @@ class Ctl(object):
                 srd = rd.decode("utf-8", "replace").replace("\\", "/")
                 if prd != rd:
                     prd = rd
-                    headers = {}
-                    if self.ar.a:
-                        headers["Cookie"] = "=".join(["cppwd", self.ar.a])
-
                     ls = {}
                     try:
                         print("      ls ~{0}".format(srd))
-                        zb = self.ar.url.encode("utf-8")
-                        zb += quotep(rd.replace(b"\\", b"/"))
-                        r = req_ses.get(zb + b"?ls&lt&dots", headers=headers)
-                        if not r:
-                            raise Exception("HTTP {0}".format(r.status_code))
+                        zt = (
+                            self.ar.vtop,
+                            quotep(rd.replace(b"\\", b"/")).decode("utf-8", "replace"),
+                        )
+                        sc, txt = web.req("GET", "%s%s?ls&lt&dots" % zt, {})
+                        if sc >= 400:
+                            raise Exception("http %s" % (sc,))
 
-                        j = r.json()
+                        j = json.loads(txt)
                         for f in j["dirs"] + j["files"]:
                             rfn = f["href"].split("?")[0].rstrip("/")
                             ls[unquote(rfn.encode("utf-8", "replace"))] = f
@@ -1001,14 +1079,17 @@ class Ctl(object):
                             req = locs
                             while req:
                                 print("DELETING ~%s/#%s" % (srd, len(req)))
-                                r = req_ses.post(self.ar.url + "?delete", json=req)
-                                if r.status_code == 413 and "json 2big" in r.text:
+                                body = json.dumps(req).encode("utf-8")
+                                sc, txt = web.req(
+                                    "POST", self.ar.url + "?delete", {}, body, MJ
+                                )
+                                if sc == 413 and "json 2big" in txt:
                                     print(" (delete request too big; slicing...)")
                                     req = req[: len(req) // 2]
                                     continue
-                                elif not r:
-                                    t = "delete request failed: %r %s"
-                                    raise Exception(t % (r, r.text))
+                                elif sc >= 400:
+                                    t = "delete request failed: %s %s"
+                                    raise Exception(t % (sc, txt))
                                 break
                             locs = locs[len(req) :]
 
@@ -1056,7 +1137,7 @@ class Ctl(object):
             if self.ar.wlist:
                 zsl = [self.ar.wsalt, str(file.size)] + [x[0] for x in file.kchunks]
                 zb = hashlib.sha512("\n".join(zsl).encode("utf-8")).digest()[:33]
-                wark = base64.urlsafe_b64encode(zb).decode("utf-8")
+                wark = ub64enc(zb).decode("utf-8")
                 vp = file.rel.decode("utf-8")
                 if self.ar.jw:
                     print("%s  %s" % (wark, vp))
@@ -1087,7 +1168,6 @@ class Ctl(object):
 
     def handshaker(self):
         search = self.ar.s
-        burl = self.ar.url[:8] + self.ar.url[8:].split("/")[0] + "/"
         while True:
             file = self.q_handshake.get()
             if not file:
@@ -1109,12 +1189,16 @@ class Ctl(object):
             while time.time() < file.cd:
                 time.sleep(0.1)
 
-            hs, sprs = handshake(self.ar, file, search)
+            try:
+                hs, sprs = handshake(self.ar, file, search)
+            except BadAuth:
+                self.panik = 1
+                break
+
             if search:
                 if hs:
                     for hit in hs:
-                        t = "found: {0}\n  {1}{2}"
-                        print(t.format(upath, burl, hit["rp"]))
+                        print("found: %s\n  %s/%s" % (upath, self.ar.burl, hit["rp"]))
                 else:
                     print("NOT found: {0}".format(upath))
 
@@ -1236,7 +1320,7 @@ class Ctl(object):
             )
 
             try:
-                upload(fsl, self.ar.a, stats)
+                upload(fsl, stats)
             except Exception as ex:
                 t = "upload failed, retrying: %s #%s+%d (%s)\n"
                 eprint(t % (file.name, cids[0][:8], len(cids) - 1, ex))
@@ -1270,14 +1354,17 @@ class APF(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFor
 
 
 def main():
+    global web
+
     time.strptime("19970815", "%Y%m%d")  # python#7980
+    "".encode("idna")  # python#29288
     if not VT100:
         os.system("rem")  # enables colors
 
     cores = (os.cpu_count() if hasattr(os, "cpu_count") else 0) or 2
     hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
-    ver = "{0}, v{1}".format(S_BUILD_DT, S_VERSION)
+    ver = "{0}  v{1}  https://youtu.be/BIcOO6TLKaY".format(S_BUILD_DT, S_VERSION)
     if "--version" in sys.argv:
         print(ver)
         return
@@ -1285,7 +1372,7 @@ def main():
     sys.argv = [x for x in sys.argv if x != "--ws"]
 
     # fmt: off
-    ap = app = argparse.ArgumentParser(formatter_class=APF, description="copyparty up2k uploader / filesearch tool, " + ver, epilog="""
+    ap = app = argparse.ArgumentParser(formatter_class=APF, description="copyparty up2k uploader / filesearch tool  " + ver, epilog="""
 NOTE:
 source file/folder selection uses rsync syntax, meaning that:
   "foo" uploads the entire folder to URL/foo/
@@ -1366,13 +1453,20 @@ source file/folder selection uses rsync syntax, meaning that:
         for x in ar.files
     ]
 
-    ar.url = ar.url.rstrip("/") + "/"
-    if "://" not in ar.url:
-        ar.url = "http://" + ar.url
+    # urlsplit needs scheme;
+    zs = ar.url.rstrip("/") + "/"
+    if "://" not in zs:
+        zs = "http://" + zs
+    ar.url = zs
+
+    url = urlsplit(zs)
+    ar.burl = "%s://%s" % (url.scheme, url.netloc)
+    ar.vtop = url.path
 
     if "https://" in ar.url.lower():
         try:
-            import ssl, zipfile
+            import ssl
+            import zipfile
         except:
             t = "ERROR: https is not available for some reason; please use http"
             print("\n\n   %s\n\n" % (t,))
@@ -1397,6 +1491,7 @@ source file/folder selection uses rsync syntax, meaning that:
     if ar.cls:
         eprint("\033[H\033[2J\033[3J", end="")
 
+    web = HCli(ar)
     ctl = Ctl(ar)
 
     if ar.dr and not ar.drd and ctl.ok:

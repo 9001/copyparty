@@ -6,7 +6,6 @@ set -e
 
 ex=(
   ftplib lzma pickle ssl tarfile bz2 zipfile tracemalloc zlib
-  urllib3.util.ssl_ urllib3.contrib.pyopenssl urllib3.contrib.socks certifi idna chardet charset_normalizer
   email.contentmanager email.policy
   encodings.{zlib_codec,base64_codec,bz2_codec,charmap,hex_codec,palmos,punycode,rot_13}
 );

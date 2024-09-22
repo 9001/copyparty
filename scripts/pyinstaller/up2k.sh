@@ -19,25 +19,12 @@ dl https://192.168.123.1:3923/cpp/scripts/pyinstaller/up2k.ico
 dl https://192.168.123.1:3923/cpp/scripts/pyinstaller/up2k.rc
 dl https://192.168.123.1:3923/cpp/scripts/pyinstaller/up2k.spec
 
-# $LOCALAPPDATA/programs/python/python37-32/python -m pip install --user -U pyinstaller requests
+# $LOCALAPPDATA/programs/python/python37-32/python -m pip install --user -U pyinstaller
 
-grep -E '^from .ssl_ import' $APPDATA/python/python37/site-packages/urllib3/util/proxy.py && {
-    echo golfing
-    echo > $APPDATA/python/python37/site-packages/requests/certs.py
-    sed -ri 's/^(DEFAULT_CA_BUNDLE_PATH = ).*/\1""/' $APPDATA/python/python37/site-packages/requests/utils.py
-    sed -ri '/^import zipfile$/d' $APPDATA/python/python37/site-packages/requests/utils.py
-    sed -ri 's/"idna"//' $APPDATA/python/python37/site-packages/requests/packages.py
-    sed -ri 's/import charset_normalizer.*/pass/' $APPDATA/python/python37/site-packages/requests/compat.py
-    sed -ri 's/raise.*charset_normalizer.*/pass/' $APPDATA/python/python37/site-packages/requests/__init__.py
-    sed -ri 's/import charset_normalizer.*//' $APPDATA/python/python37/site-packages/requests/packages.py
-    sed -ri 's/chardet.__name__/"\\roll\\tide"/' $APPDATA/python/python37/site-packages/requests/packages.py
-    sed -ri 's/chardet,//' $APPDATA/python/python37/site-packages/requests/models.py
-    for n in util/__init__.py connection.py; do awk -i inplace '/^from (\.util)?\.ssl_ /{s=1} !s; /^\)/{s=0}' $APPDATA/python/python37/site-packages/urllib3/$n; done
-    sed -ri 's/^from .ssl_ import .*//' $APPDATA/python/python37/site-packages/urllib3/util/proxy.py
-    echo golfed
-}
+sed -ri 's/^(import .*), selectors$/\1\ntry: import selectors\nexcept: pass/' $LOCALAPPDATA/programs/python/python37-32/Lib/socket.py
 
 sed -ri 's/(add_argument."-t[de]",.*help=")[^"]+/\1not applicable; HTTPS is disabled in this exe/; s/for some reason/in this exe for safety reasons/' u2c.py
+sed -ri '/^import platform/d;s/^(VT100 = )pla.*/\1False/' u2c.py
 
 read a b _ < <(awk -F\" '/^S_VERSION =/{$0=$2;sub(/\./," ");print}' < u2c.py)
 sed -r 's/1,2,3,0/'$a,$b,0,0'/;s/1\.2\.3/'$a.$b.0/ <up2k.rc >up2k.rc2
