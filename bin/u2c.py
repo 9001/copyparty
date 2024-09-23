@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.0"
-S_BUILD_DT = "2024-09-22"
+S_VERSION = "2.1"
+S_BUILD_DT = "2024-09-23"
 
 """
 u2c.py: upload to copyparty
@@ -11,7 +11,6 @@ https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py
 
 - dependencies: no
 - supports python 2.6, 2.7, and 3.3 through 3.12
-   (for higher performance on 2.6 and 2.7, use u2c v1.x)
 - if something breaks just try again and it'll autoresume
 """
 
@@ -43,6 +42,8 @@ except:
 
 
 PY2 = sys.version_info < (3,)
+PY27 = sys.version_info > (2, 7) and PY2
+PY37 = sys.version_info > (3, 7)
 if PY2:
     import httplib as http_client
     from Queue import Queue
@@ -170,8 +171,10 @@ class HCli(object):
         }
 
     def _connect(self):
-        sbs = "blocksize"
-        args = {sbs: 1048576}
+        args = {}
+        if PY37:
+            args["blocksize"] = 1048576
+
         if not self.tls:
             C = http_client.HTTPConnection
         else:
@@ -179,13 +182,7 @@ class HCli(object):
             if self.ctx:
                 args = {"context": self.ctx}
 
-        for _ in range(2):
-            try:
-                return C(self.addr, self.port, timeout=999, **args)
-            except:
-                if sbs not in args:
-                    raise
-                del args[sbs]
+        return C(self.addr, self.port, timeout=999, **args)
 
     def req(self, meth, vpath, hdrs, body=None, ctype=None):
         hdrs.update(self.base_hdrs)
@@ -201,7 +198,11 @@ class HCli(object):
         c = self.conns.pop() if self.conns else self._connect()
         try:
             c.request(meth, vpath, body, hdrs)
-            rsp = c.getresponse()
+            if PY27:
+                rsp = c.getresponse(buffering=True)
+            else:
+                rsp = c.getresponse()
+
             data = rsp.read()
             self.conns.append(c)
             return rsp.status, data.decode("utf-8")
@@ -545,7 +546,7 @@ else:
     statdir = _lsd
 
 
-def walkdir(err, top, seen):
+def walkdir(err, top, excl, seen):
     """recursive statdir"""
     atop = os.path.abspath(os.path.realpath(top))
     if atop in seen:
@@ -554,10 +555,12 @@ def walkdir(err, top, seen):
 
     seen = seen[:] + [atop]
     for ap, inf in sorted(statdir(err, top)):
+        if excl.match(ap):
+            continue
         yield ap, inf
         if stat.S_ISDIR(inf.st_mode):
             try:
-                for x in walkdir(err, ap, seen):
+                for x in walkdir(err, ap, excl, seen):
                     yield x
             except Exception as ex:
                 err.append((ap, str(ex)))
@@ -597,9 +600,7 @@ def walkdirs(err, tops, excl):
                 yield stop, dn, os.stat(stop)
 
         if isdir:
-            for ap, inf in walkdir(err, top, []):
-                if ptn.match(ap):
-                    continue
+            for ap, inf in walkdir(err, top, ptn, []):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
             d, n = top.rsplit(sep, 1)
