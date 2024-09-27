@@ -290,6 +290,8 @@ class Up2k(object):
             mtpq = "(?)"
             if up_en:
                 ups = [(1, 0, 0, time.time(), "cannot show list (server too busy)")]
+                if PY2:
+                    ups = []
 
         ups.sort(reverse=True)
 

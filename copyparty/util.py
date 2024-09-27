@@ -4,10 +4,10 @@ from __future__ import print_function, unicode_literals
 import argparse
 import base64
 import binascii
+import codecs
 import errno
 import hashlib
 import hmac
-import io
 import json
 import logging
 import math
@@ -3668,7 +3668,7 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
         if _pkg_resource_exists(E.pkg.__name__, name):
             stream = pkg_resources.resource_stream(E.pkg.__name__, name)
             if enc:
-                stream = io.TextIOWrapper(stream, encoding=enc)
+                stream = codecs.getreader(enc)(stream)
             return stream
 
     return open(os.path.join(E.mod, name), mode, encoding=enc)
