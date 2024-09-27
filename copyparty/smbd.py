@@ -12,7 +12,7 @@ from types import SimpleNamespace
 from .__init__ import ANYWIN, EXE, TYPE_CHECKING
 from .authsrv import LEELOO_DALLAS, VFS
 from .bos import bos
-from .util import Daemon, min_ex, pybin, runhook
+from .util import Daemon, absreal, min_ex, pybin, runhook, vjoin
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Union
@@ -151,6 +151,8 @@ class SMB(object):
     def _uname(self) -> str:
         if self.noacc:
             return LEELOO_DALLAS
+        if not self.asrv.acct:
+            return "*"
 
         try:
             # you found it! my single worst bit of code so far
@@ -189,7 +191,7 @@ class SMB(object):
         vfs, rem = self.asrv.vfs.get(vpath, uname, *perms)
         if not vfs.realpath:
             raise Exception("unmapped vfs")
-        return vfs, vfs.canonical(rem)
+        return vfs, vjoin(vfs.realpath, rem)
 
     def _listdir(self, vpath: str, *a: Any, **ka: Any) -> list[str]:
         vpath = vpath.replace("\\", "/").lstrip("/")
@@ -213,7 +215,7 @@ class SMB(object):
         sz = 112 * 2  # ['.', '..']
         for n, fn in enumerate(ls):
             if sz >= 64000:
-                t = "listing only %d of %d files (%d byte) in /%s; see impacket#1433"
+                t = "listing only %d of %d files (%d byte) in /%s for performance; see --smb-nwa-1"
                 warning(t, n, len(ls), sz, vpath)
                 break
 
@@ -242,6 +244,7 @@ class SMB(object):
                 t = "blocked write (no-write-acc %s): /%s @%s"
                 yeet(t % (vfs.axs.uwrite, vpath, uname))
 
+            ap = absreal(ap)
             xbu = vfs.flags.get("xbu")
             if xbu and not runhook(
                 self.nlog,

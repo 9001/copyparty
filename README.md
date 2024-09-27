@@ -1115,12 +1115,12 @@ some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
   * [shadowing](#shadowing) probably works as expected but no guarantees
 
 and some minor issues,
-* clients only see the first ~400 files in big folders; [impacket#1433](https://github.com/SecureAuthCorp/impacket/issues/1433)
+* clients only see the first ~400 files in big folders;
+  * this was originally due to [impacket#1433](https://github.com/SecureAuthCorp/impacket/issues/1433) which was fixed in impacket-0.12, so you can disable the workaround with `--smb-nwa-1` but then you get unacceptably poor performance instead
 * hot-reload of server config (`/?reload=cfg`) does not include the `[global]` section (commandline args)
 * listens on the first IPv4 `-i` interface only (default = :: = 0.0.0.0 = all)
 * login doesn't work on winxp, but anonymous access is ok -- remove all accounts from copyparty config for that to work
   * win10 onwards does not allow connecting anonymously / without accounts
-* on windows, creating a new file through rightclick --> new --> textfile throws an error due to impacket limitations -- hit OK and F5 to get your file
 * python3 only
 * slow (the builtin webdav support in windows is 5x faster, and rclone-webdav is 30x faster)
 
@@ -2168,7 +2168,7 @@ enable [thumbnails](#thumbnails) of...
 * **JPEG XL pictures:** `pyvips` or `ffmpeg`
 
 enable [smb](#smb-server) support (**not** recommended):
-* `impacket==0.11.0`
+* `impacket==0.12.0`
 
 `pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
 

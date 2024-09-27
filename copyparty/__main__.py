@@ -1181,7 +1181,7 @@ def add_smb(ap):
     ap2.add_argument("--smbw", action="store_true", help="enable write support (please dont)")
     ap2.add_argument("--smb1", action="store_true", help="disable SMBv2, only enable SMBv1 (CIFS)")
     ap2.add_argument("--smb-port", metavar="PORT", type=int, default=445, help="port to listen on -- if you change this value, you must NAT from TCP:445 to this port using iptables or similar")
-    ap2.add_argument("--smb-nwa-1", action="store_true", help="disable impacket#1433 workaround (truncate directory listings to 64kB)")
+    ap2.add_argument("--smb-nwa-1", action="store_true", help="truncate directory listings to 64kB (~400 files); avoids impacket-0.11 bug, fixes impacket-0.12 performance")
     ap2.add_argument("--smb-nwa-2", action="store_true", help="disable impacket workaround for filecopy globs")
     ap2.add_argument("--smba", action="store_true", help="small performance boost: disable per-account permissions, enables account coalescing instead (if one user has write/delete-access, then everyone does)")
     ap2.add_argument("--smbv", action="store_true", help="verbose")
