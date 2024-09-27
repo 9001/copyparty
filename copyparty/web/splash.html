@@ -32,6 +32,18 @@
 		</div>
 		{%- endif %}
 
+		{%- if ups %}
+		<h1 id="aa">incoming files:</h1>
+			<table class="vols">
+				<thead><tr><th>%</th><th>speed</th><th>eta</th><th>idle</th><th>dir</th><th>file</th></tr></thead>
+				<tbody>
+					{% for u in ups %}
+					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{%- endif %}
+
 		{%- if avol %}
 		<h1>admin panel:</h1>
 		<table><tr><td> <!-- hehehe -->
@@ -58,18 +70,6 @@
 			<a id="d" href="{{ r }}/?stack">dump stack</a>
 			<a id="e" href="{{ r }}/?reload=cfg">reload cfg</a>
 		</div>
-		{%- endif %}
-
-		{%- if ups %}
-		<h1 id="aa">incoming files:</h1>
-			<table class="vols">
-				<thead><tr><th>%</th><th>speed</th><th>eta</th><th>idle</th><th>dir</th><th>file</th></tr></thead>
-				<tbody>
-					{% for u in ups %}
-					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
-					{% endfor %}
-				</tbody>
-			</table>
 		{%- endif %}
 
 		{%- if rvol %}

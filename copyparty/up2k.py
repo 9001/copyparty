@@ -328,7 +328,7 @@ class Up2k(object):
                 zt = (
                     ineed / ihash,
                     job["size"],
-                    int(job["t0"]),
+                    int(job["t0c"]),
                     int(job["poke"]),
                     djoin(vtop, job["prel"], job["name"]),
                 )
@@ -364,10 +364,9 @@ class Up2k(object):
                     continue
                 addr = (ip or "\n") if cfg in (1, 2) else ""
                 user = (uname or "\n") if cfg in (1, 3) else ""
-                drp = self.droppable.get(ptop, {})
-                for wark, job in tab2.items():
+                for job in tab2.values():
                     if (
-                        wark in drp
+                        "done" in job
                         or (user and user != job["user"])
                         or (addr and addr != job["addr"])
                     ):
@@ -408,9 +407,8 @@ class Up2k(object):
             for ptop, tab2 in self.registry.items():
                 nbytes = 0
                 nfiles = 0
-                drp = self.droppable.get(ptop, {})
-                for wark, job in tab2.items():
-                    if wark in drp:
+                for job in tab2.values():
+                    if "done" in job:
                         continue
 
                     nfiles += 1
@@ -1057,6 +1055,7 @@ class Up2k(object):
 
         reg = {}
         drp = None
+        emptylist = []
         snap = os.path.join(histpath, "up2k.snap")
         if bos.path.exists(snap):
             with gzip.GzipFile(snap, "rb") as f:
@@ -1073,6 +1072,9 @@ class Up2k(object):
                 fp = djoin(job["ptop"], job["prel"], job["name"])
                 if bos.path.exists(fp):
                     reg[k] = job
+                    if "done" in job:
+                        job["need"] = job["hash"] = emptylist
+                        continue
                     job["poke"] = time.time()
                     job["busy"] = {}
                 else:
@@ -3021,7 +3023,7 @@ class Up2k(object):
 
                         job = deepcopy(job)
                         job["wark"] = wark
-                        job["at"] = cj.get("at") or time.time()
+                        job["at"] = cj.get("at") or now
                         zs = "vtop ptop prel name lmod host user addr poke"
                         for k in zs.split():
                             job[k] = cj.get(k) or ""
@@ -3346,6 +3348,9 @@ class Up2k(object):
                 self.log("unknown wark [{}], known: {}".format(wark, known))
                 raise Pebkac(400, "unknown wark" + SSEELOG)
 
+            if "t0c" not in job:
+                job["t0c"] = time.time()
+
             if len(chashes) > 1 and len(chashes[1]) < 44:
                 # first hash is full-length; expand remaining ones
                 uniq = []
@@ -3527,7 +3532,11 @@ class Up2k(object):
         if self.idx_wark(vflags, *z2):
             del self.registry[ptop][wark]
         else:
-            self.registry[ptop][wark]["done"] = 1
+            for k in "host tnam busy sprs poke t0c".split():
+                del job[k]
+            job["t0"] = int(job["t0"])
+            job["hash"] = []
+            job["done"] = 1
             self.regdrop(ptop, wark)
 
         if wake_sr:
@@ -4720,7 +4729,11 @@ class Up2k(object):
                     bos.unlink(path)
             return
 
-        newest = float(max(x["poke"] for _, x in reg.items()) if reg else 0)
+        newest = float(
+            max(x["t0"] if "done" in x else x["poke"] for _, x in reg.items())
+            if reg
+            else 0
+        )
         etag = (len(reg), newest)
         if etag == self.snap_prev.get(ptop):
             return
@@ -4731,12 +4744,15 @@ class Up2k(object):
         path2 = "{}.{}".format(path, os.getpid())
         body = {"droppable": self.droppable[ptop], "registry": reg}
         j = json.dumps(body, sort_keys=True, separators=(",\n", ": ")).encode("utf-8")
+        # j = re.sub(r'"(need|hash)": \[\],\n', "", j)  # bytes=slow, utf8=hungry
+        j = j.replace(b'"need": [],\n', b"")  # surprisingly optimal
+        j = j.replace(b'"hash": [],\n', b"")
         with gzip.GzipFile(path2, "wb") as f:
             f.write(j)
 
         atomic_move(self.log, path2, path, VF_CAREFUL)
 
-        self.log("snap: {} |{}|".format(path, len(reg.keys())))
+        self.log("snap: %s |%d| %.2fs" % (path, len(reg), time.time() - now))
         self.snap_prev[ptop] = etag
 
     def _tagger(self) -> None:
