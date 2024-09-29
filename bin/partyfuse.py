@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from __future__ import print_function, unicode_literals
 
 """partyfuse: remote copyparty as a local filesystem"""
 __author__ = "ed <copyparty@ocv.me>"
@@ -29,26 +28,27 @@ get server cert:
 """
 
 
-import re
-import os
-import sys
-import time
-import json
-import stat
-import errno
-import struct
-import codecs
-import builtins
-import platform
 import argparse
-import threading
-import traceback
-import http.client  # py2: httplib
-import urllib.parse
 import calendar
+import codecs
+import errno
+import json
+import os
+import platform
+import re
+import stat
+import struct
+import sys
+import threading
+import time
+import traceback
+import urllib.parse
 from datetime import datetime, timezone
 from urllib.parse import quote_from_bytes as quote
 from urllib.parse import unquote_to_bytes as unquote
+
+import builtins
+import http.client
 
 WINDOWS = sys.platform == "win32"
 MACOS = platform.system() == "Darwin"
@@ -71,11 +71,12 @@ print(
 )
 
 
-def null_log(msg):
+def nullfun(*a):
     pass
 
 
-info = log = dbg = null_log
+info = dbg = nullfun
+is_dbg = False
 
 
 try:
@@ -106,29 +107,28 @@ def termsafe(txt):
         return txt.encode(sys.stdout.encoding, "replace").decode(sys.stdout.encoding)
 
 
-def threadless_log(msg):
-    print(msg + "\n", end="")
+def threadless_log(fmt, *a):
+    fmt += "\n"
+    print(fmt % a if a else fmt, end="")
 
 
-def boring_log(msg):
-    msg = "\033[36m{:012x}\033[0m {}\n".format(threading.current_thread().ident, msg)
-    print(msg[4:], end="")
+riced_tids = {}
 
 
 def rice_tid():
     tid = threading.current_thread().ident
-    c = struct.unpack(b"B" * 5, struct.pack(b">Q", tid)[-5:])
-    return "".join("\033[1;37;48;5;{}m{:02x}".format(x, x) for x in c) + "\033[0m"
+    try:
+        return riced_tids[tid]
+    except:
+        c = struct.unpack(b"B" * 5, struct.pack(b">Q", tid)[-5:])
+        ret = "".join("\033[1;37;48;5;%dm%02x" % (x, x) for x in c) + "\033[0m"
+        riced_tids[tid] = ret
+        return ret
 
 
-def fancy_log(msg):
-    print("{:10.6f} {} {}\n".format(time.time() % 900, rice_tid(), msg), end="")
-
-
-def hexler(binary):
-    return binary.replace("\r", "\\r").replace("\n", "\\n")
-    return " ".join(["{}\033[36m{:02x}\033[0m".format(b, ord(b)) for b in binary])
-    return " ".join(map(lambda b: format(ord(b), "02x"), binary))
+def fancy_log(fmt, *a):
+    msg = fmt % a if a else fmt
+    print("%10.6f %s %s\n" % (time.time() % 900, rice_tid(), msg), end="")
 
 
 def register_wtf8():
@@ -167,19 +167,28 @@ def dewin(txt):
 
 
 class RecentLog(object):
-    def __init__(self):
+    def __init__(self, ar):
+        self.ar = ar
         self.mtx = threading.Lock()
-        self.f = None  # open("partyfuse.log", "wb")
+        self.f = open(ar.logf, "wb") if ar.logf else None
         self.q = []
 
         thr = threading.Thread(target=self.printer)
         thr.daemon = True
         thr.start()
 
-    def put(self, msg):
-        msg = "{:10.6f} {} {}\n".format(time.time() % 900, rice_tid(), msg)
+    def put(self, fmt, *a):
+        msg = fmt % a if a else fmt
+        msg = "%10.6f %s %s\n" % (time.time() % 900, rice_tid(), msg)
         if self.f:
-            fmsg = " ".join([datetime.now(UTC).strftime("%H%M%S.%f"), str(msg)])
+            zd = datetime.now(UTC)
+            fmsg = "%d-%04d-%06d.%06d %s" % (
+                zd.year,
+                zd.month * 100 + zd.day,
+                (zd.hour * 100 + zd.minute) * 100 + zd.second,
+                zd.microsecond,
+                msg,
+            )
             self.f.write(fmsg.encode("utf-8"))
 
         with self.mtx:
@@ -315,8 +324,8 @@ class Gateway(object):
             c = self.getconn(tid)
             c.request(meth, path, headers=headers, **kwargs)
             return c.getresponse()
-        except:
-            dbg("bad conn")
+        except Exception as ex:
+            info("HTTP %r", ex)
 
         self.closeconn(tid)
         try:
@@ -341,11 +350,7 @@ class Gateway(object):
         r = self.sendreq("GET", web_path, {})
         if r.status != 200:
             self.closeconn()
-            log(
-                "http error {} reading dir {} in {}".format(
-                    r.status, web_path, rice_tid()
-                )
-            )
+            info("http error %s reading dir %r", r.status, web_path)
             raise FuseOSError(errno.ENOENT)
 
         ctype = r.getheader("Content-Type", "")
@@ -354,14 +359,14 @@ class Gateway(object):
         elif ctype.startswith("text/html"):
             parser = self.parse_html
         else:
-            log("listdir on file: {}".format(path))
+            info("listdir on file (%s): %r", ctype, path)
             raise FuseOSError(errno.ENOENT)
 
         try:
             return parser(r)
         except:
-            info(repr(path) + "\n" + traceback.format_exc())
-            raise
+            info("parser: %r\n%s", path, traceback.format_exc())
+            raise FuseOSError(errno.EIO)
 
     def download_file_range(self, path, ofs1, ofs2):
         if bad_good:
@@ -369,20 +374,15 @@ class Gateway(object):
 
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
         hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
-        info(
-            "DL {:4.0f}K\033[36m{:>9}-{:<9}\033[0m{}".format(
-                (ofs2 - ofs1) / 1024.0, ofs1, ofs2 - 1, hexler(path)
-            )
-        )
+        t = "DL %4.0fK\033[36m%9d-%-9d\033[0m%r"
+        info(t, (ofs2 - ofs1) / 1024.0, ofs1, ofs2 - 1, path)
 
         r = self.sendreq("GET", web_path, {"Range": hdr_range})
         if r.status != http.client.PARTIAL_CONTENT:
+            t = "http error %d reading file %r range %s in %s"
+            info(t, r.status, web_path, hdr_range, rice_tid())
             self.closeconn()
-            raise Exception(
-                "http error {} reading file {} range {} in {}".format(
-                    r.status, web_path, hdr_range, rice_tid()
-                )
-            )
+            raise FuseOSError(errno.EIO)
 
         return r.read()
 
@@ -433,7 +433,6 @@ class Gateway(object):
             for line in lines:
                 m = ptn.match(line)
                 if not m:
-                    # print(line)
                     continue
 
                 ftype, furl, fname, fsize, fdate = m.groups()
@@ -449,7 +448,7 @@ class Gateway(object):
                     sz = int(fsize)
                     ts = calendar.timegm(time.strptime(fdate, "%Y-%m-%d %H:%M:%S"))
                 except:
-                    info("bad HTML or OS [{}] [{}]".format(fdate, fsize))
+                    info("bad HTML or OS [%r] [%r]", fdate, fsize)
                     # python cannot strptime(1959-01-01) on windows
 
                 if ftype != "DIR":
@@ -500,19 +499,20 @@ class CPPF(Operations):
         info("up")
 
     def _describe(self):
-        msg = ""
+        msg = []
         with self.filecache_mtx:
             for n, cn in enumerate(self.filecache):
                 cache_path, cache1 = cn.tag
                 cache2 = cache1 + len(cn.data)
-                msg += "\n{:<2} {:>7} {:>10}:{:<9} {}".format(
+                t = "\n{:<2} {:>7} {:>10}:{:<9} {}".format(
                     n,
                     len(cn.data),
                     cache1,
                     cache2,
                     cache_path.replace("\r", "\\r").replace("\n", "\\n"),
                 )
-        return msg
+                msg.append(t)
+        return "".join(msg)
 
     def clean_dircache(self):
         """not threadsafe"""
@@ -565,7 +565,8 @@ class CPPF(Operations):
         car = None
         cdr = None
         ncn = -1
-        dbg("cache request {}:{} |{}|".format(get1, get2, file_sz) + self._describe())
+        if is_dbg:
+            dbg("cache request %d:%d |%d|%s", get1, get2, file_sz, self._describe())
         with self.filecache_mtx:
             for cn in self.filecache:
                 ncn += 1
@@ -592,15 +593,14 @@ class CPPF(Operations):
                     buf_ofs = get1 - cache1
                     buf_end = buf_ofs + (get2 - get1)
                     dbg(
-                        "found all (#{} {}:{} |{}|) [{}:{}] = {}".format(
-                            ncn,
-                            cache1,
-                            cache2,
-                            len(cn.data),
-                            buf_ofs,
-                            buf_end,
-                            buf_end - buf_ofs,
-                        )
+                        "found all (#%d %d:%d |%d|) [%d:%d] = %d",
+                        ncn,
+                        cache1,
+                        cache2,
+                        len(cn.data),
+                        buf_ofs,
+                        buf_end,
+                        buf_end - buf_ofs,
                     )
                     return cn.data[buf_ofs:buf_end]
 
@@ -608,16 +608,15 @@ class CPPF(Operations):
                     x = cn.data[: get2 - cache1]
                     if not cdr or len(cdr) < len(x):
                         dbg(
-                            "found cdr (#{} {}:{} |{}|) [:{}-{}] = [:{}] = {}".format(
-                                ncn,
-                                cache1,
-                                cache2,
-                                len(cn.data),
-                                get2,
-                                cache1,
-                                get2 - cache1,
-                                len(x),
-                            )
+                            "found cdr (#%d %d:%d |%d|) [:%d-%d] = [:%d] = %d",
+                            ncn,
+                            cache1,
+                            cache2,
+                            len(cn.data),
+                            get2,
+                            cache1,
+                            get2 - cache1,
+                            len(x),
                         )
                         cdr = x
 
@@ -627,22 +626,21 @@ class CPPF(Operations):
                     x = cn.data[-(max(0, cache2 - get1)) :]
                     if not car or len(car) < len(x):
                         dbg(
-                            "found car (#{} {}:{} |{}|) [-({}-{}):] = [-{}:] = {}".format(
-                                ncn,
-                                cache1,
-                                cache2,
-                                len(cn.data),
-                                cache2,
-                                get1,
-                                cache2 - get1,
-                                len(x),
-                            )
+                            "found car (#%d %d:%d |%d|) [-(%d-%d):] = [-%d:] = %d",
+                            ncn,
+                            cache1,
+                            cache2,
+                            len(cn.data),
+                            cache2,
+                            get1,
+                            cache2 - get1,
+                            len(x),
                         )
                         car = x
 
                     continue
 
-                msg = "cache fallthrough\n{} {} {}\n{} {} {}\n{} {} --\n".format(
+                msg = "cache fallthrough\n%d %d %d\n%d %d %d\n%d %d --\n%s" % (
                     get1,
                     get2,
                     get2 - get1,
@@ -651,9 +649,10 @@ class CPPF(Operations):
                     cache2 - cache1,
                     get1 - cache1,
                     get2 - cache2,
+                    self._describe(),
                 )
-                msg += self._describe()
-                raise Exception(msg)
+                info(msg)
+                raise FuseOSError(errno.EIO)
 
         if car and cdr and len(car) + len(cdr) == get2 - get1:
             dbg("<cache> have both")
@@ -668,22 +667,17 @@ class CPPF(Operations):
 
             buf_ofs = get1 - h_ofs
 
-            dbg(
-                "<cache> cdr {}, car {}:{} |{}| [{}:]".format(
-                    len(cdr), h_ofs, h_end, h_end - h_ofs, buf_ofs
-                )
-            )
+            if dbg:
+                t = "<cache> cdr %d, car %d:%d |%d| [%d:]"
+                dbg(t, len(cdr), h_ofs, h_end, h_end - h_ofs, buf_ofs)
 
             buf = self.gw.download_file_range(path, h_ofs, h_end)
             if len(buf) == h_end - h_ofs:
                 ret = buf[buf_ofs:] + cdr
             else:
                 ret = buf[get1 - h_ofs :]
-                info(
-                    "remote truncated {}:{} to |{}|, will return |{}|".format(
-                        h_ofs, h_end, len(buf), len(ret)
-                    )
-                )
+                t = "remote truncated %d:%d to |%d|, will return |%d|"
+                info(t, h_ofs, h_end, len(buf), len(ret))
 
         elif car:
             h_ofs = get1 + len(car)
@@ -694,11 +688,8 @@ class CPPF(Operations):
 
             buf_ofs = (get2 - get1) - len(car)
 
-            dbg(
-                "<cache> car {}, cdr {}:{} |{}| [:{}]".format(
-                    len(car), h_ofs, h_end, h_end - h_ofs, buf_ofs
-                )
-            )
+            t = "<cache> car %d, cdr %d:%d |%d| [:%d]"
+            dbg(t, len(car), h_ofs, h_end, h_end - h_ofs, buf_ofs)
 
             buf = self.gw.download_file_range(path, h_ofs, h_end)
             ret = car + buf[:buf_ofs]
@@ -731,11 +722,8 @@ class CPPF(Operations):
             buf_ofs = get1 - h_ofs
             buf_end = buf_ofs + get2 - get1
 
-            dbg(
-                "<cache> {}:{} |{}| [{}:{}]".format(
-                    h_ofs, h_end, h_end - h_ofs, buf_ofs, buf_end
-                )
-            )
+            t = "<cache> %d:%d |%d| [%d:%d]"
+            dbg(t, h_ofs, h_end, h_end - h_ofs, buf_ofs, buf_end)
 
             buf = self.gw.download_file_range(path, h_ofs, h_end)
             ret = buf[buf_ofs:buf_end]
@@ -751,7 +739,7 @@ class CPPF(Operations):
 
     def _readdir(self, path, fh=None):
         path = path.strip("/")
-        log("readdir [{}] [{}]".format(hexler(path), fh))
+        dbg("readdir %r [%s]", path, fh)
 
         ret = self.gw.listdir(path)
         if not self.n_dircache:
@@ -773,20 +761,17 @@ class CPPF(Operations):
         cache_max = 1024 * 1024 * 2
         if length > req_max:
             # windows actually doing 240 MiB read calls, sausage
-            info("truncate |{}| to {}MiB".format(length, req_max >> 20))
+            info("truncate |%d| to %dMiB", length, req_max >> 20)
             length = req_max
 
         path = path.strip("/")
         ofs2 = offset + length
         file_sz = self.getattr(path)["st_size"]
-        log(
-            "read {} |{}| {}:{} max {}".format(
-                hexler(path), length, offset, ofs2, file_sz
-            )
-        )
+        dbg("read %r |%d| %d:%d max %d", path, length, offset, ofs2, file_sz)
+
         if ofs2 > file_sz:
             ofs2 = file_sz
-            log("truncate to |{}| :{}".format(ofs2 - offset, ofs2))
+            dbg("truncate to |%d| :%d", ofs2 - offset, ofs2)
 
         if file_sz == 0 or offset >= ofs2:
             return b""
@@ -822,7 +807,7 @@ class CPPF(Operations):
         return ret
 
     def getattr(self, path, fh=None):
-        log("getattr [{}]".format(hexler(path)))
+        dbg("getattr %r", path)
         if WINDOWS:
             path = enwin(path)  # windows occasionally decodes f0xx to xx
 
@@ -835,12 +820,11 @@ class CPPF(Operations):
 
         if not path:
             ret = self.gw.stat_dir(time.time())
-            # dbg("=" + repr(ret))
+            dbg("=%r", ret)
             return ret
 
         cn = self.get_cached_dir(dirpath)
         if cn:
-            log("cache ok")
             dents = cn.data
         else:
             dbg("cache miss")
@@ -864,7 +848,7 @@ class CPPF(Operations):
         if MACOS and path.split("/")[-1].startswith("._"):
             fun = dbg
 
-        fun("=ENOENT ({})".format(hexler(path)))
+        fun("=ENOENT %r", path)
         raise FuseOSError(errno.ENOENT)
 
     access = None
@@ -880,39 +864,39 @@ class CPPF(Operations):
     if False:
         # incorrect semantics but good for debugging stuff like samba and msys2
         def access(self, path, mode):
-            log("@@ access [{}] [{}]".format(path, mode))
+            dbg("@@ access [{}] [{}]".format(path, mode))
             return 1 if self.getattr(path) else 0
 
         def flush(self, path, fh):
-            log("@@ flush [{}] [{}]".format(path, fh))
+            dbg("@@ flush [{}] [{}]".format(path, fh))
             return True
 
         def getxattr(self, *args):
-            log("@@ getxattr [{}]".format("] [".join(str(x) for x in args)))
+            dbg("@@ getxattr [{}]".format("] [".join(str(x) for x in args)))
             return False
 
         def listxattr(self, *args):
-            log("@@ listxattr [{}]".format("] [".join(str(x) for x in args)))
+            dbg("@@ listxattr [{}]".format("] [".join(str(x) for x in args)))
             return False
 
         def open(self, path, flags):
-            log("@@ open [{}] [{}]".format(path, flags))
+            dbg("@@ open [{}] [{}]".format(path, flags))
             return 42
 
         def opendir(self, fh):
-            log("@@ opendir [{}]".format(fh))
+            dbg("@@ opendir [{}]".format(fh))
             return 69
 
         def release(self, ino, fi):
-            log("@@ release [{}] [{}]".format(ino, fi))
+            dbg("@@ release [{}] [{}]".format(ino, fi))
             return True
 
         def releasedir(self, ino, fi):
-            log("@@ releasedir [{}] [{}]".format(ino, fi))
+            dbg("@@ releasedir [{}] [{}]".format(ino, fi))
             return True
 
         def statfs(self, path):
-            log("@@ statfs [{}]".format(path))
+            dbg("@@ statfs [{}]".format(path))
             return {}
 
     if sys.platform == "win32":
@@ -930,28 +914,28 @@ class CPPF(Operations):
                 return self.junk_fh_ctr
 
             except Exception as ex:
-                log("open ERR {}".format(repr(ex)))
+                info("open ERR %r", ex)
                 raise FuseOSError(errno.ENOENT)
 
         def open(self, path, flags):
-            dbg("open [{}] [{}]".format(hexler(path), flags))
+            dbg("open %r [%s]", path, flags)
             return self._open(path)
 
         def opendir(self, path):
-            dbg("opendir [{}]".format(hexler(path)))
+            dbg("opendir %r", path)
             return self._open(path)
 
         def flush(self, path, fh):
-            dbg("flush [{}] [{}]".format(hexler(path), fh))
+            dbg("flush %r [%s]", path, fh)
 
         def release(self, ino, fi):
-            dbg("release [{}] [{}]".format(hexler(ino), fi))
+            dbg("release %r [%s]", ino, fi)
 
         def releasedir(self, ino, fi):
-            dbg("releasedir [{}] [{}]".format(hexler(ino), fi))
+            dbg("releasedir %r [%s]", ino, fi)
 
         def access(self, path, mode):
-            dbg("access [{}] [{}]".format(hexler(path), mode))
+            dbg("access %r [%s]", path, mode)
             try:
                 x = self.getattr(path)
                 if x["st_mode"] <= 0:
@@ -967,7 +951,7 @@ class TheArgparseFormatter(
 
 
 def main():
-    global info, log, dbg
+    global info, dbg, is_dbg
     time.strptime("19970815", "%Y%m%d")  # python#7980
 
     # filecache helps for reads that are ~64k or smaller;
@@ -994,37 +978,44 @@ def main():
         formatter_class=TheArgparseFormatter,
         epilog="example:" + ex_pre + ex_pre.join(examples),
     )
-    ap.add_argument(
-        "-cd", metavar="NUM_SECONDS", type=float, default=nd, help="directory cache"
-    )
-    ap.add_argument(
-        "-cf", metavar="NUM_BLOCKS", type=int, default=nf, help="file cache"
-    )
-    ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
-    ap.add_argument("-d", action="store_true", help="enable debug")
-    ap.add_argument("-te", metavar="PEM_FILE", help="certificate to expect/verify")
-    ap.add_argument("-td", action="store_true", help="disable certificate check")
+    # fmt: off
     ap.add_argument("base_url", type=str, help="remote copyparty URL to mount")
     ap.add_argument("local_path", type=str, help=where + " to mount it on")
+    ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
+
+    ap2 = ap.add_argument_group("https/TLS")
+    ap2.add_argument("-te", metavar="PEMFILE", help="certificate to expect/verify")
+    ap2.add_argument("-td", action="store_true", help="disable certificate check")
+
+    ap2 = ap.add_argument_group("cache/perf")
+    ap2.add_argument("-cd", metavar="SECS", type=float, default=nd, help="directory-cache, expiration time")
+    ap2.add_argument("-cf", metavar="BLOCKS", type=int, default=nf, help="file cache; each block is <= 1 MiB")
+
+    ap2 = ap.add_argument_group("logging")
+    ap2.add_argument("-q", action="store_true", help="quiet")
+    ap2.add_argument("-d", action="store_true", help="debug/verbose")
+    ap2.add_argument("--slowterm", action="store_true", help="only most recent msgs; good for windows")
+    ap2.add_argument("--logf", metavar="FILE", type=str, default="", help="log to FILE; enables --slowterm")
+
     ar = ap.parse_args()
+    # fmt: on
 
+    if ar.logf:
+        ar.slowterm = True
+
+    # windows terminals are slow (cmd.exe, mintty)
+    # otoh fancy_log beats RecentLog on linux
+    logger = RecentLog(ar).put if ar.slowterm else fancy_log
     if ar.d:
-        # windows terminals are slow (cmd.exe, mintty)
-        # otoh fancy_log beats RecentLog on linux
-        logger = RecentLog().put if WINDOWS else fancy_log
-
         info = logger
-        log = logger
         dbg = logger
-    else:
-        # debug=off, speed is dontcare
-        info = fancy_log
-        log = null_log
-        dbg = null_log
+        is_dbg = True
+    elif not ar.q:
+        info = logger
 
     if ar.a and ar.a.startswith("$"):
         fn = ar.a[1:]
-        log("reading password from file [{}]".format(fn))
+        info("reading password from file %r", fn)
         with open(fn, "rb") as f:
             ar.a = f.read().decode("utf-8").strip()
 
