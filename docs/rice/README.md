@@ -68,6 +68,23 @@ you will be delighted to see inline html in the translation strings; to help pre
 if you're running `copyparty-sfx.py` then you'll find it at `/tmp/pe-copyparty.1000/copyparty/web` (on linux) or `%TEMP%\pe-copyparty\copyparty\web` (on windows)
 * make sure to keep backups of your work religiously! since that location is volatile af
 
-if editing `browser.js` is inconvenient in your setup then you can instead do this:
-* add your translation to a separate javascript file (`tl.js`) and make it load before `browser.js` with the help of `--html-head='<script src="/tl.js"></script>'`
-* as the page loads, `browser.js` will look for a function named `langmod` so define that function and make it insert your translation into the `Ls` and `LANGS` variables so it'll take effect
+
+## translations (docker-friendly)
+
+if editing `browser.js` is inconvenient in your setup, for example if you're running in docker, then you can instead do this:
+* if you have python, go to the `scripts` folder and run `./tl.py fra Français` to generate a `tl.js` which is perfect for translating to French, using the three-letter language code `fra`
+  * if you do not have python, you can also just grab `tl.js` from the scripts folder, but I'll probably forget to keep that up to date... and then you'll have to find/replace all `"eng"` and `Ls.eng` to your three-letter language code
+* put your `tl.js` inside a folder that is being shared by your copyparty, preferably the webroot
+* run copyparty with the argument `--html-head='<script src="/tl.js"></script>'`
+  * if you placed `tl.js` in the webroot then you're all good, but if you put it somewhere else then change `/tl.js` accordingly
+  * if you are running copyparty with config files, you can do this:
+    ```yaml
+	[global]
+	  html-head: <script src="/tl.js"></script>
+	```
+
+you can now edit `tl.js` and press CTRL-SHIFT-R in the browser to see your changes take effect as you go
+
+if you want to contribute your translation back to the project (please do!) then you'll want to...
+* grab all of the text inside your `var tl_cpanel = {` and add it to the translations inside `copyparty/web/splash.js` in the repo
+* and the text inside your `var tl_browser = {` and add that to the translations inside `copyparty/web/browser.js` in the repo
