@@ -3,7 +3,7 @@ set -ex
 
 # PYTHONPATH=.:~/dev/partftpy/ taskset -c 0 python3 -m copyparty -v srv::r -v srv/junk:junk:A --tftp 3969 
 
-get_src=~/dev/copyparty/srv/ro/palette.flac
+get_src=~/dev/copyparty/srv/ro/palette.flac  # tftpwa...
 get_fp=ro/${get_src##*/}  # server url
 get_fn=${get_fp##*/}  # just filename
 
