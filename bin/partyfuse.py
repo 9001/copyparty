@@ -258,6 +258,7 @@ class Gateway(object):
 
         ui = urllib.parse.urlparse(self.base_url)
         self.web_root = ui.path.strip("/")
+        self.SRS = "/%s/" % (self.web_root,) if self.web_root else "/"
         try:
             self.web_host, self.web_port = ui.netloc.split(":")
             self.web_port = int(self.web_port)
@@ -346,7 +347,8 @@ class Gateway(object):
         if bad_good:
             path = dewin(path)
 
-        web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?dots&ls"
+        zs = "%s%s/" if path else "%s%s"
+        web_path = self.quotep(zs % (self.SRS, path)) + "?ls&lt&dots"
         r = self.sendreq("GET", web_path, {})
         if r.status != 200:
             self.closeconn()
@@ -372,8 +374,10 @@ class Gateway(object):
         if bad_good:
             path = dewin(path)
 
-        web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
-        hdr_range = "bytes={}-{}".format(ofs1, ofs2 - 1)
+        zs = "%s%s/" if path else "%s%s"
+        web_path = self.quotep(zs % (self.SRS, path)) + "?raw"
+        hdr_range = "bytes=%d-%d" % (ofs1, ofs2 - 1)
+
         t = "DL %4.0fK\033[36m%9d-%-9d\033[0m%r"
         info(t, (ofs2 - ofs1) / 1024.0, ofs1, ofs2 - 1, path)
 
@@ -485,6 +489,8 @@ class Gateway(object):
 
 class CPPF(Operations):
     def __init__(self, ar):
+        self.use_ns = True
+
         self.gw = Gateway(ar)
         self.junk_fh_ctr = 3
         self.n_dircache = ar.cd
@@ -997,6 +1003,10 @@ def main():
     ap2.add_argument("--slowterm", action="store_true", help="only most recent msgs; good for windows")
     ap2.add_argument("--logf", metavar="FILE", type=str, default="", help="log to FILE; enables --slowterm")
 
+    ap2 = ap.add_argument_group("fuse")
+    ap2.add_argument("--oth", action="store_true", help="tell FUSE to '-o allow_other'")
+    ap2.add_argument("--nonempty", action="store_true", help="tell FUSE to '-o nonempty'")
+
     ar = ap.parse_args()
     # fmt: on
 
@@ -1036,14 +1046,10 @@ def main():
 
     register_wtf8()
 
-    try:
-        with open("/etc/fuse.conf", "rb") as f:
-            allow_other = b"\nuser_allow_other" in f.read()
-    except:
-        allow_other = WINDOWS or MACOS
-
-    args = {"foreground": True, "nothreads": True, "allow_other": allow_other}
-    if not MACOS:
+    args = {"foreground": True, "nothreads": True}
+    if ar.oth:
+        args["allow_other"] = True
+    if ar.nonempty:
         args["nonempty"] = True
 
     FUSE(CPPF(ar), ar.local_path, encoding="wtf-8", **args)
