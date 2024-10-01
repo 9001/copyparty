@@ -437,7 +437,7 @@ rm -f ftp/pyftpdlib/{__main__,prefork}.py
 	rm -rf copyparty/mdns.py copyparty/stolen/dnslib
 
 [ $no_pf ] &&
-	rm -rf copyparty/web/a/partyfuse.py
+	rm -rf copyparty/web/a/partyfuse.py copyparty/web/deps/fuse.py
 
 [ $no_cm ] && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*

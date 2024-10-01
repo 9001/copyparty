@@ -30,6 +30,7 @@ copyparty/res/COPYING.txt
 copyparty/web/deps/
 srv/
 scripts/docker/i/
+scripts/deps-docker/uncomment.py
 contrib/package/arch/pkg/
 contrib/package/arch/src/
 

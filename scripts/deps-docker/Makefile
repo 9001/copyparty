@@ -4,8 +4,10 @@ vend := $(self)/../../copyparty/web/deps
 # prefers podman-docker (optionally rootless) over actual docker/moby
 
 all:
+	cp -pv ../uncomment.py .
+
 	docker build -t build-copyparty-deps .
-	
+
 	rm -rf $(vend)
 	mkdir $(vend)
 

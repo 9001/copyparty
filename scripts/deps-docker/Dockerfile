@@ -37,6 +37,7 @@ RUN     mkdir -p /z/dist/no-pk \
         && wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz \
         && wget https://github.com/Daninet/hash-wasm/releases/download/v$ver_hashwasm/hash-wasm@$ver_hashwasm.zip -O hash-wasm.zip \
         && wget https://github.com/PrismJS/prism/archive/refs/tags/v$ver_prism.tar.gz -O prism.tgz \
+        && wget https://files.pythonhosted.org/packages/04/0b/4506cb2e831cea4b0214d3625430e921faaa05a7fb520458c75a2dbd2152/fusepy-3.0.1.tar.gz -O fusepy.tgz \
         && (mkdir hash-wasm \
             && cd hash-wasm \
             && unzip ../hash-wasm.zip) \
@@ -56,6 +57,7 @@ RUN     mkdir -p /z/dist/no-pk \
             && npm i gulp-cli -g ) \
         && tar -xf dompurify.tgz \
         && tar -xf prism.tgz \
+        && tar -xf fusepy.tgz \
         && unzip fontawesome.zip \
         && tar -xf zopfli.tgz
 
@@ -156,6 +158,18 @@ RUN     cd /z/dist \
         && rm *.makefile \
         && mv no-pk/* . \
         && rmdir no-pk
+
+
+# build fusepy
+COPY    uncomment.py /z
+RUN     mv /z/fusepy-3.0.1/fuse.py /z/dist/f1 \
+        && cd /z/dist \
+        && python3 /z/uncomment.py f1 \
+        && sed -ri '/self.__critical_exception = e/d' f1 \
+        && awk '/^log =/{s=0} !s; /^from traceback im/{s=1;print"from functools import partial";print"basestring = str"}' <f1 >f2 \
+        && awk '/LoggingMixIn:/{exit} /Time as floating/{s=3}--s<0' <f2 >f1 \
+        && awk "/if _machine =/{s=0} /'(mips|ppc|ppc64)'/{s=1} !s" <f1 >f2 \
+        && rm f1 && mv f2 fuse.py
 
 
 # git diff -U2 --no-index marked-1.1.0-orig/ marked-1.1.0-edit/ -U2 | sed -r '/^index /d;s`^(diff --git a/)[^/]+/(.* b/)[^/]+/`\1\2`; s`^(---|\+\+\+) ([ab]/)[^/]+/`\1 \2`' > ../dev/copyparty/scripts/deps-docker/marked-ln.patch
