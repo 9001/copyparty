@@ -390,13 +390,12 @@ class Gateway(object):
 
         return r.read()
 
-    def parse_jls(self, datasrc):
+    def parse_jls(self, sck):
         rsp = b""
         while True:
-            buf = datasrc.read(1024 * 32)
+            buf = sck.read(1024 * 32)
             if not buf:
                 break
-
             rsp += buf
 
         rsp = json.loads(rsp.decode("utf-8"))
@@ -414,24 +413,24 @@ class Gateway(object):
 
         return ret
 
-    def parse_html(self, datasrc):
+    def parse_html(self, sck):
         ret = []
-        remainder = b""
+        rem = b""
         ptn = re.compile(
             r'^<tr><td>(-|DIR|<a [^<]+</a>)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>[^<]+</td><td>([^<]+)</td></tr>$'
         )
 
         while True:
-            buf = remainder + datasrc.read(4096)
-            # print('[{}]'.format(buf.decode('utf-8')))
+            buf = sck.read(4096)
             if not buf:
                 break
 
-            remainder = b""
-            endpos = buf.rfind(b"\n")
-            if endpos >= 0:
-                remainder = buf[endpos + 1 :]
-                buf = buf[:endpos]
+            buf = rem + buf
+            rem = b""
+            idx = buf.rfind(b"\n")
+            if idx >= 0:
+                rem = buf[idx + 1 :]
+                buf = buf[:idx]
 
             lines = buf.decode("utf-8").split("\n")
             for line in lines:
