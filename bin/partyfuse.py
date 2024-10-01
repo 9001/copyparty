@@ -417,7 +417,7 @@ class Gateway(object):
         ret = []
         rem = b""
         ptn = re.compile(
-            r'^<tr><td>(-|DIR|<a [^<]+</a>)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>[^<]+</td><td>([^<]+)</td></tr>$'
+            r'^<tr><td>(-|DIR|<a [^<]+</a>)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>.*</td><td>([^<]+)</td></tr>$'
         )
 
         while True:
@@ -454,7 +454,7 @@ class Gateway(object):
                     info("bad HTML or OS [%r] [%r]", fdate, fsize)
                     # python cannot strptime(1959-01-01) on windows
 
-                if ftype != "DIR":
+                if ftype != "DIR" and "zip=crc" not in ftype:
                     ret.append([fname, self.stat_file(ts, sz), 0])
                 else:
                     ret.append([fname, self.stat_dir(ts, sz), 0])
