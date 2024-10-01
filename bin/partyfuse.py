@@ -10,6 +10,11 @@ __url__ = "https://github.com/9001/copyparty/"
 """
 mount a copyparty server (local or remote) as a filesystem
 
+speeds:
+  1 GiB/s reading large files
+  27'000 files/sec: copy small files
+  700 folders/sec: copy small folders
+
 usage:
   python partyfuse.py http://192.168.1.69:3923/  ./music
 
@@ -421,7 +426,7 @@ class Gateway(object):
         )
 
         while True:
-            buf = sck.read(4096)
+            buf = sck.read(1024 * 32)
             if not buf:
                 break
 
@@ -667,7 +672,7 @@ class CPPF(Operations):
 
         elif cdr and (not car or len(car) < len(cdr)):
             h_end = get1 + (get2 - get1) - len(cdr)
-            h_ofs = min(get1, h_end - 512 * 1024)
+            h_ofs = min(get1, h_end - 0x80000)  # 512k
 
             if h_ofs < 0:
                 h_ofs = 0
@@ -688,7 +693,12 @@ class CPPF(Operations):
 
         elif car:
             h_ofs = get1 + len(car)
-            h_end = max(get2, h_ofs + 1024 * 1024)
+            if get2 < 0x100000:
+                # already cached from 0 to 64k, now do ~64k plus 1 MiB
+                h_end = max(get2, h_ofs + 0x100000)  # 1m
+            else:
+                # after 1 MiB, bump window to 8 MiB
+                h_end = max(get2, h_ofs + 0x800000)  # 8m
 
             if h_end > file_sz:
                 h_end = file_sz
@@ -702,19 +712,21 @@ class CPPF(Operations):
             ret = car + buf[:buf_ofs]
 
         else:
-            if get2 - get1 <= 1024 * 1024:
+            if get2 - get1 < 0x500000:  # 5m
                 # unless the request is for the last n bytes of the file,
                 # grow the start to cache some stuff around the range
                 if get2 < file_sz - 1:
-                    h_ofs = get1 - 1024 * 256
+                    h_ofs = get1 - 0x40000  # 256k
                 else:
-                    h_ofs = get1 - 1024 * 32
+                    h_ofs = get1 - 0x10000  # 64k
 
                 # likewise grow the end unless start is 0
-                if get1 > 0:
-                    h_end = get2 + 1024 * 1024
+                if get1 >= 0x100000:
+                    h_end = get2 + 0x400000  # 4m
+                elif get1 > 0:
+                    h_end = get2 + 0x100000  # 1m
                 else:
-                    h_end = get2 + 1024 * 64
+                    h_end = get2 + 0x10000  # 64k
             else:
                 # big enough, doesn't need pads
                 h_ofs = get1
@@ -953,10 +965,10 @@ def main():
     time.strptime("19970815", "%Y%m%d")  # python#7980
 
     # filecache helps for reads that are ~64k or smaller;
-    #   linux generally does 128k so the cache is a slowdown,
-    #   windows likes to use 4k and 64k so cache is required,
-    #   value is numChunks (1~3M each) to keep in the cache
-    nf = 24
+    #   windows likes to use 4k and 64k so cache is important,
+    #   linux generally does 128k so the cache is still nice,
+    #   value is numChunks (1~8M each) to keep in the cache
+    nf = 12
 
     # dircache is always a boost,
     #   only want to disable it for tests etc,
