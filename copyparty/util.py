@@ -761,6 +761,7 @@ class _Unrecv(object):
         self.buf = buf + self.buf
 
 
+# !rm.yes>
 class _LUnrecv(object):
     """
     with expensive debug logging
@@ -815,6 +816,7 @@ class _LUnrecv(object):
         self.buf = buf + self.buf
         t = "\033[0;7mur:push\033[0;1;31m {}\n\033[0;7mur:rem:\033[0;1;35m {}\033[0m"
         print(t.format(buf, self.buf))
+# !rm.no>
 
 
 Unrecv = _Unrecv

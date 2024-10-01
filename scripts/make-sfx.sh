@@ -27,13 +27,13 @@ help() { exec cat <<'EOF'
 #
 # `no-ftp` saves ~30k by removing the ftp server, disabling --ftp
 #
+# `no-pf` saves ~12k by removing the option to download partyfuse
+#
 # `no-tfp` saves ~10k by removing the tftp server, disabling --tftp
 #
 # `no-zm` saves ~7k by removing the zeroconf mDNS server
 #
 # `no-smb` saves ~3.5k by removing the smb / cifs server
-#
-# `no-pf` saves ~2.8k by removing the option to download partyfuse
 #
 # _____________________________________________________________________
 # web features:
@@ -109,7 +109,7 @@ pybin=$(command -v python3 || command -v python) || {
 
 langs=
 use_gz=
-zopf=2560
+zopf=2000
 while [ ! -z "$1" ]; do
 	case $1 in
 		clean)  clean=1  ; ;;

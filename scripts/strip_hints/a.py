@@ -61,9 +61,19 @@ def uh2(fp):
     # remove expensive imports too
     lns = []
     on = True
+    on2 = True
     for ln in cs.split("\n"):
         if ln.startswith("if True:"):
             on = False
+            continue
+
+        if ln.endswith("# !rm.yes>"):
+            on2 = False
+            continue
+
+        if not on2:
+            if ln.endswith("# !rm.no>"):
+                on2 = True
             continue
 
         if not on and (not ln.strip() or ln.startswith(" ")):

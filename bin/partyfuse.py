@@ -363,8 +363,10 @@ class Gateway(object):
         ctype = r.getheader("Content-Type", "")
         if ctype == "application/json":
             parser = self.parse_jls
+            # !rm.yes>
         elif ctype.startswith("text/html"):
             parser = self.parse_html
+            # !rm.no>
         else:
             info("listdir on file (%s): %r", ctype, path)
             raise FuseOSError(errno.ENOENT)
@@ -418,6 +420,7 @@ class Gateway(object):
 
         return ret
 
+    # !rm.yes>
     def parse_html(self, sck):
         ret = {}
         rem = b""
@@ -465,6 +468,7 @@ class Gateway(object):
                     ret[fname] = self.stat_dir(ts, sz)
 
         return ret
+    # !rm.no>
 
     def stat_dir(self, ts, sz=4096):
         return {
@@ -548,6 +552,7 @@ class CPPF(Operations):
                     break
         return None
 
+    # !rm.yes>
     """
             ,-------------------------------,  g1>=c1, g2<=c2
             |cache1                   cache2|  buf[g1-c1:(g1-c1)+(g2-g1)]
@@ -572,6 +577,7 @@ class CPPF(Operations):
                                     |get1       get2|
                                     `---------------'
     """
+    # !rm.no>
 
     def get_cached_file(self, path, get1, get2, file_sz):
         car = None
@@ -802,6 +808,7 @@ class CPPF(Operations):
 
         return ret
 
+    # !rm.yes>
         fn = "cppf-{}-{}-{}".format(time.time(), offset, length)
         if False:
             with open(fn, "wb", len(ret)) as f:
@@ -824,6 +831,7 @@ class CPPF(Operations):
                 raise Exception("cache bork")
 
         return ret
+    # !rm.no>
 
     def getattr(self, path, fh=None):
         dbg("getattr %r", path)
@@ -871,6 +879,7 @@ class CPPF(Operations):
     releasedir = None
     statfs = None
 
+    # !rm.yes>
     if False:
         # incorrect semantics but good for debugging stuff like samba and msys2
         def access(self, path, mode):
@@ -908,6 +917,7 @@ class CPPF(Operations):
         def statfs(self, path):
             dbg("@@ statfs [{}]".format(path))
             return {}
+    # !rm.no>
 
     if sys.platform == "win32":
         # quick compat for /mingw64/bin/python3 (msys2)

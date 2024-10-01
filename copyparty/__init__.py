@@ -73,6 +73,7 @@ web/deps/busy.mp3
 web/deps/easymde.css
 web/deps/easymde.js
 web/deps/marked.js
+web/deps/fuse.py
 web/deps/mini-fa.css
 web/deps/mini-fa.woff
 web/deps/prism.css
