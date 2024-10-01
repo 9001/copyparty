@@ -6,6 +6,8 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
+S_VERSION = "2.0"
+S_BUILD_DT = "2024-10-01"
 
 """
 mount a copyparty server (local or remote) as a filesystem
@@ -19,7 +21,7 @@ usage:
   python partyfuse.py http://192.168.1.69:3923/  ./music
 
 dependencies:
-  python3 -m pip install --user fusepy
+  python3 -m pip install --user fusepy  # or grab it from the connect page
   + on Linux: sudo apk add fuse
   + on Macos: https://osxfuse.github.io/
   + on Windows: https://github.com/billziss-gh/winfsp/releases/latest
@@ -58,6 +60,11 @@ import http.client
 WINDOWS = sys.platform == "win32"
 MACOS = platform.system() == "Darwin"
 UTC = timezone.utc
+
+# !rm.yes>
+MON3S = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec"
+MON3 = {b:a for a,b in enumerate(MON3S.split(), 1)}
+# !rm.no>
 
 
 def print(*args, **kwargs):
@@ -104,12 +111,11 @@ except:
 
 
 def termsafe(txt):
+    enc = sys.stdout.encoding
     try:
-        return txt.encode(sys.stdout.encoding, "backslashreplace").decode(
-            sys.stdout.encoding
-        )
+        return txt.encode(enc, "backslashreplace").decode(enc)
     except:
-        return txt.encode(sys.stdout.encoding, "replace").decode(sys.stdout.encoding)
+        return txt.encode(enc, "replace").decode(enc)
 
 
 def threadless_log(fmt, *a):
@@ -156,19 +162,9 @@ good_bad = {}
 def enwin(txt):
     return "".join([bad_good.get(x, x) for x in txt])
 
-    for bad, good in bad_good.items():
-        txt = txt.replace(bad, good)
-
-    return txt
-
 
 def dewin(txt):
     return "".join([good_bad.get(x, x) for x in txt])
-
-    for bad, good in bad_good.items():
-        txt = txt.replace(good, bad)
-
-    return txt
 
 
 class RecentLog(object):
@@ -258,10 +254,14 @@ class CacheNode(object):
 
 class Gateway(object):
     def __init__(self, ar):
-        self.base_url = ar.base_url
+        zs = ar.base_url
+        if "://" not in zs:
+            zs = "http://" + zs
+
+        self.base_url = zs
         self.password = ar.a
 
-        ui = urllib.parse.urlparse(self.base_url)
+        ui = urllib.parse.urlparse(zs)
         self.web_root = ui.path.strip("/")
         self.SRS = "/%s/" % (self.web_root,) if self.web_root else "/"
         try:
@@ -288,6 +288,41 @@ class Gateway(object):
                 self.ssl_context.load_verify_locations(ar.te)
 
         self.conns = {}
+
+        self.fsuf = "?raw"
+        self.dsuf = "?ls&lt&dots"
+
+        # !rm.yes>
+        if not ar.html:
+            self.parse_html = None
+
+        elif ar.html == "cpp":
+            self.parse_html = self.parse_cpp
+            self.dsuf = "?lt&dots"
+            self.re_row = re.compile(
+                r'^<tr><td>(-|DIR|<a [^<]+</a>)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>.*</td><td>([^<]+)</td></tr>$'
+            )
+
+        elif ar.html == "nginx":
+            self.parse_html = self.parse_nginx
+            self.fsuf = ""
+            self.dsuf = ""
+            self.re_row = re.compile(
+                r'^<a href="([^"]+)">([^<]+)</a> *([0-9]{2})-([A-Z][a-z]{2})-([0-9]{4}) ([0-9]{2}:[0-9]{2}) *(-|[0-9]+)\r?$'
+            )
+
+        elif ar.html == "iis":
+            self.parse_html = self.parse_iis
+            self.fsuf = ""
+            self.dsuf = ""
+            self.re_2nl = re.compile(br"<br>|</pre>")
+            self.re_row = re.compile(
+                r'^ *([0-9]{1,2})/([0-9]{1,2})/([0-9]{4}) {1,2}([0-9]{1,2}:[0-9]{2}) ([AP]M) +(&lt;dir&gt;|[0-9]+) <A HREF="([^"]+)">([^<>]+)</A>$'
+            )
+
+        else:
+            raise Exception("unknown HTML dialect: [%s]" % (ar.html,))
+        # !rm.no>
 
     def quotep(self, path):
         path = path.encode("wtf-8")
@@ -353,7 +388,7 @@ class Gateway(object):
             path = dewin(path)
 
         zs = "%s%s/" if path else "%s%s"
-        web_path = self.quotep(zs % (self.SRS, path)) + "?ls&lt&dots"
+        web_path = self.quotep(zs % (self.SRS, path)) + self.dsuf
         r = self.sendreq("GET", web_path, {})
         if r.status != 200:
             self.closeconn()
@@ -381,8 +416,7 @@ class Gateway(object):
         if bad_good:
             path = dewin(path)
 
-        zs = "%s%s/" if path else "%s%s"
-        web_path = self.quotep(zs % (self.SRS, path)) + "?raw"
+        web_path = self.quotep("%s%s" % (self.SRS, path)) + self.fsuf
         hdr_range = "bytes=%d-%d" % (ofs1, ofs2 - 1)
 
         t = "DL %4.0fK\033[36m%9d-%-9d\033[0m%r"
@@ -421,12 +455,15 @@ class Gateway(object):
         return ret
 
     # !rm.yes>
-    def parse_html(self, sck):
+    ####################################################################
+    ####################################################################
+
+    def parse_cpp(self, sck):
+        # https://a.ocv.me/pub/
+
         ret = {}
         rem = b""
-        ptn = re.compile(
-            r'^<tr><td>(-|DIR|<a [^<]+</a>)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>.*</td><td>([^<]+)</td></tr>$'
-        )
+        ptn = self.re_row
 
         while True:
             buf = sck.read(1024 * 32)
@@ -459,7 +496,7 @@ class Gateway(object):
                     sz = int(fsize)
                     ts = calendar.timegm(time.strptime(fdate, "%Y-%m-%d %H:%M:%S"))
                 except:
-                    info("bad HTML or OS [%r] [%r]", fdate, fsize)
+                    info("bad HTML or OS %r %r\n%r", fdate, fsize, line)
                     # python cannot strptime(1959-01-01) on windows
 
                 if ftype != "DIR" and "zip=crc" not in ftype:
@@ -468,9 +505,112 @@ class Gateway(object):
                     ret[fname] = self.stat_dir(ts, sz)
 
         return ret
+
+    def parse_nginx(self, sck):
+        # https://ocv.me/stuff/  "06-Feb-2015 15:43"
+
+        ret = {}
+        rem = b""
+        re_row = self.re_row
+
+        while True:
+            buf = sck.read(1024 * 32)
+            if not buf:
+                break
+
+            buf = rem + buf
+            rem = b""
+            idx = buf.rfind(b"\n")
+            if idx >= 0:
+                rem = buf[idx + 1 :]
+                buf = buf[:idx]
+
+            fdate = ""
+            lines = buf.decode("utf-8").split("\n")
+            for line in lines:
+                m = re_row.match(line)
+                if not m:
+                    continue
+
+                furl, fname, day, smon, year, hm, fsize = m.groups()
+                fname = furl.rstrip("/").split("/")[-1]
+                fname = unquote(fname)
+                fname = fname.decode("wtf-8")
+                if bad_good:
+                    fname = enwin(fname)
+
+                sz = 1
+                ts = 60 * 60 * 24 * 2
+                try:
+                    fdate = "%s-%02d-%s %s" % (year, MON3[smon], day, hm)
+                    ts = calendar.timegm(time.strptime(fdate, "%Y-%m-%d %H:%M"))
+                    sz = -1 if fsize == "-" else int(fsize)
+                except:
+                    info("bad HTML or OS %r %r\n%r", fdate, fsize, line)
+
+                if sz == -1:
+                    ret[fname] = self.stat_dir(ts, 4096)
+                else:
+                    ret[fname] = self.stat_file(ts, sz)
+
+        return ret
+
+    def parse_iis(self, sck):
+        # https://nedlasting.miljodirektoratet.no/miljodata/  " 9/28/2024  5:24 AM"
+        # https://grandcanyon.usgs.gov/photos/Foodbase/CISP/  " 6/29/2012  3:12 PM"
+
+        ret = {}
+        rem = b""
+        re_row = self.re_row
+        re_2nl = self.re_2nl
+
+        while True:
+            buf = sck.read(1024 * 32)
+            if not buf:
+                break
+
+            buf = rem + buf
+            rem = b""
+            buf = re_2nl.sub(b"\n", buf)
+            idx = buf.rfind(b"\n")
+            if idx >= 0:
+                rem = buf[idx + 1 :]
+                buf = buf[:idx]
+
+            lines = buf.decode("utf-8").split("\n")
+            for line in lines:
+                m = re_row.match(line)
+                if not m:
+                    continue
+
+                mon, day, year, hm, xm, fsize, furl, fname = m.groups()
+                fname = furl.rstrip("/").split("/")[-1]
+                fname = unquote(fname)
+                fname = fname.decode("wtf-8")
+                if bad_good:
+                    fname = enwin(fname)
+
+                sz = 1
+                ts = 60 * 60 * 24 * 2
+                fdate = "%s-%s-%s %s %s" % (year, mon, day, hm, xm)
+                try:
+                    ts = calendar.timegm(time.strptime(fdate, "%Y-%m-%d %H:%M %p"))
+                    sz = -1 if fsize == "&lt;dir&gt;" else int(fsize)
+                except:
+                    info("bad HTML or OS %r %r\n%r", fdate, fsize, line)
+
+                if sz == -1:
+                    ret[fname] = self.stat_dir(ts, 4096)
+                else:
+                    ret[fname] = self.stat_file(ts, sz)
+
+        return ret
+
+    ####################################################################
+    ####################################################################
     # !rm.no>
 
-    def stat_dir(self, ts, sz=4096):
+    def stat_dir(self, ts, sz):
         return {
             "st_mode": stat.S_IFDIR | 0o555,
             "st_uid": 1000,
@@ -497,8 +637,6 @@ class Gateway(object):
 
 class CPPF(Operations):
     def __init__(self, ar):
-        self.use_ns = True
-
         self.gw = Gateway(ar)
         self.junk_fh_ctr = 3
         self.t_dircache = ar.cds
@@ -839,16 +977,16 @@ class CPPF(Operations):
             path = enwin(path)  # windows occasionally decodes f0xx to xx
 
         path = path.strip("/")
+        if not path:
+            ret = self.gw.stat_dir(time.time(), 4096)
+            dbg("/=%r", ret)
+            return ret
+
         try:
             dirpath, fname = path.rsplit("/", 1)
         except:
             dirpath = ""
             fname = path
-
-        if not path:
-            ret = self.gw.stat_dir(time.time())
-            dbg("=%r", ret)
-            return ret
 
         cn = self.get_cached_dir(dirpath)
         if cn:
@@ -858,7 +996,9 @@ class CPPF(Operations):
             dents = self._readdir(dirpath)
 
         try:
-            return dents[fname]
+            ret = dents[fname]
+            dbg("s=%r", ret)
+            return ret
         except:
             pass
 
@@ -974,6 +1114,11 @@ def main():
     global info, dbg, is_dbg
     time.strptime("19970815", "%Y%m%d")  # python#7980
 
+    ver = "{0}, v{1}".format(S_BUILD_DT, S_VERSION)
+    if "--version" in sys.argv:
+        print("partyfuse", ver)
+        return
+
     # filecache helps for reads that are ~64k or smaller;
     #   windows likes to use 4k and 64k so cache is important,
     #   linux generally does 128k so the cache is still nice,
@@ -996,12 +1141,17 @@ def main():
 
     ap = argparse.ArgumentParser(
         formatter_class=TheArgparseFormatter,
+        description="mount a copyparty server as a local filesystem -- " + ver,
         epilog="example:" + ex_pre + ex_pre.join(examples),
     )
     # fmt: off
     ap.add_argument("base_url", type=str, help="remote copyparty URL to mount")
     ap.add_argument("local_path", type=str, help=where + " to mount it on")
     ap.add_argument("-a", metavar="PASSWORD", help="password or $filepath")
+
+    # !rm.yes>
+    ap.add_argument("--html", metavar="TYPE", default="", help="which HTML parser to use; cpp, nginx, iis")
+    # !rm.no>
 
     ap2 = ap.add_argument_group("https/TLS")
     ap2.add_argument("-te", metavar="PEMFILE", help="certificate to expect/verify")

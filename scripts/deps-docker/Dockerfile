@@ -167,7 +167,7 @@ RUN     mv /z/fusepy-3.0.1/fuse.py /z/dist/f1 \
         && python3 /z/uncomment.py f1 \
         && sed -ri '/self.__critical_exception = e/d' f1 \
         && awk '/^log =/{s=0} !s; /^from traceback im/{s=1;print"from functools import partial";print"basestring = str"}' <f1 >f2 \
-        && awk '/LoggingMixIn:/{exit} /Time as floating/{s=3}--s<0' <f2 >f1 \
+        && awk '/LoggingMixIn:/{exit} --s<0;/self.use_ns = getattr/{s=7}' <f2 >f1 \
         && awk "/if _machine =/{s=0} /'(mips|ppc|ppc64)'/{s=1} !s" <f1 >f2 \
         && rm f1 && mv f2 fuse.py
 

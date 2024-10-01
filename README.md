@@ -1885,6 +1885,7 @@ interact with copyparty using non-browser clients
 
 * FUSE: mount a copyparty server as a local filesystem
   * cross-platform python client available in [./bin/](bin/)
+  * able to mount nginx and iis directory listings too, not just copyparty
   * can be downloaded from copyparty: controlpanel -> connect -> [partyfuse.py](http://127.0.0.1:3923/.cpr/a/partyfuse.py)
   * [rclone](https://rclone.org/) as client can give ~5x performance, see [./docs/rclone.md](docs/rclone.md)
 
@@ -1924,7 +1925,7 @@ alternatively, some alternatives roughly sorted by speed (unreproducible benchma
 
 * [rclone-webdav](./docs/rclone.md) (25s), read/WRITE (rclone v1.63 or later)
 * [rclone-http](./docs/rclone.md) (26s), read-only
-* [partyfuse.py](./bin/#partyfusepy) (35s), read-only
+* [partyfuse.py](./bin/#partyfusepy) (26s), read-only
 * [rclone-ftp](./docs/rclone.md) (47s), read/WRITE
 * davfs2 (103s), read/WRITE
 * [win10-webdav](#webdav-server) (138s), read/WRITE
