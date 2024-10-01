@@ -399,7 +399,7 @@ class Gateway(object):
             rsp += buf
 
         rsp = json.loads(rsp.decode("utf-8"))
-        ret = []
+        ret = {}
         for statfun, nodes in [
             [self.stat_dir, rsp["dirs"]],
             [self.stat_file, rsp["files"]],
@@ -409,12 +409,12 @@ class Gateway(object):
                 if bad_good:
                     fname = enwin(fname)
 
-                ret.append([fname, statfun(n["ts"], n["sz"]), 0])
+                ret[fname] = statfun(n["ts"], n["sz"])
 
         return ret
 
     def parse_html(self, sck):
-        ret = []
+        ret = {}
         rem = b""
         ptn = re.compile(
             r'^<tr><td>(-|DIR|<a [^<]+</a>)</td><td><a[^>]* href="([^"]+)"[^>]*>([^<]+)</a></td><td>([^<]+)</td><td>.*</td><td>([^<]+)</td></tr>$'
@@ -455,9 +455,9 @@ class Gateway(object):
                     # python cannot strptime(1959-01-01) on windows
 
                 if ftype != "DIR" and "zip=crc" not in ftype:
-                    ret.append([fname, self.stat_file(ts, sz), 0])
+                    ret[fname] = self.stat_file(ts, sz)
                 else:
-                    ret.append([fname, self.stat_dir(ts, sz), 0])
+                    ret[fname] = self.stat_dir(ts, sz)
 
         return ret
 
@@ -492,7 +492,8 @@ class CPPF(Operations):
 
         self.gw = Gateway(ar)
         self.junk_fh_ctr = 3
-        self.n_dircache = ar.cd
+        self.t_dircache = ar.cds
+        self.n_dircache = ar.cdn
         self.n_filecache = ar.cf
 
         self.dircache = []
@@ -524,21 +525,22 @@ class CPPF(Operations):
         now = time.time()
         cutoff = 0
         for cn in self.dircache:
-            if now - cn.ts > self.n_dircache:
-                cutoff += 1
-            else:
+            if now - cn.ts <= self.t_dircache:
                 break
+            cutoff += 1
 
         if cutoff > 0:
             self.dircache = self.dircache[cutoff:]
+        elif len(self.dircache) > self.n_dircache:
+            self.dircache.pop(0)
 
     def get_cached_dir(self, dirpath):
         with self.dircache_mtx:
-            self.clean_dircache()
             for cn in self.dircache:
                 if cn.tag == dirpath:
-                    return cn
-
+                    if time.time() - cn.ts <= self.t_dircache:
+                        return cn
+                    break
         return None
 
     """
@@ -759,7 +761,7 @@ class CPPF(Operations):
         return ret
 
     def readdir(self, path, fh=None):
-        return [".", ".."] + self._readdir(path, fh)
+        return [".", ".."] + list(self._readdir(path, fh))
 
     def read(self, path, length, offset, fh=None):
         req_max = 1024 * 1024 * 8
@@ -835,19 +837,10 @@ class CPPF(Operations):
             dbg("cache miss")
             dents = self._readdir(dirpath)
 
-        for cache_name, cache_stat, _ in dents:
-            # if "qw" in cache_name and "qw" in fname:
-            #     info(
-            #         "cmp\n  [{}]\n  [{}]\n\n{}\n".format(
-            #             hexler(cache_name),
-            #             hexler(fname),
-            #             "\n".join(traceback.format_stack()[:-1]),
-            #         )
-            #     )
-
-            if cache_name == fname:
-                # dbg("=" + repr(cache_stat))
-                return cache_stat
+        try:
+            return dents[fname]
+        except:
+            pass
 
         fun = info
         if MACOS and path.split("/")[-1].startswith("._"):
@@ -967,8 +960,8 @@ def main():
 
     # dircache is always a boost,
     #   only want to disable it for tests etc,
-    #   value is numSec until an entry goes stale
-    nd = 1
+    cdn = 9  # max num dirs; 0=disable
+    cds = 1  # numsec until an entry goes stale
 
     where = "local directory"
     if WINDOWS:
@@ -993,7 +986,8 @@ def main():
     ap2.add_argument("-td", action="store_true", help="disable certificate check")
 
     ap2 = ap.add_argument_group("cache/perf")
-    ap2.add_argument("-cd", metavar="SECS", type=float, default=nd, help="directory-cache, expiration time")
+    ap2.add_argument("-cdn", metavar="DIRS", type=float, default=cdn, help="directory-cache, max num dirs; 0=disable")
+    ap2.add_argument("-cds", metavar="SECS", type=float, default=cds, help="directory-cache, expiration time")
     ap2.add_argument("-cf", metavar="BLOCKS", type=int, default=nf, help="file cache; each block is <= 1 MiB")
 
     ap2 = ap.add_argument_group("logging")
