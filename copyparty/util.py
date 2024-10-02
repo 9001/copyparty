@@ -290,6 +290,30 @@ if ANYWIN:
 UNPLICATIONS = [["no_dav", "daw"]]
 
 
+DAV_ALLPROP_L = [
+    "contentclass",
+    "creationdate",
+    "defaultdocument",
+    "displayname",
+    "getcontentlanguage",
+    "getcontentlength",
+    "getcontenttype",
+    "getlastmodified",
+    "href",
+    "iscollection",
+    "ishidden",
+    "isreadonly",
+    "isroot",
+    "isstructureddocument",
+    "lastaccessed",
+    "name",
+    "parentname",
+    "resourcetype",
+    "supportedlock",
+]
+DAV_ALLPROPS = set(DAV_ALLPROP_L)
+
+
 MIMES = {
     "opus": "audio/ogg; codecs=opus",
 }

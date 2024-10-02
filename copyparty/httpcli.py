@@ -44,6 +44,7 @@ from .util import unquote  # type: ignore
 from .util import (
     APPLESAN_RE,
     BITNESS,
+    DAV_ALLPROPS,
     HAVE_SQLITE3,
     HTTPCODE,
     META_NOBOTS,
@@ -1203,7 +1204,7 @@ class HttpCli(object):
         tap = vn.canonical(rem)
 
         if "davauth" in vn.flags and self.uname == "*":
-            self.can_read = self.can_write = self.can_get = False
+            raise Pebkac(401, "authenticate")
 
         from .dxml import parse_xml
 
@@ -1211,6 +1212,7 @@ class HttpCli(object):
         # enc = "shift_jis"
         enc = "utf-8"
         uenc = enc.upper()
+        props = DAV_ALLPROPS
 
         clen = int(self.headers.get("content-length", 0))
         if clen:
@@ -1221,33 +1223,10 @@ class HttpCli(object):
                     break
 
             xroot = parse_xml(buf.decode(enc, "replace"))
-            xtag = next(x for x in xroot if x.tag.split("}")[-1] == "prop")
-            props_lst = [y.tag.split("}")[-1] for y in xtag]
-        else:
-            props_lst = [
-                "contentclass",
-                "creationdate",
-                "defaultdocument",
-                "displayname",
-                "getcontentlanguage",
-                "getcontentlength",
-                "getcontenttype",
-                "getlastmodified",
-                "href",
-                "iscollection",
-                "ishidden",
-                "isreadonly",
-                "isroot",
-                "isstructureddocument",
-                "lastaccessed",
-                "name",
-                "parentname",
-                "resourcetype",
-                "supportedlock",
-            ]
-
-        props = set(props_lst)
-        depth = self.headers.get("depth", "infinity").lower()
+            xtag = next((x for x in xroot if x.tag.split("}")[-1] == "prop"), None)
+            if xtag is not None:
+                props = set([y.tag.split("}")[-1] for y in xtag])
+            # assume <allprop/> otherwise; nobody ever gonna <propname/>
 
         zi = int(time.time())
         vst = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, zi, zi, zi))
@@ -1261,6 +1240,7 @@ class HttpCli(object):
 
         fgen: Iterable[dict[str, Any]] = []
 
+        depth = self.headers.get("depth", "infinity").lower()
         if depth == "infinity":
             if not self.can_read:
                 t = "depth:infinity requires read-access in /%s"
