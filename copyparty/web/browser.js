@@ -4622,12 +4622,12 @@ var fileman = (function () {
 
 	r.rename = function (e) {
 		ev(e);
-		if (clgot(bren, 'hide'))
-			return toast.err(3, L.fr_eperm);
-
 		var sel = msel.getsel();
 		if (!sel.length)
 			return toast.err(3, L.fr_emore);
+
+		if (clgot(bren, 'hide'))
+			return toast.err(3, L.fr_eperm);
 
 		var f = [],
 			base = vsplit(sel[0].vp)[0],
@@ -4931,9 +4931,6 @@ var fileman = (function () {
 
 	r.delete = function (e) {
 		ev(e);
-		if (clgot(bdel, 'hide'))
-			return toast.err(3, L.fd_eperm);
-
 		var sel = msel.getsel(),
 			vps = [];
 
@@ -4942,6 +4939,9 @@ var fileman = (function () {
 
 		if (!sel.length)
 			return toast.err(3, L.fd_emore);
+
+		if (clgot(bdel, 'hide'))
+			return toast.err(3, L.fd_eperm);
 
 		function deleter(err) {
 			var xhr = new XHR(),
@@ -4980,14 +4980,14 @@ var fileman = (function () {
 
 	r.cut = function (e) {
 		ev(e);
-		if (clgot(bcut, 'hide'))
-			return toast.err(3, L.fc_eperm);
-
 		var sel = msel.getsel(),
 			vps = [];
 
 		if (!sel.length)
-			toast.err(3, L.fc_emore);
+			return toast.err(3, L.fc_emore);
+
+		if (clgot(bcut, 'hide'))
+			return toast.err(3, L.fc_eperm);
 
 		var els = [], griden = thegrid.en;
 		for (var a = 0; a < sel.length; a++) {
@@ -5095,11 +5095,11 @@ var fileman = (function () {
 	};
 
 	r.paste = function () {
-		if (clgot(bpst, 'hide'))
-			return toast.err(3, L.fp_eperm);
-
 		if (!r.clip.length)
 			return toast.err(5, L.fp_ecut);
+
+		if (clgot(bpst, 'hide'))
+			return toast.err(3, L.fp_eperm);
 
 		var req = [],
 			exists = [],
