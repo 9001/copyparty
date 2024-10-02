@@ -113,7 +113,7 @@ from .util import (
 
 if True:  # pylint: disable=using-constant-test
     import typing
-    from typing import Any, Generator, Match, Optional, Pattern, Type, Union
+    from typing import Any, Generator, Iterable, Match, Optional, Pattern, Type, Union
 
 if TYPE_CHECKING:
     from .httpconn import HttpConn
@@ -1204,10 +1204,6 @@ class HttpCli(object):
         if "davauth" in vn.flags and self.uname == "*":
             self.can_read = self.can_write = self.can_get = False
 
-        if not self.can_read and not self.can_write and not self.can_get:
-            self.log("inaccessible: [%s]" % (self.vpath,))
-            raise Pebkac(401, "authenticate")
-
         from .dxml import parse_xml
 
         # enc = "windows-31j"
@@ -1252,6 +1248,9 @@ class HttpCli(object):
         props = set(props_lst)
         depth = self.headers.get("depth", "infinity").lower()
 
+        zi = int(time.time())
+        vst = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, zi, zi, zi))
+
         try:
             topdir = {"vp": "", "st": bos.stat(tap)}
         except OSError as ex:
@@ -1259,10 +1258,21 @@ class HttpCli(object):
                 raise
             raise Pebkac(404)
 
-        if depth == "0" or not self.can_read or not stat.S_ISDIR(topdir["st"].st_mode):
-            fgen = []
+        fgen: Iterable[dict[str, Any]] = []
 
-        elif depth == "infinity":
+        if depth == "infinity":
+            if not self.can_read:
+                t = "depth:infinity requires read-access in /%s"
+                t = t % (self.vpath,)
+                self.log(t, 3)
+                raise Pebkac(401, t)
+
+            if not stat.S_ISDIR(topdir["st"].st_mode):
+                t = "depth:infinity can only be used on folders; /%s is 0o%o"
+                t = t % (self.vpath, topdir["st"])
+                self.log(t, 3)
+                raise Pebkac(400, t)
+
             if not self.args.dav_inf:
                 self.log("client wants --dav-inf", 3)
                 zb = b'<?xml version="1.0" encoding="utf-8"?>\n<D:error xmlns:D="DAV:"><D:propfind-finite-depth/></D:error>'
@@ -1290,22 +1300,28 @@ class HttpCli(object):
                 [[True, False]],
                 lstat="davrt" not in vn.flags,
             )
+            if not self.can_read:
+                vfs_ls = []
             if not self.can_dot:
                 names = set(exclude_dotfiles([x[0] for x in vfs_ls]))
                 vfs_ls = [x for x in vfs_ls if x[0] in names]
 
-            zi = int(time.time())
-            zsr = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, zi, zi, zi))
-            ls = [{"vp": vp, "st": st} for vp, st in vfs_ls]
-            ls += [{"vp": v, "st": zsr} for v in vfs_virt]
-            fgen = ls  # type: ignore
+            fgen = [{"vp": vp, "st": st} for vp, st in vfs_ls]
+            fgen += [{"vp": v, "st": vst} for v in vfs_virt]
+
+        elif depth == "0":
+            pass
 
         else:
             t = "invalid depth value '{}' (must be either '0' or '1'{})"
             t2 = " or 'infinity'" if self.args.dav_inf else ""
             raise Pebkac(412, t.format(depth, t2))
 
-        fgen = itertools.chain([topdir], fgen)  # type: ignore
+        if not self.can_read and not self.can_write and not self.can_get and not fgen:
+            self.log("inaccessible: [%s]" % (self.vpath,))
+            raise Pebkac(401, "authenticate")
+
+        fgen = itertools.chain([topdir], fgen)
         vtop = vjoin(self.args.R, vjoin(vn.vpath, rem))
 
         chunksz = 0x7FF8  # preferred by nginx or cf (dunno which)
