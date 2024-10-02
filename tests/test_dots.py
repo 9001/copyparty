@@ -107,9 +107,9 @@ class TestDots(unittest.TestCase):
         os.rename(".b", "v/.b")
 
         vcfg = [
-            ".::r.,u1:g,u2:c,dk",
-            "v/a:v/a:r.,u1:g,u2:c,dk",
-            "v/.b:v/.b:r.,u1:g,u2:c,dk",
+            ".::r.,u1:g,u2:c,dks",
+            "v/a:v/a:r.,u1:g,u2:c,dks",
+            "v/.b:v/.b:r.,u1:g,u2:c,dks",
         ]
         self.args = Cfg(v=vcfg, a=["u1:u1", "u2:u2"])
         self.asrv = AuthSrv(self.args, self.log)

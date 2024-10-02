@@ -63,7 +63,7 @@ UTC = timezone.utc
 
 # !rm.yes>
 MON3S = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec"
-MON3 = {b:a for a,b in enumerate(MON3S.split(), 1)}
+MON3 = {b: a for a, b in enumerate(MON3S.split(), 1)}
 # !rm.no>
 
 
@@ -946,7 +946,7 @@ class CPPF(Operations):
 
         return ret
 
-    # !rm.yes>
+        # !rm.yes>
         fn = "cppf-{}-{}-{}".format(time.time(), offset, length)
         if False:
             with open(fn, "wb", len(ret)) as f:
@@ -969,7 +969,7 @@ class CPPF(Operations):
                 raise Exception("cache bork")
 
         return ret
-    # !rm.no>
+        # !rm.no>
 
     def getattr(self, path, fh=None):
         dbg("getattr %r", path)
@@ -1057,6 +1057,7 @@ class CPPF(Operations):
         def statfs(self, path):
             dbg("@@ statfs [{}]".format(path))
             return {}
+
     # !rm.no>
 
     if sys.platform == "win32":

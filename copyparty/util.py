@@ -816,6 +816,8 @@ class _LUnrecv(object):
         self.buf = buf + self.buf
         t = "\033[0;7mur:push\033[0;1;31m {}\n\033[0;7mur:rem:\033[0;1;35m {}\033[0m"
         print(t.format(buf, self.buf))
+
+
 # !rm.no>
 
 
@@ -3572,6 +3574,8 @@ except ImportError:
     except ImportError:
         impresources = None
 try:
+    if sys.version_info > (3, 10):
+        raise ImportError()
     import pkg_resources
 except ImportError:
     pkg_resources = None

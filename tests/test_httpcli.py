@@ -26,6 +26,7 @@ def hdr(query):
 class TestHttpCli(unittest.TestCase):
     def setUp(self):
         self.td = tu.get_ramdisk()
+        self.maxDiff = 99999
 
     def tearDown(self):
         os.chdir(tempfile.gettempdir())
@@ -39,6 +40,7 @@ class TestHttpCli(unittest.TestCase):
         os.mkdir(td)
         os.chdir(td)
 
+        # "perm+user"; r/w/a (a=rw) for user a/o/x (a=all)
         self.dtypes = ["ra", "ro", "rx", "wa", "wo", "wx", "aa", "ao", "ax"]
         self.can_read = ["ra", "ro", "aa", "ao"]
         self.can_write = ["wa", "wo", "aa", "ao"]
@@ -121,7 +123,8 @@ class TestHttpCli(unittest.TestCase):
 
                 # expected files in archives
                 if rok:
-                    ref = [x for x in vfiles if self.in_dive(top + "/" + durl, x)]
+                    zs = top + "/" + durl
+                    ref = [x for x in vfiles if self.in_dive(zs, x)]
                     ref.sort()
                 else:
                     ref = []
@@ -166,7 +169,7 @@ class TestHttpCli(unittest.TestCase):
                     self.assertEqual([], zf_ng)
 
                 # stash
-                h, ret = self.put(url)
+                h, ret = self.put(durl)
                 res = h.startswith("HTTP/1.1 201 ")
                 self.assertEqual(res, wok)
                 if wok:

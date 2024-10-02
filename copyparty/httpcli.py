@@ -427,6 +427,7 @@ class HttpCli(object):
             vpath = undot(vpath)
 
             ptn = self.conn.hsrv.ptn_cc
+            k_safe = self.conn.hsrv.uparam_cc_ok
             for k in arglist.split("&"):
                 if "=" in k:
                     k, zs = k.split("=", 1)
@@ -439,7 +440,7 @@ class HttpCli(object):
                 k = k.lower()
                 uparam[k] = sv
 
-                if k in ("doc", "move", "tree"):
+                if k in k_safe:
                     continue
 
                 zs = "%s=%s" % (k, sv)
@@ -3829,7 +3830,7 @@ class HttpCli(object):
         items: list[str],
     ) -> bool:
         if self.args.no_zip:
-            raise Pebkac(400, "not enabled")
+            raise Pebkac(400, "not enabled in server config")
 
         logmsg = "{:4} {} ".format("", self.req)
         self.keepalive = False
@@ -4145,7 +4146,7 @@ class HttpCli(object):
                 "dbwt": None,
             }
 
-        assert vstate and vs  # type: ignore  # !rm
+        assert vstate.items and vs  # type: ignore  # !rm
 
         fmt = self.uparam.get("ls", "")
         if not fmt and (self.ua.startswith("curl/") or self.ua.startswith("fetch")):
@@ -5149,6 +5150,9 @@ class HttpCli(object):
         for k in ["zip", "tar"]:
             v = self.uparam.get(k)
             if v is not None and (not add_og or not og_fn):
+                if is_dk and "dks" not in vn.flags:
+                    t = "server config does not allow download-as-zip/tar; only dk is specified, need dks too"
+                    raise Pebkac(403, t)
                 return self.tx_zip(k, v, self.vpath, vn, rem, [])
 
         fsroot, vfs_ls, vfs_virt = vn.ls(

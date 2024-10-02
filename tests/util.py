@@ -267,6 +267,7 @@ class VHttpSrv(object):
 
         self.u2idx = None
         self.ptn_cc = re.compile(r"[\x00-\x1f]")
+        self.uparam_cc_ok = set("doc move tree".split())
 
     def cachebuster(self):
         return "a"
