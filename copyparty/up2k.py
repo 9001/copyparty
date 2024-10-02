@@ -2777,7 +2777,7 @@ class Up2k(object):
             if ptop not in self.registry:
                 raise Pebkac(410, "location unavailable")
 
-        cj["name"] = sanitize_fn(cj["name"], "", [".prologue.html", ".epilogue.html"])
+        cj["name"] = sanitize_fn(cj["name"], "")
         cj["poke"] = now = self.db_act = self.vol_act[ptop] = time.time()
         wark = self._get_wark(cj)
         job = None

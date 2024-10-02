@@ -2,7 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 # awk -F\" '/add_argument\("-[^-]/{print(substr($2,2))}' copyparty/__main__.py | sort | tr '\n' ' '
-zs = "a c e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vp e2vu ed emp i j lo mcr mte mth mtm mtp nb nc nid nih nw p q s ss sss v z zv"
+zs = "a c e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vp e2vu ed emp i j lo mcr mte mth mtm mtp nb nc nid nih nth nw p q s ss sss v z zv"
 onedash = set(zs.split())
 
 

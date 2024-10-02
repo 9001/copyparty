@@ -1804,7 +1804,7 @@ class HttpCli(object):
             if rnd:
                 fn = rand_name(fdir, fn, rnd)
 
-            fn = sanitize_fn(fn or "", "", [".prologue.html", ".epilogue.html"])
+            fn = sanitize_fn(fn or "", "")
 
         path = os.path.join(fdir, fn)
 
@@ -2547,7 +2547,7 @@ class HttpCli(object):
         self.gctx = vpath
         vpath = undot(vpath)
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
-        rem = sanitize_vpath(rem, "/", [])
+        rem = sanitize_vpath(rem, "/")
         fn = vfs.canonical(rem)
         if not fn.startswith(vfs.realpath):
             self.log("invalid mkdir [%s] [%s]" % (self.gctx, vpath), 1)
@@ -2594,7 +2594,7 @@ class HttpCli(object):
         if not ext or len(ext) > 5 or not self.can_delete:
             new_file += ".md"
 
-        sanitized = sanitize_fn(new_file, "", [])
+        sanitized = sanitize_fn(new_file, "")
 
         if not nullwrite:
             fdir = vfs.canonical(rem)
@@ -2673,9 +2673,7 @@ class HttpCli(object):
                     # fallthrough
 
                 fdir = fdir_base
-                fname = sanitize_fn(
-                    p_file or "", "", [".prologue.html", ".epilogue.html"]
-                )
+                fname = sanitize_fn(p_file or "", "")
                 abspath = os.path.join(fdir, fname)
                 suffix = "-%.6f-%s" % (time.time(), dip)
                 if p_file and not nullwrite:

@@ -1982,12 +1982,9 @@ def undot(path: str) -> str:
     return "/".join(ret)
 
 
-def sanitize_fn(fn: str, ok: str, bad: list[str]) -> str:
+def sanitize_fn(fn: str, ok: str) -> str:
     if "/" not in ok:
         fn = fn.replace("\\", "/").split("/")[-1]
-
-    if fn.lower() in bad:
-        fn = "_" + fn
 
     if ANYWIN:
         remap = [
@@ -2014,9 +2011,9 @@ def sanitize_fn(fn: str, ok: str, bad: list[str]) -> str:
     return fn.strip()
 
 
-def sanitize_vpath(vp: str, ok: str, bad: list[str]) -> str:
+def sanitize_vpath(vp: str, ok: str) -> str:
     parts = vp.replace(os.sep, "/").split("/")
-    ret = [sanitize_fn(x, ok, bad) for x in parts]
+    ret = [sanitize_fn(x, ok) for x in parts]
     return "/".join(ret)
 
 
