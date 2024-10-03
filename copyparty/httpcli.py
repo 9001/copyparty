@@ -5165,13 +5165,13 @@ class HttpCli(object):
         except:
             pass
 
+        lnames = {x.lower(): x for x in ls_names}
+
         # show dotfiles if permitted and requested
         if not self.can_dot or (
             "dots" not in self.uparam and (is_ls or "dots" not in self.cookies)
         ):
             ls_names = exclude_dotfiles(ls_names)
-
-        lnames = {x.lower(): x for x in ls_names}
 
         add_dk = vf.get("dk")
         add_fk = vf.get("fk")
