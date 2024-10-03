@@ -594,3 +594,20 @@ def _get_bit(x: int, i: int) -> bool:
 
 class DataTooLongError(ValueError):
     pass
+
+
+def qr2svg(qr: QrCode, border: int) -> str:
+    parts: list[str] = []
+    for y in range(qr.size):
+        sy = border + y
+        for x in range(qr.size):
+            if qr.modules[y][x]:
+                parts.append("M%d,%dh1v1h-1z" % (border + x, sy))
+    t = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 {0} {0}" stroke="none">
+<rect width="100%" height="100%" fill="#F7F7F7"/>
+<path d="{1}" fill="#111111"/>
+</svg>
+"""
+    return t.format(qr.size + border * 2, " ".join(parts))

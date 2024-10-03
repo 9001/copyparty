@@ -426,7 +426,7 @@ var tl_browser = {
 		"fs_tsrc": "the file or folder to share",
 		"fs_ppwd": "optional password",
 		"fs_w8": "creating share...",
-		"fs_ok": "<h6>share-URL created</h6>\npress <code>Enter/OK</code> to Clipboard\npress <code>ESC/Cancel</code> to Close\n\n",
+		"fs_ok": "press <code>Enter/OK</code> to Clipboard\npress <code>ESC/Cancel</code> to Close",
 
 		"frt_dec": "may fix some cases of broken filenames\">url-decode",
 		"frt_rst": "reset modified filenames back to the original ones\">↺ reset",

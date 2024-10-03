@@ -37,6 +37,7 @@ from .__version__ import S_VERSION
 from .authsrv import VFS  # typechk
 from .bos import bos
 from .star import StreamTar
+from .stolen.qrcodegen import QrCode, qr2svg
 from .sutil import StreamArc, gfilter
 from .szip import StreamZip
 from .up2k import up2k_chunksize
@@ -494,6 +495,9 @@ class HttpCli(object):
         self.vpaths = (
             self.vpath + "/" if self.trailing_slash and self.vpath else self.vpath
         )
+
+        if "qr" in uparam:
+            return self.tx_qr()
 
         if relchk(self.vpath) and (self.vpath != "*" or self.mode != "OPTIONS"):
             self.log("invalid relpath [{}]".format(self.vpath))
@@ -3934,6 +3938,33 @@ class HttpCli(object):
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
 
+    def tx_qr(self):
+        url = "%s://%s%s%s" % (
+            "https" if self.is_https else "http",
+            self.host,
+            self.args.SRS,
+            self.vpaths,
+        )
+        uhash = ""
+        uparams = []
+        if self.ouparam:
+            for k, v in self.ouparam.items():
+                if k == "qr":
+                    continue
+                if k == "uhash":
+                    uhash = v
+                    continue
+                uparams.append(k if v is "" else "%s=%s" % (k, v))
+        if uparams:
+            url += "?" + "&".join(uparams)
+        if uhash:
+            url += "#" + uhash
+
+        self.log("qrcode(%r)" % (url,))
+        ret = qr2svg(QrCode.encode_binary(url.encode("utf-8")), 2)
+        self.reply(ret.encode("utf-8"), mime="image/svg+xml")
+        return True
+
     def tx_md(self, vn: VFS, fs_path: str) -> bool:
         logmsg = "     %s @%s " % (self.req, self.uname)
 
@@ -4505,9 +4536,6 @@ class HttpCli(object):
         if self.uname != self.args.shr_adm:
             rows = [x for x in rows if x[5] == self.uname]
 
-        for x in rows:
-            x[1] = "yes" if x[1] else ""
-
         html = self.j2s(
             "shares", this=self, shr=self.args.shr, rows=rows, now=int(time.time())
         )
@@ -4585,7 +4613,7 @@ class HttpCli(object):
         else:
             for zs in vps:
                 if zs.endswith("/"):
-                    t = "you cannot select more than one folder, or mix flies and folders in one selection"
+                    t = "you cannot select more than one folder, or mix files and folders in one selection"
                     raise Pebkac(400, t)
             vp = vps[0].rsplit("/", 1)[0]
             for zs in vps:

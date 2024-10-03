@@ -27,7 +27,7 @@ a {
 	padding: .2em .6em;
 	margin: 0 .3em;
 }
-td a {
+#wrap td a {
 	margin: 0;
 }
 #w {
@@ -53,12 +53,13 @@ th {
 	position: sticky;
     background: #f7f7f7;
 }
-td, th {
+#wrap td,
+#wrap th {
 	padding: .3em .6em;
 	text-align: left;
 	white-space: nowrap;
 }
-td+td+td+td+td+td+td+td {
+#wrap td+td+td+td+td+td+td+td {
 	font-family: var(--font-mono), monospace, monospace;
 }
 

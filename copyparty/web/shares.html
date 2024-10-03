@@ -22,8 +22,8 @@
         <span>min/hrs = time left</span>
 
         <table id="tab"><thead><tr>
-            <th>delete</th>
             <th>sharekey</th>
+            <th>delete</th>
             <th>pw</th>
             <th>source</th>
             <th>axs</th>
@@ -37,10 +37,13 @@
         </tr></thead><tbody>
         {% for k, pw, vp, pr, st, un, t0, t1 in rows %}
         <tr>
+            <td>
+                <a href="{{ r }}{{ shr }}{{ k }}?qr">qr</a>
+                <a href="{{ r }}{{ shr }}{{ k }}">{{ k }}</a>
+            </td>
             <td><a href="#" k="{{ k }}">delete</a></td>
-            <td><a href="{{ r }}{{ shr }}{{ k }}">{{ k }}</a></td>
-            <td>{{ pw }}</td>
-            <td><a href="{{ r }}/{{ vp|e }}">{{ vp|e }}</a></td>
+            <td>{{ "yes" if pw else "--" }}</td>
+            <td><a href="{{ r }}/{{ vp|e }}">/{{ vp|e }}</a></td>
             <td>{{ pr }}</td>
             <td>{{ st }}</td>
             <td>{{ un|e }}</td>

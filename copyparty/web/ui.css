@@ -293,6 +293,12 @@ html.y #tth {
 #modalc a {
 	color: #07b;
 }
+#modalc .b64 {
+	display: block;
+	margin: .1em auto;
+	width: 60%;
+	height: 60%;
+}
 #modalb {
 	position: sticky;
 	text-align: right;

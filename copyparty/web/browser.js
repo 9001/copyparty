@@ -345,7 +345,7 @@ var Ls = {
 		"fs_tsrc": "the file or folder to share",
 		"fs_ppwd": "optional password",
 		"fs_w8": "creating share...",
-		"fs_ok": "<h6>share-URL created</h6>\npress <code>Enter/OK</code> to Clipboard\npress <code>ESC/Cancel</code> to Close\n\n",
+		"fs_ok": "press <code>Enter/OK</code> to Clipboard\npress <code>ESC/Cancel</code> to Close",
 
 		"frt_dec": "may fix some cases of broken filenames\">url-decode",
 		"frt_rst": "reset modified filenames back to the original ones\">↺ reset",
@@ -913,7 +913,7 @@ var Ls = {
 		"fs_tsrc": "fil/mappe som skal deles",
 		"fs_ppwd": "frivillig passord",
 		"fs_w8": "oppretter deling...",
-		"fs_ok": "<h6>URL opprettet</h6>\ntrykk <code>Enter/OK</code> for å kopiere linken (for CTRL-V)\ntrykk <code>ESC/Avbryt</code> for å bare bekrefte\n\n",
+		"fs_ok": "trykk <code>Enter/OK</code> for å kopiere linken (for CTRL-V)\ntrykk <code>ESC/Avbryt</code> for å bare bekrefte",
 
 		"frt_dec": "kan korrigere visse ødelagte filnavn\">url-decode",
 		"frt_rst": "nullstiller endringer (tilbake til de originale filnavnene)\">↺ reset",
@@ -1481,7 +1481,7 @@ var Ls = {
 		"fs_tsrc": "共享的文件或文件夹",
 		"fs_ppwd": "密码可选",
 		"fs_w8": "正在创建文件共享...",
-		"fs_ok": "<h6>分享链接已创建</h6>\n按 <code>Enter/OK</code> 复制到剪贴板\n按 <code>ESC/Cancel</code> 关闭\n\n",
+		"fs_ok": "按 <code>Enter/OK</code> 复制到剪贴板\n按 <code>ESC/Cancel</code> 关闭",
 
 		"frt_dec": "可能修复一些损坏的文件名\">url-decode",
 		"frt_rst": "将修改后的文件名重置为原始文件名\">↺ 重置",
@@ -1788,7 +1788,7 @@ ebi('widget').innerHTML = (
 	'	<canvas id="barbuf"></canvas>' +
 	'</div>' +
 	'<div id="np_inf">' +
-	'	<img id="np_img"></span>' +
+	'	<img id="np_img" />' +
 	'	<span id="np_url"></span>' +
 	'	<span id="np_circle"></span>' +
 	'	<span id="np_album"></span>' +
@@ -4596,11 +4596,12 @@ var fileman = (function () {
 				return;
 			}
 			surl = surl.slice(15);
-			modal.confirm(L.fs_ok + esc(surl), function() {
+			var txt = esc(surl) + '<img class="b64" src="' + surl + '?qr" />';
+			modal.confirm(txt + L.fs_ok, function() {
 				cliptxt(surl, function () {
 					toast.ok(2, L.clipped);
 				});
-			});
+			}, null);
 		}
 
 		sh_apply.onclick = function () {
