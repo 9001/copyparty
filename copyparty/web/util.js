@@ -922,15 +922,18 @@ function shumantime(v, long) {
 
 
 function lhumantime(v) {
-    var t = shumantime(v, 1),
-        tp = t.replace(/([a-z])/g, " $1 ").split(/ /g).slice(0, -1);
+    var t = shumantime(v, 1);
+    if (/[0-9]$/.exec(t))
+        t += 's';
+
+    var tp = t.replace(/([a-z])/g, " $1 ").split(/ /g).slice(0, -1);
 
     if (!L || tp.length < 2 || tp[1].indexOf('$') + 1)
         return t;
 
     var ret = '';
     for (var a = 0; a < tp.length; a += 2)
-        ret += tp[a] + ' ' + L['ht_' + tp[a + 1]].replace(tp[a] == 1 ? /!.*/ : /!/, '') + L.ht_and;
+        ret += tp[a] + ' ' + L['ht_' + tp[a + 1] + (tp[a]==1?1:2)] + L.ht_and;
 
     return ret.slice(0, -L.ht_and.length);
 }

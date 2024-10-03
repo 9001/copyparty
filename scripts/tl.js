@@ -175,10 +175,14 @@ var tl_browser = {
 		"danger": "DANGER",
 		"clipped": "copied to clipboard",
 
-		"ht_s": "second!s",
-		"ht_m": "minute!s",
-		"ht_h": "hour!s",
-		"ht_d": "day!s",
+		"ht_s1": "second",
+		"ht_s2": "seconds",
+		"ht_m1": "minute",
+		"ht_m2": "minutes",
+		"ht_h1": "hour",
+		"ht_h2": "hours",
+		"ht_d1": "day",
+		"ht_d2": "days",
 		"ht_and": " and ",
 
 		"goh": "control-panel",
@@ -406,7 +410,7 @@ var tl_browser = {
 
 		"fs_sc": "share the folder you're in",
 		"fs_ss": "share the selected files",
-		"fs_just1d": "you cannot select more than one folder,\nor mix flies and folders in one selection",
+		"fs_just1d": "you cannot select more than one folder,\nor mix files and folders in one selection",
 		"fs_abrt": "❌ abort",
 		"fs_rand": "🎲 rand.name",
 		"fs_go": "✅ create share",
