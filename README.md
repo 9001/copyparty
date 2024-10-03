@@ -1159,8 +1159,6 @@ note that this disables hotlinking because the opengraph spec demands it; to sne
 
 you can also hotlink files regardless by appending `?raw` to the url
 
-NOTE: because discord (and maybe others) strip query args such as `?raw` in opengraph tags, any links which require a filekey or dirkey will not work
-
 if you want to entirely replace the copyparty response with your own jinja2 template, give the template filepath to `--og-tpl` or volflag `og_tpl` (all members of `HttpCli` are available through the `this` object)
 
 
@@ -2086,6 +2084,8 @@ volflag `dky` disables the actual key-check, meaning anyone can see the contents
 * `dk` + `dky` gives the same behavior as if all users with `g` access have full read-access, but subfolders are hidden files (as if their names start with a dot), so `dky` is an alternative to renaming all the folders for that purpose, maybe just for some users
 
 volflag `dks` lets people enter subfolders as well, and also enables download-as-zip/tar
+
+if you enable dirkeys, it is probably a good idea to enable filekeys too, otherwise it will be impossible to hotlink files from a folder which was accessed using a dirkey
 
 dirkeys are generated based on another salt (`--dk-salt`) + filesystem-path and have a few limitations:
 * the key does not change if the contents of the folder is modified
