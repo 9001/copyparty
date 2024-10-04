@@ -3954,7 +3954,7 @@ class HttpCli(object):
                 if k == "uhash":
                     uhash = v
                     continue
-                uparams.append(k if v is "" else "%s=%s" % (k, v))
+                uparams.append(k if v == "" else "%s=%s" % (k, v))
         if uparams:
             url += "?" + "&".join(uparams)
         if uhash:

@@ -146,6 +146,13 @@ ised() {
 	sed -r "$1" <"$2" >t
 	tmv "$2"
 }
+dlf() {
+	[ -s "$f" ] && return 0
+	wget -O "$f" "$1" && return 0
+	curl -L "$1" >"$f" && return 0
+	rm -f "$f"
+	exit 1
+}
 
 stamp=$(
 	for d in copyparty scripts; do
@@ -178,8 +185,7 @@ necho() {
 	necho collecting ipaddress
 	f="../build/ipaddress-1.0.23.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://files.pythonhosted.org/packages/b9/9a/3e9da40ea28b8210dd6504d3fe9fe7e013b62bf45902b458d1cdc3c34ed9/ipaddress-1.0.23.tar.gz;
-		wget -O$f "$url" || curl -L "$url" >$f)
+		dlf https://files.pythonhosted.org/packages/b9/9a/3e9da40ea28b8210dd6504d3fe9fe7e013b62bf45902b458d1cdc3c34ed9/ipaddress-1.0.23.tar.gz
 
 	tar -zxf $f
 	mkdir py37
@@ -189,8 +195,7 @@ necho() {
 	necho collecting jinja2
 	f="../build/Jinja2-2.11.3.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://files.pythonhosted.org/packages/4f/e7/65300e6b32e69768ded990494809106f87da1d436418d5f1367ed3966fd7/Jinja2-2.11.3.tar.gz;
-		wget -O$f "$url" || curl -L "$url" >$f)
+		dlf https://files.pythonhosted.org/packages/4f/e7/65300e6b32e69768ded990494809106f87da1d436418d5f1367ed3966fd7/Jinja2-2.11.3.tar.gz
 
 	tar -zxf $f
 	mv Jinja2-*/src/jinja2 .
@@ -199,8 +204,7 @@ necho() {
 	necho collecting markupsafe
 	f="../build/MarkupSafe-1.1.1.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://files.pythonhosted.org/packages/b9/2e/64db92e53b86efccfaea71321f597fa2e1b2bd3853d8ce658568f7a13094/MarkupSafe-1.1.1.tar.gz;
-		wget -O$f "$url" || curl -L "$url" >$f)
+		dlf https://files.pythonhosted.org/packages/b9/2e/64db92e53b86efccfaea71321f597fa2e1b2bd3853d8ce658568f7a13094/MarkupSafe-1.1.1.tar.gz
 
 	tar -zxf $f
 	mv MarkupSafe-*/src/markupsafe .
@@ -212,8 +216,7 @@ necho() {
 	necho collecting pyftpdlib
 	f="../build/pyftpdlib-1.5.10.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://files.pythonhosted.org/packages/cf/31/8d910cf40317dd0db74ba0b8558d0dee23c8b002468c14d3a5dec0e6e9fd/pyftpdlib-1.5.10.tar.gz;
-		wget -O$f "$url" || curl -L "$url" >$f)
+		dlf https://files.pythonhosted.org/packages/cf/31/8d910cf40317dd0db74ba0b8558d0dee23c8b002468c14d3a5dec0e6e9fd/pyftpdlib-1.5.10.tar.gz
 
 	tar -zxf $f
 	mv pyftpdlib-*/pyftpdlib .
@@ -229,8 +232,7 @@ necho() {
 	necho collecting partftpy
 	f="../build/partftpy-0.4.0.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://files.pythonhosted.org/packages/8c/96/642bb3ddcb07a2c6764eb29aa562d1cf56877ad6c330c3c8921a5f05606d/partftpy-0.4.0.tar.gz;
-		wget -O$f "$url" || curl -L "$url" >$f)
+		dlf https://files.pythonhosted.org/packages/8c/96/642bb3ddcb07a2c6764eb29aa562d1cf56877ad6c330c3c8921a5f05606d/partftpy-0.4.0.tar.gz
 
 	tar -zxf $f
 	mv partftpy-*/partftpy .
@@ -240,8 +242,7 @@ necho() {
 	v=0.4.27
 	f="../build/python-magic-$v.tar.gz"
 	[ -e "$f" ] ||
-		(url=https://files.pythonhosted.org/packages/da/db/0b3e28ac047452d079d375ec6798bf76a036a08182dbb39ed38116a49130/python-magic-0.4.27.tar.gz;
-		wget -O$f "$url" || curl -L "$url" >$f)
+		dlf https://files.pythonhosted.org/packages/da/db/0b3e28ac047452d079d375ec6798bf76a036a08182dbb39ed38116a49130/python-magic-0.4.27.tar.gz
 
 	tar -zxf $f
 	mkdir magic
@@ -256,8 +257,7 @@ necho() {
 		necho collecting strip-hints
 		f=../build/strip-hints-0.1.10.tar.gz
 		[ -e $f ] ||
-			(url=https://files.pythonhosted.org/packages/9c/d4/312ddce71ee10f7e0ab762afc027e07a918f1c0e1be5b0069db5b0e7542d/strip-hints-0.1.10.tar.gz;
-			wget -O$f "$url" || curl -L "$url" >$f)
+			dlf https://files.pythonhosted.org/packages/9c/d4/312ddce71ee10f7e0ab762afc027e07a918f1c0e1be5b0069db5b0e7542d/strip-hints-0.1.10.tar.gz
 
 		tar -zxf $f
 		mv strip-hints-0.1.10/src/strip_hints .
@@ -315,7 +315,7 @@ necho() {
 [ ! -e copyparty/web/deps/mini-fa.woff ] && [ $dl_wd ] && {
 	echo "could not find webdeps; downloading..."
 	url=https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py
-	wget -Ox.py "$url" || curl -L "$url" >x.py
+	f=x.py; rm -f $f; dlf $url
 
 	echo "extracting webdeps..."
 	wdsrc="$("$pybin" x.py --version 2>&1 | tee /dev/stderr | awk '/sfxdir:/{sub(/.*: /,"");print;exit}')"

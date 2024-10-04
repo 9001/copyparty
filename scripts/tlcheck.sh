@@ -22,8 +22,12 @@ awk -v apos=\' -v quot=\" '
     !$0 && t!=tp {
         print "\n\033[1;37;41m====DIFF===="
     }
+    !$0 && s==sp {
+        print "\n\033[1;37;44m====IDENTICAL===="
+    }
     !$0 { print; next; }
     {
+        sp=s; s=$0;
         tp=t; t="";
         c(quot);
         c(apos);
