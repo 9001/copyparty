@@ -218,6 +218,7 @@ var Ls = {
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
 		"ct_dir1st": 'sort folders before files">📁 first',
+		"ct_nsort": 'natural sort (for filenames with leading digits)">nsort',
 		"ct_readme": 'show README.md in folder listings">📜 readme',
 		"ct_idxh": 'show index.html instead of folder listing">htm',
 		"ct_sbars": 'show scrollbars">⟊',
@@ -786,6 +787,7 @@ var Ls = {
 		"ct_ihop": 'bla ned til sist viste bilde når bildeviseren lukkes">g⮯',
 		"ct_dots": 'vis skjulte filer (gitt at serveren tillater det)">.synlig',
 		"ct_dir1st": 'sorter slik at mapper kommer foran filer">📁 først',
+		"ct_nsort": 'naturlig sortering (forstår tall i filnavn)">nsort',
 		"ct_readme": 'vis README.md nedenfor filene">📜 readme',
 		"ct_idxh": 'vis index.html istedenfor fil-liste">htm',
 		"ct_sbars": 'vis rullgardiner / skrollefelt">⟊',
@@ -1354,6 +1356,7 @@ var Ls = {
 		"ct_ihop": '当图像查看器关闭时，滚动到最后查看的文件">滚动',
 		"ct_dots": '显示隐藏文件（如果服务器允许）">隐藏文件',
 		"ct_dir1st": '在文件之前排序文件夹">📁 排序',
+		"ct_nsort": '正确排序以数字开头的文件名">数字排序', //m
 		"ct_readme": '在文件夹列表中显示 README.md">📜 readme',
 		"ct_idxh": '显示 index.html 代替文件夹列表">htm',
 		"ct_sbars": '显示滚动条">⟊',
@@ -1913,6 +1916,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '</a>\n' +
 	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '</a>\n' +
+	'		<a id="nsort" class="tgl btn" href="#" tt="' + L.ct_nsort + '</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '</a>\n' +
 	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '</a>\n' +
 	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '</a>\n' +
@@ -4187,6 +4191,9 @@ function sortfiles(nodes) {
 	var sopts = jread('fsort', jcp(dsort)),
 		dir1st = sread('dir1st') !== '0';
 
+	var collator = sread('nsort') != 1 ? null :
+		new Intl.Collator([], {numeric: true});
+
 	try {
 		var is_srch = false;
 		if (nodes[0]['rp']) {
@@ -4236,7 +4243,9 @@ function sortfiles(nodes) {
 				}
 				if (v2 === undefined) return 1 * rev;
 
-				var ret = rev * (typ == 'int' ? (v1 - v2) : (v1.localeCompare(v2)));
+				var ret = rev * (typ == 'int' ? (v1 - v2) : collator ?
+					collator.compare(v1, v2) : v1.localeCompare(v2));
+
 				if (ret === 0)
 					ret = onodes.indexOf(n1) - onodes.indexOf(n2);
 
@@ -6790,6 +6799,9 @@ var treectl = (function () {
 		mentered = null,
 		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
+	var resort = function () {
+		treectl.gentab(get_evpath(), treectl.lsc);
+	};
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
@@ -6800,9 +6812,8 @@ var treectl = (function () {
 		xhr.open('GET', SR + '/?setck=dots=' + (v ? 'y' : ''), true);
 		xhr.send();
 	});
-	bcfg_bind(r, 'dir1st', 'dir1st', true, function (v) {
-		treectl.gentab(get_evpath(), treectl.lsc);
-	});
+	bcfg_bind(r, 'nsort', 'nsort', false, resort);
+	bcfg_bind(r, 'dir1st', 'dir1st', true, resort);
 	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
 	setwrap(bcfg_bind(r, 'parpane', 'parpane', true, onscroll));
 	bcfg_bind(r, 'htree', 'hovertree', false, reload_tree);

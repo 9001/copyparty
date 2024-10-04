@@ -299,6 +299,7 @@ var tl_browser = {
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
 		"ct_dir1st": 'sort folders before files">📁 first',
+		"ct_nsort": 'natural sort (for filenames with leading digits)">nsort',
 		"ct_readme": 'show README.md in folder listings">📜 readme',
 		"ct_idxh": 'show index.html instead of folder listing">htm',
 		"ct_sbars": 'show scrollbars">⟊',
