@@ -1362,6 +1362,7 @@ html.y #widget.open {
 }
 #widget.cmp #barpos,
 #widget.cmp #barbuf {
+	height: 1.6em;
 	width: calc(100% - 11em);
 	border-radius: 0;
 	left: 5em;
