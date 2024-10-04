@@ -11,14 +11,10 @@ ckpypi() {
 		pyinstaller
 		pyinstaller-hooks-contrib
 		pywin32-ctypes
-		certifi
-		charset_normalizer
-		idna
 		Jinja2
 		MarkupSafe
 		mutagen
 		Pillow
-		requests
 	)
 	for dep in "${deps[@]}"; do
 		k=

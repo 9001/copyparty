@@ -1,4 +1,46 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-0916-0107  `v1.15.3`  incoming eta
+
+## 🧪 new features
+
+![cpanel-upload-eta2-or8](https://github.com/user-attachments/assets/eb003bd4-da3c-4995-bf6e-3a8c1c1b26dd)
+
+* incoming uploads (and their ETA) are shown in the controlpanel 609c5921 844194ee
+* list total directory sizes 427597b6
+  * show the total size and number of files of each directory in listings
+  * makes browsing a bit slower (up to 30%) so can be disabled with `--no-dirsz`
+  * sizes are calculated during startup, so it requires `-e2dsa`
+    * file-uploads will recalculate the sizes immediately, but a full rescan is necessary to see changes caused by moves/deletes
+* optimizations;
+  * reduce broker overhead when multiprocessing is disabled 4e75534e
+    * should reduce cpu usage by uploads, thumbnails, prometheus metrics
+  * reduce cpu usage from downloading thumbnails 7d64879b
+
+## 🩹 bugfixes
+
+* fix sqlite indexes d67e9cc5
+  * upload handshakes would get exponentially slow if a volume has more than 200'000 files
+  * reindex on startup can be 150x faster in some rare cases (same filename in MANY folders)
+  * the database is now around 10% larger (likely worst-case)
+* misc ux: 58835b2b
+  * shares: show media tags
+  * html hydrator assumed a folder named `foo.txt` was a doc
+  * due to sessions, use `pwd` as password placeholder on services
+
+## 🔧 other changes
+
+* add [example](https://github.com/9001/copyparty/tree/hovudstraum/contrib#flameshotsh) for uploading screenshots from linux with flameshot 1c2acdc9
+* [nginx example](https://github.com/9001/copyparty/blob/hovudstraum/contrib/nginx/copyparty.conf): use unix-sockets for higher performance a5ce1032
+* #97 chinese translation was improved, thx again @ultwcz 7a573caf
+
+## 🗿 known issues 
+
+* prometheus metrics are busted
+  * **workaround:** disable monitoring of volume status with `--nos-vst`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0909-2343  `v1.15.1`  session
 
 <img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>

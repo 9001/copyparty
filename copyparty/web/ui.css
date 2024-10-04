@@ -75,7 +75,6 @@ html {
 	top: 1px;
 	right: 1%;
 	width: 99%;
-	background: var(--fg-max);
 	animation: toastt var(--tmtime) steps(var(--tmstep)) forwards;
 	transform-origin: right;
 }
@@ -143,12 +142,18 @@ html {
 #toast.inf #toastc {
 	background: #0be;
 }
+#toast.inf #toastt {
+	background: #8ef;
+}
 #toast.ok {
 	background: #380;
 	border-color: #8e4;
 }
 #toast.ok #toastc {
 	background: #8e4;
+}
+#toast.ok #toastt {
+	background: #cf9;
 }
 #toast.warn {
 	background: #960;
@@ -157,12 +162,18 @@ html {
 #toast.warn #toastc {
 	background: #fc0;
 }
+#toast.warn #toastt {
+	background: #fe9;
+}
 #toast.err {
 	background: #900;
 	border-color: #d06;
 }
 #toast.err #toastc {
 	background: #d06;
+}
+#toast.err #toastt {
+	background: #f9c;
 }
 #toast code {
 	padding: 0 .2em;

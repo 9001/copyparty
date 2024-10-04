@@ -1527,8 +1527,13 @@ var toast = (function () {
         if (sec)
             te = setTimeout(r.hide, sec * 1000);
 
-        if (same && delta < 1000)
+        var tb = ebi('toastt');
+        if (same && delta < 1000 && tb) {
+            tb.style.animation = 'none';
+            tb.offsetHeight;
+            tb.style.animation = null;
             return;
+        }
 
         if (txt.indexOf('<body>') + 1)
             txt = txt.slice(0, txt.indexOf('<')) + ' [...]';
