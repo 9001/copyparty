@@ -5696,10 +5696,7 @@ var thegrid = (function () {
 			swrite('gridln', r.ln);
 			setTimeout(r.tippen, 20);
 		}
-		try {
-			document.documentElement.style.setProperty('--grid-ln', r.ln);
-		}
-		catch (ex) { }
+		setcvar('--grid-ln', r.ln);
 	}
 	setln();
 
@@ -5709,10 +5706,7 @@ var thegrid = (function () {
 			swrite('gridsz', r.sz);
 			setTimeout(r.tippen, 20);
 		}
-		try {
-			document.documentElement.style.setProperty('--grid-sz', r.sz + 'em');
-		}
-		catch (ex) { }
+		setcvar('--grid-sz', r.sz + 'em');
 		aligngriditems();
 	}
 	setsz();
@@ -6775,10 +6769,7 @@ var filecolwidth = (function () {
 			return;
 
 		lastwidth = w;
-		try {
-			document.documentElement.style.setProperty('--file-td-w', w + 'em');
-		}
-		catch (ex) { }
+		setcvar('--file-td-w', w + 'em');
 	}
 })();
 onresize100.add(filecolwidth, true);
@@ -7022,10 +7013,7 @@ var treectl = (function () {
 			w = iw + 'em',
 			w2 = (iw + 2) + 'em';
 
-		try {
-			document.documentElement.style.setProperty('--nav-sz', w);
-		}
-		catch (ex) { }
+		setcvar('--nav-sz', w);
 		ebi('tree').style.width = w;
 		ebi('wrap').style.marginLeft = w2;
 		onscroll();

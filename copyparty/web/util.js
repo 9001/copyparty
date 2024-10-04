@@ -535,6 +535,14 @@ function clgot(el, cls) {
 }
 
 
+function setcvar(k, v) {
+    try {
+        document.documentElement.style.setProperty(k, v);
+    }
+    catch (e) { }
+}
+
+
 var ANIM = true;
 try {
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1525,7 +1533,10 @@ var toast = (function () {
         if (txt.indexOf('<body>') + 1)
             txt = txt.slice(0, txt.indexOf('<')) + ' [...]';
 
-        obj.innerHTML = '<a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
+        setcvar('--tmtime', sec + 's');
+        setcvar('--tmstep', sec * 15);
+
+        obj.innerHTML = '<div id="toastt"></div><a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
         obj.className = cl;
         sec += obj.offsetWidth;
         obj.className += ' vis';

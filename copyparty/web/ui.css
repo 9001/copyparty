@@ -69,6 +69,19 @@ html {
 	top: 2em;
 	bottom: unset;
 }
+#toastt {
+	position: absolute;
+	height: 1px;
+	top: 1px;
+	right: 1%;
+	width: 99%;
+	background: var(--fg-max);
+	animation: toastt var(--tmtime) steps(var(--tmstep)) forwards;
+	transform-origin: right;
+}
+@keyframes toastt {
+	to {transform: scaleX(0)}
+}
 #toast a {
 	color: inherit;
 	text-shadow: inherit;
