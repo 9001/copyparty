@@ -3588,6 +3588,10 @@ def hidedir(dp) -> None:
 
 
 try:
+    if sys.version_info < (3, 10):
+        # py3.8 doesn't have .files
+        # py3.9 has broken .is_file
+        raise ImportError()
     import importlib.resources as impresources
 except ImportError:
     try:
@@ -3618,37 +3622,17 @@ def stat_resource(E: EnvParams, name: str):
     return None
 
 
-def _find_impresource_cold(E: EnvParams, name: str):
-    global _rescache_imp, _find_impresource
-
+def _find_impresource(E: EnvParams, name: str):
     assert impresources  # !rm
     try:
-        _rescache_imp = impresources.files(E.pkg)
+        files = impresources.files(E.pkg)
     except ImportError:
         return None
 
-    _find_impresource = _find_impresource_warm
-    return _find_impresource(E, name)
+    return files.joinpath(name)
 
 
-def _find_impresource_warm(E: EnvParams, name: str):
-    if not _rescache_imp:
-        return None
-
-    try:
-        return _rescache_res[name]
-    except:
-        if len(_rescache_res) > 999:
-            _rescache_res.clear()
-        ret = _rescache_imp.joinpath(name)
-        _rescache_res[name] = ret
-        return ret
-
-
-_find_impresource = _find_impresource_cold
-_rescache_imp = None
 _rescache_has = {}
-_rescache_res = {}
 
 
 def _has_resource(E: EnvParams, name: str):
