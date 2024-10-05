@@ -3622,10 +3622,10 @@ def stat_resource(E: EnvParams, name: str):
     return None
 
 
-def _find_impresource(E: EnvParams, name: str):
+def _find_impresource(pkg: types.ModuleType, name: str):
     assert impresources  # !rm
     try:
-        files = impresources.files(E.pkg)
+        files = impresources.files(pkg)
     except ImportError:
         return None
 
@@ -3635,7 +3635,7 @@ def _find_impresource(E: EnvParams, name: str):
 _rescache_has = {}
 
 
-def _has_resource(E: EnvParams, name: str):
+def _has_resource(name: str):
     try:
         return _rescache_has[name]
     except:
@@ -3644,14 +3644,17 @@ def _has_resource(E: EnvParams, name: str):
     if len(_rescache_has) > 999:
         _rescache_has.clear()
 
+    assert __package__  # !rm
+    pkg = sys.modules[__package__]
+
     if impresources:
-        res = _find_impresource(E, name)
+        res = _find_impresource(pkg, name)
         if res and res.is_file():
             _rescache_has[name] = True
             return True
 
     if pkg_resources:
-        if _pkg_resource_exists(E.pkg.__name__, name):
+        if _pkg_resource_exists(pkg.__name__, name):
             _rescache_has[name] = True
             return True
 
@@ -3660,14 +3663,15 @@ def _has_resource(E: EnvParams, name: str):
 
 
 def has_resource(E: EnvParams, name: str):
-    return _has_resource(E, name) or os.path.exists(os.path.join(E.mod, name))
+    return _has_resource(name) or os.path.exists(os.path.join(E.mod, name))
 
 
 def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
     enc = None if "b" in mode else "utf-8"
 
     if impresources:
-        res = _find_impresource(E, name)
+        assert __package__  # !rm
+        res = _find_impresource(sys.modules[__package__], name)
         if res and res.is_file():
             if enc:
                 return res.open(mode, encoding=enc)
@@ -3676,8 +3680,10 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
                 return res.open(mode)
 
     if pkg_resources:
-        if _pkg_resource_exists(E.pkg.__name__, name):
-            stream = pkg_resources.resource_stream(E.pkg.__name__, name)
+        assert __package__  # !rm
+        pkg = sys.modules[__package__]
+        if _pkg_resource_exists(pkg.__name__, name):
+            stream = pkg_resources.resource_stream(pkg.__name__, name)
             if enc:
                 stream = codecs.getreader(enc)(stream)
             return stream

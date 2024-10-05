@@ -11,6 +11,15 @@ gtar=$(command -v gtar || command -v gnutar) || true
 		realpath() { grealpath "$@"; }
 }
 
+tmv() {
+	touch -r "$1" t
+	mv t "$1"
+}
+ised() {
+	sed -r "$1" <"$2" >t
+	tmv "$2"
+}
+
 targs=(--owner=1000 --group=1000)
 [ "$OSTYPE" = msys ] &&
 	targs=()
@@ -34,6 +43,12 @@ cd pyz
 
 cp -pR ../sfx/{copyparty,partftpy} .
 cp -pR ../sfx/{ftp,j2}/* .
+
+true && {
+	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*
+	echo h > copyparty/web/mde.html
+	ised '/edit2">edit \(fancy/d' copyparty/web/md.html
+}
 
 ts=$(date -u +%s)
 hts=$(date -u +%Y-%m%d-%H%M%S)

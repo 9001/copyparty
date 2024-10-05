@@ -16,8 +16,6 @@ except:
     TYPE_CHECKING = False
 
 if True:
-    from types import ModuleType
-
     from typing import Any, Callable, Optional
 
 PY2 = sys.version_info < (3,)
@@ -110,7 +108,6 @@ RES = set(zs.strip().split("\n"))
 
 class EnvParams(object):
     def __init__(self) -> None:
-        self.pkg: Optional[ModuleType] = None
         self.t0 = time.time()
         self.mod = ""
         self.cfg = ""
