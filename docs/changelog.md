@@ -1,4 +1,49 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-1004-2319  `v1.15.4`  hermetic
+
+## 🧪 new features
+
+* [u2c](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy) (commandline uploader):
+  * remove all dependencies; now entirely self-contained 9daeed92
+    * made it 3x faster for small files, 2x faster in general
+  * improve `-x` behavior to not traverse into excluded folders b9c5c7bb
+* [partyfuse](https://github.com/9001/copyparty/tree/hovudstraum/bin#partyfusepy) (fuse client; mount a copyparty server as a local filesystem):
+  * 9x faster directory listings 03f0f994
+  * 4x faster downloads on high-latency connections 847a2bdc
+  * embed `fuse.py` (its only dependency) -- can be downloaded from the connect-page 44f2b63e
+  * support mounting nginx and iis servers too, not just copyparty c81e8984
+* reduce ram usage down to 10% when running without `-e2d` 88a1c5ca
+  * does not affect servers with `-e2d` enabled (was already optimal)
+* share folders as qr-codes e4542064
+  * when creating a share, you get a qr-code for quick access
+  * buttons in the shares controlpanel to reshow it, optionally with the password embedded into the qr-code
+* #98 read embedded webdeps and templates with `pkg_resources`; thx @shizmob! a462a644 d866841c
+  * [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz) now runs straight from the source file without unpacking anything to disk
+    * ...and is now much slower at returning resource GETs, but that is fine
+* og / opengraph / discord embeds: support filekeys ae982006
+* add option for natural sorting; thx @oshiteku! 9804f25d
+* eyecandy timer bar on toasts 0dfe1d5b
+* smb-server: impacket 0.12 is out! dc4d0d8e
+  * now *possible* to list folders with more than 400 files (it's REALLY slow)
+
+## 🩹 bugfixes
+
+* webdav:
+  * support `<allprop/>` in propfind dc157fa2
+  * list volumes when root is unmapped 480ac254
+    * previously, clients couldn't connect to the root of a copyparty server unless a volume existed at `/`
+* #101 show `.prologue.html` and `.epilogue.html` in directory listings even if user cannot see hidden files 21be82ef
+* #100 confusing toast when pressing F2 without selecting anything 2715ee6c
+* fix prometheus metrics 678675a9
+
+## 🔧 other changes
+
+* #100 allow uploading `.prologue.html` and `.epilogue.html` 19a5985f
+* #102 make translation easier when running in docker
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-0916-0107  `v1.15.3`  incoming eta
 
 ## 🧪 new features

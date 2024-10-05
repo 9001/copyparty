@@ -777,6 +777,7 @@ semi-intentional limitations:
 
 * cleanup of expired shares only works when global option `e2d` is set, and/or at least one volume on the server has volflag `e2d`
 * only folders from the same volume are shared; if you are sharing a folder which contains other volumes, then the contents of those volumes will not be available
+* related to [IdP volumes being forgotten on shutdown](https://github.com/9001/copyparty/blob/hovudstraum/docs/idp.md#idp-volumes-are-forgotten-on-shutdown), any shares pointing into a user's IdP volume will be unavailable until that user makes their first request after a restart
 * no option to "delete after first access" because tricky
   * when linking something to discord (for example) it'll get accessed by their scraper and that would count as a hit
   * browsers wouldn't be able to resume a broken download unless the requester's IP gets allowlisted for X minutes (ref. tricky)
