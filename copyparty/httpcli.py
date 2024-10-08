@@ -2156,11 +2156,17 @@ class HttpCli(object):
         except UnrecvEOF:
             raise Pebkac(422, "client disconnected while posting JSON")
 
-        self.log("decoding {} bytes of {} json".format(len(json_buf), enc))
         try:
             body = json.loads(json_buf.decode(enc, "replace"))
+            try:
+                zds = {k: v for k, v in body.items()}
+                zds["hash"] = "%d chunks" % (len(body["hash"]))
+            except:
+                zds = body
+            t = "POST len=%d type=%s ip=%s user=%s req=%r json=%s"
+            self.log(t % (len(json_buf), enc, self.ip, self.uname, self.req, zds))
         except:
-            raise Pebkac(422, "you POSTed invalid json")
+            raise Pebkac(422, "you POSTed %d bytes of invalid json" % (len(json_buf),))
 
         # self.reply(b"cloudflare", 503)
         # return True

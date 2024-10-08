@@ -1167,7 +1167,11 @@ if you want to entirely replace the copyparty response with your own jinja2 temp
 
 enable symlink-based upload deduplication  globally with `--dedup` or per-volume with volflag `dedup`
 
-when someone tries to upload a file that already exists on the server, the upload will be politely declined and a symlink is created instead, pointing to the nearest copy on disk, thus reducinc disk space usage
+by default, when someone tries to upload a file that already exists on the server, the upload will be politely declined, and the server will copy the existing file over to where the upload would have gone
+
+if you enable deduplication with `--dedup` then it'll create a symlink instead of a full copy, thus reducing disk space usage
+
+* on the contrary, if your server is hooked up to s3-glacier or similar storage where reading is expensive, and you cannot use `--safe-dedup=1` because you have other software tampering with your files, so you want to entirely disable detection of duplicate data instead, then you can specify `--no-clone` globally or `noclone` as a volflag
 
 **warning:** when enabling dedup, you should also:
 * enable indexing with `-e2dsa` or volflag `e2dsa` (see [file indexing](#file-indexing) section below); strongly recommended

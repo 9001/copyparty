@@ -1545,7 +1545,7 @@ class Up2k(object):
                 at = 0
 
             # skip upload hooks by not providing vflags
-            self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, "", "", ip, at)
+            self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, wark, "", "", ip, at)
             db.n += 1
             tfa += 1
             td = time.time() - db.t
@@ -2779,9 +2779,10 @@ class Up2k(object):
 
         cj["name"] = sanitize_fn(cj["name"], "")
         cj["poke"] = now = self.db_act = self.vol_act[ptop] = time.time()
-        wark = self._get_wark(cj)
+        wark = dwark = self._get_wark(cj)
         job = None
         pdir = djoin(ptop, cj["prel"])
+        inc_ap = djoin(pdir, cj["name"])
         try:
             dev = bos.stat(pdir).st_dev
         except:
@@ -2796,6 +2797,7 @@ class Up2k(object):
             reg = self.registry[ptop]
             vfs = self.asrv.vfs.all_vols[cj["vtop"]]
             n4g = bool(vfs.flags.get("noforget"))
+            noclone = bool(vfs.flags.get("noclone"))
             rand = vfs.flags.get("rand") or cj.get("rand")
             lost: list[tuple["sqlite3.Cursor", str, str]] = []
 
@@ -2805,6 +2807,12 @@ class Up2k(object):
             vols = [(ptop, jcur)] if jcur else []
             if vfs.flags.get("xlink"):
                 vols += [(k, v) for k, v in self.cur.items() if k != ptop]
+
+            if noclone:
+                wark = up2k_wark_from_metadata(
+                    self.salt, cj["size"], cj["lmod"], cj["prel"], cj["name"]
+                )
+
             if vfs.flags.get("up_ts", "") == "fu" or not cj["lmod"]:
                 # force upload time rather than last-modified
                 cj["lmod"] = int(time.time())
@@ -2817,10 +2825,10 @@ class Up2k(object):
 
                 if self.no_expr_idx:
                     q = r"select * from up where w = ?"
-                    argv = [wark]
+                    argv = [dwark]
                 else:
                     q = r"select * from up where substr(w,1,16)=? and +w=?"
-                    argv = [wark[:16], wark]
+                    argv = [dwark[:16], dwark]
 
                 c2 = cur.execute(q, tuple(argv))
                 for _, dtime, dsize, dp_dir, dp_fn, ip, at in c2:
@@ -2828,6 +2836,9 @@ class Up2k(object):
                         dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
 
                     dp_abs = djoin(ptop, dp_dir, dp_fn)
+                    if noclone and dp_abs != inc_ap:
+                        continue
+
                     try:
                         st = bos.stat(dp_abs)
                         if stat.S_ISLNK(st.st_mode):
@@ -2836,7 +2847,7 @@ class Up2k(object):
                         if st.st_size != dsize:
                             t = "candidate ignored (db/fs desync): {}, size fs={} db={}, mtime fs={} db={}, file: {}"
                             t = t.format(
-                                wark, st.st_size, dsize, st.st_mtime, dtime, dp_abs
+                                dwark, st.st_size, dsize, st.st_mtime, dtime, dp_abs
                             )
                             self.log(t)
                             raise Exception()
@@ -2883,7 +2894,6 @@ class Up2k(object):
                     alts.append((score, -len(alts), j, cur, dp_dir, dp_fn))
 
             job = None
-            inc_ap = djoin(cj["ptop"], cj["prel"], cj["name"])
             for dupe in sorted(alts, reverse=True):
                 rj = dupe[2]
                 orig_ap = djoin(rj["ptop"], rj["prel"], rj["name"])
@@ -2893,11 +2903,11 @@ class Up2k(object):
                     break
                 else:
                     self.log("asserting contents of %s" % (orig_ap,))
-                    dhashes, st = self._hashlist_from_file(orig_ap)
-                    dwark = up2k_wark_from_hashlist(self.salt, st.st_size, dhashes)
-                    if wark != dwark:
+                    hashes2, st = self._hashlist_from_file(orig_ap)
+                    wark2 = up2k_wark_from_hashlist(self.salt, st.st_size, hashes2)
+                    if dwark != wark2:
                         t = "will not dedup (fs index desync): fs=%s, db=%s, file: %s"
-                        self.log(t % (dwark, wark, orig_ap))
+                        self.log(t % (wark2, dwark, orig_ap))
                         lost.append(dupe[3:])
                         continue
                     data_ok = True
@@ -2962,11 +2972,11 @@ class Up2k(object):
 
                 elif inc_ap != orig_ap and not data_ok and "done" in reg[wark]:
                     self.log("asserting contents of %s" % (orig_ap,))
-                    dhashes, _ = self._hashlist_from_file(orig_ap)
-                    dwark = up2k_wark_from_hashlist(self.salt, st.st_size, dhashes)
-                    if wark != dwark:
+                    hashes2, _ = self._hashlist_from_file(orig_ap)
+                    wark2 = up2k_wark_from_hashlist(self.salt, st.st_size, hashes2)
+                    if wark != wark2:
                         t = "will not dedup (fs index desync): fs=%s, idx=%s, file: %s"
-                        self.log(t % (dwark, wark, orig_ap))
+                        self.log(t % (wark2, wark, orig_ap))
                         del reg[wark]
 
             if job or wark in reg:
@@ -3023,6 +3033,7 @@ class Up2k(object):
 
                         job = deepcopy(job)
                         job["wark"] = wark
+                        job["dwrk"] = dwark
                         job["at"] = cj.get("at") or now
                         zs = "vtop ptop prel name lmod host user addr poke"
                         for k in zs.split():
@@ -3093,7 +3104,7 @@ class Up2k(object):
                                     raise
 
                         if cur and not self.args.nw:
-                            zs = "prel name lmod size ptop vtop wark host user addr at"
+                            zs = "prel name lmod size ptop vtop wark dwrk host user addr at"
                             a = [job[x] for x in zs.split()]
                             self.db_add(cur, vfs.flags, *a)
                             cur.connection.commit()
@@ -3123,6 +3134,7 @@ class Up2k(object):
 
                 job = {
                     "wark": wark,
+                    "dwrk": dwark,
                     "t0": now,
                     "sprs": sprs,
                     "hash": deepcopy(cj["hash"]),
@@ -3165,6 +3177,7 @@ class Up2k(object):
                 "lmod": job["lmod"],
                 "sprs": job.get("sprs", sprs),
                 "hash": job["need"],
+                "dwrk": dwark,
                 "wark": wark,
             }
 
@@ -3191,7 +3204,7 @@ class Up2k(object):
             ):
                 sql = "update up set mt=? where substr(w,1,16)=? and +rd=? and +fn=?"
                 try:
-                    cur.execute(sql, (cj["lmod"], wark[:16], job["prel"], job["name"]))
+                    cur.execute(sql, (cj["lmod"], dwark[:16], job["prel"], job["name"]))
                     cur.connection.commit()
 
                     ap = djoin(job["ptop"], job["prel"], job["name"])
@@ -3513,7 +3526,7 @@ class Up2k(object):
         except:
             self.log("failed to utime ({}, {})".format(dst, times))
 
-        zs = "prel name lmod size ptop vtop wark host user addr"
+        zs = "prel name lmod size ptop vtop wark dwrk host user addr"
         z2 = [job[x] for x in zs.split()]
         wake_sr = False
         try:
@@ -3586,6 +3599,7 @@ class Up2k(object):
         ptop: str,
         vtop: str,
         wark: str,
+        dwark: str,
         host: str,
         usr: str,
         ip: str,
@@ -3608,6 +3622,7 @@ class Up2k(object):
                 ptop,
                 vtop,
                 wark,
+                dwark,
                 host,
                 usr,
                 ip,
@@ -3622,7 +3637,7 @@ class Up2k(object):
             raise
 
         if "e2t" in self.flags[ptop]:
-            self.tagq.put((ptop, wark, rd, fn, sz, ip, at))
+            self.tagq.put((ptop, dwark, rd, fn, sz, ip, at))
             self.n_tagq += 1
 
         return True
@@ -3650,6 +3665,7 @@ class Up2k(object):
         ptop: str,
         vtop: str,
         wark: str,
+        dwark: str,
         host: str,
         usr: str,
         ip: str,
@@ -3666,13 +3682,13 @@ class Up2k(object):
             db_ip = "1.1.1.1" if self.args.no_db_ip else ip
 
         sql = "insert into up values (?,?,?,?,?,?,?)"
-        v = (wark, int(ts), sz, rd, fn, db_ip, int(at or 0))
+        v = (dwark, int(ts), sz, rd, fn, db_ip, int(at or 0))
         try:
             db.execute(sql, v)
         except:
             assert self.mem_cur  # !rm
             rd, fn = s3enc(self.mem_cur, rd, fn)
-            v = (wark, int(ts), sz, rd, fn, db_ip, int(at or 0))
+            v = (dwark, int(ts), sz, rd, fn, db_ip, int(at or 0))
             db.execute(sql, v)
 
         self.volsize[db] += sz
@@ -3716,11 +3732,11 @@ class Up2k(object):
             for cd in cds:
                 # one for each unique cooldown duration
                 try:
-                    db.execute(q, (cd, wark[:16], rd, fn))
+                    db.execute(q, (cd, dwark[:16], rd, fn))
                 except:
                     assert self.mem_cur  # !rm
                     rd, fn = s3enc(self.mem_cur, rd, fn)
-                    db.execute(q, (cd, wark[:16], rd, fn))
+                    db.execute(q, (cd, dwark[:16], rd, fn))
 
             if self.xiu_asleep:
                 self.xiu_asleep = False
@@ -4174,6 +4190,7 @@ class Up2k(object):
                     fsize,
                     dvn.realpath,
                     dvn.vpath,
+                    w,
                     w,
                     "",
                     "",
@@ -4856,6 +4873,7 @@ class Up2k(object):
                 inf.st_size,
                 ptop,
                 vtop,
+                wark,
                 wark,
                 "",
                 usr,
