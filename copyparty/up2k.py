@@ -1068,8 +1068,13 @@ class Up2k(object):
             except:
                 pass
 
+            if reg2 and "dwrk" not in reg2[next(iter(reg2))]:
+                for job in reg2.values():
+                    job["dwrk"] = job["wark"]
+
             for k, job in reg2.items():
-                fp = djoin(job["ptop"], job["prel"], job["name"])
+                job["ptop"] = ptop
+                fp = djoin(ptop, job["prel"], job["name"])
                 if bos.path.exists(fp):
                     reg[k] = job
                     if "done" in job:
