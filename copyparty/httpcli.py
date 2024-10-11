@@ -5467,7 +5467,11 @@ class HttpCli(object):
         if doc:
             j2a["docname"] = doc
             doctxt = None
-            if next((x for x in files if x["name"] == doc), None):
+            dfn = lnames.get(doc.lower())
+            if dfn and dfn != doc:
+                # found Foo but want FOO
+                dfn = next((x for x in files if x["name"] == doc), None)
+            if dfn:
                 docpath = os.path.join(abspath, doc)
                 sz = bos.path.getsize(docpath)
                 if sz < 1024 * self.args.txt_max:
