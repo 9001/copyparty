@@ -473,7 +473,7 @@ class MTag(object):
                 sv = str(zv).split("/")[0].strip().lstrip("0")
                 ret[sk] = sv or 0
 
-        # normalize key notation to rkeobo
+        # normalize key notation to rekobo
         okey = ret.get("key")
         if okey:
             key = str(okey).replace(" ", "").replace("maj", "").replace("min", "m")

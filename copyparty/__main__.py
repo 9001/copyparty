@@ -896,7 +896,7 @@ def get_sects():
             dedent(
                 """
             the mDNS protocol is multicast-based, which means there are thousands
-            of fun and intersesting ways for it to break unexpectedly
+            of fun and interesting ways for it to break unexpectedly
 
             things to check if it does not work at all:
 

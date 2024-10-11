@@ -924,7 +924,7 @@ class AuthSrv(object):
 
         for un, gn in un_gn:
             # if ap/vp has a user/group placeholder, make sure to keep
-            # track so the same user/gruop is mapped when setting perms;
+            # track so the same user/group is mapped when setting perms;
             # otherwise clear un/gn to indicate it's a regular volume
 
             src1 = src0.replace("${u}", un or "\n")

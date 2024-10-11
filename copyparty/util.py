@@ -1163,7 +1163,7 @@ class Magician(object):
             return ret
 
         mime = magic.from_file(fpath, mime=True)
-        mime = re.split("[; ]", mime, 1)[0]
+        mime = re.split("[; ]", mime, maxsplit=1)[0]
         try:
             return EXTS[mime]
         except:

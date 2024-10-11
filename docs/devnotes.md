@@ -279,6 +279,7 @@ the rest is mostly optional; if you need a working env for vscode or similar
 python3 -m venv .venv
 . .venv/bin/activate
 pip install jinja2 strip_hints  # MANDATORY
+pip install argon2-cffi  # password hashing
 pip install mutagen  # audio metadata
 pip install pyftpdlib  # ftp server
 pip install partftpy  # tftp server

@@ -3045,7 +3045,7 @@ class HttpCli(object):
             if ex.errno != errno.ENOENT:
                 raise
 
-        # if file exists, chekc that timestamp matches the client's
+        # if file exists, check that timestamp matches the client's
         if srv_lastmod >= 0:
             same_lastmod = cli_lastmod3 in [-1, srv_lastmod3]
             if not same_lastmod:
@@ -4789,7 +4789,7 @@ class HttpCli(object):
 
             fmt = fmt.format(len(nfmt.format(biggest)))
             retl = [
-                "# {}: {}".format(x, ls[x])
+                ("# %s: %s" % (x, ls[x])).replace(r"</span> // <span>", " // ")
                 for x in ["acct", "perms", "srvinf"]
                 if x in ls
             ]

@@ -71,7 +71,7 @@ def cnv(src):
 
 def main():
     src = readclip()
-    src = re.split("0{100,200}", src[::-1], 1)[1][::-1]
+    src = re.split("0{100,200}", src[::-1], maxsplit=1)[1][::-1]
     with open("helptext.html", "wb") as fo:
         for ln in cnv(iter(src.split("\n")[:-3])):
             fo.write(ln.encode("utf-8") + b"\r\n")

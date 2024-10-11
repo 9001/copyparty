@@ -95,7 +95,7 @@ class TcpSrv(object):
                                 continue
 
                             # binding 0.0.0.0 after :: fails on dualstack
-                            # but is necessary on non-dualstakc
+                            # but is necessary on non-dualstack
                             if successful_binds:
                                 continue
 
