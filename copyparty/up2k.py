@@ -3451,19 +3451,19 @@ class Up2k(object):
             self.mutex.release()
             return -1, ""
         try:
-            return self._confirm_chunks(ptop, wark, chashes)
+            return self._confirm_chunks(ptop, wark, chashes, chashes)
         finally:
             self.reg_mutex.release()
             self.mutex.release()
 
     def confirm_chunks(
-        self, ptop: str, wark: str, chashes: list[str]
+        self, ptop: str, wark: str, written: list[str], locked: list[str]
     ) -> tuple[int, str]:
         with self.mutex, self.reg_mutex:
-            return self._confirm_chunks(ptop, wark, chashes)
+            return self._confirm_chunks(ptop, wark, written, locked)
 
     def _confirm_chunks(
-        self, ptop: str, wark: str, chashes: list[str]
+        self, ptop: str, wark: str, written: list[str], locked: list[str]
     ) -> tuple[int, str]:
         if True:
             self.db_act = self.vol_act[ptop] = time.time()
@@ -3475,11 +3475,11 @@ class Up2k(object):
             except Exception as ex:
                 return -2, "confirm_chunk, wark(%r)" % (ex,)  # type: ignore
 
-            for chash in chashes:
+            for chash in locked:
                 job["busy"].pop(chash, None)
 
             try:
-                for chash in chashes:
+                for chash in written:
                     job["need"].remove(chash)
             except Exception as ex:
                 return -2, "confirm_chunk, chash(%s) %r" % (chash, ex)  # type: ignore

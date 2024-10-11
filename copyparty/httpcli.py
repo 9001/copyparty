@@ -2421,13 +2421,13 @@ class HttpCli(object):
         finally:
             if locked:
                 # now block until all chunks released+confirmed
-                x = broker.ask("up2k.confirm_chunks", ptop, wark, locked)
+                x = broker.ask("up2k.confirm_chunks", ptop, wark, written, locked)
                 num_left, t = x.get()
                 if num_left < 0:
                     self.loud_reply(t, status=500)
                     return False
                 t = "got %d more chunks, %d left"
-                self.log(t % (len(locked), num_left), 6)
+                self.log(t % (len(written), num_left), 6)
 
         if num_left < 0:
             raise Pebkac(500, "unconfirmed; see serverlog")

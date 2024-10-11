@@ -257,6 +257,8 @@ for d in /usr /var; do find $d -type f -size +30M 2>/dev/null; done | while IFS=
 
 # up2k worst-case testfiles: create 64 GiB (256 x 256 MiB) of sparse files; each file takes 1 MiB disk space; each 1 MiB chunk is globally unique
 for f in {0..255}; do echo $f; truncate -s 256M $f; b1=$(printf '%02x' $f); for o in {0..255}; do b2=$(printf '%02x' $o); printf "\x$b1\x$b2" | dd of=$f bs=2 seek=$((o*1024*1024)) conv=notrunc 2>/dev/null; done; done
+# create 6.06G file with 16 bytes of unique data at start+end of each 32M chunk
+sz=6509559808; truncate -s $sz f; csz=33554432; sz=$((sz/16)); step=$((csz/16)); ofs=0; while [ $ofs -lt $sz ]; do dd if=/dev/urandom of=f bs=16 count=2 seek=$ofs conv=notrunc iflag=fullblock; [ $ofs = 0 ] && ofs=$((ofs+step-1)) || ofs=$((ofs+step)); done
 
 # py2 on osx
 brew install python@2
