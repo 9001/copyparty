@@ -86,6 +86,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [hiding from google](#hiding-from-google) - tell search engines you don't wanna be indexed
     * [themes](#themes)
     * [complete examples](#complete-examples)
+    * [listen on port 80 and 443](#listen-on-port-80-and-443) - become a *real* webserver
     * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
         * [real-ip](#real-ip) - teaching copyparty how to see client IPs
     * [prometheus](#prometheus) - metrics/stats can be enabled
@@ -990,7 +991,11 @@ uses [multicast dns](https://en.wikipedia.org/wiki/Multicast_DNS) to give copypa
 
 all enabled services ([webdav](#webdav-server), [ftp](#ftp-server), [smb](#smb-server)) will appear in mDNS-aware file managers (KDE, gnome, macOS, ...)
 
-the domain will be http://partybox.local if the machine's hostname is `partybox` unless `--name` specifies something else
+the domain will be `partybox.local` if the machine's hostname is `partybox` unless `--name` specifies something else
+
+and the web-UI will be available at http://partybox.local:3923/
+
+* if you want to get rid of the `:3923` so you can use http://partybox.local/ instead then see [listen on port 80 and 443](#listen-on-port-80-and-443)
 
 
 ### ssdp
@@ -1551,6 +1556,33 @@ if you want to change the fonts, see [./docs/rice/](./docs/rice/)
   
   * ...with logging to disk  
     `-lo log/cpp-%Y-%m%d-%H%M%S.txt.xz`
+
+
+## listen on port 80 and 443
+
+become a *real* webserver  which people can access by just going to your IP or domain without specifying a port
+
+**if you're on windows,** then you just need to add the commandline argument `-p 80,443` and you're done! nice
+
+**if you're on macos,** sorry, I don't know
+
+**if you're on Linux,** you have the following 4 options:
+
+* **option 1:** set up a [reverse-proxy](#reverse-proxy) -- this one makes a lot of sense if you're running on a proper headless server, because that way you get real HTTPS too
+
+* **option 2:** NAT to port 3923 -- this is cumbersome since you'll need to do it every time you reboot, and the exact command may depend on your linux distribution:
+  ```bash
+  iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3923
+  iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 3923
+  ```
+
+* **option 3:** disable the [security policy](https://www.w3.org/Daemon/User/Installation/PrivilegedPorts.html) which prevents the use of 80 and 443; this is *probably* fine:
+  ```
+  setcap CAP_NET_BIND_SERVICE=+eip $(realpath $(which python))
+  python copyparty-sfx.py -p 80,443
+  ```
+
+* **option 4:** run copyparty as root (please don't)
 
 
 ## reverse-proxy
