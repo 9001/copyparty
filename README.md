@@ -937,6 +937,8 @@ see [./srv/expand/](./srv/expand/) for usage and examples
 
 * files named `README.md` / `readme.md` will be rendered after directory listings unless `--no-readme` (but `.epilogue.html` takes precedence)
 
+  * and `PREADME.md` / `preadme.md` is shown above directory listings unless `--no-readme` or `.prologue.html`
+
 * `README.md` and `*logue.html` can contain placeholder values which are replaced server-side before embedding into directory listings; see `--help-exp`
 
 
@@ -2047,7 +2049,7 @@ other misc notes:
 
 behavior that might be unexpected
 
-* users without read-access to a folder can still see the `.prologue.html` / `.epilogue.html` / `README.md` contents, for the purpose of showing a description on how to use the uploader for example
+* users without read-access to a folder can still see the `.prologue.html` / `.epilogue.html` / `PREADME.md` / `README.md` contents, for the purpose of showing a description on how to use the uploader for example
 * users can submit `<script>`s which autorun (in a sandbox) for other visitors in a few ways;
   * uploading a `README.md` -- avoid with `--no-readme`
   * renaming `some.html` to `.epilogue.html` -- avoid with either `--no-logues` or `--no-dot-ren`

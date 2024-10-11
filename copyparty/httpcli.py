@@ -127,6 +127,10 @@ _ = (argparse, threading)
 
 NO_CACHE = {"Cache-Control": "no-cache"}
 
+LOGUES = [[0, ".prologue.html"], [1, ".epilogue.html"]]
+
+READMES = [[0, ["preadme.md", "PREADME.md"]], [1, ["readme.md", "README.md"]]]
+
 
 class HttpCli(object):
     """
@@ -3255,10 +3259,10 @@ class HttpCli(object):
 
     def _add_logues(
         self, vn: VFS, abspath: str, lnames: Optional[dict[str, str]]
-    ) -> tuple[list[str], str]:
+    ) -> tuple[list[str], list[str]]:
         logues = ["", ""]
         if not self.args.no_logues:
-            for n, fn in enumerate([".prologue.html", ".epilogue.html"]):
+            for n, fn in LOGUES:
                 if lnames is not None and fn not in lnames:
                     continue
                 fn = "%s/%s" % (abspath, fn)
@@ -3270,25 +3274,31 @@ class HttpCli(object):
                             logues[n], vn.flags.get("exp_lg") or []
                         )
 
-        readme = ""
-        if not self.args.no_readme and not logues[1]:
-            if lnames is None:
-                fns = ["README.md", "readme.md"]
-            elif "readme.md" in lnames:
-                fns = [lnames["readme.md"]]
+        readmes = ["", ""]
+        for n, fns in [] if self.args.no_readme else READMES:
+            if logues[n]:
+                continue
+            elif lnames is None:
+                pass
+            elif fns[0] in lnames:
+                fns = [lnames[fns[0]]]
             else:
                 fns = []
 
+            txt = ""
             for fn in fns:
                 fn = "%s/%s" % (abspath, fn)
                 if bos.path.isfile(fn):
                     with open(fsenc(fn), "rb") as f:
-                        readme = f.read().decode("utf-8")
+                        txt = f.read().decode("utf-8")
                         break
-            if readme and "exp" in vn.flags:
-                readme = self._expand(readme, vn.flags.get("exp_md") or [])
 
-        return logues, readme
+            if txt and "exp" in vn.flags:
+                txt = self._expand(txt, vn.flags.get("exp_md") or [])
+
+            readmes[n] = txt
+
+        return logues, readmes
 
     def _expand(self, txt: str, phs: list[str]) -> str:
         for ph in phs:
@@ -5142,9 +5152,9 @@ class HttpCli(object):
             j2a["no_prism"] = True
 
         if not self.can_read and not is_dk:
-            logues, readme = self._add_logues(vn, abspath, None)
+            logues, readmes = self._add_logues(vn, abspath, None)
             ls_ret["logues"] = j2a["logues"] = logues
-            ls_ret["readme"] = cgv["readme"] = readme
+            ls_ret["readmes"] = cgv["readmes"] = readmes
 
             if is_ls:
                 return self.tx_ls(ls_ret)
@@ -5401,11 +5411,18 @@ class HttpCli(object):
         else:
             taglist = list(tagset)
 
-        logues, readme = self._add_logues(vn, abspath, lnames)
+        logues, readmes = self._add_logues(vn, abspath, lnames)
         ls_ret["logues"] = j2a["logues"] = logues
-        ls_ret["readme"] = cgv["readme"] = readme
+        ls_ret["readmes"] = cgv["readmes"] = readmes
 
-        if not files and not dirs and not readme and not logues[0] and not logues[1]:
+        if (
+            not files
+            and not dirs
+            and not readmes[0]
+            and not readmes[1]
+            and not logues[0]
+            and not logues[1]
+        ):
             logues[1] = "this folder is empty"
 
         if "descript.ion" in lnames and os.path.isfile(

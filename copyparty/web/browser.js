@@ -7345,6 +7345,9 @@ var treectl = (function () {
 
 		var lg0 = res.logues ? res.logues[0] || "" : "",
 			lg1 = res.logues ? res.logues[1] || "" : "",
+			mds = res.readmes && treectl.ireadme,
+			md0 = mds ? res.readmes[0] || "" : "",
+			md1 = mds ? res.readmes[1] || "" : "",
 			dirchg = get_evpath() != cdir;
 
 		if (lg1 === Ls.eng.f_empty)
@@ -7354,9 +7357,14 @@ var treectl = (function () {
 		if (dirchg)
 			sandbox(ebi('epi'), sb_lg, '', lg1);
 
+		clmod(ebi('pro'), 'mdo');
 		clmod(ebi('epi'), 'mdo');
-		if (res.readme && treectl.ireadme)
-			show_readme(res.readme);
+
+		if (md0)
+			show_readme(md0, 0);
+
+		if (md1)
+			show_readme(md1, 1);
 		else if (!dirchg)
 			sandbox(ebi('epi'), sb_lg, '', lg1);
 
@@ -8877,14 +8885,17 @@ function set_tabindex() {
 }
 
 
-function show_readme(md) {
-	if (!treectl.ireadme)
-		return sandbox(ebi('epi'), '', '', 'a');
+function show_readme(md, n) {
+	var tgt = ebi(n ? 'epi' : 'pro');
 
-	show_md(md, 'README.md', ebi('epi'));
+	if (!treectl.ireadme)
+		return sandbox(tgt, '', '', 'a');
+
+	show_md(md, n ? 'README.md' : 'PREADME.md', tgt);
 }
-if (readme)
-	show_readme(readme);
+for (var a = 0; a < readmes.length; a++)
+	if (readmes[a])
+		show_readme(readmes[a], a);
 
 
 function sandbox(tgt, rules, cls, html) {

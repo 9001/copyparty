@@ -780,7 +780,7 @@ def get_sects():
             dedent(
                 """
             specify --exp or the "exp" volflag to enable placeholder expansions
-            in README.md / .prologue.html / .epilogue.html
+            in README.md / PREADME.md / .prologue.html / .epilogue.html
 
             --exp-md (volflag exp_md) holds the list of placeholders which can be
             expanded in READMEs, and --exp-lg (volflag exp_lg) likewise for logues;
@@ -1255,7 +1255,7 @@ def add_safety(ap):
     ap2.add_argument("--no-dot-mv", action="store_true", help="disallow moving dotfiles; makes it impossible to move folders containing dotfiles")
     ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to turn something into a dotfile")
     ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")
-    ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme.md into directory listings")
+    ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme/preadme.md into directory listings")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise)")
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore \033[33m--no-robots\033[0m")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything (volflag=norobots)")
@@ -1453,7 +1453,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--k304", metavar="NUM", type=int, default=0, help="configure the option to enable/disable k304 on the controlpanel (workaround for buggy reverse-proxies); [\033[32m0\033[0m] = hidden and default-off, [\033[32m1\033[0m] = visible and default-off, [\033[32m2\033[0m] = visible and default-on")
     ap2.add_argument("--md-sbf", metavar="FLAGS", type=u, default="downloads forms popups scripts top-navigation-by-user-activation", help="list of capabilities to ALLOW for README.md docs (volflag=md_sbf); see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox")
     ap2.add_argument("--lg-sbf", metavar="FLAGS", type=u, default="downloads forms popups scripts top-navigation-by-user-activation", help="list of capabilities to ALLOW for prologue/epilogue docs  (volflag=lg_sbf)")
-    ap2.add_argument("--no-sb-md", action="store_true", help="don't sandbox README.md documents (volflags: no_sb_md | sb_md)")
+    ap2.add_argument("--no-sb-md", action="store_true", help="don't sandbox README/PREADME.md documents (volflags: no_sb_md | sb_md)")
     ap2.add_argument("--no-sb-lg", action="store_true", help="don't sandbox prologue/epilogue docs (volflags: no_sb_lg | sb_lg); enables non-js support")
 
 
