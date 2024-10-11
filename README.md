@@ -83,7 +83,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
     * [user-changeable passwords](#user-changeable-passwords) - if permitted, users can change their own passwords
     * [using the cloud as storage](#using-the-cloud-as-storage) - connecting to an aws s3 bucket and similar
-    * [hiding from google](#hiding-from-google) - tell search engines you dont wanna be indexed
+    * [hiding from google](#hiding-from-google) - tell search engines you don't wanna be indexed
     * [themes](#themes)
     * [complete examples](#complete-examples)
     * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
@@ -114,7 +114,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [https](#https) - both HTTP and HTTPS are accepted
 * [recovering from crashes](#recovering-from-crashes)
     * [client crashes](#client-crashes)
-        * [frefox wsod](#frefox-wsod) - firefox 87 can crash during uploads
+        * [firefox wsod](#firefox-wsod) - firefox 87 can crash during uploads
 * [HTTP API](#HTTP-API) - see [devnotes](./docs/devnotes.md#http-api)
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - install these to enable bonus features
@@ -581,7 +581,7 @@ it does static images with Pillow / pyvips / FFmpeg, and uses FFmpeg for video f
 * pyvips is 3x faster than Pillow, Pillow is 3x faster than FFmpeg
 * disable thumbnails for specific volumes with volflag `dthumb` for all, or `dvthumb` / `dathumb` / `dithumb` for video/audio/images only
 
-audio files are covnerted into spectrograms using FFmpeg unless you `--no-athumb` (and some FFmpeg builds may need `--th-ff-swr`)
+audio files are converted into spectrograms using FFmpeg unless you `--no-athumb` (and some FFmpeg builds may need `--th-ff-swr`)
 
 images with the following names (see `--th-covers`) become the thumbnail of the folder they're in: `folder.png`, `folder.jpg`, `cover.png`, `cover.jpg`
 * the order is significant, so if both `cover.png` and `folder.jpg` exist in a folder, it will pick the first matching `--th-covers` entry (`folder.jpg`)
@@ -667,7 +667,7 @@ see [up2k](./docs/devnotes.md#up2k) for details on how it works, or watch a [dem
 
 **protip:** if you enable `favicon` in the `[⚙️] settings` tab (by typing something into the textbox), the icon in the browser tab will indicate upload progress -- also, the `[🔔]` and/or `[🔊]` switches enable visible and/or audible notifications on upload completion
 
-the up2k UI is the epitome of polished inutitive experiences:
+the up2k UI is the epitome of polished intuitive experiences:
 * "parallel uploads" specifies how many chunks to upload at the same time
 * `[🏃]` analysis of other files should continue while one is uploading
 * `[🥔]` shows a simpler UI for faster uploads from slow devices
@@ -716,7 +716,7 @@ you can unpost even if you don't have regular move/delete access, however only f
 
 ### self-destruct
 
-uploads can be given a lifetime,  afer which they expire / self-destruct
+uploads can be given a lifetime,  after which they expire / self-destruct
 
 the feature must be enabled per-volume with the `lifetime` [upload rule](#upload-rules) which sets the upper limit for how long a file gets to stay on the server
 
@@ -743,7 +743,7 @@ the control-panel shows the ETA for all incoming files  , but only for files bei
 
 cut/paste, rename, and delete files/folders (if you have permission)
 
-file selection: click somewhere on the line (not the link itsef), then:
+file selection: click somewhere on the line (not the link itself), then:
 * `space` to toggle
 * `up/down` to move
 * `shift-up/down` to move-and-select
@@ -988,7 +988,7 @@ uses [multicast dns](https://en.wikipedia.org/wiki/Multicast_DNS) to give copypa
 
 all enabled services ([webdav](#webdav-server), [ftp](#ftp-server), [smb](#smb-server)) will appear in mDNS-aware file managers (KDE, gnome, macOS, ...)
 
-the domain will be http://partybox.local if the machine's hostname is `partybox` unless `--name` specifies soemthing else
+the domain will be http://partybox.local if the machine's hostname is `partybox` unless `--name` specifies something else
 
 
 ### ssdp
@@ -1014,7 +1014,7 @@ print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/
 * `--qrz 1` forces 1x zoom instead of autoscaling to fit the terminal size
   * 1x may render incorrectly on some terminals/fonts, but 2x should always work
 
-it uses the server hostname if [mdns](#mdns) is enbled, otherwise it'll use your external ip (default route) unless `--qri` specifies a specific ip-prefix or domain
+it uses the server hostname if [mdns](#mdns) is enabled, otherwise it'll use your external ip (default route) unless `--qri` specifies a specific ip-prefix or domain
 
 
 ## ftp server
@@ -1039,7 +1039,7 @@ some recommended FTP / FTPS clients; `wark` = example password:
 
 ## webdav server
 
-with read-write support,  supports winXP and later, macos, nautilus/gvfs  ... a greay way to [access copyparty straight from the file explorer in your OS](#mount-as-drive)
+with read-write support,  supports winXP and later, macos, nautilus/gvfs  ... a great way to [access copyparty straight from the file explorer in your OS](#mount-as-drive)
 
 click the [connect](http://127.0.0.1:3923/?hc) button in the control-panel to see connection instructions for windows, linux, macos
 
@@ -1143,8 +1143,8 @@ authenticate with one of the following:
 tweaking the ui
 
 * set default sort order globally with `--sort` or per-volume with the `sort` volflag; specify one or more comma-separated columns to sort by, and prefix the column name with `-` for reverse sort
-  * the column names you can use are visible as tooltips when hovering over the column headers in the directory listing, for example `href ext sz ts tags/.up_at tags/Cirle tags/.tn tags/Artist tags/Title`
-  * to sort in music order (album, track, artist, title) with filename as fallback, you could `--sort tags/Cirle,tags/.tn,tags/Artist,tags/Title,href`
+  * the column names you can use are visible as tooltips when hovering over the column headers in the directory listing, for example `href ext sz ts tags/.up_at tags/Circle tags/.tn tags/Artist tags/Title`
+  * to sort in music order (album, track, artist, title) with filename as fallback, you could `--sort tags/Circle,tags/.tn,tags/Artist,tags/Title,href`
   * to sort by upload date, first enable showing the upload date in the listing with `-e2d -mte +.up_at` and then `--sort tags/.up_at`
 
 see [./docs/rice](./docs/rice) for more, including how to add stuff (css/`<meta>`/...) to the html `<head>` tag, or to add your own translation
@@ -1212,7 +1212,7 @@ through arguments:
 * `-e2t` enables metadata indexing on upload
 * `-e2ts` also scans for tags in all files that don't have tags yet
 * `-e2tsr` also deletes all existing tags, doing a full reindex
-* `-e2v` verfies file integrity at startup, comparing hashes from the db
+* `-e2v` verifies file integrity at startup, comparing hashes from the db
 * `-e2vu` patches the database with the new hashes from the filesystem
 * `-e2vp` panics and kills copyparty instead
 
@@ -1429,7 +1429,7 @@ replace 404 and 403 errors with something completely different (that's it for no
 
 replace copyparty passwords with oauth and such
 
-you can disable the built-in password-based login sysem, and instead replace it with a separate piece of software (an identity provider) which will then handle authenticating / authorizing of users; this makes it possible to login with passkeys / fido2 / webauthn / yubikey / ldap / active directory / oauth / many other single-sign-on contraptions
+you can disable the built-in password-based login system, and instead replace it with a separate piece of software (an identity provider) which will then handle authenticating / authorizing of users; this makes it possible to login with passkeys / fido2 / webauthn / yubikey / ldap / active directory / oauth / many other single-sign-on contraptions
 
 a popular choice is [Authelia](https://www.authelia.com/) (config-file based), another one is [authentik](https://goauthentik.io/) (GUI-based, more complex)
 
@@ -1456,7 +1456,7 @@ if permitted, users can change their own passwords  in the control-panel
 
   * if you run multiple copyparty instances with different users you *almost definitely* want to specify separate DBs for each instance
 
-  * if [password hashing](#password-hashing) is enbled, the passwords in the db are also hashed
+  * if [password hashing](#password-hashing) is enabled, the passwords in the db are also hashed
 
     * ...which means that all user-defined passwords will be forgotten if you change password-hashing settings
 
@@ -1476,7 +1476,7 @@ you may improve performance by specifying larger values for `--iobuf` / `--s-rd-
 
 ## hiding from google
 
-tell search engines you dont wanna be indexed,  either using the good old [robots.txt](https://www.robotstxt.org/robotstxt.html) or through copyparty settings:
+tell search engines you don't wanna be indexed,  either using the good old [robots.txt](https://www.robotstxt.org/robotstxt.html) or through copyparty settings:
 
 * `--no-robots` adds HTTP (`X-Robots-Tag`) and HTML (`<meta>`) headers with `noindex, nofollow` globally
 * volflag `[...]:c,norobots` does the same thing for that single volume
@@ -1899,7 +1899,7 @@ interact with copyparty using non-browser clients
 
 * [igloo irc](https://iglooirc.com/): Method: `post` Host: `https://you.com/up/?want=url&pw=hunter2` Multipart: `yes` File parameter: `f`
 
-copyparty returns a truncated sha512sum of your PUT/POST as base64; you can generate the same checksum locally to verify uplaods:
+copyparty returns a truncated sha512sum of your PUT/POST as base64; you can generate the same checksum locally to verify uploads:
 
     b512(){ printf "$((sha512sum||shasum -a512)|sed -E 's/ .*//;s/(..)/\\x\1/g')"|base64|tr '+/' '-_'|head -c44;}
     b512 <movie.mkv
@@ -1999,7 +1999,7 @@ when uploading files,
   * up to 30% faster uploads if you hide the upload status list by switching away from the `[🚀]` up2k ui-tab (or closing it)
     * optionally you can switch to the lightweight potato ui by clicking the `[🥔]`
     * switching to another browser-tab also works, the favicon will update every 10 seconds in that case
-  * unlikely to be a problem, but can happen when uploding many small files, or your internet is too fast, or PC too slow
+  * unlikely to be a problem, but can happen when uploading many small files, or your internet is too fast, or PC too slow
 
 
 # security
@@ -2125,13 +2125,13 @@ if [cfssl](https://github.com/cloudflare/cfssl/releases/latest) is installed, co
 
 ## client crashes
 
-### frefox wsod
+### firefox wsod
 
 firefox 87 can crash during uploads  -- the entire browser goes, including all other browser tabs, everything turns white
 
 however you can hit `F12` in the up2k tab and use the devtools to see how far you got in the uploads:
 
-* get a complete list of all uploads, organized by statuts (ok / no-good / busy / queued):  
+* get a complete list of all uploads, organized by status (ok / no-good / busy / queued):  
   `var tabs = { ok:[], ng:[], bz:[], q:[] }; for (var a of up2k.ui.tab) tabs[a.in].push(a); tabs`
 
 * list of filenames which failed:  
@@ -2248,7 +2248,7 @@ then again, if you are already into downloading shady binaries from the internet
 
 ## zipapp
 
-another emergency alternative, [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz)  has less features, is slow, requires python 3.7 or newer, worse compression, and more importantly is unable to benefit from more recent versions of jinja2 and such (which makes it less secure)... lots of drawbacks with this one really -- but it does not unpack any temporay files to disk, so it *may* just work if the regular sfx fails to start because the computer is messed up in certain funky ways, so it's worth a shot if all else fails
+another emergency alternative, [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz)  has less features, is slow, requires python 3.7 or newer, worse compression, and more importantly is unable to benefit from more recent versions of jinja2 and such (which makes it less secure)... lots of drawbacks with this one really -- but it does not unpack any temporary files to disk, so it *may* just work if the regular sfx fails to start because the computer is messed up in certain funky ways, so it's worth a shot if all else fails
 
 run it by doubleclicking it, or try typing `python copyparty.pyz` in your terminal/console/commandline/telex if that fails
 

@@ -22,7 +22,7 @@ var Ls = {
 			"vq": "video quality / bitrate",
 			"pixfmt": "subsampling / pixel structure",
 			"resw": "horizontal resolution",
-			"resh": "veritcal resolution",
+			"resh": "vertical resolution",
 			"chs": "audio channels",
 			"hz": "sample rate"
 		},
@@ -707,7 +707,7 @@ var Ls = {
 		"wt_selinv": "inverter utvalg",
 		"wt_selzip": "last ned de valgte filene som et arkiv",
 		"wt_seldl": "last ned de valgte filene$NSnarvei: Y",
-		"wt_npirc": "kopiér sang-info (irc-formattert)",
+		"wt_npirc": "kopiér sang-info (irc-formatert)",
 		"wt_nptxt": "kopiér sang-info",
 		"wt_grid": "bytt mellom ikoner og listevisning$NSnarvei: G",
 		"wt_prev": "forrige sang$NSnarvei: J",
@@ -886,7 +886,7 @@ var Ls = {
 
 		"f_dls": 'linkene i denne mappen er nå\nomgjort til nedlastningsknapper',
 
-		"f_partial": "For å laste ned en fil som enda ikke er ferdig opplastet, klikk på filen som har samme filnavn som denne, men uten <code>.PARTIAL</code> på slutten. Da vil serveren passe på at nedlastning går bra. Derfor anbefales det sterkt å trykke ABRYT eller Escape-tasten.\n\nHvis du virkelig ønsker å laste ned denne <code>.PARTIAL</code>-filen på en ukontrollert måte, trykk OK / Enter for å ignorere denne advarselen. Slik vil du høyst sannsynlig motta korrupt data.",
+		"f_partial": "For å laste ned en fil som enda ikke er ferdig opplastet, klikk på filen som har samme filnavn som denne, men uten <code>.PARTIAL</code> på slutten. Da vil serveren passe på at nedlastning går bra. Derfor anbefales det sterkt å trykke AVBRYT eller Escape-tasten.\n\nHvis du virkelig ønsker å laste ned denne <code>.PARTIAL</code>-filen på en ukontrollert måte, trykk OK / Enter for å ignorere denne advarselen. Slik vil du høyst sannsynlig motta korrupt data.",
 
 		"ft_paste": "Lim inn {0} filer$NSnarvei: ctrl-V",
 		"fr_eperm": 'kan ikke endre navn:\ndu har ikke “move”-rettigheten i denne mappen',

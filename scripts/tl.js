@@ -103,7 +103,7 @@ var tl_browser = {
 			"vq": "video quality / bitrate",
 			"pixfmt": "subsampling / pixel structure",
 			"resw": "horizontal resolution",
-			"resh": "veritcal resolution",
+			"resh": "vertical resolution",
 			"chs": "audio channels",
 			"hz": "sample rate"
 		},
