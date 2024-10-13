@@ -1016,6 +1016,7 @@ class Up2k(object):
                 vpath = k
 
         _, flags = self._expr_idx_filter(flags)
+        n4g = bool(flags.get("noforget"))
 
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
@@ -1073,21 +1074,35 @@ class Up2k(object):
                 for job in reg2.values():
                     job["dwrk"] = job["wark"]
 
+            rm = []
             for k, job in reg2.items():
                 job["ptop"] = ptop
+                if "done" in job:
+                    job["need"] = job["hash"] = emptylist
+                else:
+                    if "need" not in job:
+                        job["need"] = []
+                    if "hash" not in job:
+                        job["hash"] = []
+
                 fp = djoin(ptop, job["prel"], job["name"])
                 if bos.path.exists(fp):
                     reg[k] = job
                     if "done" in job:
-                        job["need"] = job["hash"] = emptylist
                         continue
                     job["poke"] = time.time()
                     job["busy"] = {}
                 else:
                     self.log("ign deleted file in snap: [{}]".format(fp))
+                    if not n4g:
+                        rm.append(k)
+                        continue
+
+            for x in rm:
+                del reg2[x]
 
             if drp is None:
-                drp = [k for k, v in reg.items() if not v.get("need", [])]
+                drp = [k for k, v in reg.items() if not v["need"]]
             else:
                 drp = [x for x in drp if x in reg]
 
