@@ -2036,13 +2036,32 @@ class HttpCli(object):
         return True
 
     def bakflip(
-        self, f: typing.BinaryIO, ofs: int, sz: int, sha: str, flags: dict[str, Any]
+        self,
+        f: typing.BinaryIO,
+        ap: str,
+        ofs: int,
+        sz: int,
+        good_sha: str,
+        bad_sha: str,
+        flags: dict[str, Any],
     ) -> None:
+        now = time.time()
+        t = "bad-chunk:  %.3f  %s  %s  %d  %s  %s  %s"
+        t = t % (now, bad_sha, good_sha, ofs, self.ip, self.uname, ap)
+        self.log(t, 5)
+
+        if self.args.bf_log:
+            try:
+                with open(self.args.bf_log, "ab+") as f2:
+                    f2.write((t + "\n").encode("utf-8", "replace"))
+            except Exception as ex:
+                self.log("append %s failed: %r" % (self.args.bf_log, ex))
+
         if not self.args.bak_flips or self.args.nw:
             return
 
         sdir = self.args.bf_dir
-        fp = os.path.join(sdir, sha)
+        fp = os.path.join(sdir, bad_sha)
         if bos.path.exists(fp):
             return self.log("no bakflip; have it", 6)
 
@@ -2371,7 +2390,9 @@ class HttpCli(object):
 
                     if sha_b64 != chash:
                         try:
-                            self.bakflip(f, cstart[0], post_sz, sha_b64, vfs.flags)
+                            self.bakflip(
+                                f, path, cstart[0], post_sz, chash, sha_b64, vfs.flags
+                            )
                         except:
                             self.log("bakflip failed: " + min_ex())
 

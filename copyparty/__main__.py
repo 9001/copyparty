@@ -1478,6 +1478,7 @@ def add_debug(ap):
     ap2.add_argument("--bak-flips", action="store_true", help="[up2k] if a client uploads a bitflipped/corrupted chunk, store a copy according to \033[33m--bf-nc\033[0m and \033[33m--bf-dir\033[0m")
     ap2.add_argument("--bf-nc", metavar="NUM", type=int, default=200, help="bak-flips: stop if there's more than \033[33mNUM\033[0m files at \033[33m--kf-dir\033[0m already; default: 6.3 GiB max (200*32M)")
     ap2.add_argument("--bf-dir", metavar="PATH", type=u, default="bf", help="bak-flips: store corrupted chunks at \033[33mPATH\033[0m; default: folder named 'bf' wherever copyparty was started")
+    ap2.add_argument("--bf-log", metavar="PATH", type=u, default="", help="bak-flips: log corruption info to a textfile at \033[33mPATH\033[0m")
 
 
 # fmt: on
