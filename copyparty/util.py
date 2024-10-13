@@ -665,11 +665,15 @@ class HLog(logging.Handler):
 
 
 class NetMap(object):
-    def __init__(self, ips: list[str], cidrs: list[str], keep_lo=False) -> None:
+    def __init__(
+        self, ips: list[str], cidrs: list[str], keep_lo=False, strict_cidr=False
+    ) -> None:
         """
         ips: list of plain ipv4/ipv6 IPs, not cidr
         cidrs: list of cidr-notation IPs (ip/prefix)
         """
+        self.mutex = threading.Lock()
+
         if "::" in ips:
             ips = [x for x in ips if x != "::"] + list(
                 [x.split("/")[0] for x in cidrs if ":" in x]
@@ -696,7 +700,7 @@ class NetMap(object):
             bip = socket.inet_pton(fam, ip.split("/")[0])
             self.bip.append(bip)
             self.b2sip[bip] = ip.split("/")[0]
-            self.b2net[bip] = (IPv6Network if v6 else IPv4Network)(ip, False)
+            self.b2net[bip] = (IPv6Network if v6 else IPv4Network)(ip, strict_cidr)
 
         self.bip.sort(reverse=True)
 
@@ -707,8 +711,10 @@ class NetMap(object):
         try:
             return self.cache[ip]
         except:
-            pass
+            with self.mutex:
+                return self._map(ip)
 
+    def _map(self, ip: str) -> str:
         v6 = ":" in ip
         ci = IPv6Address(ip) if v6 else IPv4Address(ip)
         bip = next((x for x in self.bip if ci in self.b2net[x]), None)
@@ -2676,6 +2682,31 @@ def build_netmap(csv: str):
 
     ips = [x.split("/")[0] for x in cidrs]
     return NetMap(ips, cidrs, True)
+
+
+def load_ipu(log: "RootLogger", ipus: list[str]) -> tuple[dict[str, str], NetMap]:
+    ip_u = {"": "*"}
+    cidr_u = {}
+    for ipu in ipus:
+        try:
+            cidr, uname = ipu.split("=")
+            cip, csz = cidr.split("/")
+        except:
+            t = "\n  invalid value %r for argument --ipu; must be CIDR=UNAME (192.168.0.0/16=amelia)"
+            raise Exception(t % (ipu,))
+        uname2 = cidr_u.get(cidr)
+        if uname2 is not None:
+            t = "\n  invalid value %r for argument --ipu; cidr %s already mapped to %r"
+            raise Exception(t % (ipu, cidr, uname2))
+        cidr_u[cidr] = uname
+        ip_u[cip] = uname
+    try:
+        nm = NetMap(["::"], list(cidr_u.keys()), True, True)
+    except Exception as ex:
+        t = "failed to translate --ipu into netmap, probably due to invalid config: %r"
+        log("root", t % (ex,), 1)
+        raise
+    return ip_u, nm
 
 
 def yieldfile(fn: str, bufsz: int) -> Generator[bytes, None, None]:

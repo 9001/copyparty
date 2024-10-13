@@ -589,6 +589,9 @@ class HttpCli(object):
                 or "*"
             )
 
+        if self.args.ipu and self.uname == "*":
+            self.uname = self.conn.ipu_iu[self.conn.ipu_nm.map(self.ip)]
+
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
         self.avol = self.asrv.vfs.aadmin[self.uname]

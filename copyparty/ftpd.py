@@ -76,6 +76,7 @@ class FtpAuth(DummyAuthorizer):
             else:
                 raise AuthenticationFailed("banned")
 
+        args = self.hub.args
         asrv = self.hub.asrv
         uname = "*"
         if username != "anonymous":
@@ -85,6 +86,9 @@ class FtpAuth(DummyAuthorizer):
                 if zs:
                     uname = zs
                     break
+
+        if args.ipu and uname == "*":
+            uname = args.ipu_iu[args.ipu_nm.map(ip)]
 
         if not uname or not (asrv.vfs.aread.get(uname) or asrv.vfs.awrite.get(uname)):
             g = self.hub.gpwd

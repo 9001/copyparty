@@ -69,6 +69,7 @@ from .util import (
     build_netmap,
     has_resource,
     ipnorm,
+    load_ipu,
     load_resource,
     min_ex,
     shut_socket,
@@ -174,6 +175,11 @@ class HttpSrv(object):
         ]
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
         self.prism = has_resource(self.E, "web/deps/prism.js.gz")
+
+        if self.args.ipu:
+            self.ipu_iu, self.ipu_nm = load_ipu(self.log, self.args.ipu)
+        else:
+            self.ipu_iu = self.ipu_nm = None
 
         self.ipa_nm = build_netmap(self.args.ipa)
         self.xff_nm = build_netmap(self.args.xff_src)

@@ -80,6 +80,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
         * [upload events](#upload-events) - the older, more powerful approach ([examples](./bin/mtag/))
     * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
+    * [ip auth](#ip-auth) - autologin based on IP range (CIDR)
     * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
     * [user-changeable passwords](#user-changeable-passwords) - if permitted, users can change their own passwords
     * [using the cloud as storage](#using-the-cloud-as-storage) - connecting to an aws s3 bucket and similar
@@ -1430,6 +1431,22 @@ note that it will occupy the parsing threads, so fork anything expensive (or set
 redefine behavior with plugins ([examples](./bin/handlers/))
 
 replace 404 and 403 errors with something completely different (that's it for now)
+
+
+## ip auth
+
+autologin based on IP range (CIDR)  , using the global-option `--ipu`
+
+for example, if everyone with an IP that starts with `192.168.123` should automatically log in as the user `spartacus`, then you can either specify `--ipu=192.168.123.0/24=spartacus` as a commandline option, or put this in a config file:
+
+```yaml
+[global]
+  ipu: 192.168.123.0/24=spartacus
+```
+
+repeat the option to map additional subnets
+
+**be careful with this one!** if you have a reverseproxy, then you definitely want to make sure you have [real-ip](#real-ip) configured correctly, and it's probably a good idea to nullmap the reverseproxy's IP just in case; so if your reverseproxy is sending requests from `172.24.27.9` then that would be `--ipu=172.24.27.9/32=`
 
 
 ## identity providers

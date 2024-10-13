@@ -59,6 +59,8 @@ class HttpConn(object):
         self.asrv: AuthSrv = hsrv.asrv  # mypy404
         self.u2fh: Util.FHC = hsrv.u2fh  # mypy404
         self.pipes: Util.CachedDict = hsrv.pipes  # mypy404
+        self.ipu_iu: Optional[dict[str, str]] = hsrv.ipu_iu
+        self.ipu_nm: Optional[NetMap] = hsrv.ipu_nm
         self.ipa_nm: Optional[NetMap] = hsrv.ipa_nm
         self.xff_nm: Optional[NetMap] = hsrv.xff_nm
         self.xff_lan: NetMap = hsrv.xff_lan  # type: ignore

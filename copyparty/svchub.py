@@ -60,6 +60,7 @@ from .util import (
     alltrace,
     ansi_re,
     build_netmap,
+    load_ipu,
     min_ex,
     mp,
     odfusion,
@@ -220,6 +221,11 @@ class SvcHub(object):
             zsl = [x.strip() for x in zs.split(",")]
             noch.update([x for x in zsl if x])
         args.chpw_no = noch
+
+        if args.ipu:
+            iu, nm = load_ipu(self.log, args.ipu)
+            setattr(args, "ipu_iu", iu)
+            setattr(args, "ipu_nm", nm)
 
         if not self.args.no_ses:
             self.setup_session_db()
