@@ -869,8 +869,8 @@ class Ctl(object):
             self.hash_b = 0
             self.up_f = 0
             self.up_c = 0
-            self.up_b = 0
-            self.up_br = 0
+            self.up_b = 0  # num bytes handled
+            self.up_br = 0  # num bytes actually transferred
             self.uploader_busy = 0
             self.serialized = False
 
@@ -1019,8 +1019,8 @@ class Ctl(object):
         if self.hash_b and self.at_hash:
             spd = humansize(self.hash_b / self.at_hash)
             eprint("\nhasher: %.2f sec, %s/s\n" % (self.at_hash, spd))
-        if self.up_b and self.at_up:
-            spd = humansize(self.up_b / self.at_up)
+        if self.up_br and self.at_up:
+            spd = humansize(self.up_br / self.at_up)
             eprint("upload: %.2f sec, %s/s\n" % (self.at_up, spd))
 
         if not self.recheck:
@@ -1186,6 +1186,7 @@ class Ctl(object):
                 self.q_upload.put(None)
                 return
 
+            chunksz = up2k_chunksize(file.size)
             upath = file.abs.decode("utf-8", "replace")
             if not VT100:
                 upath = upath.lstrip("\\?")
@@ -1245,8 +1246,13 @@ class Ctl(object):
                     file.up_c -= len(hs)
                     for cid in hs:
                         sz = file.kchunks[cid][1]
+                        self.up_br -= sz
                         self.up_b -= sz
                         file.up_b -= sz
+
+                if hs and not file.up_b:
+                    # first hs of this file; is this an upload resume?
+                    file.up_b = chunksz * max(0, len(file.kchunks) - len(hs))
 
                 file.ucids = hs
 
@@ -1261,7 +1267,7 @@ class Ctl(object):
                         c1 = c2 = ""
 
                     spd_h = humansize(file.size / file.t_hash, True)
-                    if file.up_b:
+                    if file.up_c:
                         t_up = file.t1_up - file.t0_up
                         spd_u = humansize(file.size / t_up, True)
 
@@ -1271,13 +1277,12 @@ class Ctl(object):
                         t = "   found %s %s(%.2fs,%s/s)%s"
                         print(t % (upath, c1, file.t_hash, spd_h, c2))
                 else:
-                    kw = "uploaded" if file.up_b else "   found"
+                    kw = "uploaded" if file.up_c else "   found"
                     print("{0} {1}".format(kw, upath))
 
                 self._check_if_done()
                 continue
 
-            chunksz = up2k_chunksize(file.size)
             njoin = (self.ar.sz * 1024 * 1024) // chunksz
             cs = hs[:]
             while cs:
