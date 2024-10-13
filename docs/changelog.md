@@ -1,4 +1,23 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-1011-2256  `v1.15.6`  preadme
+
+## 🧪 new features
+
+* #105 files named `preadme.md` appear at the top of directory listings 1d68acf8
+* entirely disable dedup with `--no-clone` / volflag `noclone` 3d7facd7 6b7ebdb7
+  * even if a file exists for sure on the server HDD, let the client continue uploading instead of reusing the existing data
+  * using this option "never" makes sense, unless you're using something like S3 Glacier storage where reading is really expensive but writing is cheap
+
+## 🩹 bugfixes
+
+* up2k jank after detecting a bitflip or network glitch 4a4ec88d
+  * instead of resuming the interrupted upload like it should, the upload client could get stuck or start over
+* #104 support viewing dotfile documents when dotfiles are hidden 9ccd8bb3
+* fix a buttload of typos 6adc778d 1e7697b5
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-1005-1803  `v1.15.5`  pyz all the cores
 
 ## 🩹 bugfixes
