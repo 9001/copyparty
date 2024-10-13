@@ -1013,6 +1013,9 @@ class Ctl(object):
             t = "%s eta @ %s/s, %s, %d# left\033[K" % (self.eta, spd, sleft, nleft)
             eprint(txt + "\033]0;{0}\033\\\r{0}{1}".format(t, tail))
 
+        if self.ar.wlist:
+            self.at_hash = time.time() - self.t0
+
         if self.hash_b and self.at_hash:
             spd = humansize(self.hash_b / self.at_hash)
             eprint("\nhasher: %.2f sec, %s/s\n" % (self.at_hash, spd))
@@ -1136,10 +1139,16 @@ class Ctl(object):
                     self.up_b = self.hash_b
 
             if self.ar.wlist:
+                vp = file.rel.decode("utf-8")
+                if self.ar.chs:
+                    zsl = [
+                        "%s %d %d" % (zsii[0], n, zsii[1])
+                        for n, zsii in enumerate(file.cids)
+                    ]
+                    print("chs: %s\n%s" % (vp, "\n".join(zsl)))
                 zsl = [self.ar.wsalt, str(file.size)] + [x[0] for x in file.kchunks]
                 zb = hashlib.sha512("\n".join(zsl).encode("utf-8")).digest()[:33]
                 wark = ub64enc(zb).decode("utf-8")
-                vp = file.rel.decode("utf-8")
                 if self.ar.jw:
                     print("%s  %s" % (wark, vp))
                 else:
@@ -1403,6 +1412,7 @@ source file/folder selection uses rsync syntax, meaning that:
 
     ap = app.add_argument_group("file-ID calculator; enable with url '-' to list warks (file identifiers) instead of upload/search")
     ap.add_argument("--wsalt", type=unicode, metavar="S", default="hunter2", help="salt to use when creating warks; must match server config")
+    ap.add_argument("--chs", action="store_true", help="verbose (print the hash/offset of each chunk in each file)")
     ap.add_argument("--jw", action="store_true", help="just identifier+filepath, not mtime/size too")
 
     ap = app.add_argument_group("performance tweaks")
