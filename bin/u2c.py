@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.1"
-S_BUILD_DT = "2024-09-23"
+S_VERSION = "2.2"
+S_BUILD_DT = "2024-10-13"
 
 """
 u2c.py: upload to copyparty
@@ -728,6 +728,7 @@ def handshake(ar, file, search):
     while True:
         sc = 600
         txt = ""
+        t0 = time.time()
         try:
             zs = json.dumps(req, separators=(",\n", ": "))
             sc, txt = web.req("POST", url, {}, zs.encode("utf-8"), MJ)
@@ -752,7 +753,9 @@ def handshake(ar, file, search):
                 print("\nERROR: login required, or wrong password:\n%s" % (txt,))
                 raise BadAuth()
 
-            eprint("handshake failed, retrying: %s\n  %s\n\n" % (file.name, em))
+            t = "handshake failed, retrying: %s\n  t0=%.3f t1=%.3f td=%.3f\n  %s\n\n"
+            now = time.time()
+            eprint(t % (file.name, t0, now, now - t0, em))
             time.sleep(ar.cd)
 
     try:
@@ -1379,7 +1382,7 @@ def main():
     cores = (os.cpu_count() if hasattr(os, "cpu_count") else 0) or 2
     hcores = min(cores, 3)  # 4% faster than 4+ on py3.9 @ r5-4500U
 
-    ver = "{0}  v{1}  https://youtu.be/BIcOO6TLKaY".format(S_BUILD_DT, S_VERSION)
+    ver = "{0}, v{1}".format(S_BUILD_DT, S_VERSION)
     if "--version" in sys.argv:
         print(ver)
         return
