@@ -357,17 +357,18 @@ class Up2k(object):
             return '[{"timeout":1}]'
 
         ret: list[tuple[int, str, int, int, int]] = []
+        userset = set([(uname or "\n"), "*"])
         try:
             for ptop, tab2 in self.registry.items():
                 cfg = self.flags.get(ptop, {}).get("u2abort", 1)
                 if not cfg:
                     continue
                 addr = (ip or "\n") if cfg in (1, 2) else ""
-                user = (uname or "\n") if cfg in (1, 3) else ""
+                user = userset if cfg in (1, 3) else None
                 for job in tab2.values():
                     if (
                         "done" in job
-                        or (user and user != job["user"])
+                        or (user and job["user"] not in user)
                         or (addr and addr != job["addr"])
                     ):
                         continue
@@ -3833,10 +3834,12 @@ class Up2k(object):
             with self.mutex, self.reg_mutex:
                 abrt_cfg = self.flags.get(ptop, {}).get("u2abort", 1)
                 addr = (ip or "\n") if abrt_cfg in (1, 2) else ""
-                user = (uname or "\n") if abrt_cfg in (1, 3) else ""
+                user = ((uname or "\n"), "*") if abrt_cfg in (1, 3) else None
                 reg = self.registry.get(ptop, {}) if abrt_cfg else {}
                 for wark, job in reg.items():
-                    if (user and user != job["user"]) or (addr and addr != job["addr"]):
+                    if (addr and addr != job["addr"]) or (
+                        user and job["user"] not in user
+                    ):
                         continue
                     jrem = djoin(job["prel"], job["name"])
                     if ANYWIN:
