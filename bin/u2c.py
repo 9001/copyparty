@@ -581,13 +581,17 @@ def walkdir(err, top, excl, seen):
     for ap, inf in sorted(statdir(err, top)):
         if excl.match(ap):
             continue
-        yield ap, inf
         if stat.S_ISDIR(inf.st_mode):
+            yield ap, inf
             try:
                 for x in walkdir(err, ap, excl, seen):
                     yield x
             except Exception as ex:
                 err.append((ap, str(ex)))
+        elif stat.S_ISREG(inf.st_mode):
+            yield ap, inf
+        else:
+            err.append((ap, "irregular filetype 0%o" % (inf.st_mode,)))
 
 
 def walkdirs(err, tops, excl):
