@@ -270,7 +270,16 @@ class FileSlice(object):
         self.len = tlen
         self.cdr = self.car + self.len
         self.ofs = 0  # type: int
-        self.f = open(file.abs, "rb", 512 * 1024)
+
+        self.f = None
+        self.seek = self._seek0
+        self.read = self._read0
+
+    def _open(self):
+        self.seek = self._seek
+        self.read = self._read
+
+        self.f = open(self.file.abs, "rb", 512 * 1024)
         self.f.seek(self.car)
 
         # https://stackoverflow.com/questions/4359495/what-is-exactly-a-file-like-object-in-python
@@ -282,10 +291,15 @@ class FileSlice(object):
         except:
             pass  # py27 probably
 
+    def close(self, *a, **ka):
+        return  # until _open
+
     def tell(self):
         return self.ofs
 
-    def seek(self, ofs, wh=0):
+    def _seek(self, ofs, wh=0):
+        assert self.f  # !rm
+
         if wh == 1:
             ofs = self.ofs + ofs
         elif wh == 2:
@@ -299,11 +313,21 @@ class FileSlice(object):
         self.ofs = ofs
         self.f.seek(self.car + ofs)
 
-    def read(self, sz):
+    def _read(self, sz):
+        assert self.f  # !rm
+
         sz = min(sz, self.len - self.ofs)
         ret = self.f.read(sz)
         self.ofs += len(ret)
         return ret
+
+    def _seek0(self, ofs, wh=0):
+        self._open()
+        return self.seek(ofs, wh)
+
+    def _read0(self, sz):
+        self._open()
+        return self.read(sz)
 
 
 class MTHash(object):
