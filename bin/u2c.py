@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.2"
-S_BUILD_DT = "2024-10-13"
+S_VERSION = "2.3"
+S_BUILD_DT = "2024-10-15"
 
 """
 u2c.py: upload to copyparty
@@ -61,6 +61,9 @@ else:
     from queue import Queue
 
     unicode = str
+
+
+WTF8 = "replace" if PY2 else "surrogateescape"
 
 VT100 = platform.system() != "Windows"
 
@@ -228,7 +231,7 @@ class File(object):
         self.lmod = lmod  # type: float
 
         self.abs = os.path.join(top, rel)  # type: bytes
-        self.name = self.rel.split(b"/")[-1].decode("utf-8", "replace")  # type: str
+        self.name = self.rel.split(b"/")[-1].decode("utf-8", WTF8)  # type: str
 
         # set by get_hashlist
         self.cids = []  # type: list[tuple[str, int, int]]  # [ hash, ofs, sz ]
@@ -637,11 +640,12 @@ def walkdirs(err, tops, excl):
 
 # mostly from copyparty/util.py
 def quotep(btxt):
+    # type: (bytes) -> bytes
     quot1 = quote(btxt, safe=b"/")
     if not PY2:
         quot1 = quot1.encode("ascii")
 
-    return quot1.replace(b" ", b"+")  # type: ignore
+    return quot1.replace(b" ", b"%20")  # type: ignore
 
 
 # from copyparty/util.py
@@ -748,7 +752,7 @@ def handshake(ar, file, search):
         url = file.url
     else:
         if b"/" in file.rel:
-            url = quotep(file.rel.rsplit(b"/", 1)[0]).decode("utf-8", "replace")
+            url = quotep(file.rel.rsplit(b"/", 1)[0]).decode("utf-8")
         else:
             url = ""
         url = ar.vtop + url
@@ -794,7 +798,7 @@ def handshake(ar, file, search):
     if search:
         return r["hits"], False
 
-    file.url = r["purl"]
+    file.url = quotep(r["purl"].encode("utf-8", WTF8)).decode("utf-8")
     file.name = r["name"]
     file.wark = r["wark"]
 
@@ -1085,7 +1089,7 @@ class Ctl(object):
                         print("      ls ~{0}".format(srd))
                         zt = (
                             self.ar.vtop,
-                            quotep(rd.replace(b"\\", b"/")).decode("utf-8", "replace"),
+                            quotep(rd.replace(b"\\", b"/")).decode("utf-8"),
                         )
                         sc, txt = web.req("GET", "%s%s?ls&lt&dots" % zt, {})
                         if sc >= 400:
@@ -1094,7 +1098,7 @@ class Ctl(object):
                         j = json.loads(txt)
                         for f in j["dirs"] + j["files"]:
                             rfn = f["href"].split("?")[0].rstrip("/")
-                            ls[unquote(rfn.encode("utf-8", "replace"))] = f
+                            ls[unquote(rfn.encode("utf-8", WTF8))] = f
                     except Exception as ex:
                         print("   mkdir ~{0}  ({1})".format(srd, ex))
 
@@ -1108,7 +1112,7 @@ class Ctl(object):
                             lnodes = [x.split(b"/")[-1] for x in zls]
                         bnames = [x for x in ls if x not in lnodes and x != b".hist"]
                         vpath = self.ar.url.split("://")[-1].split("/", 1)[-1]
-                        names = [x.decode("utf-8", "replace") for x in bnames]
+                        names = [x.decode("utf-8", WTF8) for x in bnames]
                         locs = [vpath + srd + "/" + x for x in names]
                         while locs:
                             req = locs
