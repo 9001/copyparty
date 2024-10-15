@@ -665,7 +665,7 @@ def up2k_chunksize(filesize):
     while True:
         for mul in [1, 2]:
             nchunks = math.ceil(filesize * 1.0 / chunksize)
-            if nchunks <= 256 or (chunksize >= 32 * 1024 * 1024 and nchunks < 4096):
+            if nchunks <= 256 or (chunksize >= 32 * 1024 * 1024 and nchunks <= 4096):
                 return chunksize
 
             chunksize += stepsize
