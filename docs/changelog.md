@@ -1,4 +1,32 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-1013-2244  `v1.15.7`  the 'a' in "ip address" stands for authentication
+
+## 🧪 new features
+
+* [cidr-based autologin](https://github.com/9001/copyparty#ip-auth) b7f9bf5a
+  * map a cidr ip-range to a username; anyone connecting from that ip-range will autologin as that user
+  * thx to @byteturtle for the idea!
+* [u2c](https://github.com/9001/copyparty/blob/hovudstraum/bin/README.md#u2cpy) / commandline uploader:
+  * option `--chs` to list individual chunk hashes cf1b7562
+  * fix progress indicator when resuming an upload 53ffd245
+* up2k: verbose logging of detected/corrected bitflips ee628363
+  * *foreshadowing intensifies* (story still developing)
+
+## 🩹 bugfixes
+
+* up2k with database disabled / running without `-e2d` 705f598b
+  * respect `noforget` when loading snaps
+  * ...but actually forget deleted files otherwise
+  * snap-loader adds empty need/hash entries as necessary
+
+## 🔧 other changes
+
+* authed users can now unpost recent uploads of unauthed users from the same IP 22b58e31
+  * would have become problematic now that cidr-based autologin is a thing
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-1011-2256  `v1.15.6`  preadme
 
 ## 🧪 new features
