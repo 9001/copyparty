@@ -2606,7 +2606,7 @@ function up2k_init(subtle) {
             cdr = t.size;
 
         if (cdr - car <= maxsz)
-            return upload_sub(t, upt, pcar, pcdr, car, cdr, chunksize, 0, car, []);
+            return upload_sub(t, upt, pcar, pcdr, car, cdr, chunksize, car, []);
 
         var car0 = car, subs = [];
         while (car < cdr) {
@@ -2859,7 +2859,7 @@ function up2k_init(subtle) {
             n < u2sz_min ? u2sz_min :
             n > u2sz_max ? u2sz_max : n
         );
-        if (n == dv[1]) sdrop('u2sz'); else swrite('u2sz', n);
+        if (n == u2sz_tgt) sdrop('u2sz'); else swrite('u2sz', n);
         if (el.value != n) el.value = n;
     };
     ebi('u2szg').addEventListener('blur', read_u2sz);
