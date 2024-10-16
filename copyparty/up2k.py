@@ -2966,7 +2966,7 @@ class Up2k(object):
                     path = djoin(rj["ptop"], rj["prel"], fn)
                     try:
                         st = bos.stat(path)
-                        if st.st_size > 0 or not rj["need"]:
+                        if st.st_size > 0 or "done" in rj:
                             # upload completed or both present
                             break
                     except:
@@ -2980,7 +2980,7 @@ class Up2k(object):
                 inc_ap = djoin(cj["ptop"], cj["prel"], cj["name"])
                 orig_ap = djoin(rj["ptop"], rj["prel"], rj["name"])
 
-                if self.args.nw or n4g or not st:
+                if self.args.nw or n4g or not st or "done" not in rj:
                     pass
 
                 elif st.st_size != rj["size"]:
@@ -3012,7 +3012,7 @@ class Up2k(object):
                     dst = djoin(cj["ptop"], cj["prel"], cj["name"])
                     vsrc = djoin(job["vtop"], job["prel"], job["name"])
                     vsrc = vsrc.replace("\\", "/")  # just for prints anyways
-                    if job["need"]:
+                    if "done" not in job:
                         self.log("unfinished:\n  {0}\n  {1}".format(src, dst))
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
                         err += "/" + quotep(vsrc) + " "
