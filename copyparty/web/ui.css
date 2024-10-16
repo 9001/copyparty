@@ -73,8 +73,8 @@ html {
 	position: absolute;
 	height: 1px;
 	top: 1px;
-	right: 1%;
-	width: 99%;
+	right: 1px;
+	left: 1px;
 	animation: toastt var(--tmtime) steps(var(--tmstep)) forwards;
 	transform-origin: right;
 }

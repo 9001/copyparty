@@ -1527,21 +1527,26 @@ var toast = (function () {
         if (sec)
             te = setTimeout(r.hide, sec * 1000);
 
-        var tb = ebi('toastt');
-        if (same && delta < 1000 && tb) {
-            tb.style.animation = 'none';
-            tb.offsetHeight;
-            tb.style.animation = null;
+        if (same && delta < 1000) {
+            var tb = ebi('toastt');
+            if (tb) {
+                tb.style.animation = 'none';
+                tb.offsetHeight;
+                tb.style.animation = null;
+            }
             return;
         }
 
         if (txt.indexOf('<body>') + 1)
             txt = txt.slice(0, txt.indexOf('<')) + ' [...]';
 
-        setcvar('--tmtime', sec + 's');
-        setcvar('--tmstep', sec * 15);
-
-        obj.innerHTML = '<div id="toastt"></div><a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
+        var html = '';
+        if (sec) {
+            setcvar('--tmtime', sec + 's');
+            setcvar('--tmstep', sec * 15);
+            html += '<div id="toastt"></div>';
+        }
+        obj.innerHTML = html + '<a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
         obj.className = cl;
         sec += obj.offsetWidth;
         obj.className += ' vis';
