@@ -66,6 +66,7 @@ if PY2:
 LEELOO_DALLAS = "leeloo_dallas"
 
 SEE_LOG = "see log for details"
+SEESLOG = " (see serverlog for details)"
 SSEELOG = " ({})".format(SEE_LOG)
 BAD_CFG = "invalid config; {}".format(SEE_LOG)
 SBADCFG = " ({})".format(BAD_CFG)

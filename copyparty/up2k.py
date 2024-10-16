@@ -20,7 +20,7 @@ from copy import deepcopy
 from queue import Queue
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS, E
-from .authsrv import LEELOO_DALLAS, SSEELOG, VFS, AuthSrv
+from .authsrv import LEELOO_DALLAS, SEESLOG, VFS, AuthSrv
 from .bos import bos
 from .cfg import vf_bmap, vf_cmap, vf_vmap
 from .fsutil import Fstab
@@ -2927,8 +2927,8 @@ class Up2k(object):
                     hashes2, st = self._hashlist_from_file(orig_ap)
                     wark2 = up2k_wark_from_hashlist(self.salt, st.st_size, hashes2)
                     if dwark != wark2:
-                        t = "will not dedup (fs index desync): fs=%s, db=%s, file: %s"
-                        self.log(t % (wark2, dwark, orig_ap))
+                        t = "will not dedup (fs index desync): fs=%s, db=%s, file: %s\n%s"
+                        self.log(t % (wark2, dwark, orig_ap, rj))
                         lost.append(dupe[3:])
                         continue
                     data_ok = True
@@ -2984,9 +2984,9 @@ class Up2k(object):
                     pass
 
                 elif st.st_size != rj["size"]:
-                    t = "will not dedup (fs index desync): {}, size fs={} db={}, mtime fs={} db={}, file: {}"
+                    t = "will not dedup (fs index desync): {}, size fs={} db={}, mtime fs={} db={}, file: {}\n{}"
                     t = t.format(
-                        wark, st.st_size, rj["size"], st.st_mtime, rj["lmod"], path
+                        wark, st.st_size, rj["size"], st.st_mtime, rj["lmod"], path, rj
                     )
                     self.log(t)
                     del reg[wark]
@@ -2996,8 +2996,8 @@ class Up2k(object):
                     hashes2, _ = self._hashlist_from_file(orig_ap)
                     wark2 = up2k_wark_from_hashlist(self.salt, st.st_size, hashes2)
                     if wark != wark2:
-                        t = "will not dedup (fs index desync): fs=%s, idx=%s, file: %s"
-                        self.log(t % (wark2, wark, orig_ap))
+                        t = "will not dedup (fs index desync): fs=%s, idx=%s, file: %s\n%s"
+                        self.log(t % (wark2, wark, orig_ap, rj))
                         del reg[wark]
 
             if job or wark in reg:
@@ -3380,7 +3380,7 @@ class Up2k(object):
             if not job:
                 known = " ".join([x for x in self.registry[ptop].keys()])
                 self.log("unknown wark [{}], known: {}".format(wark, known))
-                raise Pebkac(400, "unknown wark" + SSEELOG)
+                raise Pebkac(400, "unknown wark" + SEESLOG)
 
             if "t0c" not in job:
                 job["t0c"] = time.time()
@@ -3396,7 +3396,7 @@ class Up2k(object):
                 try:
                     nchunk = uniq.index(chashes[0])
                 except:
-                    raise Pebkac(400, "unknown chunk0 [%s]" % (chashes[0]))
+                    raise Pebkac(400, "unknown chunk0 [%s]" % (chashes[0],))
                 expanded = [chashes[0]]
                 for prefix in chashes[1:]:
                     nchunk += 1
@@ -3431,7 +3431,7 @@ class Up2k(object):
             for chash in chashes:
                 nchunk = [n for n, v in enumerate(job["hash"]) if v == chash]
                 if not nchunk:
-                    raise Pebkac(400, "unknown chunk %s" % (chash))
+                    raise Pebkac(400, "unknown chunk %s" % (chash,))
 
                 ofs = [chunksize * x for x in nchunk]
                 coffsets.append(ofs)
@@ -3525,11 +3525,13 @@ class Up2k(object):
             src = djoin(pdir, job["tnam"])
             dst = djoin(pdir, job["name"])
         except Exception as ex:
-            raise Pebkac(500, "finish_upload, wark, " + repr(ex))
+            self.log(min_ex(), 1)
+            raise Pebkac(500, "finish_upload, wark, %r%s" % (ex, SEESLOG))
 
         if job["need"]:
-            t = "finish_upload {} with remaining chunks {}"
-            raise Pebkac(500, t.format(wark, job["need"]))
+            self.log(min_ex(), 1)
+            t = "finish_upload %s with remaining chunks %s%s"
+            raise Pebkac(500, t % (wark, job["need"], SEESLOG))
 
         upt = job.get("at") or time.time()
         vflags = self.flags[ptop]
@@ -4054,7 +4056,9 @@ class Up2k(object):
                         self.db_act = self.vol_act[dbv.realpath] = time.time()
                         svpf = "/".join(x for x in [dbv.vpath, vrem, fn[0]] if x)
                         if not svpf.startswith(svp + "/"):  # assert
-                            raise Pebkac(500, "mv: bug at {}, top {}".format(svpf, svp))
+                            self.log(min_ex(), 1)
+                            t = "mv: bug at %s, top %s%s"
+                            raise Pebkac(500, t % (svpf, svp, SEESLOG))
 
                         dvpf = dvp + svpf[len(svp) :]
                         self._mv_file(uname, ip, svpf, dvpf, curs)
@@ -4069,7 +4073,9 @@ class Up2k(object):
         for zsl in (rm_ok, rm_ng):
             for ap in reversed(zsl):
                 if not ap.startswith(sabs):
-                    raise Pebkac(500, "mv_d: bug at {}, top {}".format(ap, sabs))
+                    self.log(min_ex(), 1)
+                    t = "mv_d: bug at %s, top %s%s"
+                    raise Pebkac(500, t % (ap, sabs, SEESLOG))
 
                 rem = ap[len(sabs) :].replace(os.sep, "/").lstrip("/")
                 vp = vjoin(dvp, rem)
