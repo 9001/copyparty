@@ -21,6 +21,8 @@ var up2k = null,
     m = 'will use ' + sha_js + ' instead of native sha512 due to';
 
 try {
+    if (sread('nosubtle') || window.nosubtle)
+        throw 'chickenbit';
     var cf = crypto.subtle || crypto.webkitSubtle;
     cf.digest('SHA-512', new Uint8Array(1)).then(
         function (x) { console.log('sha-ok'); up2k = up2k_init(cf); },
@@ -1358,6 +1360,10 @@ function up2k_init(subtle) {
             for (var a = 0; a < Math.min(navigator.hardwareConcurrency || 4, 16); a++)
                 hws.push(new Worker(SR + '/.cpr/w.hash.js?_=' + TS));
 
+            if (!subtle)
+                for (var a = 0; a < hws.length; a++)
+                    hws[a].postMessage('nosubtle');
+
             console.log(hws.length + " hashers");
         }
 
@@ -2579,7 +2585,7 @@ function up2k_init(subtle) {
             nparts = upt.nparts,
             pcar = nparts[0],
             pcdr = nparts[nparts.length - 1],
-            maxsz = u2sz_max * 1024 * 1024;
+            maxsz = (u2sz_max > 1 ? u2sz_max : 2040) * 1024 * 1024;
 
         if (t.done)
             return console.log('done; skip chunk', t.name, t);

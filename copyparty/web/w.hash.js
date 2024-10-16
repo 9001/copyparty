@@ -20,6 +20,7 @@ catch (ex) {
 function load_fb() {
     subtle = null;
     importScripts('deps/sha512.hw.js');
+    console.log('using fallback hasher');
 }
 
 
@@ -29,6 +30,9 @@ var reader = null,
 
 
 onmessage = (d) => {
+    if (d.data == 'nosubtle')
+        return load_fb();
+
     if (busy)
         return postMessage(["panic", 'worker got another task while busy']);
 
