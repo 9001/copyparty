@@ -219,7 +219,7 @@ also see [comparison to similar software](./docs/versus.md)
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
-    * **no filesize limit!** ...unless you use Cloudflare, then it's 383.9 GiB
+    * **no filesize limit!** even on Cloudflare
   * ☑ stash: simple PUT filedropper
   * ☑ filename randomizer
   * ☑ write-only folders
@@ -654,7 +654,7 @@ up2k has several advantages:
   * uploads resume if you reboot your browser or pc, just upload the same files again
   * server detects any corruption; the client reuploads affected chunks
   * the client doesn't upload anything that already exists on the server
-  * no filesize limit unless imposed by a proxy, for example Cloudflare, which blocks uploads over 383.9 GiB
+  * no filesize limit, even when a proxy limits the request size (for example Cloudflare)
 * much higher speeds than ftp/scp/tarpipe on some internet connections (mainly american ones) thanks to parallel connections
 * the last-modified timestamp of the file is preserved
 
@@ -689,6 +689,8 @@ and then theres the tabs below it,
 note that since up2k has to read each file twice, `[🎈] bup` can *theoretically* be up to 2x faster in some extreme cases (files bigger than your ram, combined with an internet connection faster than the read-speed of your HDD, or if you're uploading from a cuo2duo)
 
 if you are resuming a massive upload and want to skip hashing the files which already finished, you can enable `turbo` in the `[⚙️] config` tab, but please read the tooltip on that button
+
+if the server is behind a proxy which imposes a request-size limit, you can configure up2k to sneak below the limit with server-option `--u2sz` (the default is 96 MiB to support Cloudflare)
 
 
 ### file-search

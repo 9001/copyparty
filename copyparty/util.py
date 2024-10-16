@@ -2723,10 +2723,12 @@ def yieldfile(fn: str, bufsz: int) -> Generator[bytes, None, None]:
 def hashcopy(
     fin: Generator[bytes, None, None],
     fout: Union[typing.BinaryIO, typing.IO[Any]],
-    slp: float = 0,
-    max_sz: int = 0,
+    hashobj: Optional["hashlib._Hash"],
+    max_sz: int,
+    slp: float,
 ) -> tuple[int, str, str]:
-    hashobj = hashlib.sha512()
+    if not hashobj:
+        hashobj = hashlib.sha512()
     tlen = 0
     for buf in fin:
         tlen += len(buf)

@@ -2891,9 +2891,6 @@ class Up2k(object):
                         "user": cj["user"],
                         "addr": ip,
                         "at": at,
-                        "hash": [],
-                        "need": [],
-                        "busy": {},
                     }
                     for k in ["life"]:
                         if k in cj:
@@ -2935,9 +2932,12 @@ class Up2k(object):
                     job = rj
                     break
 
-            if job and wark in reg:
-                # self.log("pop " + wark + "  " + job["name"] + " handle_json db", 4)
-                del reg[wark]
+            if job:
+                if wark in reg:
+                    del reg[wark]
+                job["hash"] = job["need"] = []
+                job["done"] = True
+                job["busy"] = {}
 
             if lost:
                 c2 = None
@@ -3373,7 +3373,7 @@ class Up2k(object):
 
     def handle_chunks(
         self, ptop: str, wark: str, chashes: list[str]
-    ) -> tuple[list[str], int, list[list[int]], str, float, bool]:
+    ) -> tuple[list[str], int, list[list[int]], str, float, int, bool]:
         with self.mutex, self.reg_mutex:
             self.db_act = self.vol_act[ptop] = time.time()
             job = self.registry[ptop].get(wark)
@@ -3456,7 +3456,7 @@ class Up2k(object):
 
         job["poke"] = time.time()
 
-        return chashes, chunksize, coffsets, path, job["lmod"], job["sprs"]
+        return chashes, chunksize, coffsets, path, job["lmod"], job["size"], job["sprs"]
 
     def fast_confirm_chunks(
         self, ptop: str, wark: str, chashes: list[str]

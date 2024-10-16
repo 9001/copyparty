@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.3"
-S_BUILD_DT = "2024-10-15"
+S_VERSION = "2.4"
+S_BUILD_DT = "2024-10-16"
 
 """
 u2c.py: upload to copyparty
@@ -270,13 +270,35 @@ class FileSlice(object):
                 raise Exception(9)
             tlen += clen
 
-        self.len = tlen
+        self.len = self.tlen = tlen
         self.cdr = self.car + self.len
         self.ofs = 0  # type: int
 
         self.f = None
         self.seek = self._seek0
         self.read = self._read0
+
+    def subchunk(self, maxsz, nth):
+        if self.tlen <= maxsz:
+            return -1
+
+        if not nth:
+            self.car0 = self.car
+            self.cdr0 = self.cdr
+
+        self.car = self.car0 + maxsz * nth
+        if self.car >= self.cdr0:
+            return -2
+
+        self.cdr = self.car + min(self.cdr0 - self.car, maxsz)
+        self.len = self.cdr - self.car
+        self.seek(0)
+        return nth
+
+    def unsub(self):
+        self.car = self.car0
+        self.cdr = self.cdr0
+        self.len = self.tlen
 
     def _open(self):
         self.seek = self._seek
@@ -805,8 +827,8 @@ def handshake(ar, file, search):
     return r["hash"], r["sprs"]
 
 
-def upload(fsl, stats):
-    # type: (FileSlice, str) -> None
+def upload(fsl, stats, maxsz):
+    # type: (FileSlice, str, int) -> None
     """upload a range of file data, defined by one or more `cid` (chunk-hash)"""
 
     ctxt = fsl.cids[0]
@@ -824,21 +846,33 @@ def upload(fsl, stats):
     if stats:
         headers["X-Up2k-Stat"] = stats
 
+    nsub = 0
     try:
-        sc, txt = web.req("POST", fsl.file.url, headers, fsl, MO)
+        while nsub != -1:
+            nsub = fsl.subchunk(maxsz, nsub)
+            if nsub == -2:
+                return
+            if nsub >= 0:
+                headers["X-Up2k-Subc"] = str(maxsz * nsub)
+                headers.pop(CLEN, None)
+                nsub += 1
 
-        if sc == 400:
-            if (
-                "already being written" in txt
-                or "already got that" in txt
-                or "only sibling chunks" in txt
-            ):
-                fsl.file.nojoin = 1
+            sc, txt = web.req("POST", fsl.file.url, headers, fsl, MO)
 
-        if sc >= 400:
-            raise Exception("http %s: %s" % (sc, txt))
+            if sc == 400:
+                if (
+                    "already being written" in txt
+                    or "already got that" in txt
+                    or "only sibling chunks" in txt
+                ):
+                    fsl.file.nojoin = 1
+
+            if sc >= 400:
+                raise Exception("http %s: %s" % (sc, txt))
     finally:
         fsl.f.close()
+        if nsub != -1:
+            fsl.unsub()
 
 
 class Ctl(object):
@@ -970,7 +1004,7 @@ class Ctl(object):
                     print("  %d up %s" % (ncs - nc, cid))
                     stats = "%d/0/0/%d" % (nf, self.nfiles - nf)
                     fslice = FileSlice(file, [cid])
-                    upload(fslice, stats)
+                    upload(fslice, stats, self.ar.szm)
 
             print("  ok!")
             if file.recheck:
@@ -1318,7 +1352,7 @@ class Ctl(object):
                 self._check_if_done()
                 continue
 
-            njoin = (self.ar.sz * 1024 * 1024) // chunksz
+            njoin = self.ar.sz // chunksz
             cs = hs[:]
             while cs:
                 fsl = FileSlice(file, cs[:1])
@@ -1370,7 +1404,7 @@ class Ctl(object):
             )
 
             try:
-                upload(fsl, stats)
+                upload(fsl, stats, self.ar.szm)
             except Exception as ex:
                 t = "upload failed, retrying: %s #%s+%d (%s)\n"
                 eprint(t % (file.name, cids[0][:8], len(cids) - 1, ex))
@@ -1459,6 +1493,7 @@ source file/folder selection uses rsync syntax, meaning that:
     ap.add_argument("-j", type=int, metavar="CONNS", default=2, help="parallel connections")
     ap.add_argument("-J", type=int, metavar="CORES", default=hcores, help="num cpu-cores to use for hashing; set 0 or 1 for single-core hashing")
     ap.add_argument("--sz", type=int, metavar="MiB", default=64, help="try to make each POST this big")
+    ap.add_argument("--szm", type=int, metavar="MiB", default=96, help="max size of each POST (default is cloudflare max)")
     ap.add_argument("-nh", action="store_true", help="disable hashing while uploading")
     ap.add_argument("-ns", action="store_true", help="no status panel (for slow consoles and macos)")
     ap.add_argument("--cd", type=float, metavar="SEC", default=5, help="delay before reattempting a failed handshake/upload")
@@ -1485,6 +1520,9 @@ source file/folder selection uses rsync syntax, meaning that:
 
     if ar.dr:
         ar.ow = True
+
+    ar.sz *= 1024 * 1024
+    ar.szm *= 1024 * 1024
 
     ar.x = "|".join(ar.x or [])
 

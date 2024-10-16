@@ -853,8 +853,13 @@ function up2k_init(subtle) {
 
     setmsg(suggest_up2k, 'msg');
 
+    var u2szs = u2sz.split(','),
+        u2sz_min = parseInt(u2szs[0]),
+        u2sz_tgt = parseInt(u2szs[1]),
+        u2sz_max = parseInt(u2szs[2]);
+
     var parallel_uploads = ebi('nthread').value = icfg_get('nthread', u2j),
-        stitch_tgt = ebi('u2szg').value = icfg_get('u2sz', u2sz.split(',')[1]),
+        stitch_tgt = ebi('u2szg').value = icfg_get('u2sz', u2sz_tgt),
         uc = {},
         fdom_ctr = 0,
         biggest_file = 0;
@@ -2574,8 +2579,7 @@ function up2k_init(subtle) {
             nparts = upt.nparts,
             pcar = nparts[0],
             pcdr = nparts[nparts.length - 1],
-            snpart = pcar == pcdr ? pcar : ('' + pcar + '~' + pcdr),
-            tries = 0;
+            maxsz = u2sz_max * 1024 * 1024;
 
         if (t.done)
             return console.log('done; skip chunk', t.name, t);
@@ -2595,6 +2599,30 @@ function up2k_init(subtle) {
         if (cdr >= t.size)
             cdr = t.size;
 
+        if (cdr - car <= maxsz)
+            return upload_sub(t, upt, pcar, pcdr, car, cdr, chunksize, 0, car, []);
+
+        var car0 = car, subs = [];
+        while (car < cdr) {
+            subs.push([car, Math.min(cdr, car + maxsz)]);
+            car += maxsz;
+        }
+        upload_sub(t, upt, pcar, pcdr, 0, 0, chunksize, car0, subs);
+    }
+
+    function upload_sub(t, upt, pcar, pcdr, car, cdr, chunksize, car0, subs) {
+        var nparts = upt.nparts,
+            is_sub = subs.length;
+
+        if (is_sub) {
+            var x = subs.shift();
+            car = x[0];
+            cdr = x[1];
+        }
+
+        var snpart = is_sub ? ('' + pcar + '(' + (car-car0) +'+'+ (cdr-car)) :
+                pcar == pcdr ? pcar : ('' + pcar + '~' + pcdr);
+
         var orz = function (xhr) {
             st.bytes.inflight -= xhr.bsent;
             var txt = unpre((xhr.response && xhr.response.err) || xhr.responseText);
@@ -2608,6 +2636,10 @@ function up2k_init(subtle) {
                 return;
             }
             if (xhr.status == 200) {
+                car = car0;
+                if (subs.length)
+                    return upload_sub(t, upt, pcar, pcdr, 0, 0, chunksize, car0, subs);
+
                 var bdone = cdr - car;
                 for (var a = pcar; a <= pcdr; a++) {
                     pvis.prog(t, a, Math.min(bdone, chunksize));
@@ -2674,7 +2706,7 @@ function up2k_init(subtle) {
                     toast.warn(9.98, L.u_cuerr.format(snpart, Math.ceil(t.size / chunksize), t.name), t);
 
                 t.nojoin = t.nojoin || t.postlist.length;  // maybe rproxy postsize limit
-                console.log('chunkpit onerror,', ++tries, t.name, t);
+                console.log('chunkpit onerror,', t.name, t);
                 orz2(xhr);
             };
 
@@ -2692,6 +2724,9 @@ function up2k_init(subtle) {
             xhr.open('POST', t.purl, true);
             xhr.setRequestHeader("X-Up2k-Hash", ctxt);
             xhr.setRequestHeader("X-Up2k-Wark", t.wark);
+            if (is_sub)
+                xhr.setRequestHeader("X-Up2k-Subc", car - car0);
+
             xhr.setRequestHeader("X-Up2k-Stat", "{0}/{1}/{2}/{3} {4}/{5} {6}".format(
                 pvis.ctr.ok, pvis.ctr.ng, pvis.ctr.bz, pvis.ctr.q, btot, btot - bfin,
                 st.eta.t.split(' ').pop()));
@@ -2812,11 +2847,11 @@ function up2k_init(subtle) {
     }
 
     var read_u2sz = function () {
-        var el = ebi('u2szg'), n = parseInt(el.value), dv = u2sz.split(',');
+        var el = ebi('u2szg'), n = parseInt(el.value);
         stitch_tgt = n = (
-            isNaN(n) ? dv[1] :
-            n < dv[0] ? dv[0] :
-            n > dv[2] ? dv[2] : n
+            isNaN(n) ? u2sz_tgt :
+            n < u2sz_min ? u2sz_min :
+            n > u2sz_max ? u2sz_max : n
         );
         if (n == dv[1]) sdrop('u2sz'); else swrite('u2sz', n);
         if (el.value != n) el.value = n;

@@ -1884,7 +1884,7 @@ class HttpCli(object):
         f, fn = ren_open(fn, *open_a, **params)
         try:
             path = os.path.join(fdir, fn)
-            post_sz, sha_hex, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
+            post_sz, sha_hex, sha_b64 = hashcopy(reader, f, None, 0, self.args.s_wr_slp)
         finally:
             f.close()
 
@@ -2348,13 +2348,57 @@ class HttpCli(object):
         broker = self.conn.hsrv.broker
         x = broker.ask("up2k.handle_chunks", ptop, wark, chashes)
         response = x.get()
-        chashes, chunksize, cstarts, path, lastmod, sprs = response
+        chashes, chunksize, cstarts, path, lastmod, fsize, sprs = response
         maxsize = chunksize * len(chashes)
         cstart0 = cstarts[0]
         locked = chashes  # remaining chunks to be received in this request
         written = []  # chunks written to disk, but not yet released by up2k
         num_left = -1  # num chunks left according to most recent up2k release
         treport = time.time()  # ratelimit up2k reporting to reduce overhead
+
+        if "x-up2k-subc" in self.headers:
+            sc_ofs = int(self.headers["x-up2k-subc"])
+            chash = chashes[0]
+
+            u2sc = self.conn.hsrv.u2sc
+            try:
+                sc_pofs, hasher = u2sc[chash]
+                if not sc_ofs:
+                    t = "client restarted the chunk; forgetting subchunk offset %d"
+                    self.log(t % (sc_pofs,))
+                    raise Exception()
+            except:
+                sc_pofs = 0
+                hasher = hashlib.sha512()
+
+            et = "subchunk protocol error; resetting chunk "
+            if sc_pofs != sc_ofs:
+                u2sc.pop(chash, None)
+                t = "%s[%s]: the expected resume-point was %d, not %d"
+                raise Pebkac(400, t % (et, chash, sc_pofs, sc_ofs))
+            if len(cstarts) > 1:
+                u2sc.pop(chash, None)
+                t = "%s[%s]: only a single subchunk can be uploaded in one request; you are sending %d chunks"
+                raise Pebkac(400, t % (et, chash, len(cstarts)))
+            csize = min(chunksize, fsize - cstart0[0])
+            cstart0[0] += sc_ofs  # also sets cstarts[0][0]
+            sc_next_ofs = sc_ofs + postsize
+            if sc_next_ofs > csize:
+                u2sc.pop(chash, None)
+                t = "%s[%s]: subchunk offset (%d) plus postsize (%d) exceeds chunksize (%d)"
+                raise Pebkac(400, t % (et, chash, sc_ofs, postsize, csize))
+            else:
+                final_subchunk = sc_next_ofs == csize
+                t = "subchunk %s %d:%d/%d %s"
+                zs = "END" if final_subchunk else ""
+                self.log(t % (chash[:15], sc_ofs, sc_next_ofs, csize, zs), 6)
+                if final_subchunk:
+                    u2sc.pop(chash, None)
+                else:
+                    u2sc[chash] = (sc_next_ofs, hasher)
+        else:
+            hasher = None
+            final_subchunk = True
 
         try:
             if self.args.nw:
@@ -2386,9 +2430,11 @@ class HttpCli(object):
                     reader = read_socket(
                         self.sr, self.args.s_rd_sz, min(remains, chunksize)
                     )
-                    post_sz, _, sha_b64 = hashcopy(reader, f, self.args.s_wr_slp)
+                    post_sz, _, sha_b64 = hashcopy(
+                        reader, f, hasher, 0, self.args.s_wr_slp
+                    )
 
-                    if sha_b64 != chash:
+                    if sha_b64 != chash and final_subchunk:
                         try:
                             self.bakflip(
                                 f, path, cstart[0], post_sz, chash, sha_b64, vfs.flags
@@ -2420,7 +2466,8 @@ class HttpCli(object):
 
                     # be quick to keep the tcp winsize scale;
                     # if we can't confirm rn then that's fine
-                    written.append(chash)
+                    if final_subchunk:
+                        written.append(chash)
                     now = time.time()
                     if now - treport < 1:
                         continue
@@ -2813,7 +2860,7 @@ class HttpCli(object):
                         tabspath = os.path.join(fdir, tnam)
                         self.log("writing to {}".format(tabspath))
                         sz, sha_hex, sha_b64 = hashcopy(
-                            p_data, f, self.args.s_wr_slp, max_sz
+                            p_data, f, None, max_sz, self.args.s_wr_slp
                         )
                         if sz == 0:
                             raise Pebkac(400, "empty files in post")
@@ -3145,7 +3192,7 @@ class HttpCli(object):
             wunlink(self.log, fp, vfs.flags)
 
         with open(fsenc(fp), "wb", self.args.iobuf) as f:
-            sz, sha512, _ = hashcopy(p_data, f, self.args.s_wr_slp)
+            sz, sha512, _ = hashcopy(p_data, f, None, 0, self.args.s_wr_slp)
 
         if lim:
             lim.nup(self.ip)

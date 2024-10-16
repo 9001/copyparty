@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import print_function, unicode_literals
 
+import hashlib
 import math
 import os
 import re
@@ -144,6 +145,7 @@ class HttpSrv(object):
         self.t_periodic: Optional[threading.Thread] = None
 
         self.u2fh = FHC()
+        self.u2sc: dict[str, tuple[int, "hashlib._Hash"]] = {}
         self.pipes = CachedDict(0.2)
         self.metrics = Metrics(self)
         self.nreq = 0
