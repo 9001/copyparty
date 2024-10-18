@@ -46,6 +46,7 @@ def vf_bmap() -> dict[str, str]:
         "og_no_head",
         "og_s_title",
         "rand",
+        "rss",
         "xdev",
         "xlink",
         "xvol",

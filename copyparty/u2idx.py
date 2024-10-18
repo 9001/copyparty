@@ -95,7 +95,7 @@ class U2idx(object):
         uv: list[Union[str, int]] = [wark[:16], wark]
 
         try:
-            return self.run_query(uname, vols, uq, uv, False, 99999)[0]
+            return self.run_query(uname, vols, uq, uv, False, True, 99999)[0]
         except:
             raise Pebkac(500, min_ex())
 
@@ -301,7 +301,7 @@ class U2idx(object):
                 q += " lower({}) {} ? ) ".format(field, oper)
 
         try:
-            return self.run_query(uname, vols, q, va, have_mt, lim)
+            return self.run_query(uname, vols, q, va, have_mt, True, lim)
         except Exception as ex:
             raise Pebkac(500, repr(ex))
 
@@ -312,6 +312,7 @@ class U2idx(object):
         uq: str,
         uv: list[Union[str, int]],
         have_mt: bool,
+        sort: bool,
         lim: int,
     ) -> tuple[list[dict[str, Any]], list[str], bool]:
         if self.args.srch_dbg:
@@ -458,7 +459,8 @@ class U2idx(object):
         done_flag.append(True)
         self.active_id = ""
 
-        ret.sort(key=itemgetter("rp"))
+        if sort:
+            ret.sort(key=itemgetter("rp"))
 
         return ret, list(taglist.keys()), lim < 0 and not clamped
 

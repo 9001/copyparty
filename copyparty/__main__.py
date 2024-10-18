@@ -1357,6 +1357,14 @@ def add_transcoding(ap):
     ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete cached transcode output after \033[33mSEC\033[0m seconds")
 
 
+def add_rss(ap):
+    ap2 = ap.add_argument_group('RSS options')
+    ap2.add_argument("--rss", action="store_true", help="enable RSS output (experimental)")
+    ap2.add_argument("--rss-nf", metavar="HITS", type=int, default=250, help="default number of files to return (url-param 'nf')")
+    ap2.add_argument("--rss-fext", metavar="E,E", type=u, default="", help="default list of file extensions to include (url-param 'fext'); blank=all")
+    ap2.add_argument("--rss-sort", metavar="ORD", type=u, default="m", help="default sort order (url-param 'sort'); [\033[32mm\033[0m]=last-modified [\033[32mu\033[0m]=upload-time [\033[32mn\033[0m]=filename [\033[32ms\033[0m]=filesize; Uppercase=oldest-first. Note that upload-time is 0 for non-uploaded files")
+
+
 def add_db_general(ap, hcores):
     noidx = APPLESAN_TXT if MACOS else ""
     ap2 = ap.add_argument_group('general db options')
@@ -1526,6 +1534,7 @@ def run_argparse(
     add_db_metadata(ap)
     add_thumbnail(ap)
     add_transcoding(ap)
+    add_rss(ap)
     add_ftp(ap)
     add_webdav(ap)
     add_tftp(ap)

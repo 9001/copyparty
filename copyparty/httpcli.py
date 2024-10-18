@@ -131,6 +131,8 @@ LOGUES = [[0, ".prologue.html"], [1, ".epilogue.html"]]
 
 READMES = [[0, ["preadme.md", "PREADME.md"]], [1, ["readme.md", "README.md"]]]
 
+RSS_SORT = {"m": "mt", "u": "at", "n": "fn", "s": "sz"}
+
 
 class HttpCli(object):
     """
@@ -1201,7 +1203,145 @@ class HttpCli(object):
         if "h" in self.uparam:
             return self.tx_mounts()
 
+        if "rss" in self.uparam:
+            return self.tx_rss()
+
         return self.tx_browser()
+
+    def tx_rss(self) -> bool:
+        if self.do_log:
+            self.log("RSS  %s @%s" % (self.req, self.uname))
+
+        if not self.can_read:
+            return self.tx_404()
+
+        vn = self.vn
+        if not vn.flags.get("rss"):
+            raise Pebkac(405, "RSS is disabled in server config")
+
+        rem = self.rem
+        idx = self.conn.get_u2idx()
+        if not idx or not hasattr(idx, "p_end"):
+            if not HAVE_SQLITE3:
+                raise Pebkac(500, "sqlite3 not found on server; rss is disabled")
+            raise Pebkac(500, "server busy, cannot generate rss; please retry in a bit")
+
+        uv = [rem]
+        if "recursive" in self.uparam:
+            uq = "up.rd like ?||'%'"
+        else:
+            uq = "up.rd == ?"
+
+        zs = str(self.uparam.get("fext", self.args.rss_fext))
+        if zs in ("True", "False"):
+            zs = ""
+        if zs:
+            zsl = []
+            for ext in zs.split(","):
+                zsl.append("+up.fn like '%.'||?")
+                uv.append(ext)
+            uq += " and ( %s )" % (" or ".join(zsl),)
+
+        zs1 = self.uparam.get("sort", self.args.rss_sort)
+        zs2 = zs1.lower()
+        zs = RSS_SORT.get(zs2)
+        if not zs:
+            raise Pebkac(400, "invalid sort key; must be m/u/n/s")
+
+        uq += " order by up." + zs
+        if zs1 == zs2:
+            uq += " desc"
+
+        nmax = int(self.uparam.get("nf") or self.args.rss_nf)
+
+        hits = idx.run_query(self.uname, [self.vn], uq, uv, False, False, nmax)[0]
+
+        pw = self.ouparam.get("pw")
+        if pw:
+            q_pw = "?pw=%s" % (pw,)
+            a_pw = "&pw=%s" % (pw,)
+            for i in hits:
+                i["rp"] += a_pw if "?" in i["rp"] else q_pw
+        else:
+            q_pw = a_pw = ""
+
+        title = self.uparam.get("title") or self.vpath.split("/")[-1]
+        etitle = html_escape(title, True, True)
+
+        baseurl = "%s://%s%s" % (
+            "https" if self.is_https else "http",
+            self.host,
+            self.args.SRS,
+        )
+        feed = "%s%s" % (baseurl, self.req[1:])
+        efeed = html_escape(feed, True, True)
+        edirlink = efeed.split("?")[0] + q_pw
+
+        ret = [
+            """\
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+\t<channel>
+\t\t<atom:link href="%s" rel="self" type="application/rss+xml" />
+\t\t<title>%s</title>
+\t\t<description></description>
+\t\t<link>%s</link>
+\t\t<generator>copyparty-1</generator>
+"""
+            % (efeed, etitle, edirlink)
+        ]
+
+        q = "select fn from cv where rd=? and dn=?"
+        crd, cdn = rem.rsplit("/", 1) if "/" in rem else ("", rem)
+        try:
+            cfn = idx.cur[self.vn.realpath].execute(q, (crd, cdn)).fetchone()[0]
+            bos.stat(os.path.join(vn.canonical(rem), cfn))
+            cv_url = "%s%s?th=jf%s" % (baseurl, vjoin(self.vpath, cfn), a_pw)
+            cv_url = html_escape(cv_url, True, True)
+            zs = """\
+\t\t<image>
+\t\t\t<url>%s</url>
+\t\t\t<title>%s</title>
+\t\t\t<link>%s</link>
+\t\t</image>
+"""
+            ret.append(zs % (cv_url, etitle, edirlink))
+        except:
+            pass
+
+        for i in hits:
+            iurl = html_escape("%s%s" % (baseurl, i["rp"]), True, True)
+            title = unquotep(i["rp"].split("?")[0].split("/")[-1])
+            title = html_escape(title, True, True)
+            tag_t = str(i["tags"].get("title") or "")
+            tag_a = str(i["tags"].get("artist") or "")
+            desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
+            desc = html_escape(desc, True, True) if desc else title
+            mime = html_escape(guess_mime(title))
+            lmod = formatdate(i["ts"])
+            zsa = (iurl, iurl, title, desc, lmod, iurl, mime, i["sz"])
+            zs = (
+                """\
+\t\t<item>
+\t\t\t<guid>%s</guid>
+\t\t\t<link>%s</link>
+\t\t\t<title>%s</title>
+\t\t\t<description>%s</description>
+\t\t\t<pubDate>%s</pubDate>
+\t\t\t<enclosure url="%s" type="%s" length="%d"/>
+"""
+                % zsa
+            )
+            dur = i["tags"].get(".dur")
+            if dur:
+                zs += "\t\t\t<itunes:duration>%d</itunes:duration>\n" % (dur,)
+            ret.append(zs + "\t\t</item>\n")
+
+        ret.append("\t</channel>\n</rss>\n")
+        bret = "".join(ret).encode("utf-8", "replace")
+        self.reply(bret, 200, "text/xml; charset=utf-8")
+        self.log("rss: %d hits, %d bytes" % (len(hits), len(bret)))
+        return True
 
     def handle_propfind(self) -> bool:
         if self.do_log:

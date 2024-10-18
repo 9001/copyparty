@@ -47,6 +47,7 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
     * [shares](#shares) - share a file or folder by creating a temporary link
     * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
+    * [rss feeds](#rss-feeds) - monitor a folder with your RSS reader
     * [media player](#media-player) - plays almost every audio format there is
         * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
         * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
@@ -843,6 +844,30 @@ or a mix of both:
 * `output` = `07. meganeko - Sirius A.mp3`
 
 the metadata keys you can use in the format field are the ones in the file-browser table header (whatever is collected with `-mte` and `-mtp`)
+
+
+## rss feeds
+
+monitor a folder with your RSS reader  , optionally recursive
+
+must be enabled per-volume with volflag `rss` or globally with `--rss`
+
+the feed includes itunes metadata for use with podcast readers such as [AntennaPod](https://antennapod.org/)
+
+a feed example: https://cd.ocv.me/a/d2/d22/?rss&fext=mp3
+
+url parameters:
+
+* `pw=hunter2` for password auth
+* `recursive` to also include subfolders
+* `title=foo` changes the feed title (default: folder name)
+* `fext=mp3,opus` only include mp3 and opus files (default: all)
+* `nf=30` only show the first 30 results (default: 250)
+* `sort=m` sort by mtime (file last-modified), newest first (default)
+  * `u` = upload-time; NOTE: non-uploaded files have upload-time `0`
+  * `n` = filename
+  * `a` = filesize
+  * uppercase = reverse-sort; `M` = oldest file first
 
 
 ## media player
