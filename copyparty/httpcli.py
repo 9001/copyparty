@@ -2492,6 +2492,7 @@ class HttpCli(object):
             except:
                 # maybe busted handle (eg. disk went full)
                 f.close()
+                chashes = []  # exception flag
                 raise
         finally:
             if locked:
@@ -2500,9 +2501,11 @@ class HttpCli(object):
                 num_left, t = x.get()
                 if num_left < 0:
                     self.loud_reply(t, status=500)
-                    return False
-                t = "got %d more chunks, %d left"
-                self.log(t % (len(written), num_left), 6)
+                    if chashes:  # kills exception bubbling otherwise
+                        return False
+                else:
+                    t = "got %d more chunks, %d left"
+                    self.log(t % (len(written), num_left), 6)
 
         if num_left < 0:
             raise Pebkac(500, "unconfirmed; see serverlog")

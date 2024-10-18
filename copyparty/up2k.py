@@ -3498,6 +3498,7 @@ class Up2k(object):
                 for chash in written:
                     job["need"].remove(chash)
             except Exception as ex:
+                # dead tcp connections can get here by timeout (OK)
                 return -2, "confirm_chunk, chash(%s) %r" % (chash, ex)  # type: ignore
 
             ret = len(job["need"])

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.4"
-S_BUILD_DT = "2024-10-16"
+S_VERSION = "2.5"
+S_BUILD_DT = "2024-10-18"
 
 """
 u2c.py: upload to copyparty
@@ -154,6 +154,7 @@ class HCli(object):
         self.tls = tls
         self.verify = ar.te or not ar.td
         self.conns = []
+        self.hconns = []
         if tls:
             import ssl
 
@@ -173,7 +174,7 @@ class HCli(object):
             "User-Agent": "u2c/%s" % (S_VERSION,),
         }
 
-    def _connect(self):
+    def _connect(self, timeout):
         args = {}
         if PY37:
             args["blocksize"] = 1048576
@@ -185,7 +186,7 @@ class HCli(object):
             if self.ctx:
                 args = {"context": self.ctx}
 
-        return C(self.addr, self.port, timeout=999, **args)
+        return C(self.addr, self.port, timeout=timeout, **args)
 
     def req(self, meth, vpath, hdrs, body=None, ctype=None):
         hdrs.update(self.base_hdrs)
@@ -198,7 +199,9 @@ class HCli(object):
                 0 if not body else body.len if hasattr(body, "len") else len(body)
             )
 
-        c = self.conns.pop() if self.conns else self._connect()
+        # large timeout for handshakes (safededup)
+        conns = self.hconns if ctype == MJ else self.conns
+        c = conns.pop() if conns else self._connect(999 if ctype == MJ else 128)
         try:
             c.request(meth, vpath, body, hdrs)
             if PY27:
@@ -207,7 +210,7 @@ class HCli(object):
                 rsp = c.getresponse()
 
             data = rsp.read()
-            self.conns.append(c)
+            conns.append(c)
             return rsp.status, data.decode("utf-8")
         except:
             c.close()
@@ -870,9 +873,10 @@ def upload(fsl, stats, maxsz):
             if sc >= 400:
                 raise Exception("http %s: %s" % (sc, txt))
     finally:
-        fsl.f.close()
-        if nsub != -1:
-            fsl.unsub()
+        if fsl.f:
+            fsl.f.close()
+            if nsub != -1:
+                fsl.unsub()
 
 
 class Ctl(object):

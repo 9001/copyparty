@@ -244,7 +244,7 @@ function U2pvis(act, btns, uc, st) {
             p = bd * 100.0 / sz,
             nb = bd - bd0,
             spd = nb / (td / 1000),
-            eta = (sz - bd) / spd;
+            eta = spd ? (sz - bd) / spd : 3599;
 
         return [p, s2ms(eta), spd / (1024 * 1024)];
     };
@@ -1874,10 +1874,12 @@ function up2k_init(subtle) {
 
     function chill(t) {
         var now = Date.now();
-        if ((t.coolmul || 0) < 2 || now - t.cooldown < t.coolmul * 700)
+        if ((t.coolmul || 0) < 5 || now - t.cooldown < t.coolmul * 700)
             t.coolmul = Math.min((t.coolmul || 0.5) * 2, 32);
 
-        t.cooldown = Math.max(t.cooldown || 1, Date.now() + t.coolmul * 1000);
+        var cd = now + 1000 * (t.coolmul + Math.random() * 4 + 2);
+        t.cooldown = Math.floor(Math.max(cd, t.cooldown || 1));
+        return t;
     }
 
     /////
@@ -2270,8 +2272,7 @@ function up2k_init(subtle) {
 
             console.log('handshake onerror, retrying', t.name, t);
             apop(st.busy.handshake, t);
-            st.todo.handshake.unshift(t);
-            t.cooldown = Date.now() + 5000 + Math.floor(Math.random() * 3000);
+            st.todo.handshake.unshift(chill(t));
             t.keepalive = keepalive;
         };
         var orz = function (e) {
@@ -2284,8 +2285,7 @@ function up2k_init(subtle) {
                 }
                 catch (ex) {
                     apop(st.busy.handshake, t);
-                    st.todo.handshake.unshift(t);
-                    t.cooldown = Date.now() + 5000 + Math.floor(Math.random() * 3000);
+                    st.todo.handshake.unshift(chill(t));
                     var txt = t.t_uploading ? L.u_ehsfin : t.srch ? L.u_ehssrch : L.u_ehsinit;
                     return toast.err(0, txt + '\n\n' + L.badreply + ':\n\n' + unpre(xhr.responseText));
                 }
@@ -2464,6 +2464,7 @@ function up2k_init(subtle) {
             else {
                 pvis.seth(t.n, 1, "ERROR");
                 pvis.seth(t.n, 2, L.u_ehstmp, t);
+                apop(st.busy.handshake, t);
 
                 var err = "",
                     cls = "ERROR",
@@ -2477,7 +2478,6 @@ function up2k_init(subtle) {
                     var penalty = rsp.replace(/.*rate-limit /, "").split(' ')[0];
                     console.log("rate-limit: " + penalty);
                     t.cooldown = Date.now() + parseFloat(penalty) * 1000;
-                    apop(st.busy.handshake, t);
                     st.todo.handshake.unshift(t);
                     return;
                 }
@@ -2500,8 +2500,6 @@ function up2k_init(subtle) {
                         cls = 'defer';
                     }
                 }
-                if (rsp.indexOf('server HDD is full') + 1)
-                    return toast.err(0, L.u_ehsdf + "\n\n" + rsp.replace(/.*; /, ''));
 
                 if (err != "") {
                     if (!t.t_uploading)
@@ -2511,10 +2509,15 @@ function up2k_init(subtle) {
                     pvis.seth(t.n, 2, err);
                     pvis.move(t.n, 'ng');
 
-                    apop(st.busy.handshake, t);
                     tasker();
                     return;
                 }
+
+                st.todo.handshake.unshift(chill(t));
+
+                if (rsp.indexOf('server HDD is full') + 1)
+                    return toast.err(0, L.u_ehsdf + "\n\n" + rsp.replace(/.*; /, ''));
+
                 err = t.t_uploading ? L.u_ehsfin : t.srch ? L.u_ehssrch : L.u_ehsinit;
                 xhrchk(xhr, err + "\n\nfile: " + t.name + "\n\nerror ", "404, target folder not found", "warn", t);
             }
@@ -2654,6 +2657,7 @@ function up2k_init(subtle) {
                 st.bytes.finished += cdr - car;
                 st.bytes.uploaded += cdr - car;
                 t.bytes_uploaded += cdr - car;
+                t.cooldown = t.coolmul = 0;
                 st.etac.u++;
                 st.etac.t++;
             }
