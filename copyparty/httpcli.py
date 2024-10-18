@@ -5105,7 +5105,7 @@ class HttpCli(object):
             self.log("#wow #whoa")
 
         if not self.args.nid:
-            free, total = get_df(abspath)
+            free, total, _ = get_df(abspath, False)
             if total is not None:
                 h1 = humansize(free or 0)
                 h2 = humansize(total)

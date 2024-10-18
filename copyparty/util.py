@@ -213,6 +213,9 @@ except:
 ansi_re = re.compile("\033\\[[^mK]*[mK]")
 
 
+BOS_SEP = ("%s" % (os.sep,)).encode("ascii")
+
+
 surrogateescape.register_surrogateescape()
 if WINDOWS and PY2:
     FS_ENCODING = "utf-8"
@@ -2492,23 +2495,28 @@ def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
     return _fs_mvrm(log, abspath, "", False, flags)
 
 
-def get_df(abspath: str) -> tuple[Optional[int], Optional[int]]:
+def get_df(abspath: str, prune: bool) -> tuple[Optional[int], Optional[int], str]:
     try:
-        # some fuses misbehave
-        assert ctypes  # type: ignore  # !rm
+        ap = fsenc(abspath)
+        while prune and not os.path.isdir(ap) and BOS_SEP in ap:
+            # strip leafs until it hits an existing folder
+            ap = ap.rsplit(BOS_SEP, 1)[0]
+
         if ANYWIN:
+            assert ctypes  # type: ignore  # !rm
+            abspath = fsdec(ap)
             bfree = ctypes.c_ulonglong(0)
             ctypes.windll.kernel32.GetDiskFreeSpaceExW(  # type: ignore
                 ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
             )
-            return (bfree.value, None)
+            return (bfree.value, None, "")
         else:
-            sv = os.statvfs(fsenc(abspath))
+            sv = os.statvfs(ap)
             free = sv.f_frsize * sv.f_bfree
             total = sv.f_frsize * sv.f_blocks
-            return (free, total)
-    except:
-        return (None, None)
+            return (free, total, "")
+    except Exception as ex:
+        return (None, None, repr(ex))
 
 
 if not ANYWIN and not MACOS:

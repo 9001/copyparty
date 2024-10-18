@@ -128,7 +128,7 @@ class Metrics(object):
             addbh("cpp_disk_size_bytes", "total HDD size of volume")
             addbh("cpp_disk_free_bytes", "free HDD space in volume")
             for vpath, vol in allvols:
-                free, total = get_df(vol.realpath)
+                free, total, _ = get_df(vol.realpath, False)
                 if free is None or total is None:
                     continue
 

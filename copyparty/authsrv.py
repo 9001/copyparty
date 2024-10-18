@@ -165,8 +165,11 @@ class Lim(object):
         self.chk_rem(rem)
         if sz != -1:
             self.chk_sz(sz)
-            self.chk_vsz(broker, ptop, sz, volgetter)
-            self.chk_df(abspath, sz)  # side effects; keep last-ish
+        else:
+            sz = 0
+
+        self.chk_vsz(broker, ptop, sz, volgetter)
+        self.chk_df(abspath, sz)  # side effects; keep last-ish
 
         ap2, vp2 = self.rot(abspath)
         if abspath == ap2:
@@ -206,7 +209,15 @@ class Lim(object):
 
         if self.dft < time.time():
             self.dft = int(time.time()) + 300
-            self.dfv = get_df(abspath)[0] or 0
+
+            df, du, err = get_df(abspath, True)
+            if err:
+                t = "failed to read disk space usage for [%s]: %s"
+                self.log(t % (abspath, err), 3)
+                self.dfv = 0xAAAAAAAAA  # 42.6 GiB
+            else:
+                self.dfv = df or 0
+
             for j in list(self.reg.values()) if self.reg else []:
                 self.dfv -= int(j["size"] / (len(j["hash"]) or 999) * len(j["need"]))
 
