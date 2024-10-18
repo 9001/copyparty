@@ -33,6 +33,9 @@ onmessage = (d) => {
     if (d.data == 'nosubtle')
         return load_fb();
 
+    if (d.data == 'ping')
+        return postMessage(['pong']);
+
     if (busy)
         return postMessage(["panic", 'worker got another task while busy']);
 

@@ -17,6 +17,8 @@ function goto_up2k() {
 var up2k = null,
     up2k_hooks = [],
     hws = [],
+    hws_ok = 0,
+    hws_ng = false,
     sha_js = WebAssembly ? 'hw' : 'ac',  // ff53,c57,sa11
     m = 'will use ' + sha_js + ' instead of native sha512 due to';
 
@@ -1964,7 +1966,7 @@ function up2k_init(subtle) {
         pvis.setab(t.n, nchunks);
         pvis.move(t.n, 'bz');
 
-        if (hws.length && uc.hashw && (nchunks > 1 || document.visibilityState == 'hidden'))
+        if (hws.length && !hws_ng && uc.hashw && (nchunks > 1 || document.visibilityState == 'hidden'))
             // resolving subtle.digest w/o worker takes 1sec on blur if the actx hack breaks
             return wexec_hash(t, chunksize, nchunks);
 
@@ -2073,16 +2075,27 @@ function up2k_init(subtle) {
             free = [],
             busy = {},
             nbusy = 0,
+            init = 0,
             hashtab = {},
             mem = (MOBILE ? 128 : 256) * 1024 * 1024;
 
+        if (!hws_ok)
+            init = setTimeout(function() {
+                hws_ng = true;
+                toast.warn(30, 'webworkers failed to start\n\nwill be a bit slower due to\nhashing on main-thread');
+                apop(st.busy.hash, t);
+                st.todo.hash.unshift(t);
+                exec_hash();
+            }, 5000);
+
         for (var a = 0; a < hws.length; a++) {
             var w = hws[a];
-            free.push(w);
             w.onmessage = onmsg;
+            if (init)
+                w.postMessage('ping');
+            if (mem > 0)
+                free.push(w);
             mem -= chunksize;
-            if (mem <= 0)
-                break;
         }
 
         function go_next() {
@@ -2111,6 +2124,12 @@ function up2k_init(subtle) {
         function onmsg(d) {
             d = d.data;
             var k = d[0];
+
+            if (k == "pong")
+                if (++hws_ok == hws.length) {
+                    clearTimeout(init);
+                    go_next();
+                }
 
             if (k == "panic")
                 return vis_exh(d[1], 'up2k.js', '', '', d[1]);
@@ -2174,7 +2193,8 @@ function up2k_init(subtle) {
                 tasker();
             }
         }
-        go_next();
+        if (!init)
+            go_next();
     }
 
     /////
