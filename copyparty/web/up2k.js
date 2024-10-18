@@ -2759,7 +2759,8 @@ function up2k_init(subtle) {
 
             xhr.setRequestHeader("X-Up2k-Stat", "{0}/{1}/{2}/{3} {4}/{5} {6}".format(
                 pvis.ctr.ok, pvis.ctr.ng, pvis.ctr.bz, pvis.ctr.q, btot, btot - bfin,
-                st.eta.t.split(' ').pop()));
+                st.eta.t.indexOf('/s, ')+1 ? st.eta.t.split(' ').pop() : 'x'));
+
             xhr.setRequestHeader('Content-Type', 'application/octet-stream');
             if (xhr.overrideMimeType)
                 xhr.overrideMimeType('Content-Type', 'application/octet-stream');
