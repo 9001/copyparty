@@ -1,4 +1,31 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2024-1016-2153  `v1.15.8`  the sky is the limit
+
+## 🧪 new features
+
+* subchunks; avoid the Cloudflare filesize limit entirely fc8298c4 48147c07
+  * the previous max filesize was `383.9 GiB`, now only the sky is the limit
+  * if you're using another proxy with a more restrictive limit than Cloudflare's 100 MiB, for example 64 MiB, then `--u2sz 1,64,64`
+* m4v videos can be played in the gallery ff0a71f2
+
+## 🩹 bugfixes
+
+* up2k: uploading duplicate files could initially fail (but would succeed after a few automatic retries) due to a toctou 114b71b7
+* [u2c](https://github.com/9001/copyparty/blob/hovudstraum/bin/README.md#u2cpy) / commandline uploader:
+  * directory scanner got stuck if it found a FIFO cba1878b
+  * excessive number of FDs when uploading large files 65a2b6a2
+  * chunksize calculation; only affected files exactly 128 GiB large a2e037d6
+  * support filenames with newlines and invalid utf-8 b2770a20
+    * invalid utf-8 is replaced by `?` when they hit the server
+
+## 🔧 other changes
+
+* don't show the toast countdown bar if duration is infinite 22dfc6ec
+* chickenbit to disable the browser's built-in sha512 implementation and force the bundled wasm instead d715479e
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2024-1013-2244  `v1.15.7`  the 'a' in "ip address" stands for authentication
 
 ## 🧪 new features
