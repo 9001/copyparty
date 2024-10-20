@@ -58,7 +58,9 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
     * [h5ai](#h5ai)
     * [autoindex](#autoindex)
     * [miniserve](#miniserve)
+    * [pingvin-share](#pingvin-share)
 * [briefly considered](#briefly-considered)
+* [notes](#notes)
 
 
 # recommendations
@@ -106,6 +108,7 @@ some softwares not in the matrixes,
 * [h5ai](#h5ai)
 * [autoindex](#autoindex)
 * [miniserve](#miniserve)
+* [pingvin-share](#pingvin-share)
 
 symbol legend,
 * `█` = absolutely
@@ -426,6 +429,10 @@ symbol legend,
 | gimme-that         | python | █ mit  | 4.8 MB |
 | ass                | ts     | █ isc  |    •   |
 | linx               | go     | ░ gpl3 |  20 MB |
+| h5ai               | php    | █ mit  |    •   |
+| autoindex          | go     | █ mpl2 |  11 MB |
+| miniserve          | rust   | █ mit  |   2 MB |
+| pingvin-share      | go     | █ bsd2 | 487 MB |
 
 * `size` = binary (if available) or installed size of program and its dependencies
   * copyparty size is for the [standalone python](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) file; the [windows exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) is **6 MiB**
@@ -719,7 +726,31 @@ symbol legend,
 * 🔵 upload, tar/zip download, qr-code
 * ✅ faster at loading huge folders
 
+## [pingvin-share](https://github.com/stonith404/pingvin-share)
+* node; linux (docker)
+* mainly for uploads, not a general file server
+* 🔵 uploads are segmented (avoids cloudflare size limit)
+* 🔵 segments are written directly to target file (HDD-friendly)
+* ⚠️ uploads not resumable after a browser or laptop crash
+* ⚠️ uploads are not accelerated / integrity-checked
+  * ⚠️ across the atlantic, copyparty is 3x faster
+    * measured with chunksize 96 MiB; pingvin's default 10 MiB is much slower
+* ⚠️ can't upload folders with subfolders
+* ⚠️ no upload ETA
+* 🔵 expiration times, shares, upload-undo
+* ✅ config + user-registration gui
+* ✅ built-in OpenID and LDAP support
+  * 💾 [IdP middleware](https://github.com/9001/copyparty#identity-providers) and config-files
+* ✅ probably more than one person who understands the code
+
+
 
 # briefly considered
 * [pydio](https://github.com/pydio/cells): python/agpl3, looks great, fantastic ux -- but needs mariadb, systemwide install
 * [gossa](https://github.com/pldubouilh/gossa): go/mit, minimalistic, basic file upload, text editor, mkdir and rename (no delete/move)
+
+
+
+# notes
+
+* high-latency connections (cross-atlantic uploads) can be accurately simulated with `tc qdisc add dev eth0 root netem delay 100ms`
