@@ -1933,6 +1933,9 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **ie4** and **netscape** 4.0  | can browse, upload with `?b=u`, auth with `&pw=wark` |
 | **ncsa mosaic** 2.7       | does not get a pass, [pic1](https://user-images.githubusercontent.com/241032/174189227-ae816026-cf6f-4be5-a26e-1b3b072c1b2f.png) - [pic2](https://user-images.githubusercontent.com/241032/174189225-5651c059-5152-46e9-ac26-7e98e497901b.png) |
 | **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
+| **nintendo 3ds**          | can browse, upload, view thumbnails (thx bnjmn) |
+
+<p align="center"><img src="https://github.com/user-attachments/assets/88deab3d-6cad-4017-8841-2f041472b853" /></p>
 
 
 # client examples
