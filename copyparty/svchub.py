@@ -223,7 +223,7 @@ class SvcHub(object):
         args.chpw_no = noch
 
         if args.ipu:
-            iu, nm = load_ipu(self.log, args.ipu)
+            iu, nm = load_ipu(self.log, args.ipu, True)
             setattr(args, "ipu_iu", iu)
             setattr(args, "ipu_nm", nm)
 
@@ -377,6 +377,14 @@ class SvcHub(object):
             from .broker_thr import BrokerThr as Broker  # type: ignore
 
         self.broker = Broker(self)
+
+        # create netmaps early to avoid firewall gaps,
+        # but the mutex blocks multiprocessing startup
+        for zs in "ipu_iu ftp_ipa_nm tftp_ipa_nm".split():
+            try:
+                getattr(args, zs).mutex = threading.Lock()
+            except:
+                pass
 
     def setup_session_db(self) -> None:
         if not HAVE_SQLITE3:
@@ -761,8 +769,8 @@ class SvcHub(object):
         al.idp_h_grp = al.idp_h_grp.lower()
         al.idp_h_key = al.idp_h_key.lower()
 
-        al.ftp_ipa_nm = build_netmap(al.ftp_ipa or al.ipa)
-        al.tftp_ipa_nm = build_netmap(al.tftp_ipa or al.ipa)
+        al.ftp_ipa_nm = build_netmap(al.ftp_ipa or al.ipa, True)
+        al.tftp_ipa_nm = build_netmap(al.tftp_ipa or al.ipa, True)
 
         mte = ODict.fromkeys(DEF_MTE.split(","), True)
         al.mte = odfusion(mte, al.mte)

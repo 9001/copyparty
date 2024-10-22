@@ -669,13 +669,20 @@ class HLog(logging.Handler):
 
 class NetMap(object):
     def __init__(
-        self, ips: list[str], cidrs: list[str], keep_lo=False, strict_cidr=False
+        self,
+        ips: list[str],
+        cidrs: list[str],
+        keep_lo=False,
+        strict_cidr=False,
+        defer_mutex=False,
     ) -> None:
         """
         ips: list of plain ipv4/ipv6 IPs, not cidr
         cidrs: list of cidr-notation IPs (ip/prefix)
         """
-        self.mutex = threading.Lock()
+
+        # fails multiprocessing; defer assignment
+        self.mutex: Optional[threading.Lock] = None if defer_mutex else threading.Lock()
 
         if "::" in ips:
             ips = [x for x in ips if x != "::"] + list(
@@ -714,6 +721,9 @@ class NetMap(object):
         try:
             return self.cache[ip]
         except:
+            # intentionally crash the calling thread if unset:
+            assert self.mutex  # type: ignore  # !rm
+
             with self.mutex:
                 return self._map(ip)
 
@@ -2654,7 +2664,7 @@ def list_ips() -> list[str]:
     return list(ret)
 
 
-def build_netmap(csv: str):
+def build_netmap(csv: str, defer_mutex: bool = False):
     csv = csv.lower().strip()
 
     if csv in ("any", "all", "no", ",", ""):
@@ -2689,10 +2699,12 @@ def build_netmap(csv: str):
         cidrs.append(zs)
 
     ips = [x.split("/")[0] for x in cidrs]
-    return NetMap(ips, cidrs, True)
+    return NetMap(ips, cidrs, True, False, defer_mutex)
 
 
-def load_ipu(log: "RootLogger", ipus: list[str]) -> tuple[dict[str, str], NetMap]:
+def load_ipu(
+    log: "RootLogger", ipus: list[str], defer_mutex: bool = False
+) -> tuple[dict[str, str], NetMap]:
     ip_u = {"": "*"}
     cidr_u = {}
     for ipu in ipus:
@@ -2709,7 +2721,7 @@ def load_ipu(log: "RootLogger", ipus: list[str]) -> tuple[dict[str, str], NetMap
         cidr_u[cidr] = uname
         ip_u[cip] = uname
     try:
-        nm = NetMap(["::"], list(cidr_u.keys()), True, True)
+        nm = NetMap(["::"], list(cidr_u.keys()), True, True, defer_mutex)
     except Exception as ex:
         t = "failed to translate --ipu into netmap, probably due to invalid config: %r"
         log("root", t % (ex,), 1)
