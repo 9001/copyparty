@@ -817,6 +817,24 @@ class SvcHub(object):
         if len(al.tcolor) == 3:  # fc5 => ffcc55
             al.tcolor = "".join([x * 2 for x in al.tcolor])
 
+        zs = al.u2sz
+        zsl = zs.split(",")
+        if len(zsl) not in (1, 3):
+            t = "invalid --u2sz; must be either one number, or a comma-separated list of three numbers (min,default,max)"
+            raise Exception(t)
+        if len(zsl) < 3:
+            zsl = ["1", zs, zs]
+        zi2 = 1
+        for zs in zsl:
+            zi = int(zs)
+            # arbitrary constraint (anything above 2 GiB is probably unintended)
+            if zi < 1 or zi > 2047:
+                raise Exception("invalid --u2sz; minimum is 1, max is 2047")
+            if zi < zi2:
+                raise Exception("invalid --u2sz; values must be equal or ascending")
+            zi2 = zi
+        al.u2sz = ",".join(zsl)
+
         return True
 
     def _ipa2re(self, txt) -> Optional[re.Pattern]:
