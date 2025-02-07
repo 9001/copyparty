@@ -144,6 +144,9 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or if you are on android, [install copyparty in termux](#install-on-android)
 * or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
 * or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
+* or if you don't trust copyparty yet and want to isolate it a little, then...
+  * ...maybe [prisonparty](./bin/prisonparty.sh) to create a tiny [chroot](https://wiki.archlinux.org/title/Chroot) (very portable),
+  * ...or [bubbleparty](./bin/bubbleparty.sh) to wrap it in [bubblewrap](https://github.com/containers/bubblewrap) (much better)
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
   * docker has all deps built-in, so skip this step:
 
@@ -1186,7 +1189,7 @@ dependencies: `python3 -m pip install --user -U impacket==0.11.0`
 
 some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
 * not entirely confident that read-only is read-only
-* the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [prisonparty](./bin/prisonparty.sh)
+* the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [prisonparty](./bin/prisonparty.sh) or [bubbleparty](./bin/bubbleparty.sh)
   * account passwords work per-volume as expected, and so does account permissions (read/write/move/delete), but `--smbw` must be given to allow write-access from smb
   * [shadowing](#shadowing) probably works as expected but no guarantees
 
