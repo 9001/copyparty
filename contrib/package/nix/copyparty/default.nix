@@ -64,4 +64,5 @@ in stdenv.mkDerivation {
       --set PATH '${lib.makeBinPath ([ utillinux ] ++ lib.optional withMediaProcessing ffmpeg)}:$PATH' \
       --add-flags "$out/share/copyparty-sfx.py"
   '';
+  meta.mainProgram = "copyparty";
 }
