@@ -2631,7 +2631,6 @@ html.y #bbox-overlay figcaption a {
 	color: var(--fg-max);
 	background: var(--u2-txt-bg);
 	border: 1px solid #777;
-	font-family: var(--font-main), sans-serif;
 	font-size: 1.2em;
 	padding: .15em 0;
 	height: 1.05em;
