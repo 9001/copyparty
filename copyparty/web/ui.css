@@ -381,6 +381,9 @@ html.y .btn:focus {
 	box-shadow: 0 .1em .2em #037 inset;
 	outline: #037 solid .1em;
 }
+input, button {
+	font-family: var(--font-main), sans-serif;
+}
 input[type="submit"] {
 	cursor: pointer;
 }
