@@ -3,9 +3,7 @@
 # and read copyparty config from `/etc/copyparty.d/*.conf`
 #
 # expose additional filesystem locations to copyparty
-#   by listing them between the last `cpp` and `--`
-#
-# `cpp cpp` = user/group to run copyparty as; can be IDs (1000 1000)
+#   by listing them between the last `%I` and `--`
 #
 # unless you add -q to disable logging, you may want to remove the
 #   following line to allow buffering (slightly better performance):
@@ -20,11 +18,14 @@ Environment=PYTHONUNBUFFERED=x
 WorkingDirectory=/var/lib/copyparty-jail
 ExecReload=/bin/kill -s USR1 $MAINPID
 
+User=%I
+Group=%I
+
 # stop systemd-tmpfiles-clean.timer from deleting copyparty while it's running
 ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
 
 # run copyparty
-ExecStart=/bin/bash /usr/bin/prisonparty /var/lib/copyparty-jail cpp cpp \
+ExecStart=/bin/bash /usr/bin/prisonparty /var/lib/copyparty-jail %I %I \
   /etc/copyparty.d \
   -- \
   /usr/bin/python3 /usr/bin/copyparty -c /etc/copyparty.d/init

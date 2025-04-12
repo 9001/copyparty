@@ -42,16 +42,13 @@ package() {
     install -dm755 "${pkgdir}/etc/${pkgname}.d"
     install -Dm755 "bin/prisonparty.sh" "${pkgdir}/usr/bin/prisonparty"
     install -Dm644 "contrib/package/arch/${pkgname}.conf" "${pkgdir}/etc/${pkgname}.d/init"
-    install -Dm644 "contrib/package/arch/${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
-    install -Dm644 "contrib/package/arch/prisonparty.service" "${pkgdir}/usr/lib/systemd/system/prisonparty.service"
+    install -Dm644 "contrib/package/arch/${pkgname}@.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}@.service"
+    install -Dm644 "contrib/package/arch/prisonparty@.service" "${pkgdir}/usr/lib/systemd/system/prisonparty@.service"
     install -Dm644 "contrib/package/arch/index.md" "${pkgdir}/var/lib/${pkgname}-jail/README.md"
     install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
     find /etc/${pkgname}.d -iname '*.conf' 2>/dev/null | grep -qE . && return
     echo "┏━━━━━━━━━━━━━━━──-"
     echo "┃ Configure ${pkgname} by adding .conf files into /etc/${pkgname}.d/"
-    echo "┃ and maybe copy+edit one of the following to /etc/systemd/system/:"
-    echo "┣━♦ /usr/lib/systemd/system/${pkgname}.service   (standard)"
-    echo "┣━♦ /usr/lib/systemd/system/prisonparty.service (chroot)"
     echo "┗━━━━━━━━━━━━━━━──-"
 }
