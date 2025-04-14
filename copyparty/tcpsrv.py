@@ -566,7 +566,7 @@ class TcpSrv(object):
         ip = None
         ips = list(t1) + list(t2)
         qri = self.args.qri
-        if self.args.zm and not qri:
+        if self.args.zm and not qri and ips:
             name = self.args.name + ".local"
             t1[name] = next(v for v in (t1 or t2).values())
             ips = [name] + ips

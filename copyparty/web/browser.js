@@ -2555,7 +2555,7 @@ var mpl = (function () {
 		ebi('np_artist').textContent = np.artist || (fns.length > 1 ? fns[0] : '');
 		ebi('np_title').textContent = np.title || '';
 		ebi('np_dur').textContent = np['.dur'] || '';
-		ebi('np_url').textContent = get_vpath() + np.file.split('?')[0];
+		ebi('np_url').textContent = uricom_dec(get_evpath()) + np.file.split('?')[0];
 		if (!MOBILE && cover)
 			ebi('np_img').setAttribute('src', cover);
 		else
@@ -4433,7 +4433,8 @@ function eval_hash() {
 
 function read_dsort(txt) {
 	dnsort = dnsort ? 1 : 0;
-	clmod(ebi('nsort'), 'on', (sread('nsort') || dnsort) == 1);
+	ENATSORT = NATSORT && (sread('nsort') || dnsort) == 1;
+	clmod(ebi('nsort'), 'on', ENATSORT);
 	try {
 		var zt = (('' + txt).trim() || 'href').split(/,+/g);
 		dsort = [];
@@ -4478,9 +4479,6 @@ function sortfiles(nodes) {
 		dir1st = sread('dir1st') !== '0';
 
 	sopts = sopts && sopts.length ? sopts : jcp(dsort);
-
-	var collator = !clgot(ebi('nsort'), 'on') ? null :
-		new Intl.Collator([], {numeric: true});
 
 	try {
 		var is_srch = false;
@@ -4533,8 +4531,9 @@ function sortfiles(nodes) {
 				}
 				if (v2 === undefined) return 1 * rev;
 
-				var ret = rev * (typ == 'int' ? (v1 - v2) : collator ?
-					collator.compare(v1, v2) : v1.localeCompare(v2));
+				var ret = rev * (typ == 'int' ? (v1 - v2) :
+					ENATSORT ? NATSORT.compare(v1, v2) :
+					v1.localeCompare(v2));
 
 				if (ret === 0)
 					ret = onodes.indexOf(n1) - onodes.indexOf(n2);
@@ -5972,7 +5971,8 @@ var showfile = (function () {
 	};
 
 	r.mktree = function () {
-		var html = ['<li class="bn">' + L.tv_lst + '<br />' + linksplit(get_vpath()).join('<span>/</span>') + '</li>'];
+		var crumbs = linksplit(get_evpath()).join('<span>/</span>'),
+			html = ['<li class="bn">' + L.tv_lst + '<br />' + crumbs + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
 			html.push('<li><a href="?doc=' +
@@ -6547,8 +6547,8 @@ function tree_scrolltoo(q) {
 	var ctr = ebi('tree'),
 		em = parseFloat(getComputedStyle(act).fontSize),
 		top = act.offsetTop + ul.offsetTop,
-		min = top - 11 * em,
-		max = top - (ctr.offsetHeight - 10 * em);
+		min = top - 20 * em,
+		max = top - (ctr.offsetHeight - 16 * em);
 
 	if (ctr.scrollTop > min)
 		ctr.scrollTop = Math.floor(min);
@@ -6719,7 +6719,8 @@ var ahotkeys = function (e) {
 			return ebi('griden').click();
 	}
 
-	if ((aet == 'tr' || aet == 'td') && ae.closest('#files')) {
+	var in_ftab = (aet == 'tr' || aet == 'td') && ae.closest('#files');
+	if (in_ftab) {
 		var d = '', rem = 0;
 		if (aet == 'td') ae = ae.closest('tr'); //ie11
 		if (k == 'ArrowUp' || k == 'Up') d = 'previous';
@@ -6736,6 +6737,8 @@ var ahotkeys = function (e) {
 			msel.selui();
 			return ev(e);
 		}
+	}
+	if (in_ftab || !aet || (ae && ae.closest('#ggrid'))) {
 		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
 			var sel = msel.getsel(),
 				all = msel.getall();
@@ -7267,6 +7270,7 @@ var treectl = (function () {
 		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
 	var resort = function () {
+		ENATSORT = NATSORT && clgot(ebi('nsort'), 'on');
 		treectl.gentab(get_evpath(), treectl.lsc);
 	};
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
@@ -7595,8 +7599,8 @@ var treectl = (function () {
 	};
 
 	function reload_tree() {
-		var cdir = r.nextdir || get_vpath(),
-			cevp = get_evpath(),
+		var cevp = get_evpath(),
+			cdir = r.nextdir || uricom_dec(cevp),
 			links = QSA('#treeul a+a'),
 			nowrap = QS('#tree.nowrap') && QS('#hovertree.on'),
 			act = null;
@@ -8139,9 +8143,16 @@ var treectl = (function () {
 		}
 		delete res['a'];
 		var keys = Object.keys(res);
-		keys.sort(function (a, b) { return a.localeCompare(b); });
+		for (var a = 0; a < keys.length; a++)
+			keys[a] = [uricom_dec(keys[a]), keys[a]];
+
+		if (ENATSORT)
+			keys.sort(function (a, b) { return NATSORT.compare(a[0], b[0]); });
+		else
+			keys.sort(function (a, b) { return a[0].localeCompare(b[0]); });
+
 		for (var a = 0; a < keys.length; a++) {
-			var kk = keys[a],
+			var kk = keys[a][1],
 				m = /(\?k=[^\n]+)/.exec(kk),
 				kdk = m ? m[1] : '',
 				ks = kk.replace(kdk, '').slice(1),
@@ -9781,7 +9792,7 @@ function wintitle(txt, noname) {
 	if (s_name && !noname)
 		txt = s_name + ' ' + txt;
 
-	txt += get_vpath().slice(1, -1).split('/').pop();
+	txt += uricom_dec(get_evpath()).slice(1, -1).split('/').pop();
 
 	document.title = txt;
 }

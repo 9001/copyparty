@@ -461,6 +461,13 @@ function namesan(txt, win, fslash) {
 }
 
 
+var NATSORT, ENATSORT;
+try {
+    NATSORT = new Intl.Collator([], {numeric: true});
+}
+catch (ex) { }
+
+
 var crctab = (function () {
     var c, tab = [];
     for (var n = 0; n < 256; n++) {
@@ -614,6 +621,33 @@ function showsort(tab) {
         }
     }
 }
+function st_cmp_num(a, b) {
+    a = a[0];
+    b = b[0];
+    return (
+        a === null ? -1 :
+        b === null ? 1 :
+        (a - b)
+    );
+}
+function st_cmp_nat(a, b) {
+    a = a[0];
+    b = b[0];
+    return (
+        a === null ? -1 :
+        b === null ? 1 :
+        NATSORT.compare(a, b)
+    );
+}
+function st_cmp_gen(a, b) {
+    a = a[0];
+    b = b[0];
+    return (
+        a === null ? -1 :
+        b === null ? 1 :
+        a.localeCompare(b)
+    );
+}
 function sortTable(table, col, cb) {
     var tb = table.tBodies[0],
         th = table.tHead.rows[0].cells,
@@ -659,19 +693,17 @@ function sortTable(table, col, cb) {
         }
         vl.push([v, a]);
     }
-    vl.sort(function (a, b) {
-        a = a[0];
-        b = b[0];
-        if (a === null)
-            return -1;
-        if (b === null)
-            return 1;
 
-        if (stype == 'int') {
-            return reverse * (a - b);
-        }
-        return reverse * (a.localeCompare(b));
-    });
+    if (stype == 'int')
+        vl.sort(st_cmp_num);
+    else if (ENATSORT)
+        vl.sort(st_cmp_nat);
+    else
+        vl.sort(st_cmp_gen);
+
+    if (reverse < 0)
+        vl.reverse();
+
     if (sread('dir1st') !== '0') {
         var r1 = [], r2 = [];
         for (var i = 0; i < tr.length; i++) {
@@ -854,11 +886,6 @@ function get_evpath() {
         ret += '/';
 
     return ret;
-}
-
-
-function get_vpath() {
-    return uricom_dec(get_evpath());
 }
 
 

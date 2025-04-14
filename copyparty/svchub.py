@@ -770,6 +770,7 @@ class SvcHub(object):
         self.log("optional-dependencies", t, 6)
 
     def _check_env(self) -> None:
+        al = self.args
         try:
             files = os.listdir(E.cfg)
         except:
@@ -785,6 +786,21 @@ class SvcHub(object):
             self.log("root", t, 3)
             if self.args.bauth_last:
                 self.log("root", "WARNING: ignoring --bauth-last due to --no-bauth", 3)
+
+        have_tcp = False
+        for zs in al.i:
+            if not zs.startswith("unix:"):
+                have_tcp = True
+        if not have_tcp:
+            zb = False
+            zs = "z zm zm4 zm6 zmv zmvv zs zsv zv"
+            for zs in zs.split():
+                if getattr(al, zs, False):
+                    setattr(al, zs, False)
+                    zb = True
+            if zb:
+                t = "only listening on unix-sockets; cannot enable zeroconf/mdns/ssdp as requested"
+                self.log("root", t, 3)
 
         if not self.args.no_dav:
             from .dxml import DXML_OK

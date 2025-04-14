@@ -1,4 +1,47 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0408-2132  `v1.16.19`  GHOST
+
+did you know that every song named `GHOST` is a banger? it's true! [ghost](https://www.youtube.com/watch?v=NoUAwC4yiAw) // [ghost](https://www.youtube.com/watch?v=IKKar5SS29E) // [ghost](https://www.youtube.com/watch?v=tFSFlgm_tsw)
+
+## 🧪 new features
+
+* option to store markdown backups out-of-volume fc883418
+  * the default is still a subfolder named `.hist` next to the markdown file
+  * `--md-hist v` puts them in the volume's hist-folder instead
+  * `--md-hist n` disables markdown-backups entirely
+* #149 option to store the volume sqlite databases at a custom locations outside the hist-folder e1b9ac63
+  * new option `--dbpath` works like `--hist` but it only moves the database file, not the thumbnails
+  * they can be combined, in which case `--hist` is applied to thumbnails, `--dbpath` to the db
+  * useful when you're squeezing every last drop of performance out of your filesystem (see the issue)
+* actively prevent sharing certain databases (sessions/shares) between multiple copyparty instances acfaacbd
+  * an errormessage was added to explain some different alternatives for doing this safely
+    * for example by setting `XDG_CONFIG_HOME` which now works on all platforms b17ccc38
+
+## 🩹 bugfixes
+
+* #151 mkdir did not work in locations outside the volume root (via symlinks) 2b50fc20
+* improve the ui feedback when trying to play an audio file which failed to transcode f9954bc4
+  * also helps with server-filesystem issues, including image-thumbs
+
+## 🔧 other changes
+
+* #152 custom fonts are also applied to textboxes and buttons (thx @thaddeuskkr) d450f615
+* be more careful with the shares-db 8e0364ef
+* be less careful with the sessions-db 8e0364ef
+* update deps c0becc64
+  * web: dompurify
+  * copyparty.exe: python 3.12.10
+* rephrase `-j0` warning on windows to also mention that Microsoft Defender will freak out c0becc64
+* #149 add [a script](https://github.com/9001/copyparty/tree/hovudstraum/contrib#zfs-tunepy) to optimize the sqlite databases for storage on zfs 4f397b9b
+* block `GoogleOther` (another recalcitrant bot) from zip-downloads c2034f7b
+* rephrase `-j0` warning on windows to also mention that Microsoft Defender will freak out c0becc64
+* update [contributing.md](https://github.com/9001/copyparty/blob/hovudstraum/CONTRIBUTING.md) with a section regarding LLM/AI-written code cec3bee0
+* the [helptext](https://ocv.me/copyparty/helptext.html) will also be uploaded to each github release from now on, [permalink](https://github.com/9001/copyparty/releases/latest/download/helptext.html)
+* add review from ixbt forums b383c08c
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0323-2216  `v1.16.18`  zlib-ng
 
 ## 🧪 new features

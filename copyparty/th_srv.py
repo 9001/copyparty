@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import subprocess as sp
+import tempfile
 import threading
 import time
 
@@ -19,6 +20,7 @@ from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, au_unpk, ffprobe
 from .util import BytesIO  # type: ignore
 from .util import (
     FFMPEG_URL,
+    VF_CAREFUL,
     Cooldown,
     Daemon,
     afsenc,
@@ -49,6 +51,7 @@ HAVE_WEBP = False
 
 EXTS_TH = set(["jpg", "webp", "png"])
 EXTS_AC = set(["opus", "owa", "caf", "mp3"])
+EXTS_SPEC_SAFE = set("aif aiff flac mp3 opus wav".split())
 
 PTN_TS = re.compile("^-?[0-9a-f]{8,10}$")
 
@@ -167,11 +170,14 @@ class ThumbSrv(object):
 
         self.mutex = threading.Lock()
         self.busy: dict[str, list[threading.Condition]] = {}
+        self.untemp: dict[str, list[str]] = {}
         self.ram: dict[str, float] = {}
         self.memcond = threading.Condition(self.mutex)
         self.stopping = False
         self.rm_nullthumbs = True  # forget failed conversions on startup
         self.nthr = max(1, self.args.th_mt)
+
+        self.exts_spec_unsafe = set(self.args.th_spec_cnv.split(","))
 
         self.q: Queue[Optional[tuple[str, str, str, VFS]]] = Queue(self.nthr * 4)
         for n in range(self.nthr):
@@ -413,10 +419,18 @@ class ThumbSrv(object):
                     self.log(t % (ttpath, tpath, ex), 3)
                 pass
 
+            untemp = []
             with self.mutex:
                 subs = self.busy[tpath]
                 del self.busy[tpath]
                 self.ram.pop(ttpath, None)
+                untemp = self.untemp.pop(ttpath, None) or []
+
+            for ap in untemp:
+                try:
+                    wunlink(self.log, ap, VF_CAREFUL)
+                except:
+                    pass
 
             for x in subs:
                 with x:
@@ -670,14 +684,42 @@ class ThumbSrv(object):
         if "ac" not in ret:
             raise Exception("not audio")
 
+        fext = abspath.split(".")[-1].lower()
+
         # https://trac.ffmpeg.org/ticket/10797
         # expect 1 GiB every 600 seconds when duration is tricky;
         # simple filetypes are generally safer so let's special-case those
-        safe = ("flac", "wav", "aif", "aiff", "opus")
-        coeff = 1800 if abspath.split(".")[-1].lower() in safe else 600
-        dur = ret[".dur"][1] if ".dur" in ret else 300
+        coeff = 1800 if fext in EXTS_SPEC_SAFE else 600
+        dur = ret[".dur"][1] if ".dur" in ret else 900
         need = 0.2 + dur / coeff
         self.wait4ram(need, tpath)
+
+        infile = abspath
+        if dur >= 900 or fext in self.exts_spec_unsafe:
+            with tempfile.NamedTemporaryFile(suffix=".spec.flac", delete=False) as f:
+                f.write(b"h")
+                infile = f.name
+                try:
+                    self.untemp[tpath].append(infile)
+                except:
+                    self.untemp[tpath] = [infile]
+
+            # fmt: off
+            cmd = [
+                b"ffmpeg",
+                b"-nostdin",
+                b"-v", b"error",
+                b"-hide_banner",
+                b"-i", fsenc(abspath),
+                b"-map", b"0:a:0",
+                b"-ac", b"1",
+                b"-ar", b"48000",
+                b"-sample_fmt", b"s16",
+                b"-t", b"900",
+                b"-y", fsenc(infile),
+            ]
+            # fmt: on
+            self._run_ff(cmd, vn)
 
         fc = "[0:a:0]aresample=48000{},showspectrumpic=s="
         if "3" in fmt:
@@ -698,7 +740,7 @@ class ThumbSrv(object):
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner",
-            b"-i", fsenc(abspath),
+            b"-i", fsenc(infile),
             b"-filter_complex", fc.encode("utf-8"),
             b"-map", b"[o]",
             b"-frames:v", b"1",
