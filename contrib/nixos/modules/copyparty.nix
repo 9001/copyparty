@@ -54,8 +54,9 @@ with lib; let
   cfg = config.services.copyparty;
   configFile = pkgs.writeText "copyparty.conf" configStr;
   runtimeConfigPath = "/run/copyparty/copyparty.conf";
+  externalCacheDir = "/var/cache/copyparty";
   externalStateDir = "/var/lib/copyparty";
-  defaultShareDir = "${externalStateDir}/data";
+  defaultShareDir = "${externalCacheDir}/data";
 in {
   options.services.copyparty = {
     enable = mkEnableOption "web-based file manager";
@@ -243,7 +244,7 @@ in {
 
       environment = {
         PYTHONUNBUFFERED = "true";
-        XDG_CONFIG_HOME = lib.mkIf cfg.seperateHist externalStateDir;
+        XDG_CONFIG_HOME = externalStateDir;
       };
 
       preStart = let
@@ -261,7 +262,7 @@ in {
         Type = "simple";
         ExecStart = ''
           ${getExe cfg.package} -c ${runtimeConfigPath} \
-          ${optionalString (cfg.seperateHist) "--hist ${externalStateDir}"}
+          ${optionalString (cfg.seperateHist) "--hist ${externalCacheDir}"}
         '';
 
         # Hardening options
@@ -269,9 +270,11 @@ in {
         Group = cfg.group;
         RuntimeDirectory = ["copyparty"];
         RuntimeDirectoryMode = "0700";
-        StateDirectory = lib.mkIf cfg.seperateHist ["copyparty"];
-        StateDirectoryMode = lib.mkIf cfg.seperateHist "0700";
-        WorkingDirectory = lib.mkIf cfg.seperateHist externalStateDir;
+        StateDirectory = ["copyparty"];
+        StateDirectoryMode = "0700";
+        CacheDirectory = lib.mkIf cfg.seperateHist ["copyparty"];
+        CacheDirectoryMode = lib.mkIf cfg.seperateHist "0700";
+        WorkingDirectory = externalStateDir;
         BindReadOnlyPaths =
           [
             "/nix/store"
@@ -284,9 +287,10 @@ in {
         BindPaths =
           (
             if cfg.seperateHist
-            then [externalStateDir]
+            then [externalCacheDir]
             else []
           )
+          ++ [externalStateDir]
           ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
         ProtectSystem = "strict";
         ProtectHome = "tmpfs";
@@ -317,7 +321,7 @@ in {
     users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
       description = "Service user for copyparty";
       group = "copyparty";
-      home = lib.mkIf cfg.seperateHist externalStateDir;
+      home = lib.mkIf externalStateDir;
       isSystemUser = true;
     };
   };
