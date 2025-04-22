@@ -1,29 +1,31 @@
-{ config, pkgs, lib, ... }:
-
-with lib;
-
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   mkKeyValue = key: value:
-    if value == true then
-    # sets with a true boolean value are coerced to just the key name
+    if value == true
+    then
+      # sets with a true boolean value are coerced to just the key name
       key
-    else if value == false then
-    # or omitted completely when false
+    else if value == false
+    then
+      # or omitted completely when false
       ""
-    else
-      (generators.mkKeyValueDefault { inherit mkValueString; } ": " key value);
+    else (generators.mkKeyValueDefault {inherit mkValueString;} ": " key value);
 
-  mkAttrsString = value: (generators.toKeyValue { inherit mkKeyValue; } value);
+  mkAttrsString = value: (generators.toKeyValue {inherit mkKeyValue;} value);
 
   mkValueString = value:
-    if isList value then
-      (concatStringsSep ", " (map mkValueString value))
-    else if isAttrs value then
-      "\n" + (mkAttrsString value)
-    else
-      (generators.mkValueStringDefault { } value);
+    if isList value
+    then (concatStringsSep ", " (map mkValueString value))
+    else if isAttrs value
+    then "\n" + (mkAttrsString value)
+    else (generators.mkValueStringDefault {} value);
 
-  mkSectionName = value: "[" + (escape [ "[" "]" ] value) + "]";
+  mkSectionName = value: "[" + (escape ["[" "]"] value) + "]";
 
   mkSection = name: attrs: ''
     ${mkSectionName name}
@@ -94,7 +96,7 @@ in {
     };
 
     accounts = mkOption {
-      type = types.attrsOf (types.submodule ({ ... }: {
+      type = types.attrsOf (types.submodule ({...}: {
         options = {
           passwordFile = mkOption {
             type = types.str;
@@ -109,7 +111,7 @@ in {
       description = ''
         A set of copyparty accounts to create.
       '';
-      default = { };
+      default = {};
       example = literalExpression ''
         {
           ed.passwordFile = "/run/keys/copyparty/ed";
@@ -118,7 +120,7 @@ in {
     };
 
     volumes = mkOption {
-      type = types.attrsOf (types.submodule ({ ... }: {
+      type = types.attrsOf (types.submodule ({...}: {
         options = {
           path = mkOption {
             type = types.str;
@@ -177,7 +179,7 @@ in {
                 nohash = "\.iso$";
               };
             '';
-            default = { };
+            default = {};
           };
         };
       }));
@@ -185,7 +187,7 @@ in {
       default = {
         "/" = {
           path = defaultShareDir;
-          access = { r = "*"; };
+          access = {r = "*";};
         };
       };
       example = literalExpression ''
@@ -207,7 +209,7 @@ in {
   config = mkIf cfg.enable {
     systemd.services.copyparty = {
       description = "http file sharing hub";
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
 
       environment = {
         PYTHONUNBUFFERED = "true";
@@ -215,15 +217,14 @@ in {
       };
 
       preStart = let
-        replaceSecretCommand = name: attrs:
-          "${getExe pkgs.replace-secret} '${
-            passwordPlaceholder name
-          }' '${attrs.passwordFile}' ${runtimeConfigPath}";
+        replaceSecretCommand = name: attrs: "${getExe pkgs.replace-secret} '${
+          passwordPlaceholder name
+        }' '${attrs.passwordFile}' ${runtimeConfigPath}";
       in ''
         set -euo pipefail
         install -m 600 ${configFile} ${runtimeConfigPath}
         ${concatStringsSep "\n"
-        (mapAttrsToList replaceSecretCommand cfg.accounts)}
+          (mapAttrsToList replaceSecretCommand cfg.accounts)}
       '';
 
       serviceConfig = {
@@ -235,18 +236,20 @@ in {
         Group = "copyparty";
         RuntimeDirectory = name;
         RuntimeDirectoryMode = "0700";
-        StateDirectory = [ name "${name}/data" "${name}/.config" ];
+        StateDirectory = [name "${name}/data" "${name}/.config"];
         StateDirectoryMode = "0700";
         WorkingDirectory = home;
         TemporaryFileSystem = "/:ro";
-        BindReadOnlyPaths = [
-          "/nix/store"
-          "-/etc/resolv.conf"
-          "-/etc/nsswitch.conf"
-          "-/etc/hosts"
-          "-/etc/localtime"
-        ] ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
-        BindPaths = [ home ] ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
+        BindReadOnlyPaths =
+          [
+            "/nix/store"
+            "-/etc/resolv.conf"
+            "-/etc/nsswitch.conf"
+            "-/etc/hosts"
+            "-/etc/localtime"
+          ]
+          ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
+        BindPaths = [home] ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
         # Would re-mount paths ignored by temporary root
         #ProtectSystem = "strict";
         ProtectHome = true;
@@ -272,7 +275,7 @@ in {
       };
     };
 
-    users.groups.copyparty = { };
+    users.groups.copyparty = {};
     users.users.copyparty = {
       description = "Service user for copyparty";
       group = "copyparty";
