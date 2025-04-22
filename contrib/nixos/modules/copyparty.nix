@@ -54,8 +54,8 @@ with lib; let
   cfg = config.services.copyparty;
   configFile = pkgs.writeText "copyparty.conf" configStr;
   runtimeConfigPath = "/run/copyparty/copyparty.conf";
-  stateDir = "/var/lib/copyparty";
-  defaultShareDir = "${stateDir}/data";
+  externalStateDir = "/var/lib/copyparty";
+  defaultShareDir = "${externalStateDir}/data";
 in {
   options.services.copyparty = {
     enable = mkEnableOption "web-based file manager";
@@ -93,6 +93,16 @@ in {
       default = 4096;
       type = types.either types.int types.str;
       description = "Number of files to allow copyparty to open.";
+    };
+
+    seperateHist = mkOption {
+      default = true;
+      type = types.bool;
+      description = ''
+        Whether to have cache directories seperate from their associated volumes.
+
+        Disabling this can be useful if you want the served volume to be portable between machines, or otherwise self-contained.
+      '';
     };
 
     settings = mkOption {
@@ -233,7 +243,7 @@ in {
 
       environment = {
         PYTHONUNBUFFERED = "true";
-        XDG_CONFIG_HOME = "home";
+        XDG_CONFIG_HOME = lib.mkIf cfg.seperateHist externalStateDir;
       };
 
       preStart = let
@@ -249,16 +259,19 @@ in {
 
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${getExe cfg.package} -c ${runtimeConfigPath} --hist ${stateDir}";
+        ExecStart = ''
+          ${getExe cfg.package} -c ${runtimeConfigPath} \
+          ${optionalString (cfg.seperateHist) "--hist ${externalStateDir}"}
+        '';
 
         # Hardening options
         User = cfg.user;
         Group = cfg.group;
         RuntimeDirectory = ["copyparty"];
         RuntimeDirectoryMode = "0700";
-        StateDirectory = ["copyparty"];
-        StateDirectoryMode = "0700";
-        WorkingDirectory = stateDir;
+        StateDirectory = lib.mkIf cfg.seperateHist ["copyparty"];
+        StateDirectoryMode = lib.mkIf cfg.seperateHist "0700";
+        WorkingDirectory = lib.mkIf cfg.seperateHist externalStateDir;
         BindReadOnlyPaths =
           [
             "/nix/store"
@@ -268,7 +281,13 @@ in {
             "-/etc/localtime"
           ]
           ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
-        BindPaths = [stateDir] ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
+        BindPaths =
+          (
+            if cfg.seperateHist
+            then [externalStateDir]
+            else []
+          )
+          ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
         ProtectSystem = "strict";
         ProtectHome = "tmpfs";
         PrivateTmp = true;
@@ -291,7 +310,6 @@ in {
         LockPersonality = true;
         RestrictRealtime = true;
         MemoryDenyWriteExecute = true;
-        # RestrictAddressFamilies = "none";
       };
     };
 
@@ -299,7 +317,7 @@ in {
     users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
       description = "Service user for copyparty";
       group = "copyparty";
-      home = stateDir;
+      home = lib.mkIf cfg.seperateHist externalStateDir;
       isSystemUser = true;
     };
   };
