@@ -51,12 +51,11 @@ with lib; let
     ${concatStringsSep "\n" (mapAttrsToList mkVolume cfg.volumes)}
   '';
 
-  name = "copyparty";
   cfg = config.services.copyparty;
-  configFile = pkgs.writeText "${name}.conf" configStr;
-  runtimeConfigPath = "/run/${name}/${name}.conf";
-  home = "/var/lib/${name}";
-  defaultShareDir = "${home}/data";
+  configFile = pkgs.writeText "copyparty.conf" configStr;
+  runtimeConfigPath = "/run/copyparty/copyparty.conf";
+  stateDir = "/var/lib/copyparty";
+  defaultShareDir = "${stateDir}/data";
 in {
   options.services.copyparty = {
     enable = mkEnableOption "web-based file manager";
@@ -67,6 +66,26 @@ in {
       defaultText = "pkgs.copyparty";
       description = ''
         Package of the application to run, exposed for overriding purposes.
+      '';
+    };
+
+    user = mkOption {
+      type = types.str;
+      default = "copyparty";
+      description = ''
+        The user that copyparty will run under.
+
+        If changed from default, you are responsible for making sure the user exists.
+      '';
+    };
+
+    group = mkOption {
+      type = types.str;
+      default = "copyparty";
+      description = ''
+        The group that copyparty will run under.
+
+        If changed from default, you are responsible for making sure the user exists.
       '';
     };
 
@@ -81,6 +100,7 @@ in {
       description = ''
         Global settings to apply.
         Directly maps to values in the [global] section of the copyparty config.
+        Cannot set "c" or "hist", those are set by this module.
         See `${getExe cfg.package} --help` for more details.
       '';
       default = {
@@ -213,7 +233,7 @@ in {
 
       environment = {
         PYTHONUNBUFFERED = "true";
-        XDG_CONFIG_HOME = "${home}/.config";
+        XDG_CONFIG_HOME = "home";
       };
 
       preStart = let
@@ -229,17 +249,16 @@ in {
 
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${getExe cfg.package} -c ${runtimeConfigPath}";
+        ExecStart = "${getExe cfg.package} -c ${runtimeConfigPath} --hist ${stateDir}";
 
         # Hardening options
-        User = "copyparty";
-        Group = "copyparty";
-        RuntimeDirectory = name;
+        User = cfg.user;
+        Group = cfg.group;
+        RuntimeDirectory = ["copyparty"];
         RuntimeDirectoryMode = "0700";
-        StateDirectory = [name "${name}/data" "${name}/.config"];
+        StateDirectory = ["copyparty"];
         StateDirectoryMode = "0700";
-        WorkingDirectory = home;
-        TemporaryFileSystem = "/:ro";
+        WorkingDirectory = stateDir;
         BindReadOnlyPaths =
           [
             "/nix/store"
@@ -249,10 +268,9 @@ in {
             "-/etc/localtime"
           ]
           ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
-        BindPaths = [home] ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
-        # Would re-mount paths ignored by temporary root
-        #ProtectSystem = "strict";
-        ProtectHome = true;
+        BindPaths = [stateDir] ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
+        ProtectSystem = "strict";
+        ProtectHome = "tmpfs";
         PrivateTmp = true;
         PrivateDevices = true;
         ProtectKernelTunables = true;
@@ -272,14 +290,16 @@ in {
         NoNewPrivileges = true;
         LockPersonality = true;
         RestrictRealtime = true;
+        MemoryDenyWriteExecute = true;
+        # RestrictAddressFamilies = "none";
       };
     };
 
-    users.groups.copyparty = {};
-    users.users.copyparty = {
+    users.groups.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {};
+    users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
       description = "Service user for copyparty";
       group = "copyparty";
-      home = home;
+      home = stateDir;
       isSystemUser = true;
     };
   };
