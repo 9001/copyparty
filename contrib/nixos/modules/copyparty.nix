@@ -301,8 +301,12 @@ in {
           )
           ++ [externalStateDir]
           ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
-        ProtectSystem = "strict";
-        ProtectHome = "tmpfs";
+        # ProtectSystem = "strict";
+        # Note that unlike what 'ro' implies,
+        # this actually makes it impossible to read anything in the root FS,
+        # except for things explicitly mounted via `RuntimeDirectory`, `StateDirectory`, `CacheDirectory`, and `BindReadOnlyPaths`.
+        # This is because TemporaryFileSystem creates a *new* *empty* filesystem for the process, so only bindmounts are visible.
+        TemporaryFileSystem = "/:ro";
         PrivateTmp = true;
         PrivateDevices = true;
         ProtectKernelTunables = true;
