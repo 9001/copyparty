@@ -96,11 +96,11 @@ in {
       description = "Number of files to allow copyparty to open.";
     };
 
-    seperateHist = mkOption {
+    separateHist = mkOption {
       default = true;
       type = types.bool;
       description = ''
-        Whether to have cache directories seperate from their associated volumes.
+        Whether to have cache directories separate from their associated volumes.
 
         Disabling this can be useful if you want the served volume to be portable between machines, or otherwise self-contained.
       '';
@@ -262,7 +262,7 @@ in {
         Type = "simple";
         ExecStart = ''
           ${getExe cfg.package} -c ${runtimeConfigPath} \
-          ${optionalString (cfg.seperateHist) "--hist ${externalCacheDir}"}
+          ${optionalString (cfg.separateHist) "--hist ${externalCacheDir}"}
         '';
 
         # Hardening options
@@ -272,8 +272,8 @@ in {
         RuntimeDirectoryMode = "0700";
         StateDirectory = ["copyparty"];
         StateDirectoryMode = "0700";
-        CacheDirectory = lib.mkIf cfg.seperateHist ["copyparty"];
-        CacheDirectoryMode = lib.mkIf cfg.seperateHist "0700";
+        CacheDirectory = lib.mkIf cfg.separateHist ["copyparty"];
+        CacheDirectoryMode = lib.mkIf cfg.separateHist "0700";
         WorkingDirectory = externalStateDir;
         BindReadOnlyPaths =
           [
@@ -286,7 +286,7 @@ in {
           ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
         BindPaths =
           (
-            if cfg.seperateHist
+            if cfg.separateHist
             then [externalCacheDir]
             else []
           )
@@ -321,7 +321,7 @@ in {
     users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
       description = "Service user for copyparty";
       group = "copyparty";
-      home = lib.mkIf externalStateDir;
+      home = lib.mkIf cfg.separateHist externalStateDir;
       isSystemUser = true;
     };
   };
