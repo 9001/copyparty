@@ -70,6 +70,15 @@ in {
       '';
     };
 
+    mkWrapper = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Make a shell script wrapper called 'copyparty-env' with all options set here,
+        for ease of things like password hashing
+      '';
+    };
+
     user = mkOption {
       type = types.str;
       default = "copyparty";
@@ -324,5 +333,27 @@ in {
       home = lib.mkIf cfg.separateHist externalStateDir;
       isSystemUser = true;
     };
+    environment.systemPackages = lib.mkIf cfg.mkWrapper [
+      (
+        let
+          command = ''
+            ${getExe cfg.package} -c ${runtimeConfigPath} \
+            ${optionalString (cfg.separateHist) "--hist ${externalCacheDir}"} \
+          '';
+        in
+          pkgs.writeShellScriptBin "copyparty-env" ''
+            set -a  # automatically export variables
+            # set same environment variables as the systemd service
+            ${lib.pipe config.systemd.services.copyparty.environment [
+              (lib.filterAttrs (n: v: v != null && n != "PATH"))
+              (lib.mapAttrs (_: v: "${v}"))
+              (lib.toShellVars)
+            ]}
+            PATH=${config.systemd.services.copyparty.environment.PATH}:$PATH
+
+            exec ${command} "$@"
+          ''
+      )
+    ];
   };
 }
