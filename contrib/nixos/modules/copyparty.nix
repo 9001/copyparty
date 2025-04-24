@@ -56,7 +56,7 @@ with lib; let
   runtimeConfigPath = "/run/copyparty/copyparty.conf";
   externalCacheDir = "/var/cache/copyparty";
   externalStateDir = "/var/lib/copyparty";
-  defaultShareDir = "${externalCacheDir}/data";
+  defaultShareDir = "${externalStateDir}/data";
 in {
   options.services.copyparty = {
     enable = mkEnableOption "web-based file manager";
@@ -163,7 +163,7 @@ in {
       type = types.attrsOf (types.submodule ({...}: {
         options = {
           path = mkOption {
-            type = types.str;
+            type = types.path;
             description = ''
               Path of a directory to share.
             '';
@@ -329,6 +329,20 @@ in {
         MemoryDenyWriteExecute = true;
       };
     };
+
+    # ensure volumes exist:
+    systemd.tmpfiles.settings."copyparty" = (
+      lib.attrsets.mapAttrs' (
+        name: value: lib.attrsets.nameValuePair (value.path) ({
+          d={
+            #: in front of things means it wont change it if the directory already exists.
+            group = ":${cfg.group}";
+            user = ":${cfg.user}";
+            mode = ":755";
+          };
+        })
+      ) cfg.volumes
+    );
 
     users.groups.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {};
     users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
