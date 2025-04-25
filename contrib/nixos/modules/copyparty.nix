@@ -70,7 +70,7 @@ in {
       '';
     };
 
-    mkWrapper = mkOption {
+    mkHashWrapper = mkOption {
       type = types.bool;
       default = true;
       description = ''
@@ -351,15 +351,18 @@ in {
       home = lib.mkIf cfg.separateHist externalStateDir;
       isSystemUser = true;
     };
-    environment.systemPackages = lib.mkIf cfg.mkWrapper [
+    environment.systemPackages = lib.mkIf cfg.mkHashWrapper [
       (
         let
           command = ''
             ${getExe cfg.package} -c ${runtimeConfigPath} \
             ${optionalString (cfg.separateHist) "--hist ${externalCacheDir}"} \
+            --shr-db ''' \
+            --ses-db ''' \
+            --ah-cli \
           '';
         in
-          pkgs.writeShellScriptBin "copyparty-env" ''
+          pkgs.writeShellScriptBin "copyparty-hash" ''
             set -a  # automatically export variables
             # set same environment variables as the systemd service
             ${lib.pipe config.systemd.services.copyparty.environment [
@@ -369,7 +372,7 @@ in {
             ]}
             PATH=${config.systemd.services.copyparty.environment.PATH}:$PATH
 
-            exec ${command} "$@"
+            exec ${command}
           ''
       )
     ];
