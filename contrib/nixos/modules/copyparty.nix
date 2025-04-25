@@ -105,16 +105,6 @@ in {
       description = "Number of files to allow copyparty to open.";
     };
 
-    separateHist = mkOption {
-      default = true;
-      type = types.bool;
-      description = ''
-        Whether to have cache directories separate from their associated volumes.
-
-        Disabling this can be useful if you want the served volume to be portable between machines, or otherwise self-contained.
-      '';
-    };
-
     settings = mkOption {
       type = types.attrs;
       description = ''
@@ -126,11 +116,13 @@ in {
       default = {
         i = "127.0.0.1";
         no-reload = true;
+        hist = externalCacheDir;
       };
       example = literalExpression ''
         {
           i = "0.0.0.0";
           no-reload = true;
+          hist = ${externalCacheDir};
         }
       '';
     };
@@ -270,8 +262,7 @@ in {
       serviceConfig = {
         Type = "simple";
         ExecStart = ''
-          ${getExe cfg.package} -c ${runtimeConfigPath} \
-          ${optionalString (cfg.separateHist) "--hist ${externalCacheDir}"}
+          ${getExe cfg.package} -c ${runtimeConfigPath}
         '';
 
         # Hardening options
@@ -281,8 +272,8 @@ in {
         RuntimeDirectoryMode = "0700";
         StateDirectory = ["copyparty"];
         StateDirectoryMode = "0700";
-        CacheDirectory = lib.mkIf cfg.separateHist ["copyparty"];
-        CacheDirectoryMode = lib.mkIf cfg.separateHist "0700";
+        CacheDirectory = lib.mkIf (cfg.settings ? hist) ["copyparty"];
+        CacheDirectoryMode = lib.mkIf (cfg.settings ? hist) "0700";
         WorkingDirectory = externalStateDir;
         BindReadOnlyPaths =
           [
@@ -295,8 +286,8 @@ in {
           ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
         BindPaths =
           (
-            if cfg.separateHist
-            then [externalCacheDir]
+            if cfg.settings ? hist
+            then [cfg.hist]
             else []
           )
           ++ [externalStateDir]
@@ -348,7 +339,7 @@ in {
     users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
       description = "Service user for copyparty";
       group = "copyparty";
-      home = lib.mkIf cfg.separateHist externalStateDir;
+      home = externalStateDir;
       isSystemUser = true;
     };
     environment.systemPackages = lib.mkIf cfg.mkHashWrapper [
@@ -356,7 +347,6 @@ in {
         let
           command = ''
             ${getExe cfg.package} -c ${runtimeConfigPath} \
-            ${optionalString (cfg.separateHist) "--hist ${externalCacheDir}"} \
             --shr-db ''' \
             --ses-db ''' \
             --ah-cli \
