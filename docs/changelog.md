@@ -1,4 +1,27 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0420-1836  `v1.16.21`  unzip-compat
+
+a couple guys have been asking if I accept donations -- thanks a lot!! added a few options on [my github page](https://github.com/9001/) :>
+
+## 🧪 new features
+
+* #156 add button to loop/repeat music 71c55659
+
+## 🩹 bugfixes
+
+* #155 download-as-zip: increase compatibility with the unix `unzip` command db33d68d
+  * this unfortunately reduces support for huge zipfiles on old software (WinXP and such)
+  * and makes it less safe to stream zips into unzippers, so use tar.gz instead
+  * and is perhaps not even a copyparty bug; see commit-message for the full story
+
+## 🔧 other changes
+
+* show warning on Ctrl-A in lazy-loaded folders 5b3a5fe7
+* docker: hide keepalive pings from logs d5a9bd80
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0413-2151  `v1.16.20`  all sorted
 
 ## 🧪 new features

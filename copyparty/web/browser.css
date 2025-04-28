@@ -1151,10 +1151,10 @@ html.y #widget.open {
 	background: #fff;
 	background: var(--bg-u3);
 }
-#wfs, #wfm, #wzip, #wnp {
+#wfs, #wfm, #wzip, #wnp, #wm3u {
 	display: none;
 }
-#wfs, #wzip, #wnp {
+#wfs, #wzip, #wnp, #wm3u {
 	margin-right: .2em;
 	padding-right: .2em;
 	border: 1px solid var(--bg-u5);
@@ -1175,6 +1175,7 @@ html.y #widget.open {
 	line-height: 1em;
 }
 #wtoggle.sel #wzip,
+#wtoggle.m3u #wm3u,
 #wtoggle.np #wnp {
 	display: inline-block;
 }
@@ -1183,12 +1184,17 @@ html.y #widget.open {
 }
 #wfm a,
 #wnp a,
+#wm3u a,
 #wzip a {
 	font-size: .5em;
 	padding: 0 .3em;
 	margin: -.3em .1em;
 	position: relative;
 	display: inline-block;
+}
+#wm3u a {
+	margin: -.2em .1em;
+	font-size: .45em;
 }
 #wfs {
 	font-size: .36em;
@@ -1198,12 +1204,17 @@ html.y #widget.open {
 	border-width: 0 .25em 0 0;
 }
 #wfm span,
+#wm3u span,
 #wnp span {
 	font-size: .6em;
 	display: block;
 }
 #wnp span {
 	font-size: .7em;
+}
+#wm3u span {
+	font-size: .77em;
+	padding-top: .2em;
 }
 #wfm a:not(.en) {
 	opacity: .3;

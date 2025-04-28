@@ -253,6 +253,14 @@ class SvcHub(object):
             setattr(args, "ipu_iu", iu)
             setattr(args, "ipu_nm", nm)
 
+        for zs in "ah_salt fk_salt dk_salt".split():
+            if getattr(args, "show_%s" % (zs,)):
+                self.log("root", "effective %s is %s" % (zs, getattr(args, zs)))
+
+        if args.ah_cli or args.ah_gen:
+            args.no_ses = True
+            args.shr = ""
+
         if not self.args.no_ses:
             self.setup_session_db()
 

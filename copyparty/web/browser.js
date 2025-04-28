@@ -144,6 +144,8 @@ var Ls = {
 		"wt_seldl": "download selection as separate files$NHotkey: Y",
 		"wt_npirc": "copy irc-formatted track info",
 		"wt_nptxt": "copy plaintext track info",
+		"wt_m3ua": "add to m3u playlist (click <code>📻copy</code> later)",
+		"wt_m3uc": "copy m3u playlist to clipboard",
 		"wt_grid": "toggle grid / list view$NHotkey: G",
 		"wt_prev": "previous track$NHotkey: J",
 		"wt_play": "play / pause$NHotkey: P",
@@ -280,6 +282,7 @@ var Ls = {
 		"mt_fau": "on phones, prevent music from stopping if the next song doesn't preload fast enough (can make tags display glitchy)\">☕️",
 		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
 		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
+		"mt_m3u_c": "show buttons for clipboarding the$Nselected songs as m3u8 playlist entries\">📻",
 		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
 		"mt_oseek": "allow seeking through os integration$N$Nnote: on some devices (iPhones),$Nthis replaces the next-song button\">seek",
 		"mt_oscv": "show album cover in osd\">art",
@@ -305,6 +308,7 @@ var Ls = {
 
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
+		"mm_m3u": "press <code>Enter/OK</code> to Play\npress <code>ESC/Cancel</code> to Edit",
 		"mp_breq": "need firefox 82+ or chrome 73+ or iOS 15+",
 		"mm_bload": "now loading...",
 		"mm_bconv": "converting to {0}, please wait...",
@@ -434,6 +438,10 @@ var Ls = {
 		"tvt_next": "show next document$NHotkey: K\">⬇ next",
 		"tvt_sel": "select file &nbsp; ( for cut / copy / delete / ... )$NHotkey: S\">sel",
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
+
+		"m3u_add1": "song added to m3u playlist",
+		"m3u_addn": "{0} songs added to m3u playlist",
+		"m3u_clip": "m3u playlist now copied to clipboard\n\nyou should create a new textfile named something.m3u and paste the playlist in that document; this will make it playable",
 
 		"gt_vau": "don't show videos, just play the audio\">🎧",
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
@@ -750,6 +758,8 @@ var Ls = {
 		"wt_seldl": "last ned de valgte filene$NSnarvei: Y",
 		"wt_npirc": "kopiér sang-info (irc-formatert)",
 		"wt_nptxt": "kopiér sang-info",
+		"wt_m3ua": "legg til sang i m3u-spilleliste$N(husk å klikke på <code>📻copy</code> senere)",
+		"wt_m3uc": "kopiér m3u-spillelisten til utklippstavlen",
 		"wt_grid": "bytt mellom ikoner og listevisning$NSnarvei: G",
 		"wt_prev": "forrige sang$NSnarvei: J",
 		"wt_play": "play / pause$NSnarvei: P",
@@ -886,6 +896,7 @@ var Ls = {
 		"mt_fau": "for telefoner: forhindre at avspilling stopper hvis nettet er for tregt til å laste neste sang i tide. Hvis påskrudd, kan forårsake at sang-info ikke vises korrekt i OS'et\">☕️",
 		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
+		"mt_m3u_c": "vis knapper for å kopiere de valgte$Nsangene som innslag i en m3u8 spilleliste\">📻",
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
 		"mt_oseek": "tillat spoling med fjernkontroll$N$Nmerk: på noen enheter (iPhones) så vil$Ndette erstatte knappen for neste sang\">spoling",
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
@@ -911,6 +922,7 @@ var Ls = {
 
 		"mb_play": "lytt",
 		"mm_hashplay": "spill denne sangen?",
+		"mm_m3u": "trykk <code>Enter/OK</code> for å spille\ntrykk <code>ESC/Avbryt</code> for å redigere",
 		"mp_breq": "krever firefox 82+, chrome 73+, eller iOS 15+",
 		"mm_bload": "laster inn...",
 		"mm_bconv": "konverterer til {0}, vent litt...",
@@ -1040,6 +1052,10 @@ var Ls = {
 		"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ neste",
 		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
 		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
+
+		"m3u_add1": "sangen ble lagt til i m3u-spillelisten",
+		"m3u_addn": "{0} sanger ble lagt til i m3u-spillelisten",
+		"m3u_clip": "m3u-spillelisten ble kopiert til utklippstavlen\n\nneste steg er å opprette et tekstdokument med filnavn som slutter på <code>.m3u</code> og lime inn spillelisten der",
 
 		"gt_vau": "ikke vis videofiler, bare spill lyden\">🎧",
 		"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
@@ -1891,6 +1907,9 @@ ebi('widget').innerHTML = (
 	'</span><span id="wnp"><a' +
 	' href="#" id="npirc" tt="' + L.wt_npirc + '">📋<span>irc</span></a><a' +
 	' href="#" id="nptxt" tt="' + L.wt_nptxt + '">📋<span>txt</span></a>' +
+	'</span><span id="wm3u"><a' +
+	' href="#" id="m3ua" tt="' + L.wt_m3ua + '">📻<span>add</span></a><a' +
+	' href="#" id="m3uc" tt="' + L.wt_m3uc + '">📻<span>copy</span></a>' +
 	'</span><a' +
 	'	href="#" id="wtgrid" tt="' + L.wt_grid + '">田</a><a' +
 	'	href="#" id="wtico">♫</a>' +
@@ -2306,6 +2325,7 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
 		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
+		'<a href="#" class="tgl btn" id="au_m3u_c" tt="' + L.mt_m3u_c + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
 		'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
@@ -2348,6 +2368,7 @@ var mpl = (function () {
 		"pb_mode": (sread('pb_mode', ['loop', 'next']) || 'next').split('-')[0],
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 		'traversals': 0,
+		'm3ut': '#EXTM3U\n',
 	};
 	bcfg_bind(r, 'loop', 'au_loop', false, function (v) {
 		if (mp.au)
@@ -2376,6 +2397,9 @@ var mpl = (function () {
 	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true, announce);
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
 		clmod(ebi('wtoggle'), 'np', v && mp.au);
+	});
+	bcfg_bind(r, 'm3uen', 'au_m3u_c', false, function (v) {
+		clmod(ebi('wtoggle'), 'm3u', v && (mp.au || msel.getsel().length));
 	});
 	bcfg_bind(r, 'follow', 'au_follow', false, setaufollow);
 	bcfg_bind(r, 'ac_flac', 'ac_flac', true);
@@ -2630,6 +2654,7 @@ if (can_owa && APPLE && / OS ([1-9]|1[0-7])_/.test(UA))
 mpl.init_ac2();
 
 
+var re_m3u = /\.(m3u8?)$/i;
 var re_au_native = (can_ogg || have_acode) ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i : /\.(aac|flac|m4a|mp3|wav)$/i,
 	re_au_all = /\.(aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|itgz|itxz|itz|m4a|mdgz|mdxz|mdz|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|s3gz|s3xz|s3z|tak|tta|ulaw|wav|wma|wv|xm|xmgz|xmxz|xmz|xpk|3gp|asf|avi|flv|m4v|mkv|mov|mp4|mpeg|mpeg2|mpegts|mpg|mpg2|nut|ogm|ogv|rm|ts|vob|webm|wmv)$/i;
 
@@ -2656,15 +2681,20 @@ function MPlayer() {
 
 		link = link[link.length - 1];
 		var url = link.getAttribute('href'),
-			m = re_audio.exec(url.split('?')[0]);
+			fn = url.split('?')[0];
 
-		if (m) {
+		if (re_audio.exec(fn)) {
 			var tid = link.getAttribute('id');
 			r.order.push(tid);
 			r.tracks[tid] = url;
 			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">' + L.mb_play + '</a></td>';
 			ebi('a' + tid).onclick = ev_play;
 			clmod(trs[a], 'au', 1);
+		}
+		else if (re_m3u.exec(fn)) {
+			var tid = link.getAttribute('id');
+			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">' + L.mb_play + '</a></td>';
+			ebi('a' + tid).onclick = ev_load_m3u;
 		}
 	}
 
@@ -2880,6 +2910,8 @@ var widget = (function () {
 		wtico = ebi('wtico'),
 		nptxt = ebi('nptxt'),
 		npirc = ebi('npirc'),
+		m3ua = ebi('m3ua'),
+		m3uc = ebi('m3uc'),
 		touchmode = false,
 		was_paused = true;
 
@@ -2936,6 +2968,49 @@ var widget = (function () {
 
 		cliptxt(m, function () {
 			toast.ok(1, L.clipped, null, 'top');
+		});
+	};
+	m3ua.onclick = function (e) {
+		ev(e);
+		var el,
+			files = [],
+			sel = msel.getsel();
+
+		for (var a = 0; a < sel.length; a++) {
+			el = ebi(sel[a].id).closest('tr');
+			if (clgot(el, 'au'))
+				files.push(el);
+		}
+		el = QS('#files tr.play');
+		if (!sel.length && el)
+			files.push(el);
+
+		for (var a = 0; a < files.length; a++) {
+			var md = ft2dict(files[a])[0],
+				dur = md['.dur'] || '1',
+				tag = '';
+
+			if (md.artist && md.title)
+				tag = md.artist + ' - ' + md.title;
+			else if (md.artist)
+				tag = md.artist + ' - ' + md.file;
+			else if (md.title)
+				tag = md.title;
+
+			if (dur.indexOf(':') > 0) {
+				dur = dur.split(':');
+				dur = 60 * parseInt(dur[0]) + parseInt(dur[1]);
+			}
+			else dur = parseInt(dur);
+
+			mpl.m3ut += '#EXTINF:' + dur + ',' + tag + '\n' + uricom_dec(get_evpath()) + md.file + '\n';
+		}
+		toast.ok(2, files.length == 1 ? L.m3u_add1 : L.m3u_addn.format(files.length), null, 'top');
+	};
+	m3uc.onclick = function (e) {
+		ev(e);
+		cliptxt(mpl.m3ut, function () {
+			toast.ok(15, L.m3u_clip, null, 'top');
 		});
 	};
 	r.set(sread('au_open') == 1);
@@ -4121,6 +4196,7 @@ function play(tid, is_ev, seek) {
 	clmod(ebi(oid), 'act', 1);
 	clmod(ebi(oid).closest('tr'), 'play', 1);
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
+	clmod(ebi('wtoggle'), 'm3u', mpl.m3uen);
 	if (thegrid)
 		thegrid.loadsel();
 
@@ -4393,6 +4469,11 @@ function eval_hash() {
 
 	if (v.startsWith('#v=')) {
 		goto(v.slice(3));
+		return;
+	}
+
+	if (v.startsWith("#m3u=")) {
+		load_m3u(v.slice(5));
 		return;
 	}
 }
@@ -4736,6 +4817,7 @@ var fileman = (function () {
 		clmod(bshr, 'hide', hshr);
 
 		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
+		clmod(ebi('wtoggle'), 'm3u', mpl.m3uen && (nsel || (mp && mp.au)));
 
 		var wfs = ebi('wfs'), h = '';
 		try {
@@ -6900,7 +6982,7 @@ var ahotkeys = function (e) {
 
 
 // search
-(function () {
+var search_ui = (function () {
 	var sconf = [
 		[
 			L.s_sz,
@@ -6935,7 +7017,8 @@ var ahotkeys = function (e) {
 		]
 	];
 
-	var trs = [],
+	var r = {},
+		trs = [],
 		orig_url = null,
 		orig_html = null,
 		cap = 125;
@@ -7142,13 +7225,19 @@ var ahotkeys = function (e) {
 		search_in_progress = 0;
 		srch_msg(false, '');
 
-		var res = JSON.parse(this.responseText),
-			tagord = res.tag_order;
+		var res = JSON.parse(this.responseText);
+		r.render(res, this, true);
+	}
 
-		sortfiles(res.hits);
+	r.render = function (res, xhr, sort) {
+		var tagord = res.tag_order;
+
+		srch_msg(false, '');
+		if (sort)
+			sortfiles(res.hits);
 
 		var ofiles = ebi('files');
-		if (ofiles.getAttribute('ts') > this.ts)
+		if (xhr && ofiles.getAttribute('ts') > xhr.ts)
 			return;
 
 		treectl.hide();
@@ -7200,19 +7289,21 @@ var ahotkeys = function (e) {
 		}
 
 		ofiles = set_files_html(html.join('\n'));
-		ofiles.setAttribute("ts", this.ts);
-		ofiles.setAttribute("q_raw", this.q_raw);
+		ofiles.setAttribute("ts", xhr ? xhr.ts : 1);
+		ofiles.setAttribute("q_raw", xhr ? xhr.q_raw : 'playlist');
 		set_vq();
 		mukey.render();
 		reload_browser();
 		filecols.set_style(['File Name']);
 
-		sethash('q=' + uricom_enc(this.q_raw));
+		if (xhr)
+			sethash('q=' + uricom_enc(xhr.q_raw));
+
 		ebi('unsearch').onclick = unsearch;
 		var m = ebi('moar');
 		if (m)
 			m.onclick = moar;
-	}
+	};
 
 	function unsearch(e) {
 		ev(e);
@@ -7229,7 +7320,96 @@ var ahotkeys = function (e) {
 		cap *= 2;
 		do_search();
 	}
+
+	return r;
 })();
+
+
+function ev_load_m3u(e) {
+	ev(e);
+	var id = this.getAttribute('id').slice(1),
+		url = ebi(id).getAttribute('href').split('?')[0];
+
+	modal.confirm(L.mm_m3u,
+		function () { load_m3u(url); },
+		function () {
+			if (has(perms, 'write') && has(perms, 'delete'))
+				window.location = url + '?edit';
+			else
+				showfile.show(url);
+		}
+	);
+	return false;
+}
+function load_m3u(url) {
+	var xhr = new XHR();
+	xhr.open('GET', url, true);
+	xhr.onload = render_m3u;
+	xhr.url = url;
+	xhr.send();
+	return false;
+}
+function render_m3u() {
+	if (!xhrchk(this, L.tv_xe1, L.tv_xe2))
+		return;
+
+	var evp = get_evpath(),
+		m3u = this.responseText,
+		xtd = m3u.slice(0, 12).indexOf('#EXTM3U') + 1,
+		lines = m3u.replace(/\r/g, '\n').split('\n'),
+		dur = 1,
+		artist = '',
+		title = '',
+		ret = {'hits': [], 'tag_order': ['artist', 'title', '.dur'], 'trunc': false};
+
+	for (var a = 0; a < lines.length; a++) {
+		var ln = lines[a].trim();
+		if (xtd && ln.startsWith('#')) {
+			var m = /^#EXTINF:([0-9]+)[, ](.*)/.exec(ln);
+			if (m) {
+				dur = m[1];
+				title = m[2];
+				var ofs = title.indexOf(' - ');
+				if (ofs > 0) {
+					artist = title.slice(0, ofs);
+					title = title.slice(ofs + 3);
+				}
+			}
+			continue;
+		}
+		if (ln.indexOf('.') < 0)
+			continue;
+
+		var n = ret.hits.length + 1,
+			url = ln;
+
+		if (url.indexOf(':\\'))  // C:\
+			url = url.split(/\\/g).pop();
+
+		url = url.replace(/\\/g, '/');
+		url = uricom_enc(url).replace(/%2f/gi, '/')
+
+		if (!url.startsWith('/'))
+			url = vjoin(evp, url);
+
+		ret.hits.push({
+			"ts": 946684800 + n,
+			"sz": 100000 + n,
+			"rp": url,
+			"tags": {".dur": dur, "artist": artist, "title": title}
+		});
+		dur = 1;
+		artist = title = '';
+	}
+
+	search_ui.render(ret, null, false);
+	sethash('m3u=' + this.url.split('?')[0].split('/').pop());
+	goto();
+
+	var el = QS('#files>tbody>tr.au>td>a.play');
+	if (el)
+		el.click();
+}
 
 
 function aligngriditems() {
@@ -8133,7 +8313,7 @@ var treectl = (function () {
 		document.documentElement.scrollLeft = 0;
 		setTimeout(function () {
 			r.gentab(get_evpath(), r.lsc);
-			ebi('wrap').style.opacity = 'unset';
+			ebi('wrap').style.opacity = CLOSEST ? 'unset' : 1;
 		}, 1);
 	};
 
@@ -8286,7 +8466,7 @@ var wfp_debounce = (function () {
 		if (--r.n <= 0) {
 			r.n = 0;
 			clearTimeout(r.t);
-			ebi('wfp').style.opacity = 'unset';
+			ebi('wfp').style.opacity = CLOSEST ? 'unset' : 1;
 		}
 	};
 	r.reset = function () {
@@ -9457,6 +9637,11 @@ function sandbox(tgt, rules, allow, cls, html) {
 		clmod(tgt, 'sb');
 		return false;
 	}
+	if (!CLOSEST) {
+		tgt.textContent = html;
+		clmod(tgt, 'sb');
+		return false;
+	}
 	clmod(tgt, 'sb', 1);
 
 	var tid = tgt.getAttribute('id'),
@@ -9524,7 +9709,7 @@ window.addEventListener("message", function (e) {
 					el.parentNode.removeChild(el.previousSibling);
 
 			el.style.height = (parseInt(t[2]) + SBH) + 'px';
-			el.style.visibility = 'unset';
+			el.style.visibility = CLOSEST ? 'unset' : 'block';
 			wfp_debounce.show();
 		}
 		else if (t[0] == 'iscroll') {

@@ -472,6 +472,8 @@ FN_EMB = set([".prologue.html", ".epilogue.html", "readme.md", "preadme.md"])
 
 
 def read_ram() -> tuple[float, float]:
+    # NOTE: apparently no need to consider /sys/fs/cgroup/memory.max
+    #  (cgroups2) since the limit is synced to /proc/meminfo
     a = b = 0
     try:
         with open("/proc/meminfo", "rb", 0x10000) as f:

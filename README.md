@@ -50,6 +50,8 @@ turn almost any device into a file server with resumable uploads/downloads using
     * [rss feeds](#rss-feeds) - monitor a folder with your RSS reader
     * [recent uploads](#recent-uploads) - list all recent uploads
     * [media player](#media-player) - plays almost every audio format there is
+        * [playlists](#playlists) - create and play [m3u8](https://en.wikipedia.org/wiki/M3U) playlists
+        * [creating a playlist](#creating-a-playlist) - with a standalone mediaplayer or copyparty
         * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
         * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
@@ -251,6 +253,7 @@ also see [comparison to similar software](./docs/versus.md)
   * ☑ file manager (cut/paste, delete, [batch-rename](#batch-rename))
   * ☑ audio player (with [OS media controls](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) and opus/mp3 transcoding)
     * ☑ play video files as audio (converted on server)
+    * ☑ create and play [m3u8 playlists](#playlists)
   * ☑ image gallery with webm player
   * ☑ textfile browser with syntax hilighting
   * ☑ [thumbnails](#thumbnails)
@@ -413,6 +416,9 @@ upgrade notes
 # FAQ
 
 "frequently" asked questions
+
+* CopyParty?
+  * nope! the name is either copyparty (all-lowercase) or Copyparty -- it's [one word](https://en.wiktionary.org/wiki/copyparty) after all :>
 
 * can I change the 🌲 spinning pine-tree loading animation?
   * [yeah...](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice#boring-loader-spinner) :-(
@@ -1044,6 +1050,7 @@ open the `[🎺]` media-player-settings tab to configure it,
   * `[full]` does a full preload by downloading the entire next file; good for unreliable connections, bad for slow connections
   * `[~s]` toggles the seekbar waveform display
   * `[/np]` enables buttons to copy the now-playing info as an irc message
+  * `[📻]` enables buttons to create an [m3u playlist](#playlists) with the selected songs
   * `[os-ctl]` makes it possible to control audio playback from the lockscreen of your device (enables [mediasession](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession))
   * `[seek]` allows seeking with lockscreen controls (buggy on some devices)
   * `[art]` shows album art on the lockscreen
@@ -1062,9 +1069,37 @@ open the `[🎺]` media-player-settings tab to configure it,
 * "transcode to":
   * `[opus]` produces an `opus` whenever transcoding is necessary (the best choice on Android and PCs)
   * `[awo]` is `opus` in a `weba` file, good for iPhones (iOS 17.5 and newer) but Apple is still fixing some state-confusion bugs as of iOS 18.2.1
-  * `[caf]` is `opus` in a `caf` file, good for iPhones (iOS 11 through 17), technically unsupported by Apple but works for the mos tpart
+  * `[caf]` is `opus` in a `caf` file, good for iPhones (iOS 11 through 17), technically unsupported by Apple but works for the most part
   * `[mp3]` -- the myth, the legend, the undying master of mediocre sound quality that definitely works everywhere
 * "tint" reduces the contrast of the playback bar
+
+
+### playlists
+
+create and play [m3u8](https://en.wikipedia.org/wiki/M3U) playlists  -- see example [text](https://a.ocv.me/pub/demo/music/?doc=example-playlist.m3u) and [player](https://a.ocv.me/pub/demo/music/#m3u=example-playlist.m3u)
+
+click a file with the extension `m3u` or `m3u8` (for example `mixtape.m3u` or `touhou.m3u8` ) and you get two choices: Play / Edit
+
+playlists can include songs across folders anywhere on the server, but filekeys/dirkeys are NOT supported, so the listener must have read-access or get-access to the files
+
+
+### creating a playlist
+
+with a standalone mediaplayer or copyparty
+
+you can use foobar2000, deadbeef, just about any standalone player should work -- but you might need to edit the filepaths in the playlist so they fit with the server-URLs
+
+alternatively, you can create the playlist using copyparty itself:
+
+* open the `[🎺]` media-player-settings tab and enable the `[📻]` create-playlist feature -- this adds two new buttons in the bottom-right tray, `[📻add]` and `[📻copy]` which appear when you listen to music, or when you select a few audiofiles
+
+* click the `📻add` button while a song is playing (or when you've selected some songs) and they'll be added to "the list" (you can't see it yet)
+
+* at any time, click `📻copy` to send the playlist to your clipboard
+  * you can then continue adding more songs if you'd like
+  * if you want to wipe the playlist and start from scratch, just refresh the page
+
+* create a new textfile, name it `something.m3u` and paste the playlist there
 
 
 ### audio equalizer
@@ -2387,6 +2422,8 @@ copyparty returns a truncated sha512sum of your PUT/POST as base64; you can gene
     b512 <movie.mkv
 
 you can provide passwords using header `PW: hunter2`, cookie `cppwd=hunter2`, url-param `?pw=hunter2`, or with basic-authentication (either as the username or password)
+
+> for basic-authentication, all of the following are accepted: `password` / `whatever:password` / `password:whatever` (the username is ignored)
 
 NOTE: curl will not send the original filename if you use `-T` combined with url-params! Also, make sure to always leave a trailing slash in URLs unless you want to override the filename
 

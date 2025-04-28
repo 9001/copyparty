@@ -364,7 +364,8 @@ if (!Element.prototype.matches)
         Element.prototype.mozMatchesSelector ||
         Element.prototype.webkitMatchesSelector;
 
-if (!Element.prototype.closest)
+var CLOSEST = !!Element.prototype.closest;
+if (!CLOSEST)
     Element.prototype.closest = function (s) {
         var el = this;
         do {

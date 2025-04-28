@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 16, 21)
-CODENAME = "COPYparty"
-BUILD_DT = (2025, 4, 20)
+VERSION = (1, 17, 0)
+CODENAME = "mixtape.m3u"
+BUILD_DT = (2025, 4, 26)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)
