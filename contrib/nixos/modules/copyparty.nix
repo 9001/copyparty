@@ -347,8 +347,6 @@ in {
         let
           command = ''
             ${getExe cfg.package} -c ${runtimeConfigPath} \
-            --shr-db ''' \
-            --ses-db ''' \
             --ah-cli \
           '';
         in
