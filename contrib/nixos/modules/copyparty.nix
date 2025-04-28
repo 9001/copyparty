@@ -238,7 +238,9 @@ in {
     };
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable (let
+    command = "${getExe cfg.package} -c ${runtimeConfigPath}";
+  in {
     systemd.services.copyparty = {
       description = "http file sharing hub";
       wantedBy = ["multi-user.target"];
@@ -261,10 +263,7 @@ in {
 
       serviceConfig = {
         Type = "simple";
-        ExecStart = ''
-          ${getExe cfg.package} -c ${runtimeConfigPath}
-        '';
-
+        ExecStart = command;
         # Hardening options
         User = cfg.user;
         Group = cfg.group;
@@ -324,15 +323,17 @@ in {
     # ensure volumes exist:
     systemd.tmpfiles.settings."copyparty" = (
       lib.attrsets.mapAttrs' (
-        name: value: lib.attrsets.nameValuePair (value.path) ({
-          d={
-            #: in front of things means it wont change it if the directory already exists.
-            group = ":${cfg.group}";
-            user = ":${cfg.user}";
-            mode = ":755";
-          };
-        })
-      ) cfg.volumes
+        name: value:
+          lib.attrsets.nameValuePair (value.path) {
+            d = {
+              #: in front of things means it wont change it if the directory already exists.
+              group = ":${cfg.group}";
+              user = ":${cfg.user}";
+              mode = ":755";
+            };
+          }
+      )
+      cfg.volumes
     );
 
     users.groups.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {};
@@ -343,26 +344,20 @@ in {
       isSystemUser = true;
     };
     environment.systemPackages = lib.mkIf cfg.mkHashWrapper [
-      (
-        let
-          command = ''
-            ${getExe cfg.package} -c ${runtimeConfigPath} \
-            --ah-cli \
-          '';
-        in
-          pkgs.writeShellScriptBin "copyparty-hash" ''
-            set -a  # automatically export variables
-            # set same environment variables as the systemd service
-            ${lib.pipe config.systemd.services.copyparty.environment [
-              (lib.filterAttrs (n: v: v != null && n != "PATH"))
-              (lib.mapAttrs (_: v: "${v}"))
-              (lib.toShellVars)
-            ]}
-            PATH=${config.systemd.services.copyparty.environment.PATH}:$PATH
+      pkgs.writeShellScriptBin
+      "copyparty-hash"
+      ''
+        set -a  # automatically export variables
+        # set same environment variables as the systemd service
+        ${lib.pipe config.systemd.services.copyparty.environment [
+          (lib.filterAttrs (n: v: v != null && n != "PATH"))
+          (lib.mapAttrs (_: v: "${v}"))
+          (lib.toShellVars)
+        ]}
+        PATH=${config.systemd.services.copyparty.environment.PATH}:$PATH
 
-            exec ${command}
-          ''
-      )
+        exec ${command} --ah-cli
+      ''
     ];
-  };
+  });
 }
