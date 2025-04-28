@@ -286,7 +286,7 @@ in {
         BindPaths =
           (
             if cfg.settings ? hist
-            then [cfg.hist]
+            then [cfg.settings.hist]
             else []
           )
           ++ [externalStateDir]
@@ -344,7 +344,7 @@ in {
       isSystemUser = true;
     };
     environment.systemPackages = lib.mkIf cfg.mkHashWrapper [
-      pkgs.writeShellScriptBin
+      (pkgs.writeShellScriptBin
       "copyparty-hash"
       ''
         set -a  # automatically export variables
@@ -357,7 +357,7 @@ in {
         PATH=${config.systemd.services.copyparty.environment.PATH}:$PATH
 
         exec ${command} --ah-cli
-      ''
+      '')
     ];
   });
 }
