@@ -74,8 +74,8 @@ in {
       type = types.bool;
       default = true;
       description = ''
-        Make a shell script wrapper called 'copyparty-env' with all options set here,
-        for ease of things like password hashing
+        Make a shell script wrapper called 'copyparty-hash' with all options set here,
+        that launches the hashing cli.
       '';
     };
 
