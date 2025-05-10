@@ -2100,7 +2100,6 @@ class HttpCli(object):
         suffix = "-{:.6f}-{}".format(time.time(), self.dip())
         nameless = not fn
         if nameless:
-            suffix += ".bin"
             fn = "put" + suffix
 
         params = {"suffix": suffix, "fdir": fdir}
