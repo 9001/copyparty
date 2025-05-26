@@ -1,4 +1,4 @@
-{ lib, stdenv, makeWrapper, fetchurl, utillinux, python, jinja2, impacket, pyftpdlib, pyopenssl, argon2-cffi, pillow, pyvips, pyzmq, ffmpeg, mutagen,
+{ lib, stdenv, makeWrapper, fetchurl, util-linux, python, jinja2, impacket, pyftpdlib, pyopenssl, argon2-cffi, pillow, pyvips, pyzmq, ffmpeg, mutagen,
 
 # use argon2id-hashed passwords in config files (sha2 is always available)
 withHashedPasswords ? true,
@@ -61,7 +61,7 @@ in stdenv.mkDerivation {
   installPhase = ''
     install -Dm755 $src $out/share/copyparty-sfx.py
     makeWrapper ${pyEnv.interpreter} $out/bin/copyparty \
-      --set PATH '${lib.makeBinPath ([ utillinux ] ++ lib.optional withMediaProcessing ffmpeg)}:$PATH' \
+      --set PATH '${lib.makeBinPath ([ util-linux ] ++ lib.optional withMediaProcessing ffmpeg)}:$PATH' \
       --add-flags "$out/share/copyparty-sfx.py"
   '';
   meta.mainProgram = "copyparty";
