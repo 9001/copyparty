@@ -1413,6 +1413,8 @@ class HttpCli(object):
             pass
 
         for i in hits:
+            f = fsenc(os.path.join(self.vn.realpath, i["rp"])) if "magic" in self.vn.flags else None
+
             iurl = html_escape("%s%s" % (baseurl, i["rp"]), True, True)
             title = unquotep(i["rp"].split("?")[0].split("/")[-1])
             title = html_escape(title, True, True)
@@ -1420,7 +1422,7 @@ class HttpCli(object):
             tag_a = str(i["tags"].get("artist") or "")
             desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
             desc = html_escape(desc, True, True) if desc else title
-            mime = html_escape(guess_mime(title))
+            mime = html_escape(guess_mime(title, f))
             lmod = formatdate(max(0, i["ts"]))
             zsa = (iurl, iurl, title, desc, lmod, iurl, mime, i["sz"])
             zs = (
@@ -1599,7 +1601,9 @@ class HttpCli(object):
                 "supportedlock": '<D:lockentry xmlns:D="DAV:"><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>',
             }
             if not isdir:
-                pvs["getcontenttype"] = html_escape(guess_mime(rp))
+                f = fsenc(os.path.join(tap, x["vp"])) if "magic" in self.vn.flags else None
+
+                pvs["getcontenttype"] = html_escape(guess_mime(rp), f)
                 pvs["getcontentlength"] = str(st.st_size)
 
             for k, v in pvs.items():
@@ -4152,6 +4156,8 @@ class HttpCli(object):
             mime = "text/plain; charset={}".format(self.uparam["txt"] or "utf-8")
         elif "mime" in self.uparam:
             mime = str(self.uparam.get("mime"))
+        elif "magic" in self.vn.flags:
+            mime = guess_mime(req_path, fsenc(fs_path))
         else:
             mime = guess_mime(req_path)
 

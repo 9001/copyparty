@@ -3152,17 +3152,35 @@ def unescape_cookie(orig: str) -> str:
     return "".join(ret)
 
 
-def guess_mime(url: str, fallback: str = "application/octet-stream") -> str:
+def guess_mime_ext(url: str) -> str:
     try:
         ext = url.rsplit(".", 1)[1].lower()
     except:
-        return fallback
+        return None
 
     ret = MIMES.get(ext)
 
     if not ret:
         x = mimetypes.guess_type(url)
         ret = "application/{}".format(x[1]) if x[1] else x[0]
+
+    return ret
+
+
+def guess_mime(url: str, path: str = None, fallback: str = "application/octet-stream") -> str:
+    ret = guess_mime_ext(url)
+
+    if not ret and path:
+        import magic
+
+        try:
+            with open(path, 'rb', 0) as f:
+                ret = magic.from_buffer(f.read(4096), mime = True)
+                if ret == "text/html":
+                    # avoid serving up HTML content unless there was actually a .html extension
+                    ret = "text/plain"
+        except:
+            pass
 
     if not ret:
         ret = fallback
