@@ -15,6 +15,7 @@ RUN     apk add -U !pyc \
             py3-jinja2 py3-argon2-cffi py3-pyzmq py3-pillow \
             py3-pip py3-cffi \
             ffmpeg \
+            py3-magic \
             vips-jxl vips-heif vips-poppler vips-magick \
             py3-numpy fftw libsndfile \
             vamp-sdk vamp-sdk-libs \
