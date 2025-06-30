@@ -1,0 +1,25 @@
+# this will start `/usr/bin/copyparty`
+# and read config from `$HOME/.config/copyparty.conf`
+#
+# unless you add -q to disable logging, you may want to remove the
+#   following line to allow buffering (slightly better performance):
+#   Environment=PYTHONUNBUFFERED=x
+
+[Unit]
+Description=copyparty file server
+
+[Service]
+Type=notify
+SyslogIdentifier=copyparty
+Environment=PYTHONUNBUFFERED=x
+WorkingDirectory=/var/lib/copyparty-jail
+ExecReload=/bin/kill -s USR1 $MAINPID
+
+# stop systemd-tmpfiles-clean.timer from deleting copyparty while it's running
+ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
+
+# run copyparty
+ExecStart=/usr/bin/python3 /usr/bin/copyparty -c %h/.config/copyparty/copyparty.conf
+
+[Install]
+WantedBy=multi-user.target
