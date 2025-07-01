@@ -1343,7 +1343,7 @@ html.y #widget.open {
 	color: var(--a);
 	text-shadow: 1px 1px 1px var(--op-a-sh);
 	font-size: 1.5em;
-	padding: .25em .4em;
+	padding: 0em .4em;
 	margin: 0;
 }
 #ops a.act {
@@ -1366,6 +1366,13 @@ html.y #ops svg circle {
 #ops {
 	padding: .3em .6em;
 	white-space: nowrap;
+	display: flex;
+	align-items: center;
+}
+
+#opa_filter {
+	margin: 0em .4em;
+	min-width: 50px;
 }
 #noie {
 	color: #b60;

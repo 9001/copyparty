@@ -232,6 +232,10 @@ var Ls = {
 		"ct_idxh": 'show index.html instead of folder listing">htm',
 		"ct_sbars": 'show scrollbars">⟊',
 
+		"qs_off": 'disable quicksearch, hotkeys will work">off',
+		"qs_filter": 'typing without a focused item will hide all items that do not start with this text; disables hotkeys">filter',
+		"qs_jump": 'typing without a focused item will jump to the next item that starts with this text; disables hotkeys">jump',
+		
 		"cut_umod": "if a file already exists on the server, update the server's last-modified timestamp to match your local file (requires write+delete permissions)\">re📅",
 
 		"cut_turbo": "the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them\">turbo",
@@ -855,6 +859,10 @@ var Ls = {
 		"ct_readme": 'vis README.md nedenfor filene">📜 readme',
 		"ct_idxh": 'vis index.html istedenfor fil-liste">htm',
 		"ct_sbars": 'vis rullgardiner / skrollefelt">⟊',
+
+		"qs_off": 'deaktiver hurtigsøk, hurtigtaster vil fungere">av',
+		"qs_filter": 'skriving uten et fokusert element vil skjule alle elementer som ikke starter med denne teksten; deaktiverer hurtigtaster">filter',
+		"qs_jump": 'skriving uten et fokusert element vil hoppe til neste element som starter med denne teksten; deaktiverer hurtigtaster">hopp',
 
 		"cut_umod": 'i tilfelle en fil du laster opp allerede finnes på serveren, så skal serverens tidsstempel oppdateres slik at det stemmer overens med din lokale fil (krever rettighetene write+delete)">re📅',
 
@@ -1480,6 +1488,10 @@ var Ls = {
 		"ct_idxh": '显示 index.html 代替文件夹列表">htm',
 		"ct_sbars": '显示滚动条">⟊',
 
+		"qs_off": '禁用快速搜索，热键将正常工作">关闭',
+		"qs_filter": '在没有焦点项目时输入将隐藏所有不以此文本开头的项目；禁用热键">过滤',
+		"qs_jump": '在没有焦点项目时输入将跳转到下一个以此文本开头的项目；禁用热键">跳转',
+
 		"cut_umod": "如果文件已存在于服务器上，将服务器的最后修改时间戳更新为与你的本地文件匹配（需要写入和删除权限）\">re📅",
 
 		"cut_turbo": "YOLO 按钮，你可能不想启用这个：$N$N如果你上传了大量文件并且由于某些原因需要重新启动，$N并且想要尽快继续上传，使用此选项$N$N这会用简单的 <em>&quot;服务器上的文件大小是否相同？&quot;</em> 替代哈希检查，$N因此如果文件内容不同，它将不会被上传$N$N上传完成后，你应该关闭此选项，$N然后重新&quot;上传&quot;相同的文件以让客户端验证它们\">加速",
@@ -1922,6 +1934,7 @@ ebi('ops').innerHTML = (
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" id="opa_auc" data-dest="player" tt="' + L.ot_mp + '">🎺</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
+	'<input type="text" id="opa_filter" placeholder="Filter...">' +
 	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<div id="opdesc"></div>'
 );
@@ -2079,6 +2092,119 @@ x.parentNode.insertBefore(mknod('div', null,
 })();
 
 
+//
+// Quicksearch setting logic
+//
+var qsearch = 0; // 0=off, 1=filter, 2=jump
+var qsearch_str = "";
+var qsearch_timer = null;
+
+function set_qsearch_mode(mode) {
+	qsearch = mode;
+	swrite("qsearch_mode", qsearch);
+	set_qsearch_str("");
+	clear_qsearch_highlight();
+	do_qsearch_filter();
+}
+
+function clear_qsearch_highlight() {
+	var rows = QSA("#files tbody tr");
+	for (var i = 0; i < rows.length; i++) {
+		clmod(rows[i], "sel", 0);
+	}
+}
+
+function do_qsearch_filter() {
+	if (!treectl) return;
+	var substr = qsearch_str.toLowerCase();
+	if (!treectl._originalFiles)
+		treectl._originalFiles = treectl.lsc.files.slice();
+	if (!treectl._originalDirs)
+		treectl._originalDirs = treectl.lsc.dirs.slice();
+
+	function filter(items) {
+		return items.filter(function(item) {
+			var name = (item.href || '').split('/').filter(Boolean).pop() || '';
+			return name.toLowerCase().startsWith(substr);
+		});
+	}
+
+	var filteredDirs = substr ? filter(treectl._originalDirs) : treectl._originalDirs;
+	var filteredFiles = substr ? filter(treectl._originalFiles) : treectl._originalFiles;
+
+	var filteredLsc = Object.assign({}, treectl.lsc, {
+		dirs: filteredDirs,
+		files: filteredFiles
+	});
+
+	treectl.gentab(get_evpath(), filteredLsc);
+}
+
+var opaFilter = ebi('opa_filter')
+
+opaFilter.addEventListener('input', function () {
+	qsearch_str = this.value
+	do_qsearch_filter();
+});
+
+function set_qsearch_str(val) {
+	qsearch_str = val;
+	if (!val || qsearch !== 2) {
+		opaFilter.value = val;
+	}
+}
+
+function do_qsearch_jump() {
+	clear_qsearch_highlight();
+	var substr = qsearch_str.toLowerCase();
+	if (!substr) {
+		return;
+	}
+	var rows = QSA("#files tbody tr");
+	for (var i = 0; i < rows.length; i++) {
+		var tds = rows[i].getElementsByTagName("td");
+		if (tds.length < 2) continue;
+		var name = tds[1].textContent.trim().toLowerCase();
+		if (name.startsWith(substr)) {
+			clmod(rows[i], "sel", 1);
+			rows[i].scrollIntoView({ block: "nearest" });
+			break;
+		}
+	}
+}
+
+function handle_qsearch_key(e) {
+	if (qsearch === 0) return false;
+	if (e.ctrlKey || e.altKey || e.metaKey) {
+		return false;
+	}
+	var ch = e.key;
+	if (ch.length === 1) {
+		set_qsearch_str(qsearch_str + ch);
+		if (qsearch === 1) {
+			do_qsearch_filter();
+		} else if (qsearch === 2) {
+			do_qsearch_jump();
+		}
+		if (qsearch_timer) clearTimeout(qsearch_timer);
+		qsearch_timer = setTimeout(function() {
+			// reset on next input, don't reset current view
+			qsearch_str = "";
+		}, 2000);
+		return true;
+	}
+	if (ch === "Backspace") {
+		set_qsearch_str("");
+		if (qsearch === 1) {
+			do_qsearch_filter();
+		} else if (qsearch === 2) {
+			do_qsearch_jump();
+		}
+		return true;
+	}
+	return false;
+}
+
 // config panel
 ebi('op_cfg').innerHTML = (
 	'<div>\n' +
@@ -2096,6 +2222,12 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '</a>\n' +
 	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
+	'</div>\n' +
+	'<div id="qscfg">\n' +
+	'	<h3>quicksearch</h3>\n' +
+	'	<a id="qs_off" class="tgl btn" href="#" tt="' + L.qs_off + '</a>\n' +
+	'	<a id="qs_filter" class="tgl btn" href="#" tt="' + L.qs_filter + '</a>\n' +
+	'	<a id="qs_jump" class="tgl btn" href="#" tt="' + L.qs_jump + '</a>\n' +
 	'</div>\n' +
 	'<div>\n' +
 	'	<h3>' + L.cl_themes + '</h3>\n' +
@@ -2156,6 +2288,33 @@ ebi('op_cfg').innerHTML = (
 	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
+// Bind quicksearch setting to UI
+(function() {
+	var qs_modes = [
+		{ id: "qs_off", mode: 0 },
+		{ id: "qs_filter", mode: 1 },
+		{ id: "qs_jump", mode: 2 }
+	];
+	var saved = parseInt(sread("qsearch_mode") || "0", 10);
+	if (isNaN(saved) || saved < 0 || saved > 2) saved = 0;
+	set_qsearch_mode(saved);
+	for (var i = 0; i < qs_modes.length; i++) {
+		var btn = ebi(qs_modes[i].id);
+		if (!btn) continue;
+		btn.onclick = function(e) {
+			ev(e);
+			for (var j = 0; j < qs_modes.length; j++) {
+				clmod(ebi(qs_modes[j].id), "on", 0);
+			}
+			var idx = qs_modes.findIndex(x => x.id === this.id);
+			if (idx >= 0) {
+				clmod(this, "on", 1);
+				set_qsearch_mode(qs_modes[idx].mode);
+			}
+		};
+		clmod(btn, "on", saved === qs_modes[i].mode);
+	}
+})();
 
 // navpane
 ebi('tree').innerHTML = (
@@ -7034,6 +7193,8 @@ var ahotkeys = function (e) {
 	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre')
 		return;
 
+	if (handle_qsearch_key(e)) return;
+	
 	if (e.key == '?')
 		return hkhelp();
 
