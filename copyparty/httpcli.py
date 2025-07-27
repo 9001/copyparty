@@ -4875,11 +4875,22 @@ class HttpCli(object):
         ep = self.host
         host = ep.split(":")[0]
         hport = ep[ep.find(":") :] if ":" in ep else ""
-        rip = (
-            host
-            if self.args.rclone_mdns or not self.args.zm
-            else self.conn.hsrv.nm.map(self.ip) or host
-        )
+        
+        import ipaddress
+        try:
+            ipaddress.ip_address(host)
+            user_used_ip = True
+        except ValueError:
+            user_used_ip = False
+        
+        if user_used_ip or self.args.rclone_mdns or not self.args.zm:
+            rip = (
+                host
+                if self.args.rclone_mdns or not self.args.zm
+                else self.conn.hsrv.nm.map(self.ip) or host
+            )
+        else:
+            rip = host
         # safer than html_escape/quotep since this avoids both XSS and shell-stuff
         pw = re.sub(r"[<>&$?`\"']", "_", self.pw or "hunter2")
         vp = re.sub(r"[<>&$?`\"']", "_", self.uparam["hc"] or "").lstrip("/")
