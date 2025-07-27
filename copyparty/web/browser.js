@@ -338,6 +338,14 @@ var Ls = {
 		"f_empty": 'this folder is empty',
 		"f_chide": 'this will hide the column «{0}»\n\nyou can unhide columns in the settings tab',
 		"f_bigtxt": "this file is {0} MiB large -- really view as text?",
+
+		formatSize: function(bytes) {
+			if (bytes < 1024) return bytes + ' B';
+			let k = 1024;
+			let sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+			let i = Math.floor(Math.log(bytes) / Math.log(k));
+			return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+		}
 		"f_bigtxt2": "view just the end of the file instead? this will also enable following/tailing, showing newly added lines of text in real time",
 		"fbd_more": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_more">show {2}</a> or <a href="#" id="bd_all">show all</a></div>',
 		"fbd_all": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_all">show all</a></div>',
@@ -2931,9 +2939,17 @@ function ft2dict(tr, skip) {
 	skip = skip || {};
 
 	for (var a = 1, aa = th.length; a < aa; a++) {
-		var tv = tr.cells[a].textContent,
+		var cell = tr.cells[a],
 			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').pop().toLowerCase(),
-			vis = th[a].className.indexOf('min') === -1;
+			vis = th[a].className.indexOf('min') === -1,
+			tv;
+		
+		// For size column (typically column 3), check for data-sz attribute first
+		if (tk === 'sz' && cell.hasAttribute('data-sz')) {
+			tv = cell.getAttribute('data-sz');
+		} else {
+			tv = cell.textContent;
+		}
 
 		if (!tv || skip[tk])
 			continue;
@@ -10342,10 +10358,13 @@ function reload_browser() {
 
 	var oo = QSA('#files>tbody>tr>td:nth-child(3)');
 	for (var a = 0, aa = oo.length; a < aa; a++) {
-		var sz = oo[a].textContent.replace(/ +/g, ""),
-			hsz = sz.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-
-		oo[a].textContent = hsz;
+		var sz = oo[a].textContent.replace(/[ ,]/g, "");
+		var numSz = parseInt(sz);
+		if (!isNaN(numSz)) {
+			// Store original size as data attribute for other code that needs the raw value
+			oo[a].setAttribute('data-sz', numSz);
+			oo[a].textContent = humansize(numSz, false);
+		}
 	}
 
 	reload_mp();
