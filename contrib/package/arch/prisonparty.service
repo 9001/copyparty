@@ -22,9 +22,6 @@ Environment=PYTHONUNBUFFERED=x
 WorkingDirectory=/var/lib/copyparty-jail
 ExecReload=/bin/kill -s USR1 $MAINPID
 
-# stop systemd-tmpfiles-clean.timer from deleting copyparty while it's running
-ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
-
 # run copyparty
 ExecStart=/bin/bash /usr/bin/prisonparty /var/lib/copyparty-jail %i %i \
   /etc/copyparty.d \
