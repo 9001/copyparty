@@ -279,6 +279,7 @@ in {
             "/nix/store"
             "-/etc/resolv.conf"
             "-/etc/nsswitch.conf"
+            "-/etc/group"
             "-/etc/hosts"
             "-/etc/localtime"
           ]
