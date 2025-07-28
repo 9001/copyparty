@@ -15,7 +15,7 @@ import re
 from pathlib import Path
 
 OUTPUT_FILE = Path("pin.json")
-TARGET_ASSET = "copyparty-sfx.py"
+TARGET_ASSET = lambda version: f"copyparty-{version}.tar.gz"
 HASH_TYPE = "sha256"
 LATEST_RELEASE_URL = "https://api.github.com/repos/9001/copyparty/releases/latest"
 DOWNLOAD_URL = lambda version: f"https://github.com/9001/copyparty/releases/download/v{version}/{TARGET_ASSET}"
@@ -42,7 +42,7 @@ def remote_release_pin():
 
     response = requests.get(LATEST_RELEASE_URL).json()
     version = response["tag_name"].lstrip("v")
-    asset_info = [a for a in response["assets"] if a["name"] == TARGET_ASSET][0]
+    asset_info = [a for a in response["assets"] if a["name"] == TARGET_ASSET(version)][0]
     download_url = asset_info["browser_download_url"]
     asset = requests.get(download_url)
     formatted_hash = get_formatted_hash(asset.content)
