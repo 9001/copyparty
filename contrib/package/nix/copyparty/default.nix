@@ -91,5 +91,17 @@ stdenv.mkDerivation {
       --prefix PATH : ${lib.makeBinPath runtimeDeps} \
       --add-flag $out/share/copyparty-sfx.py
   '';
-  meta.mainProgram = "copyparty";
+  meta = {
+    description = "Turn almost any device into a file server";
+    longDescription = ''
+      Portable file server with accelerated resumable uploads, dedup, WebDAV,
+      FTP, TFTP, zeroconf, media indexer, thumbnails++ all in one file, no deps
+    '';
+    homepage = "https://github.com/9001/copyparty";
+    changelog = "https://github.com/9001/copyparty/releases/tag/v${pinData.version}";
+    license = lib.licenses.mit;
+    inherit (python.meta) platforms;
+    mainProgram = "copyparty";
+    sourceProvenance = [ lib.sourceTypes.binaryBytecode ];
+  };
 }
