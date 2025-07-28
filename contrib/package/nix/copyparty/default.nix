@@ -33,6 +33,11 @@ withSMB ? false,
 # extra packages to add to the PATH
 extraPackages ? [ ],
 
+# function that accepts a python packageset and returns a list of packages to
+# be added to the python venv. useful for scripts and such that require
+# additional dependencies
+extraPythonPackages ? (_p: [ ]),
+
 }:
 
 let
@@ -50,6 +55,7 @@ let
     ++ lib.optional withBasicAudioMetadata mutagen
     ++ lib.optional withHashedPasswords argon2-cffi
     ++ lib.optional withZeroMQ pyzmq
+    ++ (extraPythonPackages ps)
     );
 in stdenv.mkDerivation {
   pname = "copyparty";
