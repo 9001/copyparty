@@ -50,7 +50,7 @@ catch (ex) {
     }
     catch (ex) {
         console.log('up2k init failed:', ex);
-        toast.err(10, 'could not initialze up2k\n\n' + basenames(ex));
+        toast.err(10, 'could not initialize up2k\n\n' + basenames(ex));
     }
 }
 treectl.onscroll();

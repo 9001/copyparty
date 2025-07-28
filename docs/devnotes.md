@@ -328,7 +328,7 @@ if you don't need all the features, you can repack the sfx and save a bunch of s
 
 the features you can opt to drop are
 * `cm`/easymde, the "fancy" markdown editor, saves ~89k
-* `hl`, prism, the syntax hilighter, saves ~41k
+* `hl`, prism, the syntax highlighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it

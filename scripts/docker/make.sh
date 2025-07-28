@@ -115,7 +115,7 @@ filt=
             ) 2> >(tee $a.err | sed "s/^/$aa:/" >&2) > >(tee $a.out | sed "s/^/$aa:/") &
         done
         [ -e err ] && {
-            echo somethign died,
+            echo something died,
             cat err
             pkill -P $$
             exit 1
@@ -126,7 +126,7 @@ filt=
     done
     wait
     [ -e err ] && {
-        echo somethign died,
+        echo something died,
         cat err
         pkill -P $$
         exit 1

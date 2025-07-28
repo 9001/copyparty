@@ -41,7 +41,7 @@ help() { exec cat <<'EOF'
 # `no-cm` saves ~89k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
-# `no-hl` saves ~41k by removing syntax hilighting in the text viewer
+# `no-hl` saves ~41k by removing syntax highlighting in the text viewer
 #
 # `no-fnt` saves ~9k by removing the source-code-pro font
 #   (browsers will try to use 'Consolas' instead)

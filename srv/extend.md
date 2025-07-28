@@ -30,7 +30,7 @@ finally ./except/these/ones.md
 
 
 ### also-this.md
-whic hshoud be ./except/also-this.md
+which should be ./except/also-this.md
 
 
 
@@ -62,7 +62,7 @@ the difference is that with `copyparty_pre` you'll probably break various copypa
 
 
 # heres the plugins
-if there is anything below ths line in the preview then the plugin feature is disabled (good)
+if there is anything below this line in the preview then the plugin feature is disabled (good)
 
 
 

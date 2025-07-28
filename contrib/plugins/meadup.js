@@ -11,7 +11,7 @@ var hambagas = [
     "https://www.youtube.com/watch?v=pFA3KGp4GuU"
 ];
 
-// keybaord,
+// keyboard,
 //   onscreen keyboard by @steinuil
 function initKeybaord(BASE_URL, HAMBAGA, consoleLog, consoleError) {
     document.querySelector('.keybaord-container').innerHTML = `
@@ -373,7 +373,7 @@ function initKeybaord(BASE_URL, HAMBAGA, consoleLog, consoleError) {
 }
 
 
-// keybaord integration
+// keyboard integration
 (function () {
     var o = mknod('div');
     clmod(o, 'keybaord-container', 1);

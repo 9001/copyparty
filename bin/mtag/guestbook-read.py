@@ -7,7 +7,7 @@ example copyparty config to use this:
   --urlform save,get -vsrv/hello:hello:w:c,e2ts,mtp=guestbook=t10,ad,p,bin/mtag/guestbook-read.py:mte=+guestbook
 
 explained:
-  for realpath srv/hello (served at /hello), write-only for eveyrone,
+  for realpath srv/hello (served at /hello), write-only for everyone,
   enable file analysis on upload (e2ts),
   use mtp plugin "bin/mtag/guestbook-read.py" to provide metadata tag "guestbook",
   do this on all uploads regardless of extension,

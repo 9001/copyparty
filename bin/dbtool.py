@@ -39,7 +39,7 @@ def ls(db):
     print(f"{nfiles} files")
     print(f"{ntags} tags\n")
 
-    print("number of occurences for each tag,")
+    print("number of occurrences for each tag,")
     print(" 'x' = file has no tags")
     print(" 't:mtp' = the mtp flag (file not mtp processed yet)")
     print()

@@ -786,7 +786,7 @@ def get_sects():
              \033[36mc0\033[35m show all process output (default)
              \033[36mc1\033[35m show only stderr
              \033[36mc2\033[35m show only stdout
-             \033[36mc3\033[35m mute all process otput
+             \033[36mc3\033[35m mute all process output
             \033[0m
             examples:
 

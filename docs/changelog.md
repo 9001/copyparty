@@ -592,7 +592,7 @@ get the party going anywhere, anytime, no OS required! [download flashdrive imag
 
 * option to specify max-size for download-as-zip/tar 494179bd 0a33336d
   * either the total download size (`--zipmaxs 500M`), and/or max number of files (`--zipmaxn 9k`)
-  * applies to all uesrs by default; can also ignore limits for authorized users (`--zipmaxu`)
+  * applies to all users by default; can also ignore limits for authorized users (`--zipmaxu`)
   * errormessage can be customized with `--zipmaxt "winter is coming... but this download isn't"`
 * [appledoubles](https://a.ocv.me/pub/stuff/?doc=appledoubles-and-friends.txt) are detected and skipped when uploading with the browser-UI 78208405
 * IdP-volumes can be filtered by group 9c2c4237
@@ -1047,7 +1047,7 @@ this release includes a build of [copyparty-winpe64.exe](https://github.com/9001
 * webdav: support listing unmapped root with infinite recursion (Depth:0) 21a3f369
 * embed current sort config into media URLs (gallery/music) 0f257c93 4cfdc4c5 01670827
   * ensures that anyone clicking your link will see the files in the same order as you
-  * can be confgured serverside (`--hsortn`, volflag `hsortn`) and clientside (`#sort` in settings)
+  * can be configured serverside (`--hsortn`, volflag `hsortn`) and clientside (`#sort` in settings)
 * URL and UI options to disable checksum calculation of PUT, bup, basic uploads c5a000d2
   * also allows [choosing either md5, sha1, sha256, or blake2](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#write) instead of the default sha512
   * can give uploads a nice speed boost when copyparty is running on a potato
@@ -2240,7 +2240,7 @@ probably last release before v1.10 (IdP), please watch warmly
 * now possible to POST files without having to set the `act: bput` multipart field 9bc09ce9
   * mainly to support [igloo irc](https://github.com/9001/copyparty#client-examples) and other simplistic upload clients
 * try to point the linux oom-killer at FFmpeg so it doesn't kill innocent processes instead dc8e621d
-  * only works if copyparty has acces to /proc, so not in prisonparty, and maybe not in docker (todo)
+  * only works if copyparty has access to /proc, so not in prisonparty, and maybe not in docker (todo)
 * UX:
   * do another search immediately if a search-filter gets unchecked a4239a46
   * several ie11 fixes (keyboard hotkeys and a working text editor) 2fd2c6b9
@@ -3710,7 +3710,7 @@ named after [that other thing](https://en.wikipedia.org/wiki/Tower_of_Babel), no
 * display a server [qr-code](https://github.com/9001/copyparty#qr-code) [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) on startup
   * primarily for running copyparty on a phone and accessing it from another
   * optionally specify a path or password with `--qrl lootbox/?pw=hunter2`
-  * uses the server's exteral ip (default route) unless `--qri` specifies a domain / ip-prefix
+  * uses the server's external ip (default route) unless `--qri` specifies a domain / ip-prefix
   * classic cp437 `▄` `▀` for space efficiency; some misbehaving terminals / fonts need `--qrz 2`
 * new permission `G` returns the filekey of uploaded files for users without read-access
   * when combined with permission `w` and volflag `fk`, uploaded files will not be accessible unless the filekey is provided in the url, and `G` provides the filekey to the uploader unlike `g`
@@ -4938,7 +4938,7 @@ for future releases, you can use a script to automatically grab the latest sfx a
 * latest gzip edition of the sfx: [v0.11.18](https://github.com/9001/copyparty/releases/tag/v0.11.18)
 
 ## bugfixes
-* currently-playing song didn't hilight correctly
+* currently-playing song didn't highlight correctly
 
 
 
@@ -4990,7 +4990,7 @@ thx to @Bevinsky and @icxes for the ux suggestions
   * and `?raw` POST without content-type is now allowed
 * file-listing is refreshed when all up2k uploads complete
 * new option `--ign-ebind` to continue startup even if one of the IPs / ports couldn't be listened on
-* new option `--ign-ebind-all` to run even if copyparty can't receieve any connections at all
+* new option `--ign-ebind-all` to run even if copyparty can't receive any connections at all
   * maybe useful for monitoring folders and hashing new files on a timer or something
 
 ## bugfixes
@@ -6304,7 +6304,7 @@ unless the upload was paused for 6 hours or more, it can probably be resumed by 
 
 ## new features suggested by kipu
 * pause uploads by setting `parallel uploads` to `0`
-* increase max `parallel uploads` to 16 (using +/- buttons) and 64 (by manual text entry) to accomodate sad american internet connections
+* increase max `parallel uploads` to 16 (using +/- buttons) and 64 (by manual text entry) to accommodate sad american internet connections
 * also look for `cover.jpg` and `cover.png` as folder thumbnails by default, adjustable with `--th-covers`
 * change the description in the sfx so the corruption warning is the first plaintext you see
 
@@ -6458,7 +6458,7 @@ reason: [v0.11.12](https://github.com/9001/copyparty/releases/tag/v0.11.12) chan
 
 ## new features
 * much faster filesearch in chrome
-* skip hidden colums in the /np text
+* skip hidden columns in the /np text
 * support cygpaths when pointing to mtag tools
 
 ## bugfixes
@@ -7469,7 +7469,7 @@ valvrave-stop.jpg
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2020-1117-2258  `v0.5.4`  edovprim
 
-(get it? becasue reverse proxy haha)
+(get it? because reverse proxy haha)
 
 * reverse-proxy support
 * filetype column in the browser

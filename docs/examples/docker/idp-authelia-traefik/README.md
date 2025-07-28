@@ -47,4 +47,4 @@ currently **not optimal,** at least when compared to running the python sfx outs
 
 authelia is behaving strangely, handling 340 requests per second for a while, but then it suddenly drops to 75 and stays there...
 
-I'm assuming all of the performance issues is due to a misconfiguration of authelia/traefik/docker on my end, but I don't relly know where to start
+I'm assuming all of the performance issues is due to a misconfiguration of authelia/traefik/docker on my end, but I don't really know where to start

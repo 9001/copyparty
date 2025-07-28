@@ -422,7 +422,7 @@ function init_toc() {
         }
     }
 
-    // hilight the correct toc items + scroll into view
+    // highlight the correct toc items + scroll into view
     function freshen_toclist() {
         if (anchors.length == 0)
             return;
