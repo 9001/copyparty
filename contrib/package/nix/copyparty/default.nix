@@ -7,7 +7,6 @@
   python,
   jinja2,
   impacket,
-  pyftpdlib,
   pyopenssl,
   argon2-cffi,
   pillow,
