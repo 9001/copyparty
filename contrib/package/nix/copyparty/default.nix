@@ -83,7 +83,7 @@ stdenv.mkDerivation {
   src = fetchurl {
     inherit (pinData) url hash;
   };
-  buildInputs = [ makeWrapper ];
+  nativeBuildInputs = [ makeWrapper ];
   dontUnpack = true;
   installPhase = ''
     install -Dm755 $src $out/share/copyparty-sfx.py
