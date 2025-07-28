@@ -8,6 +8,7 @@
   jinja2,
   impacket,
   pyopenssl,
+  cfssl,
   argon2-cffi,
   pillow,
   pyvips,
