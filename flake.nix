@@ -34,6 +34,8 @@
           inherit (pkgs) copyparty;
           default = self.packages.${system}.copyparty;
         };
+
+        formatter = pkgs.nixfmt-tree;
       }
     );
 }
