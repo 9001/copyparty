@@ -38,6 +38,19 @@
         };
       in
       {
+        # check that copyparty builds with all optionals turned on
+        checks.copyparty-full = self.packages.${system}.copyparty.override {
+          withHashedPasswords = true;
+          withCertgen = true;
+          withThumbnails = true;
+          withFastThumbnails = true;
+          withMediaProcessing = true;
+          withBasicAudioMetadata = true;
+          withZeroMQ = true;
+          withFTPS = true;
+          withSMB = true;
+        };
+
         packages = {
           inherit (pkgs)
             copyparty
