@@ -17,6 +17,10 @@
           ffmpeg = self.ffmpeg-full;
         };
 
+        partyfuse = super.callPackage ./contrib/package/nix/partyfuse {
+          inherit copyparty;
+        };
+
         u2c = super.callPackage ./contrib/package/nix/u2c {
           inherit copyparty;
         };
@@ -35,7 +39,11 @@
       in
       {
         packages = {
-          inherit (pkgs) copyparty u2c;
+          inherit (pkgs)
+            copyparty
+            partyfuse
+            u2c
+            ;
           default = self.packages.${system}.copyparty;
         };
 
