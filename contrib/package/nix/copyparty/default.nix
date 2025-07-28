@@ -75,24 +75,22 @@ let
     ++ lib.optional withZeroMQ pyzmq
     ++ (extraPythonPackages ps)
   );
+
+  runtimeDeps = ([ util-linux ] ++ extraPackages ++ lib.optional withMediaProcessing ffmpeg);
 in
 stdenv.mkDerivation {
   pname = "copyparty";
-  version = pinData.version;
+  inherit (pinData) version;
   src = fetchurl {
-    url = pinData.url;
-    hash = pinData.hash;
+    inherit (pinData) url hash;
   };
   buildInputs = [ makeWrapper ];
   dontUnpack = true;
-  dontBuild = true;
   installPhase = ''
     install -Dm755 $src $out/share/copyparty-sfx.py
     makeWrapper ${pyEnv.interpreter} $out/bin/copyparty \
-      --set PATH '${
-        lib.makeBinPath ([ util-linux ] ++ extraPackages ++ lib.optional withMediaProcessing ffmpeg)
-      }:$PATH' \
-      --add-flags "$out/share/copyparty-sfx.py"
+      --prefix PATH : ${lib.makeBinPath runtimeDeps} \
+      --add-flag $out/share/copyparty-sfx.py
   '';
   meta.mainProgram = "copyparty";
 }
