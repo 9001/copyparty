@@ -17,6 +17,7 @@
   mutagen,
   pyftpdlib,
   magic,
+  partftpy,
   fusepy, # for partyfuse
 
   # use argon2id-hashed passwords in config files (sha2 is always available)
@@ -48,6 +49,9 @@
 
   # enable FTPS support in the FTP server
   withFTPS ? false,
+
+  # enable TFTP server
+  withTFTP ? false,
 
   # samba/cifs server; dangerous and buggy, enable if you really need it
   withSMB ? false,
@@ -83,6 +87,7 @@ buildPythonApplication {
     ++ lib.optional withSMB impacket
     ++ lib.optional withFTP pyftpdlib
     ++ lib.optional withFTPS pyopenssl
+    ++ lib.optional withTFTP partftpy
     ++ lib.optional withCertgen cfssl
     ++ lib.optional withThumbnails pillow
     ++ lib.optional withFastThumbnails pyvips
