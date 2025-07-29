@@ -18,16 +18,7 @@
         };
         python3 = prev.python3.override {
           packageOverrides = pyFinal: pyPrev: {
-            partftpy = pyFinal.tftpy.overrideAttrs {
-              pname = "partftpy";
-              version = "0.4.0";
-              src = final.fetchurl {
-                url = "https://github.com/9001/partftpy/releases/download/v0.4.0/partftpy-0.4.0.tar.gz";
-                hash = "sha256-5Q2zyuJ892PGZmb+YXg0ZPW/DK8RDL1uE0j5HPd4We0=";
-              };
-              pyproject = true;
-              pythonImportsCheck = [ "partftpy.TftpServer" ];
-            };
+            partftpy = pyFinal.callPackage ./contrib/package/nix/partftpy { };
           };
         };
       };
