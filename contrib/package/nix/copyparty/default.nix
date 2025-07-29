@@ -1,10 +1,10 @@
 {
   lib,
-  stdenv,
-  makeWrapper,
+  buildPythonApplication,
   fetchurl,
   util-linux,
   python,
+  setuptools,
   jinja2,
   impacket,
   pyopenssl,
@@ -15,6 +15,7 @@
   pyzmq,
   ffmpeg,
   mutagen,
+  fusepy, # for partyfuse
 
   # use argon2id-hashed passwords in config files (sha2 is always available)
   withHashedPasswords ? true,
@@ -58,11 +59,18 @@
 
 let
   pinData = lib.importJSON ./pin.json;
-  pyEnv = python.withPackages (
-    ps:
-    with ps;
+  runtimeDeps = ([ util-linux ] ++ extraPackages ++ lib.optional withMediaProcessing ffmpeg);
+in
+buildPythonApplication {
+  pname = "copyparty";
+  inherit (pinData) version;
+  src = fetchurl {
+    inherit (pinData) url hash;
+  };
+  dependencies =
     [
       jinja2
+      fusepy
     ]
     ++ lib.optional withSMB impacket
     ++ lib.optional withFTPS pyopenssl
@@ -73,25 +81,13 @@ let
     ++ lib.optional withBasicAudioMetadata mutagen
     ++ lib.optional withHashedPasswords argon2-cffi
     ++ lib.optional withZeroMQ pyzmq
-    ++ (extraPythonPackages ps)
-  );
+    ++ (extraPythonPackages python.packages);
+  makeWrapperArgs = [ "--prefix PATH : ${lib.makeBinPath runtimeDeps}" ];
 
-  runtimeDeps = ([ util-linux ] ++ extraPackages ++ lib.optional withMediaProcessing ffmpeg);
-in
-stdenv.mkDerivation {
-  pname = "copyparty";
-  inherit (pinData) version;
-  src = fetchurl {
-    inherit (pinData) url hash;
-  };
-  nativeBuildInputs = [ makeWrapper ];
-  dontUnpack = true;
-  installPhase = ''
-    install -Dm755 $src $out/share/copyparty-sfx.py
-    makeWrapper ${pyEnv.interpreter} $out/bin/copyparty \
-      --prefix PATH : ${lib.makeBinPath runtimeDeps} \
-      --add-flag $out/share/copyparty-sfx.py
-  '';
+  pyproject = true;
+  build-system = [
+    setuptools
+  ];
   meta = {
     description = "Turn almost any device into a file server";
     longDescription = ''
@@ -101,8 +97,7 @@ stdenv.mkDerivation {
     homepage = "https://github.com/9001/copyparty";
     changelog = "https://github.com/9001/copyparty/releases/tag/v${pinData.version}";
     license = lib.licenses.mit;
-    inherit (python.meta) platforms;
     mainProgram = "copyparty";
-    sourceProvenance = [ lib.sourceTypes.binaryBytecode ];
+    sourceProvenance = [ lib.sourceTypes.fromSource ];
   };
 }

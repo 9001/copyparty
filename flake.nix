@@ -12,17 +12,9 @@
     }:
     {
       nixosModules.default = ./contrib/nixos/modules/copyparty.nix;
-      overlays.default = final: prev: rec {
+      overlays.default = final: prev: {
         copyparty = final.python3.pkgs.callPackage ./contrib/package/nix/copyparty {
           ffmpeg = final.ffmpeg-full;
-        };
-
-        partyfuse = prev.callPackage ./contrib/package/nix/partyfuse {
-          inherit copyparty;
-        };
-
-        u2c = prev.callPackage ./contrib/package/nix/u2c {
-          inherit copyparty;
         };
       };
     }
@@ -54,8 +46,6 @@
         packages = {
           inherit (pkgs)
             copyparty
-            partyfuse
-            u2c
             ;
           default = self.packages.${system}.copyparty;
         };
