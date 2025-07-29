@@ -2001,9 +2001,9 @@ function load_md_plug(md_text, plug_type, defer) {
 
     var old_plug = md_plug[plug_type];
     if (!old_plug || old_plug[1] != js) {
-        js = 'const loc = new URL("' + location.href + '"), x = { ' + js + ' }; x;';
+        // Use Function constructor to avoid code injection via location.href
         try {
-            var x = eval(js);
+            var x = (new Function('loc', 'return { ' + js + ' };'))(new URL(location.href));
             if (x['ctor']) {
                 x['ctor']();
                 delete x['ctor'];
