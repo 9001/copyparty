@@ -81,7 +81,7 @@ buildPythonApplication {
     ++ lib.optional withBasicAudioMetadata mutagen
     ++ lib.optional withHashedPasswords argon2-cffi
     ++ lib.optional withZeroMQ pyzmq
-    ++ (extraPythonPackages python.packages);
+    ++ (extraPythonPackages python.pkgs);
   makeWrapperArgs = [ "--prefix PATH : ${lib.makeBinPath runtimeDeps}" ];
 
   pyproject = true;
