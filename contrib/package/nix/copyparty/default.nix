@@ -15,6 +15,8 @@
   pyzmq,
   ffmpeg,
   mutagen,
+  pyftpdlib,
+  magic,
   fusepy, # for partyfuse
 
   # use argon2id-hashed passwords in config files (sha2 is always available)
@@ -41,11 +43,17 @@
   # send ZeroMQ messages from event-hooks
   withZeroMQ ? true,
 
+  # enable FTP server
+  withFTP ? true,
+
   # enable FTPS support in the FTP server
   withFTPS ? false,
 
   # samba/cifs server; dangerous and buggy, enable if you really need it
   withSMB ? false,
+
+  # enables filetype detection for nameless uploads
+  withMagic ? false,
 
   # extra packages to add to the PATH
   extraPackages ? [ ],
@@ -73,6 +81,7 @@ buildPythonApplication {
       fusepy
     ]
     ++ lib.optional withSMB impacket
+    ++ lib.optional withFTP pyftpdlib
     ++ lib.optional withFTPS pyopenssl
     ++ lib.optional withCertgen cfssl
     ++ lib.optional withThumbnails pillow
@@ -81,6 +90,7 @@ buildPythonApplication {
     ++ lib.optional withBasicAudioMetadata mutagen
     ++ lib.optional withHashedPasswords argon2-cffi
     ++ lib.optional withZeroMQ pyzmq
+    ++ lib.optional withMagic magic
     ++ (extraPythonPackages python.pkgs);
   makeWrapperArgs = [ "--prefix PATH : ${lib.makeBinPath runtimeDeps}" ];
 
