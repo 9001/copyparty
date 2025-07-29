@@ -2679,7 +2679,7 @@ def get_df(abspath: str, prune: bool) -> tuple[Optional[int], Optional[int], str
             return (bfree.value, None, "")
         else:
             sv = os.statvfs(ap)
-            free = sv.f_frsize * sv.f_bfree
+            free = sv.f_frsize * sv.f_bavail
             total = sv.f_frsize * sv.f_blocks
             return (free, total, "")
     except Exception as ex:
