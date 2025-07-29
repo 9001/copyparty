@@ -25,4 +25,4 @@ ExecStart=/bin/bash /usr/bin/prisonparty /var/lib/copyparty-jail %u %u \
   /usr/bin/python3 /usr/bin/copyparty -c %h/.config/copyparty/copyparty.conf
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

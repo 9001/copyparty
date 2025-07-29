@@ -19,4 +19,4 @@ ExecReload=/bin/kill -s USR1 $MAINPID
 ExecStart=/usr/bin/python3 /usr/bin/copyparty -c %h/.config/copyparty/copyparty.conf
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
