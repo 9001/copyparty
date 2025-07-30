@@ -2344,7 +2344,7 @@ some recommended dependencies are enabled by default; [override the package](htt
 
 ## nixos module
 
-for this setup, you will need a [flake-enabled](https://nixos.wiki/wiki/Flakes) installation of NixOS.
+for [flake-enabled](https://nixos.wiki/wiki/Flakes) installations of NixOS:
 
 ```nix
 {
@@ -2368,6 +2368,33 @@ for this setup, you will need a [flake-enabled](https://nixos.wiki/wiki/Flakes) 
       ];
     };
   };
+}
+```
+
+if you don't use a flake in your configuration, you can use other dependency management tools like [npins](https://github.com/andir/npins), [niv](https://github.com/nmattia/niv), or even plain [`fetchTarball`](https://nix.dev/manual/nix/stable/language/builtins#builtins-fetchTarball), like so:
+
+```nix
+{ pkgs, ... }:
+
+let
+  # npins example, adjust for your setup. copyparty should be a path to the downloaded repo
+  # for niv, just replace the npins folder import with the sources.nix file
+  copyparty = (import ./npins).copyparty;
+
+  # or with fetchTarball:
+  copyparty = fetchTarball "https://github.com/9001/copyparty/archive/hovudstraum.tar.gz";
+in
+
+{
+  # load the copyparty NixOS module
+  imports = [ "${copyparty}/contrib/nixos/modules/copyparty.nix" ];
+
+  # add the copyparty overlay to expose the package to the module
+  nixpkgs.overlays = [ "${copyparty}/contrib/package/nix/overlay.nix" ];
+  # (optional) install the package globally
+  environment.systemPackages = [ pkgs.copyparty ];
+  # configure the copyparty module
+  services.copyparty.enable = true;
 }
 ```
 
