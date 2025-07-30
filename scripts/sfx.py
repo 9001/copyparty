@@ -370,13 +370,40 @@ def get_payload():
 
 def confirm(rv):
     msg()
-    msg("retcode", rv if rv else traceback.format_exc())
     if WINDOWS:
+        msg("=" * 72)
+        if rv == 0:
+            msg("An unexpected error occurred while running copyparty.")
+            msg("Error details:", traceback.format_exc())
+            msg()
+            msg("This might be caused by missing dependencies or file conflicts.")
+            msg()
+            msg("To debug this issue:")
+            msg("1. Open Command Prompt (cmd) or PowerShell")
+            msg("2. Navigate to the folder containing this file")
+            msg("3. Run: python", os.path.basename(me))
+            msg("4. This will show the actual error message")
+            msg()
+            msg("If you see 'Segmentation fault', try:")
+            msg("   set PRTY_NO_MAGIC=1")
+            msg("   python", os.path.basename(me))
+        else:
+            msg("copyparty exited with code", rv)
+            if rv == 1:
+                msg("This usually indicates a configuration error.")
+                msg("Check your command line arguments and try again.")
+            msg()
+            msg("For help, run: python", os.path.basename(me), "--help")
+        
+        msg("=" * 72)
         msg("*** hit enter to exit ***")
         try:
             raw_input() if PY2 else input()
         except:
             pass
+    else:
+        # Non-Windows behavior - just show the exit code and error
+        msg("retcode", rv if rv else traceback.format_exc())
 
     sys.exit(rv or 1)
 
@@ -439,6 +466,12 @@ def run_s(ld):
 
 
 def main():
+    # Set PRTY_NO_MAGIC=1 on Windows to prevent segfaults with python-magic
+    if platform.system() == "Windows" and "PRTY_NO_MAGIC" not in os.environ:
+        os.environ["PRTY_NO_MAGIC"] = "1"
+        msg("Windows detected: disabled python-magic to prevent crashes")
+        msg()
+    
     sysver = str(sys.version).replace("\n", "\n" + " " * 18)
     pktime = time.strftime("%Y-%m-%d, %H:%M:%S", time.gmtime(STAMP))
     msg()

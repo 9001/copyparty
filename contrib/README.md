@@ -7,6 +7,12 @@
 * works on windows, linux and macos
 * assumes `copyparty-sfx.py` was renamed to `copyparty.py` in the same folder as `copyparty.bat`
 
+### [`windows/`](windows/) - Windows-specific tools
+* [`windows/run-sfx.bat`](windows/run-sfx.bat) - Universal launcher for copyparty SFX files on Windows
+* [`windows/copyparty-sfx.bat`](windows/copyparty-sfx.bat) - Template batch file for pairing with specific SFX files  
+* [`windows/README.md`](windows/README.md) - Complete guide for Windows users having trouble with SFX files
+* Solves issues with double-clicking `.py` files and prevents segmentation faults on Windows
+
 ### [`index.html`](index.html)
 * drop-in redirect from an httpd to copyparty
 * assumes the webserver and copyparty is running on the same server/IP
