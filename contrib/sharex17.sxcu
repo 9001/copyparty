@@ -15,5 +15,8 @@
     "act": "bput"
   },
   "FileFormName": "f",
-  "URL": "{json:files[0].url}"
+  "URL": "{json:files[0].url}",
+  "ThumbnailURL": "",
+  "DeletionURL": "",
+  "ErrorMessage": "{json:error}"
 }

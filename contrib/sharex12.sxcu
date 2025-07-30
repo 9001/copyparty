@@ -1,6 +1,8 @@
 {
+  "Version": "17.0.0",
   "Name": "copyparty",
   "DestinationType": "ImageUploader, TextUploader, FileUploader",
+  "RequestMethod": "POST",
   "RequestURL": "http://127.0.0.1:3923/sharex",
   "FileFormName": "f",
   "Arguments": {

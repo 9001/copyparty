@@ -240,17 +240,25 @@
         <div class="os win">
             <h1>ShareX</h1>
 
-            <p>to upload screenshots using ShareX <a href="https://github.com/ShareX/ShareX/releases/tag/v12.1.1">v12</a> or <a href="https://getsharex.com/">v15+</a>, save this as <code>copyparty.sxcu</code> and run it:</p>
+            <p>to upload screenshots using ShareX <a href="https://github.com/ShareX/ShareX/releases/tag/v12.1.1">v12</a> or <a href="https://getsharex.com/">v17+</a>, save this as <code>copyparty.sxcu</code> and run it:</p>
 
             <pre class="dl" name="copyparty.sxcu">
-                { "Name": "copyparty",
+                { "Version": "17.0.0",
+                "Name": "copyparty",
+                "RequestMethod": "POST",
                 "RequestURL": "http{{ s }}://{{ ep }}/{{ rvp }}",
                 "Headers": {
                     {% if accs %}"pw": "<b>{{ pw }}</b>",{% endif %}
                     "accept": "url"
                 },
+                "Body": "MultipartFormData",
+                "Arguments": {
+                    "act": "bput"
+                },
                 "DestinationType": "ImageUploader, TextUploader, FileUploader",
-                "FileFormName": "f" }
+                "FileFormName": "f",
+                "URL": "{json:files[0].url}",
+                "ErrorMessage": "{json:error}" }
             </pre>
         </div>
 

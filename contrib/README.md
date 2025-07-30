@@ -17,7 +17,9 @@
 * `RequestURL`: full URL to the target folder
 * `pw`: password (remove the `pw` line if anon-write)
 * the `act:bput` thing is optional since copyparty v1.9.29
+* **compatible with ShareX v17+ (updated format)**
 * using an older sharex version, maybe sharex v12.1.1 for example? dw fam i got your back 👉😎👉 [`sharex12.sxcu`](sharex12.sxcu)
+* for maximum ShareX v17+ compatibility, you can also use [`sharex17.sxcu`](sharex17.sxcu)
 
 ### [`ishare.iscu`](ishare.iscu) - MacOS screenshot uploader
 * [ishare](https://isharemac.app/) config file to upload screenshots and grab the URL

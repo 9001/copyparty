@@ -1,6 +1,5 @@
 {
     "workbench.colorCustomizations": {
-        // https://ocv.me/dot/bifrost.html
         "terminal.background": "#1e1e1e",
         "terminal.foreground": "#d2d2d2",
         "terminalCursor.background": "#93A1A1",
@@ -21,6 +20,23 @@
         "terminal.ansiBrightMagenta": "#b67fe3",
         "terminal.ansiBrightCyan": "#9cf0ed",
         "terminal.ansiBrightWhite": "#ffffff",
+        "activityBar.activeBackground": "#3333ff",
+        "activityBar.background": "#3333ff",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#600000",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#3333ff",
+        "statusBar.background": "#0000ff",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#3333ff",
+        "statusBarItem.remoteBackground": "#0000ff",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#0000ff",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#0000ff99",
+        "titleBar.inactiveForeground": "#e7e7e799"
     },
     "python.terminal.activateEnvironment": false,
     "python.analysis.enablePytestSupport": false,
