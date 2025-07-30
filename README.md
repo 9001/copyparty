@@ -2451,6 +2451,8 @@ interact with copyparty using non-browser clients
     `post movie.mkv`
   * `chunk(){ curl -H pw:wark -T- http://127.0.0.1:3923/;}`  
     `chunk <movie.mkv`
+  *  `search() { curl -H "Content-Type: application/json" -X POST --data '{"n":42,"q":"'"${1}"'"}' http://127.0.0.1:3923?srch; }`
+    `search 'name like *.jpg*'`
 
 * bash: when curl and wget is not available or too boring
   * `(printf 'PUT /junk?pw=wark HTTP/1.1\r\n\r\n'; cat movie.mkv) | nc 127.0.0.1 3923`

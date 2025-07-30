@@ -198,9 +198,9 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?th=opus` | convert audio file to 128kbps opus |
 | GET | `?th=caf` | ...in the iOS-proprietary container |
 
-| method | body | result |
-|--|--|--|
-| jPOST | `{"q":"foo"}` | do a server-wide search; see the `[🔎]` search tab `raw` field for syntax |
+| method | params | body | result |
+|--|--|--|--|
+| jPOST | `?srch` | `{"n":42,"q":"foo"}` | do a server-wide search; see the `[🔎]` search tab `raw` field for syntax |
 
 | method | params | body | result |
 |--|--|--|--|
