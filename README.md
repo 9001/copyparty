@@ -144,6 +144,8 @@ made in Norway 🇳🇴
 
 ## quickstart
 
+### 1-Line Install (Instant Run)
+
 just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
 
 * or install through [pypi](https://pypi.org/project/copyparty/): `python3 -m pip install --user -U copyparty`
@@ -159,7 +161,60 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
   * docker has all deps built-in, so skip this step:
 
-enable thumbnails (images/audio/video), media indexing, and audio transcoding by installing some recommended deps:
+### Config-File Install (Recommended)
+
+ **1. Run Copyparty**
+ ```bash
+ curl -O https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py
+ python copyparty-sfx.py
+ ```
+ Or use the Windows binary:
+ ```plaintext
+ https://github.com/9001/copyparty/releases/latest/download/copyparty.exe
+ ```
+ Then open: http://127.0.0.1:3923
+
+ **2. Basic Usage**
+ By default, the current directory is shared with full read/write access.
+
+ **3. Use a Config File (Recommended)**
+ Create `config.conf`:
+ ```yaml
+ [accounts]
+   alice: secret123
+   bob: hunter2
+
+ [/]
+   ./shared
+   accs:
+     r: alice, bob
+     rw: alice
+
+ [/drop]
+   ./dropbox
+   accs:
+     w: bob
+ ```
+ Start with:
+ ```bash
+ python copyparty-sfx.py -c config.conf
+ ```
+
+ **4. Install Extras (Optional)**
+ 
+ See [Thumbnails Section](#thumbnails) for more
+ 
+ Ubuntu/Debian: `sudo apt install python3-pil ffmpeg`
+ 
+ Windows: `pip install --user Pillow` + add FFmpeg to PATH
+
+ **5. Expose Publicly (Optional)**
+ ```bash
+ cloudflared tunnel --url http://127.0.0.1:3923
+ ```
+
+### thumbnails
+Enable thumbnails (images/audio/video), media indexing, and audio transcoding by installing some recommended deps:
 
 * **Alpine:** `apk add py3-pillow ffmpeg`
 * **Debian:** `apt install --no-install-recommends python3-pil ffmpeg`
