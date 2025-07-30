@@ -329,7 +329,7 @@ var Ls = {
 		"mm_enet": "Your internet connection is wonky",
 		"mm_edec": "This file is supposedly corrupted??",
 		"mm_esupp": "Your browser does not understand this audio format",
-		"mm_eunk": "Unknown Errol",
+		"mm_eunk": "Unknown Error",
 		"mm_e404": "Could not play audio; error 404: File not found.",
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
 		"mm_e500": "Could not play audio; error 500: Check server logs.",
