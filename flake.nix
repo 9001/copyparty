@@ -11,7 +11,7 @@
       flake-utils,
     }:
     {
-      nixosModules.default = ./contrib/nixos/modules/copyparty.nix;
+      nixosModules.default = import ./contrib/nixos/modules/copyparty.nix { inherit self; };
       overlays.default = final: prev: rec {
         copyparty = final.python3.pkgs.callPackage ./contrib/package/nix/copyparty {
           ffmpeg = final.ffmpeg-full;

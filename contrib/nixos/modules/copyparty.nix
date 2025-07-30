@@ -1,3 +1,4 @@
+{ self }:
 {
   config,
   pkgs,
@@ -259,6 +260,9 @@ in
       command = "${getExe cfg.package} -c ${runtimeConfigPath}";
     in
     {
+      # add the copyparty overlay to expose the package to the module
+      nixpkgs.overlays = [ self.overlays.default ];
+
       systemd.services.copyparty = {
         description = "http file sharing hub";
         wantedBy = [ "multi-user.target" ];
