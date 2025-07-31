@@ -911,7 +911,7 @@ class HttpCli(object):
         if status == 304:
             self.out_headers.pop("Content-Length", None)
             self.out_headers.pop("Content-Type", None)
-            self.out_headerlist.clear()
+            self.out_headerlist[:] = []
             if self.k304():
                 self.keepalive = False
         else:
