@@ -3,12 +3,12 @@
 volumes:
   database:
     driver: local
-  redis:
+  valkey:
     driver: local
 
 services:
   copyparty:
-    image: copyparty/ac
+    image: copyparty/ac:latest
     container_name: idp_copyparty
     restart: unless-stopped
     user: "1000:1000"  # should match the user/group of your fileshare volumes
@@ -30,20 +30,46 @@ services:
       PYTHONUNBUFFERED: 1
       # ensures log-messages are not delayed (but can reduce speed a tiny bit)
 
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:3.2.3
+    container_name: idp_socket_proxy
+    restart: unless-stopped
+    environment:
+      - CONTAINERS=1
+      - NETWORKS=1
+      - EVENTS=1
+      - PING=1 
+      - VERSION=1
+      - LOG_LEVEL=warning
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /run:noexec,nosuid,size=10m
+    expose:
+      - 2375
+
   traefik:
-    image: traefik:v2.11
+    image: traefik:3.5
     container_name: traefik
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # WARNING: this gives traefik full root-access to the host OS, but is recommended/required(?) by traefik
-    security_opt:
-      - label:disable  # disable selinux because it (rightly) blocks access to docker.sock
+      - ./traefik:/etc/traefik:Z
     ports:
-      - 80:80
+      - "80:80"
+      - "443:443"
     command:
       - '--api'
-      - '--providers.docker=true'
+      - '--providers.docker.endpoint=tcp://socket-proxy:2375'
       - '--providers.docker.exposedByDefault=false'
       - '--entrypoints.web.address=:80'
+      - '--entrypoints.web.http.redirections.entrypoint.to=websecure'
+      - '--entrypoints.web.http.redirections.entrypoint.scheme=https'
+      - '--entrypoints.websecure.address=:443'
+      - '--log.level=WARNING'
+    depends_on:
+      - idp_socket_proxy
 
   postgresql:
     image: docker.io/library/postgres:12-alpine
@@ -64,19 +90,19 @@ services:
     env_file:
       - .env
 
-  redis:
-    image: docker.io/library/redis:alpine
+  valkey:
+    image: valkey/valkey:8.0-alpine
     command: --save 60 1 --loglevel warning
-    container_name: idp_redis
+    container_name: idp_valkey
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      test: ["CMD-SHELL", "valkey-cli ping | grep PONG"]
       start_period: 20s
       interval: 30s
       retries: 5
       timeout: 3s
     volumes:
-      - redis:/data:z
+      - valkey:/data:z
 
   authentik_server:
     image: ghcr.io/goauthentik/server:2024.2.1
