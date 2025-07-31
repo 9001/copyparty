@@ -6,7 +6,7 @@
 
 ## 🚀 Quick Start
 
-python3 -m copyparty -v
+python3 -m copyparty -v  # Starts the server in verbose mode, providing detailed logs.
 
 ---
 
