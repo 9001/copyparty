@@ -1,4 +1,4 @@
-version: "3.4"
+---
 
 volumes:
   database:
