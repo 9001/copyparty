@@ -6,7 +6,7 @@ networks:
 
 services:
   copyparty:
-    image: copyparty/ac:latest
+    image: copyparty/ac:1.18.8@sha256:19348cf85bf0df2f0b5b476162d73c72ef8bcbe0f12dd910d3cb05c0312641aa
     container_name: idp_copyparty
     user: "1000:1000"  # should match the user/group of your fileshare volumes
     volumes:
@@ -21,6 +21,7 @@ services:
       - 'traefik.http.routers.copyparty.rule=Host(`fs.example.com`)'
       - 'traefik.http.routers.copyparty.entrypoints=websecure'
       - 'traefik.http.routers.copyparty.tls=true'
+      - 'traefik.http.routers.copyparty.tls.certresolver=letsencrypt'  # ← THIS IS CRUCIAL
       - 'traefik.http.routers.copyparty.middlewares=authelia@docker'
     stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
     environment:
@@ -30,7 +31,7 @@ services:
       # ensures log-messages are not delayed (but can reduce speed a tiny bit)
 
   authelia:
-    image: authelia/authelia:v4.38.0-beta3  # the config files in the authelia folder use the new syntax
+    image: authelia/authelia:4.39.5@sha256:023e02e5203dfa0ebaee7a48b5bae34f393d1f9cada4a9df7fbf87eb1759c671
     container_name: idp_authelia
     volumes:
       - ./authelia:/config:z
@@ -41,20 +42,18 @@ services:
       - 'traefik.http.routers.authelia.rule=Host(`authelia.example.com`)'
       - 'traefik.http.routers.authelia.entrypoints=websecure'
       - 'traefik.http.routers.authelia.tls=true'
-      #- 'traefik.http.routers.authelia.tls.certresolver=letsencrypt'  # uncomment this to enable automatic certificate signing (1/2)
+      - 'traefik.http.routers.authelia.tls.certresolver=letsencrypt'
       - 'traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth?authelia_url=https://authelia.example.com'
       - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
       - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
     expose:
       - 9091
     restart: unless-stopped
-    healthcheck:
-      disable: true
     environment:
       - TZ=Etc/UTC
 
   valkey:
-    image: valkey/valkey:8.0-alpine
+    image: valkey/valkey:8.1.3-alpine3.22@sha256:0d27f0bca0249f61d060029a6aaf2e16b2c417d68d02a508e1dfb763fa2948b4
     container_name: idp_valkey
     volumes:
       - ./valkey:/data:z
@@ -65,16 +64,16 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Etc/UTC
+      - VALKEY_EXTRA_FLAGS=--requirepass your_secure_password_here
 
   socket-proxy:
-    image: lscr.io/linuxserver/socket-proxy:3.2.3
+    image: lscr.io/linuxserver/socket-proxy:3.2.3@sha256:63d2e0ce6bb0d12dfdbde5c3af31d08fee343ec3801a050c8197a3f5ffae8bed
     container_name: idp_socket_proxy
-    restart: unless-stopped
     environment:
       - CONTAINERS=1
       - NETWORKS=1
       - EVENTS=1
-      - PING=1 
+      - PING=1
       - VERSION=1
       - LOG_LEVEL=warning
     volumes:
@@ -83,14 +82,15 @@ services:
       - no-new-privileges:true
     read_only: true
     tmpfs:
-      - /run:noexec,nosuid,size=10m
+      - /run
     networks:
       - net
+    restart: unless-stopped
     expose:
       - 2375
 
   traefik:
-    image: traefik:3.5
+    image: traefik:3.5.0@sha256:4e7175cfe19be83c6b928cae49dde2f2788fb307189a4dc9550b67acf30c11a5
     container_name: idp_traefik
     volumes:
       - ./traefik:/etc/traefik:z
@@ -98,17 +98,12 @@ services:
       - net
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.api.rule=Host(`traefik.example.com`)'
-      - 'traefik.http.routers.api.entrypoints=https'
-      - 'traefik.http.routers.api.service=api@internal'
-      - 'traefik.http.routers.api.tls=true'
-      #- 'traefik.http.routers.api.tls.certresolver=letsencrypt'  # uncomment this to enable automatic certificate signing (2/2)
       - 'traefik.http.routers.api.middlewares=authelia@docker'
     ports:
       - '80:80'
       - '443:443'
     command:
-      - '--api'
+      - '--global.sendAnonymousUsage=false'
       - '--providers.docker.endpoint=tcp://socket-proxy:2375'
       - '--providers.docker.exposedByDefault=false'
       - '--entrypoints.web.address=:80'
@@ -117,8 +112,7 @@ services:
       - '--entrypoints.websecure.address=:443'
       - '--certificatesResolvers.letsencrypt.acme.email=your-email@your-domain.com'
       - '--certificatesResolvers.letsencrypt.acme.storage=/etc/traefik/acme.json'
-      - '--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=http'
-      
-      - '--log.level=WARNING'  # DEBUG
+      - '--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=web'
+      - '--log.level=INFO'
     depends_on:
-      - idp_socket_proxy
+      - socket-proxy
