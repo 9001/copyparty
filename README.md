@@ -1,3 +1,22 @@
+![Stars](https://img.shields.io/github/stars/9001/copyparty?style=flat-square)
+![Forks](https://img.shields.io/github/forks/9001/copyparty?style=flat-square)
+![License](https://img.shields.io/github/license/9001/copyparty?style=flat-square)
+
+---
+
+## 🚀 Quick Start
+
+python3 -m copyparty -v
+
+---
+
+## ✅ Features
+- 🔁 Resumable Uploads
+- 🔐 WebAuthn & Password Auth
+- 📦 Deduplication
+- 🧠 Media Indexer
+- 🖼️ Thumbnail Generator
+- 🔥 No dependencies
 <img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>
 
 ### 💾🎉 copyparty
