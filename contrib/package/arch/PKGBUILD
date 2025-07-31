@@ -1,6 +1,6 @@
-# Maintainer: Morgan Adamiec <morganamilo@archlinux.org>
-# Contributor: icxes <dev.null@need.moe>
-# NOTE: You probably don't want to use this PKGBUILD on Arch. Install copyparty using pacman instead.
+# Maintainer: icxes <dev.null@need.moe>
+# Contributor: Morgan Adamiec <morganamilo@archlinux.org>
+# NOTE: You generally shouldn't use this PKGBUILD on Arch, as it is mainly for testing purposes. Install copyparty using pacman instead.
 
 pkgname=copyparty
 pkgver="1.18.6"
