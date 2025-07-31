@@ -1,6 +1,6 @@
 # https://goauthentik.io/docs/providers/proxy/server_traefik
 ---
-
+version: "3.7"
 services:
   traefik:
     image: traefik:v2.2
