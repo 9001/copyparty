@@ -1,0 +1,32 @@
+# this will start `/usr/bin/copyparty-sfx.py`
+# and read config from `/etc/copyparty.d/*.conf`
+#
+# you probably want to:
+#   change "User=cpp" and "/home/cpp/" to another user
+#
+# unless you add -q to disable logging, you may want to remove the
+#   following line to allow buffering (slightly better performance):
+#   Environment=PYTHONUNBUFFERED=x
+
+[Unit]
+Description=copyparty file server
+
+[Service]
+Type=notify
+SyslogIdentifier=copyparty
+Environment=PYTHONUNBUFFERED=x
+WorkingDirectory=/var/lib/copyparty-jail
+ExecReload=/bin/kill -s USR1 $MAINPID
+
+# user to run as + where the TLS certificate is (if any)
+User=cpp
+Environment=XDG_CONFIG_HOME=/home/cpp/.config
+
+# stop systemd-tmpfiles-clean.timer from deleting copyparty while it's running
+ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
+
+# run copyparty
+ExecStart=/usr/bin/python3 /usr/bin/copyparty -c /etc/copyparty.d/init
+
+[Install]
+WantedBy=multi-user.target
