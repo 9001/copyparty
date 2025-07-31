@@ -29,11 +29,11 @@ session:
   secret: unsecure_session_secret
   cookies:
     - name: authelia_session
-      domain: example.com        # Root protected domain
+      domain: example.com  # Root protected domain
       default_redirection_url: https://fs.example.com
       authelia_url: https://authelia.example.com/
-      expiration: 3600           # 1 hour
-      inactivity: 300            # 5 minutes
+      expiration: 3600  # 1 hour
+      inactivity: 300  # 5 minutes
 
   redis:
     host: valkey
