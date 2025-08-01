@@ -22,7 +22,7 @@ let
   mkValueString =
     value:
     if isList value then
-      (concatStringsSep ", " (map mkValueString value))
+      (concatStringsSep "," (map mkValueString value))
     else if isAttrs value then
       "\n" + (mkAttrsString value)
     else

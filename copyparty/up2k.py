@@ -2827,7 +2827,7 @@ class Up2k(object):
         # v5a -> v5b
         # store rd+fn rather than warks to support nohash vols
         try:
-            cur.execute("select ws, rd, fn from iu limit 1").fetchone()
+            cur.execute("select c, w, rd, fn from iu limit 1").fetchone()
             return
         except:
             pass

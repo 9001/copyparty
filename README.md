@@ -152,6 +152,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or install [on arch](#arch-package) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
 * or if you are on android, [install copyparty in termux](#install-on-android)
 * or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
+* or if you have [uv](https://docs.astral.sh/uv/) installed, run `uv tool run copyparty`
 * or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
 * or if your OS is dead, give the [bootable flashdrive / cd-rom](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) a spin
 * or if you don't trust copyparty yet and want to isolate it a little, then...
