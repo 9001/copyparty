@@ -178,7 +178,7 @@ var Ls = {
 		"af1": "показать недавние загрузки",
 		"ag1": "показать известных IdP-пользователей",
 	},
-	"esp": {
+	"spa": {
 		"a1": "actualizar",
 		"b1": "hola &nbsp; <small>(no has iniciado sesión)</small>",
 		"c1": "cerrar sesión",
