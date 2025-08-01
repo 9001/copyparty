@@ -1,6 +1,4 @@
-# Maintainer: Morgan Adamiec <morganamilo@archlinux.org>
-# Contributor: icxes <dev.null@need.moe>
-# makedeb PKGBUILD script writer: Beethoven <beethovenisadog@protonmail.com>
+# Contributor: Beethoven <beethovenisadog@protonmail.com>
 
 
 pkgname=copyparty
