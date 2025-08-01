@@ -2699,6 +2699,10 @@ optionally also specify `--ah-cli` to enter an interactive mode where it will ha
 
 the default configs take about 0.4 sec and 256 MiB RAM to process a new password on a decent laptop
 
+when generating hashes using `--ah-cli` for docker or systemd services, make sure it is using the same `--ah-salt` by:
+* inspecting the generated salt using `--show-ah-salt` in copyparty service configuration
+* setting the same `--ah-salt` in both environments
+
 
 ## https
 
