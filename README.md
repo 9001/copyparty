@@ -2429,6 +2429,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
 | **sony psp** 5.50         | can browse, upload/mkdir/msg (thx dwarf) [screenshot](https://github.com/user-attachments/assets/9d21f020-1110-4652-abeb-6fc09c533d4f) |
 | **nintendo 3ds**          | can browse, upload, view thumbnails (thx bnjmn) |
+| **Nintendo Wii (Opera 9.0 "Internet Channel")**          | can browse, can't upload or download (no local storage), can view images - works best with `?b=u`, default view broken |
 
 <p align="center"><img src="https://github.com/user-attachments/assets/88deab3d-6cad-4017-8841-2f041472b853" /></p>
 
