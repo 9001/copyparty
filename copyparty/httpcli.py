@@ -107,6 +107,7 @@ from .util import (
     sendfile_py,
     set_fperms,
     stat_resource,
+    str_anchor,
     ub64dec,
     ub64enc,
     ujoin,
@@ -5369,9 +5370,9 @@ class HttpCli(object):
                 raise Pebkac(500, "sqlite3 not found on server; unpost is disabled")
             raise Pebkac(500, "server busy, cannot unpost; please retry in a bit")
 
-        zs = self.uparam.get("filter") or ""
-        filt = re.compile(zs, re.I) if zs else None
-        lm = "ups %r" % (zs,)
+        sfilt = self.uparam.get("filter") or ""
+        nfi, vfi = str_anchor(sfilt)
+        lm = "ups %d%r" % (nfi, sfilt)
 
         if self.args.shr and self.vpath.startswith(self.args.shr1):
             shr_dbv, shr_vrem = self.vn.get_dbv(self.rem)
@@ -5431,8 +5432,14 @@ class HttpCli(object):
             q = "select sz, rd, fn, at from up where ip=? and at>? order by at desc"
             for sz, rd, fn, at in cur.execute(q, (self.ip, lim)):
                 vp = "/" + "/".join(x for x in [vol.vpath, rd, fn] if x)
-                if filt and not filt.search(vp):
-                    continue
+                if nfi == 0 or (nfi == 1 and vfi in vp):
+                    pass
+                elif nfi == 2:
+                    if not vp.startswith(vfi):
+                        continue
+                elif nfi == 3:
+                    if not vp.endswith(vfi):
+                        continue
 
                 n -= 1
                 if not n:
@@ -5513,8 +5520,8 @@ class HttpCli(object):
             raise Pebkac(500, "server busy, cannot list recent uploads; please retry")
 
         sfilt = self.uparam.get("filter") or ""
-        filt = re.compile(sfilt, re.I) if sfilt else None
-        lm = "ru %r" % (sfilt,)
+        nfi, vfi = str_anchor(sfilt)
+        lm = "ru %d%r" % (nfi, sfilt)
         self.log(lm)
 
         ret: list[dict[str, Any]] = []
@@ -5549,8 +5556,14 @@ class HttpCli(object):
             q = "select sz, rd, fn, ip, at from up where at>0 order by at desc"
             for sz, rd, fn, ip, at in cur.execute(q):
                 vp = "/" + "/".join(x for x in [vol.vpath, rd, fn] if x)
-                if filt and not filt.search(vp):
-                    continue
+                if nfi == 0 or (nfi == 1 and vfi in vp):
+                    pass
+                elif nfi == 2:
+                    if not vp.startswith(vfi):
+                        continue
+                elif nfi == 3:
+                    if not vp.endswith(vfi):
+                        continue
 
                 if not dots and "/." in vp:
                     continue

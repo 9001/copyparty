@@ -2396,6 +2396,21 @@ def ujoin(rd: str, fn: str) -> str:
         return rd or fn
 
 
+def str_anchor(txt) -> tuple[int, str]:
+    if not txt:
+        return 0, ""
+    txt = txt.lower()
+    a = txt.startswith("^")
+    b = txt.endswith("$")
+    if not b:
+        if not a:
+            return 1, txt  # ~
+        return 2, txt[1:]  # ^
+    if not a:
+        return 3, txt[:-1]  # $
+    return 4, txt[1:-1]  # ^$
+
+
 def log_reloc(
     log: "NamedLogger",
     re: dict[str, str],

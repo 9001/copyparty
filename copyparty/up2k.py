@@ -402,7 +402,7 @@ class Up2k(object):
     def get_unfinished_by_user(self, uname, ip) -> dict[str, Any]:
         # returns dict due to ExceptionalQueue
         if PY2 or not self.reg_mutex.acquire(timeout=2):
-            return {"timeout":1}
+            return {"timeout": 1}
 
         ret: list[tuple[int, str, int, int, int]] = []
         userset = set([(uname or "\n"), "*"])
