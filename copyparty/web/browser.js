@@ -3074,7 +3074,7 @@ var Ls = {
 		"u_ewrite": 'sinulla ei ole move-oikeutta tähän kansioon',
 		"u_eread": 'sinulla ei ole read-oikeutta tähän kansioon',
 		"u_enoi": 'tiedostohaku ei ole käytössä palvelimen asetuksissa',
-		"u_enoow": "ylikirjoitus ei toimi täällä; tarvitaan "Delete"-oikeus",
+		"u_enoow": "ylikirjoitus ei toimi täällä; tarvitaan \"Delete\"-oikeus",
 		"u_badf": 'Nämä {0} tiedostoa ({1} yhteensä) ohitettiin, mahdollisesti tiedostojärjestelmän oikeuksien vuoksi:\n\n',
 		"u_blankf": 'Nämä {0} tiedostoa ({1} yhteensä) ovat tyhjiä; ladataanko ne silti?\n\n',
 		"u_applef": 'Nämä {0} tiedostoa ({1} yhteensä) ovat todennäköisesti ei-toivottuja;\nPaina <code>OK/Enter</code> OHITTAAKSESI seuraavat tiedostot,\nPaina <code>Cancel/ESC</code> jos ET halua sulkea pois, ja LATAA nekin:\n\n',
