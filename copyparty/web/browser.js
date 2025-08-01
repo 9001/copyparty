@@ -3145,9 +3145,9 @@ var Ls = {
 		"tt": "français",
 
 		"cols": {
-			"c": "buttons action",
+			"c": "boutons d'action",
 			"dur": "durée",
-			"q": "qualité / débit binaire",
+			"q": "qualité / débit",
 			"Ac": "codec audio",
 			"Vc": "codec vidéo",
 			"Fmt": "format / conteneur",
@@ -3155,13 +3155,13 @@ var Ls = {
 			"Vhash": "somme de contrôle vidéo",
 			"Res": "résolution",
 			"T": "type de fichier",
-			"aq": "qualité audio / débit binaire",
-			"vq": "qualité vidéo / débit binaire",
+			"aq": "qualité audio / débit",
+			"vq": "qualité vidéo / débit",
 			"pixfmt": "sous-échantillonnage / structure de pixels",
 			"resw": "résolution horizontale",
 			"resh": "résolution verticale",
 			"chs": "canaux audio",
-			"hz": "fréquence des tests"
+			"hz": "fréquence d’échantillonnage"
 		},
 
 		"hks": [
@@ -3170,9 +3170,9 @@ var Ls = {
 				["ESC", "fermer diverses choses"],
 
 				"file-manager",
-				["G", "liste à bascule / vue en grille"],
+				["G", "basculer entre l'affichage en liste/grille"],
 				["T", "imagette à bascule / icônes"],
-				["⇧ A/D", "format croquis"],
+				["⇧ A/D", "format de la vignette"],
 				["ctrl-K", "supprimer la sélection"],
 				["ctrl-X", "couper sélection dans le presse-papiers"],
 				["ctrl-C", "copier sélection dans le presse-papiers"],
@@ -3195,10 +3195,10 @@ var Ls = {
 				["A/D", "volet de navigation taille"],
 			], [
 				"audio-player",
-				["J/L", "prev/next song"],
-				["U/O", "skip 10sec back/fwd"],
-				["0..9", "jump to 0%..90%"],
-				["P", "play/pause (also initiates)"],
+				["J/L", "dernier/prochain chanson"],
+				["U/O", "passer 10sec dernier/prochain"],
+				["0..9", "sauter au 0%..90%"],
+				["P", "jouer/pause (aussi initier)"],
 				["S", "select playing song"],
 				["Y", "download song"],
 			], [
