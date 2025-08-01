@@ -3171,7 +3171,7 @@ var Ls = {
 
 				"file-manager",
 				["G", "basculer entre l'affichage en liste/grille"],
-				["T", "imagette à bascule / icônes"],
+				["T", "basculer la vignette / icônes"],
 				["⇧ A/D", "format de la vignette"],
 				["ctrl-K", "supprimer la sélection"],
 				["ctrl-X", "couper sélection dans le presse-papiers"],
