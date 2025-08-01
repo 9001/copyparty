@@ -2735,6 +2735,7 @@ var Ls = {
 		"ct_qdel": 'tiedostoja poistaessa, kysy vahvistusta vain kerran">qdel',
 		"ct_dir1st": 'lajittele hakemistot ennen tiedostoja">📁 ensin',
 		"ct_nsort": 'luonnollinen lajittelu (tiedostonimille jotka ovat numeroalkuisia)">nsort',
+		"ct_utc": 'näytä kaikki aikaleimat UTC-ajassa">UTC',
 		"ct_readme": 'näytä README.md hakemistolistauksissa">📜 readme',
 		"ct_idxh": 'näytä index.html hakemistolistan sijasta">htm',
 		"ct_sbars": 'näytä vierityspalkit">⟊',
