@@ -907,8 +907,26 @@ function noq_href(el) {
 }
 
 
+function pad2(v) {
+    return ('0' + v).slice(-2);
+}
+
+
 function unix2iso(ts) {
     return new Date(ts * 1000).toISOString().replace("T", " ").slice(0, -5);
+}
+
+
+function unix2iso_localtime(ts) {
+    var o = new Date(ts * 1000),
+        p = pad2;
+    return "{0}-{1}-{2} {3}:{4}:{5}".format(
+        o.getFullYear(),
+        p(o.getMonth() + 1),
+        p(o.getDate()),
+        p(o.getHours()),
+        p(o.getMinutes()),
+        p(o.getSeconds()));
 }
 
 
@@ -1201,6 +1219,13 @@ function scfg_bind(obj, oname, cname, defval, cb) {
 
     return v;
 }
+
+
+window.unix2ui = (function () {
+    var v = sread('utctid');
+    v = v ? (v === '0') : (window.dutc === false);
+    return v ? unix2iso_localtime : unix2iso;
+})();
 
 
 function hist_push(url) {

@@ -1026,6 +1026,8 @@ class SvcHub(object):
         except:
             raise Exception("invalid --mv-retry [%s]" % (self.args.mv_retry,))
 
+        al.js_utc = "false" if al.localtime else "true"
+
         al.tcolor = al.tcolor.lstrip("#")
         if len(al.tcolor) == 3:  # fc5 => ffcc55
             al.tcolor = "".join([x * 2 for x in al.tcolor])

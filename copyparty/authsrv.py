@@ -2775,6 +2775,7 @@ class AuthSrv(object):
                 "dth3x": vf["th3x"],
                 "dvol": self.args.au_vol,
                 "idxh": int(self.args.ih),
+                "dutc": not self.args.localtime,
                 "themes": self.args.themes,
                 "turbolvl": self.args.turbo,
                 "nosubtle": self.args.nosubtle,

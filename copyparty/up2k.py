@@ -399,12 +399,14 @@ class Up2k(object):
 
         return "{}"
 
-    def get_unfinished_by_user(self, uname, ip) -> str:
+    def get_unfinished_by_user(self, uname, ip) -> dict[str, Any]:
+        # returns dict due to ExceptionalQueue
         if PY2 or not self.reg_mutex.acquire(timeout=2):
-            return '[{"timeout":1}]'
+            return {"timeout":1}
 
         ret: list[tuple[int, str, int, int, int]] = []
         userset = set([(uname or "\n"), "*"])
+        n = 1000
         try:
             for ptop, tab2 in self.registry.items():
                 cfg = self.flags.get(ptop, {}).get("u2abort", 1)
@@ -419,7 +421,6 @@ class Up2k(object):
                         or (addr and addr != job["addr"])
                     ):
                         continue
-
                     zt5 = (
                         int(job["t0"]),
                         djoin(job["vtop"], job["prel"], job["name"]),
@@ -428,6 +429,9 @@ class Up2k(object):
                         len(job["hash"]),
                     )
                     ret.append(zt5)
+                    n -= 1
+                    if not n:
+                        break
         finally:
             self.reg_mutex.release()
 
@@ -444,7 +448,7 @@ class Up2k(object):
             }
             for (at, vp, sz, nn, nh) in ret
         ]
-        return json.dumps(ret2, separators=(",\n", ": "))
+        return {"f": ret2}
 
     def get_unfinished(self) -> str:
         if PY2 or not self.reg_mutex.acquire(timeout=0.5):

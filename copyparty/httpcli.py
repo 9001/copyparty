@@ -3109,6 +3109,20 @@ class HttpCli(object):
                 if "fperms" in vfs.flags:
                     set_fperms(f, vfs.flags)
 
+            dbv, vrem = vfs.get_dbv(rem)
+            self.conn.hsrv.broker.say(
+                "up2k.hash_file",
+                dbv.realpath,
+                dbv.vpath,
+                dbv.flags,
+                vrem,
+                sanitized,
+                self.ip,
+                bos.stat(fn).st_mtime,
+                self.uname,
+                True,
+            )
+
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         self.redirect(vpath, "?edit")
         return True
@@ -5363,6 +5377,7 @@ class HttpCli(object):
         else:
             shr_dbv = None
 
+        wret: dict[str, Any] = {}
         ret: list[dict[str, Any]] = []
         t0 = time.time()
         lim = time.time() - self.args.unpost
@@ -5384,7 +5399,13 @@ class HttpCli(object):
         x = self.conn.hsrv.broker.ask(
             "up2k.get_unfinished_by_user", self.uname, "" if bad_xff else self.ip
         )
-        uret = x.get()
+        zdsa: dict[str, Any] = x.get()
+        uret: list[dict[str, Any]] = []
+        if "timeout" in zdsa:
+            wret["nou"] = 1
+        else:
+            uret = zdsa["f"]
+        nu = len(uret)
 
         if not self.args.unpost:
             allvols = []
@@ -5430,6 +5451,8 @@ class HttpCli(object):
 
         if len(ret) > 2000:
             ret = ret[:2000]
+        if len(ret) >= 2000:
+            wret["oc"] = 1
 
         for rv in ret:
             rv["vp"] = quotep(rv["vp"])
@@ -5449,6 +5472,13 @@ class HttpCli(object):
             )
             rv["vp"] += "?k=" + fk[:nfk]
 
+        if not allvols:
+            wret["noc"] = 1
+            ret = []
+
+        nc = len(ret)
+        ret = uret + ret
+
         if shr_dbv:
             # translate vpaths from share-target to share-url
             # to satisfy access checks
@@ -5463,12 +5493,11 @@ class HttpCli(object):
             for v in ret:
                 v["vp"] = self.args.SR + v["vp"]
 
-        if not allvols:
-            ret = [{"kinshi": 1}]
-
-        jtxt = '{"u":%s,"c":%s}' % (uret, json.dumps(ret, separators=(",\n", ": ")))
-        zi = len(uret.split('\n"pd":')) - 1
-        self.log("%s #%d+%d %.2fsec" % (lm, zi, len(ret), time.time() - t0))
+        wret["f"] = ret
+        wret["nu"] = nu
+        wret["nc"] = nc
+        jtxt = json.dumps(wret, separators=(",\n", ": "))
+        self.log("%s #%d+%d %.2fsec" % (lm, nu, nc, time.time() - t0))
         self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
         return True
 

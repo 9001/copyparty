@@ -10,7 +10,7 @@ function render() {
             fn = esc(uricom_dec(vsp[1])),
             at = f.at,
             td = now - f.at,
-            ts = !at ? '(?)' : unix2iso(at),
+            ts = !at ? '(?)' : unix2ui(at),
             sa = !at ? '(?)' : td > 60 ? shumantime(td) : (td + 's'),
             sz = ('' + f.sz).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
