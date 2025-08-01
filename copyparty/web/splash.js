@@ -94,6 +94,7 @@ var Ls = {
 		"af1": "显示最近上传的文件", //m
 		"ag1": "查看已知 IdP 用户", //m
 	},
+	
 	"deu": {
 		"a1": "Neu laden",
 		"b1": "Tach, wie geht's? &nbsp; <small>(Du bist nicht angemeldet)</small>",
@@ -135,6 +136,7 @@ var Ls = {
 		"ae1": "Aktive Downloads:",
 		"af1": "Zeige neue Uploads",
 	},
+
 	"spa": {
 		"a1": "actualizar",
 		"b1": "hola &nbsp; <small>(no has iniciado sesión)</small>",
