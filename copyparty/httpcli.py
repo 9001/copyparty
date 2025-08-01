@@ -2940,7 +2940,7 @@ class HttpCli(object):
                 msg = "new password OK"
 
         redir = (self.args.SRS + "?h") if ok else ""
-        h2 = '<a href="' + self.args.SRS + '?h">Back</a>'
+        h2 = '<a href="' + self.args.SRS + '?h">Acknowledge</a>'
         html = self.j2s("msg", h1=msg, h2=h2, redir=redir)
         self.reply(html.encode("utf-8"))
         return True
@@ -2969,7 +2969,7 @@ class HttpCli(object):
             dst += "_=1#" + html_escape(uhash, True, True)
 
         _, msg = self.get_pwd_cookie(pwd)
-        html = self.j2s("msg", h1=msg, h2='<a href="' + dst + '">Back</a>', redir=dst)
+        html = self.j2s("msg", h1=msg, h2='<a href="' + dst + '">Acknowledge</a>', redir=dst)
         self.reply(html.encode("utf-8"))
         return True
 
@@ -2983,7 +2983,7 @@ class HttpCli(object):
         self.get_pwd_cookie("x")
 
         dst = self.args.SRS + "?h"
-        h2 = '<a href="' + dst + '">Back</a>'
+        h2 = '<a href="' + dst + '">Acknowledge</a>'
         html = self.j2s("msg", h1="ok bye", h2=h2, redir=dst)
         self.reply(html.encode("utf-8"))
         return True
