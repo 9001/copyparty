@@ -3172,27 +3172,27 @@ var Ls = {
 				"file-manager",
 				["G", "liste à bascule / vue en grille"],
 				["T", "imagette à bascule / icônes"],
-				["⇧ A/D", "thumbnail size"],
-				["ctrl-K", "delete selected"],
-				["ctrl-X", "cut selection to clipboard"],
-				["ctrl-C", "copy selection to clipboard"],
-				["ctrl-V", "paste (move/copy) here"],
-				["Y", "download selected"],
-				["F2", "rename selected"],
+				["⇧ A/D", "format croquis"],
+				["ctrl-K", "supprimer la sélection"],
+				["ctrl-X", "couper sélection dans le presse-papiers"],
+				["ctrl-C", "copier sélection dans le presse-papiers"],
+				["ctrl-V", "coller (déplacer/copier) ici"],
+				["Y", "télécharger la sélection"],
+				["F2", "renommer la sélection"],
 
 				"file-list-sel",
-				["space", "toggle file selection"],
-				["↑/↓", "move selection cursor"],
-				["ctrl ↑/↓", "move cursor and viewport"],
-				["⇧ ↑/↓", "select prev/next file"],
-				["ctrl-A", "select all files / folders"],
+				["space", "sélection fichier à bascule"],
+				["↑/↓", "se déplacer le curseur sélection"],
+				["ctrl ↑/↓", "se déplacer le curseur et la fenêtre d'affichage"],
+				["⇧ ↑/↓", "choisir dernier/prochain fichier"],
+				["ctrl-A", "sélection tout fichiers / dossiers"],
 			], [
 				"navigation",
-				["B", "toggle breadcrumbs / navpane"],
-				["I/K", "prev/next folder"],
-				["M", "parent folder (or unexpand current)"],
-				["V", "toggle folders / textfiles in navpane"],
-				["A/D", "navpane size"],
+				["B", "bascule le fil d'ariane / volet de navigation"],
+				["I/K", "dernier/prochain fichier"],
+				["M", "dossier parent (ou actuel non extensible)"],
+				["V", "basculer le dossier / fichiers texte dans le volet de navigation"],
+				["A/D", "volet de navigation taille"],
 			], [
 				"audio-player",
 				["J/L", "prev/next song"],
@@ -5650,7 +5650,7 @@ var Ls = {
 	},
 };
 
-var LANGS = ["eng", "nor", "chi", "deu", "fin", "rus", "spa", "ukr"];
+var LANGS = ["eng", "nor", "chi", "deu", "fin", "fra", "rus", "spa", "ukr"];
 
 if (window.langmod)
 	langmod();
