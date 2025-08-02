@@ -205,6 +205,7 @@ you may also want these, especially on servers:
 
 * [contrib/systemd/copyparty.service](contrib/systemd/copyparty.service) to run copyparty as a systemd service (see guide inside)
 * [contrib/systemd/prisonparty.service](contrib/systemd/prisonparty.service) to run it in a chroot (for extra security)
+* [contrib/podman-systemd/copyparty.container](contrib/podman-systemd/copyparty.container) to run copyparty in a Podman container as a systemd service (see guide inside)
 * [contrib/openrc/copyparty](contrib/openrc/copyparty) to run copyparty on Alpine / Gentoo
 * [contrib/rc/copyparty](contrib/rc/copyparty) to run copyparty on FreeBSD
 * [nixos module](#nixos-module) to run copyparty on NixOS hosts
