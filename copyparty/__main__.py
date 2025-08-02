@@ -1109,7 +1109,7 @@ def add_tls(ap, cert_path):
     ap2 = ap.add_argument_group('SSL/TLS options')
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls -- force plaintext")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext -- force tls")
-    ap2.add_argument("--cert", metavar="PATH", type=u, default=cert_path, help="path to concatenation of TLS key and certificate chain")
+    ap2.add_argument("--cert", metavar="PATH", type=u, default=cert_path, help="path to file containing a concatenation of TLS key and certificate chain")
     ap2.add_argument("--ssl-ver", metavar="LIST", type=u, default="", help="set allowed ssl/tls versions; [\033[32mhelp\033[0m] shows available versions; default is what your python version considers safe")
     ap2.add_argument("--ciphers", metavar="LIST", type=u, default="", help="set allowed ssl/tls ciphers; [\033[32mhelp\033[0m] shows available ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
