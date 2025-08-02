@@ -31,6 +31,7 @@ from .util import (
     relchk,
     runhook,
     sanitize_fn,
+    set_fperms,
     vjoin,
     wunlink,
 )
@@ -262,8 +263,8 @@ class FtpFs(AbstractedFS):
             wunlink(self.log, ap, VF_CAREFUL)
 
         ret = open(fsenc(ap), mode, self.args.iobuf)
-        if w and "chmod_f" in vfs.flags:
-            os.fchmod(ret.fileno(), vfs.flags["chmod_f"])
+        if w and "fperms" in vfs.flags:
+            set_fperms(ret, vfs.flags)
 
         return ret
 
@@ -297,8 +298,7 @@ class FtpFs(AbstractedFS):
 
     def mkdir(self, path: str) -> None:
         ap, vfs, _ = self.rv2a(path, w=True)
-        chmod = vfs.flags["chmod_d"]
-        bos.makedirs(ap, chmod)  # filezilla expects this
+        bos.makedirs(ap, vf=vfs.flags)  # filezilla expects this
 
     def listdir(self, path: str) -> list[str]:
         vpath = join(self.cwd, path)

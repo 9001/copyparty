@@ -33,7 +33,7 @@ except:
 
 from .__init__ import ANYWIN, PY2, RES, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
-from .authsrv import VFS  # typechk
+from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
 from .star import StreamTar
 from .stolen.qrcodegen import QrCode, qr2svg
@@ -79,8 +79,10 @@ from .util import (
     hidedir,
     html_bescape,
     html_escape,
+    html_sh_esc,
     humansize,
     ipnorm,
+    json_hesc,
     justcopy,
     load_resource,
     loadpy,
@@ -103,7 +105,9 @@ from .util import (
     sanitize_vpath,
     sendfile_kern,
     sendfile_py,
+    set_fperms,
     stat_resource,
+    str_anchor,
     ub64dec,
     ub64enc,
     ujoin,
@@ -622,6 +626,9 @@ class HttpCli(object):
                 ) or self.args.idp_h_key in self.headers
 
                 if trusted_key and trusted_xff:
+                    if idp_usr.lower() == LEELOO_DALLAS:
+                        self.loud_reply("send her back", status=403)
+                        return False
                     self.asrv.idp_checkin(self.conn.hsrv.broker, idp_usr, idp_grp)
                 else:
                     if not trusted_key:
@@ -905,7 +912,7 @@ class HttpCli(object):
         if status == 304:
             self.out_headers.pop("Content-Length", None)
             self.out_headers.pop("Content-Type", None)
-            self.out_headerlist.clear()
+            self.out_headerlist[:] = []
             if self.k304():
                 self.keepalive = False
         else:
@@ -1110,15 +1117,18 @@ class HttpCli(object):
             else:
                 return True
 
+        host = self.host.lower()
+        if host.startswith("["):
+            if "]:" in host:
+                host = host.split("]:")[0] + "]"
+        else:
+            host = host.split(":")[0]
+
         oh = self.out_headers
         origin = origin.lower()
-        good_origins = self.args.acao + [
-            "%s://%s"
-            % (
-                "https" if self.is_https else "http",
-                self.host.lower().split(":")[0],
-            )
-        ]
+        proto = "https" if self.is_https else "http"
+        good_origins = self.args.acao + ["%s://%s" % (proto, host)]
+
         if "pw" in ih or re.sub(r"(:[0-9]{1,5})?/?$", "", origin) in good_origins:
             good_origin = True
             bad_hdrs = ("",)
@@ -2083,7 +2093,7 @@ class HttpCli(object):
             fdir, fn = os.path.split(fdir)
             rem, _ = vsplit(rem)
 
-        bos.makedirs(fdir, vfs.flags["chmod_d"])
+        bos.makedirs(fdir, vf=vfs.flags)
 
         open_ka: dict[str, Any] = {"fun": open}
         open_a = ["wb", self.args.iobuf]
@@ -2141,9 +2151,7 @@ class HttpCli(object):
         if nameless:
             fn = vfs.flags["put_name2"].format(now=time.time(), cip=self.dip())
 
-        params = {"suffix": suffix, "fdir": fdir}
-        if "chmod_f" in vfs.flags:
-            params["chmod"] = vfs.flags["chmod_f"]
+        params = {"suffix": suffix, "fdir": fdir, "vf": vfs.flags}
         if self.args.nw:
             params = {}
             fn = os.devnull
@@ -2192,7 +2200,7 @@ class HttpCli(object):
                     if self.args.nw:
                         fn = os.devnull
                     else:
-                        bos.makedirs(fdir, vfs.flags["chmod_d"])
+                        bos.makedirs(fdir, vf=vfs.flags)
                         path = os.path.join(fdir, fn)
                         if not nameless:
                             self.vpath = vjoin(self.vpath, fn)
@@ -2324,7 +2332,7 @@ class HttpCli(object):
                     if self.args.hook_v:
                         log_reloc(self.log, hr["reloc"], x, path, vp, fn, vfs, rem)
                     fdir, self.vpath, fn, (vfs, rem) = x
-                    bos.makedirs(fdir, vfs.flags["chmod_d"])
+                    bos.makedirs(fdir, vf=vfs.flags)
                     path2 = os.path.join(fdir, fn)
                     atomic_move(self.log, path, path2, vfs.flags)
                     path = path2
@@ -2610,7 +2618,7 @@ class HttpCli(object):
             dst = vfs.canonical(rem)
             try:
                 if not bos.path.isdir(dst):
-                    bos.makedirs(dst, vfs.flags["chmod_d"])
+                    bos.makedirs(dst, vf=vfs.flags)
             except OSError as ex:
                 self.log("makedirs failed %r" % (dst,))
                 if not bos.path.isdir(dst):
@@ -2933,7 +2941,7 @@ class HttpCli(object):
                 msg = "new password OK"
 
         redir = (self.args.SRS + "?h") if ok else ""
-        h2 = '<a href="' + self.args.SRS + '?h">ack</a>'
+        h2 = '<a href="' + self.args.SRS + '?h">continue</a>'
         html = self.j2s("msg", h1=msg, h2=h2, redir=redir)
         self.reply(html.encode("utf-8"))
         return True
@@ -2962,7 +2970,8 @@ class HttpCli(object):
             dst += "_=1#" + html_escape(uhash, True, True)
 
         _, msg = self.get_pwd_cookie(pwd)
-        html = self.j2s("msg", h1=msg, h2='<a href="' + dst + '">ack</a>', redir=dst)
+        h2 = '<a href="' + dst + '">continue</a>'
+        html = self.j2s("msg", h1=msg, h2=h2, redir=dst)
         self.reply(html.encode("utf-8"))
         return True
 
@@ -2976,7 +2985,7 @@ class HttpCli(object):
         self.get_pwd_cookie("x")
 
         dst = self.args.SRS + "?h"
-        h2 = '<a href="' + dst + '">ack</a>'
+        h2 = '<a href="' + dst + '">continue</a>'
         html = self.j2s("msg", h1="ok bye", h2=h2, redir=dst)
         self.reply(html.encode("utf-8"))
         return True
@@ -3057,7 +3066,7 @@ class HttpCli(object):
                 raise Pebkac(405, 'folder "/%s" already exists' % (vpath,))
 
             try:
-                bos.makedirs(fn, vfs.flags["chmod_d"])
+                bos.makedirs(fn, vf=vfs.flags)
             except OSError as ex:
                 if ex.errno == errno.EACCES:
                     raise Pebkac(500, "the server OS denied write-access")
@@ -3099,8 +3108,22 @@ class HttpCli(object):
 
             with open(fsenc(fn), "wb") as f:
                 f.write(b"`GRUNNUR`\n")
-                if "chmod_f" in vfs.flags:
-                    os.fchmod(f.fileno(), vfs.flags["chmod_f"])
+                if "fperms" in vfs.flags:
+                    set_fperms(f, vfs.flags)
+
+            dbv, vrem = vfs.get_dbv(rem)
+            self.conn.hsrv.broker.say(
+                "up2k.hash_file",
+                dbv.realpath,
+                dbv.vpath,
+                dbv.flags,
+                vrem,
+                sanitized,
+                self.ip,
+                bos.stat(fn).st_mtime,
+                self.uname,
+                True,
+            )
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         self.redirect(vpath, "?edit")
@@ -3174,7 +3197,7 @@ class HttpCli(object):
             )
             upload_vpath = "{}/{}".format(vfs.vpath, rem).strip("/")
             if not nullwrite:
-                bos.makedirs(fdir_base, vfs.flags["chmod_d"])
+                bos.makedirs(fdir_base, vf=vfs.flags)
 
         rnd, lifetime, xbu, xau = self.upload_flags(vfs)
         zs = self.uparam.get("want") or self.headers.get("accept") or ""
@@ -3207,7 +3230,7 @@ class HttpCli(object):
                     if rnd:
                         fname = rand_name(fdir, fname, rnd)
 
-                    open_args = {"fdir": fdir, "suffix": suffix}
+                    open_args = {"fdir": fdir, "suffix": suffix, "vf": vfs.flags}
 
                     if "replace" in self.uparam:
                         if not self.can_delete:
@@ -3269,11 +3292,8 @@ class HttpCli(object):
                             else:
                                 open_args["fdir"] = fdir
 
-                if "chmod_f" in vfs.flags:
-                    open_args["chmod"] = vfs.flags["chmod_f"]
-
                 if p_file and not nullwrite:
-                    bos.makedirs(fdir, vfs.flags["chmod_d"])
+                    bos.makedirs(fdir, vf=vfs.flags)
 
                     # reserve destination filename
                     f, fname = ren_open(fname, "wb", fdir=fdir, suffix=suffix)
@@ -3377,7 +3397,7 @@ class HttpCli(object):
                                 if nullwrite:
                                     fdir = ap2 = ""
                                 else:
-                                    bos.makedirs(fdir, vfs.flags["chmod_d"])
+                                    bos.makedirs(fdir, vf=vfs.flags)
                                     atomic_move(self.log, abspath, ap2, vfs.flags)
                                 abspath = ap2
                         sz = bos.path.getsize(abspath)
@@ -3498,8 +3518,8 @@ class HttpCli(object):
                     ft = "{}:{}".format(self.ip, self.addr[1])
                     ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
                     f.write(ft.encode("utf-8"))
-                    if "chmod_f" in vfs.flags:
-                        os.fchmod(f.fileno(), vfs.flags["chmod_f"])
+                    if "fperms" in vfs.flags:
+                        set_fperms(f, vfs.flags)
             except Exception as ex:
                 suf = "\nfailed to write the upload report: {}".format(ex)
 
@@ -3550,7 +3570,7 @@ class HttpCli(object):
         lim = vfs.get_dbv(rem)[0].lim
         if lim:
             fp, rp = lim.all(self.ip, rp, clen, vfs.realpath, fp, self.conn.hsrv.broker)
-            bos.makedirs(fp, vfs.flags["chmod_d"])
+            bos.makedirs(fp, vf=vfs.flags)
 
         fp = os.path.join(fp, fn)
         rem = "{}/{}".format(rp, fn).strip("/")
@@ -3618,15 +3638,17 @@ class HttpCli(object):
                 zs = ub64enc(zb).decode("ascii")[:24].lower()
                 dp = "%s/md/%s/%s/%s" % (dbv.histpath, zs[:2], zs[2:4], zs)
                 self.log("moving old version to %s/%s" % (dp, mfile2))
-                if bos.makedirs(dp, vfs.flags["chmod_d"]):
+                if bos.makedirs(dp, vf=vfs.flags):
                     with open(os.path.join(dp, "dir.txt"), "wb") as f:
                         f.write(afsenc(vrd))
-                        if "chmod_f" in vfs.flags:
-                            os.fchmod(f.fileno(), vfs.flags["chmod_f"])
+                        if "fperms" in vfs.flags:
+                            set_fperms(f, vfs.flags)
             elif hist_cfg == "s":
                 dp = os.path.join(mdir, ".hist")
                 try:
                     bos.mkdir(dp, vfs.flags["chmod_d"])
+                    if "chown" in vfs.flags:
+                        bos.chown(dp, vfs.flags["uid"], vfs.flags["gid"])
                     hidedir(dp)
                 except:
                     pass
@@ -3665,8 +3687,8 @@ class HttpCli(object):
             wunlink(self.log, fp, vfs.flags)
 
         with open(fsenc(fp), "wb", self.args.iobuf) as f:
-            if "chmod_f" in vfs.flags:
-                os.fchmod(f.fileno(), vfs.flags["chmod_f"])
+            if "fperms" in vfs.flags:
+                set_fperms(f, vfs.flags)
             sz, sha512, _ = hashcopy(p_data, f, None, 0, self.args.s_wr_slp)
 
         if lim:
@@ -4907,11 +4929,8 @@ class HttpCli(object):
         else:
             rip = host
 
-        # safer than html_escape/quotep since this avoids both XSS and shell-stuff
-        pw = re.sub(r"[<>&$?`\"']", "_", self.pw or "hunter2")
-        vp = re.sub(r"[<>&$?`\"']", "_", self.uparam["hc"] or "").lstrip("/")
-        pw = pw.replace(" ", "%20")
-        vp = vp.replace(" ", "%20")
+        vp = (self.uparam["hc"] or "").lstrip("/")
+        pw = self.pw or "hunter2"
         if pw in self.asrv.sesa:
             pw = "hunter2"
 
@@ -4920,14 +4939,14 @@ class HttpCli(object):
             args=self.args,
             accs=bool(self.asrv.acct),
             s="s" if self.is_https else "",
-            rip=rip,
-            ep=ep,
-            vp=vp,
-            rvp=vjoin(self.args.R, vp),
-            host=host,
-            hport=hport,
+            rip=html_sh_esc(rip),
+            ep=html_sh_esc(ep),
+            vp=html_sh_esc(vp),
+            rvp=html_sh_esc(vjoin(self.args.R, vp)),
+            host=html_sh_esc(host),
+            hport=html_sh_esc(hport),
             aname=aname,
-            pw=pw,
+            pw=html_sh_esc(pw),
         )
         self.reply(html.encode("utf-8"))
         return True
@@ -5351,15 +5370,16 @@ class HttpCli(object):
                 raise Pebkac(500, "sqlite3 not found on server; unpost is disabled")
             raise Pebkac(500, "server busy, cannot unpost; please retry in a bit")
 
-        zs = self.uparam.get("filter") or ""
-        filt = re.compile(zs, re.I) if zs else None
-        lm = "ups %r" % (zs,)
+        sfilt = self.uparam.get("filter") or ""
+        nfi, vfi = str_anchor(sfilt)
+        lm = "ups %d%r" % (nfi, sfilt)
 
         if self.args.shr and self.vpath.startswith(self.args.shr1):
             shr_dbv, shr_vrem = self.vn.get_dbv(self.rem)
         else:
             shr_dbv = None
 
+        wret: dict[str, Any] = {}
         ret: list[dict[str, Any]] = []
         t0 = time.time()
         lim = time.time() - self.args.unpost
@@ -5381,7 +5401,13 @@ class HttpCli(object):
         x = self.conn.hsrv.broker.ask(
             "up2k.get_unfinished_by_user", self.uname, "" if bad_xff else self.ip
         )
-        uret = x.get()
+        zdsa: dict[str, Any] = x.get()
+        uret: list[dict[str, Any]] = []
+        if "timeout" in zdsa:
+            wret["nou"] = 1
+        else:
+            uret = zdsa["f"]
+        nu = len(uret)
 
         if not self.args.unpost:
             allvols = []
@@ -5406,8 +5432,14 @@ class HttpCli(object):
             q = "select sz, rd, fn, at from up where ip=? and at>? order by at desc"
             for sz, rd, fn, at in cur.execute(q, (self.ip, lim)):
                 vp = "/" + "/".join(x for x in [vol.vpath, rd, fn] if x)
-                if filt and not filt.search(vp):
-                    continue
+                if nfi == 0 or (nfi == 1 and vfi in vp):
+                    pass
+                elif nfi == 2:
+                    if not vp.startswith(vfi):
+                        continue
+                elif nfi == 3:
+                    if not vp.endswith(vfi):
+                        continue
 
                 n -= 1
                 if not n:
@@ -5427,6 +5459,8 @@ class HttpCli(object):
 
         if len(ret) > 2000:
             ret = ret[:2000]
+        if len(ret) >= 2000:
+            wret["oc"] = 1
 
         for rv in ret:
             rv["vp"] = quotep(rv["vp"])
@@ -5446,6 +5480,13 @@ class HttpCli(object):
             )
             rv["vp"] += "?k=" + fk[:nfk]
 
+        if not allvols:
+            wret["noc"] = 1
+            ret = []
+
+        nc = len(ret)
+        ret = uret + ret
+
         if shr_dbv:
             # translate vpaths from share-target to share-url
             # to satisfy access checks
@@ -5460,12 +5501,11 @@ class HttpCli(object):
             for v in ret:
                 v["vp"] = self.args.SR + v["vp"]
 
-        if not allvols:
-            ret = [{"kinshi": 1}]
-
-        jtxt = '{"u":%s,"c":%s}' % (uret, json.dumps(ret, separators=(",\n", ": ")))
-        zi = len(uret.split('\n"pd":')) - 1
-        self.log("%s #%d+%d %.2fsec" % (lm, zi, len(ret), time.time() - t0))
+        wret["f"] = ret
+        wret["nu"] = nu
+        wret["nc"] = nc
+        jtxt = json.dumps(wret, separators=(",\n", ": "))
+        self.log("%s #%d+%d %.2fsec" % (lm, nu, nc, time.time() - t0))
         self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
         return True
 
@@ -5480,8 +5520,8 @@ class HttpCli(object):
             raise Pebkac(500, "server busy, cannot list recent uploads; please retry")
 
         sfilt = self.uparam.get("filter") or ""
-        filt = re.compile(sfilt, re.I) if sfilt else None
-        lm = "ru %r" % (sfilt,)
+        nfi, vfi = str_anchor(sfilt)
+        lm = "ru %d%r" % (nfi, sfilt)
         self.log(lm)
 
         ret: list[dict[str, Any]] = []
@@ -5516,8 +5556,14 @@ class HttpCli(object):
             q = "select sz, rd, fn, ip, at from up where at>0 order by at desc"
             for sz, rd, fn, ip, at in cur.execute(q):
                 vp = "/" + "/".join(x for x in [vol.vpath, rd, fn] if x)
-                if filt and not filt.search(vp):
-                    continue
+                if nfi == 0 or (nfi == 1 and vfi in vp):
+                    pass
+                elif nfi == 2:
+                    if not vp.startswith(vfi):
+                        continue
+                elif nfi == 3:
+                    if not vp.endswith(vfi):
+                        continue
 
                 if not dots and "/." in vp:
                     continue
@@ -5591,7 +5637,7 @@ class HttpCli(object):
             self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
             return True
 
-        html = self.j2s("rups", this=self, v=jtxt)
+        html = self.j2s("rups", this=self, v=json_hesc(jtxt))
         self.reply(html.encode("utf-8"), status=200)
         return True
 
@@ -5655,14 +5701,14 @@ class HttpCli(object):
                 raise Pebkac(500, "sqlite3 not found on server; sharing is disabled")
             raise Pebkac(500, "server busy, cannot create share; please retry in a bit")
 
+        skey = self.uparam.get("skey") or self.vpath.split("/")[-1]
+
         if self.args.shr_v:
-            self.log("handle_eshare: " + self.req)
+            self.log("handle_eshare: " + skey)
 
         cur = idx.get_shr()
         if not cur:
             raise Pebkac(400, "huh, sharing must be disabled in the server config...")
-
-        skey = self.vpath.split("/")[-1]
 
         rows = cur.execute("select un, t1 from sh where k = ?", (skey,)).fetchall()
         un = rows[0][0] if rows and rows[0] else ""

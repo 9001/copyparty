@@ -52,6 +52,7 @@ if PY2:
 
     sys.dont_write_bytecode = True
     bytes = str
+    files_decoder = lambda s: unicode(s, 'utf8')
 else:
     from urllib.parse import quote_from_bytes as quote
     from urllib.parse import unquote_to_bytes as unquote
@@ -61,6 +62,7 @@ else:
     from queue import Queue
 
     unicode = str
+    files_decoder = unicode
 
 
 WTF8 = "replace" if PY2 else "surrogateescape"
@@ -1532,7 +1534,7 @@ source file/folder selection uses rsync syntax, meaning that:
 """)
 
     ap.add_argument("url", type=unicode, help="server url, including destination folder")
-    ap.add_argument("files", type=unicode, nargs="+", help="files and/or folders to process")
+    ap.add_argument("files", type=files_decoder, nargs="+", help="files and/or folders to process")
     ap.add_argument("-v", action="store_true", help="verbose")
     ap.add_argument("-a", metavar="PASSWD", help="password or $filepath")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")

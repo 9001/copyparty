@@ -320,7 +320,7 @@ class SMB(object):
 
         self.hub.up2k.handle_mv(uname, "1.7.6.2", vp1, vp2)
         try:
-            bos.makedirs(ap2, vfs2.flags["chmod_d"])
+            bos.makedirs(ap2, vf=vfs2.flags)
         except:
             pass
 

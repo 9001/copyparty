@@ -399,12 +399,14 @@ class Up2k(object):
 
         return "{}"
 
-    def get_unfinished_by_user(self, uname, ip) -> str:
+    def get_unfinished_by_user(self, uname, ip) -> dict[str, Any]:
+        # returns dict due to ExceptionalQueue
         if PY2 or not self.reg_mutex.acquire(timeout=2):
-            return '[{"timeout":1}]'
+            return {"timeout": 1}
 
         ret: list[tuple[int, str, int, int, int]] = []
         userset = set([(uname or "\n"), "*"])
+        n = 1000
         try:
             for ptop, tab2 in self.registry.items():
                 cfg = self.flags.get(ptop, {}).get("u2abort", 1)
@@ -419,7 +421,6 @@ class Up2k(object):
                         or (addr and addr != job["addr"])
                     ):
                         continue
-
                     zt5 = (
                         int(job["t0"]),
                         djoin(job["vtop"], job["prel"], job["name"]),
@@ -428,6 +429,9 @@ class Up2k(object):
                         len(job["hash"]),
                     )
                     ret.append(zt5)
+                    n -= 1
+                    if not n:
+                        break
         finally:
             self.reg_mutex.release()
 
@@ -444,7 +448,7 @@ class Up2k(object):
             }
             for (at, vp, sz, nn, nh) in ret
         ]
-        return json.dumps(ret2, separators=(",\n", ": "))
+        return {"f": ret2}
 
     def get_unfinished(self) -> str:
         if PY2 or not self.reg_mutex.acquire(timeout=0.5):
@@ -916,7 +920,7 @@ class Up2k(object):
             for vol in vols:
                 try:
                     # mkdir gonna happen at snap anyways;
-                    bos.makedirs(vol.realpath, vol.flags["chmod_d"])
+                    bos.makedirs(vol.realpath, vf=vol.flags)
                     dir_is_empty(self.log_func, not self.args.no_scandir, vol.realpath)
                 except Exception as ex:
                     self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
@@ -2827,7 +2831,7 @@ class Up2k(object):
         # v5a -> v5b
         # store rd+fn rather than warks to support nohash vols
         try:
-            cur.execute("select ws, rd, fn from iu limit 1").fetchone()
+            cur.execute("select c, w, rd, fn from iu limit 1").fetchone()
             return
         except:
             pass
@@ -3309,7 +3313,7 @@ class Up2k(object):
                         reg,
                         "up2k._get_volsize",
                     )
-                    bos.makedirs(ap2, vfs.flags["chmod_d"])
+                    bos.makedirs(ap2, vf=vfs.flags)
                     vfs.lim.nup(cj["addr"])
                     vfs.lim.bup(cj["addr"], cj["size"])
 
@@ -3445,7 +3449,7 @@ class Up2k(object):
             "wb",
             fdir=fdir,
             suffix="-%.6f-%s" % (ts, dip),
-            chmod=vf.get("chmod_f", -1),
+            vf=vf,
         )
         f.close()
         return ret
@@ -4304,7 +4308,7 @@ class Up2k(object):
                 self.log(t, 1)
                 raise Pebkac(405, t)
 
-        bos.makedirs(os.path.dirname(dabs), dvn.flags["chmod_d"])
+        bos.makedirs(os.path.dirname(dabs), vf=dvn.flags)
 
         c1, w, ftime_, fsize_, ip, at = self._find_from_vpath(
             svn_dbv.realpath, srem_dbv
@@ -4480,7 +4484,10 @@ class Up2k(object):
                 vp = vjoin(dvp, rem)
                 try:
                     dvn, drem = self.vfs.get(vp, uname, False, True)
-                    bos.mkdir(dvn.canonical(drem), dvn.flags["chmod_d"])
+                    dap = dvn.canonical(drem)
+                    bos.mkdir(dap, dvn.flags["chmod_d"])
+                    if "chown" in dvn.flags:
+                        bos.chown(dap, dvn.flags["uid"], dvn.flags["gid"])
                 except:
                     pass
 
@@ -4550,7 +4557,7 @@ class Up2k(object):
 
         is_xvol = svn.realpath != dvn.realpath
 
-        bos.makedirs(os.path.dirname(dabs), dvn.flags["chmod_d"])
+        bos.makedirs(os.path.dirname(dabs), vf=dvn.flags)
 
         if is_dirlink:
             dlabs = absreal(sabs)
@@ -5062,7 +5069,7 @@ class Up2k(object):
             "wb",
             fdir=pdir,
             suffix="-%.6f-%s" % (job["t0"], dip),
-            chmod=vf.get("chmod_f", -1),
+            vf=vf,
         )
         try:
             abspath = djoin(pdir, job["tnam"])

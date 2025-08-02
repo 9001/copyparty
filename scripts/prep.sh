@@ -22,10 +22,31 @@ update_arch_pkgbuild() {
     rm -rf x
 }
 
+update_mpr_pkgbuild() {
+    cd "$self/../contrib/package/makedeb-mpr"
+    rm -rf x
+    mkdir x
+
+    sha=$(sha256sum "$self/../dist/copyparty-$ver.tar.gz" | awk '{print$1}')
+
+    # awk -v ver=$ver -v sha=$sha '
+    #     /^pkgver=/{sub(/[0-9\.]+/,ver)};
+    #     /^sha256sums=/{sub(/[0-9a-f]{64}/,sha)};
+    #     1' PKGBUILD >a
+    # mv a PKGBUILD
+
+		echo thing 1
+		sed -s -i "s/pkgver=\"\"/pkgver=\"$ver\"/" PKGBUILD
+		sed -s -i "s/sha256sums=(\".*\")/sha256sums=(\"$sha\")/" PKGBUILD
+
+    rm -rf x
+}
+
 update_nixos_pin() {
     ( cd $self/../contrib/package/nix/copyparty;
       ./update.py $self/../dist/copyparty-sfx.py )
 }
 
 update_arch_pkgbuild
+update_mpr_pkgbuild
 update_nixos_pin

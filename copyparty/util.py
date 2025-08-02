@@ -155,7 +155,9 @@ except:
     HAVE_PSUTIL = False
 
 try:
-    if os.environ.get("PRTY_NO_MAGIC"):
+    if os.environ.get("PRTY_NO_MAGIC") or (
+        ANYWIN and not os.environ.get("PRTY_FORCE_MAGIC")
+    ):
         raise Exception()
 
     import magic
@@ -241,7 +243,18 @@ except:
     BITNESS = struct.calcsize("P") * 8
 
 
-ansi_re = re.compile("\033\\[[^mK]*[mK]")
+RE_ANSI = re.compile("\033\\[[^mK]*[mK]")
+RE_HTML_SH = re.compile(r"[<>&$?`\"';]")
+RE_CTYPE = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
+RE_CDISP = re.compile(r"^content-disposition: *([^; ]+)", re.IGNORECASE)
+RE_CDISP_FIELD = re.compile(
+    r'^content-disposition:(?: *|.*; *)name="([^"]+)"', re.IGNORECASE
+)
+RE_CDISP_FILE = re.compile(
+    r'^content-disposition:(?: *|.*; *)filename="(.*)"', re.IGNORECASE
+)
+RE_MEMTOTAL = re.compile("^MemTotal:.* kB")
+RE_MEMAVAIL = re.compile("^MemAvailable:.* kB")
 
 
 BOS_SEP = ("%s" % (os.sep,)).encode("ascii")
@@ -486,11 +499,11 @@ def read_ram() -> tuple[float, float]:
         with open("/proc/meminfo", "rb", 0x10000) as f:
             zsl = f.read(0x10000).decode("ascii", "replace").split("\n")
 
-        p = re.compile("^MemTotal:.* kB")
+        p = RE_MEMTOTAL
         zs = next((x for x in zsl if p.match(x)))
         a = int((int(zs.split()[1]) / 0x100000) * 100) / 100
 
-        p = re.compile("^MemAvailable:.* kB")
+        p = RE_MEMAVAIL
         zs = next((x for x in zsl if p.match(x)))
         b = int((int(zs.split()[1]) / 0x100000) * 100) / 100
     except:
@@ -1585,7 +1598,8 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
     fun = kwargs.pop("fun", open)
     fdir = kwargs.pop("fdir", None)
     suffix = kwargs.pop("suffix", None)
-    chmod = kwargs.pop("chmod", -1)
+    vf = kwargs.pop("vf", None)
+    fperms = vf and "fperms" in vf
 
     if fname == os.devnull:
         return fun(fname, *args, **kwargs), fname
@@ -1629,11 +1643,11 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
                 fp2 = os.path.join(fdir, fp2)
                 with open(fsenc(fp2), "wb") as f2:
                     f2.write(orig_name.encode("utf-8"))
-                    if chmod >= 0:
-                        os.fchmod(f2.fileno(), chmod)
+                    if fperms:
+                        set_fperms(f2, vf)
 
-            if chmod >= 0:
-                os.fchmod(f.fileno(), chmod)
+            if fperms:
+                set_fperms(f, vf)
 
             return f, fname
 
@@ -1695,14 +1709,10 @@ class MultipartParser(object):
         self.args = args
         self.headers = http_headers
 
-        self.re_ctype = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
-        self.re_cdisp = re.compile(r"^content-disposition: *([^; ]+)", re.IGNORECASE)
-        self.re_cdisp_field = re.compile(
-            r'^content-disposition:(?: *|.*; *)name="([^"]+)"', re.IGNORECASE
-        )
-        self.re_cdisp_file = re.compile(
-            r'^content-disposition:(?: *|.*; *)filename="(.*)"', re.IGNORECASE
-        )
+        self.re_ctype = RE_CTYPE
+        self.re_cdisp = RE_CDISP
+        self.re_cdisp_field = RE_CDISP_FIELD
+        self.re_cdisp_file = RE_CDISP_FILE
 
         self.boundary = b""
         self.gen: Optional[
@@ -2244,6 +2254,16 @@ def find_prefix(ips: list[str], cidrs: list[str]) -> list[str]:
     return ret
 
 
+def html_sh_esc(s: str) -> str:
+    s = re.sub(RE_HTML_SH, "_", s).replace(" ", "%20")
+    s = s.replace("\r", "_").replace("\n", "_")
+    return s
+
+
+def json_hesc(s: str) -> str:
+    return s.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
 def html_escape(s: str, quot: bool = False, crlf: bool = False) -> str:
     """html.escape but also newlines"""
     s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
@@ -2374,6 +2394,21 @@ def ujoin(rd: str, fn: str) -> str:
         return rd.rstrip("/") + "/" + fn.lstrip("/")
     else:
         return rd or fn
+
+
+def str_anchor(txt) -> tuple[int, str]:
+    if not txt:
+        return 0, ""
+    txt = txt.lower()
+    a = txt.startswith("^")
+    b = txt.endswith("$")
+    if not b:
+        if not a:
+            return 1, txt  # ~
+        return 2, txt[1:]  # ^
+    if not a:
+        return 3, txt[:-1]  # $
+    return 4, txt[1:-1]  # ^$
 
 
 def log_reloc(
@@ -2561,6 +2596,14 @@ def lsof(log: "NamedLogger", abspath: str) -> None:
         log("lsof %r = %s\n%s" % (abspath, rc, zs), 3)
     except:
         log("lsof failed; " + min_ex(), 3)
+
+
+def set_fperms(f: Union[typing.BinaryIO, typing.IO[Any]], vf: dict[str, Any]) -> None:
+    fno = f.fileno()
+    if "chmod_f" in vf:
+        os.fchmod(fno, vf["chmod_f"])
+    if "chown" in vf:
+        os.fchown(fno, vf["uid"], vf["gid"])
 
 
 def _fs_mvrm(
@@ -4169,7 +4212,12 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
                 stream = codecs.getreader(enc)(stream)
             return stream
 
-    return open(os.path.join(E.mod, name), mode, encoding=enc)
+    ap = os.path.join(E.mod, name)
+
+    if PY2:
+        return codecs.open(ap, "r", encoding=enc)  # type: ignore
+
+    return open(ap, mode, encoding=enc)
 
 
 class Pebkac(Exception):

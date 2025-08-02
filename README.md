@@ -80,6 +80,7 @@ made in Norway 🇳🇴
         * [periodic rescan](#periodic-rescan) - filesystem monitoring
     * [upload rules](#upload-rules) - set upload rules using volflags
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
+    * [chmod and chown](#chmod-and-chown) - per-volume filesystem-permissions and ownership
     * [other flags](#other-flags)
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
@@ -151,6 +152,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or install [on arch](#arch-package) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
 * or if you are on android, [install copyparty in termux](#install-on-android)
 * or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
+* or if you have [uv](https://docs.astral.sh/uv/) installed, run `uv tool run copyparty`
 * or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
 * or if your OS is dead, give the [bootable flashdrive / cd-rom](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) a spin
 * or if you don't trust copyparty yet and want to isolate it a little, then...
@@ -1649,6 +1651,26 @@ some examples,
   allows (but does not force) gz compression if client uploads to `/inc?pk` or `/inc?gz` or `/inc?gz=4`
 
 
+## chmod and chown
+
+per-volume filesystem-permissions and ownership
+
+by default:
+* all folders are chmod 755
+* files are usually chmod 644 (umask-defined)
+* user/group is whatever copyparty is running as
+
+this can be configured per-volume:
+* volflag `chmod_f` sets file permissions; default=`644` (usually)
+* volflag `chmod_d` sets directory permissions; default=`755`
+* volflag `uid` sets the owner user-id
+* volflag `gid` sets the owner group-id
+
+notes:
+* `gid` can only be set to one of the groups which the copyparty process is a member of
+* `uid` can only be set if copyparty is running as root (i appreciate your faith)
+
+
 ## other flags
 
 * `:c,magic` enables filetype detection for nameless uploads, same as `--magic`
@@ -2226,6 +2248,7 @@ force-enable features with known issues on your OS/env  by setting any of the fo
 | env-var                  | what it does |
 | ------------------------ | ------------ |
 | `PRTY_FORCE_MP`          | force-enable multiprocessing (real multithreading) on MacOS and other broken platforms |
+| `PRTY_FORCE_MAGIC`       | use [magic](https://pypi.org/project/python-magic/) on Windows (you will segfault) |
 
 
 # packages

@@ -415,6 +415,8 @@ to get started, first `cd` into the `scripts` folder
 
 * if you want to build the `.pyz` standalone "binary", now run `./make-pyz.sh`
 
+* if you want to build the `tar.gz` for use in a linux-distro package, now run `./make-tgz-release.sh theVersionNumber`
+
 * if you want to build a pypi package, now run `./make-pypi-release.sh d`
 
 * if you want to build a docker-image, you have two options:

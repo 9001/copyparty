@@ -240,14 +240,26 @@
         <div class="os win">
             <h1>ShareX</h1>
 
-            <p>to upload screenshots using ShareX <a href="https://github.com/ShareX/ShareX/releases/tag/v12.1.1">v12</a> or <a href="https://getsharex.com/">v15+</a>, save this as <code>copyparty.sxcu</code> and run it:</p>
+            <p>to upload screenshots using ShareX <a href="https://getsharex.com/">v15+</a>, save this as <code>copyparty.sxcu</code> and run it:</p>
+
+            <pre class="dl" name="copyparty.sxcu">
+                { "Version": "15.0.0", "Name": "copyparty",
+                "RequestURL": "http{{ s }}://{{ ep }}/{{ rvp }}",
+                "Headers": {
+                    {% if accs %}"pw": "<b>{{ pw }}</b>", {% endif %}"accept": "url"
+                },
+                "DestinationType": "ImageUploader, TextUploader, FileUploader",
+                "Body": "MultipartFormData", "URL": "{response}",
+                "RequestMethod": "POST", "FileFormName": "f" }
+            </pre>
+
+            <p>for ShareX <a href="https://github.com/ShareX/ShareX/releases/tag/v12.1.1">v12</a> specifically, save this as <code>copyparty.sxcu</code> and run it:</p>
 
             <pre class="dl" name="copyparty.sxcu">
                 { "Name": "copyparty",
                 "RequestURL": "http{{ s }}://{{ ep }}/{{ rvp }}",
                 "Headers": {
-                    {% if accs %}"pw": "<b>{{ pw }}</b>",{% endif %}
-                    "accept": "url"
+                    {% if accs %}"pw": "<b>{{ pw }}</b>", {% endif %}"accept": "url"
                 },
                 "DestinationType": "ImageUploader, TextUploader, FileUploader",
                 "FileFormName": "f" }

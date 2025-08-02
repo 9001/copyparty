@@ -45,6 +45,7 @@ from .util import (
     exclude_dotfiles,
     min_ex,
     runhook,
+    set_fperms,
     undot,
     vjoin,
     vsplit,
@@ -388,8 +389,8 @@ class Tftpd(object):
             a = (self.args.iobuf,)
 
         ret = open(ap, mode, *a, **ka)
-        if wr and "chmod_f" in vfs.flags:
-            os.fchmod(ret.fileno(), vfs.flags["chmod_f"])
+        if wr and "fperms" in vfs.flags:
+            set_fperms(ret, vfs.flags)
 
         return ret
 
@@ -398,7 +399,9 @@ class Tftpd(object):
         if "*" not in vfs.axs.uwrite:
             yeet("blocked mkdir; folder not world-writable: /%s" % (vpath,))
 
-        return bos.mkdir(ap, vfs.flags["chmod_d"])
+        bos.mkdir(ap, vfs.flags["chmod_d"])
+        if "chown" in vfs.flags:
+            bos.chown(ap, vfs.flags["uid"], vfs.flags["gid"])
 
     def _unlink(self, vpath: str) -> None:
         # return bos.unlink(self._v2a("stat", vpath, *a)[1])

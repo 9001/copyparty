@@ -9,8 +9,11 @@ from . import path as path
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
 
-_ = (path,)
-__all__ = ["path"]
+MKD_755 = {"chmod_d": 0o755}
+MKD_700 = {"chmod_d": 0o700}
+
+_ = (path, MKD_755, MKD_700)
+__all__ = ["path", "MKD_755", "MKD_700"]
 
 # grep -hRiE '(^|[^a-zA-Z_\.-])os\.' . | gsed -r 's/ /\n/g;s/\(/(\n/g' | grep -hRiE '(^|[^a-zA-Z_\.-])os\.' | sort | uniq -c
 # printf 'os\.(%s)' "$(grep ^def bos/__init__.py | gsed -r 's/^def //;s/\(.*//' | tr '\n' '|' | gsed -r 's/.$//')"
@@ -20,11 +23,15 @@ def chmod(p: str, mode: int) -> None:
     return os.chmod(fsenc(p), mode)
 
 
+def chown(p: str, uid: int, gid: int) -> None:
+    return os.chown(fsenc(p), uid, gid)
+
+
 def listdir(p: str = ".") -> list[str]:
     return [fsdec(x) for x in os.listdir(fsenc(p))]
 
 
-def makedirs(name: str, mode: int = 0o755, exist_ok: bool = True) -> bool:
+def makedirs(name: str, vf: dict[str, Any] = MKD_755, exist_ok: bool = True) -> bool:
     # os.makedirs does 777 for all but leaf; this does mode on all
     todo = []
     bname = fsenc(name)
@@ -37,9 +44,13 @@ def makedirs(name: str, mode: int = 0o755, exist_ok: bool = True) -> bool:
         if not exist_ok:
             os.mkdir(bname)  # to throw
         return False
+    mode = vf["chmod_d"]
+    chown = "chown" in vf
     for zb in todo[::-1]:
         try:
             os.mkdir(zb, mode)
+            if chown:
+                os.chown(zb, vf["uid"], vf["gid"])
         except:
             if os.path.isdir(zb):
                 continue

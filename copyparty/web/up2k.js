@@ -2511,8 +2511,8 @@ function up2k_init(subtle) {
                         var msg = [];
                         for (var a = 0, aa = Math.min(20, response.hits.length); a < aa; a++) {
                             var hit = response.hits[a],
-                                tr = unix2iso(hit.ts),
-                                tu = unix2iso(t.lmod),
+                                tr = unix2ui(hit.ts),
+                                tu = unix2ui(t.lmod),
                                 diff = parseInt(t.lmod) - parseInt(hit.ts),
                                 cdiff = (Math.abs(diff) <= 2) ? '3c0' : 'f0b',
                                 sdiff = '<span style="color:#' + cdiff + '">diff ' + diff;
@@ -3187,7 +3187,7 @@ function up2k_init(subtle) {
             return;
 
         try {
-            ebi('lifew').innerHTML = unix2iso((st.lifetime || lifetime) +
+            ebi('lifew').innerHTML = unix2ui((st.lifetime || lifetime) +
                 Date.now() / 1000 - new Date().getTimezoneOffset() * 60
             ).replace(' ', ', ').slice(0, -3);
         }
