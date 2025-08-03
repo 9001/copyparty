@@ -3367,6 +3367,7 @@ var Ls = {
 		"ct_dir1st": 'Sorteer mappen eerst en dan de bestanden">📁 first',
 		"ct_nsort": 'Natural sort (voor bestandsnamen dat beginnen met getallen)">nsort',
 		"ct_readme": 'Laat README.md in mappen lijst zien">📜 readme',
+		"ct_utc": 'Toon alle datums en tijden in UTC">UTC',
 		"ct_idxh": 'Laat index.html zien in plaats van de map overzicht">htm',
 		"ct_sbars": 'Laat scrollbars zien">⟊',
 
