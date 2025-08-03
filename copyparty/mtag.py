@@ -270,6 +270,8 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
                 ["channel_layout", "chs"],
                 ["sample_rate", ".hz"],
                 ["bit_rate", ".aq"],
+                ["bits_per_sample", ".bps"],
+                ["bits_per_raw_sample", ".bprs"],
                 ["duration", ".dur"],
             ]
 
