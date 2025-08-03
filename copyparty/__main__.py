@@ -1449,6 +1449,8 @@ def add_transcoding(ap):
     ap2.add_argument("--q-mp3", metavar="QUALITY", type=u, default="q2", help="target quality for transcoding to mp3, for example [\033[32m192k\033[0m] (CBR) or [\033[32mq0\033[0m] (CQ/CRF, q0=maxquality, q9=smallest); set 0 to disable")
     ap2.add_argument("--no-caf", action="store_true", help="disable transcoding to caf-opus (affects iOS v12~v17), will use mp3 instead")
     ap2.add_argument("--no-owa", action="store_true", help="disable transcoding to webm-opus (iOS v18 and later), will use mp3 instead")
+    ap2.add_argument("--no-wav", action="store_true", help="disable transcoding to wav (lossless, uncompressed)")
+    ap2.add_argument("--no-flac", action="store_true", help="disable transcoding to flac (lossless, compressed)")
     ap2.add_argument("--no-acode", action="store_true", help="disable audio transcoding")
     ap2.add_argument("--no-bacode", action="store_true", help="disable batch audio transcoding by folder download (zip/tar)")
     ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete cached transcode output after \033[33mSEC\033[0m seconds")

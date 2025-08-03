@@ -390,6 +390,8 @@ var tl_browser = {
 		"mt_c2owa": "opus-weba, for iOS 17.5 and newer\">owa",
 		"mt_c2caf": "opus-caf, for iOS 11 through 17\">caf",
 		"mt_c2mp3": "use this on very old devices\">mp3",
+		"mt_c2flac": "best sound quality\">flac",
+		"mt_c2wav": "uncompressed playback\">wav",
 		"mt_c2ok": "nice, good choice",
 		"mt_c2nd": "that's not the recommended output format for your device, but that's fine",
 		"mt_c2ng": "your device does not seem to support this output format, but let's try anyways",

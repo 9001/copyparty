@@ -306,7 +306,8 @@ var Ls = {
 		"mt_c2owa": "opus-weba, for iOS 17.5 and newer\">owa",
 		"mt_c2caf": "opus-caf, for iOS 11 through 17\">caf",
 		"mt_c2mp3": "use this on very old devices\">mp3",
-		"mt_c2wav": "use this for uncompressed playback\">wav",
+		"mt_c2flac": "best sound quality\">flac",
+		"mt_c2wav": "uncompressed playback\">wav",
 		"mt_c2ok": "nice, good choice",
 		"mt_c2nd": "that's not the recommended output format for your device, but that's fine",
 		"mt_c2ng": "your device does not seem to support this output format, but let's try anyways",
@@ -5549,6 +5550,7 @@ var mpl = (function () {
 			'<a href="#" id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
 			'<a href="#" id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
 			'<a href="#" id="ac2mp3" class="tgl btn" tt="' + L.mt_c2mp3 + '</a>' +
+			'<a href="#" id="ac2flac" class="tgl btn" tt="' + L.mt_c2flac + '</a>' +
 			'<a href="#" id="ac2wav" class="tgl btn" tt="' + L.mt_c2wav + '</a>' +
 			'</div></div>'
 		) : '') +
@@ -5692,8 +5694,11 @@ var mpl = (function () {
 			return;
 		}
 
-		var dv = can_ogg ? 'opus' : can_caf ? 'caf' : can_mp3 ? 'mp3' : 'wav',
-			fmts = ['opus', 'owa', 'caf', 'mp3', 'wav'],
+		var dv = can_ogg ? 'opus' :
+				can_caf ? 'caf' :
+				can_mp3 ? 'mp3' :
+				can_flac ? 'flac' : 'wav',
+			fmts = ['opus', 'owa', 'caf', 'mp3', 'flac', 'wav'],
 			btns = [];
 
 		if (v === dv)
@@ -5704,7 +5709,8 @@ var mpl = (function () {
 		if ((v == 'opus' && !can_ogg) ||
 			(v == 'caf' && !can_caf) ||
 			(v == 'owa' && !can_owa) ||
-			(v == 'mp3' && !can_mp3))
+			(v == 'mp3' && !can_mp3) ||
+			(v == 'flac' && !can_flac))
 			toast.warn(15, L.mt_c2ng);
 
 		if (v == 'owa' && IPHONE)
@@ -5843,12 +5849,14 @@ var za,
 	can_ogg = true,
 	can_owa = false,
 	can_mp3 = false,
+	can_flac = false,
 	can_caf = APPLE && !/ OS ([1-9]|1[01])_/.test(UA);
 try {
 	za = new Audio();
 	can_ogg = za.canPlayType('audio/ogg; codecs=opus') === 'probably';
 	can_owa = za.canPlayType('audio/webm; codecs=opus') === 'probably';
 	can_mp3 = za.canPlayType('audio/mpeg') === 'probably';
+	can_flac = za.canPlayType('audio/flac') === 'probably';
 	can_caf = za.canPlayType('audio/x-caf') && can_caf; //'maybe'
 }
 catch (ex) { }
