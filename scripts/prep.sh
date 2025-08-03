@@ -34,10 +34,10 @@ update_mpr_pkgbuild() {
     #     /^sha256sums=/{sub(/[0-9a-f]{64}/,sha)};
     #     1' PKGBUILD >a
     # mv a PKGBUILD
-
-		echo thing 1
-		sed -s -i "s/pkgver=\"\"/pkgver=\"$ver\"/" PKGBUILD
-		sed -s -i "s/sha256sums=(\".*\")/sha256sums=(\"$sha\")/" PKGBUILD
+    # TODO: check if this still works. if so, remove the following 2 lines:
+    
+    sed -s -i "s/pkgver=\"\"/pkgver=\"$ver\"/" PKGBUILD
+    sed -s -i "s/sha256sums=(\".*\")/sha256sums=(\"$sha\")/" PKGBUILD
 
     rm -rf x
 }

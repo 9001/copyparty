@@ -1425,6 +1425,8 @@ note that this disables hotlinking because the opengraph spec demands it; to sne
 
 you can also hotlink files regardless by appending `?raw` to the url
 
+> WARNING: if you plan to use WebDAV, then `--og-ua` / `og_ua` must be configured
+
 if you want to entirely replace the copyparty response with your own jinja2 template, give the template filepath to `--og-tpl` or volflag `og_tpl` (all members of `HttpCli` are available through the `this` object)
 
 
@@ -2429,6 +2431,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
 | **sony psp** 5.50         | can browse, upload/mkdir/msg (thx dwarf) [screenshot](https://github.com/user-attachments/assets/9d21f020-1110-4652-abeb-6fc09c533d4f) |
 | **nintendo 3ds**          | can browse, upload, view thumbnails (thx bnjmn) |
+| **Nintendo Wii (Opera 9.0 "Internet Channel")**          | can browse, can't upload or download (no local storage), can view images - works best with `?b=u`, default view broken |
 
 <p align="center"><img src="https://github.com/user-attachments/assets/88deab3d-6cad-4017-8841-2f041472b853" /></p>
 
@@ -2698,6 +2701,10 @@ you can hash passwords  before putting them into config files / providing them a
 optionally also specify `--ah-cli` to enter an interactive mode where it will hash passwords without ever writing the plaintext ones to disk
 
 the default configs take about 0.4 sec and 256 MiB RAM to process a new password on a decent laptop
+
+when generating hashes using `--ah-cli` for docker or systemd services, make sure it is using the same `--ah-salt` by:
+* inspecting the generated salt using `--show-ah-salt` in copyparty service configuration
+* setting the same `--ah-salt` in both environments
 
 
 ## https
