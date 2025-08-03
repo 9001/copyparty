@@ -1,6 +1,11 @@
 [Container]
-Image=docker.io/copyparty/ac:latest  # It's recommended to replace :latest with a specific version
+# It's recommended to replace :latest with a specific version
+# for example: docker.io/copyparty/ac:1.18.9
+Image=docker.io/copyparty/ac:latest
 ContainerName=copyparty
+
+# Uncomment to enable auto-updates
+# AutoUpdate=registry
 
 # Environment variables
 # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
@@ -11,10 +16,21 @@ Environment=PYTHONUNBUFFERED=1
 # Ports
 PublishPort=3923:3923
 
-# Volumes
+
+# Volumes (PLEASE LOOK!)
+
+# Rootful setup:
+#   Leave as-is
+# Non-root setup:
+#   Change /etc/copyparty to /home/<USER>/copyparty/config
 Volume=/etc/copyparty:/cfg:z
-# Change /mnt to the directory you want to share!
+
+# Rootful setup:
+#   Change /mnt to the directory you want to share
+# Non-root setup:
+#   Change /mnt to something owned by your user, e.g., /home/<USER>/copyparty/sharing:/w:z
 Volume=/mnt:/w:z
+
 
 # Give the container time to stop in case the thumbnailer is still running.
 # It's allowed to continue finishing up for 10s after the shutdown signal, give it a 5s buffer
