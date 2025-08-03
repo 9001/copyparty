@@ -3785,7 +3785,7 @@ var Ls = {
 		"tt": "Magyar",
 
 		"cols": {
-			"c": "action buttons",
+			"c": "akciógombok",
 			"dur": "időtartam",
 			"q": "minőség / bitráta",
 			"Ac": "audió kodek",
@@ -3821,7 +3821,7 @@ var Ls = {
 				["F2", "kijelölt elem(ek) átnevezése"],
 
 				"file-list-sel",
-				["space", "toggle file selection"],
+				["space", "fájlok kijelölése"],
 				["↑/↓", "kurzor mozgatása"],
 				["ctrl ↑/↓", "kurzor és nézet mozgatása"],
 				["⇧ ↑/↓", "előző/következő fájl kijelölése"],
@@ -3922,7 +3922,7 @@ var Ls = {
 		"wt_seldl": "kijelölés letöltése egyenként fájlokként$NGyorsbillentyű: Y",
 		"wt_npirc": "irc-formázott zeneszám infó másolása",
 		"wt_nptxt": "szöveges zeneszám információ másolása",
-		"wt_m3ua": "hozzáadás m3u lejátszási listához (kattints a <code>📻copy</code>-ra később)",
+		"wt_m3ua": "hozzáadás m3u lejátszási listához (koppints a <code>📻copy</code>-ra később)",
 		"wt_m3uc": "m3u lejátszási lista másolása vágólapra",
 		"wt_grid": "lista- / rácsnézet váltása$NGyorsbillentyű: G",
 		"wt_prev": "előző zeneszám$NGyorsbillentyű: J",
@@ -3938,7 +3938,7 @@ var Ls = {
 		"ut_pot": "feltöltés gyorsítása lassú eszközökön$Naz interfész leegyszerűsítésével",
 		"ut_srch": "ne töltsön fel, csak ellenőrizze, $N hogy a fájlok léteznek-e a szerveren (minden olvasható mappát szkennelni fog)",
 		"ut_par": "feltöltések megállítása 0-ra való állítással$N$Nállítsd magasabbra lassú / nagy késésű kapcsolatoknál$N$Nhagyd 1-en, ha a szerver helyi hálózaton van, vagy a HDD-je hátráltatja a sebességet",
-		"ul_btn": "ejts fájlokat / mappákat<br>ide (vagy kattints rám)",
+		"ul_btn": "ejts fájlokat / mappákat<br>ide (vagy koppints rám)",
 		"ul_btnu": "F E L T Ö L T É S",
 		"ul_btns": "K E R E S É S",
 
@@ -3977,7 +3977,7 @@ var Ls = {
 
 		"udt_up": "Feltöltés",
 		"udt_srch": "Keresés",
-		"udt_drop": "dobd ide",
+		"udt_drop": "ejtsd ide",
 
 		"u_nav_m": '<h6>oké, mit ajánlasz fel?</h6><code>Enter</code> = Fájlok (egy vagy több)\n<code>ESC</code> = Egy mappa (almappákkal együtt)',
 		"u_nav_b": '<a href="#" id="modal-ok">Fájlok</a><a href="#" id="modal-ng">Egy mappa</a>',
@@ -4001,7 +4001,7 @@ var Ls = {
 		"ct_ttips": '◔ ◡ ◔">ℹ️ elemleírások',
 		"ct_thumb": 'rácsnézetben ikonok és miniatűrök megjelenítése$NHotkey: T">🖼️ miniatűr',
 		"ct_csel": 'CTRL és SHIFT használata fájlok kijelölésére a rácsnézetben">kijelöl',
-		"ct_ihop": 'a képnézegető bezárása után tekerjen le a legutóbb megtekintett fájlhoz">g⮯',
+		"ct_ihop": 'a képnézegető bezárása után görgessen a legutóbb megtekintett fájlhoz">g⮯',
 		"ct_dots": 'rejtett fájlok megjelenítése (ha a szerver engedélyezi)">dotfájlok',
 		"ct_qdel": 'fájlok törlésekor csak egyszer kérjen megerősítést">ktörlés',
 		"ct_dir1st": 'mappák rendezése fájlok előtt">📁 elől',
@@ -4036,7 +4036,7 @@ var Ls = {
 
 		"cdt_lim": "maximum mennyiségű fájl megjelenítéshez egy mappában",
 		"cdt_ask": "az oldal legaljára görgetéskor,$Ntovábbi fájlok betöltése helyett,$Nkérdezzen rá",
-		"cdt_hsort": "how many sorting rules (&lt;code&gt;,sorthref&lt;/code&gt;) to include in media-URLs. Setting this to 0 will also ignore sorting-rules included in media links when clicking them",
+		"cdt_hsort": "mennyi rendezési szabályt (&lt;code&gt;,sorthref&lt;/code&gt;) tartalmazzon egy média-URL. 0-ra állítással figyelmen kívül hagyja a szabályokat a megnyitott média linkekből",
 
 		"tt_entree": "navigációs panel megjelenítése (könyvtár-fa)$NGyorsbillentyű: B",
 		"tt_detree": "breadcrumb megjelenítése$NGyorsbillentyű: B",
@@ -4057,8 +4057,8 @@ var Ls = {
 
 		"mt_loop": "egy zeneszám ismétlése\">🔁",
 		"mt_one": "lejátszás leállítása egy zeneszám után\">1️⃣",
-		"mt_shuf": "mappában levő fájlok keverése\">🔀",
-		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
+		"mt_shuf": "egy mappában levő fájlok keverése\">🔀",
+		"mt_aplay": "automatikus lejátszás, ha egy zeneszámra mutató linkre koppintottál$N$Nennek letiltásával az oldal URL-jébe sem fognak a zeneszámok azonosítói bekerülni\">a▶",
 		"mt_preload": "a következő zeneszám előre betöltése szünetmentes lejátszáshoz\">preload",
 		// ITT
 		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
