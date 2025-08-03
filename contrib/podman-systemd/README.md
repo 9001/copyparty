@@ -2,7 +2,7 @@
 
 Use this configuration if you want to run copyparty in a Podman container, with the reliability of running the container under a systemd service.
 
-Documentation for `.container` files can be found in the [Container unit](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container) docs. Systemd cannot does not understand `.container` files natively, so Podman converts these to `.service` files with a [systemd-generator](https://www.freedesktop.org/software/systemd/man/latest/systemd.generator.html). This process is transparent, but sometimes needs to be debugged in case your `.container` file is malformed. There are instructions to debug the systemd generator in the Troubleshooting section below.
+Documentation for `.container` files can be found in the [Container unit](https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html#container-units-container) docs. Systemd does not understand `.container` files natively, so Podman converts these to `.service` files with a [systemd-generator](https://www.freedesktop.org/software/systemd/man/latest/systemd.generator.html). This process is transparent, but sometimes needs to be debugged in case your `.container` file is malformed. There are instructions to debug the systemd generator in the Troubleshooting section below.
 
 To run copyparty in this way, you must already have podman installed. To install Podman, see: https://podman.io/docs/installation
 
@@ -25,7 +25,7 @@ To install and start copyparty with Podman and systemd as the root user, run the
 
 ```shell
 sudo mkdir -pv /etc/systemd/container/ /etc/copyparty/
-sudo cp -v copyparty.container /etc/systemd/containers/copyparty.container
+sudo cp -v copyparty.container /etc/systemd/containers/
 sudo cp -v copyparty.conf /etc/copyparty/
 sudo systemctl daemon-reload
 sudo systemctl start copyparty
@@ -36,7 +36,7 @@ Note: You can't "enable" this kind of Podman service. The `[Install]` section of
 You can see the status of the service with:
 
 ```shell
-sudo systemctl status copyparty
+sudo systemctl status -a copyparty
 ```
 
 You can see (and follow) the logs with either of these commands:
@@ -94,7 +94,7 @@ systemctl --user start copyparty
 You can check the status of the user service with:
 
 ```shell
-systemctl --user status copyparty
+systemctl --user status -a copyparty
 ```
 
 You can see (and follow) the logs with:
@@ -126,7 +126,7 @@ Otherwise, you won't be able to access the copyparty server from anywhere other 
 
 ## Updating copyparty
 
-To update the container, you can:
+To update the version of copyparty used in the container, you can:
 
 ```shell
 # If root:
