@@ -3899,9 +3899,9 @@ var Ls = {
 		"ot_msg": "msg: üzenet küldése a szervernaplóba",
 		"ot_mp": "médialejátszó beállításai",
 		"ot_cfg": "beállítások",
-		"ot_u2i": 'up2k: fájlok feltöltése (ha írásos hozzáférése van) vagy kereső módba váltás, hogy megtudja, hogy léteznek-e a szerveren$N$Na feltöltések leállás után folytathatóak, tobbszálasak, és a fájlok időbélyegei megmaradnak, de több CPU-t használ mint a [🎈]&nbsp; (a kezdetleges feltöltő)<br /><br />feltöltések közben ez az ikon egy folyamatjelző lesz!',
-		"ot_u2w": 'up2k: fájlok feltöltése leállás utáni folytatással (zárja be a böngészőt és később dobja oda ugyanazokat a fájlokat)$N$Ntöbbszálas, és a fájlok időbélyegei megmaradnak, de több CPU-t használ mint a [🎈]&nbsp; (a kezdetleges feltöltő)<br /><br />feltöltések közben ez az ikon egy folyamatjelző lesz!',
-		"ot_noie": 'Kérem használjon Chrome-ot / Firefox-ot / Edge-et!',
+		"ot_u2i": 'up2k: fájlok feltöltése (ha van írásos hozzáférésed) vagy kereső módba váltás, hogy megtudd, hogy léteznek-e a szerveren$N$Na feltöltések leállás után folytathatóak, tobbszálasak, és a fájlok időbélyegei megmaradnak, de több CPU-t használ mint a [🎈]&nbsp; (a kezdetleges feltöltő)<br /><br />feltöltések közben ez az ikon egy folyamatjelző lesz!',
+		"ot_u2w": 'up2k: fájlok feltöltése leállás utáni folytatással (zárd be a böngészőt és dobd ide ugyanazokat a fájlokat)$N$Ntöbbszálas, és a fájlok időbélyegei megmaradnak, de több CPU-t használ mint a [🎈]&nbsp; (a kezdetleges feltöltő)<br /><br />feltöltések közben ez az ikon egy folyamatjelző lesz!',
+		"ot_noie": 'Kérlek, használj Chrome-ot / Firefox-ot / Edge-et!',
 
 		"ab_mkdir": "mappa létrehozása",
 		"ab_mkdoc": "új markdown dokumentum",
@@ -3922,7 +3922,7 @@ var Ls = {
 		"wt_seldl": "kijelölés letöltése egyenként fájlokként$NGyorsbillentyű: Y",
 		"wt_npirc": "irc-formázott zeneszám infó másolása",
 		"wt_nptxt": "szöveges zeneszám információ másolása",
-		"wt_m3ua": "hozzáadás m3u lejátszási listához (kattintson a <code>📻copy</code>-ra később)",
+		"wt_m3ua": "hozzáadás m3u lejátszási listához (kattints a <code>📻copy</code>-ra később)",
 		"wt_m3uc": "m3u lejátszási lista másolása vágólapra",
 		"wt_grid": "lista- / rácsnézet váltása$NGyorsbillentyű: G",
 		"wt_prev": "előző zeneszám$NGyorsbillentyű: J",
@@ -3933,12 +3933,12 @@ var Ls = {
 		"ut_rand": "véletlenszerű fájlnevek",
 		"ut_u2ts": "a módosítási időbélyeg másolása$Na helyi fájlrendszerről a szerverre\">📅",
 		"ut_ow": "felülírja a szerveren már létező fájlokat?$N🛡️: soha (inkább új fájlnevet generál)$N🕒: felülír, ha a helyi fájl újabb, mint a szerveren$N♻️: mindig felülír, ha a fájlok különböznek",
-		"ut_mt": "további fájlok hasítása feltöltés közben$N$Nkapcsolja ki, ha a CPU vagy HDD hátráltatja a sebességet",
+		"ut_mt": "további fájlok hasítása feltöltés közben$N$Nkapcsold ki, ha a CPU vagy HDD hátráltatja a sebességet",
 		"ut_ask": 'kérjen-e megerősítést feltöltés előtt">💭',
 		"ut_pot": "feltöltés gyorsítása lassú eszközökön$Naz interfész leegyszerűsítésével",
 		"ut_srch": "ne töltsön fel, csak ellenőrizze, $N hogy a fájlok léteznek-e a szerveren (minden olvasható mappát szkennelni fog)",
-		"ut_par": "feltöltések megállítása 0-ra való állítással$N$Nállítsa magasabbra lassú / nagy késésű kapcsolatoknál$N$Nhagyja 1-en, ha a szerver helyi hálózaton van, vagy a HDD-je hátráltatja a sebességet",
-		"ul_btn": "ejtsen fájlokat / mappákat<br>ide (vagy kattintson rám)",
+		"ut_par": "feltöltések megállítása 0-ra való állítással$N$Nállítsd magasabbra lassú / nagy késésű kapcsolatoknál$N$Nhagyd 1-en, ha a szerver helyi hálózaton van, vagy a HDD-je hátráltatja a sebességet",
+		"ul_btn": "ejts fájlokat / mappákat<br>ide (vagy kattints rám)",
 		"ul_btnu": "F E L T Ö L T É S",
 		"ul_btns": "K E R E S É S",
 
@@ -3977,9 +3977,9 @@ var Ls = {
 
 		"udt_up": "Feltöltés",
 		"udt_srch": "Keresés",
-		"udt_drop": "dobja ide",
+		"udt_drop": "dobd ide",
 
-		"u_nav_m": '<h6>oké, mit ajánl fel?</h6><code>Enter</code> = Fájlok (egy vagy több)\n<code>ESC</code> = Egy mappa (almappákkal együtt)',
+		"u_nav_m": '<h6>oké, mit ajánlasz fel?</h6><code>Enter</code> = Fájlok (egy vagy több)\n<code>ESC</code> = Egy mappa (almappákkal együtt)',
 		"u_nav_b": '<a href="#" id="modal-ok">Fájlok</a><a href="#" id="modal-ng">Egy mappa</a>',
 
 		"cl_opts": "kapcsolók",
@@ -3994,7 +3994,7 @@ var Ls = {
 		"cl_hiddenc": "elrejtett oszlopok",
 		"cl_hidec": "elrejt",
 		"cl_reset": "visszaállítás",
-		"cl_hpick": "koppintson egy oszlop fejlécére hogy elrejtse",
+		"cl_hpick": "koppints egy oszlop fejlécére hogy elrejtse",
 		"cl_hcancel": "oszlop elrejtése megszakítva",
 
 		"ct_grid": '田 a rács',
@@ -4013,11 +4013,11 @@ var Ls = {
 
 		"cut_umod": "ha egy fájl már létezik a szerveren, frissítse a szerveren a fájl módosításának dátumát (írás+törlés jogosultság szükséges)\">friss📅",
 
-		"cut_turbo": "a yolo gomb, valószínűleg NEM szeretné ezt bekapcsolni:$N$Nhasználja, ha nagy mennyiségű fájlokat töltött fel, de valamiért újra kellett kezdenie és szeretné azonnal folytatni a feltöltést$N$Nez a hasítást egy egyszerű <em>&quot;megegyezik a fájlméret a szerveren?&quot;</em> kérdéssel helyettesíti, szóval ha a tartalom különbözik, a fálj NEM lesz feltöltve$N$Nérdemes kikapcsolni, amint a feltöltés befejeződött, és &quot;feltölteni&quot; ugyanazokat a fájlokat, hogy a kliens ellenőrizhesse őket\">turbó",
+		"cut_turbo": "a yolo gomb, valószínűleg NEM szeretnéd ezt bekapcsolni:$N$Nhasználd, ha nagy mennyiségű fájlokat töltesz fel, de valamiért újra kellett kezdened és szeretnéd azonnal folytatni a feltöltést$N$Nez a hasítást egy egyszerű <em>&quot;megegyezik a fájlméret a szerveren?&quot;</em> kérdéssel helyettesíti, szóval ha a tartalom különbözik, a fálj NEM lesz feltöltve$N$Nérdemes kikapcsolni, amint a feltöltés befejeződött, és &quot;feltölteni&quot; ugyanazokat a fájlokat, hogy a kliens ellenőrizhesse őket\">turbó",
 
 		"cut_datechk": "nincs hatással ha a turbó gomb ki van kapcsolva$N$Ncsökkenti a yolo-faktort egy kis mértékkel; összehasonlítja a fájlok időbélyegeit, hogy egyeznek-e$N$N<em>elméletileg</em> felismerheti a legtöbb félkész / hibás feltöltést, de nem helyettesíti a turbó nélküli ellenőrzést a végén\">dátum-ell",
 
-		"cut_u2sz": "feltöltött darabok mérete (MiB-ban); nagyobb értékek gyorsabban repülnek az Atlanti-óceán felett. Próbáljon kisebb értékeket kevésbé megbízható kapcsolatokon",
+		"cut_u2sz": "feltöltött darabok mérete (MiB-ban); nagyobb értékek gyorsabban repülnek az Atlanti-óceán felett. Próbálj kisebb értékeket kevésbé megbízható kapcsolatokon",
 
 		"cut_flag": "biztosítsa, hogy egyszerre csak egy lap folytat feltöltést $N -- minden lapon be kell ezt kapcsolni $N -- csak egyező tartományhoz tartozó lapokon van hatása",
 
@@ -4030,7 +4030,7 @@ var Ls = {
 
 		"cut_wasm": "wasm használata a böngésző beépített hasítója helyett; chrome-alapú böngészőkön javítja a teljesítményt, de megemeli a CPU-használatot, és a régebbi chrome verzíókban hibák vannak, ami elfogyaszthatja az összes RAM-ot és a böngészőt összeomláshoz vezetheti\">wasm",
 
-		"cft_text": "favicon szövege (üres mező és frissítés hogy kikapcsolja)",
+		"cft_text": "favicon szövege (üres mező és frissítés hogy kikapcsold)",
 		"cft_fg": "előtér színe",
 		"cft_bg": "háttér színe",
 
