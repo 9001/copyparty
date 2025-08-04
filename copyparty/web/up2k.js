@@ -1595,7 +1595,7 @@ function up2k_init(subtle) {
         ev(e);
         var txt = linklist();
         cliptxt(txt + '\n', function () {
-            toast.inf(5, un_clip.format(txt.split('\n').length));
+            toast.inf(5, L.un_clip.format(txt.split('\n').length));
         });
     };
 
