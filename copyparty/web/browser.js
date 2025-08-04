@@ -3806,10 +3806,10 @@ var Ls = {
 
 		"hks": [
 			[
-				"misc",
+				"egyéb",
 				["ESC", "dolgok bezárása"],
 
-				"file-manager",
+				"fájlkezelő",
 				["G", "lista- / rácsnézet váltása"],
 				["T", "miniatűrök / ikonok kapcsolása"],
 				["⇧ A/D", "miniatűrök mérete"],
@@ -3820,21 +3820,21 @@ var Ls = {
 				["Y", "kijelölés letöltése"],
 				["F2", "kijelölt elem(ek) átnevezése"],
 
-				"file-list-sel",
+				"fájlkezelő kijelölés",
 				["space", "fájlok kijelölése"],
 				["↑/↓", "kurzor mozgatása"],
 				["ctrl ↑/↓", "kurzor és nézet mozgatása"],
 				["⇧ ↑/↓", "előző/következő fájl kijelölése"],
 				["ctrl-A", "összes fájl / mappa kijelölése"],
 			], [
-				"navigation",
+				"navigáció",
 				["B", "breadcrumb / navigációs panel váltása"],
 				["I/K", "előző/következő mappa"],
 				["M", "felsőbb mappa (vagy a jelenlegi becsukása)"],
 				["V", "mappák / szövekfájlok váltása navigációs panelben"],
 				["A/D", "navigációs panel mérete"],
 			], [
-				"audio-player",
+				"audiolejátszó",
 				["J/L", "előző/következő zeneszám"],
 				["U/O", "10mp előre-/visszaugrás"],
 				["0..9", "0%..90%-hoz ugrás"],
@@ -3842,7 +3842,7 @@ var Ls = {
 				["S", "lejátszásban lévő zeneszám kijelölése"],
 				["Y", "zeneszám letöltése"],
 			], [
-				"image-viewer",
+				"képnézegető",
 				["J/L, ←/→", "előző/következő kép"],
 				["Home/End", "első/utolsó kép"],
 				["F", "teljes képernyő"],
@@ -3851,7 +3851,7 @@ var Ls = {
 				["S", "kép kijelölése"],
 				["Y", "kép letöltése"],
 			], [
-				"video-player",
+				"videolejátszó",
 				["U/O", "10mp előre-/visszaugrás"],
 				["P/K/Space", "lejátszás/szüneteltetés"],
 				["C", "lejátszás folytatása következővel"],
@@ -3859,7 +3859,7 @@ var Ls = {
 				["M", "némítás"],
 				["[ and ]", "ismétlés elejének és végének beállítása"],
 			], [
-				"textfile-viewer",
+				"szövegfájl-olvasó",
 				["I/K", "előző/következő fájl"],
 				["M", "szövegfájl bezárása"],
 				["E", "szövegfájl szerkesztése"],
