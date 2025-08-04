@@ -94,6 +94,47 @@ var Ls = {
 		"af1": "显示最近上传的文件", //m
 		"ag1": "查看已知 IdP 用户", //m
 	},
+	"cze": {
+		"a1": "obnovit",
+		"b1": "ahoj cizinče &nbsp; <small>(nejsi přihlášen)</small>",
+		"c1": "odhlásit se",
+		"d1": "vypsat zásobníku",  // TLNote: "d2" is the tooltip for this button
+		"d2": "zobrazit stav všech aktivních vláken",
+		"e1": "znovu načíst konfiguraci",
+		"e2": "znovu načíst konfigurační soubory (accounts/volumes/volflags),$Na prohledat všechny e2ds úložiště$N$Npoznámka: všechny změny globálních nastavení$Nvyžadují úplné restartování, aby se projevily",
+		"f1": "můžeš procházet:",
+		"g1": "můžeš nahrávat do:",
+		"cc1": "další věci:",
+		"h1": "zakázat k304",  // TLNote: "j1" explains what k304 is
+		"i1": "povolit k304",
+		"j1": "povolení k304 odpojí vašeho klienta při každém HTTP 304, což může zabránit některým chybovým proxy serverům, aby se zasekly (náhle nenačítaly stránky), <em>ale</em> také to obecně zpomalí věci",
+		"k1": "resetovat nastavení klienta",
+		"l1": "přihlaste se pro více:",
+		"m1": "vítej zpět,",  // TLNote: "welcome back, USERNAME"
+		"n1": "404 nenalezeno &nbsp;┐( ´ -`)┌",
+		"o1": 'nebo možná nemáš přístup -- zkus heslo nebo <a href="' + SR + '/?h">jdi domů</a>',
+		"p1": "403 zakázáno &nbsp;~┻━┻",
+		"q1": 'použij heslo nebo <a href="' + SR + '/?h">jdi domů</a>',
+		"r1": "jdi domů",
+		".s1": "znovu prohledat",
+		"t1": "akce",  // TLNote: this is the header above the "rescan" buttons
+		"u2": "čas od posledního zápisu na server$N( upload / rename / ... )$N$N17d = 17 dní$N1h23 = 1 hodina 23 minut$N4m56 = 4 minuty 56 sekund",
+		"v1": "připojit",
+		"v2": "použít tento server jako místní HDD",
+		"w1": "přepnout na https",
+		"x1": "změnit heslo",
+		"y1": "upravit sdílení",  // TLNote: shows the list of folders that the user has decided to share
+		"z1": "odblokovat toto sdílení:",  // TLNote: the password prompt to see a hidden share
+		"ta1": "nejprve vyplňte své nové heslo",
+		"ta2": "zopakujte pro potvrzení nového hesla:",
+		"ta3": "nalezen překlep; zkuste to prosím znovu",
+		"aa1": "příchozí soubory:",
+		"ab1": "deaktivovat no304",
+		"ac1": "povolit no304",
+		"ad1": "povolení no304 deaktivuje veškeré mezipaměti; zkuste to, pokud k304 nestačilo. To ovšem zapříčíní obrovské množství síťového provozu!",
+		"ae1": "aktivní stahování:",
+		"af1": "zobrazit nedávné nahrávání",
+	},
 	"deu": {
 		"a1": "Neu laden",
 		"b1": "Tach, wie geht's? &nbsp; <small>(Du bist nicht angemeldet)</small>",
