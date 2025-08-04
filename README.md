@@ -262,7 +262,7 @@ also see [comparison to similar software](./docs/versus.md)
     * ☑ play video files as audio (converted on server)
     * ☑ create and play [m3u8 playlists](#playlists)
   * ☑ image gallery with webm player
-  * ☑ [textfile browser](#textfile-viewer) with syntax hilighting
+  * ☑ [textfile browser](#textfile-viewer) with syntax highlighting
     * ☑ realtime streaming of growing files (logfiles and such)
   * ☑ [thumbnails](#thumbnails)
     * ☑ ...of images using Pillow, pyvips, or FFmpeg
