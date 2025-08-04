@@ -7556,7 +7556,7 @@ var Ls = {
 	},
 };
 
-var LANGS = ["eng", "nor", "chi", "deu", "fin", "grc", "ita", "nld", "rus", "spa", "ukr"];
+var LANGS = ["eng", "nor", "chi", "deu", "fin", "grc", "hun", "ita", "nld", "rus", "spa", "ukr"];
 
 if (window.langmod)
 	langmod();
