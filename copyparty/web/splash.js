@@ -218,6 +218,47 @@ var Ls = {
 		"ae1": "ενεργές μεταφορτώσεις:",
 		"af1": "προβολή πρόσφατων μεταφορτώσεων",
 	},
+	"hun": {
+		"a1": "frissítés",
+		"b1": "üdv, idegen &nbsp; <small>(nem vagy bejelentkezve)</small>",
+		"c1": "kijelentkezés",
+		"d1": "stack lekérése",  // TLNote: "d2" is the tooltip for this button
+		"d2": "minden futó szál állapotát megmutatja",
+		"e1": "konfiguráció újratöltése",
+		"e2": "konfigurációs fájlok újratöltése (fiókok/kötetek/volflag-ek,$Nés minden e2ds kötet újraszkennelése$N$Nmegjegyzés: változások a globális beállításokhoz$Negy teljes újraindítást igényelnek, hogy hatályba lépjenek",
+		"f1": "böngészheted ezeket:",
+		"g1": "feltölthetsz ide:",
+		"cc1": "egyéb cuccok:",
+		"h1": "k304 letiltása",  // TLNote: "j1" explains what k304 is
+		"i1": "k304 engedélyezése",
+		"j1": "k304 bekapcsolásakor a kliens minden HTTP 304 esetén bontja a kapcsolatot, ezzel furán viselkedő proxiszervereken segítve (hirtelen nem töltődnek be az oldalak), <em>de</em> ez általában lelassítja a dolgokat",
+		"k1": "kliens beállításainak törlése",
+		"l1": "jelentkezz be továbbiakért:",
+		"m1": "üdv újra,",  // TLNote: "welcome back, USERNAME"
+		"n1": "404 nem található &nbsp;┐( ´ -`)┌",
+		"o1": 'vagy nincs hozzáférésed -- próbálj beírni egy jelszót vagy <a href="' + SR + '/?h">vissza a főoldalra</a>',
+		"p1": "403 hozzáférés megtagadva &nbsp;~┻━┻",
+		"q1": 'írj be egy jelszót vagy <a href="' + SR + '/?h">vissza a főoldalra/a>',
+		"r1": "vissza a főoldalra",
+		".s1": "újraszkennelés",
+		"t1": "parancs",  // TLNote: this is the header above the "rescan" buttons
+		"u2": "elmúlt idő az utolsó írás óta$N( feltöltés / átnevezés / ... )$N$N17d = 17 nap$N1h23 = 1 óra 23 perc$N4m56 = 4 perc 56 másodperc",
+		"v1": "kapcsolódás",
+		"v2": "használd a szervert helyi mind egy helyi lemezt",
+		"w1": "váltás https-re",
+		"x1": "jelszó változtatása",
+		"y1": "megosztások szerkesztése",  // TLNote: shows the list of folders that the user has decided to share
+		"z1": "oldd fel ezt a megosztást:",  // TLNote: the password prompt to see a hidden share
+		"ta1": "először írd be az új jelszavadat",
+		"ta2": "megerősítéshez ismételd meg az új jelszavadat:",
+		"ta3": "lehet elírtad; kérlek próbáld újra",
+		"aa1": "beérkező fájlok",
+		"ab1": "no304 letiltása",
+		"ac1": "no304 engedélyezése",
+		"ad1": "no304 bekapcsolásakor semmilyen gyorsítótárazás nem fog történni; próbáld ki, ha a k304 nem elég. Ez nagyon sok adatforgalmat pazarol!",
+		"ae1": "active downloads:",
+		"af1": "közelmúltbeli feltöltések",
+	},
 	"ita": {
 		"a1": "aggiorna",
 		"b1": "ciao &nbsp; <small>(non sei connesso)</small>",
