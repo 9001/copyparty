@@ -2277,11 +2277,9 @@ if your distro/OS is not mentioned below, there might be some hints in the [«on
 
 `pacman -S copyparty` (in [arch linux extra](https://archlinux.org/packages/extra/any/copyparty/))
 
-it comes with a [systemd service](./contrib/package/arch/copyparty.service) and expects to find one or more [config files](./docs/example.conf) in `/etc/copyparty.d/`
+it comes with a [systemd service](./contrib/systemd/copyparty@.service) as well as a [user service](./contrib/systemd/copyparty-user.service), and expects to find a [config file](./contrib/systemd/copyparty.example.conf) in `/etc/copyparty/copyparty.conf` or `~/.config/copyparty/copyparty.conf`
 
-after installing it, you may want to `cp /usr/lib/systemd/system/copyparty.service /etc/systemd/system/` and then `vim /etc/systemd/system/copyparty.service` to change what user/group it is running as (you only need to do this once)
-
-NOTE: there used to be an aur package; this evaporated when copyparty was adopted by the official archlinux repos. If you're still using the aur package, please move
+after installing, start either the system service or the user service and navigate to (http://127.0.0.1:3923) for further instructions (unless you already edited the config files, in which case you are good to go, probably)
 
 
 ## fedora package
