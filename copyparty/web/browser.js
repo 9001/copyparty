@@ -3522,7 +3522,7 @@ var Ls = {
 		"frb_apply": "ZASTOSUJ ZMIANĘ NAZWY",
 		"fr_adv": "zmiana nazwy hurtowa / metadanych / wzorcem\">zaawansowane",
 		"fr_case": "rozróżnianie wielkości liter w regex\">wlit",
-		"fr_win": "nazwy bezpieczne dla windowsa; zamienia symbole <code>&lt;&gt;:&quot;\\|?*</code> na japońskie odpowiedniki\">win",
+		"fr_win": "nazwy bezpieczne dla systemu Windows; zamienia symbole <code>&lt;&gt;:&quot;\\|?*</code> na japońskie odpowiedniki\">win",
 		"fr_slash": "zamienia <code>/</code> symbolem, który nie tworzy nowych folderów\">brak /",
 		"fr_re": "regex search pattern to apply to original filenames; capturing groups can be referenced in the format field below like &lt;code&gt;(1)&lt;/code&gt; and &lt;code&gt;(2)&lt;/code&gt; and so on",
 		"fr_fmt": "inspired by foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; is replaced by song title,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skips [this] part if artist is blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; pads tracknumber to 2 digits",
