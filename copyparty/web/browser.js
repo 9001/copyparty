@@ -3144,7 +3144,7 @@ var Ls = {
   "pol": {
     "tt": "Polski",
 		"cols": {
-			"c": "przciski akcji",
+			"c": "przyciski akcji",
 			"dur": "czas trwania",
 			"q": "jakość / bitrate",
 			"Ac": "kodek audio",
@@ -3177,7 +3177,7 @@ var Ls = {
 				["ctrl-C", "skopiuj zaznaczone do schowka"],
 				["ctrl-V", "wklej (przenieś/skopiuj) tutaj"],
 				["Y", "pobierz zaznaczone"],
-				["F2", "zmień nazwę zaznaczenia"],
+				["F2", "zmień nazwę zaznaczonych"],
 
 				"file-list-sel",
 				["spacja", "przełącz zaznaczanie plików"],
@@ -3235,16 +3235,16 @@ var Ls = {
 
 		"ht_s1": "sekunda",
 		"ht_s2": "sekund(y)",
-		"ht_m1": "minute",
-		"ht_m2": "minutes",
-		"ht_h1": "hour",
-		"ht_h2": "hours",
+		"ht_m1": "minuta",
+		"ht_m2": "minuty",
+		"ht_h1": "godzina",
+		"ht_h2": "godziny",
 		"ht_d1": "dzień",
 		"ht_d2": "dni",
 		"ht_and": " i ",
 
 		"goh": "panel sterowania",
-		"gop": 'poprzedni sibling">poprzedni',
+		"gop": 'poprzedni plik/folder">poprzedni',
 		"gou": 'nadrzędny folder">w górę',
 		"gon": 'następny folder">następny',
 		"logout": "Wyloguj ",
@@ -3264,7 +3264,7 @@ var Ls = {
 
 		"ab_mkdir": "stwórz folder",
 		"ab_mkdoc": "stwórz dok. markdown",
-		"ab_msg": "wyślij wiad. do loga serwera",
+		"ab_msg": "wyślij wiad. do logów serwera",
 
 		"ay_path": "przejdź do folderów",
 		"ay_files": "przejdź do plików",
@@ -3370,7 +3370,7 @@ var Ls = {
 		"ct_idxh": 'pokazuj plik index.html zamiast zawartości folderu">htm',
 		"ct_sbars": 'pokazuj paski przewijania">⟊',
 
-		"cut_umod": "uaktualnij znacznik ostatniej modyfikacji pliku, tak aby pasował do pliku lokajnego jeżeli plik już istnieje na serwerze (wymaga dostępu zapisu i usuwania)\">📅 ponownie",
+		"cut_umod": "uaktualnij znacznik ostatniej modyfikacji pliku, tak aby pasował do pliku lokalnego jeżeli plik już istnieje na serwerze (wymaga dostępu zapisu i usuwania)\">📅 ponownie",
 
 		"cut_turbo": "przycisk „raz się żyje”, raczej NIE POWINIENEŚ tego włączać:$N$Nużywaj jeśli przesyłano ogromną liczbę plików i z jakiegoś powodu musisz przesłać pliki ponownie, kontynuując jak najszybciej$N$Nzamienia sprawdzanie sumy kontrolnej plików prostym <em>&quot;czy ten plik jest tego samego rozmiaru jak ten na serwerze?&quot;</em> więc jeśli pliki różnią się zawartością, ale są tego samego rozmiaru, NIE ZOSTANĄ przesłane ponownie$N$Nta opcja powinna zostać wyłączona po zakończeniu przesyłania, i potem &quot;przesłać&quot; te same pliki ponownie w celu weryfikacji\">turbo",
 
@@ -3387,7 +3387,7 @@ var Ls = {
 
 		"cut_mt": "używaj wielowątkowości, aby przyspieszyć obliczanie sumy kontrolnej plików$N$Nużywa web workerów i wymaga$Nwięcej pamięci RAM (do 512 MiB)$N$Nprzyspiesza https o 30% i http 4,5-krotnie\">ww",
 
-		"cut_wasm": "używaj WASM zamiast wbudowanego hashera przeglądarki; zwiększa prędkość na Chromo-pochodnych przeglądarkach, zwiększając zużycie procesora, ponadto wiele starszych wersji Chrome'a zawiera błędy powodujące zeżarcie całej pamięci RAM komputera i przymusowe zamknięcie przeglądarki jeżeli ta opcja jest włączona\">wasm",
+		"cut_wasm": "używaj WASM zamiast wbudowanego hashera przeglądarki; zwiększa prędkość na Chrome'o-pochodnych przeglądarkach, zwiększając zużycie procesora, ponadto wiele starszych wersji Chrome'a zawiera błędy powodujące zeżarcie całej pamięci RAM komputera i przymusowe zamknięcie przeglądarki jeżeli ta opcja jest włączona\">wasm",
 
 		"cft_text": "tekst favicon (aby wyłączyć, usuń zawartość i przeładuj stronę)",
 		"cft_fg": "kolor tekstu",
@@ -3452,24 +3452,24 @@ var Ls = {
 		"mb_play": "odtwórz",
 		"mm_hashplay": "odtworzyć ten plik audio?",
 		"mm_m3u": "naciśnij <code>Enter/OK</code>, aby odtworzyć\nnaciśnij <code>ESC/Cancel</code>, aby edytować",
-		"mp_breq": "wymagany jest firefox 82+, chrome 73+ lub iOS 15+",
+		"mp_breq": "wymagany jest Firefox 82+, Chrome 73+ lub iOS 15+",
 		"mm_bload": "wczytywanie...",
 		"mm_bconv": "konwertowanie do {0}, proszę czekać...",
 		"mm_opusen": "ta przeglądarka nie może odtwarzać plików aac / m4a;\ntranskodowanie do formatu opus włączone",
 		"mm_playerr": "odtwarzanie nie powiodło się: ",
 		"mm_eabrt": "Odtwarzanie zostało przerwane",
 		"mm_enet": "Połączenie z internetem jest słabe",
-		"mm_edec": "Ten plik jest niby uszkodzony??",
+		"mm_edec": "Ten plik wydaje się uszkodzony??",
 		"mm_esupp": "Twoja przeglądarka nie rozumie tego formatu audio",
-		"mm_eunk": "Nieznany błund",
+		"mm_eunk": "Nieznany błąd",
 		"mm_e404": "Nie można odtworzyć; błąd 404: Nie znaleziono pliku.",
-		"mm_e403": "Nie można odtworzyć; błąd 403: Odmowa dostęou.\n\nSpróbuj przeładować stronę (F5), może cię wylogowało",
+		"mm_e403": "Nie można odtworzyć; błąd 403: Odmowa dostępu.\n\nSpróbuj przeładować stronę (F5), może cię wylogowało",
 		"mm_e500": "Nie można odtworzyć; błąd 500: Sprawdź logi serwera.",
 		"mm_e5xx": "Nie można odtworzyć; błąd serwera",
 		"mm_nof": "nie znaleziono więcej plików audio",
 		"mm_prescan": "Szukanie kolejnego utworu...",
 		"mm_scank": "Znaleziono następną piosenkę:",
-		"mm_uncache": "wyczyszczono pamięć podręczną; wszystkie utwory zostaną pobrane ponownie przy nastęonym odtworzeniu",
+		"mm_uncache": "wyczyszczono pamięć podręczną; wszystkie utwory zostaną pobrane ponownie przy następnym odtworzeniu",
 		"mm_hnf": "ten utwór już nie istnieje",
 
 		"im_hnf": "ten obraz już nie istnieje",
@@ -3484,9 +3484,9 @@ var Ls = {
 
 		"f_dls": 'linki do plików w aktualnym folderze\nzostały zmienione w linki pobierania',
 
-		"f_partial": "Aby bezpiecznie pobrać plik, który aktualnie jest przesyłany, wybierz plik o tej samej nazie, lecz bez rozszerzenia <code>.PARTIAL</code>. Żeby to zrobić, naciśnij ANULUJ lub klawisz ESC.\n\nWciśnięcie OK / Enter zignoruje to ostrzeżenie i pobierze plik tymczasowy <code>.PARTIAL</code>, który prawie z pewnością będzie zepsuty",
+		"f_partial": "Aby bezpiecznie pobrać plik, który aktualnie jest przesyłany, wybierz plik o tej samej nazwie, lecz bez rozszerzenia <code>.PARTIAL</code>. Żeby to zrobić, naciśnij ANULUJ lub klawisz ESC.\n\nWciśnięcie OK / Enter zignoruje to ostrzeżenie i pobierze plik tymczasowy <code>.PARTIAL</code>, który prawie z pewnością będzie zepsuty",
 
-		"ft_paste": "wkklej {0} elementów$NSkrót: ctrl-V",
+		"ft_paste": "wklej {0} elementów$NSkrót: ctrl-V",
 		"fr_eperm": 'nie można zmienić nazwy:\nnie posiadasz uprawnienia „move” w tym folderze',
 		"fd_eperm": 'nie można usunąć:\nnie posiadasz uprawnienia „delete” w tym folderze',
 		"fc_eperm": 'nie można wyciąć:\nnie posiadasz uprawnienia „move” w tym folderze',
