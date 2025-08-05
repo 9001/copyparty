@@ -1,4 +1,7 @@
 # Maintainer: icxes <dev.null@need.moe>
+# Contributor: Morgan Adamiec <morganamilo@archlinux.org>
+# NOTE: You generally shouldn't use this PKGBUILD on Arch, as it is mainly for testing purposes. Install copyparty using pacman instead.
+
 pkgname=copyparty
 pkgver="1.18.10"
 pkgrel=1
@@ -6,52 +9,41 @@ pkgdesc="File server with accelerated resumable uploads, dedup, WebDAV, FTP, TFT
 arch=("any")
 url="https://github.com/9001/${pkgname}"
 license=('MIT')
-depends=("python" "lsof" "python-jinja")
+depends=("bash" "python" "lsof" "python-jinja")
 makedepends=("python-wheel" "python-setuptools" "python-build" "python-installer" "make" "pigz")
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags"
-            "cfssl: generate TLS certificates on startup (pointless when reverse-proxied)"
-            "python-mutagen: music tags (alternative)" 
-            "python-pillow: thumbnails for images" 
-            "python-pyvips: thumbnails for images (higher quality, faster, uses more ram)" 
-            "libkeyfinder-git: detection of musical keys" 
-            "qm-vamp-plugins: BPM detection" 
-            "python-pyopenssl: ftps functionality" 
-            "python-pyzmq: send zeromq messages from event-hooks" 
-            "python-argon2-cffi: hashed passwords in config" 
-            "python-impacket-git: smb support (bad idea)"
+            "cfssl: generate TLS certificates on startup"
+            "python-mutagen: music tags (alternative)"
+            "python-pillow: thumbnails for images"
+            "python-pyvips: thumbnails for images (higher quality, faster, uses more ram)"
+            "libkeyfinder: detection of musical keys"
+            "python-pyopenssl: ftps functionality"
+            "python-pyzmq: send zeromq messages from event-hooks"
+            "python-argon2-cffi: hashed passwords in config"
 )
 source=("https://github.com/9001/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
-backup=("etc/${pkgname}.d/init" )
+backup=("etc/${pkgname}/copyparty.conf" )
 sha256sums=("49c5fedf7619437bc0af125cb4e8360d9bda9d87ef45d6314d7acf163ab4cf99")
 
 build() {
+    cd "${srcdir}/${pkgname}-${pkgver}/copyparty/web"
+    make
+
     cd "${srcdir}/${pkgname}-${pkgver}"
-    
-    pushd copyparty/web
-    make -j$(nproc)
-    rm Makefile
-    popd
-    
-    python3 -m build -wn
+    python -m build --wheel --no-isolation
 }
 
 package() {
     cd "${srcdir}/${pkgname}-${pkgver}"
-    python3 -m installer -d "$pkgdir" dist/*.whl
+    python -m installer --destdir="$pkgdir" dist/*.whl
 
-    install -dm755 "${pkgdir}/etc/${pkgname}.d"
+    install -dm755 "${pkgdir}/etc/${pkgname}"
     install -Dm755 "bin/prisonparty.sh" "${pkgdir}/usr/bin/prisonparty"
-    install -Dm644 "contrib/package/arch/${pkgname}.conf" "${pkgdir}/etc/${pkgname}.d/init"
-    install -Dm644 "contrib/package/arch/${pkgname}.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}.service"
-    install -Dm644 "contrib/package/arch/prisonparty.service" "${pkgdir}/usr/lib/systemd/system/prisonparty.service"
-    install -Dm644 "contrib/package/arch/index.md" "${pkgdir}/var/lib/${pkgname}-jail/README.md"
+    install -Dm644 "contrib/systemd/${pkgname}.conf" "${pkgdir}/etc/${pkgname}/copyparty.conf"
+    install -Dm644 "contrib/systemd/${pkgname}@.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}@.service"
+    install -Dm644 "contrib/systemd/${pkgname}-user.service" "${pkgdir}/usr/lib/systemd/user/${pkgname}.service"
+    install -Dm644 "contrib/systemd/prisonparty@.service" "${pkgdir}/usr/lib/systemd/system/prisonparty@.service"
+    install -Dm644 "contrib/systemd/prisonparty-user.service" "${pkgdir}/usr/lib/systemd/user/prisonparty.service"
+    install -Dm644 "contrib/systemd/index.md" "${pkgdir}/var/lib/${pkgname}-jail/README.md"
     install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-
-    find /etc/${pkgname}.d -iname '*.conf' 2>/dev/null | grep -qE . && return
-    echo "┏━━━━━━━━━━━━━━━──-"
-    echo "┃ Configure ${pkgname} by adding .conf files into /etc/${pkgname}.d/"
-    echo "┃ and maybe copy+edit one of the following to /etc/systemd/system/:"
-    echo "┣━♦ /usr/lib/systemd/system/${pkgname}.service   (standard)"
-    echo "┣━♦ /usr/lib/systemd/system/prisonparty.service (chroot)"
-    echo "┗━━━━━━━━━━━━━━━──-"
 }
