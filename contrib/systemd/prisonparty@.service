@@ -1,0 +1,38 @@
+# this will start `/usr/bin/copyparty`
+# in a chroot, preventing accidental access elsewhere,
+# and read copyparty config from `/etc/copyparty/copyparty.conf`
+#
+# expose additional filesystem locations to copyparty
+#   by listing them between the last `%i` and `--`
+#
+# `%i %i` = user/group to run copyparty as; can be IDs (1000 1000)
+#   the %i refers to whatever you put after the prisonparty@
+#   so with prisonparty@foo.service, %i == foo
+#
+# unless you add -q to disable logging, you may want to remove the
+#   following line to allow buffering (slightly better performance):
+#   Environment=PYTHONUNBUFFERED=x
+
+[Unit]
+Description=copyparty file server
+
+[Service]
+Type=notify
+SyslogIdentifier=prisonparty
+WorkingDirectory=/var/lib/copyparty-jail
+Environment=PYTHONUNBUFFERED=x
+Environment=PRTY_CONFIG=/etc/copyparty/copyparty.conf
+ExecReload=/bin/kill -s USR1 $MAINPID
+
+# user to run as + where the TLS certificate is (if any)
+User=%i
+Environment=XDG_CONFIG_HOME=/home/%i/.config
+
+# run copyparty
+ExecStart=/bin/bash /usr/bin/prisonparty /var/lib/copyparty-jail %i %i \
+  /etc/copyparty \
+  -- \
+  /usr/bin/python3 /usr/bin/copyparty
+
+[Install]
+WantedBy=multi-user.target

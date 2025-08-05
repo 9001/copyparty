@@ -1,0 +1,33 @@
+# this will start `/usr/bin/copyparty`
+# in a chroot, preventing accidental access elsewhere,
+# and read copyparty config from `$HOME/.config/copyparty.conf`
+#
+# expose additional filesystem locations to copyparty
+#   by listing them between the last `%u` and `--`
+#
+# unless you add -q to disable logging, you may want to remove the
+#   following line to allow buffering (slightly better performance):
+#   Environment=PYTHONUNBUFFERED=x
+
+[Unit]
+Description=copyparty file server
+
+[Service]
+Type=notify
+SyslogIdentifier=prisonparty
+WorkingDirectory=/var/lib/copyparty-jail
+Environment=PYTHONUNBUFFERED=x
+Environment=PRTY_CONFIG=%h/.config/copyparty/copyparty.conf
+ExecReload=/bin/kill -s USR1 $MAINPID
+
+# ensure there is a config
+ExecStartPre=/bin/bash -c 'if [[ ! -f %h/.config/copyparty/copyparty.conf ]]; then mkdir -p %h/.config/copyparty; cp /etc/copyparty/copyparty.conf %h/.config/copyparty/copyparty.conf; fi'
+
+# run copyparty
+ExecStart=/bin/bash /usr/bin/prisonparty /var/lib/copyparty-jail %u %u \
+  %h/.config/copyparty \
+  -- \
+  /usr/bin/python3 /usr/bin/copyparty
+
+[Install]
+WantedBy=default.target
