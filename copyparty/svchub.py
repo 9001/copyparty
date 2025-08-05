@@ -850,15 +850,6 @@ class SvcHub(object):
 
     def _check_env(self) -> None:
         al = self.args
-        try:
-            files = os.listdir(E.cfg)
-        except:
-            files = []
-
-        hits = [x for x in files if x.lower().endswith(".conf")]
-        if hits:
-            t = "WARNING: found config files in [%s]: %s\n  config files are not expected here, and will NOT be loaded (unless your setup is intentionally hella funky)"
-            self.log("root", t % (E.cfg, ", ".join(hits)), 3)
 
         if self.args.no_bauth:
             t = "WARNING: --no-bauth disables support for the Android app; you may want to use --bauth-last instead"
