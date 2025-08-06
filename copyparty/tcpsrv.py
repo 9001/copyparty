@@ -245,8 +245,10 @@ class TcpSrv(object):
 
     def _listen(self, ip: str, port: int) -> None:
         uds_perm = uds_gid = -1
+        bound = False
+        tcp = False
+
         if "unix:" in ip:
-            tcp = False
             ipv = socket.AF_UNIX
             uds = ip.split(":")
             ip = uds[-1]
@@ -259,7 +261,12 @@ class TcpSrv(object):
                     import grp
 
                     uds_gid = grp.getgrnam(uds[2]).gr_gid
+        elif "fd:" in ip:
+            fd = ip[3:]
+            bound = socket.socket(fileno=int(fd))
 
+            tcp = bound.proto == socket.IPPROTO_TCP
+            ipv = bound.family
         elif ":" in ip:
             tcp = True
             ipv = socket.AF_INET6
@@ -267,7 +274,10 @@ class TcpSrv(object):
             tcp = True
             ipv = socket.AF_INET
 
-        srv = socket.socket(ipv, socket.SOCK_STREAM)
+        if not bound:
+            srv = socket.socket(ipv, socket.SOCK_STREAM)
+        else:
+            srv = bound
 
         if not ANYWIN or self.args.reuseaddr:
             srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -286,29 +296,30 @@ class TcpSrv(object):
             srv.setsockopt(socket.SOL_IP, socket.IP_FREEBIND, 1)
 
         try:
-            if tcp:
-                srv.bind((ip, port))
-            else:
-                if ANYWIN or self.args.rm_sck:
-                    if os.path.exists(ip):
-                        os.unlink(ip)
-                    srv.bind(ip)
+            if not bound:
+                if tcp:
+                    srv.bind((ip, port))
                 else:
-                    tf = "%s.%d" % (ip, os.getpid())
-                    if os.path.exists(tf):
-                        os.unlink(tf)
-                    srv.bind(tf)
-                    if uds_gid != -1:
-                        os.chown(tf, -1, uds_gid)
-                    if uds_perm != -1:
-                        os.chmod(tf, uds_perm)
-                    atomic_move(self.nlog, tf, ip, VF_CAREFUL)
+                    if ANYWIN or self.args.rm_sck:
+                        if os.path.exists(ip):
+                            os.unlink(ip)
+                        srv.bind(ip)
+                    else:
+                        tf = "%s.%d" % (ip, os.getpid())
+                        if os.path.exists(tf):
+                            os.unlink(tf)
+                        srv.bind(tf)
+                        if uds_gid != -1:
+                            os.chown(tf, -1, uds_gid)
+                        if uds_perm != -1:
+                            os.chmod(tf, uds_perm)
+                        atomic_move(self.nlog, tf, ip, VF_CAREFUL)
 
-            sport = srv.getsockname()[1] if tcp else port
-            if port != sport:
-                # linux 6.0.16 lets you bind a port which is in use
-                # except it just gives you a random port instead
-                raise OSError(E_ADDR_IN_USE[0], "")
+                sport = srv.getsockname()[1] if tcp else port
+                if port != sport:
+                    # linux 6.0.16 lets you bind a port which is in use
+                    # except it just gives you a random port instead
+                    raise OSError(E_ADDR_IN_USE[0], "")
             self.srv.append(srv)
         except (OSError, socket.error) as ex:
             try:
@@ -437,7 +448,7 @@ class TcpSrv(object):
     def detect_interfaces(self, listen_ips: list[str]) -> dict[str, Netdev]:
         from .stolen.ifaddr import get_adapters
 
-        listen_ips = [x for x in listen_ips if "unix:" not in x]
+        listen_ips = [x for x in listen_ips if not x.startswith(("unix:", "fd:"))]
 
         nics = get_adapters(True)
         eps: dict[str, Netdev] = {}

@@ -868,7 +868,7 @@ class SvcHub(object):
 
         have_tcp = False
         for zs in al.i:
-            if not zs.startswith("unix:"):
+            if not zs.startswith(("unix:", "fd:")):
                 have_tcp = True
         if not have_tcp:
             zb = False
@@ -878,7 +878,7 @@ class SvcHub(object):
                     setattr(al, zs, False)
                     zb = True
             if zb:
-                t = "only listening on unix-sockets; cannot enable zeroconf/mdns/ssdp as requested"
+                t = "no ip addresses provided; cannot enable zeroconf/mdns/ssdp as requested"
                 self.log("root", t, 3)
 
         if not self.args.no_dav:
