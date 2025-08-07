@@ -43,7 +43,6 @@ package() {
     install -Dm644 "contrib/systemd/${pkgname}@.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}@.service"
     install -Dm644 "contrib/systemd/${pkgname}-user.service" "${pkgdir}/usr/lib/systemd/user/${pkgname}.service"
     install -Dm644 "contrib/systemd/prisonparty@.service" "${pkgdir}/usr/lib/systemd/system/prisonparty@.service"
-    install -Dm644 "contrib/systemd/prisonparty-user.service" "${pkgdir}/usr/lib/systemd/user/prisonparty.service"
     install -Dm644 "contrib/systemd/index.md" "${pkgdir}/var/lib/${pkgname}-jail/README.md"
     install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }
