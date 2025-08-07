@@ -244,7 +244,7 @@ var Ls = {
 		"t1": "parancs",  // TLNote: this is the header above the "rescan" buttons
 		"u2": "elmúlt idő az utolsó írás óta$N( feltöltés / átnevezés / ... )$N$N17d = 17 nap$N1h23 = 1 óra 23 perc$N4m56 = 4 perc 56 másodperc",
 		"v1": "kapcsolódás",
-		"v2": "használd a szervert helyi mind egy helyi lemezt",
+		"v2": "használd a szervert mint egy helyi lemezt",
 		"w1": "váltás https-re",
 		"x1": "jelszó változtatása",
 		"y1": "megosztások szerkesztése",  // TLNote: shows the list of folders that the user has decided to share
@@ -256,7 +256,7 @@ var Ls = {
 		"ab1": "no304 letiltása",
 		"ac1": "no304 engedélyezése",
 		"ad1": "no304 bekapcsolásakor semmilyen gyorsítótárazás nem fog történni; próbáld ki, ha a k304 nem elég. Ez nagyon sok adatforgalmat pazarol!",
-		"ae1": "active downloads:",
+		"ae1": "aktív letöltések:",
 		"af1": "közelmúltbeli feltöltések",
 	},
 	"ita": {
