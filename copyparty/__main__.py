@@ -564,7 +564,7 @@ def get_sects():
 
             \033[32m-i fd:\033[33m3\033[0m uses the socket passed to copyparty on file descriptor 3
 
-            \033[33m-p\033[0m (tcp ports) is ignored for unix sockets
+            \033[33m-p\033[0m (tcp ports) is ignored for non ip-addresses
             """
             ),
         ],
