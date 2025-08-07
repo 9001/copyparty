@@ -437,6 +437,7 @@ upgrade notes
 
 * can I link someone to a password-protected volume/file by including the password in the URL?
   * yes, by adding `?pw=hunter2` to the end; replace `?` with `&` if there are parameters in the URL already, meaning it contains a `?` near the end
+    * if you have enabled `--accounts` then do `?pw=username:password` instead
 
 * how do I stop `.hist` folders from appearing everywhere on my HDD?
   * by default, a `.hist` folder is created inside each volume for the filesystem index, thumbnails, audio transcodes, and markdown document history. Use the `--hist` global-option or the `hist` volflag to move it somewhere else; see [database location](#database-location)
@@ -1016,6 +1017,7 @@ a feed example: https://cd.ocv.me/a/d2/d22/?rss&fext=mp3
 url parameters:
 
 * `pw=hunter2` for password auth
+  * if you enabled `--usernames` then do `pw=username:password` instead
 * `recursive` to also include subfolders
 * `title=foo` changes the feed title (default: folder name)
 * `fext=mp3,opus` only include mp3 and opus files (default: all)
@@ -1301,6 +1303,7 @@ an FTP server can be started using `--ftp 3921`,  and/or `--ftps` for explicit T
   * if you enable both `ftp` and `ftps`, the port-range will be divided in half
   * some older software (filezilla on debian-stable) cannot passive-mode with TLS
 * login with any username + your password, or put your password in the username field
+  * unless you enabled `--usernames`
 
 some recommended FTP / FTPS clients; `wark` = example password:
 * https://winscp.net/eng/download.php
@@ -1318,6 +1321,7 @@ click the [connect](http://127.0.0.1:3923/?hc) button in the control-panel to se
 
 general usage:
 * login with any username + your password, or put your password in the username field (password field can be empty/whatever)
+  * unless you enabled `--usernames`
 
 on macos, connect from finder:
 * [Go] -> [Connect to Server...] -> http://192.168.123.1:3923/
@@ -1333,6 +1337,7 @@ using the GUI  (winXP or later):
 * rightclick [my computer] -> [map network drive] -> Folder: `http://192.168.123.1:3923/`
   * on winXP only, click the `Sign up for online storage` hyperlink instead and put the URL there
   * providing your password as the username is recommended; the password field can be anything or empty
+    * unless you enabled `--usernames`
 
 the webdav client that's built into windows has the following list of bugs; you can avoid all of these by connecting with rclone instead:
 * win7+ doesn't actually send the password to the server when reauthenticating after a reboot unless you first try to login with an incorrect password and then switch to the correct password
@@ -1390,6 +1395,7 @@ some **BIG WARNINGS** specific to SMB/CIFS, in decreasing importance:
 * the smb backend is not fully integrated with vfs, meaning there could be security issues (path traversal). Please use `--smb-port` (see below) and [prisonparty](./bin/prisonparty.sh) or [bubbleparty](./bin/bubbleparty.sh)
   * account passwords work per-volume as expected, and so does account permissions (read/write/move/delete), but `--smbw` must be given to allow write-access from smb
   * [shadowing](#shadowing) probably works as expected but no guarantees
+* not compatible with pw-hashing or `--usernames`
 
 and some minor issues,
 * clients only see the first ~400 files in big folders;
@@ -2058,7 +2064,11 @@ you can either:
 * or do location-based proxying, using `--rp-loc=/stuff` to tell copyparty where it is mounted -- has a slight performance cost and higher chance of bugs
   * if copyparty says `incorrect --rp-loc or webserver config; expected vpath starting with [...]` it's likely because the webserver is stripping away the proxy location from the request URLs -- see the `ProxyPass` in the apache example below
 
-when running behind a reverse-proxy (this includes services like cloudflare), it is important to configure real-ip correctly, as many features rely on knowing the client's IP. Look out for red and yellow log messages which explain how to do this. But basically, set `--xff-hdr` to the name of the http header to read the IP from (usually `x-forwarded-for`, but cloudflare uses `cf-connecting-ip`), and then `--xff-src` to the IP of the reverse-proxy so copyparty will trust the xff-hdr. Note that `--rp-loc` in particular will not work at all unless you do this
+when running behind a reverse-proxy (this includes services like cloudflare), it is important to configure real-ip correctly, as many features rely on knowing the client's IP. The best/safest approach is to configure your reverse-proxy so it gives copyparty a header which only contains the client's true/real IP-address, and then setting `--xff-hdr theHeaderName --rproxy 1` but alternatively, if you want/need to let copyparty handle this, look out for red and yellow log messages which explain how to do that. Basically, the log will say this:
+
+> set `--xff-hdr` to the name of the http-header to read the IP from (usually `x-forwarded-for`, but cloudflare uses `cf-connecting-ip`), and then `--xff-src` to the IP of the reverse-proxy so copyparty will trust the xff-hdr. You will also need to configure `--rproxy` to `1` if the header only contains one IP (the correct one) or to a *negative value* if it contains multiple; `-1` being the rightmost and most trusted IP (the nearest proxy, so usually not the correct one), `-2` being the second-closest hop, and so on
+
+Note that `--rp-loc` in particular will not work at all unless you configure the above correctly
 
 some reverse proxies (such as [Caddy](https://caddyserver.com/)) can automatically obtain a valid https/tls certificate for you, and some support HTTP/2 and QUIC which *could* be a nice speed boost, depending on a lot of factors
 * **warning:** nginx-QUIC (HTTP/3) is still experimental and can make uploads much slower, so HTTP/1.1 is recommended for now
@@ -2277,11 +2287,9 @@ if your distro/OS is not mentioned below, there might be some hints in the [«on
 
 `pacman -S copyparty` (in [arch linux extra](https://archlinux.org/packages/extra/any/copyparty/))
 
-it comes with a [systemd service](./contrib/package/arch/copyparty.service) and expects to find one or more [config files](./docs/example.conf) in `/etc/copyparty.d/`
+it comes with a [systemd service](./contrib/systemd/copyparty@.service) as well as a [user service](./contrib/systemd/copyparty-user.service), and expects to find a [config file](./contrib/systemd/copyparty.example.conf) in `/etc/copyparty/copyparty.conf` or `~/.config/copyparty/copyparty.conf`
 
-after installing it, you may want to `cp /usr/lib/systemd/system/copyparty.service /etc/systemd/system/` and then `vim /etc/systemd/system/copyparty.service` to change what user/group it is running as (you only need to do this once)
-
-NOTE: there used to be an aur package; this evaporated when copyparty was adopted by the official archlinux repos. If you're still using the aur package, please move
+after installing, start either the system service or the user service and navigate to http://127.0.0.1:3923 for further instructions (unless you already edited the config files, in which case you are good to go, probably)
 
 
 ## fedora package
@@ -2504,6 +2512,8 @@ you can provide passwords using header `PW: hunter2`, cookie `cppwd=hunter2`, ur
 
 > for basic-authentication, all of the following are accepted: `password` / `whatever:password` / `password:whatever` (the username is ignored)
 
+* unless you've enabled `--usernames`, then it's `PW: usr:pwd`, cookie `cppwd=usr:pwd`, url-param `?pw=usr:pwd`
+
 NOTE: curl will not send the original filename if you use `-T` combined with url-params! Also, make sure to always leave a trailing slash in URLs unless you want to override the filename
 
 
@@ -2615,7 +2625,7 @@ there is a [discord server](https://discord.gg/25J8CdTT6G)  with an `@everyone` 
 
 some notes on hardening
 
-* set `--rproxy 0` if your copyparty is directly facing the internet (not through a reverse-proxy)
+* set `--rproxy 0` *if and only if* your copyparty is directly facing the internet (not through a reverse-proxy)
   * cors doesn't work right otherwise
 * if you allow anonymous uploads or otherwise don't trust the contents of a volume, you can prevent XSS with volflag `nohtml`
   * this returns html documents as plaintext, and also disables markdown rendering
@@ -2718,6 +2728,8 @@ the default configs take about 0.4 sec and 256 MiB RAM to process a new password
 when generating hashes using `--ah-cli` for docker or systemd services, make sure it is using the same `--ah-salt` by:
 * inspecting the generated salt using `--show-ah-salt` in copyparty service configuration
 * setting the same `--ah-salt` in both environments
+
+> ⚠️ if you have enabled `--usernames` then provide the password as `username:password` when hashing it, for example `ed:hunter2`
 
 
 ## https
@@ -2835,6 +2847,8 @@ these are standalone programs and will never be imported / evaluated by copypart
 # sfx
 
 the self-contained "binary" (recommended!)  [copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py) will unpack itself and run copyparty, assuming you have python installed of course
+
+if you only need english, [copyparty-en.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-en.py) is the same thing but smaller
 
 you can reduce the sfx size by repacking it; see [./docs/devnotes.md#sfx-repack](./docs/devnotes.md#sfx-repack)
 

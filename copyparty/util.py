@@ -2982,6 +2982,17 @@ def justcopy(
     return tlen, "checksum-disabled", "checksum-disabled"
 
 
+def eol_conv(
+    fin: Generator[bytes, None, None], conv: str
+) -> Generator[bytes, None, None]:
+    crlf = conv.lower() == "crlf"
+    for buf in fin:
+        buf = buf.replace(b"\r", b"")
+        if crlf:
+            buf = buf.replace(b"\n", b"\r\n")
+        yield buf
+
+
 def hashcopy(
     fin: Generator[bytes, None, None],
     fout: Union[typing.BinaryIO, typing.IO[Any]],

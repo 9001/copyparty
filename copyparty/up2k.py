@@ -375,11 +375,12 @@ class Up2k(object):
                 if ineed == ihash or not ineed:
                     continue
 
+                poke = job["poke"]
                 zt = (
                     ineed / ihash,
                     job["size"],
-                    int(job["t0c"]),
-                    int(job["poke"]),
+                    int(job.get("t0c", poke)),
+                    int(poke),
                     djoin(vtop, job["prel"], job["name"]),
                 )
                 ret.append(zt)

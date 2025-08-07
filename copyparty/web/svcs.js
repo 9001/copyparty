@@ -49,12 +49,14 @@ function setos(os) {
 setos(WINDOWS ? 'win' : LINUX ? 'lin' : MACOS ? 'mac' : 'idk');
 
 
+var pw = '';
 function setpw(e) {
     ev(e);
     modal.prompt('password:', '', function (v) {
         if (!v)
             return;
 
+        pw = v;
         var pw0 = ebi('pw0').innerHTML,
             oa = QSA('b');
     
@@ -67,3 +69,12 @@ function setpw(e) {
 }
 if (ebi('setpw'))
     ebi('setpw').onclick = setpw;
+
+
+ebi('qr').onclick = function () {
+    var url = ('' + location).split('?')[0];
+    if (pw)
+        url += '?pw=' + pw;
+    var txt = esc(url) + '<img class="b64" width="100" height="100" src="' + addq(url, 'qr') + '" />';
+    modal.alert(txt);
+};

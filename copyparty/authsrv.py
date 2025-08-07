@@ -1700,6 +1700,7 @@ class AuthSrv(object):
         if not mount and not self.args.idp_h_usr:
             # -h says our defaults are CWD at root and read/write for everyone
             axs = AXS(["*"], ["*"], None, None)
+            ehint = ""
             if self.is_lxc:
                 t = "Read-access has been disabled due to failsafe: Docker detected, but %s. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to all of /w/ by adding the following arguments to the docker container:  -v .::rw"
                 if len(cfg_files_loaded) == 1:
@@ -1709,10 +1710,21 @@ class AuthSrv(object):
                 else:
                     self.log(t % ("the config does not define any volumes",), 1)
                 axs = AXS()
+                ehint = "; please try moving them up one level, into the parent folder:"
             elif self.args.c:
                 t = "Read-access has been disabled due to failsafe: No volumes were defined by the config-file. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to the working-directory by adding the following arguments:  -v .::rw"
                 self.log(t, 1)
                 axs = AXS()
+                ehint = ":"
+            if ehint:
+                try:
+                    files = os.listdir(E.cfg)
+                except:
+                    files = []
+                hits = [x for x in files if x.lower().endswith(".conf")]
+                if hits:
+                    t = "Hint: Found some config files in [%s], but these were not automatically loaded because they are in the wrong place%s %s\n"
+                    self.log(t % (E.cfg, ehint, ", ".join(hits)), 3)
             zvf = {"tcolor": self.args.tcolor}
             vfs = VFS(self.log_func, absreal("."), "", "", axs, zvf)
             if not axs.uread:
@@ -2630,6 +2642,8 @@ class AuthSrv(object):
         self.re_pwd = None
         pwds = [re.escape(x) for x in self.iacct.keys()]
         pwds.extend(list(self.sesa))
+        if self.args.usernames:
+            pwds.extend([x.split(":", 1)[1] for x in pwds if ":" in x])
         if pwds:
             if self.ah.on:
                 zs = r"(\[H\] pw:.*|[?&]pw=)([^&]+)"
@@ -2930,6 +2944,9 @@ class AuthSrv(object):
             t = "minimum password length: %d characters"
             return False, t % (self.args.chpw_len,)
 
+        if self.args.usernames:
+            pw = "%s:%s" % (uname, pw)
+
         hpw = self.ah.hash(pw) if self.ah.on else pw
 
         if hpw == self.acct[uname]:
@@ -3021,6 +3038,12 @@ class AuthSrv(object):
         self.log("chpw: " + msg, 6)
 
     def setup_pwhash(self, acct: dict[str, str]) -> None:
+        if self.args.usernames:
+            for uname, pw in list(acct.items())[:]:
+                if pw.startswith("+") and len(pw) == 33:
+                    continue
+                acct[uname] = "%s:%s" % (uname, pw)
+
         self.ah = PWHash(self.args)
         if not self.ah.on:
             if self.args.ah_cli or self.args.ah_gen:

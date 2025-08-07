@@ -111,6 +111,7 @@ def vf_vmap() -> dict[str, str]:
         "tail_tmax",
         "tail_who",
         "tcolor",
+        "txt_eol",
         "unlist",
         "u2abort",
         "u2ts",
@@ -322,6 +323,7 @@ flagcats = {
         "exp": "enable textfile expansion; see --help-exp",
         "exp_md": "placeholders to expand in markdown files; see --help",
         "exp_lg": "placeholders to expand in prologue/epilogue; see --help",
+        "txt_eol=lf": "enable EOL conversion when writing docs (LF or CRLF)",
     },
     "tailing": {
         "notail": "disable ?tail (download a growing file continuously)",

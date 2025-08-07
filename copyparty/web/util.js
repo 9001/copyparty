@@ -120,7 +120,7 @@ function esc(txt) {
 function basenames(txt) {
     return (txt + '').replace(/https?:\/\/[^ \/]+\//g, '/').replace(/js\?_=[a-zA-Z]{4}/g, 'js');
 }
-if ((document.location + '').indexOf(',rej,') + 1)
+if ((location + '').indexOf(',rej,') + 1)
     window.onunhandledrejection = function (e) {
         var err = e.reason;
         try {
@@ -741,7 +741,7 @@ function assert_vp(path) {
     if (path.indexOf('//') + 1)
         throw 'nonlocal1: ' + path;
 
-    var o = window.location.origin;
+    var o = location.origin;
     if (have_URL && (new URL(path, o)).origin != o)
         throw 'nonlocal2: ' + path;
 }
@@ -893,7 +893,7 @@ function uricom_adec(arr, li) {
 
 
 function get_evpath() {
-    var ret = document.location.pathname;
+    var ret = location.pathname;
 
     if (ret.indexOf('/') !== 0)
         ret = '/' + ret;
@@ -1249,10 +1249,10 @@ function hist_replace(url) {
 
 function sethash(hv) {
     if (window.history && history.replaceState) {
-        hist_replace(document.location.pathname + document.location.search + '#' + hv);
+        hist_replace(location.pathname + location.search + '#' + hv);
     }
     else {
-        document.location.hash = hv;
+        location.hash = hv;
     }
 }
 
