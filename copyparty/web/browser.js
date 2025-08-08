@@ -3426,7 +3426,7 @@ var Ls = {
 		"mt_npclip": "pokaż przyciski kopiowania aktualnie odtwarzanego utworu\">/np",
 		"mt_m3u_c": "pokaż przyciski kopiowania$Nwybranych piosenek jako playlista m3u8\">📻",
 		"mt_octl": "integracja z systemem operacyjnym (przyciski multimedialne / informacje o utworze)\">os-int",
-		"mt_oseek": "zezwól na przewijanie utworu poprzez integrację z systemem$N$Nnotka: na niektórych urządzeniach (iPhone'y),$Nzamienia przycisk następnej piosenki\">seek",
+		"mt_oseek": "zezwól na przewijanie utworu poprzez integrację z systemem$N$Nuwaga: na niektórych urządzeniach (iPhone'y),$Nzamienia przycisk następnej piosenki\">seek",
 		"mt_oscv": "pokaż okładkę albumu w widoku systemu\">okładka",
 		"mt_follow": "podążaj za odtwarzanym utworem przewijając widok\">🎯",
 		"mt_compact": "kompaktowe sterowanie\">⟎",
