@@ -1371,7 +1371,7 @@ var Ls = {
 
 		"goh": "kontrollpanel",
 		"gop": 'navigér åt mappa før den her">forr.',
-		"gou": 'navigér eitt nivå opp',
+		"gou": 'navigér eitt nivå opp">opp',
 		"gon": 'navigér åt mappa etter den her">neste',
 		"logout": "Logg ut ",
 		"access": " åtgang",
@@ -1891,7 +1891,7 @@ var Ls = {
 		"ur_1sn": "Fila finnast IKKE på serveren",
 		"ur_asn": "Fann INGEN av dei {0} filene på serveren",
 		"ur_um": "Ferdig;\n{0} opplastingar gjekk bra,\n{1} opplastingar gjekk feil",
-		"ur_sm": "Ferdig;\n{0} filer blei funne,\n{1} filer finnast IKKE på serveren",
+		"ur_sm": "Ferdig;\n{0} filer blei funne,\n{1} filer finnast IKKJE på serveren",
 
 		"lang_set": "passar det å laste sida på nytt?",
 	},
