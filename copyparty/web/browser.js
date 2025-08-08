@@ -1521,7 +1521,7 @@ var Ls = {
 
 		"cdt_lim": "maks mengd filer å vise per mappe",
 		"cdt_ask": "vis knappar for å laste fleire filer nederst på sida i staden for å gradvis laste meir av mappea når man scroller ned",
-		"cdt_hsort": "antall sorteringsregler (&lt;code&gt;,sorthref&lt;/code&gt;) som skal inkluderast når media-URL'ar genererast. Dersom denne er 0 så vil sorteringsregler i URL'ar korkje bli generert eller lest",
+		"cdt_hsort": "antall sorteringsreglar (&lt;code&gt;,sorthref&lt;/code&gt;) som skal inkluderast når media-URL'ar genererast. Dersom denne er 0 så vil sorteringsreglar i URL'ar korkje bli generert eller lest",
 
 		"tt_entree": "bytt åt mappehierarki$NSnarvei: B",
 		"tt_detree": "bytt åt tradisjonell stivising$NSnarvei: B",
