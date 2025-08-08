@@ -3539,7 +3539,7 @@ var Ls = {
 
 		"fd_ok": "usunięto",
 		"fd_err": "usuwanie zakończone niepowodzeniem:\n",
-		"fd_none": "nie usunięto nic; może usuwanie zostało zablokowane przez konfigurację serwera (xbd)?",
+		"fd_none": "nie usunięto nic; usunięcie mogło zostać zablokowane przez konfigurację serwera (xbd)?",
 		"fd_busy": "usuwanie {0} elementów...\n\n{1}",
 		"fd_warn1": "USUNĄĆ {0} elementów?",
 		"fd_warn2": "<b>OSTATNIA SZANSA!</b> Tej operacji nie da się cofnąć. Usunąć?",
@@ -3551,7 +3551,7 @@ var Ls = {
 		"fcc_warn": 'skopiowano {0} elementów,\n\nlecz można je wkleić tylko w <b>tej</b> karcie\n(ze względu na ogromną ilość wybranych elementów)',
 
 		"fp_apply": "zastosuj te nazwy",
-		"fp_ecut": "najpierw wytnij lub skopiuj pliki / foldery, aby je wkleić / przenieść\n\nnotka: można wycinać / wklejać pomiędzy różnymi kartami przeglądarki",
+		"fp_ecut": "najpierw wytnij lub skopiuj pliki / foldery, aby je wkleić / przenieść\n\nuwaga: można wycinać / wklejać pomiędzy różnymi kartami przeglądarki",
 		"fp_ename": "Nie udało się przenieść {0} elementów, gdyż ich nazwy już istnieją w tym folderze. Nadaj im nowe nazwy poniżej, bądź zostaw pole nazwy puste, aby je pominąć:",
 		"fcp_ename": "Nie udało się przekopiować {0} elementów, gdyż ich nazwy już istnieją w tym folderze. Nadaj im nowe nazwy poniżej, bądź zostaw pole nazwy puste, aby je pominąć:",
 		"fp_emore": "pozostało jeszcze kilka kolizji nazw plików do poprawy",
@@ -3593,7 +3593,7 @@ var Ls = {
 		"m3u_clip": "skopiowano playlistę m3u do schowka\n\nutwórz",
 
 		"gt_vau": "nie pokazuj obrazu, odtwarzaj tylko dźwięk\">🎧",
-		"gt_msel": "wybierz pliki; kliknij plik z wciśniętym klawiszem CTRL, aby zastąpić$N$N&lt;em&gt;gdy tryb jest aktywny, kliknij dwukrotnie na plik / folder, żeby go otworzyć&lt;/em&gt;$N$NSkrót: S\">wybierzwiele",
+		"gt_msel": "wybierz pliki; kliknij plik z wciśniętym klawiszem CTRL, aby zastąpić$N$N&lt;em&gt;gdy tryb jest aktywny, kliknij dwukrotnie na plik / folder, żeby go otworzyć&lt;/em&gt;$N$NSkrót: S\">wybierz wiele",
 		"gt_crop": "kadruj miniaturki do środka\">kadruj",
 		"gt_3x": "miniaturki w wysokiej rozdzielczości\">3x",
 		"gt_zoom": "przybliż",
@@ -3635,7 +3635,7 @@ var Ls = {
 
 		"badreply": "Nie udało się przeanalizować odpowiedzi serwera",
 
-		"xhr403": "403: Odmowa dostępu.\n\nSpróbuj przeładować stronę (F5), może cię wylogowało",
+		"xhr403": "403: Odmowa dostępu.\n\nSpróbuj przeładować stronę (F5), możliwe, że cię wylogowano",
 		"xhr0": "nieznany (być może utracono połączenie z serwerem, lub jest on nieaktywny)",
 		"cf_ok": "przepraszamy, włączyła się ochrona przed DD" + wah + "oS\n\nwszystko powinno wrócić do normy za około 30 sekund\n\njeśli nic się nie zmieni, naciśnij klawisz F5, aby przeładować stronę",
 		"tl_xe1": "nie można wyświetlić podfolderów:\n\nbłąd ",
@@ -3655,7 +3655,7 @@ var Ls = {
 		"fz_tarxz": "gnu-tar z kompresją xz poziomu 3.$N$Nzazwyczaj bardzo wolne, używaj nieksompresowanego tar",
 		"fz_zip8": "zip z nazwami plików UTF-8 (może działać nieprawidłowo na systemie Windows 7 i starszych)",
 		"fz_zipd": "zip z nazwami plików cp437, dobre dla bardzo starego oprogramowania",
-		"fz_zipc": "cp437 z CRC32 obliczonym wcześniej,$Ndla MS-DOS PKZIP v2.04g (październik 1993)$N(przetwarzanie trwa dłużej)",
+		"fz_zipc": "cp437 z CRC32 obliczonym wcześniej,$Ndla MS-DOS PKZIP v2.04g (październik 1993)$N(przetwarzanie do pobrania trwa dłużej)",
 
 		"un_m1": "można usunąć ostatnio przesłane pliki (lub przerwać trwające) poniżej",
 		"un_upd": "odśwież",
@@ -3684,7 +3684,7 @@ var Ls = {
 		"u_https1": "powinieneś przejść",
 		"u_https2": "na HTTPS w celu",
 		"u_https3": "uzyskania lepszej wydajności",
-		"u_ancient": 'twoja przeglądarka jest niezwykle zabytkowa -- może powinieneś zamiast tego <a href="#" onclick="goto(\'bup\')">użyć bup</a>',
+		"u_ancient": 'twoja przeglądarka jest niezwykle zabytkowa -- powinieneś zamiast tego <a href="#" onclick="goto(\'bup\')">użyć bup</a>',
 		"u_nowork": "wymaga Firefox 53+, Chrome 57+ lub iOS 11+",
 		"tail_2old": "wymaga Firefox 105+, Chrome 71+ lub iOS 14.5+",
 		"u_nodrop": 'ta przeglądarka jest za stara, nie wspiera przesyłania "przeciągnij i upuść"',
@@ -3694,7 +3694,7 @@ var Ls = {
 		"u_depot": 'przełącz na <a href="#">ładny interfejs</a> (może zmniejszyć prędkośc przesyłania)',
 		"u_gotpot": 'przełączanie na lekki interfejs w celu poprawy prędkości przesyłania,\n\nzawsze można przełączyć się na ładny interfejs!',
 		"u_pott": "<p>pliki: &nbsp; <b>{0}</b> ukończonych, &nbsp; <b>{1}</b> nie powiodło się, &nbsp; <b>{2}</b> w trakcie, &nbsp; <b>{3}</b> oczekujących</p>",
-		"u_ever": "podstawowe przesyłanie; up2k wymaga co najmniej przeglądarek:<br>Chrome 21 // Firefox 13 // Edge 12 // Opera 12 // Safari 5.1",
+		"u_ever": "podstawowe przesyłanie; up2k wymaga minimalnie przeglądarek:<br>Chrome 21 // Firefox 13 // Edge 12 // Opera 12 // Safari 5.1",
 		"u_su2k": 'podstawowe przesyłanie; <a href="#" id="u2yea">up2k</a> jest lepszy',
 		"u_uput": 'optymalizuj dla prędkości (pomijając spr. sum kontrolnych)',
 		"u_ewrite": 'nie masz dostępu do zapisu (write) w tym folderze',
@@ -3717,7 +3717,7 @@ var Ls = {
 		"u_hashdone": 'obliczono sumę kontrolną',
 		"u_hashing": 'obliczanie sumy kontrolnej',
 		"u_hs": 'nawiązywanie połączenia...',
-		"u_started": "rozpoczęto przesyłanie; patrz [🚀]",
+		"u_started": "rozpoczęto przesyłanie; zobacz w [🚀]",
 		"u_dupdefer": "duplikat; zostanie przetworzony na końcu",
 		"u_actx": "kliknij ten napis, aby zapobiec spadkowi <br />wydajności po zmianie aktywnego okna/karty przeglądarki",
 		"u_fixed": "OK!&nbsp; Naprawiono 👍",

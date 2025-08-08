@@ -209,7 +209,7 @@ var Ls = {
 		"z1": "odblokuj udostępnienie:",
 		"ta1": "najpierw wprowadź nowe hasło",
 		"ta2": "powtórz hasło dla potwierdzenia:",
-		"ta3": "znaleziono literówkę, spróbuj pomownie",
+		"ta3": "znaleziono literówkę, spróbuj ponownie",
 		"aa1": "pliki przychodzące:",
 		"ab1": "wyłącz no304",
 		"ac1": "włącz no304",
