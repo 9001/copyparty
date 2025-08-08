@@ -180,7 +180,7 @@ var Ls = {
 		"a1": "odśwież",
 		"b1": "witaj, nieznajomy &nbsp; <small>(nie jesteś zalogowany)</small>",
 		"c1": "wyloguj się",
-		"d1": "stos zrzutu",
+		"d1": "zrzut stosu",
 		"d2": "pokazuje status wszystkich aktywnych wątków",
 		"e1": "przeładuj konfigurację",
 		"e2": "przeładuj pliki konfiguracyjne (konta/wolumeny/flagi wolumenów),$Ni przeskanuje wszystkie wolumeny e2ds$N$Nnotka: zmiany konfiguracji globalnej$Nwymagają pełnego uruchomienia ponownie serwera, aby zaczęły obowiązywać",
