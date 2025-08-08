@@ -3141,8 +3141,8 @@ var Ls = {
 
 		"lang_set": "ladataanko sivu uudestaan kielen vaihtamiseksi?",
 	},
-  "pol": {
-    "tt": "Polski",
+	"pol": {
+		"tt": "Polski",
 		"cols": {
 			"c": "przyciski akcji",
 			"dur": "czas trwania",
@@ -3250,7 +3250,7 @@ var Ls = {
 		"logout": "Wyloguj ",
 		"access": " dostęp",
 		"ot_close": "zamknij pod-menu",
-		"ot_search": "szukaj plików po atrybutach, ścieżce / nazwie, tagach muzyki, bądź dowolnej ich kombinacji$N$N&lt;code&gt;foo bar&lt;/code&gt; = musi zawierać «foo» oraz «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = musi zawierać «foo», lecz nie «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = musi zaczynać się od  «yana» i być plikiem «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = zawierać dokładnie «try unite»$N$Nformatem daty jest iso-8601, czyli$N&lt;code&gt;2009-12-31&lt;/code&gt; lub &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_search": "szukaj plików po atrybutach, ścieżce / nazwie, tagach muzyki, bądź dowolnej ich kombinacji$N$N&lt;code&gt;foo bar&lt;/code&gt; = musi zawierać «foo» oraz «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = musi zawierać «foo», lecz nie «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = musi zaczynać się od «yana» i być plikiem «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = zawierać dokładnie «try unite»$N$Nformatem daty jest iso-8601, czyli$N&lt;code&gt;2009-12-31&lt;/code&gt; lub &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
 		"ot_unpost": "unpost: usuń ostatnio przesłane pliki lub przerwij przesyłanie",
 		"ot_bup": "bup: podstawowe przesyłanie danych, wspiera nawet netscape 4.0",
 		"ot_mkdir": "mkdir: tworzy nowy folder",
@@ -3766,7 +3766,7 @@ var Ls = {
 		"ur_sm": "Zakończono;\nznaleziono {0} pliki(ów),\nnie znaleziono {1} pliki(ów) na serwerze",
 
 		"lang_set": "odśwież stronę (F5), aby zastosować zmianę.",
-  },
+	},
 	"rus": {
 		"tt": "Русский",
 
