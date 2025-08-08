@@ -330,7 +330,6 @@ the features you can opt to drop are
 * `cm`/easymde, the "fancy" markdown editor, saves ~89k
 * `hl`, prism, the syntax hilighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
-* `dd`, the custom mouse cursor for the media player tray tab, saves ~2k
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
 

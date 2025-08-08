@@ -88,7 +88,7 @@ class ThumbCli(object):
         if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg", "png"]:
             return os.path.join(ptop, rem)
 
-        if fmt[:1] in "jw":
+        if fmt[:1] in "jw" and fmt != "wav":
             sfmt = fmt[:1]
 
             if sfmt == "j" and self.args.th_no_jpg:
@@ -129,7 +129,7 @@ class ThumbCli(object):
 
         tpath = thumb_path(histpath, rem, mtime, fmt, self.fmt_ffa)
         tpaths = [tpath]
-        if fmt[:1] == "w":
+        if fmt[:1] == "w" and fmt != "wav":
             # also check for jpg (maybe webp is unavailable)
             tpaths.append(tpath.rsplit(".", 1)[0] + ".jpg")
 

@@ -83,7 +83,12 @@ class FtpAuth(DummyAuthorizer):
         uname = "*"
         if username != "anonymous":
             uname = ""
-            for zs in (password, username):
+            if args.usernames:
+                alts = ["%s:%s" % (username, password)]
+            else:
+                alts = password, username
+
+            for zs in alts:
                 zs = asrv.iacct.get(asrv.ah.hash(zs), "")
                 if zs:
                     uname = zs
@@ -607,7 +612,7 @@ class Ftpd(object):
         if "::" in ips:
             ips.append("0.0.0.0")
 
-        ips = [x for x in ips if "unix:" not in x]
+        ips = [x for x in ips if not x.startswith(("unix:", "fd:"))]
 
         if self.args.ftp4:
             ips = [x for x in ips if ":" not in x]

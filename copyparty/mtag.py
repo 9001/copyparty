@@ -67,6 +67,8 @@ HAVE_FFPROBE = not os.environ.get("PRTY_NO_FFPROBE") and have_ff("ffprobe")
 CBZ_PICS = set("png jpg jpeg gif bmp tga tif tiff webp avif".split())
 CBZ_01 = re.compile(r"(^|[^0-9v])0+[01]\b")
 
+FMT_AU = set("mp3 ogg flac wav".split())
+
 
 class MParser(object):
     def __init__(self, cmdline: str) -> None:
@@ -242,7 +244,7 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
     ret: dict[str, Any] = {}  # processed
     md: dict[str, list[Any]] = {}  # raw tags
 
-    is_audio = fmt.get("format_name") in ["mp3", "ogg", "flac", "wav"]
+    is_audio = fmt.get("format_name") in FMT_AU
     if fmt.get("filename", "").split(".")[-1].lower() in ["m4a", "aac"]:
         is_audio = True
 
@@ -270,6 +272,8 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
                 ["channel_layout", "chs"],
                 ["sample_rate", ".hz"],
                 ["bit_rate", ".aq"],
+                ["bits_per_sample", ".bps"],
+                ["bits_per_raw_sample", ".bprs"],
                 ["duration", ".dur"],
             ]
 

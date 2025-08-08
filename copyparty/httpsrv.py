@@ -324,7 +324,8 @@ class HttpSrv(object):
             spins = 0
             while self.ncli >= self.nclimax:
                 if not spins:
-                    self.log(self.name, "at connection limit; waiting", 3)
+                    t = "at connection limit (global-option 'nc'); waiting"
+                    self.log(self.name, t, 3)
 
                 spins += 1
                 time.sleep(0.1)

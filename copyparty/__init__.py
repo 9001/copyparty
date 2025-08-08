@@ -63,10 +63,6 @@ web/browser.js
 web/browser2.html
 web/cf.html
 web/copyparty.gif
-web/dd/2.png
-web/dd/3.png
-web/dd/4.png
-web/dd/5.png
 web/deps/busy.mp3
 web/deps/easymde.css
 web/deps/easymde.js

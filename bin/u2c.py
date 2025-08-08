@@ -52,7 +52,7 @@ if PY2:
 
     sys.dont_write_bytecode = True
     bytes = str
-    files_decoder = lambda s: unicode(s, 'utf8')
+    files_decoder = lambda s: unicode(s, "utf8")
 else:
     from urllib.parse import quote_from_bytes as quote
     from urllib.parse import unquote_to_bytes as unquote

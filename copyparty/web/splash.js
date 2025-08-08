@@ -1,4 +1,5 @@
 // please add translations in alphabetic order, but keep "nor" and "eng" first
+// (lines ending with //m are machine translations)
 var Ls = {
 	"nor": {
 		"a1": "oppdater",
@@ -93,6 +94,47 @@ var Ls = {
 		"af1": "显示最近上传的文件", //m
 		"ag1": "查看已知 IdP 用户", //m
 	},
+	"cze": {
+		"a1": "obnovit",
+		"b1": "ahoj cizinče &nbsp; <small>(nejsi přihlášen)</small>",
+		"c1": "odhlásit se",
+		"d1": "vypsat zásobníku",  // TLNote: "d2" is the tooltip for this button
+		"d2": "zobrazit stav všech aktivních vláken",
+		"e1": "znovu načíst konfiguraci",
+		"e2": "znovu načíst konfigurační soubory (accounts/volumes/volflags),$Na prohledat všechny e2ds úložiště$N$Npoznámka: všechny změny globálních nastavení$Nvyžadují úplné restartování, aby se projevily",
+		"f1": "můžeš procházet:",
+		"g1": "můžeš nahrávat do:",
+		"cc1": "další věci:",
+		"h1": "zakázat k304",  // TLNote: "j1" explains what k304 is
+		"i1": "povolit k304",
+		"j1": "povolení k304 odpojí vašeho klienta při každém HTTP 304, což může zabránit některým chybovým proxy serverům, aby se zasekly (náhle nenačítaly stránky), <em>ale</em> také to obecně zpomalí věci",
+		"k1": "resetovat nastavení klienta",
+		"l1": "přihlaste se pro více:",
+		"m1": "vítej zpět,",  // TLNote: "welcome back, USERNAME"
+		"n1": "404 nenalezeno &nbsp;┐( ´ -`)┌",
+		"o1": 'nebo možná nemáš přístup -- zkus heslo nebo <a href="' + SR + '/?h">jdi domů</a>',
+		"p1": "403 zakázáno &nbsp;~┻━┻",
+		"q1": 'použij heslo nebo <a href="' + SR + '/?h">jdi domů</a>',
+		"r1": "jdi domů",
+		".s1": "znovu prohledat",
+		"t1": "akce",  // TLNote: this is the header above the "rescan" buttons
+		"u2": "čas od posledního zápisu na server$N( upload / rename / ... )$N$N17d = 17 dní$N1h23 = 1 hodina 23 minut$N4m56 = 4 minuty 56 sekund",
+		"v1": "připojit",
+		"v2": "použít tento server jako místní HDD",
+		"w1": "přepnout na https",
+		"x1": "změnit heslo",
+		"y1": "upravit sdílení",  // TLNote: shows the list of folders that the user has decided to share
+		"z1": "odblokovat toto sdílení:",  // TLNote: the password prompt to see a hidden share
+		"ta1": "nejprve vyplňte své nové heslo",
+		"ta2": "zopakujte pro potvrzení nového hesla:",
+		"ta3": "nalezen překlep; zkuste to prosím znovu",
+		"aa1": "příchozí soubory:",
+		"ab1": "deaktivovat no304",
+		"ac1": "povolit no304",
+		"ad1": "povolení no304 deaktivuje veškeré mezipaměti; zkuste to, pokud k304 nestačilo. To ovšem zapříčíní obrovské množství síťového provozu!",
+		"ae1": "aktivní stahování:",
+		"af1": "zobrazit nedávné nahrávání",
+	},
 	"deu": {
 		"a1": "Neu laden",
 		"b1": "Tach, wie geht's? &nbsp; <small>(Du bist nicht angemeldet)</small>",
@@ -173,8 +215,133 @@ var Ls = {
 		"ac1": "ota no304 käyttöön",
 		"ad1": "no304:n lopettaa välimuistin käytön kokonaan; kokeile tätä jos k304 ei riittänyt. Tuhlaa valtavan määrän verkkoliikennettä!",
 		"ae1": "lähtevät:",
-        	"af1": "näytä viimeaikaiset lataukset",
+		"af1": "näytä viimeaikaiset lataukset",
 		"ag1": "näytä tunnetut IdP-käyttäjät",
+	},
+	"grc": {
+		"a1": "ανανέωση",
+		"b1": "γεια σου ξένε! &nbsp; <small>(δεν είσαι συνδεδεμένος)</small>",
+		"c1": "αποσύνδεση",
+		"d1": "σωρός απορριμμάτων",
+		"d2": "εμφανίζει την κατάσταση όλων των ενεργών διεργασιών",
+		"e1": "επαναφόρτωση του cfg",
+		"e2": "φορτώνει ξανά τα αρχεία ρυθμίσεων (λογαριασμοί/τόμοι/volflags),$Nκαι κάνει επανεξέταση όλων των τόμων e2ds$N$Nσημείωση: οποιαδήποτε αλλαγή στις καθολικές ρυθμίσεις$Nαπαιτεί πλήρη επανεκκίνηση για να εφαρμοστεί",
+		"f1": "μπορείς να περιηγηθείς:",
+		"g1": "μπορείς να εκτελέσεις μεταφόρτωση σε:",
+		"cc1": "άλλα πράγματα:",
+		"h1": "απενεργοποίση k304",
+		"i1": "ενεργοποίηση k304",
+		"j1": "η ενεργοποίηση του k304 θα αποσυνδέσει το πρόγραμμα πελάτη σου σε κάθε HTTP 304, κάτι που μπορεί να αποτρέψει κάποια προβληματικά proxies από το να κολλάνε (να μην φορτώνουν ξαφνικά σελίδες), <em>αλλά</em> θα κάνει τα πράγματα, γενικά πιο αργά",
+		"k1": "επαναφορά ρυθμίσεων στο πρόγραμμα πελάτη",
+		"l1": "συνδέσου για περισσότερα:",
+		"m1": "καλώς ήρθες,",
+		"n1": "404 δεν βρέθηκε &nbsp;┐( ´ -`)┌",
+		"o1": '´η μήπως δεν έχεις πρόσβαση -- δοκίμασε έναν κωδικό <a href="' + SR + '/?h">πήγαινε στην αρχική</a>',
+		"p1": "403 απαγορευμένο &nbsp;~┻━┻",
+		"q1": 'δοκίμασε έναν κωδικό <a href="' + SR + '/?h">πήγαινε στην αρχική</a>',
+		"r1": "πίσω στην αρχική",
+		".s1": "επανάληψη σάρωσης",
+		"t1": "ενέργεια",
+		"u2": "χρόνος από την τελευταία εγγραφή του διακομιστή$N( μεταφόρτωση / μετονομασία / ... )$N$N17d = 17 days$N1ω23 = 1 ώρα 23 λεπτά$N4λ56 = 4 λεπτά 56 δευτερόλεπτα",
+		"v1": "σύνδεση",
+		"v2": "χρησιμοποίησε αυτόν το διακομιστή σαν τοπικό δίσκο",
+		"w1": "εναλλαγή σε https",
+		"x1": "αλλαγή κωδικού",
+		"y1": "επεξεργασία κοινόχρηστων φακέλων",
+		"z1": "ξεκλείδωμα αυτού του κοινόχρηστου φακέλου:",
+		"ta1": "συμπλήρωσε πρώτα το νέο σου κωδικό",
+		"ta2": "επανέλαβε για να επιβεβαιώσεις το νέο κωδικό:",
+		"ta3": "βρέθηκε τυπογραφικό λάθος· δοκίμασε ξανά",
+		"aa1": "εισερχόμενα αρχεία:",
+		"ab1": "απενεργοποίηση no304",
+		"ac1": "ενεργοποίηση no304",
+		"ad1": "η ενεργοποίηση του no304 θα απενεργοποιήσει όλη την προσωρινή αποθήκευση· δοκίμασέ το αν το k304 δεν ήταν αρκετό. Προσοχή, θα σπαταλήσει τεράστιο όγκο δικτυακής κίνησης!",
+		"ae1": "ενεργές μεταφορτώσεις:",
+		"af1": "προβολή πρόσφατων μεταφορτώσεων",
+	},
+	"ita": {
+		"a1": "aggiorna",
+		"b1": "ciao &nbsp; <small>(non sei connesso)</small>",
+		"c1": "disconnetti",
+		"d1": "stato",
+		"d2": "mostra lo stato di tutti i thread attivi",
+		"e1": "ricarica configurazione",
+		"e2": "ricarica i file di configurazione (account/volumi/flag dei volumi),\n e riesegue la scansione di tutti i volumi e2ds.\n\nNota: qualsiasi modifica alle impostazioni globali richiede un riavvio completo per avere effetto",
+		"f1": "puoi visualizzare:",
+		"g1": "puoi caricare su:",
+		"cc1": "altro:",
+		"h1": "disattiva k304",
+		"i1": "attiva k304",
+		"j1": "k304 interrompe la connessione per ogni HTTP 304. Questo aiuta contro alcuni proxy difettosi che possono bloccarsi o smettere improvvisamente di caricare pagine, ma riduce notevolmente le prestazioni",
+		"k1": "resetta impostazioni",
+		"l1": "accedi:",
+		"m1": "bentornato,",
+		"n1": "404: file non trovato &nbsp;┐( ´ -`)┌",
+		"o1": "oppure forse non hai accesso? prova una password o <a href=\"SR/?h\">torna alla home</a>",
+		"p1": "403: accesso negato &nbsp;~┻━┻",
+		"q1": "prova una password o <a href=\"SR/?h\">torna alla home</a>",
+		"r1": "torna alla home",
+		".s1": "mappa",
+		"t1": "azione",
+		"u2": "tempo dall'ultima scrittura sul server\n (caricamento / rinomina / ...)\n\n17d = 17 giorni\n1h23 = 1 ora 23 minuti\n4m56 = 4 minuti 56 secondi",
+		"v1": "connetti",
+		"v2": "usa questo server come un disco locale",
+		"w1": "passa a https",
+		"x1": "cambia password",
+		"y1": "le tue condivisioni",
+		"z1": "sblocca area:",
+		"ta1": "devi prima inserire una nuova password",
+		"ta2": "ripeti per confermare la nuova password:",
+		"ta3": "errore di digitazione; riprova",
+		"aa1": "in arrivo:",
+		"ab1": "disattiva no304",
+		"ac1": "attiva no304",
+		"ad1": "no304 disabilita completamente la cache. Se k304 non è sufficiente, prova questa opzione. Aumenterà notevolmente il consumo di dati!",
+		"ae1": "in uscita:",
+		"af1": "mostra i file caricati di recente",
+		"ag1": "mostra utenti IdP conosciuti"
+	},
+	"nld": {
+		"a1": "Update",
+		"b1": "Hallo, hoe gaat het met jou? &nbsp; <small>(Je bent niet ingelogd)</small>",
+		"c1": "Uitloggen",
+		"d1": "Voorwaarde",
+		"d2": "Toont de status van alle actieve threads",
+		"e1": "Configuratie opnieuw laden.",
+		"e2": "Leest configuratiebestanden opnieuw in$N(accounts, volumes, volumeschakelaars)$Nen brengt alle e2ds-volumes in kaart$N$Nopmerking: veranderingen in globale parameters$Nvereist een volledige herstart van de server",
+		"f1": "Je kan het volgende lezen:",
+		"g1": "Je kan naar het volgende uploaden:",
+		"cc1": "Schakelaars en dergelijke:",
+		"h1": "k304 uitschakelen",
+		"i1": "k304 inschakelen",
+		"j1": "k304 verbreekt de verbinding voor elke HTTP 304. Dit helpt tegen bepaalde proxy servers die kunnen vastlopen/plotseling stoppen met het laden van pagina's, maar het vermindert ook de prestaties aanzienlijk",
+		"k1": "Instellingen resetten",
+		"l1": "Inloggen:",
+		"m1": "Welkom terug,",
+		"n1": "404: bestand bestaat niet &nbsp;┐( ´ -`)┌",
+		"o1": 'of misschien heb je geen toegang? probeer een wachtwoord of <a href="' + SR + '/?h">ga naar startscherm</a>',
+		"p1": "403: toegang geweigerd &nbsp;~┻━┻",
+		"q1": 'Probeer een wachtwoord of <a href="' + SR + '/?h">ga naar startscherm</a>',
+		"r1": "Ga naar startscherm",
+		".s1": "Kaart",
+		"t1": "Actie",
+		"u2": "Tijd sinds iemand voor het laatst naar de server schreef$N( upload / naamswijziging / ... )$N$N17d = 17 dagen$N1h23 = 1 uur 23 minuten$N4m56 = 4 minuten 56 secondes",
+		"v1": "Verbinden",
+		"v2": "Gebruik deze server als een lokale harde schijf",
+		"w1": "Overschakelen naar https",
+		"x1": "Wachtwoord wijzigen",
+		"y1": "Jou gedeelde items",
+		"z1": "Ontgrendel gebied:",
+		"ta1": "Je moet eerst een nieuw wachtwoord invoeren",
+		"ta2": "Herhaal om nieuw wachtwoord te bevestigen:",
+		"ta3": "Typefout gevonden; probeer het opnieuw",
+		"aa1": "Inkomend:",
+		"ab1": "Schakel nr. 304 uit",
+		"ac1": "Schakel nr. 304 in",
+		"ad1": "Nr. 304 stopt al het cachegebruik. Als k304 niet voldoende was, probeer dan deze. Vermenigvuldigt het dataverbruik.!",
+		"ae1": "Uitgaand:",
+		"af1": "Recent geüploade bestanden weergeven",
+		"ag1": "Bekende IdP-gebruikers weergeven",
 	},
 	"pol": {
 		"a1": "odśwież",
@@ -332,7 +499,7 @@ try {
 catch (ex) { }
 
 tt.init();
-var o = QS('input[name="cppwd"]');
+var o = QS('input[name="uname"]') || QS('input[name="cppwd"]');
 if (!ebi('c') && o.offsetTop + o.offsetHeight < window.innerHeight)
 	o.focus();
 
@@ -341,6 +508,9 @@ if (o && /[0-9]+$/.exec(o.innerHTML))
 	o.innerHTML = shumantime(o.innerHTML);
 
 ebi('uhash').value = '' + location.hash;
+
+if (/\&re=/.test('' + location))
+	ebi('a').className = 'af g';
 
 (function() {
 	if (!ebi('x'))

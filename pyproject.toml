@@ -45,6 +45,14 @@ classifiers = [
 "Demo Server" = "https://a.ocv.me/pub/demo/"
 
 [project.optional-dependencies]
+all = [
+    "argon2-cffi",
+    "partftpy>=0.4.0",
+    "Pillow",
+    "pyftpdlib",
+    "pyopenssl",
+    "pyzmq",
+]
 thumbnails = ["Pillow"]
 thumbnails2 = ["pyvips"]
 audiotags = ["mutagen"]
@@ -86,7 +94,6 @@ copyparty = [
     "web/*.css",
     "web/*.html",
     "web/a/*.bat",
-    "web/dd/*.png",
     "web/deps/*.gz",
     "web/deps/*.woff*",
 ]

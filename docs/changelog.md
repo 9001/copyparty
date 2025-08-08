@@ -1,4 +1,83 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0804-0013  `v1.18.10`  idp speedboost
+
+## 🧪 new features
+
+* #426 add Dutch translation (thx @DeStilleGast!) 3798e19a
+* #458 add Italian translation (thx @AOTREVAI!) a38e6e65
+* #456 transcode to flac/wav (thx @missaustraliana!) b469db3c b2d48c64 0d09fb68
+* #439 config-file can be provided through `PRTY_CONFIG` (thx @icxes!) 971360e9
+* #459 videos can become folder thumbnails 16bbcce5
+* add `--idp-cookie`, session-tickets for IdP auth (performance boost) f9502c3d
+  * useful when the IdP-server becomes a bottleneck
+
+## 🩹 bugfixes
+
+* #412 fix PUT-uploads into volumes with `nosub` volflag 47fa4a92
+* #435 ignore spurious exceptions from browser extensions 39e55824
+* #449 IPv6 QR-Code didn't include port 66a5bf36
+* #295 do not force `d2d` in blank vfs (introduced in v1.18.3) 848315c0
+
+## 🔧 other changes
+
+* #440 improved finnish translation (thx @icxes!) a68d5b03
+* point to the `-nc` option in the "at max connections" warning 153d240d
+* the play-button now indicates "play-as-audio" for video-files 40d56bb3
+* docs:
+  * #411 improve password-hashing instructions (thx @chinponya!) c69c7c8a
+  * #429 improve `--cert` helptext (thx @kzshantonu!) 7e3825f8
+  * #413 copyparty is Wii Internet Channel compatible! (thx @techflashYT!) 50f16293
+  * #461 how to use groups without IdP e85a7107
+  * mention that WebDAV and OpenGraph are incompatible by default (and how to fix that) 0bc1b8f7
+  * #345 short explanation about the sfx in quickstart ae5eefc5
+* #398 pypi-package now has extra-group `all` 6eaf8af1
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0801-2056  `v1.18.9`  fix Denial-of-Service
+
+## ⚠️ ATTN: this release fixes a Denial-of-Service vuln
+
+[CVE-2025-54796](https://github.com/9001/copyparty/security/advisories/GHSA-5662-2rj7-f2v6): an unauthenticated user could make the server grind to a halt by accessing a particular URL
+
+## recent important news
+
+* [v1.18.9 (2025-08-01)](https://github.com/9001/copyparty/releases/tag/v1.18.9) fixed [CVE-2025-54796](https://github.com/9001/copyparty/security/advisories/GHSA-5662-2rj7-f2v6) (Denial-of-Service)
+* [v1.15.0 (2024-09-08)](https://github.com/9001/copyparty/releases/tag/v1.15.0) changed upload deduplication to be default-disabled
+* [v1.14.3 (2024-08-30)](https://github.com/9001/copyparty/releases/tag/v1.14.3) fixed a bug that was introduced in v1.13.8 (2024-08-13); this bug could lead to **data loss** -- see the v1.14.3 release-notes for details
+
+## 🧪 new features
+
+* #310 translated to Spanish (thx @herruzo99!) a1dfd0be
+* #350 translated to Ukrainian (thx @MrMebelMan!) fea45e45
+* #321 translated to Russian (thx @A1Asriel!) 0b05c726
+* #381 translated to Finnish (thx @icxes and @Permik!) 7ecedb2c
+  * haha it says surf
+* #312 add option to use localtime in the UI ad23b253
+* #386 initial packaging for debian (thx @Beethoven-n!) 3c6f0b17
+
+## 🩹 bugfixes
+
+* CVE-2025-54796 / GHSA-5662-2rj7-f2v6 09910ba8
+* #347 fix upload-abort when uploading to a share 6d6d79fc
+* fix xiu backlog dropping on restart 3222ba3a
+* #375 fix crash on really old versions of python2.7 (thx @bb!) b69d5901
+* #388 another python2.7 fix: improve unicode support in u2c (thx @KevinXuxuxu!) 9c197535
+* log creator of new/blank markdown docs d0d2f206
+* #400 config didn't support indenting with tabs c1604288
+
+## 🔧 other changes
+
+* `ack` was changed to `continue` 4fa7be2a
+
+## 🌠 fun facts
+
+* the translations have made the sfx size balloon from 766 to 845 KiB in under a week... nice! keep em coming :tada: 
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0731-0833  `v1.18.8`  sfx hotfix
 
 ## 🩹 bugfixes

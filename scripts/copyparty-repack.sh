@@ -137,10 +137,10 @@ repack() {
 }
 
 repack sfx-full "re gz"
-repack sfx-ent  "re no-dd"
-repack sfx-ent  "re no-dd gz"
-repack sfx-lite "re no-dd no-cm no-hl"
-repack sfx-lite "re no-dd no-cm no-hl gz"
+repack sfx-ent  "re"
+repack sfx-ent  "re gz"
+repack sfx-lite "re no-cm no-hl"
+repack sfx-lite "re no-cm no-hl gz"
 
 
 # move fuse and up2k clients into copyparty-extras/,

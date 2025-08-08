@@ -50,7 +50,7 @@ HAVE_AVIF = False
 HAVE_WEBP = False
 
 EXTS_TH = set(["jpg", "webp", "png"])
-EXTS_AC = set(["opus", "owa", "caf", "mp3"])
+EXTS_AC = set(["opus", "owa", "caf", "mp3", "flac", "wav"])
 EXTS_SPEC_SAFE = set("aif aiff flac mp3 opus wav".split())
 
 PTN_TS = re.compile("^-?[0-9a-f]{8,10}$")
@@ -355,8 +355,10 @@ class ThumbSrv(object):
                 tex = tpath.rsplit(".", 1)[-1]
                 want_mp3 = tex == "mp3"
                 want_opus = tex in ("opus", "owa", "caf")
+                want_flac = tex == "flac"
+                want_wav = tex == "wav"
                 want_png = tex == "png"
-                want_au = want_mp3 or want_opus
+                want_au = want_mp3 or want_opus or want_flac or want_wav
                 for lib in self.args.th_dec:
                     can_au = lib == "ff" and (
                         ext in self.fmt_ffa or ext in self.fmt_ffv
@@ -371,6 +373,10 @@ class ThumbSrv(object):
                             funs.append(self.conv_opus)
                         elif want_mp3:
                             funs.append(self.conv_mp3)
+                        elif want_flac:
+                            funs.append(self.conv_flac)
+                        elif want_wav:
+                            funs.append(self.conv_wav)
                         elif want_png:
                             funs.append(self.conv_waves)
                             png_ok = True
@@ -802,6 +808,66 @@ class ThumbSrv(object):
             b"-ac", b"2",
             b"-c:a", b"libmp3lame",
             qk, qv,
+            fsenc(tpath)
+        ]
+        # fmt: on
+        self._run_ff(cmd, vn, oom=300)
+
+    def conv_flac(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
+        if self.args.no_acode or not self.args.allow_flac:
+            raise Exception("flac not permitted in server config")
+
+        self.wait4ram(0.2, tpath)
+        tags, rawtags = ffprobe(abspath, int(vn.flags["convt"] / 2))
+        if "ac" not in tags:
+            raise Exception("not audio")
+
+        self.log("conv2 flac", 6)
+
+        # fmt: off
+        cmd = [
+            b"ffmpeg",
+            b"-nostdin",
+            b"-v", b"error",
+            b"-hide_banner",
+            b"-i", fsenc(abspath),
+            b"-map", b"0:a:0",
+            b"-c:a", b"flac",
+            fsenc(tpath)
+        ]
+        # fmt: on
+        self._run_ff(cmd, vn, oom=300)
+
+    def conv_wav(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
+        if self.args.no_acode or not self.args.allow_wav:
+            raise Exception("wav not permitted in server config")
+
+        self.wait4ram(0.2, tpath)
+        tags, rawtags = ffprobe(abspath, int(vn.flags["convt"] / 2))
+        if "ac" not in tags:
+            raise Exception("not audio")
+
+        bits = tags[".bps"][1]
+        if bits == 0.0:
+            bits = tags[".bprs"][1]
+
+        codec = b"pcm_s32le"
+        if bits <= 16.0:
+            codec = b"pcm_s16le"
+        elif bits <= 24.0:
+            codec = b"pcm_s24le"
+
+        self.log("conv2 wav", 6)
+
+        # fmt: off
+        cmd = [
+            b"ffmpeg",
+            b"-nostdin",
+            b"-v", b"error",
+            b"-hide_banner",
+            b"-i", fsenc(abspath),
+            b"-map", b"0:a:0",
+            b"-c:a", codec,
             fsenc(tpath)
         ]
         # fmt: on
