@@ -3165,7 +3165,7 @@ var Ls = {
 			"Ahash": "somme de contrôle audio",
 			"Vhash": "somme de contrôle vidéo",
 			"Res": "résolution",
-			"T": "type de fichiers",
+			"T": "type de fichier",
 			"aq": "qualité audio / débit binaire",
 			"vq": "qualité vidéo / débit binaire",
 			"pixfmt": "sous-échantillonnage / structure de pixel",
@@ -3211,7 +3211,7 @@ var Ls = {
 				["0..9", "sauter à 0%..90%"],
 				["P", "lecture/pause (démarre également la lecture)"],
 				["S", "sélectionner la chanson en cours"],
-				["Y", "télécharger la morceau"],
+				["Y", "télécharger le morceau"],
 			], [
 				"visionneuse d'image",
 				["J/L, ←/→", "image précédente/suivante"],
@@ -3243,7 +3243,7 @@ var Ls = {
 
 		"enable": "Activer",
 		"danger": "DANGER",
-		"clipped": "copié dans presse-papier",
+		"clipped": "copié dans le presse-papier",
 
 		"ht_s1": "seconde",
 		"ht_s2": "secondes",
@@ -3708,7 +3708,7 @@ var Ls = {
 		"u_depot": 'passer à <a href="#">l\'interface utilisateur fancy</a> (peut réduire la vitesse de téléversement)',
 		"u_gotpot": 'passage à l\'interface utilisateur potato pour une vitesse de téléversement améliorée,\n\nn\'hésitez pas à revenir en arrière si ça ne vous plaît pas !',
 		"u_pott": "<p>fichiers: &nbsp; <b>{0}</b> fini, &nbsp; <b>{1}</b> échoué, &nbsp; <b>{2}</b> en cours, &nbsp; <b>{3}</b> en attente</p>",
-		"u_ever": "ceci est le téléverseur de base ; up2k nécessite au moinschrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_ever": "ceci est le téléverseur de base ; up2k nécessite au moins chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
 		"u_su2k": 'ceci est le téléverseur de base; <a href="#" id="u2yea">up2k</a> est meilleur',
 		"u_uput": 'optimiser pour la vitesse (ignorer la somme de contrôle)',
 		"u_ewrite": 'vous n\'avez pas accès en écriture à ce dossier',
@@ -3775,7 +3775,7 @@ var Ls = {
 		"ur_1un": "Échec du téléversement, désolé",
 		"ur_aun": "Tous les {0} téléversements ont échoué, désolé",
 		"ur_1sn": "Fichier NON trouvé sur le serveur",
-		"ur_asn": "Les {0} fichiers non PAS ÉTÉ trouvés sur le serveur",
+		"ur_asn": "Les {0} fichiers n'ont PAS ÉTÉ trouvés sur le serveur",
 		"ur_um": "Terminé;\n{0} téléversements OK,\n{1} téléversements échoués, désolé",
 		"ur_sm": "Terminé;\n{0} fichiers trouvés sur le serveur,\n{1} fichiers NON trouvés sur le serveur",
 
