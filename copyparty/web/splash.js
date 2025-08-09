@@ -510,6 +510,47 @@ var Ls = {
 		"af1": "mostrar subidas recientes",
 		"ag1": "mostrar usuarios IdP conocidos"
 	},
+	"swe": {
+		"a1": "refresh",
+		"b1": "howdy stranger &nbsp; <small>(you're not logged in)</small>",
+		"c1": "logout",
+		"d1": "dump stack",  // TLNote: "d2" is the tooltip for this button
+		"d2": "shows the state of all active threads",
+		"e1": "reload cfg",
+		"e2": "reload config files (accounts/volumes/volflags),$Nand rescan all e2ds volumes$N$Nnote: any changes to global settings$Nrequire a full restart to take effect",
+		"f1": "you can browse:",
+		"g1": "you can upload to:",
+		"cc1": "other stuff:",
+		"h1": "disable k304",  // TLNote: "j1" explains what k304 is
+		"i1": "enable k304",
+		"j1": "enabling k304 will disconnect your client on every HTTP 304, which can prevent some buggy proxies from getting stuck (suddenly not loading pages), <em>but</em> it will also make things slower in general",
+		"k1": "reset client settings",
+		"l1": "login for more:",
+		"m1": "welcome back,",  // TLNote: "welcome back, USERNAME"
+		"n1": "404 not found &nbsp;┐( ´ -`)┌",
+		"o1": 'or maybe you don\'t have access -- try a password or <a href="' + SR + '/?h">go home</a>',
+		"p1": "403 forbiddena &nbsp;~┻━┻",
+		"q1": 'use a password or <a href="' + SR + '/?h">go home</a>',
+		"r1": "go home",
+		".s1": "rescan",
+		"t1": "action",  // TLNote: this is the header above the "rescan" buttons
+		"u2": "time since the last server write$N( upload / rename / ... )$N$N17d = 17 days$N1h23 = 1 hour 23 minutes$N4m56 = 4 minutes 56 seconds",
+		"v1": "connect",
+		"v2": "use this server as a local HDD",
+		"w1": "switch to https",
+		"x1": "change password",
+		"y1": "edit shares",  // TLNote: shows the list of folders that the user has decided to share
+		"z1": "unlock this share:",  // TLNote: the password prompt to see a hidden share
+		"ta1": "fill in your new password first",
+		"ta2": "repeat to confirm new password:",
+		"ta3": "found a typo; please try again",
+		"aa1": "incoming files:",
+		"ab1": "disable no304",
+		"ac1": "enable no304",
+		"ad1": "enabling no304 will disable all caching; try this if k304 wasn't enough. This will waste a huge amount of network traffic!",
+		"ae1": "active downloads:",
+        "af1": "show recent uploads",
+	},
 	"ukr": {
 		"a1": "оновити",
 		"b1": "привітик, незнайомцю &nbsp; <small>(ви не авторизовані)</small>",
