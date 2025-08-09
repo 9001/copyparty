@@ -15,7 +15,7 @@
 <body>
 	<div id="wrap">
 		{%- if not in_shr %}
-		<a id="a" href="{{ r }}/?h" class="af">refresh</a>
+		<a id="a" href="{{ r }}/?h{{ re }}" class="af">refresh</a>
 		<a id="v" href="{{ r }}/?hc" class="af">connect</a>
 
 		{%- if this.uname == '*' %}
@@ -120,7 +120,12 @@
 		<div>
 			<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
 				<input type="hidden" id="la" name="act" value="login" />
+				{% if this.args.usernames %}
+				<input type="text" id="lu" name="uname" placeholder=" username" size="12" />
+				<input type="password" id="lp" name="cppwd" placeholder=" password" size="12" />
+				{% else %}
 				<input type="password" id="lp" name="cppwd" placeholder=" password" />
+				{% endif %}
 				<input type="hidden" name="uhash" id="uhash" value="x" />
 				<input type="submit" id="ls" value="login" />
 				{% if chpw %}

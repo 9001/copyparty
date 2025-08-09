@@ -536,7 +536,7 @@ def get_sects():
             dedent(
                 """
             \033[33m-i\033[0m takes a comma-separated list of interfaces to listen on;
-            IP-addresses and/or unix-sockets (Unix Domain Sockets)
+            IP-addresses, unix-sockets, and/or open file descriptors
 
             the default (\033[32m-i ::\033[0m) means all IPv4 and IPv6 addresses
 
@@ -562,7 +562,9 @@ def get_sects():
             \033[32m-i unix:\033[33m/dev/shm/party.sock\033[0m keeps umask-defined permission
             (usually \033[33m0600\033[0m) and the same user/group as copyparty
 
-            \033[33m-p\033[0m (tcp ports) is ignored for unix sockets
+            \033[32m-i fd:\033[33m3\033[0m uses the socket passed to copyparty on file descriptor 3
+
+            \033[33m-p\033[0m (tcp ports) is ignored for unix-sockets and FDs
             """
             ),
         ],
@@ -916,6 +918,9 @@ def get_sects():
             copyparty will also hash and print any passwords that are non-hashed
             (password which do not start with '+') and then terminate afterwards
 
+            if you have enabled --usernames then the password
+            must be provided as username:password for hashing
+
             \033[36m--ah-alg\033[0m specifies the hashing algorithm and a
                list of optional comma-separated arguments:
 
@@ -993,18 +998,19 @@ def build_flags_desc():
 
 
 def add_general(ap, nc, srvname):
-    ap2 = ap.add_argument_group('general options')
-    ap2.add_argument("-c", metavar="PATH", type=u, default=CFG_DEF, action="append", help="add config file")
+    ap2 = ap.add_argument_group("general options")
+    ap2.add_argument("-c", metavar="PATH", type=u, default=CFG_DEF, action="append", help="\033[34mREPEATABLE:\033[0m add config file")
     ap2.add_argument("-nc", metavar="NUM", type=int, default=nc, help="max num clients")
     ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="max num cpu cores, 0=all")
-    ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="add account, \033[33mUSER\033[0m:\033[33mPASS\033[0m; example [\033[32med:wark\033[0m]")
-    ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="add volume, \033[33mSRC\033[0m:\033[33mDST\033[0m:\033[33mFLAG\033[0m; examples [\033[32m.::r\033[0m], [\033[32m/mnt/nas/music:/music:r:aed\033[0m], see --help-accounts")
-    ap2.add_argument("--grp", metavar="G:N,N", type=u, action="append", help="add group, \033[33mNAME\033[0m:\033[33mUSER1\033[0m,\033[33mUSER2\033[0m,\033[33m...\033[0m; example [\033[32madmins:ed,foo,bar\033[0m]")
+    ap2.add_argument("-a", metavar="ACCT", type=u, action="append", help="\033[34mREPEATABLE:\033[0m add account, \033[33mUSER\033[0m:\033[33mPASS\033[0m; example [\033[32med:wark\033[0m]")
+    ap2.add_argument("-v", metavar="VOL", type=u, action="append", help="\033[34mREPEATABLE:\033[0m add volume, \033[33mSRC\033[0m:\033[33mDST\033[0m:\033[33mFLAG\033[0m; examples [\033[32m.::r\033[0m], [\033[32m/mnt/nas/music:/music:r:aed\033[0m], see --help-accounts")
+    ap2.add_argument("--grp", metavar="G:N,N", type=u, action="append", help="\033[34mREPEATABLE:\033[0m add group, \033[33mNAME\033[0m:\033[33mUSER1\033[0m,\033[33mUSER2\033[0m,\033[33m...\033[0m; example [\033[32madmins:ed,foo,bar\033[0m]")
+    ap2.add_argument("--usernames", action="store_true", help="require username and password for login; default is just password")
     ap2.add_argument("-ed", action="store_true", help="enable the ?dots url parameter / client option which allows clients to see dotfiles / hidden files (volflag=dots)")
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,xm", help="how to handle url-form POSTs; see \033[33m--help-urlform\033[0m")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="server terminal title, for example [\033[32m$ip-10.1.2.\033[0m] or [\033[32m$ip-]")
     ap2.add_argument("--name", metavar="TXT", type=u, default=srvname, help="server name (displayed topleft in browser and in mDNS)")
-    ap2.add_argument("--mime", metavar="EXT=MIME", type=u, action="append", help="map file \033[33mEXT\033[0mension to \033[33mMIME\033[0mtype, for example [\033[32mjpg=image/jpeg\033[0m]")
+    ap2.add_argument("--mime", metavar="EXT=MIME", type=u, action="append", help="\033[34mREPEATABLE:\033[0m map file \033[33mEXT\033[0mension to \033[33mMIME\033[0mtype, for example [\033[32mjpg=image/jpeg\033[0m]")
     ap2.add_argument("--mimes", action="store_true", help="list default mimetype mapping and exit")
     ap2.add_argument("--rmagic", action="store_true", help="do expensive analysis to improve accuracy of returned mimetypes; will make file-downloads, rss, and webdav slower (volflag=rmagic)")
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
@@ -1012,7 +1018,7 @@ def add_general(ap, nc, srvname):
 
 
 def add_qr(ap, tty):
-    ap2 = ap.add_argument_group('qr options')
+    ap2 = ap.add_argument_group("qr options")
     ap2.add_argument("--qr", action="store_true", help="show http:// QR-code on startup")
     ap2.add_argument("--qrs", action="store_true", help="show https:// QR-code on startup")
     ap2.add_argument("--qrl", metavar="PATH", type=u, default="", help="location to include in the url, for example [\033[32mpriv/?pw=hunter2\033[0m]")
@@ -1034,7 +1040,7 @@ def add_fs(ap):
 
 def add_share(ap):
     db_path = os.path.join(E.cfg, "shares.db")
-    ap2 = ap.add_argument_group('share-url options')
+    ap2 = ap.add_argument_group("share-url options")
     ap2.add_argument("--shr", metavar="DIR", type=u, default="", help="toplevel virtual folder for shared files/folders, for example [\033[32m/share\033[0m]")
     ap2.add_argument("--shr-db", metavar="FILE", type=u, default=db_path, help="database to store shares in")
     ap2.add_argument("--shr-adm", metavar="U,U", type=u, default="", help="comma-separated list of users allowed to view/delete any share")
@@ -1043,7 +1049,7 @@ def add_share(ap):
 
 
 def add_upload(ap):
-    ap2 = ap.add_argument_group('upload options')
+    ap2 = ap.add_argument_group("upload options")
     ap2.add_argument("--dotpart", action="store_true", help="dotfile incomplete uploads, hiding them from clients unless \033[33m-ed\033[0m")
     ap2.add_argument("--plain-ip", action="store_true", help="when avoiding filename collisions by appending the uploader's ip to the filename: append the plaintext ip instead of salting and hashing the ip")
     ap2.add_argument("--put-name", metavar="TXT", type=u, default="put-{now.6f}-{cip}.bin", help="filename for nameless uploads (when uploader doesn't provide a name); default is [\033[32mput-UNIXTIME-IP.bin\033[0m] (the \033[32m.6f\033[0m means six decimal places) (volflag=put_name)")
@@ -1085,14 +1091,14 @@ def add_upload(ap):
 
 
 def add_network(ap):
-    ap2 = ap.add_argument_group('network options')
-    ap2.add_argument("-i", metavar="IP", type=u, default="::", help="IPs and/or unix-sockets to listen on (see \033[33m--help-bind\033[0m). Default: all IPv4 and IPv6")
+    ap2 = ap.add_argument_group("network options")
+    ap2.add_argument("-i", metavar="IP", type=u, default="::", help="IPs and/or unix-sockets to listen on (comma-separated list; see \033[33m--help-bind\033[0m). Default: all IPv4 and IPv6")
     ap2.add_argument("-p", metavar="PORT", type=u, default="3923", help="ports to listen on (comma/range); ignored for unix-sockets")
     ap2.add_argument("--ll", action="store_true", help="include link-local IPv4/IPv6 in mDNS replies, even if the NIC has routable IPs (breaks some mDNS clients)")
-    ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=1, help="which ip to associate clients with; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd, unsafe), [\033[32m2\033[0m]=outermost-proxy, [\033[32m3\033[0m]=second-proxy, [\033[32m-1\033[0m]=closest-proxy")
+    ap2.add_argument("--rproxy", metavar="DEPTH", type=int, default=9999999, help="which ip to associate clients with; [\033[32m0\033[0m]=tcp, [\033[32m1\033[0m]=origin (first x-fwd, unsafe), [\033[32m-1\033[0m]=closest-proxy, [\033[32m-2\033[0m]=second-hop, [\033[32m-3\033[0m]=third-hop")
     ap2.add_argument("--xff-hdr", metavar="NAME", type=u, default="x-forwarded-for", help="if reverse-proxied, which http header to read the client's real ip from")
-    ap2.add_argument("--xff-src", metavar="CIDR", type=u, default="127.0.0.0/8, ::1/128", help="comma-separated list of trusted reverse-proxy CIDRs; only accept the real-ip header (\033[33m--xff-hdr\033[0m) and IdP headers if the incoming connection is from an IP within either of these subnets. Specify [\033[32mlan\033[0m] to allow all LAN / private / non-internet IPs. Can be disabled with [\033[32many\033[0m] if you are behind cloudflare (or similar) and are using \033[32m--xff-hdr=cf-connecting-ip\033[0m (or similar)")
-    ap2.add_argument("--ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m; examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
+    ap2.add_argument("--xff-src", metavar="CIDR", type=u, default="127.0.0.0/8, ::1/128", help="list of trusted reverse-proxy CIDRs (comma-separated); only accept the real-ip header (\033[33m--xff-hdr\033[0m) and IdP headers if the incoming connection is from an IP within either of these subnets. Specify [\033[32mlan\033[0m] to allow all LAN / private / non-internet IPs. Can be disabled with [\033[32many\033[0m] if you are behind cloudflare (or similar) and are using \033[32m--xff-hdr=cf-connecting-ip\033[0m (or similar)")
+    ap2.add_argument("--ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m (comma-separated); examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--rp-loc", metavar="PATH", type=u, default="", help="if reverse-proxying on a location instead of a dedicated domain/subdomain, provide the base location here; example: [\033[32m/foo/bar\033[0m]")
     if ANYWIN:
         ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets on windows; allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
@@ -1110,7 +1116,7 @@ def add_network(ap):
 
 
 def add_tls(ap, cert_path):
-    ap2 = ap.add_argument_group('SSL/TLS options')
+    ap2 = ap.add_argument_group("SSL/TLS options")
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls -- force plaintext")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext -- force tls")
     ap2.add_argument("--cert", metavar="PATH", type=u, default=cert_path, help="path to file containing a concatenation of TLS key and certificate chain")
@@ -1122,7 +1128,7 @@ def add_tls(ap, cert_path):
 
 def add_cert(ap, cert_path):
     cert_dir = os.path.dirname(cert_path)
-    ap2 = ap.add_argument_group('TLS certificate generator options')
+    ap2 = ap.add_argument_group("TLS certificate generator options")
     ap2.add_argument("--no-crt", action="store_true", help="disable automatic certificate creation")
     ap2.add_argument("--crt-ns", metavar="N,N", type=u, default="", help="comma-separated list of FQDNs (domains) to add into the certificate")
     ap2.add_argument("--crt-exact", action="store_true", help="do not add wildcard entries for each \033[33m--crt-ns\033[0m")
@@ -1142,7 +1148,7 @@ def add_cert(ap, cert_path):
 def add_auth(ap):
     idp_db = os.path.join(E.cfg, "idp.db")
     ses_db = os.path.join(E.cfg, "sessions.db")
-    ap2 = ap.add_argument_group('IdP / identity provider / user authentication options')
+    ap2 = ap.add_argument_group("IdP / identity provider / user authentication options")
     ap2.add_argument("--idp-h-usr", metavar="HN", type=u, default="", help="bypass the copyparty authentication checks if the request-header \033[33mHN\033[0m contains a username to associate the request with (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy")
     ap2.add_argument("--idp-h-grp", metavar="HN", type=u, default="", help="assume the request-header \033[33mHN\033[0m contains the groupname of the requesting user; can be referenced in config files for group-based access control")
     ap2.add_argument("--idp-h-key", metavar="HN", type=u, default="", help="optional but recommended safeguard; your reverse-proxy will insert a secret header named \033[33mHN\033[0m into all requests, and the other IdP headers will be ignored if this header is not present")
@@ -1156,14 +1162,14 @@ def add_auth(ap):
     ap2.add_argument("--ses-db", metavar="PATH", type=u, default=ses_db, help="where to store the sessions database (if you run multiple copyparty instances, make sure they use different DBs)")
     ap2.add_argument("--ses-len", metavar="CHARS", type=int, default=20, help="session key length; default is 120 bits ((20//4)*4*6)")
     ap2.add_argument("--no-ses", action="store_true", help="disable sessions; use plaintext passwords in cookies")
-    ap2.add_argument("--ipu", metavar="CIDR=USR", type=u, action="append", help="users with IP matching \033[33mCIDR\033[0m are auto-authenticated as username \033[33mUSR\033[0m; example: [\033[32m172.16.24.0/24=dave]")
+    ap2.add_argument("--ipu", metavar="CIDR=USR", type=u, action="append", help="\033[34mREPEATABLE:\033[0m users with IP matching \033[33mCIDR\033[0m are auto-authenticated as username \033[33mUSR\033[0m; example: [\033[32m172.16.24.0/24=dave]")
 
 
 def add_chpw(ap):
     db_path = os.path.join(E.cfg, "chpw.json")
-    ap2 = ap.add_argument_group('user-changeable passwords options')
+    ap2 = ap.add_argument_group("user-changeable passwords options")
     ap2.add_argument("--chpw", action="store_true", help="allow users to change their own passwords")
-    ap2.add_argument("--chpw-no", metavar="U,U,U", type=u, action="append", help="do not allow password-changes for this comma-separated list of usernames")
+    ap2.add_argument("--chpw-no", metavar="U,U,U", type=u, action="append", help="\033[34mREPEATABLE:\033[0m do not allow password-changes for this comma-separated list of usernames")
     ap2.add_argument("--chpw-db", metavar="PATH", type=u, default=db_path, help="where to store the passwords database (if you run multiple copyparty instances, make sure they use different DBs)")
     ap2.add_argument("--chpw-len", metavar="N", type=int, default=8, help="minimum password length")
     ap2.add_argument("--chpw-v", metavar="LVL", type=int, default=2, help="verbosity of summary on config load [\033[32m0\033[0m] = nothing at all, [\033[32m1\033[0m] = number of users, [\033[32m2\033[0m] = list users with default-pw, [\033[32m3\033[0m] = list all users")
@@ -1212,12 +1218,12 @@ def add_zc_ssdp(ap):
 
 
 def add_ftp(ap):
-    ap2 = ap.add_argument_group('FTP options (TCP only)')
+    ap2 = ap.add_argument_group("FTP options (TCP only)")
     ap2.add_argument("--ftp", metavar="PORT", type=int, default=0, help="enable FTP server on \033[33mPORT\033[0m, for example \033[32m3921")
     ap2.add_argument("--ftps", metavar="PORT", type=int, default=0, help="enable FTPS server on \033[33mPORT\033[0m, for example \033[32m3990")
     ap2.add_argument("--ftpv", action="store_true", help="verbose")
     ap2.add_argument("--ftp4", action="store_true", help="only listen on IPv4")
-    ap2.add_argument("--ftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
+    ap2.add_argument("--ftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m (comma-separated); specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--ftp-no-ow", action="store_true", help="if target file exists, reject upload instead of overwrite")
     ap2.add_argument("--ftp-wt", metavar="SEC", type=int, default=7, help="grace period for resuming interrupted uploads (any client can write to any file last-modified more recently than \033[33mSEC\033[0m seconds ago)")
     ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, default="", help="the NAT address to use for passive connections")
@@ -1225,7 +1231,7 @@ def add_ftp(ap):
 
 
 def add_webdav(ap):
-    ap2 = ap.add_argument_group('WebDAV options')
+    ap2 = ap.add_argument_group("WebDAV options")
     ap2.add_argument("--daw", action="store_true", help="enable full write support, even if client may not be webdav. \033[1;31mWARNING:\033[0m This has side-effects -- PUT-operations will now \033[1;31mOVERWRITE\033[0m existing files, rather than inventing new filenames to avoid loss of data. You might want to instead set this as a volflag where needed. By not setting this flag, uploaded files can get written to a filename which the client does not expect (which might be okay, depending on client)")
     ap2.add_argument("--dav-inf", action="store_true", help="allow depth:infinite requests (recursive file listing); extremely server-heavy but required for spec compliance -- luckily few clients rely on this")
     ap2.add_argument("--dav-mac", action="store_true", help="disable apple-garbage filter -- allow macos to create junk files (._* and .DS_Store, .Spotlight-*, .fseventsd, .Trashes, .AppleDouble, __MACOS)")
@@ -1235,7 +1241,7 @@ def add_webdav(ap):
 
 
 def add_tftp(ap):
-    ap2 = ap.add_argument_group('TFTP options (UDP only)')
+    ap2 = ap.add_argument_group("TFTP options (UDP only)")
     ap2.add_argument("--tftp", metavar="PORT", type=int, default=0, help="enable TFTP server on \033[33mPORT\033[0m, for example \033[32m69 \033[0mor \033[32m3969")
     ap2.add_argument("--tftp4", action="store_true", help="only listen on IPv4")
     ap2.add_argument("--tftpv", action="store_true", help="verbose")
@@ -1243,12 +1249,12 @@ def add_tftp(ap):
     ap2.add_argument("--tftp-no-fast", action="store_true", help="debug: disable optimizations")
     ap2.add_argument("--tftp-lsf", metavar="PTN", type=u, default="\\.?(dir|ls)(\\.txt)?", help="return a directory listing if a file with this name is requested and it does not exist; defaults matches .ls, dir, .dir.txt, ls.txt, ...")
     ap2.add_argument("--tftp-nols", action="store_true", help="if someone tries to download a directory, return an error instead of showing its directory listing")
-    ap2.add_argument("--tftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m; specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
+    ap2.add_argument("--tftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m (comma-separated); specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--tftp-pr", metavar="P-P", type=u, default="", help="the range of UDP ports to use for data transfer, for example \033[32m12000-13000")
 
 
 def add_smb(ap):
-    ap2 = ap.add_argument_group('SMB/CIFS options')
+    ap2 = ap.add_argument_group("SMB/CIFS options")
     ap2.add_argument("--smb", action="store_true", help="enable smb (read-only) -- this requires running copyparty as root on linux and macos unless \033[33m--smb-port\033[0m is set above 1024 and your OS does port-forwarding from 445 to that.\n\033[1;31mWARNING:\033[0m this protocol is DANGEROUS and buggy! Never expose to the internet!")
     ap2.add_argument("--smbw", action="store_true", help="enable write support (please dont)")
     ap2.add_argument("--smb1", action="store_true", help="disable SMBv2, only enable SMBv1 (CIFS)")
@@ -1262,30 +1268,30 @@ def add_smb(ap):
 
 
 def add_handlers(ap):
-    ap2 = ap.add_argument_group('handlers (see --help-handlers)')
-    ap2.add_argument("--on404", metavar="PY", type=u, action="append", help="handle 404s by executing \033[33mPY\033[0m file")
-    ap2.add_argument("--on403", metavar="PY", type=u, action="append", help="handle 403s by executing \033[33mPY\033[0m file")
+    ap2 = ap.add_argument_group("handlers (see --help-handlers)")
+    ap2.add_argument("--on404", metavar="PY", type=u, action="append", help="\033[34mREPEATABLE:\033[0m handle 404s by executing \033[33mPY\033[0m file")
+    ap2.add_argument("--on403", metavar="PY", type=u, action="append", help="\033[34mREPEATABLE:\033[0m handle 403s by executing \033[33mPY\033[0m file")
     ap2.add_argument("--hot-handlers", action="store_true", help="recompile handlers on each request -- expensive but convenient when hacking on stuff")
 
 
 def add_hooks(ap):
-    ap2 = ap.add_argument_group('event hooks (see --help-hooks)')
-    ap2.add_argument("--xbu", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m before a file upload starts")
-    ap2.add_argument("--xau", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m after  a file upload finishes")
-    ap2.add_argument("--xiu", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m after  all uploads finish and volume is idle")
-    ap2.add_argument("--xbc", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m before a file copy")
-    ap2.add_argument("--xac", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m after  a file copy")
-    ap2.add_argument("--xbr", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m before a file move/rename")
-    ap2.add_argument("--xar", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m after  a file move/rename")
-    ap2.add_argument("--xbd", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m before a file delete")
-    ap2.add_argument("--xad", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m after  a file delete")
-    ap2.add_argument("--xm", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m on message")
-    ap2.add_argument("--xban", metavar="CMD", type=u, action="append", help="execute \033[33mCMD\033[0m if someone gets banned (pw/404/403/url)")
+    ap2 = ap.add_argument_group("event hooks (see --help-hooks)")
+    ap2.add_argument("--xbu", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m before a file upload starts")
+    ap2.add_argument("--xau", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m after  a file upload finishes")
+    ap2.add_argument("--xiu", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m after  all uploads finish and volume is idle")
+    ap2.add_argument("--xbc", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m before a file copy")
+    ap2.add_argument("--xac", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m after  a file copy")
+    ap2.add_argument("--xbr", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m before a file move/rename")
+    ap2.add_argument("--xar", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m after  a file move/rename")
+    ap2.add_argument("--xbd", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m before a file delete")
+    ap2.add_argument("--xad", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m after  a file delete")
+    ap2.add_argument("--xm", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m on message")
+    ap2.add_argument("--xban", metavar="CMD", type=u, action="append", help="\033[34mREPEATABLE:\033[0m execute \033[33mCMD\033[0m if someone gets banned (pw/404/403/url)")
     ap2.add_argument("--hook-v", action="store_true", help="verbose hooks")
 
 
 def add_stats(ap):
-    ap2 = ap.add_argument_group('grafana/prometheus metrics endpoint')
+    ap2 = ap.add_argument_group("grafana/prometheus metrics endpoint")
     ap2.add_argument("--stats", action="store_true", help="enable openmetrics at /.cpr/metrics for admin accounts")
     ap2.add_argument("--nos-hdd", action="store_true", help="disable disk-space metrics (used/free space)")
     ap2.add_argument("--nos-vol", action="store_true", help="disable volume size metrics (num files, total bytes, vmaxb/vmaxn)")
@@ -1295,15 +1301,16 @@ def add_stats(ap):
 
 
 def add_yolo(ap):
-    ap2 = ap.add_argument_group('yolo options')
+    ap2 = ap.add_argument_group("yolo options")
     ap2.add_argument("--allow-csrf", action="store_true", help="disable csrf protections; let other domains/sites impersonate you through cross-site requests")
     ap2.add_argument("--cookie-lax", action="store_true", help="allow cookies from other domains (if you follow a link from another website into your server, you will arrive logged-in); this reduces protection against CSRF")
+    ap2.add_argument("--no-fnugg", action="store_true", help="disable the smoketest for caching-related issues in the web-UI")
     ap2.add_argument("--getmod", action="store_true", help="permit ?move=[...] and ?delete as GET")
     ap2.add_argument("--wo-up-readme", action="store_true", help="allow users with write-only access to upload logues and readmes without adding the _wo_ filename prefix (volflag=wo_up_readme)")
 
 
 def add_optouts(ap):
-    ap2 = ap.add_argument_group('opt-outs')
+    ap2 = ap.add_argument_group("opt-outs")
     ap2.add_argument("-nw", action="store_true", help="never write anything to disk (debug/benchmark)")
     ap2.add_argument("--keep-qem", action="store_true", help="do not disable quick-edit-mode on windows (it is disabled to avoid accidental text selection in the terminal window, as this would pause execution)")
     ap2.add_argument("--no-dav", action="store_true", help="disable webdav support")
@@ -1329,7 +1336,7 @@ def add_optouts(ap):
 
 
 def add_safety(ap):
-    ap2 = ap.add_argument_group('safety options')
+    ap2 = ap.add_argument_group("safety options")
     ap2.add_argument("-s", action="count", default=0, help="increase safety: Disable thumbnails / potentially dangerous software (ffmpeg/pillow/vips), hide partial uploads, avoid crawlers.\n └─Alias of\033[32m --dotpart --no-thumb --no-mtag-ff --no-robots --force-js")
     ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, webdav, 404 on 403, ban on excessive 404s.\n └─Alias of\033[32m -s --unpost=0 --no-del --no-mv --hardlink --vague-403 -nih")
     ap2.add_argument("-sss", action="store_true", help="further increase safety: Enable logging to disk, scan for dangerous symlinks.\n └─Alias of\033[32m -ss --no-dav --no-logues --no-readme -lo=cpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz --ls=**,*,ln,p,r")
@@ -1360,7 +1367,7 @@ def add_safety(ap):
 
 
 def add_salt(ap, fk_salt, dk_salt, ah_salt):
-    ap2 = ap.add_argument_group('salting options')
+    ap2 = ap.add_argument_group("salting options")
     ap2.add_argument("--ah-alg", metavar="ALG", type=u, default="none", help="account-pw hashing algorithm; one of these, best to worst: \033[32margon2 scrypt sha2 none\033[0m (each optionally followed by alg-specific comma-sep. config)")
     ap2.add_argument("--ah-salt", metavar="SALT", type=u, default=ah_salt, help="account-pw salt; ignored if \033[33m--ah-alg\033[0m is none (default)")
     ap2.add_argument("--ah-gen", metavar="PW", type=u, default="", help="generate hashed password for \033[33mPW\033[0m, or read passwords from STDIN if \033[33mPW\033[0m is [\033[32m-\033[0m]")
@@ -1374,14 +1381,14 @@ def add_salt(ap, fk_salt, dk_salt, ah_salt):
 
 
 def add_shutdown(ap):
-    ap2 = ap.add_argument_group('shutdown options')
+    ap2 = ap.add_argument_group("shutdown options")
     ap2.add_argument("--ign-ebind", action="store_true", help="continue running even if it's impossible to listen on some of the requested endpoints")
     ap2.add_argument("--ign-ebind-all", action="store_true", help="continue running even if it's impossible to receive connections at all")
     ap2.add_argument("--exit", metavar="WHEN", type=u, default="", help="shutdown after \033[33mWHEN\033[0m has finished; [\033[32mcfg\033[0m] config parsing, [\033[32midx\033[0m] volscan + multimedia indexing")
 
 
 def add_logging(ap):
-    ap2 = ap.add_argument_group('logging options')
+    ap2 = ap.add_argument_group("logging options")
     ap2.add_argument("-q", action="store_true", help="quiet; disable most STDOUT messages")
     ap2.add_argument("-lo", metavar="PATH", type=u, default="", help="logfile, example: \033[32mcpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz\033[0m (NB: some errors may appear on STDOUT only)")
     ap2.add_argument("--no-ansi", action="store_true", default=not VT100, help="disable colors; same as environment-variable NO_COLOR")
@@ -1390,7 +1397,7 @@ def add_logging(ap):
     ap2.add_argument("--no-voldump", action="store_true", help="do not list volumes and permissions on startup")
     ap2.add_argument("--log-utc", action="store_true", help="do not use local timezone; assume the TZ env-var is UTC (tiny bit faster)")
     ap2.add_argument("--log-tdec", metavar="N", type=int, default=3, help="timestamp resolution / number of timestamp decimals")
-    ap2.add_argument("--log-badpwd", metavar="N", type=int, default=1, help="log failed login attempt passwords: 0=terse, 1=plaintext, 2=hashed")
+    ap2.add_argument("--log-badpwd", metavar="N", type=int, default=2, help="log failed login attempt passwords: 0=terse, 1=plaintext, 2=hashed")
     ap2.add_argument("--log-conn", action="store_true", help="debug: print tcp-server msgs")
     ap2.add_argument("--log-htp", action="store_true", help="debug: print http-server threadpool scaling")
     ap2.add_argument("--ihead", metavar="HEADER", type=u, action='append', help="print request \033[33mHEADER\033[0m; [\033[32m*\033[0m]=all")
@@ -1399,7 +1406,7 @@ def add_logging(ap):
 
 
 def add_admin(ap):
-    ap2 = ap.add_argument_group('admin panel options')
+    ap2 = ap.add_argument_group("admin panel options")
     ap2.add_argument("--no-reload", action="store_true", help="disable ?reload=cfg (reload users/volumes/volflags from config file)")
     ap2.add_argument("--no-rescan", action="store_true", help="disable ?scan (volume reindexing)")
     ap2.add_argument("--no-stack", action="store_true", help="disable ?stack (list all stacks)")
@@ -1413,7 +1420,7 @@ def add_admin(ap):
 def add_thumbnail(ap):
     th_ram = (RAM_AVAIL or RAM_TOTAL or 9) * 0.6
     th_ram = int(max(min(th_ram, 6), 0.3) * 10) / 10
-    ap2 = ap.add_argument_group('thumbnail options')
+    ap2 = ap.add_argument_group("thumbnail options")
     ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails (volflag=dthumb)")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails (volflag=dvthumb)")
     ap2.add_argument("--no-athumb", action="store_true", help="disable audio thumbnails (spectrograms) (volflag=dathumb)")
@@ -1445,7 +1452,7 @@ def add_thumbnail(ap):
 
 
 def add_transcoding(ap):
-    ap2 = ap.add_argument_group('transcoding options')
+    ap2 = ap.add_argument_group("transcoding options")
     ap2.add_argument("--q-opus", metavar="KBPS", type=int, default=128, help="target bitrate for transcoding to opus; set 0 to disable")
     ap2.add_argument("--q-mp3", metavar="QUALITY", type=u, default="q2", help="target quality for transcoding to mp3, for example [\033[32m192k\033[0m] (CBR) or [\033[32mq0\033[0m] (CQ/CRF, q0=maxquality, q9=smallest); set 0 to disable")
     ap2.add_argument("--allow-wav", action="store_true", help="allow transcoding to wav (lossless, uncompressed)")
@@ -1458,7 +1465,7 @@ def add_transcoding(ap):
 
 
 def add_tail(ap):
-    ap2 = ap.add_argument_group('tailing options (realtime streaming of a growing file)')
+    ap2 = ap.add_argument_group("tailing options (realtime streaming of a growing file)")
     ap2.add_argument("--tail-who", metavar="LVL", type=int, default=2, help="who can tail? [\033[32m0\033[0m]=nobody, [\033[32m1\033[0m]=admins, [\033[32m2\033[0m]=authenticated-with-read-access, [\033[32m3\033[0m]=everyone-with-read-access (volflag=tail_who)")
     ap2.add_argument("--tail-cmax", metavar="N", type=int, default=64, help="do not allow starting a new tail if more than \033[33mN\033[0m active downloads")
     ap2.add_argument("--tail-tmax", metavar="SEC", type=float, default=0, help="terminate connection after \033[33mSEC\033[0m seconds; [\033[32m0\033[0m]=never (volflag=tail_tmax)")
@@ -1468,7 +1475,7 @@ def add_tail(ap):
 
 
 def add_rss(ap):
-    ap2 = ap.add_argument_group('RSS options')
+    ap2 = ap.add_argument_group("RSS options")
     ap2.add_argument("--rss", action="store_true", help="enable RSS output (experimental) (volflag=rss)")
     ap2.add_argument("--rss-nf", metavar="HITS", type=int, default=250, help="default number of files to return (url-param 'nf')")
     ap2.add_argument("--rss-fext", metavar="E,E", type=u, default="", help="default list of file extensions to include (url-param 'fext'); blank=all")
@@ -1477,7 +1484,7 @@ def add_rss(ap):
 
 def add_db_general(ap, hcores):
     noidx = APPLESAN_TXT if MACOS else ""
-    ap2 = ap.add_argument_group('general db options')
+    ap2 = ap.add_argument_group("general db options")
     ap2.add_argument("-e2d", action="store_true", help="enable up2k database; this enables file search, upload-undo, improves deduplication")
     ap2.add_argument("-e2ds", action="store_true", help="scan writable folders for new files on startup; sets \033[33m-e2d\033[0m")
     ap2.add_argument("-e2dsa", action="store_true", help="scans all folders on startup; sets \033[33m-e2ds\033[0m")
@@ -1506,7 +1513,7 @@ def add_db_general(ap, hcores):
 
 
 def add_db_metadata(ap):
-    ap2 = ap.add_argument_group('metadata db options')
+    ap2 = ap.add_argument_group("metadata db options")
     ap2.add_argument("-e2t", action="store_true", help="enable metadata indexing; makes it possible to search for artist/title/codec/resolution/...")
     ap2.add_argument("-e2ts", action="store_true", help="scan newly discovered files for metadata on startup; sets \033[33m-e2t\033[0m")
     ap2.add_argument("-e2tsr", action="store_true", help="delete all metadata from DB and do a full rescan; sets \033[33m-e2ts\033[0m")
@@ -1516,15 +1523,16 @@ def add_db_metadata(ap):
     ap2.add_argument("--mtag-mt", metavar="CORES", type=int, default=CORES, help="num cpu cores to use for tag scanning")
     ap2.add_argument("--mtag-v", action="store_true", help="verbose tag scanning; print errors from mtp subprocesses and such")
     ap2.add_argument("--mtag-vv", action="store_true", help="debug mtp settings and mutagen/FFprobe parsers")
-    ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="add/replace metadata mapping")
+    ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="\033[34mREPEATABLE:\033[0m add/replace metadata mapping")
     ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.); either an entire replacement list, or add/remove stuff on the default-list with +foo or /bar", default=DEF_MTE)
     ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags to hide by default (comma-sep.); assign/add/remove same as \033[33m-mte\033[0m", default=DEF_MTH)
-    ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="read tag \033[33mM\033[0m using program \033[33mBIN\033[0m to parse the file")
+    ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="\033[34mREPEATABLE:\033[0m read tag \033[33mM\033[0m using program \033[33mBIN\033[0m to parse the file")
 
 
 def add_txt(ap):
-    ap2 = ap.add_argument_group('textfile options')
+    ap2 = ap.add_argument_group("textfile options")
     ap2.add_argument("--md-hist", metavar="TXT", type=u, default="s", help="where to store old version of markdown files; [\033[32ms\033[0m]=subfolder, [\033[32mv\033[0m]=volume-histpath, [\033[32mn\033[0m]=nope/disabled (volflag=md_hist)")
+    ap2.add_argument("--txt-eol", metavar="TYPE", type=u, default="", help="enable EOL conversion when writing documents; supported: CRLF, LF (volflag=txt_eol)")
     ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="the textfile editor will check for serverside changes every \033[33mSEC\033[0m seconds")
     ap2.add_argument("-emp", action="store_true", help="enable markdown plugins -- neat but dangerous, big XSS risk")
     ap2.add_argument("--exp", action="store_true", help="enable textfile expansion -- replace {{self.ip}} and such; see \033[33m--help-exp\033[0m (volflag=exp)")
@@ -1534,7 +1542,7 @@ def add_txt(ap):
 
 
 def add_og(ap):
-    ap2 = ap.add_argument_group('og / open graph / discord-embed options')
+    ap2 = ap.add_argument_group("og / open graph / discord-embed options")
     ap2.add_argument("--og", action="store_true", help="disable hotlinking and return an html document instead; this is required by open-graph, but can also be useful on its own (volflag=og)")
     ap2.add_argument("--og-ua", metavar="RE", type=u, default="", help="only disable hotlinking / engage OG behavior if the useragent matches regex \033[33mRE\033[0m (volflag=og_ua)")
     ap2.add_argument("--og-tpl", metavar="PATH", type=u, default="", help="do not return the regular copyparty html, but instead load the jinja2 template at \033[33mPATH\033[0m (if path contains 'EXT' then EXT will be replaced with the requested file's extension) (volflag=og_tpl)")
@@ -1552,7 +1560,7 @@ def add_og(ap):
 
 
 def add_ui(ap, retry):
-    ap2 = ap.add_argument_group('ui options')
+    ap2 = ap.add_argument_group("ui options")
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
     ap2.add_argument("--gsel", action="store_true", help="select files in grid by ctrl-click (volflag=gsel)")
     ap2.add_argument("--localtime", action="store_true", help="default to local timezone instead of UTC")
@@ -1567,7 +1575,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--qdel", metavar="LVL", type=int, default=2, help="number of confirmations to show when deleting files (2/1/0)")
     ap2.add_argument("--unlist", metavar="REGEX", type=u, default="", help="don't show files/folders matching \033[33mREGEX\033[0m in file list. WARNING: Purely cosmetic! Does not affect API calls, just the browser. Example: [\033[32m\\.(js|css)$\033[0m] (volflag=unlist)")
     ap2.add_argument("--favico", metavar="TXT", type=u, default="c 000 none" if retry else "🎉 000 none", help="\033[33mfavicon-text\033[0m [ \033[33mforeground\033[0m [ \033[33mbackground\033[0m ] ], set blank to disable")
-    ap2.add_argument("--ext-th", metavar="E=VP", type=u, action="append", help="use thumbnail-image \033[33mVP\033[0m for file-extension \033[33mE\033[0m, example: [\033[32mexe=/.res/exe.png\033[0m] (volflag=ext_th)")
+    ap2.add_argument("--ext-th", metavar="E=VP", type=u, action="append", help="\033[34mREPEATABLE:\033[0m use thumbnail-image \033[33mVP\033[0m for file-extension \033[33mE\033[0m, example: [\033[32mexe=/.res/exe.png\033[0m] (volflag=ext_th)")
     ap2.add_argument("--mpmc", type=u, default="", help=argparse.SUPPRESS)
     ap2.add_argument("--spinner", metavar="TXT", type=u, default="🌲", help="\033[33memoji\033[0m or \033[33memoji,css\033[0m Example: [\033[32m🥖,padding:0\033[0m]")
     ap2.add_argument("--css-browser", metavar="L", type=u, default="", help="URL to additional CSS to include in the filebrowser html")
@@ -1583,6 +1591,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--ver", action="store_true", help="show version on the control panel (incompatible with \033[33m-nb\033[0m)")
     ap2.add_argument("--k304", metavar="NUM", type=int, default=0, help="configure the option to enable/disable k304 on the controlpanel (workaround for buggy reverse-proxies); [\033[32m0\033[0m] = hidden and default-off, [\033[32m1\033[0m] = visible and default-off, [\033[32m2\033[0m] = visible and default-on")
     ap2.add_argument("--no304", metavar="NUM", type=int, default=0, help="configure the option to enable/disable no304 on the controlpanel (workaround for buggy caching in browsers); [\033[32m0\033[0m] = hidden and default-off, [\033[32m1\033[0m] = visible and default-off, [\033[32m2\033[0m] = visible and default-on")
+    ap2.add_argument("--ctl-re", metavar="SEC", type=int, default=1, help="the controlpanel Refresh-button will autorefresh every SEC; [\033[32m0\033[0m] = just once")
     ap2.add_argument("--md-sbf", metavar="FLAGS", type=u, default="downloads forms popups scripts top-navigation-by-user-activation", help="list of capabilities to allow in the iframe 'sandbox' attribute for README.md docs (volflag=md_sbf); see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#sandbox")
     ap2.add_argument("--lg-sbf", metavar="FLAGS", type=u, default="downloads forms popups scripts top-navigation-by-user-activation", help="list of capabilities to allow in the iframe 'sandbox' attribute for prologue/epilogue docs (volflag=lg_sbf)")
     ap2.add_argument("--md-sba", metavar="TXT", type=u, default="", help="the value of the iframe 'allow' attribute for README.md docs, for example [\033[32mfullscreen\033[0m] (volflag=md_sba)")
@@ -1593,7 +1602,7 @@ def add_ui(ap, retry):
 
 
 def add_debug(ap):
-    ap2 = ap.add_argument_group('debug options')
+    ap2 = ap.add_argument_group("debug options")
     ap2.add_argument("--vc", action="store_true", help="verbose config file parser (explain config)")
     ap2.add_argument("--cgen", action="store_true", help="generate config file from current config (best-effort; probably buggy)")
     ap2.add_argument("--deps", action="store_true", help="list information about detected optional dependencies")

@@ -964,6 +964,7 @@ function up2k_init(subtle) {
             "t": 0
         },
         "car": 0,
+        "nre": 0,
         "slow_io": null,
         "oserr": false,
         "modn": 0,
@@ -1572,7 +1573,7 @@ function up2k_init(subtle) {
 
     function linklist() {
         var ret = [],
-            base = document.location.origin.replace(/\/$/, '');
+            base = location.origin.replace(/\/$/, '');
 
         for (var a = 0; a < st.files.length; a++) {
             var t = st.files[a],
@@ -1595,7 +1596,7 @@ function up2k_init(subtle) {
         ev(e);
         var txt = linklist();
         cliptxt(txt + '\n', function () {
-            toast.inf(5, un_clip.format(txt.split('\n').length));
+            toast.inf(5, L.un_clip.format(txt.split('\n').length));
         });
     };
 
@@ -1783,8 +1784,7 @@ function up2k_init(subtle) {
     }
 
     var tasker = (function () {
-        var running = false,
-            was_busy = false;
+        var running = false;
 
         var defer = function () {
             running = false;
@@ -1801,7 +1801,17 @@ function up2k_init(subtle) {
             while (true) {
                 var now = Date.now(),
                     blocktime = now - r.tact,
-                    is_busy = st.car < st.files.length;
+                    was_busy = st.is_busy,
+                    is_busy = !!(  // gzip take the wheel
+                        st.car < st.files.length ||
+                        st.busy.hash.length ||
+                        st.todo.hash.length ||
+                        st.busy.handshake.length ||
+                        st.todo.handshake.length ||
+                        st.busy.upload.length ||
+                        st.todo.upload.length ||
+                        st.busy.head.length ||
+                        st.todo.head.length);
 
                 if (blocktime > 2500)
                     console.log('main thread blocked for ' + blocktime);
@@ -1809,7 +1819,16 @@ function up2k_init(subtle) {
                 r.tact = now;
 
                 if (was_busy && !is_busy) {
-                    for (var a = 0; a < st.files.length; a++) {
+                    var nre = 0, nf = 0;
+                    for (var a = 0; a < st.files.length; a++)
+                        if (st.files[a].want_recheck)
+                            nre++;
+                    console.log('nre', nre, 'st', st.nre);
+                    if (st.nre != nre) {
+                        st.nre = nre;
+                        nf = st.files.length;
+                    }
+                    for (var a = 0; a < nf; a++) {
                         var t = st.files[a];
                         if (t.want_recheck) {
                             t.rechecks++;
@@ -1817,7 +1836,7 @@ function up2k_init(subtle) {
                             push_t(st.todo.handshake, t);
                         }
                     }
-                    is_busy = st.todo.handshake.length;
+                    is_busy = !!st.todo.handshake.length;
                     try {
                         if (!is_busy && !uc.fsearch && !msel.getsel().length && (!mp.au || mp.au.paused))
                             treectl.goto();
@@ -1826,7 +1845,7 @@ function up2k_init(subtle) {
                 }
 
                 if (was_busy != is_busy) {
-                    st.is_busy = was_busy = is_busy;
+                    st.is_busy = is_busy;
 
                     window[(is_busy ? "add" : "remove") +
                         "EventListener"]("beforeunload", warn_uploader_busy);
@@ -1947,7 +1966,7 @@ function up2k_init(subtle) {
 
         for (var a = 0; a < st.files.length; a++) {
             var t = st.files[a];
-            if (t.want_recheck && !t.rechecks)
+            if (t.want_recheck && t.rechecks < 999)
                 return;
         }
 
@@ -2693,8 +2712,9 @@ function up2k_init(subtle) {
                     if (ofs !== -1) {
                         err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2).trimEnd()).join(' / ');
                     }
-                    if (!t.rechecks && (err_pend || err_srcb)) {
+                    if (!t.rechecks)
                         t.rechecks = 0;
+                    if (t.rechecks < 999 && (err_pend || err_srcb)) {
                         t.want_recheck = true;
                         if (st.busy.upload.length || st.busy.handshake.length || st.bytes.uploaded) {
                             err = L.u_dupdefer;

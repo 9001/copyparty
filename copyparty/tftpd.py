@@ -179,7 +179,7 @@ class Tftpd(object):
         if "::" in ips:
             ips.append("0.0.0.0")
 
-        ips = [x for x in ips if "unix:" not in x]
+        ips = [x for x in ips if not x.startswith(("unix:", "fd:"))]
 
         if self.args.tftp4:
             ips = [x for x in ips if ":" not in x]
