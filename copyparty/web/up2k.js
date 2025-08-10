@@ -2831,7 +2831,7 @@ function up2k_init(subtle) {
         if (!t.t_uploading)
             t.t_uploading = Date.now();
 
-        pvis.seth(t.n, 1, "🚀 send");
+        pvis.seth(t.n, 1, "🚀 " + L.ul_send);
 
         var chunksize = get_chunksize(t.size),
             car = pcar * chunksize,
