@@ -9078,7 +9078,7 @@ var Ls = {
 		"tt_pdock": "visa överordnade mappar i en panel längst upp i vyn",
 		"tt_dynt": "väx vyn när trädet expanderar",
 		"tt_wrap": "automatisk radbrytning",
-		"tt_hover": "visa överlånga rader när pekaren hovrar över dem$N( skrollhjulet fungerar ej såvida inte muspekaren$Nstår till vänster )",
+		"tt_hover": "visa överlånga rader när muspekaren hovrar över dem$N( skrollhjulet fungerar ej såvida inte pekaren$Nstår till vänster )",
 
 		"ml_pmode": "vid mappens slut...",
 		"ml_btns": "komm.",
