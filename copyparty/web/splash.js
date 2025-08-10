@@ -550,6 +550,7 @@ var Ls = {
 		"ad1": "detta stänger av all cachning; prova detta om k304 inte räckte till. Detta kommer att slösa enorma mängder nätverkstrafik!",
 		"ae1": "aktiva nedladdningar:",
         "af1": "visa senaste uppladdningar",
+        "ag1": "visa idp-cache"
 	},
 	"ukr": {
 		"a1": "оновити",
