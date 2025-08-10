@@ -246,7 +246,7 @@ var Ls = {
 		"v1": "connecter",
 		"v2": "utilisez ce serveur en tant que disque dur local",
 		"w1": "passer à https",
-		"x1": "change mot de passe",
+		"x1": "changer mot de passe",
 		"y1": "modifier les partages",  // TLNote: shows the list of folders that the user has decided to share
 		"z1": "déverrouiller ce partage:",  // TLNote: the password prompt to see a hidden share
 		"ta1": "entrez d'abord votre nouveau mot de passe",
