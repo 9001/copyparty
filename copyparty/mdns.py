@@ -76,7 +76,8 @@ class MDNS(MCast):
         if not self.args.zm_nwa_1:
             set_avahi_379()
 
-        zs = self.args.name + ".local."
+        zs = self.args.zm_fqdn or (self.args.name + ".local")
+        zs = zs.replace("--name", self.args.name).rstrip(".") + "."
         zs = zs.encode("ascii", "replace").decode("ascii", "replace")
         self.hn = "-".join(x for x in zs.split("?") if x) or (
             "vault-{}".format(random.randint(1, 255))

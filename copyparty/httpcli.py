@@ -1599,6 +1599,10 @@ class HttpCli(object):
                     "quota-available-bytes": str(bfree),
                     "quota-used-bytes": str(btot - bfree),
                 }
+                if "quotaused" in props:  # macos finder crazytalk
+                    df["quotaused"] = df["quota-used-bytes"]
+                    if "quota" in props:
+                        df["quota"] = df["quota-available-bytes"]  # idk, makes it happy
             else:
                 df = {}
         else:
@@ -4971,7 +4975,7 @@ class HttpCli(object):
             rip = host
 
         vp = (self.uparam["hc"] or "").lstrip("/")
-        pw = self.pw or "hunter2"
+        pw = self.ouparam.get("pw") or "hunter2"
         if pw in self.asrv.sesa:
             pw = "hunter2"
 
@@ -5481,13 +5485,13 @@ class HttpCli(object):
             q = "select sz, rd, fn, at from up where ip=? and at>? order by at desc"
             for sz, rd, fn, at in cur.execute(q, (self.ip, lim)):
                 vp = "/" + "/".join(x for x in [vol.vpath, rd, fn] if x)
-                if nfi == 0 or (nfi == 1 and vfi in vp):
+                if nfi == 0 or (nfi == 1 and vfi in vp.lower()):
                     pass
                 elif nfi == 2:
-                    if not vp.startswith(vfi):
+                    if not vp.lower().startswith(vfi):
                         continue
                 elif nfi == 3:
-                    if not vp.endswith(vfi):
+                    if not vp.lower().endswith(vfi):
                         continue
                 else:
                     continue
@@ -5607,13 +5611,13 @@ class HttpCli(object):
             q = "select sz, rd, fn, ip, at from up where at>0 order by at desc"
             for sz, rd, fn, ip, at in cur.execute(q):
                 vp = "/" + "/".join(x for x in [vol.vpath, rd, fn] if x)
-                if nfi == 0 or (nfi == 1 and vfi in vp):
+                if nfi == 0 or (nfi == 1 and vfi in vp.lower()):
                     pass
                 elif nfi == 2:
-                    if not vp.startswith(vfi):
+                    if not vp.lower().startswith(vfi):
                         continue
                 elif nfi == 3:
-                    if not vp.endswith(vfi):
+                    if not vp.lower().endswith(vfi):
                         continue
                 else:
                     continue

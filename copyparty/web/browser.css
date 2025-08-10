@@ -1377,7 +1377,7 @@ html.y #ops svg circle {
 .opview select,
 .opview input[type=text] {
 	color: var(--fg);
-	background: var(--txt-bg);
+	background: var(--bg-u5);
 	border: none;
 	box-shadow: 0 0 2px var(--txt-sh);
 	border-bottom: 1px solid #999;
