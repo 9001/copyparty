@@ -8900,7 +8900,7 @@ var Ls = {
 			]
 		],
 
-		"m_ok": "Okej",
+		"m_ok": "OK",
 		"m_ng": "Avbryt",
 
 		"enable": "Aktivera",
