@@ -1767,6 +1767,10 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     ensure_webdeps()
 
+    if CFG_DEF:
+        supp = args_from_cfg(CFG_DEF[0])
+        argv.extend(supp)
+
     for k, v in zip(argv[1:], argv[2:]):
         if k == "-c" and os.path.isfile(v):
             supp = args_from_cfg(v)
