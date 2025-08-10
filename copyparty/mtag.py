@@ -29,7 +29,7 @@ from .util import (
 )
 
 if True:  # pylint: disable=using-constant-test
-    from typing import Any, Optional, Union
+    from typing import Any, Optional, Union, IO
 
     from .util import NamedLogger, RootLogger
 
@@ -60,9 +60,23 @@ def have_ff(scmd: str) -> bool:
     else:
         return bool(shutil.which(scmd))
 
+def expat_is_secure():
+    """
+    From the python xml docs:
+
+    An attacker can abuse XML features to carry out denial of service attacks, access local files, generate network connections to other machines, or circumvent firewalls.
+    Expat versions lower that 2.6.0 may be vulnerable to “billion laughs”, “quadratic blowup” and “large tokens”. Python may be vulnerable if it uses such older versions of Expat as a system-provided library. Check pyexpat.EXPAT_VERSION.
+    """
+    import pyexpat
+    # expat_2.7.1
+    if len(pyexpat.EXPAT_VERSION) < 11:
+        return False
+    major, minor, patch = (int(x) for x in pyexpat.EXPAT_VERSION[6:].split("."))
+    return major > 2 or major == 2 and minor >= 6
 
 HAVE_FFMPEG = not os.environ.get("PRTY_NO_FFMPEG") and have_ff("ffmpeg")
 HAVE_FFPROBE = not os.environ.get("PRTY_NO_FFPROBE") and have_ff("ffprobe")
+HAVE_SECURE_EXPAT = os.environ.get("PRTY_ALLOW_INSECURE_EXPAT") or expat_is_secure()
 
 CBZ_PICS = set("png jpg jpeg gif bmp tga tif tiff webp avif".split())
 CBZ_01 = re.compile(r"(^|[^0-9v])0+[01]\b")
@@ -175,6 +189,10 @@ def au_unpk(
             if not znil:
                 raise Exception("no images inside cbz")
             fi = zf.open(using)
+
+        elif pk == "epub":
+            if HAVE_SECURE_EXPAT:
+                fi = get_cover_from_epub(log, abspath)
 
         else:
             raise Exception("unknown compression %s" % (pk,))
@@ -365,6 +383,70 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
     return zd, md
 
 
+def get_cover_from_epub(log: "NamedLogger", abspath: str) -> IO[bytes] | None:
+    import zipfile
+    import xml.etree.ElementTree as ElTree
+    try:
+        from urlparse import urljoin  # Python2
+    except ImportError:
+        from urllib.parse import urljoin  # Python3
+
+    with zipfile.ZipFile(abspath, "r") as z:
+        # First open the container file to find the package document (.opf file)
+        try:
+            container_root = ElTree.parse(z.open("META-INF/container.xml"))
+        except KeyError:
+            log(f"epub: no container file found in {abspath}")
+            return None
+
+        # https://www.w3.org/TR/epub-33/#sec-container.xml-rootfile-elem
+        container_namesapce = {"": "urn:oasis:names:tc:opendocument:xmlns:container"}
+        # One file could contain multiple package documents, default to the first one
+        rootfile_path = container_root\
+            .find("./rootfiles/rootfile", container_namesapce)\
+            .get("full-path")
+
+        # Then open the first package document to find the path of the cover image
+        try:
+            package_root = ElTree.parse(z.open(rootfile_path))
+        except KeyError:
+            log(f"epub: no package document found in {abspath}")
+            return None
+
+        # https://www.w3.org/TR/epub-33/#sec-package-doc
+        package_namespaces = {"": "http://www.idpf.org/2007/opf"}
+        # https://www.w3.org/TR/epub-33/#sec-cover-image
+        coverimage_path_node = package_root\
+            .find("./manifest/item[@properties='cover-image']", package_namespaces)
+        if coverimage_path_node:
+            coverimage_path = coverimage_path_node.get("href")
+        else:
+            # This might be an EPUB2 file, try the legacy way of specifying covers
+            coverimage_path = _get_cover_from_epub2(log, package_root, package_namespaces)
+
+        # This url is either absolute (in the .epub) or relative to the package document
+        adjusted_cover_path = urljoin(rootfile_path, coverimage_path)
+
+        return z.open(adjusted_cover_path)
+
+
+def _get_cover_from_epub2(log: "NamedLogger", package_root, package_namespaces) -> str | None:
+    # <meta name="cover" content="id-to-cover-image"> in <metadata>, then
+    # <item> in <manifest>
+    cover_id = package_root \
+        .find("./metadata/meta[@name='cover']", package_namespaces) \
+        .get("content")
+    if not cover_id:
+        return None
+
+    for node in package_root.iterfind("./manifest/item", package_namespaces):
+        if node.get("id") == cover_id:
+            cover_path = node.get("href")
+            return cover_path
+
+    return None
+
+
 class MTag(object):
     def __init__(self, log_func: "RootLogger", args: argparse.Namespace) -> None:
         self.log_func = log_func
@@ -406,6 +488,9 @@ class MTag(object):
             pyname = os.path.basename(pybin)
             self.log(msg.format(or_ffprobe, " " * 37, pyname), c=1)
             return
+
+        if not HAVE_SECURE_EXPAT:
+            self.log("expat version is missing critical security fixes; epub thumbnails will not be available", c=3)
 
         # https://picard-docs.musicbrainz.org/downloads/MusicBrainz_Picard_Tag_Map.html
         tagmap = {
