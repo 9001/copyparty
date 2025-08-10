@@ -29,7 +29,7 @@ from .util import (
 )
 
 if True:  # pylint: disable=using-constant-test
-    from typing import Any, Optional, Union, IO
+    from typing import IO, Any, Optional, Union
 
     from .util import NamedLogger, RootLogger
 
@@ -59,6 +59,7 @@ def have_ff(scmd: str) -> bool:
             return False
     else:
         return bool(shutil.which(scmd))
+
 
 HAVE_FFMPEG = not os.environ.get("PRTY_NO_FFMPEG") and have_ff("ffmpeg")
 HAVE_FFPROBE = not os.environ.get("PRTY_NO_FFPROBE") and have_ff("ffprobe")
@@ -369,7 +370,9 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
 
 def get_cover_from_epub(log: "NamedLogger", abspath: str) -> IO[bytes] | None:
     import zipfile
+
     from .dxml import parse_xml
+
     try:
         from urlparse import urljoin  # Python2
     except ImportError:
@@ -380,33 +383,34 @@ def get_cover_from_epub(log: "NamedLogger", abspath: str) -> IO[bytes] | None:
         try:
             container_root = parse_xml(z.read("META-INF/container.xml").decode())
         except KeyError:
-            log(f"epub: no container file found in {abspath}")
+            log("epub: no container file found in %s" % (abspath,))
             return None
 
         # https://www.w3.org/TR/epub-33/#sec-container.xml-rootfile-elem
-        container_namespace = {"": "urn:oasis:names:tc:opendocument:xmlns:container"}
+        container_ns = {"": "urn:oasis:names:tc:opendocument:xmlns:container"}
         # One file could contain multiple package documents, default to the first one
-        rootfile_path = container_root\
-            .find("./rootfiles/rootfile", container_namespace)\
-            .get("full-path")
+        rootfile_path = container_root.find("./rootfiles/rootfile", container_ns).get(
+            "full-path"
+        )
 
         # Then open the first package document to find the path of the cover image
         try:
             package_root = parse_xml(z.read(rootfile_path).decode())
         except KeyError:
-            log(f"epub: no package document found in {abspath}")
+            log("epub: no package document found in %s" % (abspath,))
             return None
 
         # https://www.w3.org/TR/epub-33/#sec-package-doc
-        package_namespaces = {"": "http://www.idpf.org/2007/opf"}
+        package_ns = {"": "http://www.idpf.org/2007/opf"}
         # https://www.w3.org/TR/epub-33/#sec-cover-image
-        coverimage_path_node = package_root\
-            .find("./manifest/item[@properties='cover-image']", package_namespaces)
-        if coverimage_path_node:
+        coverimage_path_node = package_root.find(
+            "./manifest/item[@properties='cover-image']", package_ns
+        )
+        if coverimage_path_node is not None:
             coverimage_path = coverimage_path_node.get("href")
         else:
             # This might be an EPUB2 file, try the legacy way of specifying covers
-            coverimage_path = _get_cover_from_epub2(log, package_root, package_namespaces)
+            coverimage_path = _get_cover_from_epub2(log, package_root, package_ns)
 
         # This url is either absolute (in the .epub) or relative to the package document
         adjusted_cover_path = urljoin(rootfile_path, coverimage_path)
@@ -414,16 +418,17 @@ def get_cover_from_epub(log: "NamedLogger", abspath: str) -> IO[bytes] | None:
         return z.open(adjusted_cover_path)
 
 
-def _get_cover_from_epub2(log: "NamedLogger", package_root, package_namespaces) -> str | None:
+def _get_cover_from_epub2(log: "NamedLogger", package_root, package_ns) -> str | None:
     # <meta name="cover" content="id-to-cover-image"> in <metadata>, then
     # <item> in <manifest>
-    cover_id = package_root \
-        .find("./metadata/meta[@name='cover']", package_namespaces) \
-        .get("content")
+    cover_id = package_root.find("./metadata/meta[@name='cover']", package_ns).get(
+        "content"
+    )
+
     if not cover_id:
         return None
 
-    for node in package_root.iterfind("./manifest/item", package_namespaces):
+    for node in package_root.iterfind("./manifest/item", package_ns):
         if node.get("id") == cover_id:
             cover_path = node.get("href")
             return cover_path
