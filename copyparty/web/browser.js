@@ -3893,7 +3893,7 @@ var Ls = {
 		"gou": 'dossier parent">haut',
 		"gon": 'dossier suivant">suivant',
 		"logout": "Déconnexion ",
-		"access": "accès",
+		"access": " accès",
 		"ot_close": "fermer le sous-menu",
 		"ot_search": "chercher des fichiers par leurs attributs, chemin / nom, tag musicaux, ou nimporte quelle combinaison de ces options$N$N&lt;code&gt;foo bar&lt;/code&gt; = doit contenir à la fois «foo» et «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = doit contenir «foo» mais pas «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = commence par «yana» et est un fichier «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contient exactement «try unite»$N$Nle format de date est iso-8601, comme$N&lt;code&gt;2009-12-31&lt;/code&gt; ou &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
 		"ot_unpost": "unpost: supprimer vos téléchargements récents, ou annuler ceux en cours",

@@ -218,6 +218,47 @@ var Ls = {
 		"af1": "näytä viimeaikaiset lataukset",
 		"ag1": "näytä tunnetut IdP-käyttäjät",
 	},
+	"fra": {
+		"a1": "rafraîchir",
+		"b1": "salut étranger &nbsp; <small>(vous n'êtes pas connecté.)</small>",
+		"c1": "déconnexion",
+		"d1": "vidange de la pile",  // TLNote: "d2" is the tooltip for this button
+		"d2": "affiche l'état de tous les threads actifs",
+		"e1": "recharger la configuration",
+		"e2": "recharger le fichier configuration (comptes/volumes/indicateurs de volume),$Net rescanner tous les e2ds volumes$N$Nnote: n'importe quel changement aux paramètres globaux$Nnécessite un redémarrage complet pour prendre effet",
+		"f1": "vous pouvez naviguer:",
+		"g1": "vous pouvez télécharger sur:",
+		"cc1": "autres choses:",
+		"h1": "désactiver k304",  // TLNote: "j1" explains what k304 is
+		"i1": "activer k304",
+		"j1": "activer k304 vouloir déconnecter votre client sur chaque HTTP 304, ce qui peut éviter certains proxys défectueux d'avoir bloqué (les pages ne se chargent soudainement plus), <em>mais</em> cela ralentira également les choses en général",
+		"k1": "réinitialiser client paramètres",
+		"l1": "connectez-vous pour en savoir plus:",
+		"m1": "heureux vous revoir,",  // TLNote: "welcome back, USERNAME"
+		"n1": "404 introuvable &nbsp;┐( ´ -`)┌",
+		"o1": 'ou peut-être que vous n\'y avez pas accès -- essayer un mot de passe ou <a href="' + SR + '/?h">aller à la page d\'accueil</a>',
+		"p1": "403 interdita &nbsp;~┻━┻",
+		"q1": 'utiliser un mot de passe or <a href="' + SR + '/?h">aller à la page d\'accueil</a>',
+		"r1": "aller à la page d\'accueil",
+		".s1": "rescan",
+		"t1": "action",  // TLNote: this is the header above the "rescan" buttons
+		"u2": "temps écoulé depuis la dernière écriture sur le serveur$N( télécharger / renommer / ... )$N$N17j = 17 jours$N1h23 = 1 heur 23 minutes$N4m56 = 4 minutes 56 secondes",
+		"v1": "connecter",
+		"v2": "utilisez ce serveur en tant que disque dur local",
+		"w1": "passer à https",
+		"x1": "change mot de passe",
+		"y1": "modifier les partages",  // TLNote: shows the list of folders that the user has decided to share
+		"z1": "déverrouiller ce partage:",  // TLNote: the password prompt to see a hidden share
+		"ta1": "entrez d'abord votre nouveau mot de passe",
+		"ta2": "répétez pour confirmer le nouveau mot de passe:",
+		"ta3": "une faute de frappe a été détectée ; veuillez réessayer.",
+		"aa1": "fichiers entrants:",
+		"ab1": "désactiver no304",
+		"ac1": "activer no304",
+		"ad1": "l'activation de no304 désactivera toute mise en cache; essayez ceci si k304 n'était pas suffisant. Cela va générer un trafic réseau considérable!",
+		"ae1": "téléchargements actifs:",
+        "af1": "afficher les derniers téléchargements",
+	},
 	"grc": {
 		"a1": "ανανέωση",
 		"b1": "γεια σου ξένε! &nbsp; <small>(δεν είσαι συνδεδεμένος)</small>",
