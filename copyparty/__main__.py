@@ -1431,7 +1431,7 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-ram-max", metavar="GB", type=float, default=th_ram, help="max memory usage (GiB) permitted by thumbnailer; not very accurate")
     ap2.add_argument("--th-crop", metavar="TXT", type=u, default="y", help="crop thumbnails to 4:3 or keep dynamic height; client can override in UI unless force. [\033[32my\033[0m]=crop, [\033[32mn\033[0m]=nocrop, [\033[32mfy\033[0m]=force-y, [\033[32mfn\033[0m]=force-n (volflag=crop)")
     ap2.add_argument("--th-x3", metavar="TXT", type=u, default="n", help="show thumbs at 3x resolution; client can override in UI unless force. [\033[32my\033[0m]=yes, [\033[32mn\033[0m]=no, [\033[32mfy\033[0m]=force-yes, [\033[32mfn\033[0m]=force-no (volflag=th3x)")
-    ap2.add_argument("--th-dec", metavar="LIBS", default="vips,pil,ff", help="image decoders, in order of preference")
+    ap2.add_argument("--th-dec", metavar="LIBS", default="vips,pil,raw,ff", help="image decoders, in order of preference")
     ap2.add_argument("--th-no-jpg", action="store_true", help="disable jpg output")
     ap2.add_argument("--th-no-webp", action="store_true", help="disable webp output")
     ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg output for video thumbs (avoids issues on some FFmpeg builds)")
@@ -1442,9 +1442,11 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-covers", metavar="N,N", type=u, default="folder.png,folder.jpg,cover.png,cover.jpg", help="folder thumbnails to stat/look for; enabling \033[33m-e2d\033[0m will make these case-insensitive, and try them as dotfiles (.folder.jpg), and also automatically select thumbnails for all folders that contain pics, even if none match this pattern")
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
     # https://github.com/libvips/libvips
+    # https://stackoverflow.com/a/47612661
     # ffmpeg -hide_banner -demuxers | awk '/^ D  /{print$2}' | while IFS= read -r x; do ffmpeg -hide_banner -h demuxer=$x; done | grep -E '^Demuxer |extensions:'
     ap2.add_argument("--th-r-pil", metavar="T,T", type=u, default="avif,avifs,blp,bmp,cbz,dcx,dds,dib,emf,eps,epub,fits,flc,fli,fpx,gif,heic,heics,heif,heifs,icns,ico,im,j2p,j2k,jp2,jpeg,jpg,jpx,pbm,pcx,pgm,png,pnm,ppm,psd,qoi,sgi,spi,tga,tif,tiff,webp,wmf,xbm,xpm", help="image formats to decode using pillow")
     ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="avif,exr,fit,fits,fts,gif,hdr,heic,jp2,jpeg,jpg,jpx,jxl,nii,pfm,pgm,png,ppm,svg,tif,tiff,webp", help="image formats to decode using pyvips")
+    ap2.add_argument("--th-r-raw", metavar="T,T", type=u, default="arw,cr2,crw,dcr,dng,erf,k25,kdc,mrw,nef,orf,pef,raf,raw,sr2,srf,x3f", help="image formats to decode using rawpy")
     ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,cbz,dds,dib,epub,fit,fits,fts,gif,hdr,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,qoi,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="3gp,asf,av1,avc,avi,flv,h264,h265,hevc,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,ts,vob,webm,wmv", help="video formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bonk,dfpwm,dts,flac,gsm,ilbc,it,itgz,itxz,itz,m4a,mdgz,mdxz,mdz,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,oga,ogg,okt,opus,ra,s3m,s3gz,s3xz,s3z,tak,tta,ulaw,wav,wma,wv,xm,xmgz,xmxz,xmz,xpk", help="audio formats to decode using ffmpeg")

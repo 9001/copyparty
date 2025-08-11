@@ -2,6 +2,7 @@
 from __future__ import print_function, unicode_literals
 
 import hashlib
+import io
 import logging
 import os
 import re
@@ -121,6 +122,17 @@ try:
 except:
     HAVE_VIPS = False
 
+try:
+    if os.environ.get("PRTY_NO_RAW"):
+        raise Exception()
+
+    HAVE_RAW = True
+    import rawpy
+
+    logging.getLogger("rawpy").setLevel(logging.WARNING)
+except:
+    HAVE_RAW = False
+
 
 th_dir_cache = {}
 
@@ -205,11 +217,19 @@ class ThumbSrv(object):
         if self.args.th_clean:
             Daemon(self.cleaner, "thumb.cln")
 
-        self.fmt_pil, self.fmt_vips, self.fmt_ffi, self.fmt_ffv, self.fmt_ffa = [
+        (
+            self.fmt_pil,
+            self.fmt_vips,
+            self.fmt_raw,
+            self.fmt_ffi,
+            self.fmt_ffv,
+            self.fmt_ffa,
+        ) = [
             set(y.split(","))
             for y in [
                 self.args.th_r_pil,
                 self.args.th_r_vips,
+                self.args.th_r_raw,
                 self.args.th_r_ffi,
                 self.args.th_r_ffv,
                 self.args.th_r_ffa,
@@ -231,6 +251,9 @@ class ThumbSrv(object):
 
         if "vips" in self.args.th_dec:
             self.thumbable |= self.fmt_vips
+
+        if "raw" in self.args.th_dec:
+            self.thumbable |= self.fmt_raw
 
         if "ff" in self.args.th_dec:
             for zss in [self.fmt_ffi, self.fmt_ffv, self.fmt_ffa]:
@@ -313,6 +336,7 @@ class ThumbSrv(object):
             "thumbable": self.thumbable,
             "pil": self.fmt_pil,
             "vips": self.fmt_vips,
+            "raw": self.fmt_raw,
             "ffi": self.fmt_ffi,
             "ffv": self.fmt_ffv,
             "ffa": self.fmt_ffa,
@@ -368,6 +392,8 @@ class ThumbSrv(object):
                         funs.append(self.conv_pil)
                     elif lib == "vips" and ext in self.fmt_vips:
                         funs.append(self.conv_vips)
+                    elif lib == "raw" and ext in self.fmt_raw:
+                        funs.append(self.conv_raw)
                     elif can_au and (want_png or want_au):
                         if want_opus:
                             funs.append(self.conv_opus)
@@ -480,35 +506,38 @@ class ThumbSrv(object):
 
         return im
 
+    def conv_image_pil(self, im: "Image.Image", tpath: str, fmt: str, vn: VFS) -> None:
+        try:
+            im = self.fancy_pillow(im, fmt, vn)
+        except Exception as ex:
+            self.log("fancy_pillow {}".format(ex), "90")
+            im.thumbnail(self.getres(vn, fmt))
+
+        fmts = ["RGB", "L"]
+        args = {"quality": 40}
+
+        if tpath.endswith(".webp"):
+            # quality 80 = pillow-default
+            # quality 75 = ffmpeg-default
+            # method 0 = pillow-default, fast
+            # method 4 = ffmpeg-default
+            # method 6 = max, slow
+            fmts.extend(("RGBA", "LA"))
+            args["method"] = 6
+        else:
+            # default q = 75
+            args["progressive"] = True
+
+        if im.mode not in fmts:
+            # print("conv {}".format(im.mode))
+            im = im.convert("RGB")
+
+        im.save(tpath, **args)
+
     def conv_pil(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.2, tpath)
         with Image.open(fsenc(abspath)) as im:
-            try:
-                im = self.fancy_pillow(im, fmt, vn)
-            except Exception as ex:
-                self.log("fancy_pillow {}".format(ex), "90")
-                im.thumbnail(self.getres(vn, fmt))
-
-            fmts = ["RGB", "L"]
-            args = {"quality": 40}
-
-            if tpath.endswith(".webp"):
-                # quality 80 = pillow-default
-                # quality 75 = ffmpeg-default
-                # method 0 = pillow-default, fast
-                # method 4 = ffmpeg-default
-                # method 6 = max, slow
-                fmts.extend(("RGBA", "LA"))
-                args["method"] = 6
-            else:
-                # default q = 75
-                args["progressive"] = True
-
-            if im.mode not in fmts:
-                # print("conv {}".format(im.mode))
-                im = im.convert("RGB")
-
-            im.save(tpath, **args)
+            self.conv_image_pil(im, tpath, fmt, vn)
 
     def conv_vips(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.2, tpath)
@@ -530,6 +559,50 @@ class ThumbSrv(object):
 
         assert img  # type: ignore  # !rm
         img.write_to_file(tpath, Q=40)
+
+    def conv_raw(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
+        self.wait4ram(0.2, tpath)
+        with rawpy.imread(abspath) as raw:
+            thumb = raw.extract_thumb()
+        if thumb.format == rawpy.ThumbFormat.JPEG and tpath.endswith(".jpg"):
+            # if we have a jpg thumbnail and no webp output is available,
+            # just write the jpg directly (it'll be the wrong size, but it's fast)
+            with open(tpath, "wb") as f:
+                f.write(thumb.data)
+        if HAVE_VIPS:
+            crops = ["centre", "none"]
+            if "f" in fmt:
+                crops = ["none"]
+            w, h = self.getres(vn, fmt)
+            kw = {"height": h, "size": "down", "intent": "relative"}
+
+            for c in crops:
+                try:
+                    kw["crop"] = c
+                    if thumb.format == rawpy.ThumbFormat.BITMAP:
+                        img = pyvips.Image.new_from_array(
+                            thumb.data, interpretation="rgb"
+                        )
+                        img = img.thumbnail_image(w, **kw)
+                    else:
+                        img = pyvips.Image.thumbnail_buffer(thumb.data, w, **kw)
+                    break
+                except:
+                    if c == crops[-1]:
+                        raise
+
+            assert img  # type: ignore  # !rm
+            img.write_to_file(tpath, Q=40)
+        elif HAVE_PIL:
+            if thumb.format == rawpy.ThumbFormat.BITMAP:
+                im = Image.fromarray(thumb.data, "RGB")
+            else:
+                im = Image.open(io.BytesIO(thumb.data))
+            self.conv_image_pil(im, tpath, fmt, vn)
+        else:
+            raise Exception(
+                "either pil or vips is needed to process embedded bitmap thumbnails in raw files"
+            )
 
     def conv_ffmpeg(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.2, tpath)

@@ -266,6 +266,7 @@ also see [comparison to similar software](./docs/versus.md)
     * ☑ realtime streaming of growing files (logfiles and such)
   * ☑ [thumbnails](#thumbnails)
     * ☑ ...of images using Pillow, pyvips, or FFmpeg
+    * ☑ ...of RAW files using rawpy
     * ☑ ...of videos using FFmpeg
     * ☑ ...of audio (spectrograms) using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
@@ -2795,6 +2796,7 @@ enable [thumbnails](#thumbnails) of...
 * **HEIF pictures:** `pyvips` or `ffmpeg` or `pyheif-pillow-opener` (requires Linux or a C compiler)
 * **AVIF pictures:** `pyvips` or `ffmpeg` or `pillow-avif-plugin` or pillow v11.3+
 * **JPEG XL pictures:** `pyvips` or `ffmpeg`
+* **RAW images:** `rawpy`, plus one of `pyvips` or `Pillow` (for some formats)
 
 enable sending [zeromq messages](#zeromq) from event-hooks: `pyzmq`
 
@@ -2828,6 +2830,7 @@ set any of the following environment variables to disable its associated optiona
 | `PRTY_NO_PIL_HEIF`   | disable 3rd-party Pillow plugin for [HEIF support](https://pypi.org/project/pyheif-pillow-opener/) |
 | `PRTY_NO_PIL_WEBP`   | disable use of native webp support in Pillow |
 | `PRTY_NO_PSUTIL`     | do not use [psutil](https://pypi.org/project/psutil/) for reaping stuck hooks and plugins on Windows |
+| `PRTY_NO_RAW`        | disable all [rawpy](https://pypi.org/project/rawpy/)-based thumbnail support for RAW images |
 | `PRTY_NO_VIPS`       | disable all [libvips](https://pypi.org/project/pyvips/)-based thumbnail support; will fallback to Pillow or ffmpeg |
 
 example: `PRTY_NO_PIL=1 python3 copyparty-sfx.py`
