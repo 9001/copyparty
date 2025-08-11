@@ -9221,15 +9221,15 @@ var Ls = {
 		"fd_warn2": "<b>Sista chansen!</b> Det finns inget sätt att ångra detta. Radera?",
 
 		"fc_ok": "klippte {0} objekt",
-        "fc_warn": 'klippte {0} objekt, men:\n\nendast <b>denna</b> webbläsarflik kan klistra in dem\n(eftersom urvalet är so enormt stort)',
+        "fc_warn": 'klippte {0} objekt, men:\n\nendast <b>denna</b> webbläsarflik kan klistra in dem\n(eftersom urvalet är så enormt stort)',
 
 		"fcc_ok": "kopierade {0} objekt till urklippet",
-		"fcc_warn": 'kopierade {0} objekt till urklippet, men:\n\nendast <b>denna</b> webbläsarflik kan klistra in dem\n(eftersom urvalet är so enormt stort)',
+		"fcc_warn": 'kopierade {0} objekt till urklippet, men:\n\nendast <b>denna</b> webbläsarflik kan klistra in dem\n(eftersom urvalet är så enormt stort)',
 
 		"fp_apply": "använd dessa namn",
 		"fp_ecut": "klipp eller kopiera filer / mappar först för att klistra / flytta dem\n\nobs.: du kan klippa och klistra mellan webbläsarflikar",
-		"fp_ename": "{0} objekt kan ej flyttas hit eftersom filnamnen redan är upptagna. Ge dem nya namn nedan för att fortsätta, eller lämna fältet tomt för att skippa:",
-		"fcp_ename": "{0} objekt kan ej kopieras hit eftersom filnamnen redan är upptagna. Ge dem nya namn nedan för att fortsätta, eller lämna fältet tomt för att skippa:",
+		"fp_ename": "{0} objekt kan ej flyttas hit eftersom filnamnen redan är tagna. Ge dem nya namn nedan för att fortsätta, eller lämna fältet tomt för att skippa:",
+		"fcp_ename": "{0} objekt kan ej kopieras hit eftersom filnamnen redan är tagna. Ge dem nya namn nedan för att fortsätta, eller lämna fältet tomt för att skippa:",
 		"fp_emore": "det finns fortfarande filnamnskrockar att fixa",
 		"fp_ok": "flytt lyckades",
 		"fcp_ok": "kopiering lyckades",
@@ -9350,7 +9350,7 @@ var Ls = {
 		"un_m2": "sorterat efter uppladdningstid; senast uppladdad först:",
 		"un_no1": "tjosan! inga uppladdningar är tillräckligt nya",
 		"un_no2": "tjosan! inga uppladdningar som matchar filtret är tillräckligt nya",
-		"un_next": "radera de {0} nästkommande filerna nedan",
+		"un_next": "radera de {0} nästkommande filerna",
 		"un_abrt": "avbryt",
 		"un_del": "radera",
 		"un_m3": "laddar dina senaste uppladdningar...",
