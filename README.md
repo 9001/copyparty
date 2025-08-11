@@ -266,7 +266,7 @@ also see [comparison to similar software](./docs/versus.md)
     * ☑ realtime streaming of growing files (logfiles and such)
   * ☑ [thumbnails](#thumbnails)
     * ☑ ...of images using Pillow, pyvips, or FFmpeg
-    * ☑ ...of RAW files using rawpy
+    * ☑ ...of RAW images using rawpy
     * ☑ ...of videos using FFmpeg
     * ☑ ...of audio (spectrograms) using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
