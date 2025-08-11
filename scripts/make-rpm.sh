@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 #--localbuild to build webdeps and tar locally; otherwise just download prebuilt
 #--pm change packagemanager; otherwise default to dnf
@@ -27,7 +28,7 @@ sourcepkg="copyparty-$ver.tar.gz"
 
 #make temporary directory to build rpm in
 mkdir -p $releasedir/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-trap "rm -rf $releasedir/" EXIT
+trap "rm -rf $releasedir" EXIT
 
 # make/get tarball
 if [ $local_build ]; then 
@@ -37,6 +38,7 @@ if [ $local_build ]; then
         make -C deps-docker
     fi
     if [ ! -f "dist/$sourcepkg" ]; then
+        ./$cppdir/scripts/make-sfx.sh gz fast  # pulls some build-deps + good smoketest
         ./$cppdir/scripts/make-tgz-release.sh "$ver"
     fi
 else
@@ -52,7 +54,10 @@ sed -i "s/\$pkgver/$ver/g" "$releasedir/SPECS/copyparty.spec"
 sed -i "s/\$pkgrel/1/g"  "$releasedir/SPECS/copyparty.spec"
 
 sudo $packagemanager update
-sudo $packagemanager install rpmdevtools python-wheel python-setuptools pyproject-rpm-macros
+sudo $packagemanager install \
+	rpmdevtools python-devel pyproject-rpm-macros \
+	python-wheel python-setuptools python-jinja2 \
+    make pigz
 cd "$releasedir/"
 rpmbuild --define "_topdir `pwd`" -bb SPECS/copyparty.spec
 cd -
