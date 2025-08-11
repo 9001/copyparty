@@ -317,7 +317,6 @@ class SvcHub(object):
 
         self._feature_test()
 
-        self.log("initial th_dec", self.args.th_dec)
         decs = {k: 1 for k in self.args.th_dec.split(",")}
         if not HAVE_VIPS:
             decs.pop("vips", None)
@@ -347,7 +346,7 @@ class SvcHub(object):
                 self.thumbsrv = ThumbSrv(self)
             else:
                 want_ff = True
-                msg = "need either Pillow, pyvips, rawpy, or FFmpeg to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n{0}apt install ffmpeg"
+                msg = "need either Pillow, pyvips, or FFmpeg to create thumbnails; for example:\n{0}{1} -m pip install --user Pillow\n{0}{1} -m pip install --user pyvips\n{0}apt install ffmpeg"
                 msg = msg.format(" " * 37, os.path.basename(pybin))
                 if EXE:
                     msg = "copyparty.exe cannot use Pillow or pyvips; need ffprobe.exe and ffmpeg.exe to create thumbnails"
