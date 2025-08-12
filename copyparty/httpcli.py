@@ -1106,7 +1106,18 @@ class HttpCli(object):
         status: int = 200,
         use302: bool = False,
     ) -> bool:
-        vp = self.args.SRS + vpath
+        if self.args.R:
+            if vpath.startswith(self.args.SR):
+                vp = vpath
+            elif vpath.startswith("/"):
+                vp = self.args.SR + vpath
+            else:
+                vp = self.args.SRS + vpath
+        else:
+            if vpath.startswith("/"):
+                vp = vpath
+            else:
+                vp = "/" + vpath if vpath else "/"
         html = self.j2s(
             "msg",
             h2='<a href="{}">{} {}</a>'.format(
