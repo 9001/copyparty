@@ -3986,11 +3986,11 @@ html.e #path i {
 html.e #hovertree:after {
   color: red;
   content: "BUGGY";
-}*/
 html.ez #hovertree:after {
   color: rgb(255 98 98);
   content: "BUGGY";
 }
+}*/
 html.e #widget {
   box-shadow: 0 0;
   border: 0 !important;
