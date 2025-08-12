@@ -1570,7 +1570,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--localtime", action="store_true", help="default to local timezone instead of UTC")
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language; one of the following: \033[32meng nor chi\033[0m")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use (0..7)")
-    ap2.add_argument("--themes", metavar="NUM", type=int, default=8, help="number of themes installed")
+    ap2.add_argument("--themes", metavar="NUM", type=int, default=10, help="number of themes installed")
     ap2.add_argument("--au-vol", metavar="0-100", type=int, default=50, choices=range(0, 101), help="default audio/video volume percent")
     ap2.add_argument("--sort", metavar="C,C,C", type=u, default="href", help="default sort order, comma-separated column IDs (see header tooltips), prefix with '-' for descending. Examples: \033[32mhref -href ext sz ts tags/Album tags/.tn\033[0m (volflag=sort)")
     ap2.add_argument("--nsort", action="store_true", help="default-enable natural sort of filenames with leading numbers (volflag=nsort)")
