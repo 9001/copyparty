@@ -9235,6 +9235,7 @@ var Ls = {
 		"fcp_ok": "kopiering lyckades",
 		"fp_busy": "flyttar {0} objekt...\n\n{1}",
 		"fcp_busy": "kopierar {0} objekt...\n\n{1}",
+		"fp_abrt": "avbryter...",
 		"fp_err": "flytt misslyckades:\n",
 		"fcp_err": "kopiering misslyckades:\n",
 		"fp_confirm": "flytta dessa {0} objekt hit?",
