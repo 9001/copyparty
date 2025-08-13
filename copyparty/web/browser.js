@@ -8999,9 +8999,9 @@ var Ls = {
 		// keep short:
 		"utl_404": "404",
 		"utl_err": "FEL",
-		"utl_oserr": "Systemfel",
+		"utl_oserr": "OS-fel",
 		"utl_found": "hittad",
-		"utl_defer": "defer",
+		"utl_defer": "väntar",
 		"utl_yolo": "YOLO",
 		"utl_done": "klar",
 
