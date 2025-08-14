@@ -1987,6 +1987,9 @@ class HttpCli(object):
         if "eshare" in self.uparam:
             return self.handle_eshare()
 
+        if "fs_abrt" in self.uparam:
+            return self.handle_fs_abrt()
+
         if "application/octet-stream" in ctype:
             return self.handle_post_binary()
 
@@ -5958,7 +5961,9 @@ class HttpCli(object):
                 self.asrv.vfs.get(vdst, self.uname, False, True, False, True)
                 wunlink(self.log, dabs, dvn.flags)
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_mv", self.uname, self.ip, vsrc, vdst)
+        x = self.conn.hsrv.broker.ask(
+            "up2k.handle_mv", self.ouparam.get("akey"), self.uname, self.ip, vsrc, vdst
+        )
         self.loud_reply(x.get(), status=201)
         return True
 
@@ -5988,8 +5993,19 @@ class HttpCli(object):
                 self.asrv.vfs.get(vdst, self.uname, False, True, False, True)
                 wunlink(self.log, dabs, dvn.flags)
 
-        x = self.conn.hsrv.broker.ask("up2k.handle_cp", self.uname, self.ip, vsrc, vdst)
+        x = self.conn.hsrv.broker.ask(
+            "up2k.handle_cp", self.ouparam.get("akey"), self.uname, self.ip, vsrc, vdst
+        )
         self.loud_reply(x.get(), status=201)
+        return True
+
+    def handle_fs_abrt(self):
+        if self.args.no_fs_abrt:
+            t = "aborting an ongoing copy/move is disabled in server config"
+            raise Pebkac(403, t)
+
+        self.conn.hsrv.broker.say("up2k.handle_fs_abrt", self.uparam["fs_abrt"])
+        self.loud_reply("aborting", status=200)
         return True
 
     def tx_ls(self, ls: dict[str, Any]) -> bool:

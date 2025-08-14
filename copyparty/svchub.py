@@ -39,9 +39,9 @@ from .th_srv import (
     HAVE_FFPROBE,
     HAVE_HEIF,
     HAVE_PIL,
+    HAVE_RAW,
     HAVE_VIPS,
     HAVE_WEBP,
-    HAVE_RAW,
     ThumbSrv,
 )
 from .up2k import Up2k

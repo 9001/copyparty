@@ -113,14 +113,17 @@ except:
 
 try:
     if os.environ.get("PRTY_NO_VIPS"):
-        raise Exception()
+        raise ImportError()
 
     HAVE_VIPS = True
     import pyvips
 
     logging.getLogger("pyvips").setLevel(logging.WARNING)
-except:
+except Exception as e:
     HAVE_VIPS = False
+    if not isinstance(e, ImportError):
+        logging.warning("libvips found, but failed to load: " + str(e))
+
 
 try:
     if os.environ.get("PRTY_NO_RAW"):

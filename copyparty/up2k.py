@@ -144,6 +144,7 @@ class Up2k(object):
 
         self.salt = self.args.warksalt
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{44}$")
+        self.abrt_key = ""
 
         self.gid = 0
         self.gt0 = 0
@@ -3988,6 +3989,9 @@ class Up2k(object):
             except:
                 pass
 
+    def handle_fs_abrt(self, akey: str) -> None:
+        self.abrt_key = akey
+
     def handle_rm(
         self,
         uname: str,
@@ -4197,7 +4201,7 @@ class Up2k(object):
 
         return n_files, ok + ok2, ng + ng2
 
-    def handle_cp(self, uname: str, ip: str, svp: str, dvp: str) -> str:
+    def handle_cp(self, abrt: str, uname: str, ip: str, svp: str, dvp: str) -> str:
         if svp == dvp or dvp.startswith(svp + "/"):
             raise Pebkac(400, "cp: cannot copy parent into subfolder")
 
@@ -4244,6 +4248,8 @@ class Up2k(object):
 
                         dvpf = dvp + svpf[len(svp) :]
                         self._cp_file(uname, ip, svpf, dvpf, curs)
+                        if abrt and abrt == self.abrt_key:
+                            raise Pebkac(400, "filecopy aborted by http-api")
 
                     for v in curs:
                         v.connection.commit()
@@ -4411,7 +4417,7 @@ class Up2k(object):
 
         return "k"
 
-    def handle_mv(self, uname: str, ip: str, svp: str, dvp: str) -> str:
+    def handle_mv(self, abrt: str, uname: str, ip: str, svp: str, dvp: str) -> str:
         if svp == dvp or dvp.startswith(svp + "/"):
             raise Pebkac(400, "mv: cannot move parent into subfolder")
 
@@ -4466,6 +4472,8 @@ class Up2k(object):
 
                         dvpf = dvp + svpf[len(svp) :]
                         self._mv_file(uname, ip, svpf, dvpf, curs)
+                        if abrt and abrt == self.abrt_key:
+                            raise Pebkac(400, "filemove aborted by http-api")
 
                     for v in curs:
                         v.connection.commit()
