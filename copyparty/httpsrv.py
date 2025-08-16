@@ -70,6 +70,7 @@ from .util import (
     build_netmap,
     has_resource,
     ipnorm,
+    load_ipr,
     load_ipu,
     load_resource,
     min_ex,
@@ -192,6 +193,11 @@ class HttpSrv(object):
             self.ipu_iu, self.ipu_nm = load_ipu(self.log, self.args.ipu)
         else:
             self.ipu_iu = self.ipu_nm = None
+
+        if self.args.ipr:
+            self.ipr = load_ipr(self.log, self.args.ipr)
+        else:
+            self.ipr = None
 
         self.ipa_nm = build_netmap(self.args.ipa)
         self.xff_nm = build_netmap(self.args.xff_src)
@@ -324,7 +330,8 @@ class HttpSrv(object):
             spins = 0
             while self.ncli >= self.nclimax:
                 if not spins:
-                    self.log(self.name, "at connection limit; waiting", 3)
+                    t = "at connection limit (global-option 'nc'); waiting"
+                    self.log(self.name, t, 3)
 
                 spins += 1
                 time.sleep(0.1)

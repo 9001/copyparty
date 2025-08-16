@@ -37,11 +37,12 @@
                 {% if accs %}<code><b id="pw0">{{ pw }}</b></code>=password, {% endif %}<code><b>mp</b></code>=mountpoint
             </span>
             {% if accs %}<a href="#" id="setpw">use real password</a>{% endif %}
+            <a href="#" id="qr">show qr</a>
         </p>
 
 
 
-        {% if args.idp_h_usr %}
+        {% if args.have_idp_hdrs %}
         <p style="line-height:2em"><b>WARNING:</b> this server is using IdP-based authentication, so this stuff may not work as advertised. Depending on server config, these commands can probably only be used to access areas which don't require authentication, unless you auth using any non-IdP accounts defined in the copyparty config. Please see <a href="https://github.com/9001/copyparty/blob/hovudstraum/docs/idp.md#connecting-webdav-clients">the IdP docs</a></p>
         {% endif %}
 
@@ -240,14 +241,26 @@
         <div class="os win">
             <h1>ShareX</h1>
 
-            <p>to upload screenshots using ShareX <a href="https://github.com/ShareX/ShareX/releases/tag/v12.1.1">v12</a> or <a href="https://getsharex.com/">v15+</a>, save this as <code>copyparty.sxcu</code> and run it:</p>
+            <p>to upload screenshots using ShareX <a href="https://getsharex.com/">v15+</a>, save this as <code>copyparty.sxcu</code> and run it:</p>
+
+            <pre class="dl" name="copyparty.sxcu">
+                { "Version": "15.0.0", "Name": "copyparty",
+                "RequestURL": "http{{ s }}://{{ ep }}/{{ rvp }}",
+                "Headers": {
+                    {% if accs %}"pw": "<b>{{ pw }}</b>", {% endif %}"accept": "url"
+                },
+                "DestinationType": "ImageUploader, TextUploader, FileUploader",
+                "Body": "MultipartFormData", "URL": "{response}",
+                "RequestMethod": "POST", "FileFormName": "f" }
+            </pre>
+
+            <p>for ShareX <a href="https://github.com/ShareX/ShareX/releases/tag/v12.1.1">v12</a> specifically, save this as <code>copyparty.sxcu</code> and run it:</p>
 
             <pre class="dl" name="copyparty.sxcu">
                 { "Name": "copyparty",
                 "RequestURL": "http{{ s }}://{{ ep }}/{{ rvp }}",
                 "Headers": {
-                    {% if accs %}"pw": "<b>{{ pw }}</b>",{% endif %}
-                    "accept": "url"
+                    {% if accs %}"pw": "<b>{{ pw }}</b>", {% endif %}"accept": "url"
                 },
                 "DestinationType": "ImageUploader, TextUploader, FileUploader",
                 "FileFormName": "f" }

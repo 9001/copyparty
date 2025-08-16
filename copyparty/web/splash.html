@@ -15,14 +15,14 @@
 <body>
 	<div id="wrap">
 		{%- if not in_shr %}
-		<a id="a" href="{{ r }}/?h" class="af">refresh</a>
+		<a id="a" href="{{ r }}/?h{{ re }}" class="af">refresh</a>
 		<a id="v" href="{{ r }}/?hc" class="af">connect</a>
 
 		{%- if this.uname == '*' %}
 			<p id="b">howdy stranger &nbsp; <small>(you're not logged in)</small></p>
 		{%- else %}
 			<a id="c" href="{{ r }}/?pw=x" class="logout">logout</a>
-			<p><span id="m">welcome back,</span> <strong>{{ this.uname|e }}</strong></p>
+			<p><span id="m">welcome back,</span> <strong id="un">{{ this.uname|e }}</strong></p>
 		{%- endif %}
 		{%- endif %}
 
@@ -120,7 +120,12 @@
 		<div>
 			<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
 				<input type="hidden" id="la" name="act" value="login" />
+				{% if this.args.usernames %}
+				<input type="text" id="lu" name="uname" placeholder=" username" size="12" />
+				<input type="password" id="lp" name="cppwd" placeholder=" password" size="12" />
+				{% else %}
 				<input type="password" id="lp" name="cppwd" placeholder=" password" />
+				{% endif %}
 				<input type="hidden" name="uhash" id="uhash" value="x" />
 				<input type="submit" id="ls" value="login" />
 				{% if chpw %}
@@ -163,6 +168,13 @@
 
 			<li><a id="af" href="{{ r }}/?ru">show recent uploads</a></li>
 			<li><a id="k" href="{{ r }}/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
+
+			{%- if this.uname != '*' %}
+			<li><form method="post" enctype="multipart/form-data">
+				<input type="hidden" name="act" value="logout" />
+				<input type="submit" id="lo" value="logout “{{ this.uname|e }}” everywhere" />
+			</form></li>
+			{% endif %}
 		</ul>
 
 	</div>

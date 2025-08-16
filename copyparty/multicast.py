@@ -183,11 +183,7 @@ class MCast(object):
                 srv.ips[oth_ip.split("/")[0]] = ipaddress.ip_network(oth_ip, False)
 
             # gvfs breaks if a linklocal ip appears in a dns reply
-            ll = {
-                k: v
-                for k, v in srv.ips.items()
-                if k.startswith("169.254") or k.startswith("fe80")
-            }
+            ll = {k: v for k, v in srv.ips.items() if k.startswith(("169.254", "fe80"))}
             rt = {k: v for k, v in srv.ips.items() if k not in ll}
 
             if self.args.ll or not rt:

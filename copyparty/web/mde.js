@@ -6,7 +6,7 @@ var dom_doc = ebi('m');
 var dom_md = ebi('mt');
 
 (function () {
-    var n = document.location + '';
+    var n = location + '';
     n = (n.slice(n.indexOf('//') + 2).split('?')[0] + '?v').split('/');
     n[0] = 'top';
     var loc = [];
@@ -113,7 +113,7 @@ function save(mde) {
         fd.append("lastmod", (force ? -1 : last_modified));
         fd.append("body", txt);
 
-        var url = (document.location + '').split('?')[0];
+        var url = (location + '').split('?')[0];
         var xhr = new XHR();
         xhr.open('POST', url, true);
         xhr.responseType = 'text';
@@ -166,7 +166,7 @@ function save_cb() {
     //alert('save OK -- wrote ' + r.size + ' bytes.\n\nsha512: ' + r.sha512);
 
     // download the saved doc from the server and compare
-    var url = (document.location + '').split('?')[0] + '?_=' + Date.now();
+    var url = (location + '').split('?')[0] + '?_=' + Date.now();
     var xhr = new XHR();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';

@@ -68,6 +68,7 @@ def vf_bmap() -> dict[str, str]:
 def vf_vmap() -> dict[str, str]:
     """argv-to-volflag: simple values"""
     ret = {
+        "ac_convt": "aconvt",
         "no_hash": "nohash",
         "no_idx": "noidx",
         "re_maxage": "scan",
@@ -111,9 +112,13 @@ def vf_vmap() -> dict[str, str]:
         "tail_tmax",
         "tail_who",
         "tcolor",
+        "txt_eol",
         "unlist",
         "u2abort",
         "u2ts",
+        "uid",
+        "gid",
+        "unp_who",
         "ups_who",
         "zip_who",
         "zipmaxn",
@@ -175,6 +180,8 @@ flagcats = {
         "nodupe": "rejects existing files (instead of linking/cloning them)",
         "chmod_d=755": "unix-permission for new dirs/folders",
         "chmod_f=644": "unix-permission for new files",
+        "uid=573": "change owner of new files/folders to unix-user 573",
+        "gid=999": "change owner of new files/folders to unix-group 999",
         "sparse": "force use of sparse files, mainly for s3-backed storage",
         "nosparse": "deny use of sparse files, mainly for slow storage",
         "daw": "enable full WebDAV write support (dangerous);\nPUT-operations will now \033[1;31mOVERWRITE\033[0;35m existing files",
@@ -255,7 +262,8 @@ flagcats = {
         "thsize": "thumbnail res; WxH",
         "crop": "center-cropping (y/n/fy/fn)",
         "th3x": "3x resolution (y/n/fy/fn)",
-        "convt": "conversion timeout in seconds",
+        "convt": "convert-to-image timeout in seconds",
+        "aconvt": "convert-to-audio timeout in seconds",
         "ext_th=s=/b.png": "use /b.png as thumbnail for file-extension s",
     },
     "handlers\n(better explained in --help-handlers)": {
@@ -318,6 +326,7 @@ flagcats = {
         "exp": "enable textfile expansion; see --help-exp",
         "exp_md": "placeholders to expand in markdown files; see --help",
         "exp_lg": "placeholders to expand in prologue/epilogue; see --help",
+        "txt_eol=lf": "enable EOL conversion when writing docs (LF or CRLF)",
     },
     "tailing": {
         "notail": "disable ?tail (download a growing file continuously)",
@@ -335,6 +344,7 @@ flagcats = {
         "dky": 'allow seeing files (not folders) inside a specific folder\nwith "g" perm, and does not require a valid dirkey to do so',
         "rss": "allow '?rss' URL suffix (experimental)",
         "rmagic": "expensive analysis for mimetype accuracy",
+        "unp_who=2": "unpost only if same... 1=ip+name, 2=ip, 3=name",
         "ups_who=2": "restrict viewing the list of recent uploads",
         "zip_who=2": "restrict access to download-as-zip/tar",
         "zipmaxn=9k": "reject download-as-zip if more than 9000 files",

@@ -147,6 +147,10 @@ class PWHash(object):
     def cli(self) -> None:
         import getpass
 
+        if self.args.usernames:
+            t = "since you have enabled --usernames, please provide username:password"
+            print(t)
+
         while True:
             try:
                 p1 = getpass.getpass("password> ")

@@ -1,4 +1,207 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0807-2213  `v1.19.0`  usernames
+
+## 🧪 new features
+
+* #511 login with username and password (not just password) can now optionally be enabled with `--usernames` 346515cc
+  * if you have enabled password hashing (`ah-alg: argon2` or similar) then you will need to hash your passwords again after enabling usernames, hashing them as `username:password:`
+* #468 add Greek translation (thx @chamdim!) 50f46187 392abd06
+* #471 add Czech translation (thx @kubakubakuba!) c9556583
+* #515 support systemd socket acivation (thx @mati1210!) 9b9d2a92
+* #523 add QR-code to the connectpage bcc3b156
+* #513 optional EOL-conversion for texteditor 8b31ed88
+* controlpanel refresh-button now toggles automatic refresh 7ae84dea
+
+## 🩹 bugfixes
+
+* fix stuck uploads when the up2k database (`e2d`) is not enabled 4a043568
+  * if more than 60'000 files were uploaded and there were several dupes of some files, they could get stuck and never upload
+  * upload performance is improved remarkably by enabling `e2d` so such huge uploads non-e2d had not been tested in a long time 
+* #467 #470 fix ui-crash when exporting links of all uploaded files to clipboard (thx @geekalaa!) 0df1901f
+* #487 fix ui-crash when the location url-part is `//` 0f55a1ae
+* fix viewing `.MD` files (8a0746c6)
+
+## 🔧 other changes
+
+* when a reverse-proxy is detected, force explicit configuration of `--rproxy` to obtain correct client IP 3f8cb7e8
+  * a bit inconvenient, but helps prevent potentially-dangerous misconfiguration
+  * the necessary configuration changes are explained in the serverlog (you can't miss it)
+  * thanks to @person4268 for pointing out that there was room for improvements!
+* failed login attempts now only log a sha512 hash of the provided password
+  * to see login-attempts with incorrect passwords as plaintext like before, `log-badpwd: 1`
+* #502 add systemd user services and templated services (thx @icxes!) 34d98e99
+* #475 improve helptext for multivalue global-options c2ac57a2
+* #475 add [chungus.conf](https://github.com/9001/copyparty/blob/hovudstraum/docs/chungus.conf), massive extensive nonsensical demo config b664ebb0
+* try to detect proxies with incorrect caching behavior 9e980bb5
+* recent-uploads now support ie9 a57f7cc2
+* languages and themes are now dropdowns a9ee4f24
+* copyparty.exe: upgrade python to 3.13.6 a98360f2
+* introduce [copyparty-en.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-en.py), english-only edition of copyparty-sfx.py to save space 33497e6b
+
+## 🗿 known issues 
+
+* the `copyparty.pyz` in this release is english-only, and does not include the translations -- they got lost in transit while adjusting the buildscripts to make `copyparty-en.py`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0804-0013  `v1.18.10`  idp speedboost
+
+## 🧪 new features
+
+* #426 add Dutch translation (thx @DeStilleGast!) 3798e19a
+* #458 add Italian translation (thx @AOTREVAI!) a38e6e65
+* #456 transcode to flac/wav (thx @missaustraliana!) b469db3c b2d48c64 0d09fb68
+* #439 config-file can be provided through `PRTY_CONFIG` (thx @icxes!) 971360e9
+* #459 videos can become folder thumbnails 16bbcce5
+* add `--idp-cookie`, session-tickets for IdP auth (performance boost) f9502c3d
+  * useful when the IdP-server becomes a bottleneck
+
+## 🩹 bugfixes
+
+* #412 fix PUT-uploads into volumes with `nosub` volflag 47fa4a92
+* #435 ignore spurious exceptions from browser extensions 39e55824
+* #449 IPv6 QR-Code didn't include port 66a5bf36
+* #295 do not force `d2d` in blank vfs (introduced in v1.18.3) 848315c0
+
+## 🔧 other changes
+
+* #440 improved finnish translation (thx @icxes!) a68d5b03
+* point to the `-nc` option in the "at max connections" warning 153d240d
+* the play-button now indicates "play-as-audio" for video-files 40d56bb3
+* docs:
+  * #411 improve password-hashing instructions (thx @chinponya!) c69c7c8a
+  * #429 improve `--cert` helptext (thx @kzshantonu!) 7e3825f8
+  * #413 copyparty is Wii Internet Channel compatible! (thx @techflashYT!) 50f16293
+  * #461 how to use groups without IdP e85a7107
+  * mention that WebDAV and OpenGraph are incompatible by default (and how to fix that) 0bc1b8f7
+  * #345 short explanation about the sfx in quickstart ae5eefc5
+* #398 pypi-package now has extra-group `all` 6eaf8af1
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0801-2056  `v1.18.9`  fix Denial-of-Service
+
+## ⚠️ ATTN: this release fixes a Denial-of-Service vuln
+
+[CVE-2025-54796](https://github.com/9001/copyparty/security/advisories/GHSA-5662-2rj7-f2v6): an unauthenticated user could make the server grind to a halt by accessing a particular URL
+
+## recent important news
+
+* [v1.18.9 (2025-08-01)](https://github.com/9001/copyparty/releases/tag/v1.18.9) fixed [CVE-2025-54796](https://github.com/9001/copyparty/security/advisories/GHSA-5662-2rj7-f2v6) (Denial-of-Service)
+* [v1.15.0 (2024-09-08)](https://github.com/9001/copyparty/releases/tag/v1.15.0) changed upload deduplication to be default-disabled
+* [v1.14.3 (2024-08-30)](https://github.com/9001/copyparty/releases/tag/v1.14.3) fixed a bug that was introduced in v1.13.8 (2024-08-13); this bug could lead to **data loss** -- see the v1.14.3 release-notes for details
+
+## 🧪 new features
+
+* #310 translated to Spanish (thx @herruzo99!) a1dfd0be
+* #350 translated to Ukrainian (thx @MrMebelMan!) fea45e45
+* #321 translated to Russian (thx @A1Asriel!) 0b05c726
+* #381 translated to Finnish (thx @icxes and @Permik!) 7ecedb2c
+  * haha it says surf
+* #312 add option to use localtime in the UI ad23b253
+* #386 initial packaging for debian (thx @Beethoven-n!) 3c6f0b17
+
+## 🩹 bugfixes
+
+* CVE-2025-54796 / GHSA-5662-2rj7-f2v6 09910ba8
+* #347 fix upload-abort when uploading to a share 6d6d79fc
+* fix xiu backlog dropping on restart 3222ba3a
+* #375 fix crash on really old versions of python2.7 (thx @bb!) b69d5901
+* #388 another python2.7 fix: improve unicode support in u2c (thx @KevinXuxuxu!) 9c197535
+* log creator of new/blank markdown docs d0d2f206
+* #400 config didn't support indenting with tabs c1604288
+
+## 🔧 other changes
+
+* `ack` was changed to `continue` 4fa7be2a
+
+## 🌠 fun facts
+
+* the translations have made the sfx size balloon from 766 to 845 KiB in under a week... nice! keep em coming :tada: 
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0731-0833  `v1.18.8`  sfx hotfix
+
+## 🩹 bugfixes
+
+* #354 fix `copyparty-sfx.py` failing to start on certain versions of python c17ce4892ecdb4e11437bc2785d132bd8100eaec
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0730-2131  `v1.18.7`  SECURITY: fix another XSS
+
+## ⚠️ ATTN: this release fixes an XSS vulnerability
+
+[GHSA-8mx2-rjh8-q3jq](https://github.com/9001/copyparty/security/advisories/GHSA-8mx2-rjh8-q3jq), could let an attacker execute arbitrary JS by tricking you into clicking a malicious URL
+
+Soon there won't be many of these left, surely. Huge thanks to @Ju0x for finding and reporting this.
+
+## 🧪 new features
+
+* #265 uid/gid for new files can be configured per-volume f1959988
+  * has preconditions; [see readme](https://github.com/9001/copyparty#chmod-and-chown)
+* #212 add German translation (thx @rGunti, @Scotsguy, @chocolateimage) 9d32564c
+
+## 🩹 bugfixes
+
+* GHSA-8mx2-rjh8-q3jq a8705e61
+* #276 windows: fix segfault (thx @kernel1994 for debugging!) a9d07c63
+* #272 webdav: send disk-size and disk-free to clients 4988a55e
+* #285 use disk-free sans root-reserve on linux (thx @Arklaum!) c3cc2dde 
+* cors-check was funky on IPv6 e9684d40
+* #325 upgrade sharex example for newer versions 6016ec93
+* #300 restore support for old versions of python 2.7 b7ca6f4a
+
+## 🔧 other changes
+
+* shares: the config POST-target is now always the webroot (for ease of IdP configuration) fb7cbc42 
+* unlist: now applies to the navpane too fbf17be2
+* windows: show disk-usage as well, not just disk-free 5c6341e9
+* #228 nix-pkg improvements (thx @dtomvan!) 4915b14b
+* docker-compose: ensure logs appear in realtime 3cde1f3b
+* mention that IdP-volumes and users [can now be persisted](https://github.com/9001/copyparty/blob/hovudstraum/docs/idp.md#but-you-can-enable-idp-volume-persistence) 6069bc9b
+* #316 explain a scary-looking thing in the code 053de619
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0728-2320  `v1.18.6`  reflink-dedup
+
+## 🧪 new features
+
+* #201 add support for reflink-based dedup on cow filesystems df9feabc
+  * combine `--dedup` with `--reflink` to enable, or volflags with same name
+  * a better and safer alternative to the other dedup approaches (symlink/hardlink), but only possible to use in some cases:
+    * needs linux 5.3 or newer, python 3.14 or newer, btrfs/xfs/zfs
+    * not available in the docker images yet; needs a new version of python, so maybe next alpine release (november/december 2025)
+* ratelimit password changes to impede bruteforcing a2601fd6
+  * limit is set by `--ban-pwc` (default is 5 changes in 60min)
+
+## 🩹 bugfixes
+
+* #240 nixos: fix unixgroups issue (thx @chinponya!) 7c9c962b
+* #246 cbz: use correct page for thumbnail (thx @Scotsguy!) 542a1de1
+
+## 🔧 other changes
+
+* volflag `nosub` now also prevents mkdir 0f2c6235
+* improve documentation:
+  * #229 use the same example UDS path everywhere cb019afe
+  * [example nginx config](https://github.com/9001/copyparty/blob/hovudstraum/contrib/nginx/copyparty.conf) had misleading cloudflare comment (thx @jmi2k!) 674fc1fe
+  * more readable `--help-chmod` 03d23dae
+  * #244 fix typo in `--help` 4f013f64
+* #242 hide "use real pw" on connectpage if no accounts (thx @toast003!) 025942a7
+* #211 docker: remove deprecated attribute (thx @ptweezy!) 5b98e104
+* #190 add the feature-showcase video to the readme (thx @RustoMCSpit!) 43e6da34
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0727-2305  `v1.18.5`  SECURITY: fix XSS in media tags
 
 ## ⚠️ ATTN: this release fixes an XSS vulnerability

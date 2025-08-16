@@ -330,7 +330,6 @@ the features you can opt to drop are
 * `cm`/easymde, the "fancy" markdown editor, saves ~89k
 * `hl`, prism, the syntax hilighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
-* `dd`, the custom mouse cursor for the media player tray tab, saves ~2k
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
 
@@ -355,7 +354,7 @@ pip install mutagen  # audio metadata
 pip install pyftpdlib  # ftp server
 pip install partftpy  # tftp server
 pip install impacket  # smb server -- disable Windows Defender if you REALLY need this on windows
-pip install Pillow pyheif-pillow-opener  # thumbnails
+pip install Pillow pillow-heif  # thumbnails
 pip install pyvips  # faster thumbnails
 pip install psutil  # better cleanup of stuck metadata parsers on windows 
 pip install black==21.12b0 click==8.0.2 bandit pylint flake8 isort mypy  # vscode tooling
@@ -414,6 +413,8 @@ to get started, first `cd` into the `scripts` folder
   * removing `gz` too compresses even better, but startup gets slower
 
 * if you want to build the `.pyz` standalone "binary", now run `./make-pyz.sh`
+
+* if you want to build the `tar.gz` for use in a linux-distro package, now run `./make-tgz-release.sh theVersionNumber`
 
 * if you want to build a pypi package, now run `./make-pypi-release.sh d`
 

@@ -155,7 +155,9 @@ except:
     HAVE_PSUTIL = False
 
 try:
-    if os.environ.get("PRTY_NO_MAGIC"):
+    if os.environ.get("PRTY_NO_MAGIC") or (
+        ANYWIN and not os.environ.get("PRTY_FORCE_MAGIC")
+    ):
         raise Exception()
 
     import magic
@@ -241,7 +243,18 @@ except:
     BITNESS = struct.calcsize("P") * 8
 
 
-ansi_re = re.compile("\033\\[[^mK]*[mK]")
+RE_ANSI = re.compile("\033\\[[^mK]*[mK]")
+RE_HTML_SH = re.compile(r"[<>&$?`\"';]")
+RE_CTYPE = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
+RE_CDISP = re.compile(r"^content-disposition: *([^; ]+)", re.IGNORECASE)
+RE_CDISP_FIELD = re.compile(
+    r'^content-disposition:(?: *|.*; *)name="([^"]+)"', re.IGNORECASE
+)
+RE_CDISP_FILE = re.compile(
+    r'^content-disposition:(?: *|.*; *)filename="(.*)"', re.IGNORECASE
+)
+RE_MEMTOTAL = re.compile("^MemTotal:.* kB")
+RE_MEMAVAIL = re.compile("^MemAvailable:.* kB")
 
 
 BOS_SEP = ("%s" % (os.sep,)).encode("ascii")
@@ -386,6 +399,9 @@ application swf=x-shockwave-flash m3u=vnd.apple.mpegurl db3=vnd.sqlite3 sqlite=v
 text ass=plain ssa=plain
 image jpg=jpeg xpm=x-xpixmap psd=vnd.adobe.photoshop jpf=jpx tif=tiff ico=x-icon djvu=vnd.djvu
 image heic=heic-sequence heif=heif-sequence hdr=vnd.radiance svg=svg+xml
+image arw=x-sony-arw cr2=x-canon-cr2 crw=x-canon-crw dcr=x-kodak-dcr dng=x-adobe-dng erf=x-epson-erf
+image k25=x-kodak-k25 kdc=x-kodak-kdc mrw=x-minolta-mrw nef=x-nikon-nef orf=x-olympus-orf
+image pef=x-pentax-pef raf=x-fuji-raf raw=x-panasonic-raw sr2=x-sony-sr2 srf=x-sony-srf x3f=x-sigma-x3f
 audio caf=x-caf mp3=mpeg m4a=mp4 mid=midi mpc=musepack aif=aiff au=basic qcp=qcelp
 video mkv=x-matroska mov=quicktime avi=x-msvideo m4v=x-m4v ts=mp2t
 video asf=x-ms-asf flv=x-flv 3gp=3gpp 3g2=3gpp2 rmvb=vnd.rn-realmedia-vbr
@@ -486,11 +502,11 @@ def read_ram() -> tuple[float, float]:
         with open("/proc/meminfo", "rb", 0x10000) as f:
             zsl = f.read(0x10000).decode("ascii", "replace").split("\n")
 
-        p = re.compile("^MemTotal:.* kB")
+        p = RE_MEMTOTAL
         zs = next((x for x in zsl if p.match(x)))
         a = int((int(zs.split()[1]) / 0x100000) * 100) / 100
 
-        p = re.compile("^MemAvailable:.* kB")
+        p = RE_MEMAVAIL
         zs = next((x for x in zsl if p.match(x)))
         b = int((int(zs.split()[1]) / 0x100000) * 100) / 100
     except:
@@ -1585,7 +1601,8 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
     fun = kwargs.pop("fun", open)
     fdir = kwargs.pop("fdir", None)
     suffix = kwargs.pop("suffix", None)
-    chmod = kwargs.pop("chmod", -1)
+    vf = kwargs.pop("vf", None)
+    fperms = vf and "fperms" in vf
 
     if fname == os.devnull:
         return fun(fname, *args, **kwargs), fname
@@ -1629,11 +1646,11 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
                 fp2 = os.path.join(fdir, fp2)
                 with open(fsenc(fp2), "wb") as f2:
                     f2.write(orig_name.encode("utf-8"))
-                    if chmod >= 0:
-                        os.fchmod(f2.fileno(), chmod)
+                    if fperms:
+                        set_fperms(f2, vf)
 
-            if chmod >= 0:
-                os.fchmod(f.fileno(), chmod)
+            if fperms:
+                set_fperms(f, vf)
 
             return f, fname
 
@@ -1695,14 +1712,10 @@ class MultipartParser(object):
         self.args = args
         self.headers = http_headers
 
-        self.re_ctype = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
-        self.re_cdisp = re.compile(r"^content-disposition: *([^; ]+)", re.IGNORECASE)
-        self.re_cdisp_field = re.compile(
-            r'^content-disposition:(?: *|.*; *)name="([^"]+)"', re.IGNORECASE
-        )
-        self.re_cdisp_file = re.compile(
-            r'^content-disposition:(?: *|.*; *)filename="(.*)"', re.IGNORECASE
-        )
+        self.re_ctype = RE_CTYPE
+        self.re_cdisp = RE_CDISP
+        self.re_cdisp_field = RE_CDISP_FIELD
+        self.re_cdisp_file = RE_CDISP_FILE
 
         self.boundary = b""
         self.gen: Optional[
@@ -2244,6 +2257,16 @@ def find_prefix(ips: list[str], cidrs: list[str]) -> list[str]:
     return ret
 
 
+def html_sh_esc(s: str) -> str:
+    s = re.sub(RE_HTML_SH, "_", s).replace(" ", "%20")
+    s = s.replace("\r", "_").replace("\n", "_")
+    return s
+
+
+def json_hesc(s: str) -> str:
+    return s.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
 def html_escape(s: str, quot: bool = False, crlf: bool = False) -> str:
     """html.escape but also newlines"""
     s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
@@ -2374,6 +2397,21 @@ def ujoin(rd: str, fn: str) -> str:
         return rd.rstrip("/") + "/" + fn.lstrip("/")
     else:
         return rd or fn
+
+
+def str_anchor(txt) -> tuple[int, str]:
+    if not txt:
+        return 0, ""
+    txt = txt.lower()
+    a = txt.startswith("^")
+    b = txt.endswith("$")
+    if not b:
+        if not a:
+            return 1, txt  # ~
+        return 2, txt[1:]  # ^
+    if not a:
+        return 3, txt[:-1]  # $
+    return 4, txt[1:-1]  # ^$
 
 
 def log_reloc(
@@ -2563,6 +2601,14 @@ def lsof(log: "NamedLogger", abspath: str) -> None:
         log("lsof failed; " + min_ex(), 3)
 
 
+def set_fperms(f: Union[typing.BinaryIO, typing.IO[Any]], vf: dict[str, Any]) -> None:
+    fno = f.fileno()
+    if "chmod_f" in vf:
+        os.fchmod(fno, vf["chmod_f"])
+    if "chown" in vf:
+        os.fchown(fno, vf["uid"], vf["gid"])
+
+
 def _fs_mvrm(
     log: "NamedLogger", src: str, dst: str, atomic: bool, flags: dict[str, Any]
 ) -> bool:
@@ -2662,7 +2708,7 @@ def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
     return _fs_mvrm(log, abspath, "", False, flags)
 
 
-def get_df(abspath: str, prune: bool) -> tuple[Optional[int], Optional[int], str]:
+def get_df(abspath: str, prune: bool) -> tuple[int, int, str]:
     try:
         ap = fsenc(abspath)
         while prune and not os.path.isdir(ap) and BOS_SEP in ap:
@@ -2673,17 +2719,22 @@ def get_df(abspath: str, prune: bool) -> tuple[Optional[int], Optional[int], str
             assert ctypes  # type: ignore  # !rm
             abspath = fsdec(ap)
             bfree = ctypes.c_ulonglong(0)
+            btotal = ctypes.c_ulonglong(0)
+            bavail = ctypes.c_ulonglong(0)
             ctypes.windll.kernel32.GetDiskFreeSpaceExW(  # type: ignore
-                ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
+                ctypes.c_wchar_p(abspath),
+                ctypes.pointer(bavail),
+                ctypes.pointer(btotal),
+                ctypes.pointer(bfree),
             )
-            return (bfree.value, None, "")
+            return (bavail.value, btotal.value, "")
         else:
             sv = os.statvfs(ap)
-            free = sv.f_frsize * sv.f_bfree
+            free = sv.f_frsize * sv.f_bavail
             total = sv.f_frsize * sv.f_blocks
             return (free, total, "")
     except Exception as ex:
-        return (None, None, repr(ex))
+        return (0, 0, repr(ex))
 
 
 if not ANYWIN and not MACOS:
@@ -2903,6 +2954,27 @@ def load_ipu(
     return ip_u, nm
 
 
+def load_ipr(
+    log: "RootLogger", iprs: list[str], defer_mutex: bool = False
+) -> dict[str, NetMap]:
+    ret = {}
+    for ipr in iprs:
+        try:
+            zs, uname = ipr.split("=")
+            cidrs = zs.split(",")
+        except:
+            t = "\n  invalid value %r for argument --ipr; must be CIDR[,CIDR[,...]]=UNAME (192.168.0.0/16=amelia)"
+            raise Exception(t % (ipr,))
+        try:
+            nm = NetMap(["::"], cidrs, True, True, defer_mutex)
+        except Exception as ex:
+            t = "failed to translate --ipr into netmap, probably due to invalid config: %r"
+            log("root", t % (ex,), 1)
+            raise
+        ret[uname] = nm
+    return ret
+
+
 def yieldfile(fn: str, bufsz: int) -> Generator[bytes, None, None]:
     readsz = min(bufsz, 128 * 1024)
     with open(fsenc(fn), "rb", bufsz) as f:
@@ -2932,6 +3004,17 @@ def justcopy(
             time.sleep(slp)
 
     return tlen, "checksum-disabled", "checksum-disabled"
+
+
+def eol_conv(
+    fin: Generator[bytes, None, None], conv: str
+) -> Generator[bytes, None, None]:
+    crlf = conv.lower() == "crlf"
+    for buf in fin:
+        buf = buf.replace(b"\r", b"")
+        if crlf:
+            buf = buf.replace(b"\n", b"\r\n")
+        yield buf
 
 
 def hashcopy(
@@ -3519,7 +3602,7 @@ def runihook(
     verbose: bool,
     cmd: str,
     vol: "VFS",
-    ups: list[tuple[str, int, int, str, str, str, int]],
+    ups: list[tuple[str, int, int, str, str, str, int, str]],
 ) -> bool:
     _, chk, fork, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
     bcmd = [sfsenc(x) for x in acmd]
@@ -4164,7 +4247,12 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
                 stream = codecs.getreader(enc)(stream)
             return stream
 
-    return open(os.path.join(E.mod, name), mode, encoding=enc)
+    ap = os.path.join(E.mod, name)
+
+    if PY2:
+        return codecs.open(ap, "r", encoding=enc)  # type: ignore
+
+    return open(ap, mode, encoding=enc)
 
 
 class Pebkac(Exception):

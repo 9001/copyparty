@@ -14,7 +14,6 @@ clean=--clean
 
 uname -s | grep WOW64 && m=64 || m=32
 uname -s | grep NT-10 && w10=1 || w7=1
-[ $w7 ] && export PRTY_NO_MAGIC=1
 [ $w7 ] && [ -e up2k.sh ] && [ ! "$1" ] && ./up2k.sh
 
 [ $w7 ] && pyv=37 || pyv=313

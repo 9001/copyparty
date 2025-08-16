@@ -143,7 +143,7 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None, **ka0):
         ka = {}
 
-        ex = "chpw cookie_lax daw dav_auth dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid gsel hardlink hardlink_only ih ihead magic nid nih no_acode no_athumb no_bauth no_clone no_cp no_dav no_db_ip no_del no_dirsz no_dupe no_lifetime no_logues no_mv no_pipe no_poll no_readme no_robots no_sb_md no_sb_lg no_scandir no_tail no_tarcmp no_thumb no_vthumb no_zip nrand nsort nw og og_no_head og_s_title ohead q rand re_dirsz reflink rmagic rss smb srch_dbg srch_excl stats uqe vague_403 vc ver wo_up_readme write_uplog xdev xlink xvol zipmaxu zs"
+        ex = "allow_flac allow_wav chpw cookie_lax daw dav_auth dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid gsel hardlink hardlink_only ih ihead localtime magic nid nih no_acode no_athumb no_bauth no_clone no_cp no_dav no_db_ip no_del no_dirsz no_dupe no_fnugg no_lifetime no_logues no_mv no_pipe no_poll no_readme no_robots no_sb_md no_sb_lg no_scandir no_tail no_tarcmp no_thumb no_vthumb no_u2abrt no_zip nrand nsort nw og og_no_head og_s_title ohead q rand re_dirsz reflink rmagic rss smb srch_dbg srch_excl stats uqe usernames vague_403 vc ver wo_up_readme write_uplog xdev xlink xvol zipmaxu zs"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "dav_inf dedup dotpart dotsrch hook_v no_dhash no_fastboot no_fpool no_htp no_rescan no_sendfile no_ses no_snap no_up_list no_voldump re_dhash see_dots plain_ip"
@@ -152,22 +152,25 @@ class Cfg(Namespace):
         ex = "ah_cli ah_gen css_browser dbpath hist ipu js_browser js_other mime mimes no_forget no_hash no_idx nonsus_urls og_tpl og_ua ua_nodoc ua_nozip"
         ka.update(**{k: None for k in ex.split()})
 
-        ex = "hash_mt hsortn qdel safe_dedup srch_time tail_fd tail_rate u2abort u2j u2sz"
+        ex = "gid uid"
+        ka.update(**{k: -1 for k in ex.split()})
+
+        ex = "hash_mt hsortn qdel safe_dedup srch_time tail_fd tail_rate u2abort u2j u2sz unp_who"
         ka.update(**{k: 1 for k in ex.split()})
 
-        ex = "au_vol dl_list mtab_age reg_cap s_thead s_tbody tail_tmax tail_who th_convt ups_who zip_who"
+        ex = "ac_convt au_vol dl_list mtab_age reg_cap s_thead s_tbody tail_tmax tail_who th_convt ups_who zip_who"
         ka.update(**{k: 9 for k in ex.split()})
 
-        ex = "db_act forget_ip idp_store k304 loris no304 nosubtle re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo u2ow zipmaxn zipmaxs"
+        ex = "ctl_re db_act forget_ip idp_cookie idp_store k304 loris no304 nosubtle qr_pin re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo u2ow zipmaxn zipmaxs"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg bname chmod_f chpw_db doctitle df exit favico idp_h_usr ipa html_head lg_sba lg_sbf log_fk md_sba md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i shr tcolor textfiles unlist vname xff_src zipmaxt R RS SR"
+        ex = "ah_alg bname chmod_f chpw_db doctitle df exit favico ipa html_head lg_sba lg_sbf log_fk md_sba md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i shr tcolor textfiles txt_eol unlist vname xff_src zipmaxt R RS SR"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "ban_403 ban_404 ban_422 ban_pw ban_pwc ban_url spinner"
         ka.update(**{k: "no" for k in ex.split()})
 
-        ex = "ext_th grp on403 on404 xac xad xar xau xban xbc xbd xbr xbu xiu xm"
+        ex = "ext_th grp idp_h_usr idp_hm_usr ipr on403 on404 xac xad xar xau xban xbc xbd xbr xbu xiu xm"
         ka.update(**{k: [] for k in ex.split()})
 
         ex = "exp_lg exp_md"
@@ -182,9 +185,12 @@ class Cfg(Namespace):
             E=E,
             bup_ck="sha512",
             chmod_d="755",
+            cookie_cmax=8192,
+            cookie_nmax=50,
             dbd="wal",
             dk_salt="b" * 16,
             fk_salt="a" * 16,
+            grp_all="acct",
             idp_gsep=re.compile("[|:;+,]"),
             iobuf=256 * 1024,
             lang="eng",

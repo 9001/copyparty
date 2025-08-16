@@ -19,20 +19,14 @@
         <a href="{{ r }}/?h">control-panel</a>
         &nbsp; Filter: <input type="text" id="filter" size="20" placeholder="documents/passwords" />
         &nbsp; <span id="hits"></span>
-        <table id="tab"><thead><tr>
-            <th>size</th>
-            <th>who</th>
-            <th>when</th>
-            <th>age</th>
-            <th>dir</th>
-            <th>file</th>
-        </tr></thead><tbody id="tb"></tbody></table>
+        <div id="tw"></div>
     </div>
 	<a href="#" id="repl">π</a>
 	<script>
 
 var SR="{{ r }}",
 	lang="{{ lang }}",
+    dutc={{ this.args.js_utc }},
 	dfavico="{{ favico }}";
 
 var STG = window.localStorage;

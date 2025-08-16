@@ -31,6 +31,7 @@ from .util import (
     relchk,
     runhook,
     sanitize_fn,
+    set_fperms,
     vjoin,
     wunlink,
 )
@@ -82,7 +83,12 @@ class FtpAuth(DummyAuthorizer):
         uname = "*"
         if username != "anonymous":
             uname = ""
-            for zs in (password, username):
+            if args.usernames:
+                alts = ["%s:%s" % (username, password)]
+            else:
+                alts = password, username
+
+            for zs in alts:
                 zs = asrv.iacct.get(asrv.ah.hash(zs), "")
                 if zs:
                     uname = zs
@@ -90,6 +96,10 @@ class FtpAuth(DummyAuthorizer):
 
         if args.ipu and uname == "*":
             uname = args.ipu_iu[args.ipu_nm.map(ip)]
+        if args.ipr and uname in args.ipr_u:
+            if not args.ipr_u[uname].map(ip):
+                logging.warning("username [%s] rejected by --ipr", uname)
+                uname = "*"
 
         if not uname or not (asrv.vfs.aread.get(uname) or asrv.vfs.awrite.get(uname)):
             g = self.hub.gpwd
@@ -262,8 +272,8 @@ class FtpFs(AbstractedFS):
             wunlink(self.log, ap, VF_CAREFUL)
 
         ret = open(fsenc(ap), mode, self.args.iobuf)
-        if w and "chmod_f" in vfs.flags:
-            os.fchmod(ret.fileno(), vfs.flags["chmod_f"])
+        if w and "fperms" in vfs.flags:
+            set_fperms(ret, vfs.flags)
 
         return ret
 
@@ -279,9 +289,12 @@ class FtpFs(AbstractedFS):
             # returning 550 is library-default and suitable
             raise FSE("No such file or directory")
 
-        avfs = vfs.chk_ap(ap, st)
-        if not avfs:
-            raise FSE("Permission denied", 1)
+        if vfs.realpath:
+            avfs = vfs.chk_ap(ap, st)
+            if not avfs:
+                raise FSE("Permission denied", 1)
+        else:
+            avfs = vfs
 
         self.cwd = nwd
         (
@@ -297,8 +310,7 @@ class FtpFs(AbstractedFS):
 
     def mkdir(self, path: str) -> None:
         ap, vfs, _ = self.rv2a(path, w=True)
-        chmod = vfs.flags["chmod_d"]
-        bos.makedirs(ap, chmod)  # filezilla expects this
+        bos.makedirs(ap, vf=vfs.flags)  # filezilla expects this
 
     def listdir(self, path: str) -> list[str]:
         vpath = join(self.cwd, path)
@@ -397,8 +409,12 @@ class FtpFs(AbstractedFS):
             return st
 
     def utime(self, path: str, timeval: float) -> None:
-        ap = self.rv2a(path, w=True)[0]
-        return bos.utime(ap, (timeval, timeval))
+        try:
+            ap = self.rv2a(path, w=True)[0]
+            return bos.utime(ap, (int(time.time()), int(timeval)))
+        except Exception as ex:
+            logging.error("ftp.utime: %s, %r", ex, ex)
+            raise
 
     def lstat(self, path: str) -> os.stat_result:
         ap = self.rv2a(path)[0]
@@ -487,7 +503,11 @@ class FtpHandler(FTPHandler):
     def ftp_STOR(self, file: str, mode: str = "w") -> Any:
         # Optional[str]
         vp = join(self.fs.cwd, file).lstrip("/")
-        ap, vfs, rem = self.fs.v2a(vp, w=True)
+        try:
+            ap, vfs, rem = self.fs.v2a(vp, w=True)
+        except Exception as ex:
+            self.respond("550 %s" % (ex,), logging.info)
+            return
         self.vfs_map[ap] = vp
         xbu = vfs.flags.get("xbu")
         if xbu and not runhook(
@@ -607,7 +627,7 @@ class Ftpd(object):
         if "::" in ips:
             ips.append("0.0.0.0")
 
-        ips = [x for x in ips if "unix:" not in x]
+        ips = [x for x in ips if not x.startswith(("unix:", "fd:"))]
 
         if self.args.ftp4:
             ips = [x for x in ips if ":" not in x]

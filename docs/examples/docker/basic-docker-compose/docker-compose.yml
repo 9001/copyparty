@@ -10,9 +10,12 @@ services:
       - ./:/cfg:z
       - /path/to/your/fileshare/top/folder:/w:z
 
-    # enabling mimalloc by replacing "NOPE" with "2" will make some stuff twice as fast, but everything will use twice as much ram:
     environment:
       LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE
+      # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
+
+      PYTHONUNBUFFERED: 1
+      # ensures log-messages are not delayed (but can reduce speed a tiny bit)
 
     stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
     healthcheck:

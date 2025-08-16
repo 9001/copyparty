@@ -27,6 +27,9 @@ services:
       LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE
       # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
 
+      PYTHONUNBUFFERED: 1
+      # ensures log-messages are not delayed (but can reduce speed a tiny bit)
+
   authelia:
     image: authelia/authelia:v4.38.0-beta3  # the config files in the authelia folder use the new syntax
     container_name: idp_authelia

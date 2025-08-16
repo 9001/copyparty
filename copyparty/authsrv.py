@@ -33,6 +33,7 @@ from .util import (
     afsenc,
     get_df,
     humansize,
+    json_hesc,
     min_ex,
     odfusion,
     read_utf8,
@@ -70,6 +71,25 @@ if PY2:
 
 
 LEELOO_DALLAS = "leeloo_dallas"
+##
+## you might be curious what Leeloo Dallas is doing here, so let me explain:
+##
+## certain daemonic tasks, namely:
+##  * deletion of expired files, running on a timer
+##  * deletion of sidecar files, initiated by plugins
+## need to skip the usual permission-checks to do their thing,
+## so we let Leeloo handle these
+##
+## and also, the smb-server has really shitty support for user-accounts
+## so one popular way to avoid issues is by running copyparty without users;
+## this makes all smb-clients identify as LD to gain unrestricted access
+##
+## Leeloo, being a fictional character from The Fifth Element,
+## obviously does not exist and will never be able to access any copyparty
+## instances from the outside (the username is rejected at every entrypoint)
+##
+## thanks for coming to my ted talk
+
 
 SEE_LOG = "see log for details"
 SEESLOG = " (see serverlog for details)"
@@ -121,6 +141,8 @@ class Lim(object):
         self.reg: Optional[dict[str, dict[str, Any]]] = None  # up2k registry
 
         self.chmod_d = 0o755
+        self.uid = self.gid = -1
+        self.chown = False
 
         self.nups: dict[str, list[float]] = {}  # num tracker
         self.bups: dict[str, list[tuple[float, int]]] = {}  # byte tracker list
@@ -283,6 +305,8 @@ class Lim(object):
             # no branches yet; make one
             sub = os.path.join(path, "0")
             bos.mkdir(sub, self.chmod_d)
+            if self.chown:
+                os.chown(sub, self.uid, self.gid)
         else:
             # try newest branch only
             sub = os.path.join(path, str(dirs[-1]))
@@ -298,6 +322,8 @@ class Lim(object):
         # make a branch
         sub = os.path.join(path, str(dirs[-1] + 1))
         bos.mkdir(sub, self.chmod_d)
+        if self.chown:
+            os.chown(sub, self.uid, self.gid)
         ret = self.dive(sub, lvs - 1)
         if ret is None:
             raise Pebkac(500, "rotation bug")
@@ -1073,6 +1099,9 @@ class AuthSrv(object):
             if rejected:
                 continue
 
+            if gn == self.args.grp_all:
+                gn = ""
+
             # if ap/vp has a user/group placeholder, make sure to keep
             # track so the same user/group is mapped when setting perms;
             # otherwise clear un/gn to indicate it's a regular volume
@@ -1182,6 +1211,7 @@ class AuthSrv(object):
         self.load_idp_db(bool(self.idp_accs))
         ret = {un: gns[:] for un, gns in self.idp_accs.items()}
         ret.update({zs: [""] for zs in acct if zs not in ret})
+        grps[self.args.grp_all] = list(ret.keys())
         for gn, uns in grps.items():
             for un in uns:
                 try:
@@ -1659,6 +1689,9 @@ class AuthSrv(object):
                     self.log("\n{0}\n{1}{0}".format(t, "\n".join(slns)))
                     raise
 
+        self.args.have_idp_hdrs = bool(self.args.idp_h_usr or self.args.idp_hm_usr)
+        self.args.have_ipu_or_ipr = bool(self.args.ipu or self.args.ipr)
+
         self.setup_pwhash(acct)
         defpw = acct.copy()
         self.setup_chpw(acct)
@@ -1671,9 +1704,10 @@ class AuthSrv(object):
 
             mount = cased
 
-        if not mount and not self.args.idp_h_usr:
+        if not mount and not self.args.have_idp_hdrs:
             # -h says our defaults are CWD at root and read/write for everyone
             axs = AXS(["*"], ["*"], None, None)
+            ehint = ""
             if self.is_lxc:
                 t = "Read-access has been disabled due to failsafe: Docker detected, but %s. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to all of /w/ by adding the following arguments to the docker container:  -v .::rw"
                 if len(cfg_files_loaded) == 1:
@@ -1683,11 +1717,23 @@ class AuthSrv(object):
                 else:
                     self.log(t % ("the config does not define any volumes",), 1)
                 axs = AXS()
+                ehint = "; please try moving them up one level, into the parent folder:"
             elif self.args.c:
                 t = "Read-access has been disabled due to failsafe: No volumes were defined by the config-file. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to the working-directory by adding the following arguments:  -v .::rw"
                 self.log(t, 1)
                 axs = AXS()
-            vfs = VFS(self.log_func, absreal("."), "", "", axs, self.vf0())
+                ehint = ":"
+            if ehint:
+                try:
+                    files = os.listdir(E.cfg)
+                except:
+                    files = []
+                hits = [x for x in files if x.lower().endswith(".conf")]
+                if hits:
+                    t = "Hint: Found some config files in [%s], but these were not automatically loaded because they are in the wrong place%s %s\n"
+                    self.log(t % (E.cfg, ehint, ", ".join(hits)), 3)
+            zvf = {"tcolor": self.args.tcolor}
+            vfs = VFS(self.log_func, absreal("."), "", "", axs, zvf)
             if not axs.uread:
                 self.badcfg1 = True
         elif "" not in mount:
@@ -1831,7 +1877,7 @@ class AuthSrv(object):
 
         if missing_users:
             zs = ", ".join(k for k in sorted(missing_users))
-            if self.args.idp_h_usr:
+            if self.args.have_idp_hdrs:
                 t = "the following users are unknown, and assumed to come from IdP: "
                 self.log(t + zs, c=6)
             else:
@@ -1841,6 +1887,16 @@ class AuthSrv(object):
 
         if LEELOO_DALLAS in all_users:
             raise Exception("sorry, reserved username: " + LEELOO_DALLAS)
+
+        zsl = []
+        for usr in list(acct)[:]:
+            zs = acct[usr].strip()
+            if not zs:
+                zs = ub64enc(os.urandom(48)).decode("ascii")
+                zsl.append(usr)
+            acct[usr] = zs
+        if zsl:
+            self.log("generated random passwords for users %r" % (zsl,), 6)
 
         seenpwds = {}
         for usr, pwd in acct.items():
@@ -2162,12 +2218,12 @@ class AuthSrv(object):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
-            zs = "forget_ip nrand tail_who u2abort u2ow ups_who zip_who"
+            zs = "forget_ip gid nrand tail_who u2abort u2ow uid ups_who zip_who"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
 
-            zs = "convt tail_fd tail_rate tail_tmax"
+            zs = "aconvt convt tail_fd tail_rate tail_tmax"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = float(vol.flags[k])
@@ -2199,8 +2255,17 @@ class AuthSrv(object):
                 if (is_d and zi != 0o755) or not is_d:
                     free_umask = True
 
+            vol.flags.pop("chown", None)
+            if vol.flags["uid"] != -1 or vol.flags["gid"] != -1:
+                vol.flags["chown"] = True
+            vol.flags.pop("fperms", None)
+            if "chown" in vol.flags or vol.flags.get("chmod_f"):
+                vol.flags["fperms"] = True
             if vol.lim:
                 vol.lim.chmod_d = vol.flags["chmod_d"]
+                vol.lim.chown = "chown" in vol.flags
+                vol.lim.uid = vol.flags["uid"]
+                vol.lim.gid = vol.flags["gid"]
 
             if vol.flags.get("og"):
                 self.args.uqe = True
@@ -2489,7 +2554,7 @@ class AuthSrv(object):
             if not self.args.no_voldump:
                 self.log(t)
 
-            if have_e2d or self.args.idp_h_usr:
+            if have_e2d or self.args.have_idp_hdrs:
                 t = self.chk_sqlite_threadsafe()
                 if t:
                     self.log("\n\033[{}\033[0m\n".format(t))
@@ -2594,6 +2659,8 @@ class AuthSrv(object):
         self.re_pwd = None
         pwds = [re.escape(x) for x in self.iacct.keys()]
         pwds.extend(list(self.sesa))
+        if self.args.usernames:
+            pwds.extend([x.split(":", 1)[1] for x in pwds if ":" in x])
         if pwds:
             if self.ah.on:
                 zs = r"(\[H\] pw:.*|[?&]pw=)([^&]+)"
@@ -2716,6 +2783,8 @@ class AuthSrv(object):
                 "s_name": self.args.bname,
                 "have_up2k_idx": "e2d" in vf,
                 "have_acode": not self.args.no_acode,
+                "have_c2flac": self.args.allow_flac,
+                "have_c2wav": self.args.allow_wav,
                 "have_shr": self.args.shr,
                 "have_zip": not self.args.no_zip,
                 "have_mv": not self.args.no_mv,
@@ -2740,6 +2809,7 @@ class AuthSrv(object):
                 "dth3x": vf["th3x"],
                 "dvol": self.args.au_vol,
                 "idxh": int(self.args.ih),
+                "dutc": not self.args.localtime,
                 "themes": self.args.themes,
                 "turbolvl": self.args.turbo,
                 "nosubtle": self.args.nosubtle,
@@ -2751,7 +2821,7 @@ class AuthSrv(object):
                 "lifetime": vn.js_ls["lifetime"],
                 "u2sort": self.args.u2sort,
             }
-            vn.js_htm = json.dumps(js_htm)
+            vn.js_htm = json_hesc(json.dumps(js_htm))
 
         vols = list(vfs.all_nodes.values())
         if enshare:
@@ -2774,7 +2844,7 @@ class AuthSrv(object):
     def load_idp_db(self, quiet=False) -> None:
         # mutex me
         level = self.args.idp_store
-        if level < 2 or not self.args.idp_h_usr:
+        if level < 2 or not self.args.have_idp_hdrs:
             return
 
         assert sqlite3  # type: ignore  # !rm
@@ -2830,7 +2900,10 @@ class AuthSrv(object):
 
         n = []
         q = "insert into us values (?,?,?)"
-        for uname in self.acct:
+        accs = list(self.acct)
+        if self.args.have_idp_hdrs and self.args.idp_cookie:
+            accs.extend(self.idp_accs.keys())
+        for uname in accs:
             if uname not in ases:
                 sid = ub64enc(os.urandom(blen)).decode("ascii")
                 cur.execute(q, (uname, sid, int(time.time())))
@@ -2887,6 +2960,9 @@ class AuthSrv(object):
         if len(pw) < self.args.chpw_len:
             t = "minimum password length: %d characters"
             return False, t % (self.args.chpw_len,)
+
+        if self.args.usernames:
+            pw = "%s:%s" % (uname, pw)
 
         hpw = self.ah.hash(pw) if self.ah.on else pw
 
@@ -2979,6 +3055,12 @@ class AuthSrv(object):
         self.log("chpw: " + msg, 6)
 
     def setup_pwhash(self, acct: dict[str, str]) -> None:
+        if self.args.usernames:
+            for uname, pw in list(acct.items())[:]:
+                if pw.startswith("+") and len(pw) == 33:
+                    continue
+                acct[uname] = "%s:%s" % (uname, pw)
+
         self.ah = PWHash(self.args)
         if not self.ah.on:
             if self.args.ah_cli or self.args.ah_gen:
@@ -3422,7 +3504,7 @@ def expand_config_file(
     ipath += " -> " + fp
     ret.append("#\033[36m opening cfg file{}\033[0m".format(ipath))
 
-    cfg_lines = read_utf8(log, fp, True).split("\n")
+    cfg_lines = read_utf8(log, fp, True).replace("\t", " ").split("\n")
     if True:  # diff-golf
         for oln in [x.rstrip() for x in cfg_lines]:
             ln = oln.split("  #")[0].strip()

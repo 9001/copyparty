@@ -3,7 +3,7 @@ for (var a = 0; a < t.length; a++)
     t[a].onclick = rm;
 
 function rm() {
-    var u = SR + shr + uricom_enc(this.getAttribute('k')) + '?eshare=rm',
+    var u = SR + '/?eshare=rm&skey=' + uricom_enc(this.getAttribute('k')),
         xhr = new XHR();
 
     xhr.open('POST', u, true);
@@ -13,7 +13,7 @@ function rm() {
 
 function bump() {
     var k = this.closest('tr').getElementsByTagName('a')[2].getAttribute('k'),
-        u = SR + shr + uricom_enc(k) + '?eshare=' + this.value,
+        u = SR + '/?skey=' + uricom_enc(k) + '&eshare=' + this.value,
         xhr = new XHR();
 
     xhr.open('POST', u, true);
@@ -25,7 +25,7 @@ function cb() {
     if (this.status !== 200)
         return modal.alert('<h6>server error</h6>' + esc(unpre(this.responseText)));
 
-    document.location = '?shares';
+    location = '?shares';
 }
 
 function qr(e) {
@@ -64,7 +64,7 @@ function showqr(href) {
         for (var b = 7; b < 9; b++) {
             var v = buf[ibuf++];
             tr[a].cells[b].innerHTML =
-                v ? unix2iso(v).replace(' ', ',&nbsp;') : 'never';
+                v ? unix2ui(v).replace(' ', ',&nbsp;') : 'never';
         }
 
     for (var a = 0; a < tr.length; a++)

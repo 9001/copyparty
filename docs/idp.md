@@ -9,9 +9,9 @@ in the copyparty `[global]` config, specify which headers to read client info fr
 
 # important notes
 
-## IdP volumes are forgotten on shutdown
+## by default, IdP volumes are forgotten on shutdown
 
-IdP volumes, meaning dynamically-created volumes, meaning volumes that contain `${u}` or `${g}` in their URL, will be forgotten during a server restart and then "revived" when the volume's owner sends their first request after the restart
+IdP volumes, meaning dynamically-created volumes, meaning volumes that contain `${u}` or `${g}` in their URL, will (by default) be forgotten during a server restart and then "revived" when the volume's owner sends their first request after the restart
 
 until each IdP volume is revived, it will inherit the permissions of its parent volume (if any)
 
@@ -19,7 +19,17 @@ this means that, if an IdP volume is located inside a folder that is readable by
 
 and likewise -- if the IdP volume is inside a folder that is only accessible by certain users, but the IdP volume is configured to allow access from unauthenticated users, then the contents of the volume will NOT be accessible until it is revived
 
-until this limitation is fixed (if ever), it is recommended to place IdP volumes inside an appropriate parent volume, so they can inherit acceptable permissions until their revival; see the "strategic volumes" at the bottom of [./examples/docker/idp/copyparty.conf](./examples/docker/idp/copyparty.conf)
+it is recommended to place IdP volumes inside an appropriate parent volume, so they can inherit acceptable permissions until their revival; see the "strategic volumes" at the bottom of [./examples/docker/idp/copyparty.conf](./examples/docker/idp/copyparty.conf)
+
+## but you can enable IdP volume persistence
+
+global-option `idp-store` can enable user/group persistence across restarts;
+
+* `idp-store: 1` (default) will log users into a database, but not actually "remember" them (the knowledge is ignored)
+* `idp-store: 2` remembers usernames only
+* `idp-store: 3` remembers usernames and their groups
+
+the reason why this is default-disabled, is because you may expect copyparty to forget about a user when you delete them from the IdP-server; this will not be the case any longer, you will need to click `view idp cache` in the controlpanel and manually remove the users you want gone
 
 
 ## Connecting webdav clients

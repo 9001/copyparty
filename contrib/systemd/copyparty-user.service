@@ -1,0 +1,26 @@
+# this will start `/usr/bin/copyparty`
+# and read config from `$HOME/.config/copyparty.conf`
+#
+# unless you add -q to disable logging, you may want to remove the
+#   following line to allow buffering (slightly better performance):
+#   Environment=PYTHONUNBUFFERED=x
+
+[Unit]
+Description=copyparty file server
+
+[Service]
+Type=notify
+SyslogIdentifier=copyparty
+WorkingDirectory=/var/lib/copyparty-jail
+Environment=PYTHONUNBUFFERED=x
+Environment=PRTY_CONFIG=%h/.config/copyparty/copyparty.conf
+ExecReload=/bin/kill -s USR1 $MAINPID
+
+# ensure there is a config
+ExecStartPre=/bin/bash -c 'if [[ ! -f %h/.config/copyparty/copyparty.conf ]]; then mkdir -p %h/.config/copyparty; cp /etc/copyparty/copyparty.conf %h/.config/copyparty/copyparty.conf; fi'
+
+# run copyparty
+ExecStart=/usr/bin/python3 /usr/bin/copyparty
+
+[Install]
+WantedBy=default.target

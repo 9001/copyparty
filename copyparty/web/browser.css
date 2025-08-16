@@ -1113,18 +1113,7 @@ html.y #widget.open {
 	top: -.12em;
 }
 #wtico {
-	cursor: url(dd/4.png), pointer;
-	animation: cursor 500ms;
-}
-#wtico:hover {
-	animation: cursor 500ms infinite;
-}
-@keyframes cursor {
-	 0% {cursor: url(dd/2.png), pointer}
-	30% {cursor: url(dd/3.png), pointer}
-	50% {cursor: url(dd/4.png), pointer}
-	75% {cursor: url(dd/5.png), pointer}
-	85% {cursor: url(dd/4.png), pointer}
+	cursor: pointer;
 }
 @keyframes spin {
 	100% {transform: rotate(360deg)}
@@ -1385,6 +1374,7 @@ html.y #ops svg circle {
 #op_cfg input[type=text] {
 	top: -.3em;
 }
+.opview select,
 .opview input[type=text] {
 	color: var(--fg);
 	background: var(--txt-bg);
@@ -1394,6 +1384,11 @@ html.y #ops svg circle {
 	border-color: var(--a);
 	border-radius: .2em;
 	padding: .2em .3em;
+}
+.opview select {
+	padding: .3em;
+	margin: .2em .4em;
+	background: var(--bg-u3);
 }
 .opview input.err {
 	color: var(--err-fg);
@@ -1935,6 +1930,11 @@ html.y #tree.nowrap .ntree a+a:hover {
 	margin: 0 0 .3em 0;
 	padding: 0;
 	font-size: 1.5em;
+}
+#fs_abrt {
+	margin-top: 1em;
+	text-shadow: 0;
+	box-shadow: 1px 1px 0 var(--bg-d3);
 }
 #doc {
 	overflow: visible;
@@ -3277,4 +3277,791 @@ html.d #treepar {
 	#bbox-btns {
 		transition: background-color .3s ease, color .3s ease;
 	}
+}
+html.ey {
+  --negative-space: 0em; /* Use this to change the global spacing of the 95 theme */
+  --font-main: consolas;
+  --font-serif: consolas;
+  --font-mono: consolas;
+  --w: #fff;
+  --w2: #dfdfdf;
+  --w3: grey;
+  --fg: #000;
+  --fg-max: #0000ff;
+  --fg-weak: #0000ff;
+  --bg: #c6c3c6;
+  --bg-d3: #ff0;
+  --bg-d2: var(--w3);
+  --bg-d1: var(--bg);
+  --bg-u2: var(--bg);
+  --bg-u3: var(--bg);
+  --bg-u5: var(--shadow-color-2);
+  --tab-alt: #00f;
+  --g-fsel-bg: #00f;
+  --g-sel-bg: #00f;
+  --g-fsel-b1: #fff;
+  --row-alt: var(--w);
+  --scroll: var(--silver);
+  --f-sel-sh: transparent;
+  --a: #000;
+  --a-b: #fff;
+  --a-hil: #fff;
+  --a-h-bg: var(--bg);
+  --a-dark: var(--a);
+  --a-gray: var(--fg-weak);
+  --btn-fg: var(--fg);
+  --btn-bg: var(--bg);
+  --btn-h-fg: var(--fg);
+  --btn-h-bg: var(--bg);
+  --btn-1-fg: var(--fg);
+  --btn-1-bg: var(--bg);
+  --btn-1h-bg: var(--bg-d3);
+  --txt-sh: a;
+  --txt-bg: var(--white);
+  --u2-b1-bg: var(--w2);
+  --u2-b2-bg: var(--w2);
+  --u2-txt-bg: var(--w2);
+  --u2-tab-bg: a;
+  --u2-tab-1-bg: var(--w2);
+  --sort-1: var(--fg-weak);
+  --tree-bg: var(--w);
+  --g-b1: a;
+  --g-b2: a;
+  --g-f-bg: var(--w2);
+  --f-sh1: 0.1;
+  --f-sh2: 0.02;
+  --f-sh3: 0.1;
+  --f-h-b1: a;
+  --srv-1: var(--w);
+  --srv-3: var(--a);
+  --mp-sh: a;
+  --black: #000;
+  --white: #fff;
+  --grey: grey;
+  --silver: silver;
+  --transparent: transparent;
+  --shadow-color-1: #0a0a0a;
+  --shadow-color-2: #808080;
+  --border-dashed-black: 1px dashed var(--black);
+  --radius: 0;
+  --focus-outline: 1px dashed var(--black);
+  --hover-outline: 1px dotted var(--black);
+  --fm-off: var(--w3);
+  --ttlbar: linear-gradient(90deg, navy, #1084d0);
+  --inset-bg: var(--white);
+  --scroll-bkg: var(--white);
+
+  /*All sides*/
+  --shadow-outset: inset -1px -1px var(--shadow-color-1),
+    inset 1px 1px var(--white), inset -2px -2px var(--grey),
+    inset 2px 2px var(--w2);
+
+  --shadow-inset: inset -1px -1px var(--white),
+    inset 1px 1px var(--shadow-color-1), inset -2px -2px var(--w2),
+    inset 2px 2px var(--shadow-color-2);
+
+  --shadow-input: inset -1px -1px var(--white), inset 1px 1px var(--grey),
+    inset -2px -2px var(--w2), inset 2px 2px var(--shadow-color-1);
+
+  /*Indiv sides*/
+  --shadow-outset-bottom: inset 0 -1px var(--shadow-color-1),
+    inset 0 -2px var(--grey);
+  --shadow-outset-right: inset -1px 0 var(--shadow-color-1),
+    inset -2px 0 var(--grey);
+  --shadow-outset-left: inset 1px 0 var(--white), inset 2px 0 var(--w2);
+  --shadow-outset-top: inset 0 1px var(--white), inset 0 2px var(--w2);
+
+  --shadow-inset-bottom: inset 0 -1px var(--white), inset 0 -2px var(--w2);
+  --shadow-inset-right: inset -1px 0 var(--white), inset -2px 0 var(--w2);
+  --shadow-inset-left: inset 1px 0 var(--shadow-color-1),
+    inset 2px 0 var(--shadow-color-2);
+  --shadow-inset-top: inset 0 1px var(--shadow-color-1),
+    inset 0 2px var(--shadow-color-2);
+}
+html.ez {
+  --negative-space: 0em; /* Use this to change the global spacing of your theme :) */
+  --font-main: consolas;
+  --font-serif: consolas;
+  --font-mono: consolas;
+  --w: #fff;
+  --w2: var(--inset-bg);
+  --w3: grey;
+  --fg: #cfcfcf;
+  --fg-max: #47b8ff;
+  --fg-weak: #47b8ff;
+  --bg: #383838;
+  --bg-d3: #600000;
+  --bg-d2: var(--shadow-color-1);
+  --bg-d1: var(--bg);
+  --u2-tab-1-fg: #ff0;
+  --bg-u2: var(--bg);
+  --bg-u3: var(--bg);
+  --bg-u5: var(--shadow-color-2);
+  --tab-alt: #47b8ff;
+  --g-fsel-bg: #0000b7;
+  --g-sel-bg: #00f;
+  --g-fsel-b1: #fff;
+  --row-alt: #555555;
+  --scroll: #555555;
+  --f-sel-sh: transparent;
+  --a: var(--fg);
+  --a-b: var(--fg);
+  --a-hil: var(--fg);
+  --btn-1h-bg: var(--bg-d3);
+  --a-h-bg: var(--bg);
+  --a-dark: var(--a);
+  --a-gray: var(--fg-weak);
+  --btn-fg: var(--white);
+  --btn-bg: var(--bg);
+  --btn-h-fg: var(--white);
+  --btn-h-bg: var(--bg);
+  --btn-1-fg: var(--white);
+  --btn-1-bg: var(--bg);
+  --txt-sh: a;
+  --u2-b1-bg: var(--w2);
+  --u2-b2-bg: var(--w2);
+  --u2-txt-bg: var(--w2);
+  --u2-tab-bg: a;
+  --u2-tab-1-bg: var(--w2);
+  --sort-1: var(--fg-weak);
+  --g-b1: a;
+  --g-b2: a;
+  --g-f-bg: var(--w2);
+  --f-sh1: 0.1;
+  --f-sh2: 0.02;
+  --f-sh3: 0.1;
+  --f-h-b1: a;
+  --srv-1: var(--w);
+  --srv-3: var(--a);
+  --mp-sh: a;
+  --black: #000;
+  --white: #fff;
+  --grey: grey;
+  --silver: #858585;
+  --transparent: transparent;
+  --shadow-color-1: #101010;
+  --shadow-color-2: #1f1f1f;
+  --border-dashed-black: 1px dashed var(--shadow-color-1);
+  --radius: 0;
+  --focus-outline: 1px dashed var(--white);
+  --hover-outline: 1px dotted var(--white);
+  --fm-off: var(--w3);
+  --ttlbar: linear-gradient(90deg, var(--shadow-color-1) 20%, #888888);
+  --inset-bg: #3f3f3f;
+  --tree-bg: var(--inset-bg);
+  --txt-bg: var(--inset-bg);
+  --scroll-bkg: var(--black);
+
+  /*All sides*/
+  --shadow-outset: inset -1px -1px var(--shadow-color-1), inset 1px 1px #878787,
+    inset -2px -2px var(--shadow-color-2), inset 2px 2px #575757;
+
+  --shadow-inset: inset -1px -1px #878787, inset 1px 1px var(--shadow-color-1),
+    inset -2px -2px #575757, inset 2px 2px var(--shadow-color-2);
+
+  --shadow-input: inset -1px -1px var(--white),
+    inset 1px 1px var(--shadow-color-2), inset -2px -2px #575757,
+    inset 2px 2px var(--shadow-color-1);
+
+  --shadow-outset-bottom: inset 0 -1px var(--shadow-color-1),
+    inset 0 -2px var(--shadow-color-2);
+  --shadow-outset-right: inset -1px 0 var(--shadow-color-1),
+    inset -2px 0 var(--shadow-color-2);
+  --shadow-outset-left: inset 1px 0 #878787, inset 2px 0 #575757;
+  --shadow-outset-top: inset 0 1px #878787, inset 0 2px #575757;
+
+  --shadow-inset-bottom: inset 0 -1px #878787, inset 0 -2px #575757;
+  --shadow-inset-right: inset -1px 0 #878787, inset -2px 0 #575757;
+  --shadow-inset-left: inset 1px 0 var(--shadow-color-1),
+    inset 2px 0 var(--shadow-color-2);
+  --shadow-inset-top: inset 0 1px var(--shadow-color-1),
+    inset 0 2px var(--shadow-color-2);
+}
+
+html.e {
+  text-shadow: none;
+}
+
+html.e #files,
+html.e #u2conf input[type="checkbox"]:hover + label,
+html.e .tgl.btn.on:hover,
+html.e body {
+  background: var(--bg);
+}
+html.e #pctl a,
+html.e #repl,
+html.e #u2conf a,
+html.e #u2conf input[type="checkbox"] + label,
+html.e #wfp a,
+html.e .btn,
+html.e .eq_step,
+html.e input[type="submit"] {
+  box-shadow: var(--shadow-outset);
+  border-radius: var(--radius);
+  background: var(--bg);
+  border: 0;
+}
+a.s0r,
+html.e #ghead a.s0,
+html.e #u2conf input[type="checkbox"]:checked + label,
+html.e .tgl.btn.on,
+html.e input[type="submit"]:active {
+  box-shadow: var(--shadow-inset) !important;
+}
+html.e #ops a:hover,
+html.e #pctl a:hover,
+html.e #repl:hover,
+html.e #u2conf a:hover,
+html.e #u2conf input[type="checkbox"]:hover + label,
+html.e #wfp a:hover,
+html.e .btn:hover,
+html.e .eq_step:hover,
+html.e input[type="submit"]:hover {
+  outline: var(--hover-outline);
+  outline-offset: -4px;
+}
+html.e .ntree a:hover,
+html.e :focus,
+html.e :focus + label,
+html.e a:active,
+html.e tr:focus,
+input[type="text"]:focus {
+  outline: var(--focus-outline) !important;
+}
+html.e tr:focus {
+  box-shadow: none;
+}
+html.e #pctl a:focus,
+html.e #repl:hover,
+html.e #u2conf input[type="checkbox"]:focus + label,
+html.e #wfp a:focus,
+html.e .btn:focus,
+html.e .eq_step:focus {
+  border: 0 !important;
+  outline: var(--focus-outline) !important;
+  outline-offset: 2px;
+  box-shadow: var(--shadow-outset) !important;
+}
+html.e #files tbody,
+html.e #u2cards a.act {
+  box-shadow: var(--shadow-inset);
+}
+html.e #files {
+  border: 2px groove var(--transparent);
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.3em;
+  top: 0;
+  border: 0;
+}
+html.e #files tbody tr td,
+html.e #files thead th {
+  border-radius: var(--radius);
+}
+#files td {
+  background: var(--w2);
+}
+html.e #files tr {
+  background-color: var(--black);
+}
+html.e #srv_info span,
+html.e label {
+  color: var(--btn-fg) !important;
+}
+html.e #acc_info {
+  background: var(--transparent);
+  color: var(--white);
+  height: 2em;
+  left: 1em;
+  width: fit-content;
+}
+html.e #acc_info,
+html.e #ops,
+html.e #srv_info {
+  display: flex;
+  align-items: center;
+}
+html.e #flogout:before {
+  padding-left: 0.2em;
+  padding-right: 0.4em;
+  content: " | ";
+}
+html.e #blogout {
+  color: var(--w);
+  box-shadow: none;
+  background: transparent;
+}
+html.e .opwide > div {
+  border-left: 1px solid var(--fg);
+}
+html.e #srv_info {
+  background: var(--transparent);
+  color: var(--white);
+  height: fit-content;
+  top: 3.2em;
+  left: 1em;
+  gap: 0.2em;
+}
+html.e #u2cards a.act {
+  padding: 0.2em 1em;
+}
+html.e #u2btn {
+  border: var(--border-dashed-black);
+  border-radius: var(--border-radius);
+  transform: translateY(30%);
+}
+html.e #ops,
+html.e #ops a {
+  border-radius: var(--radius);
+}
+@media only screen and (max-width: 600px) {
+  html.e #acc_info {
+    background: var(--transparent);
+    color: var(--white);
+    height: fit-content;
+    align-items: center;
+    top: 3.2em;
+    right: 1em;
+    left: auto;
+    display: flex;
+    gap: 0.2em;
+  }
+  html.e #u2btn {
+    transform: none;
+  }
+}
+html.e #ops {
+  background: var(--ttlbar);
+  /*HC*/
+  box-shadow: inset 0-1px grey, inset 0-2px var(--shadow-color-1);
+  height: 2em;
+  gap: 0.6em;
+  padding: 0.2em;
+  flex-direction: row-reverse;
+  margin-bottom: 1.2em;
+}
+html.e #srch_form,
+html.e .opbox {
+  padding-bottom: 1em;
+  padding-top: 1em;
+  max-width: 100vw;
+}
+html.e #ghead,
+html.e #ops a {
+  align-items: center;
+  display: flex;
+}
+html.e #ops a {
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+  height: 1.4em;
+  padding: 0;
+  box-shadow: var(--shadow-outset);
+  background: var(--bg);
+  aspect-ratio: 1/1;
+  justify-content: center;
+  font-size: 1.25em;
+  z-index: 4;
+}
+html.e #blogout:focus,
+html.e #ops a:focus {
+  outline: 1px dashed var(--w) !important;
+}
+
+html.e #blogout:hover {
+  text-decoration: underline;
+}
+
+html.e #ops > a:not(:first-child).act {
+  height: 1.4em;
+  width: 1.4em;
+  padding-bottom: 0.3em;
+  margin-top: 0.3em;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  box-shadow: var(--shadow-inset-left), var(--shadow-inset-top),
+    var(--shadow-inset-right);
+  z-index: 6;
+}
+html.e #ops a.act {
+  box-shadow: var(--shadow-inset);
+  border-bottom: 0;
+}
+html.e a:active {
+  border: 0;
+}
+html.e :focus,
+html.e :focus + label {
+  border: 0 !important;
+  outline-offset: 1px;
+  border-radius: var(--radius) !important;
+  box-shadow: inherit;
+}
+html.e #opa_x {
+  text-shadow: 0 0 0 var(--transparent) !important;
+  color: var(--bg) !important;
+  display: flex;
+}
+html.e #opa_x:before {
+  content: "⨯";
+  color: var(--fg) !important;
+  margin-top: -0.1em;
+  font-size: 1.75em;
+  position: absolute;
+}
+html.e .opbox {
+  margin: -1.2em 0 0;
+  box-shadow: var(--shadow-inset-bottom), var(--shadow-inset-left),
+    var(--shadow-inset-right);
+  border-radius: var(--radius);
+  z-index: 5;
+  background: var(--bg);
+}
+html.e #srch_form {
+  margin: 0;
+  border-radius: var(--radius);
+}
+html.e #op_unpost {
+  max-width: 100vw;
+  margin: 0;
+}
+html.e label:focus {
+  box-shadow: 0 0;
+}
+html.e #tree {
+  box-shadow: none;
+  padding-right: 5px;
+}
+html.e #tt {
+  background: var(--w2);
+}
+html.e .mdo a {
+  background: 0 0;
+  text-decoration: underline;
+}
+html.e .mdo code,
+html.e .mdo pre {
+  color: var(--white);
+  background: var(--w2);
+  border: 0;
+}
+html.e .mdo h1,
+html.e .mdo h2 {
+  background: 0 0;
+  border-color: var(--w2);
+}
+html.e #tt,
+html.e .mdo ol ol,
+html.e .mdo ol ul,
+html.e .mdo ul ol,
+html.e .mdo ul ul {
+  border-color: var(--w2);
+}
+html.e .mdo li > em,
+html.e .mdo p > em,
+html.e .mdo td > em {
+  color: #fd0;
+}
+html.e input.txtbox,
+html.e input[type="text"],
+html.e select {
+  background-color: var(--txt-bg);
+  box-shadow: var(--shadow-input) !important;
+  box-sizing: border-box;
+  padding: 3px 4px;
+  border-radius: var(--radius);
+  border: 0;
+}
+html.e #gfiles {
+  box-shadow: var(--shadow-outset);
+  background: var(--bg);
+  padding: 0.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+html.e #ggrid {
+  background-color: var(--inset-bg);
+  box-shadow: var(--shadow-input);
+  padding: 1.5em;
+  margin: 0;
+  overflow-x: scroll;
+}
+html.e #ghead {
+  margin: 0;
+  justify-content: flex-end;
+  gap: 0.4em;
+  padding: 0;
+  overflow: auto;
+  top: 0px;
+  border-radius: 0px;
+}
+html.e #ghead a {
+  margin: 0;
+  border-radius: var(--radius);
+}
+html.e ::-webkit-scrollbar,
+html.e::-webkit-scrollbar {
+  width: 16px !important;
+  height: 16px !important;
+  background: var(--transparent) !important;
+}
+html.e ::-webkit-scrollbar-button,
+html.e ::-webkit-scrollbar-thumb,
+html.e::-webkit-scrollbar-button,
+html.e::-webkit-scrollbar-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  background: var(--scroll) !important;
+  /*HC*/
+  box-shadow: var(--shadow-outset);
+  border: 1px solid !important;
+  border-color: var(--silver) var(--black) var(--black) var(--silver) !important;
+}
+html.e ::-webkit-scrollbar-track,
+html.e::-webkit-scrollbar-track {
+  image-rendering: optimize-contrast !important;
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgLTAuNSAyIDIiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+CjxtZXRhZGF0YT5NYWRlIHdpdGggUGl4ZWxzIHRvIFN2ZyBodHRwczovL2NvZGVwZW4uaW8vc2hzaGF3L3Blbi9YYnh2Tmo8L21ldGFkYXRhPgo8cGF0aCBzdHJva2U9IiNjMGMwYzAiIGQ9Ik0wIDBoMU0xIDFoMSIgLz4KPC9zdmc+) !important;
+  background-position: 0 0 !important;
+  background-repeat: repeat !important;
+  background-size: 2px !important;
+  background: var(--scroll-bkg);
+}
+#tree::-webkit-scrollbar,
+#tree::-webkit-scrollbar-track {
+  background: var(--scroll-bkg);
+}
+html.e ::-webkit-scrollbar-button,
+html.e::-webkit-scrollbar-button {
+  background-repeat: no-repeat !important;
+  background-size: 16px !important;
+}
+html.e ::-webkit-scrollbar-button:single-button:vertical:decrement,
+html.e::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgLTAuNSAxNiAxNiIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj4KPG1ldGFkYXRhPk1hZGUgd2l0aCBQaXhlbHMgdG8gU3ZnIGh0dHBzOi8vY29kZXBlbi5pby9zaHNoYXcvcGVuL1hieHZOajwvbWV0YWRhdGE+CjxwYXRoIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTcgNWgxTTYgNmgzTTUgN2g1TTQgOGg3IiAvPgo8L3N2Zz4=) !important;
+}
+html.e ::-webkit-scrollbar-button:single-button:vertical:increment,
+html.e::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgLTAuNSAxNiAxNiIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj4KPG1ldGFkYXRhPk1hZGUgd2l0aCBQaXhlbHMgdG8gU3ZnIGh0dHBzOi8vY29kZXBlbi5pby9zaHNoYXcvcGVuL1hieHZOajwvbWV0YWRhdGE+CjxwYXRoIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTQgNWg3TTUgNmg1TTYgN2gzTTcgOGgxIiAvPgo8L3N2Zz4=) !important;
+}
+html.e ::-webkit-scrollbar-button:single-button:horizontal:decrement,
+html.e::-webkit-scrollbar-button:single-button:horizontal:decrement {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgLTAuNSAxNiAxNiIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj4KPG1ldGFkYXRhPk1hZGUgd2l0aCBQaXhlbHMgdG8gU3ZnIGh0dHBzOi8vY29kZXBlbi5pby9zaHNoYXcvcGVuL1hieHZOajwvbWV0YWRhdGE+CjxwYXRoIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTggM2gxTTcgNGgyTTYgNWgzTTUgNmg0TTYgN2gzTTcgOGgyTTggOWgxIiAvPgo8L3N2Zz4=) !important;
+}
+html.e ::-webkit-scrollbar-button:single-button:horizontal:increment,
+html.e::-webkit-scrollbar-button:single-button:horizontal:increment {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgLTAuNSAxNiAxNiIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj4KPG1ldGFkYXRhPk1hZGUgd2l0aCBQaXhlbHMgdG8gU3ZnIGh0dHBzOi8vY29kZXBlbi5pby9zaHNoYXcvcGVuL1hieHZOajwvbWV0YWRhdGE+CjxwYXRoIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTYgM2gxTTYgNGgyTTYgNWgzTTYgNmg0TTYgN2gzTTYgOGgyTTYgOWgxIiAvPgo8L3N2Zz4=) !important;
+}
+html.e ::-webkit-scrollbar-corner,
+html.e::-webkit-scrollbar-corner {
+  background: var(--silver) !important;
+}
+html,
+html.e #tree {
+  scrollbar-color: inherit !important;
+}
+html.e #tree {
+  background: var(--bg);
+  padding-left: 0.4em;
+  padding-top: 0;
+  margin-left: var(--negative-space);
+}
+html.e.noscroll #tree {
+  /*HC*/
+  box-shadow: 1px 1px var(--grey), 2px 2px var(--shadow-color-1),
+    var(--shadow-outset-bottom);
+}
+html.e #treeh {
+  background: var(--bg);
+  box-shadow: var(--shadow-outset-top), var(--shadow-outset-bottom);
+  width: calc(1.5em + var(--nav-sz) - var(--sbw));
+  height: 2.4em;
+  border: none;
+  top: -2px;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+html.e #treeh .btn {
+  margin: 0px;
+  top: auto;
+}
+html.e #tree ul {
+  border-left: var(--border-dashed-black);
+  margin-left: 2.15em;
+}
+html.e .ntree a:first-child {
+  font-family: scp, monospace, monospace;
+  font-size: 1.2em;
+  line-height: 0;
+  background: var(--inset-bg);
+  aspect-ratio: 1/1;
+  text-align: center;
+  align-content: center;
+  border-radius: var(--radius) !important;
+  padding: 0.057em;
+  border: 1px solid var(--black);
+}
+html.e .ntree a:first-child:after {
+  content: ".";
+  position: absolute;
+  border-top: var(--border-dashed-black);
+  color: var(--transparent);
+  font-size: 0.9em;
+  margin-left: 0.13em;
+}
+html.e #treeul {
+  border: 0 !important;
+  position: static;
+  margin: 0 !important;
+  min-height: 100%;
+  height: max-content;
+}
+html.e .ntree a:last-of-type:before {
+  content: "📁";
+  margin-left: 0.3em;
+}
+html.e .ntree {
+  padding-left: 1em !important;
+  padding-top: 0.3em !important;
+  background: var(--inset-bg);
+  box-shadow: var(--shadow-inset-left), var(--shadow-inset-bottom);
+}
+html.e #tree li {
+  margin-left: -0.5em;
+  border-top: 0;
+}
+html.e .ntree a:hover {
+  outline-offset: -2px;
+  color: var(--fg);
+  border-radius: var(--radius) !important;
+}
+html.e #treepar {
+  width: calc(-1em + var(--nav-sz) - var(--sbw));
+  overflow: hidden;
+  left: -0.7em;
+  box-shadow: var(--shadow-inset-left), var(--shadow-inset-top);
+  border-left: 0 !important;
+  border-bottom: var(--border-dashed-black);
+  margin-left: calc(2.1em - (1em - var(--negative-space))) !important;
+}
+html.e #path,
+html.e #widgeti,
+html.e #wtoggle,
+html.e #wtoggle a,
+html.e #files,
+html.e #files thead th,
+html.e #ghead a,
+html.e #tree {
+  box-shadow: var(--shadow-outset);
+}
+html.e.noscroll #treepar {
+  width: calc(var(--nav-sz) - 1em);
+}
+html.e #docul {
+  border-left: 0 !important;
+  margin-left: 0 !important;
+}
+html.e #wrap {
+  transform: translateX(calc((var(--negative-space) * 2) - 1.2em));
+  padding-right: var(--negative-space);
+  position: relative;
+  margin-right: calc((var(--negative-space) * 2) - 1.2em);
+  margin-top: var(--negative-space);
+  margin-left: 1.2em;
+  /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
+}
+html.e input[type="radio"] {
+  accent-color: #232323;
+}
+html.e #path {
+  width: calc(100% - 0.4em);
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.2em;
+  overflow-x: auto;
+}
+html.e #path i {
+  border: 1px solid var(--w);
+  border-color: var(--w);
+  margin: 0;
+  border-width: 0.1em 0.1em 0 0;
+  height: 0.5em;
+  width: 0.5em;
+}/*
+html.e #hovertree:after {
+  color: red;
+  content: "BUGGY";
+html.ez #hovertree:after {
+  color: rgb(255 98 98);
+  content: "BUGGY";
+}
+}*/
+html.e #widget {
+  box-shadow: 0 0;
+  border: 0 !important;
+}
+html.e #wtico,
+html.e #zip1 {
+  box-shadow: 0 0 !important;
+}
+html.e #wtgrid {
+  top: -0.09em;
+}
+html.e #wfs,
+html.e #wm3u,
+html.e #wnp,
+html.e #wzip {
+  border-width: 0 1px 0 0;
+}
+html.e #wfm.act + #wzip1 + #wzip,
+html.e #wfm.act + #wzip1 + #wzip + #wnp {
+  border-left-width: 1px;
+}
+html.e #barpos {
+  /* border-radius: var(--radius); */
+  box-shadow: var(--shadow-inset);
+}
+html.e #goh + span {
+  border-left: 0.1em solid var(--bg-u5);
+}
+html.e #wfp {
+  margin: var(--negative-space);
+  font-size: 0;
+  display: inline-block;
+}
+html.e #wfp a {
+  font-size: large;
+  display: inline-block;
+}
+html.e #repl {
+  font-size: large;
+  padding: 0.33em;
+  right: calc(var(--negative-space) * 0.89);
+  position: absolute;
+}
+html.e #epi {
+  text-align: center;
+  text-wrap-mode: nowrap;
+  margin: 0px;
+}
+
+html.e #epi.logue:not(.mdo) {
+  padding: 0.8em;
+  box-shadow: var(--shadow-outset);
+}
+
+html.e #epi.logue.mdo {
+  padding-left: 3px;
+}
+
+html.e #doc {
+  box-shadow: var(--shadow-inset);
+  background: var(--inset-bg);
+  margin: 0.2em;
+  border-radius: var(--radius);
+}
+
+html.e #detree {
+  padding: 0px;
 }

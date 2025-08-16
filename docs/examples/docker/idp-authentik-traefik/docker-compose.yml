@@ -27,6 +27,9 @@ services:
       LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE
       # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
 
+      PYTHONUNBUFFERED: 1
+      # ensures log-messages are not delayed (but can reduce speed a tiny bit)
+
   traefik:
     image: traefik:v2.11
     container_name: traefik
