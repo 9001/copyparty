@@ -13,278 +13,278 @@ var hambagas = [
 
 // keyboard,
 //   onscreen keyboard by @steinuil
-function initKeybaord(BASE_URL, HAMBAGA, consoleLog, consoleError) {
-    document.querySelector('.keybaord-container').innerHTML = `
-      <div class="keybaord-body">
-        <div class="keybaord-row keybaord-row-1">
-          <div class="keybaord-key" data-keybaord-key="Escape">
+function initKeyboard(BASE_URL, HAMBAGA, consoleLog, consoleError) {
+    document.querySelector('.keyboard-container').innerHTML = `
+      <div class="keyboard-body">
+        <div class="keyboard-row keyboard-row-1">
+          <div class="keyboard-key" data-keyboard-key="Escape">
             esc
           </div>
-          <div class="keybaord-key" data-keybaord-key="F1">
+          <div class="keyboard-key" data-keyboard-key="F1">
             F1
           </div>
-          <div class="keybaord-key" data-keybaord-key="F2">
+          <div class="keyboard-key" data-keyboard-key="F2">
             F2
           </div>
-          <div class="keybaord-key" data-keybaord-key="F3">
+          <div class="keyboard-key" data-keyboard-key="F3">
             F3
           </div>
-          <div class="keybaord-key" data-keybaord-key="F4">
+          <div class="keyboard-key" data-keyboard-key="F4">
             F4
           </div>
-          <div class="keybaord-key" data-keybaord-key="F5">
+          <div class="keyboard-key" data-keyboard-key="F5">
             F5
           </div>
-          <div class="keybaord-key" data-keybaord-key="F6">
+          <div class="keyboard-key" data-keyboard-key="F6">
             F6
           </div>
-          <div class="keybaord-key" data-keybaord-key="F7">
+          <div class="keyboard-key" data-keyboard-key="F7">
             F7
           </div>
-          <div class="keybaord-key" data-keybaord-key="F8">
+          <div class="keyboard-key" data-keyboard-key="F8">
             F8
           </div>
-          <div class="keybaord-key" data-keybaord-key="F9">
+          <div class="keyboard-key" data-keyboard-key="F9">
             F9
           </div>
-          <div class="keybaord-key" data-keybaord-key="F10">
+          <div class="keyboard-key" data-keyboard-key="F10">
             F10
           </div>
-          <div class="keybaord-key" data-keybaord-key="F11">
+          <div class="keyboard-key" data-keyboard-key="F11">
             F11
           </div>
-          <div class="keybaord-key" data-keybaord-key="F12">
+          <div class="keyboard-key" data-keyboard-key="F12">
             F12
           </div>
-          <div class="keybaord-key" data-keybaord-key="Insert">
+          <div class="keyboard-key" data-keyboard-key="Insert">
             ins
           </div>
-          <div class="keybaord-key" data-keybaord-key="Delete">
+          <div class="keyboard-key" data-keyboard-key="Delete">
             del
           </div>
         </div>
-        <div class="keybaord-row keybaord-row-2">
-          <div class="keybaord-key" data-keybaord-key="\`">
+        <div class="keyboard-row keyboard-row-2">
+          <div class="keyboard-key" data-keyboard-key="\`">
             \`
           </div>
-          <div class="keybaord-key" data-keybaord-key="1">
+          <div class="keyboard-key" data-keyboard-key="1">
             1
           </div>
-          <div class="keybaord-key" data-keybaord-key="2">
+          <div class="keyboard-key" data-keyboard-key="2">
             2
           </div>
-          <div class="keybaord-key" data-keybaord-key="3">
+          <div class="keyboard-key" data-keyboard-key="3">
             3
           </div>
-          <div class="keybaord-key" data-keybaord-key="4">
+          <div class="keyboard-key" data-keyboard-key="4">
             4
           </div>
-          <div class="keybaord-key" data-keybaord-key="5">
+          <div class="keyboard-key" data-keyboard-key="5">
             5
           </div>
-          <div class="keybaord-key" data-keybaord-key="6">
+          <div class="keyboard-key" data-keyboard-key="6">
             6
           </div>
-          <div class="keybaord-key" data-keybaord-key="7">
+          <div class="keyboard-key" data-keyboard-key="7">
             7
           </div>
-          <div class="keybaord-key" data-keybaord-key="8">
+          <div class="keyboard-key" data-keyboard-key="8">
             8
           </div>
-          <div class="keybaord-key" data-keybaord-key="9">
+          <div class="keyboard-key" data-keyboard-key="9">
             9
           </div>
-          <div class="keybaord-key" data-keybaord-key="0">
+          <div class="keyboard-key" data-keyboard-key="0">
             0
           </div>
-          <div class="keybaord-key" data-keybaord-key="-">
+          <div class="keyboard-key" data-keyboard-key="-">
             -
           </div>
-          <div class="keybaord-key" data-keybaord-key="=">
+          <div class="keyboard-key" data-keyboard-key="=">
             =
           </div>
-          <div class="keybaord-key keybaord-backspace" data-keybaord-key="BackSpace">
+          <div class="keyboard-key keyboard-backspace" data-keyboard-key="BackSpace">
             backspace
           </div>
         </div>
-        <div class="keybaord-row keybaord-row-3">
-          <div class="keybaord-key keybaord-tab" data-keybaord-key="Tab">
+        <div class="keyboard-row keyboard-row-3">
+          <div class="keyboard-key keyboard-tab" data-keyboard-key="Tab">
             tab
           </div>
-          <div class="keybaord-key" data-keybaord-key="q">
+          <div class="keyboard-key" data-keyboard-key="q">
             q
           </div>
-          <div class="keybaord-key" data-keybaord-key="w">
+          <div class="keyboard-key" data-keyboard-key="w">
             w
           </div>
-          <div class="keybaord-key" data-keybaord-key="e">
+          <div class="keyboard-key" data-keyboard-key="e">
             e
           </div>
-          <div class="keybaord-key" data-keybaord-key="r">
+          <div class="keyboard-key" data-keyboard-key="r">
             r
           </div>
-          <div class="keybaord-key" data-keybaord-key="t">
+          <div class="keyboard-key" data-keyboard-key="t">
             t
           </div>
-          <div class="keybaord-key" data-keybaord-key="y">
+          <div class="keyboard-key" data-keyboard-key="y">
             y
           </div>
-          <div class="keybaord-key" data-keybaord-key="u">
+          <div class="keyboard-key" data-keyboard-key="u">
             u
           </div>
-          <div class="keybaord-key" data-keybaord-key="i">
+          <div class="keyboard-key" data-keyboard-key="i">
             i
           </div>
-          <div class="keybaord-key" data-keybaord-key="o">
+          <div class="keyboard-key" data-keyboard-key="o">
             o
           </div>
-          <div class="keybaord-key" data-keybaord-key="p">
+          <div class="keyboard-key" data-keyboard-key="p">
             p
           </div>
-          <div class="keybaord-key" data-keybaord-key="[">
+          <div class="keyboard-key" data-keyboard-key="[">
             [
           </div>
-          <div class="keybaord-key" data-keybaord-key="]">
+          <div class="keyboard-key" data-keyboard-key="]">
             ]
           </div>
-          <div class="keybaord-key keybaord-enter" data-keybaord-key="Return">
+          <div class="keyboard-key keyboard-enter" data-keyboard-key="Return">
             enter
           </div>
         </div>
-        <div class="keybaord-row keybaord-row-4">
-          <div class="keybaord-key keybaord-capslock" data-keybaord-key="HAMBAGA">
+        <div class="keyboard-row keyboard-row-4">
+          <div class="keyboard-key keyboard-capslock" data-keyboard-key="HAMBAGA">
             🍔
           </div>
-          <div class="keybaord-key" data-keybaord-key="a">
+          <div class="keyboard-key" data-keyboard-key="a">
             a
           </div>
-          <div class="keybaord-key" data-keybaord-key="s">
+          <div class="keyboard-key" data-keyboard-key="s">
             s
           </div>
-          <div class="keybaord-key" data-keybaord-key="d">
+          <div class="keyboard-key" data-keyboard-key="d">
             d
           </div>
-          <div class="keybaord-key" data-keybaord-key="f">
+          <div class="keyboard-key" data-keyboard-key="f">
             f
           </div>
-          <div class="keybaord-key" data-keybaord-key="g">
+          <div class="keyboard-key" data-keyboard-key="g">
             g
           </div>
-          <div class="keybaord-key" data-keybaord-key="h">
+          <div class="keyboard-key" data-keyboard-key="h">
             h
           </div>
-          <div class="keybaord-key" data-keybaord-key="j">
+          <div class="keyboard-key" data-keyboard-key="j">
             j
           </div>
-          <div class="keybaord-key" data-keybaord-key="k">
+          <div class="keyboard-key" data-keyboard-key="k">
             k
           </div>
-          <div class="keybaord-key" data-keybaord-key="l">
+          <div class="keyboard-key" data-keyboard-key="l">
             l
           </div>
-          <div class="keybaord-key" data-keybaord-key=";">
+          <div class="keyboard-key" data-keyboard-key=";">
             ;
           </div>
-          <div class="keybaord-key" data-keybaord-key="'">
+          <div class="keyboard-key" data-keyboard-key="'">
             '
           </div>
-          <div class="keybaord-key keybaord-backslash" data-keybaord-key="\\">
+          <div class="keyboard-key keyboard-backslash" data-keyboard-key="\\">
             \\
           </div>
         </div>
-        <div class="keybaord-row keybaord-row-5">
-          <div class="keybaord-key keybaord-lshift" data-keybaord-key="Shift_L">
+        <div class="keyboard-row keyboard-row-5">
+          <div class="keyboard-key keyboard-lshift" data-keyboard-key="Shift_L">
             shift
           </div>
-          <div class="keybaord-key" data-keybaord-key="\\">
+          <div class="keyboard-key" data-keyboard-key="\\">
             \\
           </div>
-          <div class="keybaord-key" data-keybaord-key="z">
+          <div class="keyboard-key" data-keyboard-key="z">
             z
           </div>
-          <div class="keybaord-key" data-keybaord-key="x">
+          <div class="keyboard-key" data-keyboard-key="x">
             x
           </div>
-          <div class="keybaord-key" data-keybaord-key="c">
+          <div class="keyboard-key" data-keyboard-key="c">
             c
           </div>
-          <div class="keybaord-key" data-keybaord-key="v">
+          <div class="keyboard-key" data-keyboard-key="v">
             v
           </div>
-          <div class="keybaord-key" data-keybaord-key="b">
+          <div class="keyboard-key" data-keyboard-key="b">
             b
           </div>
-          <div class="keybaord-key" data-keybaord-key="n">
+          <div class="keyboard-key" data-keyboard-key="n">
             n
           </div>
-          <div class="keybaord-key" data-keybaord-key="m">
+          <div class="keyboard-key" data-keyboard-key="m">
             m
           </div>
-          <div class="keybaord-key" data-keybaord-key=",">
+          <div class="keyboard-key" data-keyboard-key=",">
             ,
           </div>
-          <div class="keybaord-key" data-keybaord-key=".">
+          <div class="keyboard-key" data-keyboard-key=".">
             .
           </div>
-          <div class="keybaord-key" data-keybaord-key="/">
+          <div class="keyboard-key" data-keyboard-key="/">
             /
           </div>
-          <div class="keybaord-key keybaord-rshift" data-keybaord-key="Shift_R">
+          <div class="keyboard-key keyboard-rshift" data-keyboard-key="Shift_R">
             shift
           </div>
         </div>
-        <div class="keybaord-row keybaord-row-6">
-          <div class="keybaord-key keybaord-lctrl" data-keybaord-key="Control_L">
+        <div class="keyboard-row keyboard-row-6">
+          <div class="keyboard-key keyboard-lctrl" data-keyboard-key="Control_L">
             ctrl
           </div>
-          <div class="keybaord-key keybaord-super" data-keybaord-key="Meta_L">
+          <div class="keyboard-key keyboard-super" data-keyboard-key="Meta_L">
             win
           </div>
-          <div class="keybaord-key keybaord-alt" data-keybaord-key="Alt_L">
+          <div class="keyboard-key keyboard-alt" data-keyboard-key="Alt_L">
             alt
           </div>
-          <div class="keybaord-key keybaord-spacebar" data-keybaord-key="space">
+          <div class="keyboard-key keyboard-spacebar" data-keyboard-key="space">
             space
           </div>
-          <div class="keybaord-key keybaord-altgr" data-keybaord-key="Alt_R">
+          <div class="keyboard-key keyboard-altgr" data-keyboard-key="Alt_R">
             altgr
           </div>
-          <div class="keybaord-key keybaord-what" data-keybaord-key="Menu">
+          <div class="keyboard-key keyboard-what" data-keyboard-key="Menu">
             menu
           </div>
-          <div class="keybaord-key keybaord-rctrl" data-keybaord-key="Control_R">
+          <div class="keyboard-key keyboard-rctrl" data-keyboard-key="Control_R">
             ctrl
           </div>
         </div>
-        <div class="keybaord-row">
-          <div class="keybaord-key" data-keybaord-key="XF86AudioLowerVolume">
+        <div class="keyboard-row">
+          <div class="keyboard-key" data-keyboard-key="XF86AudioLowerVolume">
             🔉
           </div>
-          <div class="keybaord-key" data-keybaord-key="XF86AudioRaiseVolume">
+          <div class="keyboard-key" data-keyboard-key="XF86AudioRaiseVolume">
             🔊
           </div>
-          <div class="keybaord-key" data-keybaord-key="Left">
+          <div class="keyboard-key" data-keyboard-key="Left">
             ⬅️
           </div>
-          <div class="keybaord-key" data-keybaord-key="Down">
+          <div class="keyboard-key" data-keyboard-key="Down">
             ⬇️
           </div>
-          <div class="keybaord-key" data-keybaord-key="Up">
+          <div class="keyboard-key" data-keyboard-key="Up">
             ⬆️
           </div>
-          <div class="keybaord-key" data-keybaord-key="Right">
+          <div class="keyboard-key" data-keyboard-key="Right">
             ➡️
           </div>
-          <div class="keybaord-key" data-keybaord-key="Page_Up">
+          <div class="keyboard-key" data-keyboard-key="Page_Up">
             PgUp
           </div>
-          <div class="keybaord-key" data-keybaord-key="Page_Down">
+          <div class="keyboard-key" data-keyboard-key="Page_Down">
             PgDn
           </div>
-          <div class="keybaord-key" data-keybaord-key="Home">
+          <div class="keyboard-key" data-keyboard-key="Home">
             🏠
           </div>
-          <div class="keybaord-key" data-keybaord-key="End">
+          <div class="keyboard-key" data-keyboard-key="End">
             End
           </div>
         </div>
@@ -307,9 +307,9 @@ function initKeybaord(BASE_URL, HAMBAGA, consoleLog, consoleError) {
             (err) => consoleError(err)
         );
     }
-    const MODIFIER_ON_CLASS = "keybaord-modifier-on";
-    const KEY_DATASET = "data-keybaord-key";
-    const KEY_CLASS = "keybaord-key";
+    const MODIFIER_ON_CLASS = "keyboard-modifier-on";
+    const KEY_DATASET = "data-keyboard-key";
+    const KEY_CLASS = "keyboard-key";
 
     const modifiers = new Set()
 
@@ -338,7 +338,7 @@ function initKeybaord(BASE_URL, HAMBAGA, consoleLog, consoleError) {
     }
 
     Array.from(document.querySelectorAll("." + KEY_CLASS)).forEach((button) => {
-        const key = button.dataset.keybaordKey;
+        const key = button.dataset.keyboardKey;
 
         button.addEventListener("click", (ev) => {
             switch (key) {
@@ -376,22 +376,22 @@ function initKeybaord(BASE_URL, HAMBAGA, consoleLog, consoleError) {
 // keyboard integration
 (function () {
     var o = mknod('div');
-    clmod(o, 'keybaord-container', 1);
+    clmod(o, 'keyboard-container', 1);
     ebi('op_msg').appendChild(o);
 
     o = mknod('style');
     o.innerHTML = `
-.keybaord-body {
+.keyboard-body {
 	display: flex;
 	flex-flow: column nowrap;
     margin: .6em 0;
 }
 
-.keybaord-row {
+.keyboard-row {
 	display: flex;
 }
 
-.keybaord-key {
+.keyboard-key {
 	border: 1px solid rgba(128,128,128,0.2);
 	width: 41px;
 	height: 40px;
@@ -401,73 +401,73 @@ function initKeybaord(BASE_URL, HAMBAGA, consoleLog, consoleError) {
 	align-items: center;
 }
 
-.keybaord-key:active {
+.keyboard-key:active {
 	background-color: lightgrey;
 }
 
-.keybaord-key.keybaord-modifier-on {
+.keyboard-key.keyboard-modifier-on {
 	background-color: lightblue;
 }
 
-.keybaord-key.keybaord-backspace {
+.keyboard-key.keyboard-backspace {
 	width: 82px;
 }
 
-.keybaord-key.keybaord-tab {
+.keyboard-key.keyboard-tab {
 	width: 55px;
 }
 
-.keybaord-key.keybaord-enter {
+.keyboard-key.keyboard-enter {
 	width: 69px;
 }
 
-.keybaord-key.keybaord-capslock {
+.keyboard-key.keyboard-capslock {
 	width: 80px;
 }
 
-.keybaord-key.keybaord-backslash {
+.keyboard-key.keyboard-backslash {
 	width: 88px;
 }
 
-.keybaord-key.keybaord-lshift {
+.keyboard-key.keyboard-lshift {
 	width: 65px;
 }
 
-.keybaord-key.keybaord-rshift {
+.keyboard-key.keyboard-rshift {
 	width: 103px;
 }
 
-.keybaord-key.keybaord-lctrl {
+.keyboard-key.keyboard-lctrl {
 	width: 55px;
 }
 
-.keybaord-key.keybaord-super {
+.keyboard-key.keyboard-super {
 	width: 55px;
 }
 
-.keybaord-key.keybaord-alt {
+.keyboard-key.keyboard-alt {
 	width: 55px;
 }
 
-.keybaord-key.keybaord-altgr {
+.keyboard-key.keyboard-altgr {
 	width: 55px;
 }
 
-.keybaord-key.keybaord-what {
+.keyboard-key.keyboard-what {
 	width: 55px;
 }
 
-.keybaord-key.keybaord-rctrl {
+.keyboard-key.keyboard-rctrl {
 	width: 55px;
 }
 
-.keybaord-key.keybaord-spacebar {
+.keyboard-key.keyboard-spacebar {
 	width: 302px;
 }
 `;
     document.head.appendChild(o);
 
-    initKeybaord('/', hambagas,
+    initKeyboard('/', hambagas,
         (msg) => { toast.inf(2, msg.toString()) },
         (msg) => { toast.err(30, msg.toString()) });
 })();
