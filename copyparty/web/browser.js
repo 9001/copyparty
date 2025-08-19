@@ -6472,12 +6472,12 @@ var Ls = {
 		"ul_btnu": "U P L O A D",
 		"ul_btns": "Z O E K E N",
 
-		"ul_hash": "Gash",
-		"ul_send": "Verstuur",
+		"ul_hash": "Hashing",
+		"ul_send": "Versturen",
 		"ul_done": "Klaar",
 		"ul_idle1": "Geen uploads in wachtrij",
 		"ut_etah": "Gemiddelde &lt;em&gt;hashing&lt;/em&gt; snelheid en geschatte tijd tot de voltooiing",
-		"ut_etau": "Gemiddelde &lt;em&gt;upload&lt;/em&gt; snelheid en geschatte tijd tot voltooiing",
+		"ut_etau": "Gemiddelde &lt;em&gt;verzend&lt;/em&gt; snelheid en geschatte tijd tot voltooiing",
 		"ut_etat": "Gemiddelde &lt;em&gt;totale&lt;/em&gt; snelheid en geschatte tijd tot voltooiing",
 
 		"uct_ok": "Succesvol afgerond",
