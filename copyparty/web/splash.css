@@ -24,6 +24,7 @@ h1 {
 li {
 	margin: 1em 0;
 }
+#lo,
 a {
 	color: #047;
 	background: #fff;
@@ -47,6 +48,7 @@ td a {
 	float: right;
 	margin: -.2em 0 0 .8em;
 }
+#lo,
 .logout,
 a.r {
 	color: #c04;
@@ -176,12 +178,14 @@ html.z {
 html.z h1 {
 	border-color: #777;
 }
+html.z #lo,
 html.z a {
 	color: #fff;
 	background: #057;
 	border-color: #37a;
 }
 html.z .logout,
+html.z #lo,
 html.z a.r {
 	background: #804;
 	border-color: #c28;

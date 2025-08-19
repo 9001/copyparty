@@ -46,8 +46,6 @@ help() { exec cat <<'EOF'
 # `no-fnt` saves ~9k by removing the source-code-pro font
 #   (browsers will try to use 'Consolas' instead)
 #
-# `no-dd` saves ~2k by removing the mouse cursor
-#
 # _____________________________________________________________________
 # build behavior:
 #
@@ -61,8 +59,8 @@ help() { exec cat <<'EOF'
 #
 # _____________________________________________________________________
 # some usage examples:
-#   ./scripts/make-sfx.sh lang eng no-cm no-hl no-dd no-fnt no-smb no-pf
-#   ./scripts/rls.sh sfx  lang eng no-cm no-hl no-dd no-fnt no-smb no-pf
+#   ./scripts/make-sfx.sh lang eng no-cm no-hl no-fnt no-smb no-pf
+#   ./scripts/rls.sh sfx  lang eng no-cm no-hl no-fnt no-smb no-pf
 #   (reduces v1.14.2 from 700k to 495k)
 
 EOF
@@ -76,7 +74,6 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	sed()  { gsed  "$@"; }
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
-	shuf() { gshuf "$@"; }
 	nproc() { gnproc; }
 	sha1sum() { shasum "$@"; }
 	unexpand() { gunexpand "$@"; }
@@ -123,7 +120,6 @@ while [ ! -z "$1" ]; do
 		no-pf)  no_pf=1  ; ;;
 		no-fnt) no_fnt=1 ; ;;
 		no-hl)  no_hl=1  ; ;;
-		no-dd)  no_dd=1  ; ;;
 		no-cm)  no_cm=1  ; ;;
 		dl-wd)  dl_wd=1  ; ;;
 		ign-wd) ign_wd=1 ; ;;
@@ -160,9 +156,9 @@ stamp=$(
 	done | sort | tail -n 1 | sha1sum | cut -c-16
 )
 
-rm -rf sfx$CSN/*
-mkdir -p sfx$CSN build
-cd sfx$CSN
+rm -rf sfx/*
+mkdir -p sfx build
+cd sfx
 
 tmpdir="$(
 	printf '%s\n' "$TMPDIR" /tmp |
@@ -221,6 +217,7 @@ necho() {
 	tar -zxf $f
 	mv pyftpdlib-*/pyftpdlib .
 	rm -rf pyftpdlib-* pyftpdlib/test
+	patch -s -p1 <../scripts/patches/pyftpdlib-win313.patch
 	for f in pyftpdlib/_async{hat,ore}.py; do
 		[ -e "$f" ] || continue;
 		iawk 'NR<4||NR>27||!/^#/;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' $f
@@ -398,7 +395,7 @@ ts=$(date -u +%s)
 hts=$(date -u +%Y-%m%d-%H%M%S) # --date=@$ts (thx osx)
 
 mkdir -p ../dist
-sfx_out=../dist/copyparty-sfx$CSN
+sfx_out=../dist/copyparty-sfx
 
 echo cleanup
 find -name '*.pyc' -delete
@@ -454,13 +451,6 @@ rm -f ftp/pyftpdlib/{__main__,prefork}.py
 	f=copyparty/web/ui.css
 	gzip -d "$f.gz" || true
 	ised "s/src:.*scp.*\)/src:local('Consolas')/" $f
-}
-
-[ $no_dd ] && {
-	rm -rf copyparty/web/dd
-	f=copyparty/web/browser.css
-	gzip -d "$f.gz" || true
-	ised 's/(cursor: ?)url\([^)]+\), ?(pointer)/\1\2/; s/[0-9]+% \{cursor:[^}]+\}//; s/animation: ?cursor[^};]+//' $f
 }
 
 [ $langs ] && {
@@ -564,7 +554,7 @@ gzres() {
 }
 
 
-zdir="$tmpdir/cpp-mksfx$CSN"
+zdir="$tmpdir/cpp-mksfx"
 [ -e "$zdir/$stamp" ] || rm -rf "$zdir"
 mkdir -p "$zdir"
 echo a > "$zdir/$stamp"
@@ -593,15 +583,7 @@ echo gen tarlist
 for d in copyparty partftpy magic j2 py2 py37 ftp; do find $d -type f || true; done |  # strip_hints
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
-
-for n in {1..50}; do
-	(grep -vE '\.gz$' list1; grep -E '\.gz$' list1 | (shuf||gshuf) ) >list || true
-	s=$( (sha1sum||shasum) < list | cut -c-16)
-	grep -q $s "$zdir/h" 2>/dev/null && continue
-	echo $s >> "$zdir/h"
-	break
-done
-[ $n -eq 50 ] && exit
+(grep -vE '\.gz$' list1; grep -E '\.gz$' list1) >list
 
 echo creating tar
 tar -cf tar "${targs[@]}" --numeric-owner -T list

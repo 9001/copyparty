@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 18, 7)
-CODENAME = "logtail"
-BUILD_DT = (2025, 7, 30)
+VERSION = (1, 19, 4)
+CODENAME = "usernames"
+BUILD_DT = (2025, 8, 17)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

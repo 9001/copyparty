@@ -1,0 +1,41 @@
+Date: Tue, 22 Oct 2024 12:47:30 +0200
+Subject: Workaround for isabs() on Windows + Python 3.13 (#652)
+
+Starting from Python 3.13, `os.path.isabs("/foo")` on Windows return `False`
+
+diff --git a/pyftpdlib/filesystems.py b/pyftpdlib/filesystems.py
+index 9b9326bf..320ffe40 100644
+--- a/pyftpdlib/filesystems.py
++++ b/pyftpdlib/filesystems.py
+@@ -132,6 +132,16 @@ def cwd(self, path):
+ 
+     # --- Pathname / conversion utilities
+ 
++    @staticmethod
++    def _isabs(path, _windows=os.name == "nt"):
++        # Windows + Python 3.13: isabs() changed so that a path
++        # starting with "/" is no longer considered absolute.
++        # https://github.com/python/cpython/issues/44626
++        # https://github.com/python/cpython/pull/113829/
++        if _windows and path.startswith("/"):
++            return True
++        return os.path.isabs(path)
++
+     def ftpnorm(self, ftppath):
+         """Normalize a "virtual" ftp pathname (typically the raw string
+         coming from client) depending on the current working directory.
+@@ -146,3 +156,3 @@
+         assert isinstance(ftppath, unicode), ftppath
+-        if os.path.isabs(ftppath):
++        if self._isabs(ftppath):
+             p = os.path.normpath(ftppath)
+@@ -162,3 +172,3 @@
+         # This is for extra protection, maybe not really necessary.
+-        if not os.path.isabs(p):
++        if not self._isabs(p):
+             p = u("/")
+@@ -201,3 +211,3 @@
+         assert isinstance(fspath, unicode), fspath
+-        if os.path.isabs(fspath):
++        if self._isabs(fspath):
+             p = os.path.normpath(fspath)

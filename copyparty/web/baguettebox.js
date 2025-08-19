@@ -48,6 +48,7 @@ window.baguetteBox = (function () {
 
     var onFSC = function (e) {
         isFullscreen = !!document.fullscreenElement;
+        clmod(document.documentElement, 'bb_fsc', isFullscreen);
     };
 
     var overlayClickHandler = function (e) {
@@ -402,7 +403,7 @@ window.baguetteBox = (function () {
             if (isFullscreen)
                 document.exitFullscreen();
             else
-                (vid() || ebi('bbox-overlay')).requestFullscreen();
+                ebi('bbox-overlay').requestFullscreen();
         }
         catch (ex) {
             if (IPHONE)

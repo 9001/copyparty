@@ -391,7 +391,7 @@ class U2idx(object):
             fk_alg = 2 if "fka" in flags else 1
             c = cur.execute(uq, tuple(vuv))
             for hit in c:
-                w, ts, sz, rd, fn, ip, at = hit[:7]
+                w, ts, sz, rd, fn = hit[:5]
 
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)

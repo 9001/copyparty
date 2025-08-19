@@ -399,6 +399,9 @@ application swf=x-shockwave-flash m3u=vnd.apple.mpegurl db3=vnd.sqlite3 sqlite=v
 text ass=plain ssa=plain
 image jpg=jpeg xpm=x-xpixmap psd=vnd.adobe.photoshop jpf=jpx tif=tiff ico=x-icon djvu=vnd.djvu
 image heic=heic-sequence heif=heif-sequence hdr=vnd.radiance svg=svg+xml
+image arw=x-sony-arw cr2=x-canon-cr2 crw=x-canon-crw dcr=x-kodak-dcr dng=x-adobe-dng erf=x-epson-erf
+image k25=x-kodak-k25 kdc=x-kodak-kdc mrw=x-minolta-mrw nef=x-nikon-nef orf=x-olympus-orf
+image pef=x-pentax-pef raf=x-fuji-raf raw=x-panasonic-raw sr2=x-sony-sr2 srf=x-sony-srf x3f=x-sigma-x3f
 audio caf=x-caf mp3=mpeg m4a=mp4 mid=midi mpc=musepack aif=aiff au=basic qcp=qcelp
 video mkv=x-matroska mov=quicktime avi=x-msvideo m4v=x-m4v ts=mp2t
 video asf=x-ms-asf flv=x-flv 3gp=3gpp 3g2=3gpp2 rmvb=vnd.rn-realmedia-vbr
@@ -2396,6 +2399,21 @@ def ujoin(rd: str, fn: str) -> str:
         return rd or fn
 
 
+def str_anchor(txt) -> tuple[int, str]:
+    if not txt:
+        return 0, ""
+    txt = txt.lower()
+    a = txt.startswith("^")
+    b = txt.endswith("$")
+    if not b:
+        if not a:
+            return 1, txt  # ~
+        return 2, txt[1:]  # ^
+    if not a:
+        return 3, txt[:-1]  # $
+    return 4, txt[1:-1]  # ^$
+
+
 def log_reloc(
     log: "NamedLogger",
     re: dict[str, str],
@@ -2936,6 +2954,27 @@ def load_ipu(
     return ip_u, nm
 
 
+def load_ipr(
+    log: "RootLogger", iprs: list[str], defer_mutex: bool = False
+) -> dict[str, NetMap]:
+    ret = {}
+    for ipr in iprs:
+        try:
+            zs, uname = ipr.split("=")
+            cidrs = zs.split(",")
+        except:
+            t = "\n  invalid value %r for argument --ipr; must be CIDR[,CIDR[,...]]=UNAME (192.168.0.0/16=amelia)"
+            raise Exception(t % (ipr,))
+        try:
+            nm = NetMap(["::"], cidrs, True, True, defer_mutex)
+        except Exception as ex:
+            t = "failed to translate --ipr into netmap, probably due to invalid config: %r"
+            log("root", t % (ex,), 1)
+            raise
+        ret[uname] = nm
+    return ret
+
+
 def yieldfile(fn: str, bufsz: int) -> Generator[bytes, None, None]:
     readsz = min(bufsz, 128 * 1024)
     with open(fsenc(fn), "rb", bufsz) as f:
@@ -2965,6 +3004,17 @@ def justcopy(
             time.sleep(slp)
 
     return tlen, "checksum-disabled", "checksum-disabled"
+
+
+def eol_conv(
+    fin: Generator[bytes, None, None], conv: str
+) -> Generator[bytes, None, None]:
+    crlf = conv.lower() == "crlf"
+    for buf in fin:
+        buf = buf.replace(b"\r", b"")
+        if crlf:
+            buf = buf.replace(b"\n", b"\r\n")
+        yield buf
 
 
 def hashcopy(
@@ -3552,7 +3602,7 @@ def runihook(
     verbose: bool,
     cmd: str,
     vol: "VFS",
-    ups: list[tuple[str, int, int, str, str, str, int]],
+    ups: list[tuple[str, int, int, str, str, str, int, str]],
 ) -> bool:
     _, chk, fork, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
     bcmd = [sfsenc(x) for x in acmd]
@@ -4200,8 +4250,6 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
     ap = os.path.join(E.mod, name)
 
     if PY2:
-        import codecs
-
         return codecs.open(ap, "r", encoding=enc)  # type: ignore
 
     return open(ap, mode, encoding=enc)

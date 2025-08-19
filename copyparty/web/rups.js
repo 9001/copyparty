@@ -1,5 +1,6 @@
 function render() {
-    var ups = V.ups, now = V.now, html = [];
+    var html = ['<table id="tab"><thead><tr><th>size</th><th>who</th><th>ip</th><th>when</th><th>age</th><th>dir</th><th>file</th></tr></thead><tbody>'];
+    var ups = V.ups, now = V.now;
     ebi('filter').value = V.filter;
     ebi('hits').innerHTML = 'showing ' + ups.length + ' files';
 
@@ -10,11 +11,12 @@ function render() {
             fn = esc(uricom_dec(vsp[1])),
             at = f.at,
             td = now - f.at,
-            ts = !at ? '(?)' : unix2iso(at),
+            ts = !at ? '(?)' : unix2ui(at),
             sa = !at ? '(?)' : td > 60 ? shumantime(td) : (td + 's'),
             sz = ('' + f.sz).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
         html.push('<tr><td>' + sz +
+            '</td><td>' + (f.un || '') +
             '</td><td>' + f.ip +
             '</td><td>' + ts +
             '</td><td>' + sa +
@@ -26,7 +28,8 @@ function render() {
         var t = V.filter ? ' matching the filter' : '';
         html = ['<tr><td colspan="6">there are no uploads' + t + '</td></tr>'];
     }
-    ebi('tb').innerHTML = html.join('');
+    html.push('</tbody></table>');
+    ebi('tw').innerHTML = html.join('\n');
 }
 render();
 
@@ -46,7 +49,7 @@ function ask(e) {
             V = JSON.parse(this.responseText)
         }
         catch (ex) {
-            ebi('tb').innerHTML = '<tr><td colspan="6">failed to decode server response as json: <pre>' + esc(this.responseText) + '</pre></td></tr>';
+            ebi('tw').innerHTML = 'failed to decode server response as json: <pre>' + esc(this.responseText) + '</pre>';
             return;
         }
         render();

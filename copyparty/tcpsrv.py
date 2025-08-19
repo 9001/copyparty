@@ -25,8 +25,8 @@ from .util import (
     termsize,
 )
 
-if True:
-    from typing import Generator, Union
+if True:  # pylint: disable=using-constant-test
+    from typing import Generator, Optional, Union
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -245,8 +245,10 @@ class TcpSrv(object):
 
     def _listen(self, ip: str, port: int) -> None:
         uds_perm = uds_gid = -1
+        bound: Optional[socket.socket] = None
+        tcp = False
+
         if "unix:" in ip:
-            tcp = False
             ipv = socket.AF_UNIX
             uds = ip.split(":")
             ip = uds[-1]
@@ -259,7 +261,12 @@ class TcpSrv(object):
                     import grp
 
                     uds_gid = grp.getgrnam(uds[2]).gr_gid
+        elif "fd:" in ip:
+            fd = ip[3:]
+            bound = socket.socket(fileno=int(fd))
 
+            tcp = bound.proto == socket.IPPROTO_TCP
+            ipv = bound.family
         elif ":" in ip:
             tcp = True
             ipv = socket.AF_INET6
@@ -267,7 +274,7 @@ class TcpSrv(object):
             tcp = True
             ipv = socket.AF_INET
 
-        srv = socket.socket(ipv, socket.SOCK_STREAM)
+        srv = bound or socket.socket(ipv, socket.SOCK_STREAM)
 
         if not ANYWIN or self.args.reuseaddr:
             srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -284,6 +291,10 @@ class TcpSrv(object):
 
         if getattr(self.args, "freebind", False):
             srv.setsockopt(socket.SOL_IP, socket.IP_FREEBIND, 1)
+
+        if bound:
+            self.srv.append(srv)
+            return
 
         try:
             if tcp:
@@ -437,7 +448,7 @@ class TcpSrv(object):
     def detect_interfaces(self, listen_ips: list[str]) -> dict[str, Netdev]:
         from .stolen.ifaddr import get_adapters
 
-        listen_ips = [x for x in listen_ips if "unix:" not in x]
+        listen_ips = [x for x in listen_ips if not x.startswith(("unix:", "fd:"))]
 
         nics = get_adapters(True)
         eps: dict[str, Netdev] = {}
@@ -583,8 +594,7 @@ class TcpSrv(object):
         if not ip:
             return ""
 
-        if ":" in ip:
-            ip = "[{}]".format(ip)
+        hip = "[%s]" % (ip,) if ":" in ip else ip
 
         if self.args.http_only:
             https = ""
@@ -596,7 +606,7 @@ class TcpSrv(object):
         ports = t1.get(ip, t2.get(ip, []))
         dport = 443 if https else 80
         port = "" if dport in ports or not ports else ":{}".format(ports[0])
-        txt = "http{}://{}{}/{}".format(https, ip, port, self.args.qrl)
+        txt = "http{}://{}{}/{}".format(https, hip, port, self.args.qrl)
 
         btxt = txt.encode("utf-8")
         if PY2:
@@ -604,6 +614,10 @@ class TcpSrv(object):
 
         fg = self.args.qr_fg
         bg = self.args.qr_bg
+        nocolor = fg == -1
+        if nocolor:
+            fg = 0
+
         pad = self.args.qrp
         zoom = self.args.qrz
         qrc = QrCode.encode_binary(btxt)
@@ -631,6 +645,8 @@ class TcpSrv(object):
 
         qr = qr.replace("\n", "\033[K\n") + "\033[K"  # win10do
         cc = " \033[0;38;5;{0};47;48;5;{1}m" if fg else " \033[0;30;47m"
+        if nocolor:
+            cc = " \033[0m"
         t = cc + "\n{2}\033[999G\033[0m\033[J"
         t = t.format(fg, bg, qr)
         if ANYWIN:

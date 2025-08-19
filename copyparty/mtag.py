@@ -29,7 +29,7 @@ from .util import (
 )
 
 if True:  # pylint: disable=using-constant-test
-    from typing import Any, Optional, Union
+    from typing import IO, Any, Optional, Union
 
     from .util import NamedLogger, RootLogger
 
@@ -66,6 +66,8 @@ HAVE_FFPROBE = not os.environ.get("PRTY_NO_FFPROBE") and have_ff("ffprobe")
 
 CBZ_PICS = set("png jpg jpeg gif bmp tga tif tiff webp avif".split())
 CBZ_01 = re.compile(r"(^|[^0-9v])0+[01]\b")
+
+FMT_AU = set("mp3 ogg flac wav".split())
 
 
 class MParser(object):
@@ -174,6 +176,9 @@ def au_unpk(
                 raise Exception("no images inside cbz")
             fi = zf.open(using)
 
+        elif pk == "epub":
+            fi = get_cover_from_epub(log, abspath)
+
         else:
             raise Exception("unknown compression %s" % (pk,))
 
@@ -203,7 +208,7 @@ def au_unpk(
 
 def ffprobe(
     abspath: str, timeout: int = 60
-) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]]]:
+) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]], list[Any], dict[str, Any]]:
     cmd = [
         b"ffprobe",
         b"-hide_banner",
@@ -217,8 +222,17 @@ def ffprobe(
     return parse_ffprobe(so)
 
 
-def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]]]:
-    """ffprobe -show_format -show_streams"""
+def parse_ffprobe(
+    txt: str,
+) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]], list[Any], dict[str, Any]]:
+    """
+    txt: output from ffprobe -show_format -show_streams
+    returns:
+     * normalized tags
+     * original/raw tags
+     * list of streams
+     * format props
+    """
     streams = []
     fmt = {}
     g = {}
@@ -242,7 +256,7 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
     ret: dict[str, Any] = {}  # processed
     md: dict[str, list[Any]] = {}  # raw tags
 
-    is_audio = fmt.get("format_name") in ["mp3", "ogg", "flac", "wav"]
+    is_audio = fmt.get("format_name") in FMT_AU
     if fmt.get("filename", "").split(".")[-1].lower() in ["m4a", "aac"]:
         is_audio = True
 
@@ -270,6 +284,8 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
                 ["channel_layout", "chs"],
                 ["sample_rate", ".hz"],
                 ["bit_rate", ".aq"],
+                ["bits_per_sample", ".bps"],
+                ["bits_per_raw_sample", ".bprs"],
                 ["duration", ".dur"],
             ]
 
@@ -309,7 +325,7 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
                 ret[rk] = v1
 
     if ret.get("vc") == "ansi":  # shellscript
-        return {}, {}
+        return {}, {}, [], {}
 
     for strm in streams:
         for sk, sv in strm.items():
@@ -358,7 +374,77 @@ def parse_ffprobe(txt: str) -> tuple[dict[str, tuple[int, Any]], dict[str, list[
     zero = int("0")
     zd = {k: (zero, v) for k, v in ret.items()}
 
-    return zd, md
+    return zd, md, streams, fmt
+
+
+def get_cover_from_epub(log: "NamedLogger", abspath: str) -> Optional[IO[bytes]]:
+    import zipfile
+
+    from .dxml import parse_xml
+
+    try:
+        from urlparse import urljoin  # Python2
+    except ImportError:
+        from urllib.parse import urljoin  # Python3
+
+    with zipfile.ZipFile(abspath, "r") as z:
+        # First open the container file to find the package document (.opf file)
+        try:
+            container_root = parse_xml(z.read("META-INF/container.xml").decode())
+        except KeyError:
+            log("epub: no container file found in %s" % (abspath,))
+            return None
+
+        # https://www.w3.org/TR/epub-33/#sec-container.xml-rootfile-elem
+        container_ns = {"": "urn:oasis:names:tc:opendocument:xmlns:container"}
+        # One file could contain multiple package documents, default to the first one
+        rootfile_path = container_root.find("./rootfiles/rootfile", container_ns).get(
+            "full-path"
+        )
+
+        # Then open the first package document to find the path of the cover image
+        try:
+            package_root = parse_xml(z.read(rootfile_path).decode())
+        except KeyError:
+            log("epub: no package document found in %s" % (abspath,))
+            return None
+
+        # https://www.w3.org/TR/epub-33/#sec-package-doc
+        package_ns = {"": "http://www.idpf.org/2007/opf"}
+        # https://www.w3.org/TR/epub-33/#sec-cover-image
+        coverimage_path_node = package_root.find(
+            "./manifest/item[@properties='cover-image']", package_ns
+        )
+        if coverimage_path_node is not None:
+            coverimage_path = coverimage_path_node.get("href")
+        else:
+            # This might be an EPUB2 file, try the legacy way of specifying covers
+            coverimage_path = _get_cover_from_epub2(log, package_root, package_ns)
+
+        # This url is either absolute (in the .epub) or relative to the package document
+        adjusted_cover_path = urljoin(rootfile_path, coverimage_path)
+
+        return z.open(adjusted_cover_path)
+
+
+def _get_cover_from_epub2(
+    log: "NamedLogger", package_root, package_ns
+) -> Optional[str]:
+    # <meta name="cover" content="id-to-cover-image"> in <metadata>, then
+    # <item> in <manifest>
+    cover_id = package_root.find("./metadata/meta[@name='cover']", package_ns).get(
+        "content"
+    )
+
+    if not cover_id:
+        return None
+
+    for node in package_root.iterfind("./manifest/item", package_ns):
+        if node.get("id") == cover_id:
+            cover_path = node.get("href")
+            return cover_path
+
+    return None
 
 
 class MTag(object):
@@ -629,7 +715,7 @@ class MTag(object):
         if not bos.path.isfile(abspath):
             return {}
 
-        ret, md = ffprobe(abspath, self.args.mtag_to)
+        ret, md, _, _ = ffprobe(abspath, self.args.mtag_to)
 
         if self.args.mtag_vv:
             for zd in (ret, dict(md)):

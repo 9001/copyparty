@@ -68,6 +68,7 @@ def vf_bmap() -> dict[str, str]:
 def vf_vmap() -> dict[str, str]:
     """argv-to-volflag: simple values"""
     ret = {
+        "ac_convt": "aconvt",
         "no_hash": "nohash",
         "no_idx": "noidx",
         "re_maxage": "scan",
@@ -111,11 +112,14 @@ def vf_vmap() -> dict[str, str]:
         "tail_tmax",
         "tail_who",
         "tcolor",
+        "th_spec_p",
+        "txt_eol",
         "unlist",
         "u2abort",
         "u2ts",
         "uid",
         "gid",
+        "unp_who",
         "ups_who",
         "zip_who",
         "zipmaxn",
@@ -259,7 +263,9 @@ flagcats = {
         "thsize": "thumbnail res; WxH",
         "crop": "center-cropping (y/n/fy/fn)",
         "th3x": "3x resolution (y/n/fy/fn)",
-        "convt": "conversion timeout in seconds",
+        "convt": "convert-to-image timeout in seconds",
+        "aconvt": "convert-to-audio timeout in seconds",
+        "th_spec_p=1": "make spectrograms? 0=never 1=fallback 2=always",
         "ext_th=s=/b.png": "use /b.png as thumbnail for file-extension s",
     },
     "handlers\n(better explained in --help-handlers)": {
@@ -322,6 +328,7 @@ flagcats = {
         "exp": "enable textfile expansion; see --help-exp",
         "exp_md": "placeholders to expand in markdown files; see --help",
         "exp_lg": "placeholders to expand in prologue/epilogue; see --help",
+        "txt_eol=lf": "enable EOL conversion when writing docs (LF or CRLF)",
     },
     "tailing": {
         "notail": "disable ?tail (download a growing file continuously)",
@@ -339,6 +346,7 @@ flagcats = {
         "dky": 'allow seeing files (not folders) inside a specific folder\nwith "g" perm, and does not require a valid dirkey to do so',
         "rss": "allow '?rss' URL suffix (experimental)",
         "rmagic": "expensive analysis for mimetype accuracy",
+        "unp_who=2": "unpost only if same... 1=ip+name, 2=ip, 3=name",
         "ups_who=2": "restrict viewing the list of recent uploads",
         "zip_who=2": "restrict access to download-as-zip/tar",
         "zipmaxn=9k": "reject download-as-zip if more than 9000 files",
