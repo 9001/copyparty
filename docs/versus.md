@@ -125,12 +125,12 @@ symbol legend,
 | config GUI              |   | █ | █ | █ | █ |   |   | █ | █ | █ |   | █ | █ |
 | good documentation      |   |   |   | █ | █ | █ | █ |   |   | █ | █ | ╱ | ╱ |
 | runs on iOS             | ╱ |   |   |   |   | ╱ |   |   |   |   |   |   |   |
-| runs on Android         | █ |   |   |   |   | █ |   |   |   |   |   |   |   |
+| runs on Android         | █ |   | █ |   |   | █ |   |   |   |   |   |   |   |
 | runs on WinXP           | █ | █ |   |   |   | █ |   |   |   |   |   |   |   |
 | runs on Windows         | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ | █ | █ | ╱ |
 | runs on Linux           | █ | ╱ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | runs on Macos           | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |   |
-| runs on FreeBSD         | █ |   |   | • | █ | █ | █ | • | █ | █ |   | █ |   |
+| runs on FreeBSD         | █ |   | █ | • | █ | █ | █ | • | █ | █ |   | █ |   |
 | runs on Risc-V          | █ |   |   | █ | █ | █ |   | • |   | █ |   |   |   |
 | portable binary         | █ | █ | █ |   |   | █ | █ |   |   | █ |   | █ | █ |
 | zero setup, just go     | █ | █ | █ |   |   | ╱ | █ |   |   | █ |   | ╱ | █ |
@@ -161,7 +161,7 @@ symbol legend,
 | upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ |
 | parallel uploads        | █ |   |   | █ | █ |   | • |   | █ | █ | █ |   | █ |
 | resumable uploads       | █ |   | █ |   |   |   |   |   | █ | █ | █ | ╱ |   |
-| upload segmenting       | █ |   |   | █ |   |   |   | █ | █ | █ | █ | ╱ | █ |
+| upload segmenting       | █ |   | █ | █ |   |   |   | █ | █ | █ | █ | ╱ | █ |
 | upload acceleration     | █ |   |   |   |   |   |   |   | █ |   | █ |   |   |
 | upload verification     | █ |   |   | █ | █ |   |   |   | █ |   |   |   |   |
 | upload deduplication    | █ |   |   |   | █ |   |   |   | █ |   |   |   |   |
@@ -169,7 +169,7 @@ symbol legend,
 | CTRL-V from device      | █ |   |   | █ |   |   |   |   |   |   |   |   |   |
 | race the beam ("p2p")   | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | "tail -f" streaming     | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| keep last-modified time | █ |   |   | █ | █ | █ |   |   |   |   |   | █ |   |
+| keep last-modified time | █ |   | █ | █ | █ | █ |   |   |   |   |   | █ |   |
 | upload rules            | ╱ | ╱ | ╱ | ╱ | ╱ |   |   | ╱ | ╱ |   | ╱ | ╱ | ╱ |
 | ┗ max disk usage        | █ | █ | █ |   | █ |   |   |   | █ |   |   | █ | █ |
 | ┗ max filesize          | █ |   |   |   |   |   |   | █ |   |   | █ | █ | █ |
@@ -251,7 +251,7 @@ symbol legend,
 
 | feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
-| config from cmd args    | █ |   |   |   |   | █ | █ |   |   | █ |   | ╱ | ╱ |
+| config from cmd args    | █ |   | █ |   |   | █ | █ |   |   | █ |   | ╱ | ╱ |
 | config files            | █ | █ | █ | ╱ | ╱ | █ |   | █ |   | █ | • | ╱ | ╱ |
 | runtime config reload   | █ | █ | █ |   |   |   |   | █ | █ | █ | █ |   | █ |
 | same-port http / https  | █ |   |   |   |   |   |   |   |   |   |   |   |   |
@@ -276,10 +276,10 @@ symbol legend,
 | per-account chroot      |   |   |   |   |   |   |   |   |   |   |   | █ |   |
 | single-sign-on          | ╱ |   |   | █ | █ |   |   |   | • |   |   |   |   |
 | token auth              | ╱ |   |   | █ | █ |   |   | █ |   |   |   |   | █ |
-| 2fa                     | ╱ |   |   | █ | █ |   |   |   |   |   |   | █ | ╱ |
+| 2fa                     | ╱ |   | / | █ | █ |   |   |   |   |   |   | █ | ╱ |
 | per-volume permissions  | █ | █ | █ | █ | █ | █ | █ |   | █ | █ | ╱ | █ | █ |
-| per-folder permissions  | ╱ |   |   | █ | █ |   | █ |   | █ | █ | ╱ | █ | █ |
-| per-file permissions    |   |   |   | █ | █ |   | █ |   | █ |   |   |   | █ |
+| per-folder permissions  | ╱ |   | █ | █ | █ |   | █ |   | █ | █ | ╱ | █ | █ |
+| per-file permissions    |   |   | █ | █ | █ |   | █ |   | █ |   |   |   | █ |
 | per-file passwords      | █ |   |   | █ | █ |   | █ |   | █ |   |   |   | █ |
 | unmap subfolders        | █ |   | █ |   |   |   | █ |   |   | █ | ╱ | • |   |
 | index.html blocks list  | ╱ |   |   |   |   |   | █ |   |   | • |   |   |   |
@@ -297,13 +297,13 @@ symbol legend,
 | full sync               |   |   |   | █ | █ |   |   |   |   |   |   |   |   |
 | speed throttle          |   | █ | █ |   |   | █ |   |   | █ |   |   | █ |   |
 | anti-bruteforce         | █ | █ | █ | █ | █ |   |   |   | • |   |   | █ | • |
-| dyndns updater          |   | █ |   |   |   |   |   |   |   |   |   |   |   |
+| dyndns updater          |   | █ | █ |   |   |   |   |   |   |   |   |   |   |
 | self-updater            |   |   | █ |   |   |   |   |   |   |   |   |   | █ |
 | log rotation            | █ |   | █ | █ | █ |   |   | • | █ |   |   | █ | • |
 | upload tracking / log   | █ | █ | • | █ | █ |   |   | █ | █ |   |   | ╱ | █ |
 | prometheus metrics      | █ |   |   | █ |   |   |   |   |   |   |   | █ |   |
 | curl-friendly ls        | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| curl-friendly upload    | █ |   |   |   |   | █ | █ | • |   |   |   |   |   |
+| curl-friendly upload    | █ |   | █ |   |   | █ | █ | • |   |   |   |   |   |
 
 * `unmap subfolders` = "shadowing"; mounting a local folder in the middle of an existing filesystem tree in order to disable access below that path
 * `files stored as-is` = uploaded files are trivially readable from the server HDD, not sliced into chunks or in weird folder structures or anything like that
@@ -332,7 +332,8 @@ symbol legend,
   * `upload tracking / log` in main logfile
 * `m`/arozos:
   * `2fa` maybe possible through LDAP/Oauth
-
+* `c`/hfs3
+  * `2fa` available by installing a plugin
 
 ## client features
 
@@ -342,18 +343,18 @@ symbol legend,
 | themes                  | █ | █ | █ | █ |   |   |   |   | █ |   |   |   |   |
 | directory tree nav      | █ | ╱ |   |   | █ |   |   |   | █ |   | ╱ |   |   |
 | multi-column sorting    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| thumbnails              | █ |   |   | ╱ | ╱ |   |   | █ | █ | ╱ |   |   | █ |
-| ┗ image thumbnails      | █ |   |   | █ | █ |   |   | █ | █ | █ |   |   | █ |
+| thumbnails              | █ |   | / | ╱ | ╱ |   |   | █ | █ | ╱ |   |   | █ |
+| ┗ image thumbnails      | █ |   | / | █ | █ |   |   | █ | █ | █ |   |   | █ |
 | ┗ video thumbnails      | █ |   |   | █ | █ |   |   |   | █ |   |   |   | █ |
 | ┗ audio spectrograms    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | audio player            | █ |   | ╱ | █ | █ |   |   |   | █ | ╱ |   |   | █ |
 | ┗ gapless playback      | █ |   |   |   |   |   |   |   | • |   |   |   |   |
 | ┗ audio equalizer       | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | ┗ waveform seekbar      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| ┗ OS integration        | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| ┗ OS integration        | █ |   | █ |   |   |   |   |   |   |   |   |   |   |
 | ┗ transcode to lossy    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| video player            | █ |   |   | █ | █ |   |   |   | █ | █ |   |   | █ |
-| ┗ video transcoding     |   |   |   |   |   |   |   |   | █ |   |   |   |   |
+| video player            | █ |   | █ | █ | █ |   |   |   | █ | █ |   |   | █ |
+| ┗ video transcoding     |   |   | / |   |   |   |   |   | █ |   |   |   |   |
 | audio BPM detector      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | audio key detector      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | search by path / name   | █ | █ | █ | █ | █ |   | █ |   | █ | █ | ╱ |   |   |
@@ -366,15 +367,15 @@ symbol legend,
 | undo recent uploads     | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | create directories      | █ |   | █ | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
 | image viewer            | █ |   | █ | █ | █ |   |   |   | █ | █ | █ |   | █ |
-| markdown viewer         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
+| markdown viewer         | █ |   | / |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
 | markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
-| readme.md in listing    | █ |   |   | █ |   |   |   |   |   |   |   |   |   |
+| readme.md in listing    | █ |   | / | █ |   |   |   |   |   |   |   |   |   |
 | rename files            | █ | █ | █ | █ | █ | ╱ | █ |   | █ | █ | █ | █ | █ |
 | batch rename            | █ |   |   |   |   |   |   |   | █ |   |   |   |   |
-| cut / paste files       | █ | █ |   | █ | █ |   |   |   | █ |   |   |   | █ |
+| cut / paste files       | █ | █ | █ | █ | █ |   |   |   | █ |   |   |   | █ |
 | move files              | █ | █ | █ | █ | █ |   | █ |   | █ | █ | █ |   | █ |
 | delete files            | █ | █ | █ | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
-| copy files              |   |   |   |   | █ |   |   |   | █ | █ | █ |   | █ |
+| copy files              |   |   | / |   | █ |   |   |   | █ | █ | █ |   | █ |
 
 * `single-page app` = multitasking; possible to continue navigating while uploading
 * `audio player » os-integration` = use the [lockscreen](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) or [media hotkeys](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) to play/pause, prev/next song
@@ -383,8 +384,6 @@ symbol legend,
 * `undo recent uploads` = accounts without delete permissions have a time window where they can undo their own uploads
 * `a`/copyparty has teeny-tiny skips playing gapless albums depending on audio codec (opus best)
 * `b`/hfs2 has a very basic directory tree view, not showing sibling folders
-* `c`/hfs3 remarks:
-  * audio playback does not continue into next song
 * `f`/rclone can do some file management (mkdir, rename, delete) when hosting througn webdav
 * `j`/filebrowser remarks:
   * audio playback does not continue into next song
@@ -471,10 +470,8 @@ symbol legend,
 * vfs with gui config, per-volume permissions
 * tested locally, v0.53.2 on archlinux
 * 🔵 uploads are resumable
-* ⚠️ uploads are not segmented; max upload size 100 MiB on cloudflare
 * ⚠️ uploads are not accelerated (copyparty is 3x faster across the atlantic)
 * ⚠️ uploads are not integrity-checked
-* ⚠️ copies the file after upload; need twice filesize free disk space
 * ⚠️ uploading small files is decent; `107` files per sec (copyparty does `670`/sec, 6x faster)
 * ⚠️ doesn't support crazy filenames
 * ✅ config GUI
