@@ -2390,7 +2390,7 @@ in
   imports = [ "${copyparty}/contrib/nixos/modules/copyparty.nix" ];
 
   # add the copyparty overlay to expose the package to the module
-  nixpkgs.overlays = [ "${copyparty}/contrib/package/nix/overlay.nix" ];
+  nixpkgs.overlays = [ (import "${copyparty}/contrib/package/nix/overlay.nix") ];
   # (optional) install the package globally
   environment.systemPackages = [ pkgs.copyparty ];
   # configure the copyparty module
