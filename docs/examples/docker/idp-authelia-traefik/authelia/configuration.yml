@@ -2,7 +2,7 @@
 
 identity_validation:
   reset_password:
-    jwt_secret: 'a_very_important_secret'
+    jwt_secret: 'a_very_important_secret_so_please_change_this'
 
 server:
   address: 'tcp://:9091'
@@ -29,7 +29,7 @@ session:
   secret: unsecure_session_secret
   cookies:
     - name: authelia_session
-      domain: example.com  # Root protected domain
+      domain: example.com  # this should match whatever your root protected domain is
       default_redirection_url: https://fs.example.com
       authelia_url: https://authelia.example.com/
       expiration: 3600  # 1 hour
