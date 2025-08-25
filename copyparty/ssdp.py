@@ -5,7 +5,6 @@ import errno
 import re
 import select
 import socket
-import time
 
 from .__init__ import TYPE_CHECKING
 from .multicast import MC_Sck, MCast

@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals
 
 import argparse
-import traceback
 
 from queue import Queue
 

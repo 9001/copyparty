@@ -1949,7 +1949,7 @@ class Up2k(object):
                 try:
                     stl = bos.lstat(abspath)
                     st = bos.stat(abspath) if stat.S_ISLNK(stl.st_mode) else stl
-                except Exception as ex:
+                except Exception:
                     self.log("missing file: %r" % (abspath,), 3)
                     f404.append((drd, dfn, w))
                     continue
@@ -3058,7 +3058,7 @@ class Up2k(object):
                             )
                             self.log(t)
                             raise Exception()
-                    except Exception as ex:
+                    except Exception:
                         if n4g:
                             st = NULLSTAT
                         else:

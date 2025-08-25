@@ -5,7 +5,7 @@ import ctypes
 from ctypes import wintypes
 
 if True:  # pylint: disable=using-constant-test
-    from typing import Iterable, List
+    from typing import Iterable
 
 from . import _shared as shared
 

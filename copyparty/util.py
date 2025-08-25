@@ -1836,7 +1836,7 @@ class MultipartParser(object):
                 # look for boundary near the end of the buffer
                 n = 0
                 for n in range(1, len(buf) + 1):
-                    if not buf[-n:] in self.boundary:
+                    if buf[-n:] not in self.boundary:
                         n -= 1
                         break
 
@@ -3314,7 +3314,7 @@ def guess_mime(
                 if ret.startswith("text/htm"):
                     # avoid serving up HTML content unless there was actually a .html extension
                     ret = "text/plain"
-        except Exception as ex:
+        except Exception:
             pass
 
     if not ret:

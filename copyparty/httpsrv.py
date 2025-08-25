@@ -405,7 +405,7 @@ class HttpSrv(object):
                 self.log(self.name, "accept({}): {}".format(fno, ex), c=6)
                 time.sleep(0.02)
                 continue
-            except TypeError as ex:
+            except TypeError:
                 # on macOS, accept() may return a None saddr if blocked by LittleSnitch;
                 # unicode(saddr[0]) ==> TypeError: 'NoneType' object is not subscriptable
                 if tcp and not saddr:

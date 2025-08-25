@@ -10,7 +10,7 @@ import subprocess as sp
 import sys
 import tempfile
 
-from .__init__ import ANYWIN, EXE, PY2, WINDOWS, E, unicode
+from .__init__ import ANYWIN, EXE, PY2, WINDOWS, unicode
 from .authsrv import VFS
 from .bos import bos
 from .util import (
