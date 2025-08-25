@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from fontTools.ttLib import TTFont, newTable
+from fontTools.ttLib import TTFont
 
 
 def main():

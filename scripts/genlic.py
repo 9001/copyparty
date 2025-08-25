@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-import re, os, sys, codecs
+import re
+import os
+import sys
+import codecs
 
 outfile = os.path.realpath(sys.argv[1])
 

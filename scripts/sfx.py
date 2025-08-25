@@ -1,7 +1,17 @@
 #!/usr/bin/env python3
 # coding: latin-1
 from __future__ import print_function, unicode_literals
-import re, os, sys, time, shutil, signal, tarfile, hashlib, platform, tempfile, traceback
+import re
+import os
+import sys
+import time
+import shutil
+import signal
+import tarfile
+import hashlib
+import platform
+import tempfile
+import traceback
 import subprocess as sp
 
 

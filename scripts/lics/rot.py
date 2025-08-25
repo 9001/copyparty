@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-import os, codecs
+import os
+import codecs
 
 for fn in os.listdir("."):
     if not fn.endswith(".txt"):
