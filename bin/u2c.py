@@ -1648,7 +1648,8 @@ source file/folder selection uses rsync syntax, meaning that:
 
     if "https://" in ar.url.lower():
         try:
-            pass
+            import ssl
+            import zipfile
         except:
             t = "ERROR: https is not available for some reason; please use http"
             print("\n\n   %s\n\n" % (t,))
