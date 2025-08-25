@@ -5,7 +5,7 @@ set -e
 #
 # assumption: these directories, and everything within, are owned by root
 sysdirs=(); for v in /bin /lib /lib32 /lib64 /sbin /usr /etc/alternatives ; do
-	[ -e $v ] && sysdirs+=($v)
+	[ -e "$v" ] && sysdirs+=("$v")
 done
 
 # error-handler
@@ -68,13 +68,13 @@ cpp="$1"; shift
 }
 trap - EXIT
 
-usr="$(getent passwd $uid | cut -d: -f1)"
+usr="$(getent passwd "$uid" | cut -d: -f1)"
 [ "$usr" ] || { echo "ERROR invalid username/uid $uid"; exit 1; }
-uid="$(getent passwd $uid | cut -d: -f3)"
+uid="$(getent passwd "$uid" | cut -d: -f3)"
 
-grp="$(getent group $gid | cut -d: -f1)"
+grp="$(getent group "$gid" | cut -d: -f1)"
 [ "$grp" ] || { echo "ERROR invalid groupname/gid $gid"; exit 1; }
-gid="$(getent group $gid | cut -d: -f3)"
+gid="$(getent group "$gid" | cut -d: -f3)"
 
 # debug/vis
 echo
@@ -106,8 +106,8 @@ while IFS= read -r v; do
 	}
 	i1=$(stat -c%D.%i "$v/"      2>/dev/null || echo a)
 	i2=$(stat -c%D.%i "$jail$v/" 2>/dev/null || echo b)
-	[ $i1 = $i2 ] && continue
-	mount | grep -qF " $jail$v " && echo wtf $i1 $i2 $v && continue
+	[ "$i1" = "$i2" ] && continue
+	mount | grep -qF " $jail$v " && echo wtf "$i1" "$i2" "$v" && continue
 	mkdir -p "$jail$v"
 	mount --bind "$v" "$jail$v"
 done
@@ -130,7 +130,7 @@ cln() {
 		done
 	}
 	rmdir "$jail/.prisonlock" || true
-	exit $rv
+	exit "$rv"
 }
 trap cln EXIT
 
@@ -141,7 +141,7 @@ chmod 777 "$jail/tmp"
 
 
 # create a dev
-(cd $jail; mkdir -p dev; cd dev
+(cd "$jail"; mkdir -p dev; cd dev
 [ -e null ]    || mknod -m 666 null    c 1 3
 [ -e zero ]    || mknod -m 666 zero    c 1 5
 [ -e random ]  || mknod -m 444 random  c 1 8
@@ -150,13 +150,14 @@ chmod 777 "$jail/tmp"
 
 
 # run copyparty
-export HOME="$(getent passwd $uid | cut -d: -f6)"
+HOME="$(getent passwd $uid | cut -d: -f6)"
+export HOME
 export USER="$usr"
 export LOGNAME="$USER"
 #echo "pybin [$pybin]"
 #echo "pyarg [$pyarg]"
 #echo "cpp [$cpp]"
-chroot --userspec=$uid:$gid "$jail" "$pybin" $pyarg "$cpp" "$@" &
+chroot --userspec="$uid:$gid" "$jail" "$pybin" "$pyarg" "$cpp" "$@" &
 p=$!
 trap 'kill -USR1 $p' USR1
 trap 'trap - INT TERM; kill $p' INT TERM

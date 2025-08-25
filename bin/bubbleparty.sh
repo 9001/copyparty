@@ -1,5 +1,5 @@
 #!/bin/sh
-# usage: ./bubbleparty.sh ./copyparty-sfx.py ....
+# usage: ./bubbleparty.sh ./copyparty-sfx.py ...
 bwrap \
   --unshare-all \
   --ro-bind /usr /usr \
@@ -9,11 +9,11 @@ bwrap \
   --dev-bind /dev /dev \
   --dir /tmp \
   --dir /var \
-  --bind $(pwd) $(pwd) \
+  --bind "$(pwd)" "$(pwd)" \
   --share-net \
   --die-with-parent \
   --file 11 /etc/passwd \
   --file 12 /etc/group \
   "$@" \
-  11< <(getent passwd $(id -u) 65534) \
-  12< <(getent group $(id -g) 65534) 
+  11< <(getent passwd "$(id -u)" 65534) \
+  12< <(getent group "$(id -g)" 65534)

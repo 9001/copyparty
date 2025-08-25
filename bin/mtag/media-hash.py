@@ -3,7 +3,6 @@
 import re
 import sys
 import json
-import time
 import base64
 import hashlib
 import subprocess as sp

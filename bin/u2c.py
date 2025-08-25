@@ -199,9 +199,7 @@ class HCli(object):
         if ctype:
             hdrs["Content-Type"] = ctype
         if meth == "POST" and CLEN not in hdrs:
-            hdrs[CLEN] = (
-                0 if not body else body.len if hasattr(body, "len") else len(body)
-            )
+            hdrs[CLEN] = 0 if not body else body.len if hasattr(body, "len") else len(body)
 
         # large timeout for handshakes (safededup)
         conns = self.hconns if ctype == MJ else self.conns
@@ -910,11 +908,7 @@ def upload(fsl, stats, maxsz):
             sc, txt = web.req("POST", fsl.file.url, headers, fsl, MO)
 
             if sc == 400:
-                if (
-                    "already being written" in txt
-                    or "already got that" in txt
-                    or "only sibling chunks" in txt
-                ):
+                if "already being written" in txt or "already got that" in txt or "only sibling chunks" in txt:
                     fsl.file.nojoin = 1
 
             if sc >= 400:
@@ -1223,9 +1217,7 @@ class Ctl(object):
                             while req:
                                 print("DELETING ~%s#%s" % (srd, len(req)))
                                 body = json.dumps(req).encode("utf-8")
-                                sc, txt = web.req(
-                                    "POST", self.ar.url + "?delete", {}, body, MJ
-                                )
+                                sc, txt = web.req("POST", self.ar.url + "?delete", {}, body, MJ)
                                 if sc == 413 and "json 2big" in txt:
                                     print(" (delete request too big; slicing...)")
                                     req = req[: len(req) // 2]
@@ -1251,17 +1243,10 @@ class Ctl(object):
                 with self.mutex:
                     if (
                         self.hash_f - self.up_f == 1
-                        or (
-                            self.hash_b - self.up_b < 1024 * 1024 * 1024
-                            and self.hash_c - self.up_c < 512
-                        )
+                        or (self.hash_b - self.up_b < 1024 * 1024 * 1024 and self.hash_c - self.up_c < 512)
                     ) and (
                         not self.ar.nh
-                        or (
-                            self.q_upload.empty()
-                            and self.q_handshake.empty()
-                            and not self.uploader_busy
-                        )
+                        or (self.q_upload.empty() and self.q_handshake.empty() and not self.uploader_busy)
                     ):
                         break
 
@@ -1280,10 +1265,7 @@ class Ctl(object):
             if self.ar.wlist:
                 vp = file.rel.decode("utf-8")
                 if self.ar.chs:
-                    zsl = [
-                        "%s %d %d" % (zsii[0], n, zsii[1])
-                        for n, zsii in enumerate(file.cids)
-                    ]
+                    zsl = ["%s %d %d" % (zsii[0], n, zsii[1]) for n, zsii in enumerate(file.cids)]
                     print("chs: %s\n%s" % (vp, "\n".join(zsl)))
                 zsl = [self.ar.wsalt, str(file.size)] + [x[0] for x in file.cids]
                 zb = hashlib.sha512("\n".join(zsl).encode("utf-8")).digest()[:33]
@@ -1650,8 +1632,7 @@ source file/folder selection uses rsync syntax, meaning that:
             raise Exception("--safe is incompatible with " + str(errs))
 
     ar.files = [
-        os.path.abspath(os.path.realpath(x.encode("utf-8")))
-        + (x[-1:] if x[-1:] in ("\\", "/") else "").encode("utf-8")
+        os.path.abspath(os.path.realpath(x.encode("utf-8"))) + (x[-1:] if x[-1:] in ("\\", "/") else "").encode("utf-8")
         for x in ar.files
     ]
 
@@ -1667,8 +1648,7 @@ source file/folder selection uses rsync syntax, meaning that:
 
     if "https://" in ar.url.lower():
         try:
-            import ssl
-            import zipfile
+            pass
         except:
             t = "ERROR: https is not available for some reason; please use http"
             print("\n\n   %s\n\n" % (t,))

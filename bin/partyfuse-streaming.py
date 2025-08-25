@@ -80,9 +80,7 @@ def print(*args, **kwargs):
 
 def termsafe(txt):
     try:
-        return txt.encode(sys.stdout.encoding, "backslashreplace").decode(
-            sys.stdout.encoding
-        )
+        return txt.encode(sys.stdout.encoding, "backslashreplace").decode(sys.stdout.encoding)
     except:
         return txt.encode(sys.stdout.encoding, "replace").decode(sys.stdout.encoding)
 
@@ -361,9 +359,7 @@ class Gateway(object):
         except:
             tid = threading.current_thread().ident
             dbg(
-                "\033[1;37;44mbad conn {:x}\n  {} {}\n  {}\033[0m".format(
-                    tid, meth, path, c.rx_path if c else "(null)"
-                )
+                "\033[1;37;44mbad conn {:x}\n  {} {}\n  {}\033[0m".format(tid, meth, path, c.rx_path if c else "(null)")
             )
 
         self.closeconn(c)
@@ -390,11 +386,7 @@ class Gateway(object):
         c = self.sendreq("GET", web_path, {})
         if c.rx.status != 200:
             self.closeconn(c)
-            log(
-                "http error {} reading dir {} in {}".format(
-                    c.rx.status, web_path, rice_tid()
-                )
-            )
+            log("http error {} reading dir {} in {}".format(c.rx.status, web_path, rice_tid()))
             raise FuseOSError(errno.ENOENT)
 
         if not c.rx.getheader("Content-Type", "").startswith("text/html"):
@@ -435,19 +427,13 @@ class Gateway(object):
 
         web_path = self.quotep("/" + "/".join([self.web_root, path])) + "?raw"
         hdr_range = "bytes={}-".format(ofs1)
-        info(
-            "DL {:4.0f}K\033[36m{:>9}-{:<9}\033[0m{}".format(
-                (ofs2 - ofs1) / 1024.0, ofs1, ofs2 - 1, hexler(path)
-            )
-        )
+        info("DL {:4.0f}K\033[36m{:>9}-{:<9}\033[0m{}".format((ofs2 - ofs1) / 1024.0, ofs1, ofs2 - 1, hexler(path)))
 
         c = self.sendreq("GET", web_path, {"Range": hdr_range})
         if c.rx.status != http.client.PARTIAL_CONTENT:
             self.closeconn(c)
             raise Exception(
-                "http error {} reading file {} range {} in {}".format(
-                    c.rx.status, web_path, hdr_range, rice_tid()
-                )
+                "http error {} reading file {} range {} in {}".format(c.rx.status, web_path, hdr_range, rice_tid())
             )
 
         ret = c.rx.read(ofs2 - ofs1)
@@ -644,9 +630,7 @@ class CPPF(Operations):
 
                 if get1 >= cache1 and get2 <= cache2:
                     # keep cache entry alive by moving it to the end
-                    self.filecache = (
-                        self.filecache[:ncn] + self.filecache[ncn + 1 :] + [cn]
-                    )
+                    self.filecache = self.filecache[:ncn] + self.filecache[ncn + 1 :] + [cn]
                     buf_ofs = get1 - cache1
                     buf_end = buf_ofs + (get2 - get1)
                     dbg(
@@ -729,32 +713,20 @@ class CPPF(Operations):
 
             buf_ofs = get1 - h_ofs
 
-            dbg(
-                "<cache> cdr {}, car {}:{} |{}| [{}:]".format(
-                    len(cdr), h_ofs, h_end, h_end - h_ofs, buf_ofs
-                )
-            )
+            dbg("<cache> cdr {}, car {}:{} |{}| [{}:]".format(len(cdr), h_ofs, h_end, h_end - h_ofs, buf_ofs))
 
             buf, c = self.gw.download_file_range(path, h_ofs, h_end)
             if len(buf) == h_end - h_ofs:
                 ret = buf[buf_ofs:] + cdr
             else:
                 ret = buf[get1 - h_ofs :]
-                info(
-                    "remote truncated {}:{} to |{}|, will return |{}|".format(
-                        h_ofs, h_end, len(buf), len(ret)
-                    )
-                )
+                info("remote truncated {}:{} to |{}|, will return |{}|".format(h_ofs, h_end, len(buf), len(ret)))
 
         elif car:
             h_ofs = get1 + len(car)
             buf_ofs = (get2 - get1) - len(car)
 
-            dbg(
-                "<cache> car {}, cdr {}:{} |{}| [:{}]".format(
-                    len(car), h_ofs, get2, get2 - h_ofs, buf_ofs
-                )
-            )
+            dbg("<cache> car {}, cdr {}:{} |{}| [:{}]".format(len(car), h_ofs, get2, get2 - h_ofs, buf_ofs))
 
             buf, c = self.gw.download_file_range(path, h_ofs, get2)
             ret = car + buf[:buf_ofs]
@@ -771,11 +743,7 @@ class CPPF(Operations):
             buf_ofs = get1 - h_ofs
             buf_end = buf_ofs + get2 - get1
 
-            dbg(
-                "<cache> {}:{} |{}| [{}:{}]".format(
-                    h_ofs, get2, get2 - h_ofs, buf_ofs, buf_end
-                )
-            )
+            dbg("<cache> {}:{} |{}| [{}:{}]".format(h_ofs, get2, get2 - h_ofs, buf_ofs, buf_end))
 
             buf, c = self.gw.download_file_range(path, h_ofs, get2)
             ret = buf[buf_ofs:buf_end]
@@ -783,7 +751,10 @@ class CPPF(Operations):
         if c and c.cnode and len(c.cnode.data) + len(buf) < 1024 * 1024:
             dbg(
                 "cache: {}(@{}) + {}(@{})".format(
-                    len(c.cnode.data), c.cnode.tag[1], len(buf), buf_ofs, get1
+                    len(c.cnode.data),
+                    c.cnode.tag[1],
+                    len(buf),
+                    buf_ofs,
                 )
             )
             c.cnode.data += buf
@@ -828,11 +799,7 @@ class CPPF(Operations):
         path = path.strip("/")
         ofs2 = offset + length
         file_sz = self.getattr(path)["st_size"]
-        log(
-            "read {} |{}| {}:{} max {}".format(
-                hexler(path), length, offset, ofs2, file_sz
-            )
-        )
+        log("read {} |{}| {}:{} max {}".format(hexler(path), length, offset, ofs2, file_sz))
         if ofs2 > file_sz:
             ofs2 = file_sz
             log("truncate to |{}| :{}".format(ofs2 - offset, ofs2))
@@ -1005,9 +972,7 @@ class CPPF(Operations):
                 raise FuseOSError(errno.ENOENT)
 
 
-class TheArgparseFormatter(
-    argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter
-):
+class TheArgparseFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
     pass
 
 
@@ -1039,12 +1004,8 @@ def main():
         formatter_class=TheArgparseFormatter,
         epilog="example:" + ex_pre + ex_pre.join(examples),
     )
-    ap.add_argument(
-        "-cd", metavar="NUM_SECONDS", type=float, default=nd, help="directory cache"
-    )
-    ap.add_argument(
-        "-cf", metavar="NUM_BLOCKS", type=int, default=nf, help="file cache"
-    )
+    ap.add_argument("-cd", metavar="NUM_SECONDS", type=float, default=nd, help="directory cache")
+    ap.add_argument("-cf", metavar="NUM_BLOCKS", type=int, default=nf, help="file cache")
     ap.add_argument("-a", metavar="PASSWORD", help="password")
     ap.add_argument("-d", action="store_true", help="enable debug")
     ap.add_argument("-te", metavar="PEM_FILE", help="certificate to expect/verify")

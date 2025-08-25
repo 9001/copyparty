@@ -79,7 +79,6 @@ def compare(n1, d1, n2, d2, verbose):
     miss = {}
     nmiss = 0
     for w1s, k, v in d1.execute("select * from mt"):
-
         n += 1
         if n % 100_000 == 0:
             m = f"\033[36mchecked {n:,} of {nt:,} tags in {n1} against {n2}, so far {nmiss} missing tags\033[0m"
@@ -102,9 +101,7 @@ def compare(n1, d1, n2, d2, verbose):
 
         v2 = None
         if w2:
-            v2 = d2.execute(
-                "select v from mt where w = ? and +k = ?", (w2[:16], k)
-            ).fetchone()
+            v2 = d2.execute("select v from mt where w = ? and +k = ?", (w2[:16], k)).fetchone()
             if v2:
                 v2 = v2[0]
 

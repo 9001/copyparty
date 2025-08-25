@@ -7,7 +7,6 @@ __copyright__ = 2020
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
-import re
 import os
 import sys
 import time
@@ -20,7 +19,6 @@ import platform
 import threading
 import http.client  # py2: httplib
 import urllib.parse
-from datetime import datetime
 from urllib.parse import quote_from_bytes as quote
 from urllib.parse import unquote_to_bytes as unquote
 
@@ -103,12 +101,7 @@ def get_tid():
 
 
 def html_dec(txt):
-    return (
-        txt.replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace("&quot;", '"')
-        .replace("&amp;", "&")
-    )
+    return txt.replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", '"').replace("&amp;", "&")
 
 
 def register_wtf8():
@@ -238,11 +231,7 @@ class Gateway(object):
         r = self.sendreq("GET", web_path)
         if r.status != 200:
             self.closeconn()
-            raise Exception(
-                "http error {} reading dir {} in {}".format(
-                    r.status, web_path, rice_tid()
-                )
-            )
+            raise Exception("http error {} reading dir {} in {}".format(r.status, web_path, rice_tid()))
 
         return self.parse_jls(r)
 
@@ -258,9 +247,7 @@ class Gateway(object):
         if r.status != http.client.PARTIAL_CONTENT:
             self.closeconn()
             raise Exception(
-                "http error {} reading file {} range {} in {}".format(
-                    r.status, web_path, hdr_range, rice_tid()
-                )
+                "http error {} reading file {} range {} in {}".format(r.status, web_path, hdr_range, rice_tid())
             )
 
         return r.read()
@@ -395,9 +382,7 @@ class CPPF(Fuse):
 
                 if get1 >= cache1 and get2 <= cache2:
                     # keep cache entry alive by moving it to the end
-                    self.filecache = (
-                        self.filecache[:ncn] + self.filecache[ncn + 1 :] + [cn]
-                    )
+                    self.filecache = self.filecache[:ncn] + self.filecache[ncn + 1 :] + [cn]
                     buf_ofs = get1 - cache1
                     buf_end = buf_ofs + (get2 - get1)
                     dbg(
@@ -471,11 +456,7 @@ class CPPF(Fuse):
 
             buf_ofs = (get2 - get1) - len(cdr)
 
-            dbg(
-                "<cache> cdr {}, car {}-{}={} [-{}:]".format(
-                    len(cdr), h_ofs, h_end, h_end - h_ofs, buf_ofs
-                )
-            )
+            dbg("<cache> cdr {}, car {}-{}={} [-{}:]".format(len(cdr), h_ofs, h_end, h_end - h_ofs, buf_ofs))
 
             buf = self.gw.download_file_range(path, h_ofs, h_end)
             ret = buf[-buf_ofs:] + cdr
@@ -489,11 +470,7 @@ class CPPF(Fuse):
 
             buf_ofs = (get2 - get1) - len(car)
 
-            dbg(
-                "<cache> car {}, cdr {}-{}={} [:{}]".format(
-                    len(car), h_ofs, h_end, h_end - h_ofs, buf_ofs
-                )
-            )
+            dbg("<cache> car {}, cdr {}-{}={} [:{}]".format(len(car), h_ofs, h_end, h_end - h_ofs, buf_ofs))
 
             buf = self.gw.download_file_range(path, h_ofs, h_end)
             ret = car + buf[:buf_ofs]
@@ -511,11 +488,7 @@ class CPPF(Fuse):
             buf_ofs = get1 - h_ofs
             buf_end = buf_ofs + get2 - get1
 
-            dbg(
-                "<cache> {}-{}={} [{}:{}]".format(
-                    h_ofs, h_end, h_end - h_ofs, buf_ofs, buf_end
-                )
-            )
+            dbg("<cache> {}-{}={} [{}:{}]".format(h_ofs, h_end, h_end - h_ofs, buf_ofs, buf_end))
 
             buf = self.gw.download_file_range(path, h_ofs, h_end)
             ret = buf[buf_ofs:buf_end]
@@ -648,9 +621,7 @@ def main():
         print("  need argument: -o url=<...>")
         print("  need argument: mount-path")
         print("example:")
-        print(
-            "  ./partyfuse2.py -f -o allow_other,auto_unmount,nonempty,pw=wark,url=http://192.168.1.69:3923 /mnt/nas"
-        )
+        print("  ./partyfuse2.py -f -o allow_other,auto_unmount,nonempty,pw=wark,url=http://192.168.1.69:3923 /mnt/nas")
         sys.exit(1)
 
     server.init2()

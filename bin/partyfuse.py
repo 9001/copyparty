@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 """partyfuse: remote copyparty as a local filesystem"""
+
 __author__ = "ed <copyparty@ocv.me>"
 __copyright__ = 2019
 __license__ = "MIT"
@@ -315,7 +316,7 @@ class Gateway(object):
             self.parse_html = self.parse_iis
             self.fsuf = ""
             self.dsuf = ""
-            self.re_2nl = re.compile(br"<br>|</pre>")
+            self.re_2nl = re.compile(rb"<br>|</pre>")
             self.re_row = re.compile(
                 r'^ *([0-9]{1,2})/([0-9]{1,2})/([0-9]{4}) {1,2}([0-9]{1,2}:[0-9]{2}) ([AP]M) +(&lt;dir&gt;|[0-9]+) <A HREF="([^"]+)">([^<>]+)</A>$'
             )
@@ -744,9 +745,7 @@ class CPPF(Operations):
 
                 if get1 >= cache1 and get2 <= cache2:
                     # keep cache entry alive by moving it to the end
-                    self.filecache = (
-                        self.filecache[:ncn] + self.filecache[ncn + 1 :] + [cn]
-                    )
+                    self.filecache = self.filecache[:ncn] + self.filecache[ncn + 1 :] + [cn]
                     buf_ofs = get1 - cache1
                     buf_end = buf_ofs + (get2 - get1)
                     dbg(
@@ -1106,9 +1105,7 @@ class CPPF(Operations):
                 raise FuseOSError(errno.ENOENT)
 
 
-class TheArgparseFormatter(
-    argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter
-):
+class TheArgparseFormatter(argparse.RawTextHelpFormatter, argparse.ArgumentDefaultsHelpFormatter):
     pass
 
 

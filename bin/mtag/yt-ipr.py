@@ -138,7 +138,7 @@ def freg_conv(pd):
     }
 
     if [x for x in vid_id if x not in string.ascii_letters + string.digits + "_-"]:
-        print(f"malicious json", file=sys.stderr)
+        print("malicious json", file=sys.stderr)
         return
 
     basepath = os.path.dirname(sys.argv[1])
