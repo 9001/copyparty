@@ -70,15 +70,18 @@
 }:
 
 let
-  pinData = lib.importJSON ./pin.json;
   runtimeDeps = ([ util-linux ] ++ extraPackages ++ lib.optional withMediaProcessing ffmpeg);
+  version = lib.pipe (lib.strings.readFile ../../../../copyparty/__version__.py) [
+    (lib.strings.splitString "\n")
+    (lib.lists.map (lib.strings.match  "VERSION *= *\\(([0-9]+), *([0-9]+), *([0-9])\\)"))
+    (lib.lists.findFirst (x: x != null) [ "0" "0" "0" ])
+    (l: "${lib.lists.elemAt l 0}.${lib.lists.elemAt l 1}.${lib.lists.elemAt l 2}")
+  ];
 in
 buildPythonApplication {
   pname = "copyparty";
-  inherit (pinData) version;
-  src = fetchurl {
-    inherit (pinData) url hash;
-  };
+  inherit version;
+  src = ../../../../.;
   dependencies =
     [
       jinja2
@@ -110,7 +113,7 @@ buildPythonApplication {
       FTP, TFTP, zeroconf, media indexer, thumbnails++ all in one file, no deps
     '';
     homepage = "https://github.com/9001/copyparty";
-    changelog = "https://github.com/9001/copyparty/releases/tag/v${pinData.version}";
+    changelog = "https://github.com/9001/copyparty/releases/tag/v${version}";
     license = lib.licenses.mit;
     mainProgram = "copyparty";
     sourceProvenance = [ lib.sourceTypes.fromSource ];
