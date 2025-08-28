@@ -4,7 +4,7 @@ FROM    DO_NOT_USE_THIS_DOCKER_IMAGE
 #FROM    fedora:39
 WORKDIR /z
 LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
-        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
+        org.opencontainers.image.source="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-djf" \
         org.opencontainers.image.description="copyparty with all optional dependencies, including musical key / bpm detection, and higher performance than the other editions"
