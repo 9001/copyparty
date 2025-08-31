@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # usage: ./bubbleparty.sh ./copyparty-sfx.py ....
 bwrap \
   --unshare-all \
