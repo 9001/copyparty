@@ -16630,7 +16630,7 @@ var ahotkeys = function (e) {
 	if (n !== 0)
 		return seek_au_rel(n) || true;
 
-	if (k == 'KeyY')
+	if (k == 'KeyY' || k == 'y')
 		return msel.getsel().length ? ebi('seldl').click() :
 			showfile.active() ? ebi('dldoc').click() :
 				dl_song();
@@ -16674,18 +16674,18 @@ var ahotkeys = function (e) {
 	}
 
 	if (mp && mp.au && !mp.au.paused) {
-		if (k == 'KeyS')
+		if (k == 'KeyS' || k == 's')
 			return sel_song();
 	}
 
 	if (thegrid.en) {
-		if (k == 'KeyS' || k == 's')
+		if (k == 'KeyS' || k == 's' || k == 'S')
 			return ebi('gridsel').click();
 
-		if (k == 'KeyA' || k == 'a')
+		if (k == 'KeyA' || k == 'a' || k == 'A')
 			return QSA('#ghead a[z]')[0].click();
 
-		if (k == 'KeyD' || k == 'd')
+		if (k == 'KeyD' || k == 'd' || k == 'D')
 			return QSA('#ghead a[z]')[1].click();
 	}
 };
