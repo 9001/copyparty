@@ -135,7 +135,7 @@ in
     globalExtraConfig = mkOption {
       type = types.str;
       default = "";
-      description = "Appened to the end of the [global] section verbatim. This is useful for flags which are used in a repeating manner (e.g. ipu: 255.255.255.1=user) which can't be repeated in the settings = {} attribute set.";
+      description = "Appended to the end of the [global] section verbatim. This is useful for flags which are used in a repeating manner (e.g. ipu: 255.255.255.1=user) which can't be repeated in the settings = {} attribute set.";
     };
 
     accounts = mkOption {
