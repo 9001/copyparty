@@ -3057,4 +3057,4 @@ for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
 specifically you may want to [build the sfx](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#just-the-sfx) or [build from scratch](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#build-from-scratch)
 
 see [./docs/TODO.md](./docs/TODO.md) for planned features / fixes / changes
-
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
