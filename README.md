@@ -1,43 +1,64 @@
 <img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>
 
-### 💾🎉 copyparty
+### 💾🎉 复刻派对
 
-turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser
+使用[*任何*](#浏览器支持)网页浏览器将几乎任何设备变成文件服务器，实现可暂停的上传/下载
 
-* server only needs Python (2 or 3), all dependencies optional
+* 服务器只需要 Python（2 或 3），所有依赖都是可选的
 * 🔌 protocols: [http](#the-browser) // [webdav](#webdav-server) // [ftp](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
 * 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
-👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
+👉 **[开始](#快速开始)!** 或者访问 **[只读演示服务器](https://a.ocv.me/pub/demo/)** 👀 在我地下室的 nuc 上运行
 
-📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
+📷 
+**screenshot:**
+[浏览器]
+(#the-browser)
+ // 
+[上传]
+(#uploading)
+ // 
+[取消发布]
+(#unpost)
+ // 
+[缩略图]
+(#thumbnails)
+ // 
+[搜索]
+(#searching)
+ // 
+[文件搜索]
+(#file-search)
+ // 
+[zip 下载]
 
-🎬 **videos:** [upload](https://a.ocv.me/pub/demo/pics-vids/up2k.webm) // [cli-upload](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm) // [race-the-beam](https://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm) // 👉 **[feature-showcase](https://a.ocv.me/pub/demo/showcase-hq.webm)** ([youtube](https://www.youtube.com/watch?v=15_-hgsX2V0))
 
-made in Norway 🇳🇴
+🎬 **视频：** [上传](https://a.ocv.me/pub/demo/pics-vids/up2k.webm) // [命令行上传](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm) // [速度赛](https://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm) // 👉 **[功能展示](https://a.ocv.me/pub/demo/showcase-hq.webm)** ([YouTube](https://www.youtube.com/watch?v=15_-hgsX2V0))
+
+挪威制造 🇳🇴
 
 
-## readme toc
+## 读取说明 目录
 
-* top
-    * [quickstart](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
-        * [at home](#at-home) - make it accessible over the internet
-        * [on servers](#on-servers) - you may also want these, especially on servers
-    * [features](#features) - also see [comparison to similar software](./docs/versus.md)
-    * [testimonials](#testimonials) - small collection of user feedback
-* [motivations](#motivations) - project goals / philosophy
-    * [notes](#notes) - general notes
-* [bugs](#bugs) - roughly sorted by chance of encounter
-    * [not my bugs](#not-my-bugs) - same order here too
-* [breaking changes](#breaking-changes) - upgrade notes
-* [FAQ](#FAQ) - "frequently" asked questions
-* [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
-    * [shadowing](#shadowing) - hiding specific subfolders
-    * [dotfiles](#dotfiles) - unix-style hidden files/folders
-* [the browser](#the-browser) - accessing a copyparty server using a web-browser
-    * [tabs](#tabs) - the main tabs in the ui
-    * [hotkeys](#hotkeys) - the browser has the following hotkeys
-    * [navpane](#navpane) - switching between breadcrumbs or navpane
+* 顶部
+    * [快速开始](#快速开始) - 只需运行 **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- 就这样！ 🎉
+        * [在家](#在家) - 使其可通过互联网访问
+        * [在服务器上](#在服务器上) - 你可能还需要这些，特别是在服务器上
+    * [功能](#功能) - 另请参见 [与类似软件的比较](./docs/versus.md)
+    * [用户评价](#用户评价) - 一组用户反馈
+* [动机](#动机) - 项目目标 / 理念
+    * [备注](#备注) - 一般备注
+* [错误](#错误) - 大致按遇到的几率排序
+    * [不是我的错误](#不是我的错误) - 这里的顺序也是一样的
+* [重大更改](#重大更改) - 升级说明
+* [常见问题](#常见问题) - 经常被问到的问题
+* [账户和卷](#账户和卷) - 每个文件夹、每个用户的权限
+    * [影子](#影子) - 隐藏特定子文件夹
+    * [点文件](#点文件) - unix风格的隐藏文件/文件夹
+* [浏览器](#浏览器) - 使用网页浏览器访问 copyparty 服务器
+    * [标签](#标签) - 用户界面中的主要标签
+    * [快捷键](#快捷键) - 浏览器有以下快捷键
+    * [导航面板](#导航面板) - 在面包屑导航和导航面板之间切换
     * [thumbnails](#thumbnails) - press `g` or `田` to toggle grid-view instead of the file listing
     * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
     * [uploading](#uploading) - drag files/folders into the web-browser to upload
@@ -60,9 +81,9 @@ made in Norway 🇳🇴
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
         * [markdown vars](#markdown-vars) - dynamic docs with serverside variable expansion
     * [other tricks](#other-tricks)
-    * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
-* [server config](#server-config) - using arguments or config files, or a mix of both
-    * [zeroconf](#zeroconf) - announce enabled services on the LAN ([pic](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png))
+    * [搜索](#搜索) - 按大小、日期、路径/名称、mp3标签搜索，...
+* [服务器配置](#服务器配置) - 使用参数或配置文件，或两者兼有
+    * [zeroconf](#zeroconf) - 在局域网（[pic](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png))
         * [mdns](#mdns) - LAN domain-name and feature announcer
         * [ssdp](#ssdp) - windows-explorer announcer
     * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
@@ -3049,7 +3070,7 @@ journalctl -aS '48 hour ago' -u copyparty | grep -C10 FILENAME | tee bug.log
 
 if there's a wall of base64 in the log (thread stacks) then please include that, especially if you run into something freezing up or getting stuck, for example `OperationalError('database is locked')` -- alternatively you can visit `/?stack` to see the stacks live, so http://127.0.0.1:3923/?stack for example
 
-
+[![Powered by DartNode](https://dartnode.com/branding/DN-Open-Source-sm.png)](https://dartnode.com "Powered by DartNode - Free VPS for Open Source")
 # devnotes
 
 for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
