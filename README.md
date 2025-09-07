@@ -8,7 +8,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * 🔌 protocols: [http](#the-browser) // [webdav](#webdav-server) // [ftp](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
 * 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
-👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
+👉 **[get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
 
 📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
@@ -17,137 +17,157 @@ turn almost any device into a file server with resumable uploads/downloads using
 made in Norway 🇳🇴
 
 
-## readme toc
+# readme table of contents
 
-* top
-    * [quickstart](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
-        * [at home](#at-home) - make it accessible over the internet
-        * [on servers](#on-servers) - you may also want these, especially on servers
-    * [features](#features) - also see [comparison to similar software](./docs/versus.md)
-    * [testimonials](#testimonials) - small collection of user feedback
-* [motivations](#motivations) - project goals / philosophy
-    * [notes](#notes) - general notes
-* [bugs](#bugs) - roughly sorted by chance of encounter
-    * [not my bugs](#not-my-bugs) - same order here too
-* [breaking changes](#breaking-changes) - upgrade notes
-* [FAQ](#FAQ) - "frequently" asked questions
-* [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
-    * [shadowing](#shadowing) - hiding specific subfolders
-    * [dotfiles](#dotfiles) - unix-style hidden files/folders
-* [the browser](#the-browser) - accessing a copyparty server using a web-browser
-    * [tabs](#tabs) - the main tabs in the ui
-    * [hotkeys](#hotkeys) - the browser has the following hotkeys
-    * [navpane](#navpane) - switching between breadcrumbs or navpane
-    * [thumbnails](#thumbnails) - press `g` or `田` to toggle grid-view instead of the file listing
-    * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
-    * [uploading](#uploading) - drag files/folders into the web-browser to upload
+### 1. TOP ([START HERE](#quickstart))
+   * [**quickstart**](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** — that's it! 🎉
+      * [at home](#at-home) - make it accessible over the internet
+      * [on servers](#on-servers) - you may also want these, especially on servers
+   * [features](#features) - also see [comparison to similar software](./docs/versus.md)
+   * [testimonials](#testimonials) - small collection of user feedback
+
+### 2. [MOTIVATIONS](#motivations) - project goals / philosophy
+   * [notes](#notes) - general notes
+
+### 3. [BUGS](#bugs) - roughly sorted by chance of encounter
+   * [not my bugs](#not-my-bugs) - same order here too
+
+### 4. [BREAKING CHANGES](#breaking-changes) - upgrade notes
+
+### 5. [FAQ](#faq) - "frequently" asked questions
+
+### 6. [ACCOUNTS & VOLUMES](#accounts-and-volumes) - per-folder, per-user permissions
+   * [shadowing](#shadowing) - hiding specific subfolders
+   * [dotfiles](#dotfiles) - unix-style hidden files/folders
+
+### 7. [THE BROWSER](#the-browser) - accessing a copyparty server using a web browser
+   * [tabs](#tabs) - the main tabs in the ui
+   * [hotkeys](#hotkeys) - the browser has the following hotkeys
+   * [navpane](#navpane) - switching between breadcrumbs or navpane
+   * [thumbnails](#thumbnails) - press `g` or `田` to toggle grid-view instead of the file listing
+   * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
+   * [uploading](#uploading) - drag files/folders into the web-browser to upload
         * [file-search](#file-search) - dropping files into the browser also lets you see if they exist on the server
         * [unpost](#unpost) - undo/delete accidental uploads
         * [self-destruct](#self-destruct) - uploads can be given a lifetime
         * [race the beam](#race-the-beam) - download files while they're still uploading ([demo video](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm))
         * [incoming files](#incoming-files) - the control-panel shows the ETA for all incoming files
-    * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
-    * [shares](#shares) - share a file or folder by creating a temporary link
-    * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
-    * [rss feeds](#rss-feeds) - monitor a folder with your RSS reader
-    * [recent uploads](#recent-uploads) - list all recent uploads
-    * [media player](#media-player) - plays almost every audio format there is
+   * [file manager](#file-manager) - cut/paste, rename, and delete files/folders (if you have permission)
+   * [shares](#shares) - share a file or folder by creating a temporary link
+   * [batch rename](#batch-rename) - select some files and press `F2` to bring up the rename UI
+   * [rss feeds](#rss-feeds) - monitor a folder with your RSS reader
+   * [recent uploads](#recent-uploads) - list all recent uploads
+   * [media player](#media-player) - plays almost every audio format there is
         * [playlists](#playlists) - create and play [m3u8](https://en.wikipedia.org/wiki/M3U) playlists
         * [creating a playlist](#creating-a-playlist) - with a standalone mediaplayer or copyparty
         * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
         * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
-    * [textfile viewer](#textfile-viewer) - with realtime streaming of logfiles and such ([demo](https://a.ocv.me/pub/demo/logtail/))
-    * [markdown viewer](#markdown-viewer) - and there are *two* editors
+   * [textfile viewer](#textfile-viewer) - with realtime streaming of logfiles and such ([demo](https://a.ocv.me/pub/demo/logtail/))
+   * [markdown viewer](#markdown-viewer) - and there are *two* editors
         * [markdown vars](#markdown-vars) - dynamic docs with serverside variable expansion
-    * [other tricks](#other-tricks)
-    * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
-* [server config](#server-config) - using arguments or config files, or a mix of both
+   * [other tricks](#other-tricks)
+   * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
+
+### 8. [SERVER CONFIG](#server-config) - using arguments or config files, or a mix of both
     * [zeroconf](#zeroconf) - announce enabled services on the LAN ([pic](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png))
         * [mdns](#mdns) - LAN domain-name and feature announcer
         * [ssdp](#ssdp) - windows-explorer announcer
-    * [qr-code](#qr-code) - print a qr-code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
-    * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
-    * [webdav server](#webdav-server) - with read-write support
+   * [qr-code](#qr-code) - print a qr code [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) for quick access
+   * [ftp server](#ftp-server) - an FTP server can be started using `--ftp 3921`
+   * [webdav server](#webdav-server) - with read-write support
         * [connecting to webdav from windows](#connecting-to-webdav-from-windows) - using the GUI
-    * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
-    * [smb server](#smb-server) - unsafe, slow, not recommended for wan
-    * [browser ux](#browser-ux) - tweaking the ui
-    * [opengraph](#opengraph) - discord and social-media embeds
-    * [file deduplication](#file-deduplication) - enable symlink-based upload deduplication
-    * [file indexing](#file-indexing) - enable music search, upload-undo, and better dedup
+   * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
+   * [smb server](#smb-server) - unsafe, slow, not recommended for wan
+   * [browser ux](#browser-ux) - tweaking the ui
+   * [opengraph](#opengraph) - discord and social-media embeds
+   * [file deduplication](#file-deduplication) - enable symlink-based upload deduplication
+   * [file indexing](#file-indexing) - enable music search, upload-undo, and better dedup
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
         * [periodic rescan](#periodic-rescan) - filesystem monitoring
-    * [upload rules](#upload-rules) - set upload rules using volflags
-    * [compress uploads](#compress-uploads) - files can be autocompressed on upload
-    * [chmod and chown](#chmod-and-chown) - per-volume filesystem-permissions and ownership
-    * [other flags](#other-flags)
-    * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
-    * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
-    * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
-    * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
+   * [upload rules](#upload-rules) - set upload rules using volflags
+   * [compress uploads](#compress-uploads) - files can be autocompressed on upload
+   * [`chmod` and `chown`](#chmod-and-chown) - per-volume filesystem-permissions and ownership
+   * [other flags](#other-flags)
+   * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
+   * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
+   * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
+   * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
         * [zeromq](#zeromq) - event-hooks can send zeromq messages
         * [upload events](#upload-events) - the older, more powerful approach ([examples](./bin/mtag/))
-    * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
-    * [ip auth](#ip-auth) - autologin based on IP range (CIDR)
+   * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
+   * [ip auth](#ip-auth) - autologin based on IP range (CIDR)
         * [restrict to ip](#restrict-to-ip) - limit a user to certain IP ranges (CIDR)
-    * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
+   * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
         * [generic header auth](#generic-header-auth) - other ways to auth by header
-    * [user-changeable passwords](#user-changeable-passwords) - if permitted, users can change their own passwords
-    * [using the cloud as storage](#using-the-cloud-as-storage) - connecting to an aws s3 bucket and similar
-    * [hiding from google](#hiding-from-google) - tell search engines you don't wanna be indexed
-    * [themes](#themes)
-    * [complete examples](#complete-examples)
-    * [listen on port 80 and 443](#listen-on-port-80-and-443) - become a *real* webserver
-    * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
+   * [user-changeable passwords](#user-changeable-passwords) - if permitted, users can change their own passwords
+   * [using the cloud as storage](#using-the-cloud-as-storage) - connecting to an aws s3 bucket and similar
+   * [hiding from google](#hiding-from-google) - tell search engines you don't wanna be indexed
+   * [themes](#themes)
+   * [complete examples](#complete-examples)
+   * [listen on port 80 and 443](#listen-on-port-80-and-443) - become a *real* webserver
+   * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
         * [real-ip](#real-ip) - teaching copyparty how to see client IPs
         * [reverse-proxy performance](#reverse-proxy-performance)
-    * [permanent cloudflare tunnel](#permanent-cloudflare-tunnel) - if you have a domain and want to get your copyparty online real quick
-    * [prometheus](#prometheus) - metrics/stats can be enabled
-    * [other extremely specific features](#other-extremely-specific-features) - you'll never find a use for these
+   * [permanent cloudflare tunnel](#permanent-cloudflare-tunnel) - if you have a domain and want to get your copyparty online real quick
+   * [prometheus](#prometheus) - metrics/stats can be enabled
+   * [other extremely specific features](#other-extremely-specific-features) - you'll never find a use for these
         * [custom mimetypes](#custom-mimetypes) - change the association of a file extension
-        * [GDPR compliance](#GDPR-compliance) - imagine using copyparty professionally...
+        * [GDPR compliance](#gdpr-compliance) - imagine using copyparty professionally...
         * [feature chickenbits](#feature-chickenbits) - buggy feature? rip it out
         * [feature beefybits](#feature-beefybits) - force-enable features with known issues on your OS/env
-* [packages](#packages) - the party might be closer than you think
-    * [arch package](#arch-package) - `pacman -S copyparty` (in [arch linux extra](https://archlinux.org/packages/extra/any/copyparty/))
-    * [fedora package](#fedora-package) - does not exist yet
-    * [homebrew formulae](#homebrew-formulae) - `brew install copyparty ffmpeg`
-    * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
-    * [nixos module](#nixos-module)
-* [browser support](#browser-support) - TLDR: yes
-* [client examples](#client-examples) - interact with copyparty using non-browser clients
-    * [folder sync](#folder-sync) - sync folders to/from copyparty
-    * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
-* [android app](#android-app) - upload to copyparty with one tap
-* [iOS shortcuts](#iOS-shortcuts) - there is no iPhone app, but
-* [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
-    * [client-side](#client-side) - when uploading files
-* [security](#security) - there is a [discord server](https://discord.gg/25J8CdTT6G)
-    * [gotchas](#gotchas) - behavior that might be unexpected
-    * [cors](#cors) - cross-site request config
-    * [filekeys](#filekeys) - prevent filename bruteforcing
+
+### 9. [PACKAGES](#packages) - the party might be closer than you think
+   * [arch package](#arch-package) - `pacman -S copyparty` (in [arch linux extra](https://archlinux.org/packages/extra/any/copyparty/))
+   * [fedora package](#fedora-package) - does not exist yet
+   * [homebrew formulae](#homebrew-formulae) - `brew install copyparty ffmpeg`
+   * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
+   * [nixos module](#nixos-module)
+
+### 10. [BROWSER SUPPORT](#browser-support) - TLDR: yes
+
+### 11. [CLIENT EXAMPLES](#client-examples) - interact with copyparty using non-browser clients
+   * [folder sync](#folder-sync) - sync folders to/from copyparty
+   * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
+
+### 12. [ANDROID APP](#android-app) - upload to copyparty with one tap
+* [ios shortcuts](#ios-shortcuts) - there is no iPhone app, but
+
+### 13. [PERFORMANCE](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
+   * [client-side](#client-side) - when uploading files
+
+### 14. [SECURITY](#security) - there is a [discord server](https://discord.gg/25J8CdTT6G)
+   * [gotchas](#gotchas) - behavior that might be unexpected
+   * [cors](#cors) - cross-site request config
+   * [filekeys](#filekeys) - prevent filename bruteforcing
         * [dirkeys](#dirkeys) - share specific folders in a volume
-    * [password hashing](#password-hashing) - you can hash passwords
-    * [https](#https) - both HTTP and HTTPS are accepted
-* [recovering from crashes](#recovering-from-crashes)
-    * [client crashes](#client-crashes)
+   * [password hashing](#password-hashing) - you can hash passwords
+   * [https](#https) - both HTTP and HTTPS are accepted
+
+### 15. [RECOVERING FROM CRASHES](#recovering-from-crashes)
+   * [client crashes](#client-crashes)
         * [firefox wsod](#firefox-wsod) - firefox 87 can crash during uploads
-* [HTTP API](#HTTP-API) - see [devnotes](./docs/devnotes.md#http-api)
+
+### 16. [HTTP API](#HTTP-API) - see [devnotes](./docs/devnotes.md#http-api)
 * [dependencies](#dependencies) - mandatory deps
-    * [optional dependencies](#optional-dependencies) - install these to enable bonus features
+   * [optional dependencies](#optional-dependencies) - install these to enable bonus features
         * [dependency chickenbits](#dependency-chickenbits) - prevent loading an optional dependency
-    * [optional gpl stuff](#optional-gpl-stuff)
-* [sfx](#sfx) - the self-contained "binary" (recommended!)
-    * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
-    * [zipapp](#zipapp) - another emergency alternative, [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz)
-* [install on android](#install-on-android)
-* [install on iOS](#install-on-iOS)
-* [reporting bugs](#reporting-bugs) - ideas for context to include, and where to submit them
-* [devnotes](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
+   * [optional gpl stuff](#optional-gpl-stuff)
+
+### 17. [SFX](#sfx) - the self-contained "binary" (recommended!)
+   * [copyparty.exe](#copypartyexe) - download [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) (win8+) or [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) (win7+)
+   * [zipapp](#zipapp) - another emergency alternative, [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz)
+
+### 18. [INSTALL ON ANDROID](#install-on-android)
+
+### 19. [INSTALL ON ios](#install-on-ios)
+
+### 20. [REPORTING BUGS](#reporting-bugs) - ideas for context to include, and where to submit them
+
+### 21. [DEV NOTES](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
 
 
-## quickstart
+# quickstart
 
 just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
 
@@ -157,7 +177,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
 * or install [on arch](#arch-package) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
 * or if you are on android, [install copyparty in termux](#install-on-android)
-* or maybe an iPhone or iPad? [install in a-Shell on iOS](#install-on-iOS)
+* or maybe an iPhone or iPad? [install in a-Shell on ios](#install-on-ios)
 * or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
 * or if you have [uv](https://docs.astral.sh/uv/) installed, run `uv tool run copyparty`
 * or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
@@ -244,7 +264,7 @@ also see [comparison to similar software](./docs/versus.md)
   * ☑ [upnp / zeroconf / mdns / ssdp](#zeroconf)
   * ☑ [event hooks](#event-hooks) / script runner
   * ☑ [reverse-proxy support](https://github.com/9001/copyparty#reverse-proxy)
-  * ☑ cross-platform (Windows, Linux, Macos, Android, iOS, FreeBSD, arm32/arm64, ppc64le, s390x, risc-v/riscv64)
+  * ☑ cross-platform (Windows, Linux, Macos, Android, ios, FreeBSD, arm32/arm64, ppc64le, s390x, risc-v/riscv64)
 * upload
   * ☑ basic: plain multipart, ie6 support
   * ☑ [up2k](#uploading): js, resumable, multithreaded
@@ -306,7 +326,7 @@ small collection of user feedback
 
 project goals / philosophy
 
-* inverse linux philosophy -- do all the things, and do an *okay* job
+* inverse linux philosophy — do all the things, and do an *okay* job
   * quick drop-in service to get a lot of features in a pinch
   * some of [the alternatives](./docs/versus.md) might be a better fit for you
 * run anywhere, support everything
@@ -330,7 +350,7 @@ general notes:
   * because no browsers currently implement the media-query to do this properly orz
 
 browser-specific:
-* iPhone/iPad: use Firefox to download files
+* iPhone / iPad: use Firefox to download files
 * Android-Chrome: increase "parallel uploads" for higher speed (android bug)
 * Android-Firefox: takes a while to select files (their fix for ☝️)
 * Desktop-Firefox: ~~may use gigabytes of RAM if your files are massive~~ *seems to be OK now*
@@ -388,7 +408,7 @@ same order here too
 * iPhones: music volume goes on a rollercoaster during song changes
   * nothing I can do about it because `AudioContext` is still broken in safari
 
-* iPhones: the preload feature (in the media-player-options tab) can cause a tiny audio glitch 20sec before the end of each song, but disabling it may cause worse iOS bugs to appear instead
+* iPhones: the preload feature (in the media-player-options tab) can cause a tiny audio glitch 20sec before the end of each song, but disabling it may cause worse ios bugs to appear instead
   * just a hunch, but disabling preloading may cause playback to stop entirely, or possibly mess with bluetooth speakers
   * tried to add a tooltip regarding this but looks like apple broke my tooltips
 
@@ -432,7 +452,7 @@ upgrade notes
 "frequently" asked questions
 
 * CopyParty?
-  * nope! the name is either copyparty (all-lowercase) or Copyparty -- it's [one word](https://en.wiktionary.org/wiki/copyparty) after all :>
+  * **nope**! the name is either copyparty (all-lowercase) or Copyparty -- it's [one word](https://en.wiktionary.org/wiki/copyparty) after all :>
 
 * can I change the 🌲 spinning pine-tree loading animation?
   * [yeah...](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice#boring-loader-spinner) :-(
@@ -1069,7 +1089,7 @@ plays almost every audio format there is  (if the server has FFmpeg installed fo
 the following audio formats are usually always playable, even without FFmpeg: `aac|flac|m4a|mp3|ogg|opus|wav`
 
 some highlights:
-* OS integration; control playback from your phone's lockscreen ([windows](https://user-images.githubusercontent.com/241032/233213022-298a98ba-721a-4cf1-a3d4-f62634bc53d5.png) // [iOS](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) // [android](https://user-images.githubusercontent.com/241032/233212311-a7368590-08c7-4f9f-a1af-48ccf3f36fad.png))
+* OS integration; control playback from your phone's lockscreen ([windows](https://user-images.githubusercontent.com/241032/233213022-298a98ba-721a-4cf1-a3d4-f62634bc53d5.png) // [ios](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) // [android](https://user-images.githubusercontent.com/241032/233212311-a7368590-08c7-4f9f-a1af-48ccf3f36fad.png))
 * shows the audio waveform in the seekbar
 * not perfectly gapless but can get really close (see settings + eq below); good enough to enjoy gapless albums as intended
 * videos can be played as audio, without wasting bandwidth on the video
@@ -1102,8 +1122,8 @@ open the `[🎺]` media-player-settings tab to configure it,
     * `aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|m4a|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|tak|tta|ulaw|wav|wma|wv|xm|xpk`
 * "transcode to":
   * `[opus]` produces an `opus` whenever transcoding is necessary (the best choice on Android and PCs)
-  * `[awo]` is `opus` in a `weba` file, good for iPhones (iOS 17.5 and newer) but Apple is still fixing some state-confusion bugs as of iOS 18.2.1
-  * `[caf]` is `opus` in a `caf` file, good for iPhones (iOS 11 through 17), technically unsupported by Apple but works for the most part
+  * `[awo]` is `opus` in a `weba` file, good for iPhones (ios 17.5 and newer) but Apple is still fixing some state-confusion bugs as of ios 18.2.1
+  * `[caf]` is `opus` in a `caf` file, good for iPhones (ios 11 through 17), technically unsupported by Apple but works for the most part
   * `[mp3]` -- the myth, the legend, the undying master of mediocre sound quality that definitely works everywhere
   * `[flac]` -- lossless but compressed, for LAN and/or fiber playback on electrostatic headphones
   * `[wav]` -- lossless and uncompressed, for LAN and/or fiber playback on electrostatic headphones connected to very old equipment
@@ -1147,7 +1167,7 @@ can also boost the volume in general, or increase/decrease stereo width (like [c
 
 has the convenient side-effect of reducing the pause between songs, so gapless albums play better with the eq enabled (just make it flat)
 
-not available on iPhones / iPads because AudioContext currently breaks background audio playback on iOS (15.7.8)
+not available on iPhones / iPads because AudioContext currently breaks background audio playback on ios (15.7.8)
 
 
 ### fix unreliable playback on android
@@ -2504,9 +2524,9 @@ TLDR: yes
 
 ![copyparty-ie4-fs8](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png)
 
-`ie` = internet-explorer, `ff` = firefox, `c` = chrome, `iOS` = iPhone/iPad, `Andr` = Android
+`ie` = internet-explorer, `ff` = firefox, `c` = chrome, `ios` = iPhone/iPad, `Andr` = Android
 
-| feature         | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
+| feature         | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | ios | Andr |
 | --------------- | --- | ---- | ---- | ---- | ----- | ---- | --- | ---- |
 | browse files    | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | thumbnail view  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
@@ -2527,13 +2547,13 @@ TLDR: yes
 | markdown viewer |  -  | `*2` | `*2` | `*2` |  yep  | yep  | yep | yep  |
 | play mp3/m4a    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | play ogg/opus   |  -  |  -   |  -   |  -   |  yep  | yep  | `*3` | yep |
-| **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
+| **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | ios | Andr |
 
 * internet explorer 6 through 8 behave the same
 * firefox 52 and chrome 49 are the final winxp versions
 * `*1` yes, but extremely slow (ie10: `1 MiB/s`, ie11: `270 KiB/s`)
 * `*2` only able to do plaintext documents (no markdown rendering)
-* `*3` iOS 11 and newer, opus only, and requires FFmpeg on the server
+* `*3` ios 11 and newer, opus only, and requires FFmpeg on the server
 
 quick summary of more eccentric web-browsers trying to view a directory index:
 
@@ -2666,7 +2686,7 @@ the app is **NOT** the full copyparty server! just a basic upload client, nothin
 if you want to run the copyparty server on your android device, see [install on android](#install-on-android)
 
 
-# iOS shortcuts
+# ios shortcuts
 
 there is no iPhone app, but  the following shortcuts are almost as good:
 
@@ -2675,7 +2695,7 @@ there is no iPhone app, but  the following shortcuts are almost as good:
   * can download links and rehost the target file on copyparty (see first comment inside the shortcut)
   * pics become lowres if you share from gallery to shortcut, so better to launch the shortcut and pick stuff from there
 
-if you want to run the copyparty server on your iPhone or iPad, see [install on iOS](#install-on-iOS)
+if you want to run the copyparty server on your iPhone or iPad, see [install on ios](#install-on-ios)
 
 
 # performance
@@ -3010,7 +3030,7 @@ if you want thumbnails (photos+videos) and you're okay with spending another 132
 * or if you want to use `vips` for photo-thumbs instead, `pkg install libvips && python -m pip install --user -U wheel && python -m pip install --user -U pyvips && (cd /data/data/com.termux/files/usr/lib/; ln -s libgobject-2.0.so{,.0}; ln -s libvips.so{,.42})`
 
 
-# install on iOS
+# install on ios
 
 first install one of the following:
 * [a-Shell mini](https://apps.apple.com/us/app/a-shell-mini/id1543537943) gives you the essential features
