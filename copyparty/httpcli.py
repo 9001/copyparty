@@ -4012,6 +4012,10 @@ class HttpCli(object):
             raise Pebkac(403, t)
         return ""
 
+    def _can_opds(self, volflags: dict[str, Any]) -> str:
+        # TODO: Permissions
+        return ""
+
     def tx_res(self, req_path: str) -> bool:
         status = 200
         logmsg = "{:4} {} ".format("", self.req)
@@ -6221,7 +6225,7 @@ class HttpCli(object):
 
         add_og = "og" in vn.flags
         if add_og:
-            if "th" in self.uparam or "raw" in self.uparam:
+            if "th" in self.uparam or "raw" in self.uparam or "opds1" in self.uparam:
                 add_og = False
             elif vn.flags["og_ua"]:
                 add_og = vn.flags["og_ua"].search(self.ua)
@@ -6432,8 +6436,16 @@ class HttpCli(object):
             is_ls = True
 
         tpl = "browser"
+        is_opds = False
         if "b" in self.uparam:
             tpl = "browser2"
+            is_js = False
+        elif "opds1" in self.uparam:
+            # Display directory listing as OPDS v1.2 catalog feed
+            # TODO: Permissions
+            # TODO: Server Config
+            is_opds = True
+            tpl = "opds1"
             is_js = False
 
         vf = vn.flags
@@ -6646,6 +6658,43 @@ class HttpCli(object):
             else:
                 href = quotep(href)
 
+            mime = None
+            if is_opds:
+                href += "&" if "?" in href else "?"
+                href += "opds1"
+                if not is_dir:
+                    if "rmagic" in self.vn.flags:
+                        mime = guess_mime(fn, fspath)
+                    else:
+                        mime = guess_mime(fn)
+                    # Make sure we can actually generate JPEG thumbnails
+                    if (
+                        self.args.th_no_jpg
+                        or not self.thumbcli
+                        or "dthumb" in dbv.flags
+                        or "dithumb" in dbv.flags
+                    ):
+                        jpeg_thumb_href = None
+                        jpeg_thumb_href_hires = None
+                    else:
+                        jpeg_thumb_href = href + "&th=jf"
+                        jpeg_thumb_href_hires = jpeg_thumb_href + "3"
+
+                iso8601 = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (
+                    zd.year,
+                    zd.month,
+                    zd.day,
+                    zd.hour,
+                    zd.minute,
+                    zd.second,
+                )
+
+            else:
+                mime = None
+                iso8601 = None
+                jpeg_thumb_href = None
+                jpeg_thumb_href_hires = None
+
             item = {
                 "lead": margin,
                 "href": href,
@@ -6653,7 +6702,11 @@ class HttpCli(object):
                 "sz": sz,
                 "ext": ext,
                 "dt": dt,
+                "iso8601": iso8601,
                 "ts": int(linf.st_mtime),
+                "mime": mime,
+                "jpeg_thumb_href": jpeg_thumb_href,
+                "jpeg_thumb_href_hires": jpeg_thumb_href_hires,
             }
             if is_dir:
                 dirs.append(item)
@@ -6842,6 +6895,9 @@ class HttpCli(object):
                 "taglist": taglist,
             }
             j2a["files"] = []
+        elif is_opds:
+            j2a["files"] = files
+            j2a["dirs"] = dirs
         else:
             j2a["files"] = dirs + files
 
@@ -6992,5 +7048,9 @@ class HttpCli(object):
                 self.html_head = zs.replace("\n\n", "\n")
 
         html = self.j2s(tpl, **j2a)
-        self.reply(html.encode("utf-8", "replace"))
+        if is_opds:
+            mime = "application/atom+xml;profile=opds-catalog"
+        else:
+            mime = None
+        self.reply(html.encode("utf-8", "replace"), mime=mime)
         return True
