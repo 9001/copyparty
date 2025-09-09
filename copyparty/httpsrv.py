@@ -185,7 +185,7 @@ class HttpSrv(object):
             "shares",
             "splash",
             "svcs",
-            "opds1",  # TODO: not actually html
+            "opds",  # TODO: not actually html
         ]
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
         self.prism = has_resource(self.E, "web/deps/prism.js.gz")

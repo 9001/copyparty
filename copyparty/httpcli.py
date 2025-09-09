@@ -6225,7 +6225,7 @@ class HttpCli(object):
 
         add_og = "og" in vn.flags
         if add_og:
-            if "th" in self.uparam or "raw" in self.uparam or "opds1" in self.uparam:
+            if "th" in self.uparam or "raw" in self.uparam or "opds" in self.uparam:
                 add_og = False
             elif vn.flags["og_ua"]:
                 add_og = vn.flags["og_ua"].search(self.ua)
@@ -6440,14 +6440,14 @@ class HttpCli(object):
         if "b" in self.uparam:
             tpl = "browser2"
             is_js = False
-        elif "opds1" in self.uparam:
+        elif "opds" in self.uparam:
             # Display directory listing as OPDS v1.2 catalog feed
             if not (self.args.opds or "opds" in self.vn.flags):
                 raise Pebkac(405, "OPDS is disabled in server config")
             if not self.can_read:
                 raise Pebkac(401, "OPDS requires read permission")
             is_opds = True
-            tpl = "opds1"
+            tpl = "opds"
             is_js = False
 
         vf = vn.flags
@@ -6671,7 +6671,7 @@ class HttpCli(object):
             mime = None
             if is_opds:
                 href += "&" if "?" in href else "?"
-                href += "opds1"
+                href += "opds"
                 if not is_dir:
                     if "rmagic" in self.vn.flags:
                         mime = guess_mime(fn, fspath)
