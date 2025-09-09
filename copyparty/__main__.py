@@ -1432,6 +1432,10 @@ def add_smb(ap):
     ap2.add_argument("--smbvv", action="store_true", help="verboser")
     ap2.add_argument("--smbvvv", action="store_true", help="verbosest")
 
+def add_opds(ap):
+    ap2 = ap.add_argument_group("OPDS options")
+    ap2.add_argument("--opds", action="store_true", help="enable opds -- allows e-book readers to browse and download files (volflag=opds)")
+    ap2.add_argument("--opds-allowed", metavar="T,T", type=u, default="epub,cbz,pdf", help="file formats to list in OPDS feeds; leave empty to show everything (volflag=opds_allowed)")
 
 def add_handlers(ap):
     ap2 = ap.add_argument_group("handlers (see --help-handlers)")
@@ -1856,6 +1860,7 @@ def run_argparse(
     add_webdav(ap)
     add_tftp(ap)
     add_smb(ap)
+    add_opds(ap)
     add_safety(ap)
     add_salt(ap, fk_salt, dk_salt, ah_salt)
     add_optouts(ap)

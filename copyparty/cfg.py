@@ -52,6 +52,7 @@ def vf_bmap() -> dict[str, str]:
         "og",
         "og_no_head",
         "og_s_title",
+        "opds",
         "rand",
         "reflink",
         "rmagic",
@@ -143,6 +144,7 @@ def vf_cmap() -> dict[str, str]:
         "mte",
         "mth",
         "mtp",
+        "opds_allowed",
         "xac",
         "xad",
         "xar",
@@ -326,6 +328,10 @@ flagcats = {
         "og_tpl": "custom html; see --og-tpl in --help",
         "og_no_head": "you want to add tags manually with og_tpl",
         "og_ua": "if defined: only send OG html if useragent matches this regex",
+    },
+    "opds": {
+        "opds": "enable OPDS",
+        "opds_allowed": "file formats to list in OPDS feeds; leave empty to show everything"
     },
     "textfiles": {
         "md_no_br": "newline only on double-newline or two tailing spaces",
