@@ -253,7 +253,7 @@ window.baguetteBox = (function () {
             ['S', 'toggle file selection'],
             ['space, P, K', 'video: play / pause'],
             ['U', 'video: seek 10sec back'],
-            ['P', 'video: seek 10sec ahead'],
+            ['O', 'video: seek 10sec ahead'],
             ['0..9', 'video: seek 0%..90%'],
             ['M', 'video: toggle mute'],
             ['V', 'video: toggle loop'],
