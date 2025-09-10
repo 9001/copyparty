@@ -4218,7 +4218,7 @@ class HttpCli(object):
         #
         # force download
 
-        if "dl" in self.ouparam:
+        if "dl" in self.ouparam or "opds" in self.uparam:
             cdis = gen_content_disposition(os.path.basename(req_path))
             self.out_headers["Content-Disposition"] = cdis
 
