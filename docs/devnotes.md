@@ -160,6 +160,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 
 | method | params | result |
 |--|--|--|
+| GET | `?dl` | download file (don't show in-browser) |
 | GET | `?ls` | list files/folders at URL as JSON |
 | GET | `?ls&dots` | list files/folders at URL as JSON, including dotfiles |
 | GET | `?ls=t` | list files/folders at URL as plaintext |
@@ -328,7 +329,7 @@ if you don't need all the features, you can repack the sfx and save a bunch of s
 
 the features you can opt to drop are
 * `cm`/easymde, the "fancy" markdown editor, saves ~89k
-* `hl`, prism, the syntax hilighter, saves ~41k
+* `hl`, prism, the syntax highlighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
@@ -354,7 +355,7 @@ pip install mutagen  # audio metadata
 pip install pyftpdlib  # ftp server
 pip install partftpy  # tftp server
 pip install impacket  # smb server -- disable Windows Defender if you REALLY need this on windows
-pip install Pillow pyheif-pillow-opener  # thumbnails
+pip install Pillow pillow-heif  # thumbnails
 pip install pyvips  # faster thumbnails
 pip install psutil  # better cleanup of stuck metadata parsers on windows 
 pip install black==21.12b0 click==8.0.2 bandit pylint flake8 isort mypy  # vscode tooling

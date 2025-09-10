@@ -50,7 +50,7 @@ catch (ex) {
     }
     catch (ex) {
         console.log('up2k init failed:', ex);
-        toast.err(10, 'could not initialze up2k\n\n' + basenames(ex));
+        toast.err(10, 'could not initialize up2k\n\n' + basenames(ex));
     }
 }
 treectl.onscroll();
@@ -732,7 +732,7 @@ function Donut(uc, st) {
         tstrober = setInterval(strobe, 300);
 
         if (uc.upsfx && actx && actx.state != 'suspended')
-            sfx();
+            sfx_nice();
 
         // firefox may forget that filedrops are user-gestures so it can skip this:
         if (uc.upnag && Notification && Notification.permission == 'granted')
@@ -745,8 +745,10 @@ function Donut(uc, st) {
         if (!txt)
             clearInterval(tstrober);
     }
+}
 
-    function sfx() {
+function sfx_nice() {
+    if (true) {
         var osc = actx.createOscillator(),
             gain = actx.createGain(),
             gg = gain.gain,
@@ -2831,7 +2833,7 @@ function up2k_init(subtle) {
         if (!t.t_uploading)
             t.t_uploading = Date.now();
 
-        pvis.seth(t.n, 1, "🚀 send");
+        pvis.seth(t.n, 1, "🚀 " + L.ul_send);
 
         var chunksize = get_chunksize(t.size),
             car = pcar * chunksize,
@@ -3037,10 +3039,12 @@ function up2k_init(subtle) {
         if (anymod(e))
             return;
 
-        if (e.code == 'ArrowUp')
+        var k = e.key || e.code;
+
+        if (k == 'ArrowUp')
             bumpthread(1);
 
-        if (e.code == 'ArrowDown')
+        if (k == 'ArrowDown')
             bumpthread(-1);
     }
 
@@ -3103,7 +3107,8 @@ function up2k_init(subtle) {
     ebi('u2szg').addEventListener('blur', read_u2sz);
     ebi('u2szg').onkeydown = function (e) {
         if (anymod(e)) return;
-        var n = e.code == 'ArrowUp' ? 1 : e.code == 'ArrowDown' ? -1 : 0;
+        var k = e.key || e.code,
+            n = k == 'ArrowUp' ? 1 : k == 'ArrowDown' ? -1 : 0;
         if (!n) return;
         this.value = parseInt(this.value) + n;
         read_u2sz();
@@ -3180,7 +3185,8 @@ function up2k_init(subtle) {
 
     function kd_life(e) {
         var el = e.target,
-            d = e.code == 'ArrowUp' ? 1 : e.code == 'ArrowDown' ? -1 : 0;
+            k = e.key || e.code,
+            d = k == 'ArrowUp' ? 1 : k == 'ArrowDown' ? -1 : 0;
 
         if (anymod(e) || !d)
             return;
@@ -3421,6 +3427,7 @@ if (QS('#op_up2k.act'))
     goto_up2k();
 
 apply_perms({ "perms": perms, "frand": frand, "u2ts": u2ts });
+fileman.render();
 
 
 (function () {

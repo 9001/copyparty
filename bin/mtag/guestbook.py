@@ -11,7 +11,7 @@ example copyparty config to use this:
   --urlform save,get -vsrv/hello:hello:w:c,e2ts,mtp=xgb=ebin,t10,ad,p,bin/mtag/guestbook.py:mte=+xgb
 
 explained:
-  for realpath srv/hello (served at /hello),write-only for eveyrone,
+  for realpath srv/hello (served at /hello),write-only for everyone,
   enable file analysis on upload (e2ts),
   use mtp plugin "bin/mtag/guestbook.py" to provide metadata tag "xgb",
   do this on all uploads with the file extension "bin",

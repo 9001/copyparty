@@ -130,6 +130,7 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
     nlog: "NamedLogger" = lambda msg, c=0: log("cert-gen-srv", msg, c)
 
     names = args.crt_ns.split(",") if args.crt_ns else []
+    names = [x.strip() for x in names]
     if not args.crt_exact:
         for n in names[:]:
             names.append("*.{}".format(n))

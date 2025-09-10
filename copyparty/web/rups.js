@@ -1,5 +1,5 @@
 function render() {
-    var html = ['<table id="tab"><thead><tr><th>size</th><th>who</th><th>when</th><th>age</th><th>dir</th><th>file</th></tr></thead><tbody>'];
+    var html = ['<table id="tab"><thead><tr><th>size</th><th>who</th><th>ip</th><th>when</th><th>age</th><th>dir</th><th>file</th></tr></thead><tbody>'];
     var ups = V.ups, now = V.now;
     ebi('filter').value = V.filter;
     ebi('hits').innerHTML = 'showing ' + ups.length + ' files';
@@ -16,6 +16,7 @@ function render() {
             sz = ('' + f.sz).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 
         html.push('<tr><td>' + sz +
+            '</td><td>' + (f.un || '') +
             '</td><td>' + f.ip +
             '</td><td>' + ts +
             '</td><td>' + sa +

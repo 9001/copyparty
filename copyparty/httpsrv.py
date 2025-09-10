@@ -70,6 +70,7 @@ from .util import (
     build_netmap,
     has_resource,
     ipnorm,
+    load_ipr,
     load_ipu,
     load_resource,
     min_ex,
@@ -192,6 +193,11 @@ class HttpSrv(object):
             self.ipu_iu, self.ipu_nm = load_ipu(self.log, self.args.ipu)
         else:
             self.ipu_iu = self.ipu_nm = None
+
+        if self.args.ipr:
+            self.ipr = load_ipr(self.log, self.args.ipr)
+        else:
+            self.ipr = None
 
         self.ipa_nm = build_netmap(self.args.ipa)
         self.xff_nm = build_netmap(self.args.xff_src)
@@ -565,7 +571,7 @@ class HttpSrv(object):
 
             v = self.E.t0
             try:
-                with os.scandir(os.path.join(self.E.mod, "web")) as dh:
+                with os.scandir(self.E.mod_ + "web") as dh:
                     for fh in dh:
                         inf = fh.stat()
                         v = max(v, inf.st_mtime)

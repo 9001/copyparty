@@ -9,13 +9,14 @@ import time
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
 from .cert import gencert
-from .stolen.qrcodegen import QrCode
+from .stolen.qrcodegen import QrCode, qr2svg
 from .util import (
     E_ACCESS,
     E_ADDR_IN_USE,
     E_ADDR_NOT_AVAIL,
     E_UNREACH,
     HAVE_IPV6,
+    IP6_LL,
     IP6ALL,
     VF_CAREFUL,
     Netdev,
@@ -140,12 +141,12 @@ class TcpSrv(object):
         # keep IPv6 LL-only nics
         ll_ok: set[str] = set()
         for ip, nd in self.netdevs.items():
-            if not ip.startswith("fe80"):
+            if not ip.startswith(IP6_LL):
                 continue
 
             just_ll = True
             for ip2, nd2 in self.netdevs.items():
-                if nd == nd2 and ":" in ip2 and not ip2.startswith("fe80"):
+                if nd == nd2 and ":" in ip2 and not ip2.startswith(IP6_LL):
                     just_ll = False
 
             if just_ll or self.args.ll:
@@ -164,7 +165,7 @@ class TcpSrv(object):
         title_vars = [x[1:] for x in self.args.wintitle.split(" ") if x.startswith("$")]
         t = "available @ {}://{}:{}/  (\033[33m{}\033[0m)"
         for ip, desc in sorted(eps.items(), key=lambda x: x[1]):
-            if ip.startswith("fe80") and ip not in ll_ok:
+            if ip.startswith(IP6_LL) and ip not in ll_ok:
                 continue
 
             for port in sorted(self.args.p):
@@ -304,6 +305,10 @@ class TcpSrv(object):
                     if os.path.exists(ip):
                         os.unlink(ip)
                     srv.bind(ip)
+                    if uds_gid != -1:
+                        os.chown(ip, -1, uds_gid)
+                    if uds_perm != -1:
+                        os.chmod(ip, uds_perm)
                 else:
                     tf = "%s.%d" % (ip, os.getpid())
                     if os.path.exists(tf):
@@ -614,9 +619,17 @@ class TcpSrv(object):
 
         fg = self.args.qr_fg
         bg = self.args.qr_bg
+        nocolor = fg == -1
+        if nocolor:
+            fg = 0
+
         pad = self.args.qrp
         zoom = self.args.qrz
         qrc = QrCode.encode_binary(btxt)
+
+        for zs in self.args.qr_file or []:
+            self._qr2file(qrc, zs)
+
         if zoom == 0:
             try:
                 tw, th = termsize()
@@ -632,6 +645,8 @@ class TcpSrv(object):
         halfc = "\033[40;48;5;{0}m{1}\033[47;48;5;{2}m"
         if not fg:
             halfc = "\033[0;40m{1}\033[0;47m"
+        if nocolor:
+            halfc = "\033[0;7m{1}\033[0m"
 
         def ansify(m: re.Match) -> str:
             return halfc.format(fg, " " * len(m.group(1)), bg)
@@ -641,6 +656,8 @@ class TcpSrv(object):
 
         qr = qr.replace("\n", "\033[K\n") + "\033[K"  # win10do
         cc = " \033[0;38;5;{0};47;48;5;{1}m" if fg else " \033[0;30;47m"
+        if nocolor:
+            cc = " \033[0m"
         t = cc + "\n{2}\033[999G\033[0m\033[J"
         t = t.format(fg, bg, qr)
         if ANYWIN:
@@ -648,3 +665,29 @@ class TcpSrv(object):
             t = t.replace("\n", "`\n`")
 
         return txt + t
+
+    def _qr2file(self, qrc: QrCode, txt: str):
+        if ".txt:" in txt or ".svg:" in txt:
+            ap, zs1, zs2 = txt.rsplit(":", 2)
+            bg = fg = ""
+        else:
+            ap, zs1, zs2, bg, fg = txt.rsplit(":", 4)
+        zoom = int(zs1)
+        pad = int(zs2)
+
+        if ap.endswith(".txt"):
+            if zoom not in (1, 2):
+                raise Exception("invalid zoom for qr.txt; must be 1 or 2")
+            with open(ap, "wb") as f:
+                f.write(qrc.render(zoom, pad).encode("utf-8"))
+        elif ap.endswith(".svg"):
+            with open(ap, "wb") as f:
+                f.write(qr2svg(qrc, pad).encode("utf-8"))
+        else:
+            qrc.to_png(zoom, pad, self._h2i(bg), self._h2i(fg), ap)
+
+    def _h2i(self, hs):
+        try:
+            return tuple(int(hs[i : i + 2], 16) for i in (0, 2, 4))
+        except:
+            return None

@@ -36,11 +36,15 @@ class ThumbCli(object):
             if not c:
                 raise Exception()
         except:
-            c = {k: set() for k in ["thumbable", "pil", "vips", "ffi", "ffv", "ffa"]}
+            c = {
+                k: set()
+                for k in ["thumbable", "pil", "vips", "raw", "ffi", "ffv", "ffa"]
+            }
 
         self.thumbable = c["thumbable"]
         self.fmt_pil = c["pil"]
         self.fmt_vips = c["vips"]
+        self.fmt_raw = c["raw"]
         self.fmt_ffi = c["ffi"]
         self.fmt_ffv = c["ffv"]
         self.fmt_ffa = c["ffa"]

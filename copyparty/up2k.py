@@ -60,6 +60,7 @@ from .util import (
     sfsenc,
     spack,
     statdir,
+    trystat_shutil_copy2,
     ub64enc,
     unhumanize,
     vjoin,
@@ -77,7 +78,7 @@ except:
 if HAVE_SQLITE3:
     import sqlite3
 
-DB_VER = 5
+DB_VER = 6
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional, Pattern, Union
@@ -90,6 +91,9 @@ ICV_EXTS = set(zsg.split(","))
 
 zsg = "3gp,asf,av1,avc,avi,flv,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,vob,webm,wmv"
 VCV_EXTS = set(zsg.split(","))
+
+zsg = "aif,aiff,alac,ape,flac,m4a,mp3,oga,ogg,opus,tak,tta,wav,wma,wv"
+ACV_EXTS = set(zsg.split(","))
 
 zsg = "nohash noidx xdev xvol"
 VF_AFFECTS_INDEXING = set(zsg.split(" "))
@@ -144,6 +148,7 @@ class Up2k(object):
 
         self.salt = self.args.warksalt
         self.r_hash = re.compile("^[0-9a-zA-Z_-]{44}$")
+        self.abrt_key = ""
 
         self.gid = 0
         self.gt0 = 0
@@ -410,10 +415,11 @@ class Up2k(object):
 
         ret: list[tuple[int, str, int, int, int]] = []
         userset = set([(uname or "\n"), "*"])
+        e_d = {}
         n = 1000
         try:
             for ptop, tab2 in self.registry.items():
-                cfg = self.flags.get(ptop, {}).get("u2abort", 1)
+                cfg = self.flags.get(ptop, e_d).get("u2abort", 1)
                 if not cfg:
                     continue
                 addr = (ip or "\n") if cfg in (1, 2) else ""
@@ -902,7 +908,7 @@ class Up2k(object):
         self.iacct = self.asrv.iacct
         self.grps = self.asrv.grps
 
-        have_e2d = self.args.idp_h_usr or self.args.chpw or self.args.shr
+        have_e2d = self.args.have_idp_hdrs or self.args.chpw or self.args.shr
         vols = list(all_vols.values())
         t0 = time.time()
 
@@ -922,6 +928,12 @@ class Up2k(object):
         with self.mutex, self.reg_mutex:
             # only need to protect register_vpath but all in one go feels right
             for vol in vols:
+                if bos.path.isfile(vol.realpath):
+                    self.volstate[vol.vpath] = "online (just-a-file)"
+                    t = "NOTE: volume [/%s] is a file, not a folder"
+                    self.log(t % (vol.vpath,))
+                    continue
+
                 try:
                     # mkdir gonna happen at snap anyways;
                     bos.makedirs(vol.realpath, vf=vol.flags)
@@ -1128,7 +1140,7 @@ class Up2k(object):
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
-        zs = "ext_th_d html_head put_name2 mv_re_r mv_re_t rm_re_r rm_re_t srch_re_dots srch_re_nodot zipmax zipmaxn_v zipmaxs_v"
+        zs = "du_iwho ext_th_d html_head put_name2 mv_re_r mv_re_t rm_re_r rm_re_t srch_re_dots srch_re_nodot zipmax zipmaxn_v zipmaxs_v"
         fx = set(zs.split())
         fd = vf_bmap()
         fd.update(vf_cmap())
@@ -1482,7 +1494,8 @@ class Up2k(object):
         unreg: list[str] = []
         files: list[tuple[int, int, str]] = []
         fat32 = True
-        cv = vcv = ""
+        cv = vcv = acv = ""
+        e_d = {}
 
         th_cvd = self.args.th_coversd
         th_cvds = self.args.th_coversd_set
@@ -1592,9 +1605,11 @@ class Up2k(object):
                         cv = iname
                     elif not vcv and ext in VCV_EXTS and not iname.startswith("."):
                         vcv = iname
+                    elif not acv and ext in ACV_EXTS and not iname.startswith("."):
+                        acv = iname
 
         if not cv:
-            cv = vcv
+            cv = vcv or acv
 
         if not self.args.no_dirsz:
             tnf += len(files)
@@ -1654,7 +1669,7 @@ class Up2k(object):
             abspath = cdirs + fn
             nohash = reh.search(abspath) if reh else False
 
-            sql = "select w, mt, sz, ip, at from up where rd = ? and fn = ?"
+            sql = "select w, mt, sz, ip, at, un from up where rd = ? and fn = ?"
             try:
                 c = db.c.execute(sql, (rd, fn))
             except:
@@ -1663,7 +1678,7 @@ class Up2k(object):
             in_db = list(c.fetchall())
             if in_db:
                 self.pp.n -= 1
-                dw, dts, dsz, ip, at = in_db[0]
+                dw, dts, dsz, ip, at, un = in_db[0]
                 if len(in_db) > 1:
                     t = "WARN: multiple entries: %r => %r |%d|\n%r"
                     rep_db = "\n".join([repr(x) for x in in_db])
@@ -1676,9 +1691,12 @@ class Up2k(object):
                 if dts == lmod and dsz == sz and (nohash or dw[0] != "#" or not sz):
                     continue
 
+                if un is None:
+                    un = ""
+
                 t = "reindex %r => %r mtime(%s/%s) size(%s/%s)"
                 self.log(t % (top, rp, dts, lmod, dsz, sz))
-                self.db_rm(db.c, rd, fn, 0)
+                self.db_rm(db.c, e_d, rd, fn, 0)
                 tfa += 1
                 db.n += 1
                 in_db = []
@@ -1686,6 +1704,7 @@ class Up2k(object):
                 dw = ""
                 ip = ""
                 at = 0
+                un = ""
 
             self.pp.msg = "a%d %s" % (self.pp.n, abspath)
 
@@ -1711,9 +1730,10 @@ class Up2k(object):
             if dw and dw != wark:
                 ip = ""
                 at = 0
+                un = ""
 
             # skip upload hooks by not providing vflags
-            self.db_add(db.c, {}, rd, fn, lmod, sz, "", "", wark, wark, "", "", ip, at)
+            self.db_add(db.c, e_d, rd, fn, lmod, sz, "", "", wark, wark, "", un, ip, at)
             db.n += 1
             db.nf += 1
             tfa += 1
@@ -1773,7 +1793,7 @@ class Up2k(object):
         rm_files = [x for x in hits if x not in seen_files]
         n_rm = len(rm_files)
         for fn in rm_files:
-            self.db_rm(db.c, rd, fn, 0)
+            self.db_rm(db.c, e_d, rd, fn, 0)
 
         if n_rm:
             self.log("forgot {} deleted files".format(n_rm))
@@ -2150,8 +2170,8 @@ class Up2k(object):
 
             with self.mutex:
                 try:
-                    q = "select rd, fn, ip, at from up where substr(w,1,16)=? and +w=?"
-                    rd, fn, ip, at = cur.execute(q, (w16, w)).fetchone()
+                    q = "select rd, fn, ip, at, un from up where substr(w,1,16)=? and +w=?"
+                    rd, fn, ip, at, un = cur.execute(q, (w16, w)).fetchone()
                 except:
                     # file modified/deleted since spooling
                     continue
@@ -2170,12 +2190,15 @@ class Up2k(object):
             abspath = djoin(ptop, rd, fn)
             self.pp.msg = "c%d %s" % (nq, abspath)
             if not mpool:
-                n_tags = self._tagscan_file(cur, entags, w, abspath, ip, at)
+                n_tags = self._tagscan_file(cur, entags, w, abspath, ip, at, un)
             else:
+                oth_tags = {}
                 if ip:
-                    oth_tags = {"up_ip": ip, "up_at": at}
-                else:
-                    oth_tags = {}
+                    oth_tags["up_ip"] = ip
+                if at:
+                    oth_tags["up_at"] = at
+                if un:
+                    oth_tags["up_by"] = un
 
                 mpool.put(Mpqe({}, entags, w, abspath, oth_tags))
                 with self.mutex:
@@ -2331,8 +2354,8 @@ class Up2k(object):
                     if w in in_progress:
                         continue
 
-                    q = "select rd, fn, ip, at from up where substr(w,1,16)=? limit 1"
-                    rd, fn, ip, at = cur.execute(q, (w,)).fetchone()
+                    q = "select rd, fn, ip, at, un from up where substr(w,1,16)=? limit 1"
+                    rd, fn, ip, at, un = cur.execute(q, (w,)).fetchone()
                     rd, fn = s3dec(rd, fn)
                     abspath = djoin(ptop, rd, fn)
 
@@ -2356,7 +2379,10 @@ class Up2k(object):
 
                     if ip:
                         oth_tags["up_ip"] = ip
+                    if at:
                         oth_tags["up_at"] = at
+                    if un:
+                        oth_tags["up_by"] = un
 
                     jobs.append(Mpqe(parsers, set(), w, abspath, oth_tags))
                     in_progress[w] = True
@@ -2545,6 +2571,7 @@ class Up2k(object):
         abspath: str,
         ip: str,
         at: float,
+        un: Optional[str],
     ) -> int:
         """will mutex(main)"""
         assert self.mtag  # !rm
@@ -2565,7 +2592,10 @@ class Up2k(object):
 
         if ip:
             tags["up_ip"] = ip
+        if at:
             tags["up_at"] = at
+        if un:
+            tags["up_by"] = un
 
         with self.mutex:
             return self._tag_file(write_cur, entags, wark, abspath, tags)
@@ -2669,16 +2699,19 @@ class Up2k(object):
         if not existed and ver is None:
             return self._try_create_db(db_path, cur)
 
-        if ver == 4:
+        for upver in (4, 5):
+            if ver != upver:
+                continue
             try:
                 t = "creating backup before upgrade: "
                 cur = self._backup_db(db_path, cur, ver, t)
-                self._upgrade_v4(cur)
-                ver = 5
+                getattr(self, "_upgrade_v%d" % (upver,))(cur)
+                ver += 1  # type: ignore
             except:
-                self.log("WARN: failed to upgrade from v4", 3)
+                self.log("WARN: failed to upgrade from v%d" % (ver,), 3)
 
         if ver == DB_VER:
+            # these no longer serve their intended purpose but they're great as additional sanchks
             self._add_dhash_tab(cur)
             self._add_xiu_tab(cur)
             self._add_cv_tab(cur)
@@ -2736,7 +2769,7 @@ class Up2k(object):
         cur.close()
         db.close()
 
-        shutil.copy2(fsenc(db_path), fsenc(bak))
+        trystat_shutil_copy2(self.log, fsenc(db_path), fsenc(bak))
         return self._orz(db_path)
 
     def _read_ver(self, cur: "sqlite3.Cursor") -> Optional[int]:
@@ -2780,7 +2813,7 @@ class Up2k(object):
             idx = r"create index up_w on up(w)"
 
         for cmd in [
-            r"create table up (w text, mt int, sz int, rd text, fn text, ip text, at int)",
+            r"create table up (w text, mt int, sz int, rd text, fn text, ip text, at int, un text)",
             r"create index up_vp on up(rd, fn)",
             r"create index up_fn on up(fn)",
             r"create index up_ip on up(ip)",
@@ -2808,6 +2841,15 @@ class Up2k(object):
             r"alter table up add column at int",
             r"create index up_ip on up(ip)",
             r"update kv set v=5 where k='sver'",
+        ]:
+            cur.execute(cmd)
+
+        cur.connection.commit()
+
+    def _upgrade_v5(self, cur: "sqlite3.Cursor") -> None:
+        for cmd in [
+            r"alter table up add column un text",
+            r"update kv set v=6 where k='sver'",
         ]:
             cur.execute(cmd)
 
@@ -3010,7 +3052,7 @@ class Up2k(object):
                     argv = [dwark[:16], dwark]
 
                 c2 = cur.execute(q, tuple(argv))
-                for _, dtime, dsize, dp_dir, dp_fn, ip, at in c2:
+                for _, dtime, dsize, dp_dir, dp_fn, ip, at, _ in c2:
                     if dp_dir.startswith("//") or dp_fn.startswith("//"):
                         dp_dir, dp_fn = s3dec(dp_dir, dp_fn)
 
@@ -3102,7 +3144,7 @@ class Up2k(object):
                 for cur, dp_dir, dp_fn in lost:
                     t = "forgetting desynced db entry: %r"
                     self.log(t % ("/" + vjoin(vjoin(vfs.vpath, dp_dir), dp_fn)))
-                    self.db_rm(cur, dp_dir, dp_fn, cj["size"])
+                    self.db_rm(cur, vfs.flags, dp_dir, dp_fn, cj["size"])
                     if c2 and c2 != cur:
                         c2.connection.commit()
 
@@ -3396,10 +3438,9 @@ class Up2k(object):
                     cur.connection.commit()
 
                     ap = djoin(job["ptop"], job["prel"], job["name"])
-                    times = (int(time.time()), int(cj["lmod"]))
-                    bos.utime(ap, times, False)
+                    mt = bos.utime_c(self.log, ap, int(cj["lmod"]), False, True)
 
-                    self.log("touched %r from %d to %d" % (ap, job["lmod"], cj["lmod"]))
+                    self.log("touched %r from %d to %d" % (ap, job["lmod"], mt))
                 except Exception as ex:
                     self.log("umod failed, %r" % (ex,), 3)
 
@@ -3432,8 +3473,8 @@ class Up2k(object):
             try:
                 vrel = vjoin(job["prel"], fname)
                 xlink = bool(vf.get("xlink"))
-                cur, wark, _, _, _, _ = self._find_from_vpath(ptop, vrel)
-                self._forget_file(ptop, vrel, cur, wark, True, st.st_size, xlink)
+                cur, wark, _, _, _, _, _ = self._find_from_vpath(ptop, vrel)
+                self._forget_file(ptop, vrel, vf, cur, wark, True, st.st_size, xlink)
             except Exception as ex:
                 self.log("skipping replace-relink: %r" % (ex,))
             finally:
@@ -3551,11 +3592,10 @@ class Up2k(object):
                 t = "BUG: no valid sources to link from! orig(%r) fsrc(%r) link(%r)"
                 self.log(t, 1)
                 raise Exception(t % (src, fsrc, dst))
-            shutil.copy2(fsenc(csrc), fsenc(dst))
+            trystat_shutil_copy2(self.log, fsenc(csrc), fsenc(dst))
 
         if lmod and (not linked or SYMTIME):
-            times = (int(time.time()), int(lmod))
-            bos.utime(dst, times, False)
+            bos.utime_c(self.log, dst, int(lmod), False)
 
     def handle_chunks(
         self, ptop: str, wark: str, chashes: list[str]
@@ -3728,10 +3768,8 @@ class Up2k(object):
         times = (int(time.time()), int(job["lmod"]))
         t = "no more chunks, setting times %s (%d) on %r"
         self.log(t % (times, bos.path.getsize(dst), dst))
-        try:
-            bos.utime(dst, times)
-        except:
-            self.log("failed to utime (%r, %s)" % (dst, times))
+        bos.utime_c(self.log, dst, times[1], False)
+        # the above logmsg (and associated logic) is retained due to unforget.py
 
         zs = "prel name lmod size ptop vtop wark dwrk host user addr"
         z2 = [job[x] for x in zs.split()]
@@ -3850,7 +3888,9 @@ class Up2k(object):
 
         return True
 
-    def db_rm(self, db: "sqlite3.Cursor", rd: str, fn: str, sz: int) -> None:
+    def db_rm(
+        self, db: "sqlite3.Cursor", vflags: dict[str, Any], rd: str, fn: str, sz: int
+    ) -> None:
         sql = "delete from up where rd = ? and fn = ?"
         try:
             r = db.execute(sql, (rd, fn))
@@ -3858,9 +3898,22 @@ class Up2k(object):
             assert self.mem_cur  # !rm
             r = db.execute(sql, s3enc(self.mem_cur, rd, fn))
 
-        if r.rowcount:
-            self.volsize[db] -= sz
-            self.volnfiles[db] -= 1
+        if not r.rowcount:
+            return
+
+        self.volsize[db] -= sz
+        self.volnfiles[db] -= 1
+
+        if "nodirsz" not in vflags:
+            try:
+                q = "update ds set nf=nf-1, sz=sz-? where rd=?"
+                while True:
+                    db.execute(q, (sz, rd))
+                    if not rd:
+                        break
+                    rd = rd.rsplit("/", 1)[0] if "/" in rd else ""
+            except:
+                pass
 
     def db_add(
         self,
@@ -3881,7 +3934,7 @@ class Up2k(object):
         skip_xau: bool = False,
     ) -> None:
         """mutex(main) me"""
-        self.db_rm(db, rd, fn, sz)
+        self.db_rm(db, vflags, rd, fn, sz)
 
         if not ip:
             db_ip = ""
@@ -3889,14 +3942,14 @@ class Up2k(object):
             # plugins may expect this to look like an actual IP
             db_ip = "1.1.1.1" if "no_db_ip" in vflags else ip
 
-        sql = "insert into up values (?,?,?,?,?,?,?)"
-        v = (dwark, int(ts), sz, rd, fn, db_ip, int(at or 0))
+        sql = "insert into up values (?,?,?,?,?,?,?,?)"
+        v = (dwark, int(ts), sz, rd, fn, db_ip, int(at or 0), usr)
         try:
             db.execute(sql, v)
         except:
             assert self.mem_cur  # !rm
             rd, fn = s3enc(self.mem_cur, rd, fn)
-            v = (dwark, int(ts), sz, rd, fn, db_ip, int(at or 0))
+            v = (dwark, int(ts), sz, rd, fn, db_ip, int(at or 0), usr)
             db.execute(sql, v)
 
         self.volsize[db] += sz
@@ -3988,6 +4041,9 @@ class Up2k(object):
             except:
                 pass
 
+    def handle_fs_abrt(self, akey: str) -> None:
+        self.abrt_key = akey
+
     def handle_rm(
         self,
         uname: str,
@@ -4034,7 +4090,7 @@ class Up2k(object):
             vn, rem = vn0.get_dbv(rem0)
             ptop = vn.realpath
             with self.mutex, self.reg_mutex:
-                abrt_cfg = self.flags.get(ptop, {}).get("u2abort", 1)
+                abrt_cfg = vn.flags.get("u2abort", 1)
                 addr = (ip or "\n") if abrt_cfg in (1, 2) else ""
                 user = ((uname or "\n"), "*") if abrt_cfg in (1, 3) else None
                 reg = self.registry.get(ptop, {}) if abrt_cfg else {}
@@ -4055,17 +4111,22 @@ class Up2k(object):
                 if partial:
                     dip = ip
                     dat = time.time()
+                    dun = uname
+                    un_cfg = 1
                 else:
-                    if not self.args.unpost:
+                    un_cfg = vn.flags["unp_who"]
+                    if not self.args.unpost or not un_cfg:
                         t = "the unpost feature is disabled in server config"
                         raise Pebkac(400, t)
 
-                    _, _, _, _, dip, dat = self._find_from_vpath(ptop, rem)
+                    _, _, _, _, dip, dat, dun = self._find_from_vpath(ptop, rem)
 
             t = "you cannot delete this: "
             if not dip:
                 t += "file not found"
-            elif dip != ip:
+            elif dip != ip and un_cfg in (1, 2):
+                t += "not uploaded by (You)"
+            elif dun != uname and un_cfg in (1, 3):
                 t += "not uploaded by (You)"
             elif dat < time.time() - self.args.unpost:
                 t += "uploaded too long ago"
@@ -4154,9 +4215,9 @@ class Up2k(object):
                     try:
                         ptop = dbv.realpath
                         xlink = bool(dbv.flags.get("xlink"))
-                        cur, wark, _, _, _, _ = self._find_from_vpath(ptop, volpath)
+                        cur, wark, _, _, _, _, _ = self._find_from_vpath(ptop, volpath)
                         self._forget_file(
-                            ptop, volpath, cur, wark, True, st.st_size, xlink
+                            ptop, volpath, dbv.flags, cur, wark, True, st.st_size, xlink
                         )
                     finally:
                         if cur:
@@ -4197,7 +4258,7 @@ class Up2k(object):
 
         return n_files, ok + ok2, ng + ng2
 
-    def handle_cp(self, uname: str, ip: str, svp: str, dvp: str) -> str:
+    def handle_cp(self, abrt: str, uname: str, ip: str, svp: str, dvp: str) -> str:
         if svp == dvp or dvp.startswith(svp + "/"):
             raise Pebkac(400, "cp: cannot copy parent into subfolder")
 
@@ -4244,6 +4305,8 @@ class Up2k(object):
 
                         dvpf = dvp + svpf[len(svp) :]
                         self._cp_file(uname, ip, svpf, dvpf, curs)
+                        if abrt and abrt == self.abrt_key:
+                            raise Pebkac(400, "filecopy aborted by http-api")
 
                     for v in curs:
                         v.connection.commit()
@@ -4313,7 +4376,7 @@ class Up2k(object):
 
         bos.makedirs(os.path.dirname(dabs), vf=dvn.flags)
 
-        c1, w, ftime_, fsize_, ip, at = self._find_from_vpath(
+        c1, w, ftime_, fsize_, ip, at, un = self._find_from_vpath(
             svn_dbv.realpath, srem_dbv
         )
         c2 = self.cur.get(dvn.realpath)
@@ -4338,7 +4401,7 @@ class Up2k(object):
                     w,
                     w,
                     "",
-                    "",
+                    un or "",
                     ip or "",
                     at or 0,
                 )
@@ -4365,7 +4428,7 @@ class Up2k(object):
             b1, b2 = fsenc(sabs), fsenc(dabs)
             is_link = os.path.islink(b1)  # due to _relink
             try:
-                shutil.copy2(b1, b2)
+                trystat_shutil_copy2(self.log, b1, b2)
             except:
                 try:
                     wunlink(self.log, dabs, dvn.flags)
@@ -4411,7 +4474,7 @@ class Up2k(object):
 
         return "k"
 
-    def handle_mv(self, uname: str, ip: str, svp: str, dvp: str) -> str:
+    def handle_mv(self, abrt: str, uname: str, ip: str, svp: str, dvp: str) -> str:
         if svp == dvp or dvp.startswith(svp + "/"):
             raise Pebkac(400, "mv: cannot move parent into subfolder")
 
@@ -4466,6 +4529,8 @@ class Up2k(object):
 
                         dvpf = dvp + svpf[len(svp) :]
                         self._mv_file(uname, ip, svpf, dvpf, curs)
+                        if abrt and abrt == self.abrt_key:
+                            raise Pebkac(400, "filemove aborted by http-api")
 
                     for v in curs:
                         v.connection.commit()
@@ -4597,7 +4662,7 @@ class Up2k(object):
 
             return "k"
 
-        c1, w, ftime_, fsize_, ip, at = self._find_from_vpath(svn.realpath, srem)
+        c1, w, ftime_, fsize_, ip, at, un = self._find_from_vpath(svn.realpath, srem)
         c2 = self.cur.get(dvn.realpath)
 
         has_dupes = False
@@ -4610,7 +4675,14 @@ class Up2k(object):
 
             with self.reg_mutex:
                 has_dupes = self._forget_file(
-                    svn.realpath, srem, c1, w, is_xvol, fsize_ or fsize, xlink
+                    svn.realpath,
+                    srem,
+                    svn.flags,
+                    c1,
+                    w,
+                    is_xvol,
+                    fsize_ or fsize,
+                    xlink,
                 )
 
             if not is_xvol:
@@ -4631,7 +4703,7 @@ class Up2k(object):
                     w,
                     w,
                     "",
-                    "",
+                    un or "",
                     ip or "",
                     at or 0,
                 )
@@ -4662,7 +4734,7 @@ class Up2k(object):
             b1, b2 = fsenc(sabs), fsenc(dabs)
             is_link = os.path.islink(b1)  # due to _relink
             try:
-                shutil.copy2(b1, b2)
+                trystat_shutil_copy2(self.log, b1, b2)
             except:
                 try:
                     wunlink(self.log, dabs, dvn.flags)
@@ -4731,13 +4803,14 @@ class Up2k(object):
         Optional[int],
         str,
         Optional[int],
+        str,
     ]:
         cur = self.cur.get(ptop)
         if not cur:
-            return None, None, None, None, "", None
+            return None, None, None, None, "", None, ""
 
         rd, fn = vsplit(vrem)
-        q = "select w, mt, sz, ip, at from up where rd=? and fn=? limit 1"
+        q = "select w, mt, sz, ip, at, un from up where rd=? and fn=? limit 1"
         try:
             c = cur.execute(q, (rd, fn))
         except:
@@ -4746,14 +4819,15 @@ class Up2k(object):
 
         hit = c.fetchone()
         if hit:
-            wark, ftime, fsize, ip, at = hit
-            return cur, wark, ftime, fsize, ip, at
-        return cur, None, None, None, "", None
+            wark, ftime, fsize, ip, at, un = hit
+            return cur, wark, ftime, fsize, ip, at, un
+        return cur, None, None, None, "", None, ""
 
     def _forget_file(
         self,
         ptop: str,
         vrem: str,
+        vflags: dict[str, Any],
         cur: Optional["sqlite3.Cursor"],
         wark: Optional[str],
         drop_tags: bool,
@@ -4778,7 +4852,7 @@ class Up2k(object):
                 q = "delete from mt where w=?"
                 cur.execute(q, (wark[:16],))
 
-            self.db_rm(cur, srd, sfn, sz)
+            self.db_rm(cur, vflags, srd, sfn, sz)
 
         reg = self.registry.get(ptop)
         if reg:
@@ -4867,7 +4941,10 @@ class Up2k(object):
             mt = bos.path.getmtime(slabs, False)
             flags = self.flags.get(ptop) or {}
             atomic_move(self.log, sabs, slabs, flags)
-            bos.utime(slabs, (int(time.time()), int(mt)), False)
+            try:
+                bos.utime(slabs, (int(time.time()), int(mt)), False)
+            except:
+                self.log("relink: failed to utime(%r, %s)" % (slabs, mt), 3)
             self._symlink(slabs, sabs, flags, False, is_mv=True)
             full[slabs] = (ptop, rem)
             sabs = slabs

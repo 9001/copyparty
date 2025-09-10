@@ -1,7 +1,7 @@
 FROM    alpine:latest
 WORKDIR /z
 LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
-        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
+        org.opencontainers.image.source="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-ac" \
         org.opencontainers.image.description="copyparty with Pillow and FFmpeg (image/audio/video thumbnails, audio transcoding, media tags)"
@@ -16,6 +16,6 @@ COPY    i/dist/copyparty-sfx.py innvikler.sh ./
 ADD     base ./base
 RUN     ash innvikler.sh ac
 
-WORKDIR /w
+WORKDIR /state
 EXPOSE  3923
-ENTRYPOINT ["python3", "-m", "copyparty", "--no-crt", "-c", "/z/initcfg"]
+ENTRYPOINT ["python3", "-m", "copyparty", "-c", "/z/initcfg"]

@@ -46,7 +46,7 @@ def main(cli, vn, rem):
 
     # uncomment one of these:
     send_http_302_temporary_redirect(cli, new_path)
-    #send_http_301_permanent_redirect(cli, new_path)
-    #send_errorpage_with_redirect_link(cli, new_path)
+    # send_http_301_permanent_redirect(cli, new_path)
+    # send_errorpage_with_redirect_link(cli, new_path)
 
     return "true"

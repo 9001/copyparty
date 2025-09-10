@@ -71,7 +71,7 @@ avg() { awk 'function pr(ncsz) {if (nsmp>0) {printf "%3s %s\n", csz, sum/nsmp} c
 python3 -um copyparty -nw -v srv::rw -i 127.0.0.1 2>&1 | tee log 
 cat log | awk '!/"purl"/{next} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");t=60*(60*$1+$2)+$3} t<p{t+=86400} !a{a=t;sa=s} {b=t;sb=s} END {print b-a,sa,sb}'
 
-# or if the client youre measuring dies for ~15sec every once ina while and you wanna filter those out,
+# or if the client you're measuring dies for ~15sec every once ina while and you wanna filter those out,
 cat log | awk '!/"purl"/{next} {s=$1;sub(/[^m]+m/,"");gsub(/:/," ");t=60*(60*$1+$2)+$3} t<p{t+=86400} !p{a=t;p=t;r=0;next} t-p>1{printf "%.3f += %.3f - %.3f  (%.3f)  # %.3f -> %.3f\n",r,p,a,p-a,p,t;r+=p-a;a=t} {p=t} END {print r+p-a}'
 
 
@@ -337,3 +337,5 @@ mk && t0="$(date)" && while true; do date -s "$(date '+ 1 hour')"; systemd-tmpfi
 mk && sudo -u ed flock /tmp/foo sleep 40 & sleep 1; ps aux | grep -E 'sleep 40$' && t0="$(date)" && for n in {1..40}; do date -s "$(date '+ 1 day')"; systemd-tmpfiles --clean; ls -1 /tmp | grep foo || break; done; echo "$t0"
 mk && t0="$(date)" && for n in {1..40}; do date -s "$(date '+ 1 day')"; systemd-tmpfiles --clean; ls -1 /tmp | grep foo || break; tar -cf/dev/null /tmp/foo; done; echo "$t0"
 
+# number of megabytes downloaded since some date
+awk </var/log/wjaycore.out '/^..36m2025-05-20/{o=1} !o{next} !/ plain 20[06](,| \[[^,]+\],) +[0-9.]+.\[33m[KM] .* n[0-9]+$/{next} {v=$0;sub(/.* plain 20[06](,| \[[^,]+\],) +/,"",v);sub(/ .*/,"",v);u=v;sub(/.\[.*/,"",v);sub(/.*m/,"",u);$0=u} /[KMG]/{v*=1024} /[MG]/{v*=1024} /G/{v*=1024} {t+=v} END{printf "%d\n",t/(1024*1024)}'

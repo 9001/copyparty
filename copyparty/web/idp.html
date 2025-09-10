@@ -10,7 +10,7 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/shares.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
-{{ html_head }}
+{{- html_head }}
 </head>
 
 <body>
@@ -23,17 +23,17 @@
             <th>user</th>
             <th>groups</th>
         </tr></thead><tbody>
-        {% for un, gn in rows %}
+        {%- for un, gn in rows %}
         <tr>
             <td><a href="{{ r }}/?idp=rm={{ un|e }}">forget</a></td>
             <td>{{ un|e }}</td>
             <td>{{ gn|e }}</td>
         </tr>
-        {% endfor %}
+        {%- endfor %}
         </tbody></table>
-        {% if not rows %}
+        {%- if not rows %}
         (there are no IdP users in the cache)
-        {% endif %}
+        {%- endif %}
     </div>
 	<a href="#" id="repl">π</a>
 	<script>

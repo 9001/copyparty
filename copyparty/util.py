@@ -52,6 +52,7 @@ from .__init__ import (
     VT100,
     WINDOWS,
     EnvParams,
+    unicode,
 )
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
@@ -112,7 +113,13 @@ E_ACCESS = _ens("EACCES WSAEACCES")
 E_UNREACH = _ens("EHOSTUNREACH WSAEHOSTUNREACH ENETUNREACH WSAENETUNREACH")
 
 IP6ALL = "0:0:0:0:0:0:0:0"
+IP6_LL = ("fe8", "fe9", "fea", "feb")
+IP64_LL = ("fe8", "fe9", "fea", "feb", "169.254")
 
+UC_CDISP = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._"
+BC_CDISP = UC_CDISP.encode("ascii")
+UC_CDISP_SET = set(UC_CDISP)
+BC_CDISP_SET = set(BC_CDISP)
 
 try:
     import fcntl
@@ -399,6 +406,9 @@ application swf=x-shockwave-flash m3u=vnd.apple.mpegurl db3=vnd.sqlite3 sqlite=v
 text ass=plain ssa=plain
 image jpg=jpeg xpm=x-xpixmap psd=vnd.adobe.photoshop jpf=jpx tif=tiff ico=x-icon djvu=vnd.djvu
 image heic=heic-sequence heif=heif-sequence hdr=vnd.radiance svg=svg+xml
+image arw=x-sony-arw cr2=x-canon-cr2 crw=x-canon-crw dcr=x-kodak-dcr dng=x-adobe-dng erf=x-epson-erf
+image k25=x-kodak-k25 kdc=x-kodak-kdc mrw=x-minolta-mrw nef=x-nikon-nef orf=x-olympus-orf
+image pef=x-pentax-pef raf=x-fuji-raf raw=x-panasonic-raw sr2=x-sony-sr2 srf=x-sony-srf x3f=x-sigma-x3f
 audio caf=x-caf mp3=mpeg m4a=mp4 mid=midi mpc=musepack aif=aiff au=basic qcp=qcelp
 video mkv=x-matroska mov=quicktime avi=x-msvideo m4v=x-m4v ts=mp2t
 video asf=x-ms-asf flv=x-flv 3gp=3gpp 3g2=3gpp2 rmvb=vnd.rn-realmedia-vbr
@@ -2068,6 +2078,29 @@ def gencookie(
     )
 
 
+def gen_content_disposition(fn: str) -> str:
+    safe = UC_CDISP_SET
+    bsafe = BC_CDISP_SET
+    fn = fn.replace("/", "_").replace("\\", "_")
+    zb = fn.encode("utf-8", "xmlcharrefreplace")
+    if not PY2:
+        zbl = [
+            chr(x).encode("utf-8")
+            if x in bsafe
+            else "%{:02X}".format(x).encode("ascii")
+            for x in zb
+        ]
+    else:
+        zbl = [unicode(x) if x in bsafe else "%{:02X}".format(ord(x)) for x in zb]
+
+    ufn = b"".join(zbl).decode("ascii")
+    afn = "".join([x if x in safe else "_" for x in fn]).lstrip(".")
+    while ".." in afn:
+        afn = afn.replace("..", ".")
+
+    return "attachment; filename=\"%s\"; filename*=UTF-8''%s" % (afn, ufn)
+
+
 def humansize(sz: float, terse: bool = False) -> str:
     for unit in HUMANSIZE_UNITS:
         if sz < 1024:
@@ -2606,6 +2639,24 @@ def set_fperms(f: Union[typing.BinaryIO, typing.IO[Any]], vf: dict[str, Any]) ->
         os.fchown(fno, vf["uid"], vf["gid"])
 
 
+def trystat_shutil_copy2(log: "NamedLogger", src: bytes, dst: bytes) -> bytes:
+    try:
+        return shutil.copy2(src, dst)
+    except:
+        # ignore failed mtime on linux+ntfs; for example:
+        # shutil.py:437 <copy2>: copystat(src, dst, follow_symlinks=follow_symlinks)
+        # shutil.py:376 <copystat>: lookup("utime")(dst, ns=(st.st_atime_ns, st.st_mtime_ns),
+        # [PermissionError] [Errno 1] Operation not permitted, '/windows/_videos'
+        _, _, tb = sys.exc_info()
+        for _, _, fun, _ in traceback.extract_tb(tb):
+            if fun == "copystat":
+                if log:
+                    t = "warning: failed to retain some file attributes (timestamp and/or permissions) during copy from %r to %r:\n%s"
+                    log(t % (src, dst, min_ex()), 3)
+                return dst  # close enough
+        raise
+
+
 def _fs_mvrm(
     log: "NamedLogger", src: str, dst: str, atomic: bool, flags: dict[str, Any]
 ) -> bool:
@@ -2951,6 +3002,27 @@ def load_ipu(
     return ip_u, nm
 
 
+def load_ipr(
+    log: "RootLogger", iprs: list[str], defer_mutex: bool = False
+) -> dict[str, NetMap]:
+    ret = {}
+    for ipr in iprs:
+        try:
+            zs, uname = ipr.split("=")
+            cidrs = zs.split(",")
+        except:
+            t = "\n  invalid value %r for argument --ipr; must be CIDR[,CIDR[,...]]=UNAME (192.168.0.0/16=amelia)"
+            raise Exception(t % (ipr,))
+        try:
+            nm = NetMap(["::"], cidrs, True, True, defer_mutex)
+        except Exception as ex:
+            t = "failed to translate --ipr into netmap, probably due to invalid config: %r"
+            log("root", t % (ex,), 1)
+            raise
+        ret[uname] = nm
+    return ret
+
+
 def yieldfile(fn: str, bufsz: int) -> Generator[bytes, None, None]:
     readsz = min(bufsz, 128 * 1024)
     with open(fsenc(fn), "rb", bufsz) as f:
@@ -3135,8 +3207,9 @@ def statdir(
         else:
             src = "listdir"
             fun: Any = os.lstat if lstat else os.stat
+            btop_ = os.path.join(btop, b"")
             for name in os.listdir(btop):
-                abspath = os.path.join(btop, name)
+                abspath = btop_ + name
                 try:
                     yield (fsdec(name), fun(abspath))
                 except Exception as ex:
@@ -3175,7 +3248,9 @@ def rmdirs(
 
     stats = statdir(logger, scandir, lstat, top, False)
     dirs = [x[0] for x in stats if stat.S_ISDIR(x[1].st_mode)]
-    dirs = [os.path.join(top, x) for x in dirs]
+    if dirs:
+        top_ = os.path.join(top, "")
+        dirs = [top_ + x for x in dirs]
     ok = []
     ng = []
     for d in reversed(dirs):
@@ -3578,7 +3653,7 @@ def runihook(
     verbose: bool,
     cmd: str,
     vol: "VFS",
-    ups: list[tuple[str, int, int, str, str, str, int]],
+    ups: list[tuple[str, int, int, str, str, str, int, str]],
 ) -> bool:
     _, chk, fork, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
     bcmd = [sfsenc(x) for x in acmd]
@@ -4151,7 +4226,7 @@ def _pkg_resource_exists(pkg: str, name: str) -> bool:
 
 
 def stat_resource(E: EnvParams, name: str):
-    path = os.path.join(E.mod, name)
+    path = E.mod_ + name
     if os.path.exists(path):
         return os.stat(fsenc(path))
     return None
@@ -4198,7 +4273,7 @@ def _has_resource(name: str):
 
 
 def has_resource(E: EnvParams, name: str):
-    return _has_resource(name) or os.path.exists(os.path.join(E.mod, name))
+    return _has_resource(name) or os.path.exists(E.mod_ + name)
 
 
 def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
@@ -4223,7 +4298,7 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
                 stream = codecs.getreader(enc)(stream)
             return stream
 
-    ap = os.path.join(E.mod, name)
+    ap = E.mod_ + name
 
     if PY2:
         return codecs.open(ap, "r", encoding=enc)  # type: ignore

@@ -1,7 +1,7 @@
 FROM    alpine:latest
 WORKDIR /z
 LABEL   org.opencontainers.image.url="https://github.com/9001/copyparty" \
-        org.opencontainers.image.source="https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker" \
+        org.opencontainers.image.source="https://github.com/9001/copyparty" \
         org.opencontainers.image.licenses="MIT" \
         org.opencontainers.image.title="copyparty-iv" \
         org.opencontainers.image.description="copyparty with Pillow, FFmpeg, libvips (image/audio/video thumbnails, audio transcoding, media tags)"
@@ -14,17 +14,20 @@ RUN     apk add -U !pyc \
             ffmpeg \
             py3-magic \
             vips-jxl vips-heif vips-poppler vips-magick \
+            libraw py3-numpy cython \
         && apk add -t .bd \
             bash wget gcc g++ make cmake patchelf \
             python3-dev py3-wheel libffi-dev \
+            libraw-dev py3-numpy-dev \
         && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
         && python3 -m pip install pyvips \
+        && python3 -m pip install "$(wget -O- https://api.github.com/repos/letmaik/rawpy/releases/latest | awk -F\" '$2=="tarball_url"{print$4}')" \
         && apk del py3-pip .bd
 
 COPY    i/dist/copyparty-sfx.py innvikler.sh ./
 ADD     base ./base
 RUN     ash innvikler.sh iv
 
-WORKDIR /w
+WORKDIR /state
 EXPOSE  3923
-ENTRYPOINT ["python3", "-m", "copyparty", "--no-crt", "-c", "/z/initcfg"]
+ENTRYPOINT ["python3", "-m", "copyparty", "-c", "/z/initcfg"]

@@ -66,7 +66,7 @@ def main():
     try:
         sp.check_call(cmd)
     except:
-        t = "-- FAILED TO DONWLOAD " + name
+        t = "-- FAILED TO DOWNLOAD " + name
         print(f"{t}\n", end="")
         open(t, "wb").close()
 

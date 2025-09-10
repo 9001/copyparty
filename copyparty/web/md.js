@@ -201,7 +201,7 @@ function convert_markdown(md_text, dest_dom) {
 
     var marked_opts = {
         //headerPrefix: 'h-',
-        breaks: true,
+        breaks: !md_no_br,
         gfm: true
     };
 
@@ -217,7 +217,7 @@ function convert_markdown(md_text, dest_dom) {
     catch (ex) {
         if (IE) {
             dest_dom.innerHTML = 'IE cannot into markdown ;_;';
-            return;
+            return false;
         }
 
         if (ext)
@@ -344,6 +344,8 @@ function convert_markdown(md_text, dest_dom) {
             }
             catch (ex) { }
         }, 1);
+    
+    return true;
 }
 
 
@@ -422,7 +424,7 @@ function init_toc() {
         }
     }
 
-    // hilight the correct toc items + scroll into view
+    // highlight the correct toc items + scroll into view
     function freshen_toclist() {
         if (anchors.length == 0)
             return;

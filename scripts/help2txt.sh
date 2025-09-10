@@ -23,7 +23,7 @@ exit 0
 
 
 # first open an infinitely wide console (this is why you own an ultrawide) and copypaste this into it:
-for a in '' -bind -accounts -flags -handlers -hooks -urlform -exp -ls -dbd -chmod -pwhash -zm; do
+for a in '' -bind -accounts -auth -auth-ord -flags -handlers -hooks -idp -urlform -exp -ls -dbd -chmod -pwhash -zm; do
 ./copyparty-sfx.py --help$a 2>/dev/null; printf '\n\n\n%0255d\n\n\n'; done
 
 # then copypaste all of the output by pressing ctrl-shift-a, ctrl-shift-c

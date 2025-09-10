@@ -10,7 +10,7 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/shares.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
-{{ html_head }}
+{{- html_head }}
 </head>
 
 <body>
@@ -36,7 +36,7 @@
             <th>hrs</th>
             <th>add time</th>
         </tr></thead><tbody>
-        {% for k, pw, vp, pr, st, un, t0, t1 in rows %}
+        {%- for k, pw, vp, pr, st, un, t0, t1 in rows %}
         <tr>
             <td>
                 <a href="{{ r }}{{ shr }}{{ k }}?qr">qr</a>
@@ -54,11 +54,11 @@
             <td>{{ "inf" if not t1 else "dead" if t1 < now else ((t1 - now) / 3600) | round(1) }}</td>
             <td></td>
         </tr>
-        {% endfor %}
+        {%- endfor %}
         </tbody></table>
-        {% if not rows %}
+        {%- if not rows %}
         (you don't have any active shares btw)
-        {% endif %}
+        {%- endif %}
     </div>
 	<a href="#" id="repl">π</a>
 	<script>
