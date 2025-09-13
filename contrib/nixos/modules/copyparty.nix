@@ -52,6 +52,7 @@ let
     ${mkSection "global" cfg.settings}
     ${cfg.globalExtraConfig}
     ${mkSection "accounts" (accountsWithPlaceholders cfg.accounts)}
+    ${mkSection "groups" cfg.groups}
     ${concatStringsSep "\n" (mapAttrsToList mkVolume cfg.volumes)}
   '';
 
@@ -163,6 +164,19 @@ in
       example = literalExpression ''
         {
           ed.passwordFile = "/run/keys/copyparty/ed";
+        };
+      '';
+    };
+
+    groups = mkOption {
+      type = types.attrsOf (types.listOf types.str);
+      description = ''
+        A set of copyparty groups to create and the users that should be part of each group.
+      '';
+      default = { };
+      example = literalExpression ''
+        {
+          group_name = [ "user1" "user2" ];
         };
       '';
     };
