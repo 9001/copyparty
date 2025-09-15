@@ -806,6 +806,53 @@ var Ls = {
 		"af1": "показать недавние загрузки",
 		"ag1": "показать известных IdP-пользователей",
 	},
+	"epo": {
+		"a1": "reŝargi",
+		"b1": "sal, nekonatulo &nbsp; <small>(vi ne estas ensalutita)</small>",
+		"c1": "elsaluti",
+		"d1": "montru stakon",  // TLNote: "d2" is the tooltip for this button
+		"d2": "montras la staton de ĉiuj aktivaj fadenoj",
+		"e1": "reŝargi CFGon",
+		"e2": "reŝargas la agordo-dosierojn (kontoj/portiloj/portilo-flagoj),$Nkaj reskanas ĉiuj portiloj de ed2s$N$Nnoto: ĉiuj ŝanĝoj de ĝeneralaj agordoj postulas$Npostulas tutan restartigon por efektiviĝi",
+		"f1": "vi povas vidi:",
+		"g1": "vi povas alŝuti al:",
+		"cc1": "aliaĵoj:",
+		"h1": "malŝalti k304-on",  // TLNote: "j1" explains what k304 is
+		"i1": "ŝalti k304-on",
+		"j1": "k304 malkonektas vian klienton je ĉiu HTTP-eraro 304; tio povas eviti paraliziĝon dum uzado de difektitaj retperantoj (paĝoj subite ne ŝargiĝas), <em>sed</em> ĝi ankaŭ plimalrapidigas ĉion",
+		"k1": "rekomenci agordojn de kliento",
+		"l1": "ensaluti por pli da opcioj:",
+        "ls3": "ensaluti", //m
+        "lu4": "uzantnomo", //m
+        "lp4": "pasvorto", //m
+		"lo3": "ensaluti kiel “{0}” ĉie", //m
+		"lo2": "ĉi tiu finigos seancon en ĉiuj retumiloj", //m
+		"m1": "bonvenon denove,",  // TLNote: "welcome back, USERNAME"
+		"n1": "404 ne trovita &nbsp;┐( ´ -`)┌",
+		"o1": 'aŭ eble vi ne havas rajton -- provu uzi pasvorton aŭ <a href="' + SR + '/?h">iri hejmen</a>',
+		"p1": "403 ne permesita &nbsp;~┻━┻",
+		"q1": 'uzu pasvorton aŭ <a href="' + SR + '/?h">iru hejmen</a>',
+		"r1": "hejmen",
+		".s1": "reskani",
+		"t1": "ago",  // TLNote: this is the header above the "rescan" buttons
+		"u2": "tempo post lasta skribo (alŝuto / alinomado / ...) je servilo$N( upload / rename / ... )$N$N17d = 17 tagoj$N1h23 = 1 horo 23 minutoj$N4m56 = 4 minutoj 56 sekundoj",
+		"v1": "konekti",
+		"v2": "uzi ĉi tiun servilon kiel loka disko",
+		"w1": "uzi HTTPS-protokolon",
+		"x1": "ŝanĝi pasvorton",
+		"y1": "redakti komunaĵojn",  // TLNote: shows the list of folders that the user has decided to share
+		"z1": "malŝlosi ĉi tiun komunaĵon:",  // TLNote: the password prompt to see a hidden share
+		"ta1": "entajpu novan pasvorton unue",
+		"ta2": "retajpu por konfirmi:",
+		"ta3": "tajpo-eraro; bonvolu provu denove",
+		"aa1": "aktivaj alŝutoj:",
+		"ab1": "malŝalti no304-on",
+		"ac1": "ŝalti no304-on",
+		"ad1": "no304 malŝaltas ĉiun kaŝmemoradon; provu ĉi tion, se k304 ne riparis la difektojn. Ĉi tiu agordo malŝparas multon da datumtrafiko!",
+		"ae1": "aktivaj elŝutoj:",
+        "af1": "montri lastajn alŝutojn",
+		"ag1": "montri kaŝmemoron de idp",
+	},
 };
 
 if (window.langmod)
