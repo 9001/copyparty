@@ -53,6 +53,13 @@
 ### [`zfs-tune.py`](zfs-tune.py)
 * optimizes databases for optimal performance when stored on a zfs filesystem; also see [openzfs docs](https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Workload%20Tuning.html#database-workloads) and specifically the SQLite subsection
 
+### [`setup-ashell.sh`](setup-ashell.sh)
+* downloads `copyparty-sfx.py` on $HOME/Documents on your iPhone/iPad
+* creates a simple config file on $HOME/Documents/cpc (can be edited with vim) (good luck closing it tho)
+* makes a simple executable script that starts the server. by default it opens the ports 80, 443 and 3923 for http and https. when run it will also print a qr code to access the server.
+* run with `cpp`
+* because of platform limitations it will only work if a-shell is running in the foreground
+
 # OS integration
 init-scripts to start copyparty as a service
 * [`systemd/copyparty.service`](systemd/copyparty.service) runs the sfx normally

@@ -3023,7 +3023,7 @@ first install one of the following:
 and then copypaste the following command into `a-Shell`:
 
 ```sh
-curl https://github.com/9001/copyparty/raw/refs/heads/hovudstraum/contrib/setup-ashell.sh | sh
+curl https://raw.githubusercontent.com/9001/copyparty/refs/heads/hovudstraum/contrib/setup-ashell.sh | sh
 ```
 
 what this does:
