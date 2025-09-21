@@ -41,25 +41,25 @@ RUN     mkdir -p /z/dist/no-pk \
         && (mkdir hash-wasm \
             && cd hash-wasm \
             && unzip ../hash-wasm.zip) \
-        && (tar -xf asmcrypto.tgz \
+        && (tar --no-same-owner -xf asmcrypto.tgz \
             && cd asmcrypto.js-$ver_asmcrypto \
             && npm install ) \
-        && (tar -xf marked.tgz \
+        && (tar --no-same-owner -xf marked.tgz \
             && cd marked-$ver_marked \
             && npm install \
             && npm i grunt uglify-js -g ) \
-        && (tar -xf codemirror.tgz \
+        && (tar --no-same-owner -xf codemirror.tgz \
             && cd codemirror5-$ver_codemirror \
             && npm install ) \
-        && (tar -xf mde.tgz \
+        && (tar --no-same-owner -xf mde.tgz \
             && cd easy-markdown-editor* \
             && npm install \
             && npm i gulp-cli -g ) \
-        && tar -xf dompurify.tgz \
-        && tar -xf prism.tgz \
-        && tar -xf fusepy.tgz \
+        && tar --no-same-owner -xf dompurify.tgz \
+        && tar --no-same-owner -xf prism.tgz \
+        && tar --no-same-owner -xf fusepy.tgz \
         && unzip fontawesome.zip \
-        && tar -xf zopfli.tgz
+        && tar --no-same-owner -xf zopfli.tgz
 
 
 COPY    busy-mp3.sh /z/
@@ -68,7 +68,7 @@ RUN     /z/busy-mp3.sh \
 
 
 # build fonttools (which needs zopfli)
-RUN     tar -xf zopfli.tgz \
+RUN     tar --no-same-owner -xf zopfli.tgz \
         && cd zopfli* \
         && cmake \
             -DCMAKE_INSTALL_PREFIX=/usr \
