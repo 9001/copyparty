@@ -85,19 +85,34 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
 the table headers in the matrixes below are the different softwares, with a quick review of each software in the next section
 
 the softwares,
-* `a` = [copyparty](https://github.com/9001/copyparty)
-* `b` = [hfs2](https://github.com/rejetto/hfs2/) 🔥
-* `c` = [hfs3](https://rejetto.com/hfs/)
-* `d` = [nextcloud](https://github.com/nextcloud/server)
-* `e` = [seafile](https://github.com/haiwen/seafile)
-* `f` = [rclone](https://github.com/rclone/rclone), specifically `rclone serve webdav .`
-* `g` = [dufs](https://github.com/sigoden/dufs)
-* `h` = [chibisafe](https://github.com/chibisafe/chibisafe)
-* `i` = [kodbox](https://github.com/kalcaddle/kodbox)
-* `j` = [filebrowser](https://github.com/filebrowser/filebrowser)
-* `k` = [filegator](https://github.com/filegator/filegator)
-* `l` = [sftpgo](https://github.com/drakkan/sftpgo)
-* `m` = [arozos](https://github.com/tobychui/arozos)
+
+[a]: https://github.com/9001/copyparty "copyparty"
+[b]: https://github.com/rejetto/hfs2/ "hfs2"
+[c]: https://rejetto.com/hfs/ "hfs3"
+[d]: https://github.com/nextcloud/server "nextcloud"
+[e]: https://github.com/haiwen/seafile "seafile"
+[f]: https://github.com/rclone/rclone "rclone"
+[g]: https://github.com/sigoden/dufs "dufs"
+[h]: https://github.com/chibisafe/chibisafe "chibisafe"
+[i]: https://github.com/kalcaddle/kodbox "kodbox"
+[j]: https://github.com/filebrowser/filebrowser "filebrowser"
+[k]: https://github.com/filegator/filegator "filegator"
+[l]: https://github.com/drakkan/sftpgo "sftpgo"
+[m]: https://github.com/tobychui/arozos "arozos"
+
+* `a` = [copyparty][a]
+* `b` = [hfs2][b] 🔥
+* `c` = [hfs3][c]
+* `d` = [nextcloud][d]
+* `e` = [seafile][e]
+* `f` = [rclone][f], specifically `rclone serve webdav .`
+* `g` = [dufs][g]
+* `h` = [chibisafe][h]
+* `i` = [kodbox][i]
+* `j` = [filebrowser][j]
+* `k` = [filegator][k]
+* `l` = [sftpgo][l]
+* `m` = [arozos][m]
 
 some softwares not in the matrixes,
 * [updog](#updog)
@@ -119,7 +134,7 @@ symbol legend,
 
 ## general
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | intuitive UX            |   | ╱ | █ | █ | █ |   | █ | █ | █ | █ | █ | █ | █ |
 | config GUI              |   | █ | █ | █ | █ |   |   | █ | █ | █ |   | █ | █ |
@@ -156,7 +171,7 @@ symbol legend,
 
 *the thing that copyparty is actually kinda good at*
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | download folder as zip  | █ | █ | █ | █ | ╱ |   | █ |   | █ | █ | ╱ | █ | ╱ |
 | download folder as tar  | █ |   |   |   |   |   |   |   |   |   |   |   |   |
@@ -220,7 +235,7 @@ symbol legend,
 
 ## protocols and client support
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | serve https             | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | serve webdav            | █ |   |   | █ | █ | █ | █ |   | █ |   |   | █ | █ |
@@ -251,7 +266,7 @@ symbol legend,
 
 ## server configuration
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | config from cmd args    | █ |   | █ |   |   | █ | █ |   |   | █ |   | ╱ | ╱ |
 | config files            | █ | █ | █ | ╱ | ╱ | █ |   | █ |   | █ | • | ╱ | ╱ |
@@ -272,7 +287,7 @@ symbol legend,
 
 ## server capabilities
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | accounts                | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | per-account chroot      |   |   |   |   |   |   |   |   |   |   |   | █ |   |
@@ -339,7 +354,7 @@ symbol legend,
 
 ## client features
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------  | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | single-page app         | █ |   | █ | █ | █ |   |   | █ | █ | █ | █ |   | █ |
 | themes                  | █ | █ | █ | █ |   |   |   |   | █ |   |   |   |   |
@@ -398,7 +413,7 @@ symbol legend,
 
 ## integration
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | OS alert on upload      | ╱ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |   |
 | discord                 | ╱ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |   |
