@@ -6571,7 +6571,6 @@ class HttpCli(object):
 
         no_zip = bool(self._can_zip(vf))
 
-
         dirs = []
         files = []
         ptn_hr = RE_HR
@@ -6852,7 +6851,9 @@ class HttpCli(object):
             allowed_exts = vf.get("opds_exts") or self.args.opds_exts
 
             if allowed_exts:
-                files = [x for x in files if x["name"].rsplit(".", 1)[-1] in allowed_exts]
+                files = [
+                    x for x in files if x["name"].rsplit(".", 1)[-1] in allowed_exts
+                ]
             for item in dirs:
                 href = item["href"]
                 href += ("&" if "?" in href else "?") + "opds"
@@ -6888,10 +6889,10 @@ class HttpCli(object):
 
                 # Make sure we can actually generate JPEG thumbnails
                 if (
-                        not self.args.th_no_jpg
-                        and self.thumbcli
-                        and "dthumb" not in dbv.flags
-                        and "dithumb" not in dbv.flags
+                    not self.args.th_no_jpg
+                    and self.thumbcli
+                    and "dthumb" not in dbv.flags
+                    and "dithumb" not in dbv.flags
                 ):
                     item["jpeg_thumb_href"] = href + "&th=jf"
                     item["jpeg_thumb_href_hires"] = item["jpeg_thumb_href"] + "3"
