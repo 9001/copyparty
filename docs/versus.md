@@ -264,7 +264,7 @@ symbol legend,
 
 * `folder-rproxy` = reverse-proxying without dedicating an entire (sub)domain, using a subfolder instead
 * `l`/sftpgo:
-  * config: user can be add by cmd command in [Portable mode](https://docs.sftpgo.com/enterprise/cli/#portable-mode); if not in  Portable mode users must be added through gui / api calls
+  * config: user can be added by cmd command in [Portable mode](https://docs.sftpgo.com/2.6/cli/#portable-mode); if not in  Portable mode users must be added through gui / api calls
 * `m`/arozos:
   * configuration is primarily through GUI
   * reverse-proxy is not guaranteed to see the correct client IP
