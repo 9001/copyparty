@@ -4012,10 +4012,6 @@ class HttpCli(object):
             raise Pebkac(403, t)
         return ""
 
-    def _can_opds(self, volflags: dict[str, Any]) -> str:
-        # TODO: Permissions
-        return ""
-
     def tx_res(self, req_path: str) -> bool:
         status = 200
         logmsg = "{:4} {} ".format("", self.req)
