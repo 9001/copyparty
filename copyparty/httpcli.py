@@ -6571,11 +6571,6 @@ class HttpCli(object):
 
         no_zip = bool(self._can_zip(vf))
 
-        volflag_opds_exts = vf.get("opds_exts")
-        if volflag_opds_exts is not None:
-            opds_no_filter = len(volflag_opds_exts) == 0
-        else:
-            opds_no_filter = len(self.args.opds_exts) == 0
 
         dirs = []
         files = []
@@ -6640,8 +6635,6 @@ class HttpCli(object):
                 ext = ptn_hr.sub("@", fn.rsplit(".", 1)[1])
                 if len(ext) > 16:
                     ext = ext[:16]
-                if is_opds and not opds_no_filter and ext not in self.args.opds_exts:
-                    continue
             else:
                 ext = "%"
 
@@ -6664,43 +6657,6 @@ class HttpCli(object):
             else:
                 href = quotep(href)
 
-            mime = None
-            if is_opds:
-                href += "&" if "?" in href else "?"
-                href += "opds"
-                if not is_dir:
-                    if "rmagic" in self.vn.flags:
-                        mime = guess_mime(fn, fspath)
-                    else:
-                        mime = guess_mime(fn)
-                    # Make sure we can actually generate JPEG thumbnails
-                    if (
-                        self.args.th_no_jpg
-                        or not self.thumbcli
-                        or "dthumb" in dbv.flags
-                        or "dithumb" in dbv.flags
-                    ):
-                        jpeg_thumb_href = None
-                        jpeg_thumb_href_hires = None
-                    else:
-                        jpeg_thumb_href = href + "&th=jf"
-                        jpeg_thumb_href_hires = jpeg_thumb_href + "3"
-
-                iso8601 = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (
-                    zd.year,
-                    zd.month,
-                    zd.day,
-                    zd.hour,
-                    zd.minute,
-                    zd.second,
-                )
-
-            else:
-                mime = None
-                iso8601 = None
-                jpeg_thumb_href = None
-                jpeg_thumb_href_hires = None
-
             item = {
                 "lead": margin,
                 "href": href,
@@ -6708,11 +6664,8 @@ class HttpCli(object):
                 "sz": sz,
                 "ext": ext,
                 "dt": dt,
-                "iso8601": iso8601,
                 "ts": int(linf.st_mtime),
-                "mime": mime,
-                "jpeg_thumb_href": jpeg_thumb_href,
-                "jpeg_thumb_href_hires": jpeg_thumb_href_hires,
+                "_fspath": fspath,
             }
             if is_dir:
                 dirs.append(item)
@@ -6893,6 +6846,55 @@ class HttpCli(object):
             d["name"] += "/"
 
         dirs.sort(key=itemgetter("name"))
+
+        if is_opds:
+            # exclude files which don't match --opds-exts
+            allowed_exts = vf.get("opds_exts") or self.args.opds_exts
+
+            if allowed_exts:
+                files = [x for x in files if x["name"].rsplit(".", 1)[-1] in allowed_exts]
+            for item in dirs:
+                href = item["href"]
+                href += ("&" if "?" in href else "?") + "opds"
+
+                zd = datetime.fromtimestamp(max(0, item["ts"]), UTC)
+                item["iso8601"] = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (
+                    zd.year,
+                    zd.month,
+                    zd.day,
+                    zd.hour,
+                    zd.minute,
+                    zd.second,
+                )
+
+            for item in files:
+                href = item["href"]
+                href += ("&" if "?" in href else "?") + "opds"
+
+                zd = datetime.fromtimestamp(max(0, item["ts"]), UTC)
+                item["iso8601"] = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (
+                    zd.year,
+                    zd.month,
+                    zd.day,
+                    zd.hour,
+                    zd.minute,
+                    zd.second,
+                )
+
+                if "rmagic" in self.vn.flags:
+                    item["mime"] = guess_mime(fn, item["_fspath"])
+                else:
+                    item["mime"] = guess_mime(fn)
+
+                # Make sure we can actually generate JPEG thumbnails
+                if (
+                        not self.args.th_no_jpg
+                        and self.thumbcli
+                        and "dthumb" not in dbv.flags
+                        and "dithumb" not in dbv.flags
+                ):
+                    item["jpeg_thumb_href"] = href + "&th=jf"
+                    item["jpeg_thumb_href_hires"] = item["jpeg_thumb_href"] + "3"
 
         if is_js:
             j2a["ls0"] = cgv["ls0"] = {
