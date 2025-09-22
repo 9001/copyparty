@@ -9,7 +9,7 @@ from plyer import notification
 _ = r"""
 show os notification on upload; works on windows, linux, macos, android
 
-depdencies:
+dependencies:
     windows: python3 -m pip install --user -U plyer
     linux:   python3 -m pip install --user -U plyer
     macos:   python3 -m pip install --user -U plyer pyobjus

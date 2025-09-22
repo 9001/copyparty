@@ -6,8 +6,8 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
-S_VERSION = "2.0"
-S_BUILD_DT = "2024-10-01"
+S_VERSION = "2.1"
+S_BUILD_DT = "2025-09-06"
 
 """
 mount a copyparty server (local or remote) as a filesystem
@@ -99,7 +99,7 @@ except:
     elif MACOS:
         libfuse = "install https://osxfuse.github.io/"
     else:
-        libfuse = "apt install libfuse3-3\n    modprobe fuse"
+        libfuse = "apt install libfuse2\n    modprobe fuse"
 
     m = """\033[33m
   could not import fuse; these may help:
@@ -359,7 +359,7 @@ class Gateway(object):
     def sendreq(self, meth, path, headers, **kwargs):
         tid = get_tid()
         if self.password:
-            headers["Cookie"] = "=".join(["cppwd", self.password])
+            headers["PW"] = self.password
 
         try:
             c = self.getconn(tid)
@@ -902,9 +902,7 @@ class CPPF(Operations):
         return ret
 
     def _readdir(self, path, fh=None):
-        path = path.strip("/")
-        dbg("readdir %r [%s]", path, fh)
-
+        dbg("dircache miss")
         ret = self.gw.listdir(path)
         if not self.n_dircache:
             return ret
@@ -914,11 +912,17 @@ class CPPF(Operations):
             self.dircache.append(cn)
             self.clean_dircache()
 
-        # import pprint; pprint.pprint(ret)
         return ret
 
     def readdir(self, path, fh=None):
-        return [".", ".."] + list(self._readdir(path, fh))
+        dbg("readdir %r [%s]", path, fh)
+        path = path.strip("/")
+        cn = self.get_cached_dir(path)
+        if cn:
+            ret = cn.data
+        else:
+            ret = self._readdir(path, fh)
+        return [".", ".."] + list(ret)
 
     def read(self, path, length, offset, fh=None):
         req_max = 1024 * 1024 * 8
@@ -993,7 +997,6 @@ class CPPF(Operations):
         if cn:
             dents = cn.data
         else:
-            dbg("cache miss")
             dents = self._readdir(dirpath)
 
         try:
@@ -1141,10 +1144,15 @@ def main():
     if WINDOWS:
         examples.append("http://192.168.1.69:3923/music/  M:")
 
+    epi = "example:" + ex_pre + ex_pre.join(examples)
+    epi += """\n
+NOTE: if server has --usernames enabled, then password is "username:password"
+"""
+
     ap = argparse.ArgumentParser(
         formatter_class=TheArgparseFormatter,
         description="mount a copyparty server as a local filesystem -- " + ver,
-        epilog="example:" + ex_pre + ex_pre.join(examples),
+        epilog=epi,
     )
     # fmt: off
     ap.add_argument("base_url", type=str, help="remote copyparty URL to mount")

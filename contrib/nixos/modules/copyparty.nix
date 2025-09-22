@@ -50,6 +50,7 @@ let
 
   configStr = ''
     ${mkSection "global" cfg.settings}
+    ${cfg.globalExtraConfig}
     ${mkSection "accounts" (accountsWithPlaceholders cfg.accounts)}
     ${concatStringsSep "\n" (mapAttrsToList mkVolume cfg.volumes)}
   '';
@@ -129,6 +130,12 @@ in
           hist = ${externalCacheDir};
         }
       '';
+    };
+
+    globalExtraConfig = mkOption {
+      type = types.str;
+      default = "";
+      description = "Appended to the end of the [global] section verbatim. This is useful for flags which are used in a repeating manner (e.g. ipu: 255.255.255.1=user) which can't be repeated in the settings = {} attribute set.";
     };
 
     accounts = mkOption {
@@ -373,3 +380,4 @@ in
     }
   );
 }
+

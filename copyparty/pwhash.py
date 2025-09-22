@@ -25,6 +25,7 @@ class PWHash(object):
         self.args = args
 
         zsl = args.ah_alg.split(",")
+        zsl = [x.strip() for x in zsl]
         alg = zsl[0]
         if alg == "none":
             alg = ""

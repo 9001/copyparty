@@ -65,6 +65,9 @@ DXMLParser = _DXMLParser
 
 
 def parse_xml(txt: str) -> ET.Element:
+    """
+    Parse XML into an xml.etree.ElementTree.Element while defusing some unsafe parts.
+    """
     parser = DXMLParser()
     parser.feed(txt)
     return parser.close()  # type: ignore

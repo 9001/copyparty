@@ -1263,10 +1263,13 @@ function sethash(hv) {
 
 function dl_file(url) {
     console.log('DL [%s]', url);
-    var o = mknod('a');
+    qsr('#dlfth');
+    var o = mknod('a', 'dlfth');
     o.setAttribute('href', url);
     o.setAttribute('download', '');
-    o.click();
+    document.body.appendChild(o);
+    ebi('dlfth').click();
+    qsr('#dlfth');
 }
 
 
@@ -1821,12 +1824,12 @@ var modal = (function () {
     };
 
     var onkey = function (e) {
-        var k = (e.code || e.key) + '',
+        var k = (e.key || e.code) + '',
             eok = ebi('modal-ok'),
             eng = ebi('modal-ng'),
             ae = document.activeElement;
 
-        if (k == 'Space' && ae && (ae === eok || ae === eng))
+        if ((k == 'Space' || k == 'Spacebar' || k == ' ') && ae && (ae === eok || ae === eng))
             k = 'Enter';
 
         if (k.endsWith('Enter')) {

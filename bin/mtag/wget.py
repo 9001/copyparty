@@ -84,7 +84,7 @@ def main():
         #   on success, delete the .bin file which contains the URL
         os.unlink(fp)
     except:
-        open("-- FAILED TO DONWLOAD " + name, "wb").close()
+        open("-- FAILED TO DOWNLOAD " + name, "wb").close()
 
     os.unlink(tfn)
     print(url)

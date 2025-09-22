@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # usage: ./bubbleparty.sh ./copyparty-sfx.py ....
 bwrap \
   --unshare-all \
@@ -9,7 +9,7 @@ bwrap \
   --dev-bind /dev /dev \
   --dir /tmp \
   --dir /var \
-  --bind $(pwd) $(pwd) \
+  --bind "$(pwd)" "$(pwd)" \
   --share-net \
   --die-with-parent \
   --file 11 /etc/passwd \

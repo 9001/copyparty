@@ -15,9 +15,15 @@ rm -rf /z/base
 rm -rf /var/cache/apk/* /root/.cache
 
 # initial config; common for all flavors
-mkdir /cfg /w
-chmod 777 /cfg /w
-echo % /cfg > initcfg
+mkdir /state /cfg /w
+chmod 777 /state /cfg /w
+cat >initcfg <<'EOF'
+[global]
+  chdir: /w
+  no-crt
+
+% /cfg
+EOF
 
 # unpack sfx and dive in
 python3 copyparty-sfx.py --version

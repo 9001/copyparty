@@ -49,21 +49,47 @@ function setos(os) {
 setos(WINDOWS ? 'win' : LINUX ? 'lin' : MACOS ? 'mac' : 'idk');
 
 
-var pw = '';
+var un, un0, pw, pw0, unpw, up0;
 function setpw(e) {
     ev(e);
+    if (!ebi('un0'))
+        return askpw();
+
+    modal.prompt('username:', '', function (v) {
+        if (!v)
+            return;
+
+        un = v;
+        un0 = ebi('un0').innerHTML;
+        var oa = QSA('b');
+
+        for (var a = 0; a < oa.length; a++)
+            if (oa[a].innerHTML == un0)
+                oa[a].textContent = un;
+        
+        askpw();
+    });
+}
+function askpw() {
     modal.prompt('password:', '', function (v) {
         if (!v)
             return;
 
         pw = v;
-        var pw0 = ebi('pw0').innerHTML,
-            oa = QSA('b');
-    
+        pw0 = ebi('pw0').innerHTML;
+        var oa = QSA('b');
+
         for (var a = 0; a < oa.length; a++)
             if (oa[a].innerHTML == pw0)
-                oa[a].textContent = v;
+                oa[a].textContent = pw;
 
+        if (un) {
+            unpw = un ? (un+':'+pw) : pw;
+            up0 = ebi('up0').innerHTML;
+            for (var a = 0; a < oa.length; a++)
+                if (oa[a].innerHTML == up0)
+                    oa[a].textContent = unpw;
+        }
         add_dls();
     });
 }

@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="{{ r }}/.cpr/mde.css?_={{ ts }}">
 	<link rel="stylesheet" href="{{ r }}/.cpr/deps/mini-fa.css?_={{ ts }}">
 	<link rel="stylesheet" href="{{ r }}/.cpr/deps/easymde.css?_={{ ts }}">
-{{ html_head }}
+{{- html_head }}
 </head>
 <body>
 	<div id="mw">
@@ -28,7 +28,8 @@
 
 var SR = "{{ r }}",
 	last_modified = {{ lastmod }},
-	have_emp = {{ "true" if have_emp else "false" }},
+	have_emp = {{ have_emp }},
+	md_no_br = {{ md_no_br }},
 	dfavico = "{{ favico }}";
 
 var md_opt = {

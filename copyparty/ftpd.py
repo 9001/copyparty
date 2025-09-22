@@ -68,13 +68,13 @@ class FtpAuth(DummyAuthorizer):
         if ip.startswith("::ffff:"):
             ip = ip[7:]
 
-        ip = ipnorm(ip)
+        ipn = ipnorm(ip)
         bans = self.hub.bans
-        if ip in bans:
-            rt = bans[ip] - time.time()
+        if ipn in bans:
+            rt = bans[ipn] - time.time()
             if rt < 0:
                 logging.info("client unbanned")
-                del bans[ip]
+                del bans[ipn]
             else:
                 raise AuthenticationFailed("banned")
 
@@ -96,6 +96,10 @@ class FtpAuth(DummyAuthorizer):
 
         if args.ipu and uname == "*":
             uname = args.ipu_iu[args.ipu_nm.map(ip)]
+        if args.ipr and uname in args.ipr_u:
+            if not args.ipr_u[uname].map(ip):
+                logging.warning("username [%s] rejected by --ipr", uname)
+                uname = "*"
 
         if not uname or not (asrv.vfs.aread.get(uname) or asrv.vfs.awrite.get(uname)):
             g = self.hub.gpwd
@@ -147,10 +151,6 @@ class FtpFs(AbstractedFS):
 
         self.cwd = "/"  # pyftpdlib convention of leading slash
         self.root = "/var/lib/empty"
-
-        self.can_read = self.can_write = self.can_move = False
-        self.can_delete = self.can_get = self.can_upget = False
-        self.can_admin = self.can_dot = False
 
         self.listdirinfo = self.listdir
         self.chdir(".")
@@ -214,7 +214,7 @@ class FtpFs(AbstractedFS):
         m: bool = False,
         d: bool = False,
     ) -> tuple[str, VFS, str]:
-        return self.v2a(os.path.join(self.cwd, vpath), r, w, m, d)
+        return self.v2a(join(self.cwd, vpath), r, w, m, d)
 
     def ftp2fs(self, ftppath: str) -> str:
         # return self.v2a(ftppath)
@@ -285,21 +285,14 @@ class FtpFs(AbstractedFS):
             # returning 550 is library-default and suitable
             raise FSE("No such file or directory")
 
-        avfs = vfs.chk_ap(ap, st)
-        if not avfs:
-            raise FSE("Permission denied", 1)
+        if vfs.realpath:
+            avfs = vfs.chk_ap(ap, st)
+            if not avfs:
+                raise FSE("Permission denied", 1)
+        else:
+            avfs = vfs
 
         self.cwd = nwd
-        (
-            self.can_read,
-            self.can_write,
-            self.can_move,
-            self.can_delete,
-            self.can_get,
-            self.can_upget,
-            self.can_admin,
-            self.can_dot,
-        ) = avfs.can_access("", self.h.uname)
 
     def mkdir(self, path: str) -> None:
         ap, vfs, _ = self.rv2a(path, w=True)
@@ -322,7 +315,7 @@ class FtpFs(AbstractedFS):
             vfs_ls = [x[0] for x in vfs_ls1]
             vfs_ls.extend(vfs_virt.keys())
 
-            if not self.can_dot:
+            if self.uname not in vfs.axs.udot:
                 vfs_ls = exclude_dotfiles(vfs_ls)
 
             vfs_ls.sort()
@@ -370,16 +363,13 @@ class FtpFs(AbstractedFS):
             raise FSE(str(ex))
 
     def rename(self, src: str, dst: str) -> None:
-        if not self.can_move:
-            raise FSE("Not allowed for user " + self.h.uname)
-
         if self.args.no_mv:
             raise FSE("The rename/move feature is disabled in server config")
 
         svp = join(self.cwd, src).lstrip("/")
         dvp = join(self.cwd, dst).lstrip("/")
         try:
-            self.hub.up2k.handle_mv(self.uname, self.h.cli_ip, svp, dvp)
+            self.hub.up2k.handle_mv("", self.uname, self.h.cli_ip, svp, dvp)
         except Exception as ex:
             raise FSE(str(ex))
 
@@ -403,7 +393,7 @@ class FtpFs(AbstractedFS):
 
     def utime(self, path: str, timeval: float) -> None:
         ap = self.rv2a(path, w=True)[0]
-        return bos.utime(ap, (timeval, timeval))
+        bos.utime_c(logging.warning, ap, int(timeval), False)
 
     def lstat(self, path: str) -> os.stat_result:
         ap = self.rv2a(path)[0]
@@ -492,7 +482,11 @@ class FtpHandler(FTPHandler):
     def ftp_STOR(self, file: str, mode: str = "w") -> Any:
         # Optional[str]
         vp = join(self.fs.cwd, file).lstrip("/")
-        ap, vfs, rem = self.fs.v2a(vp, w=True)
+        try:
+            ap, vfs, rem = self.fs.v2a(vp, w=True)
+        except Exception as ex:
+            self.respond("550 %s" % (ex,), logging.info)
+            return
         self.vfs_map[ap] = vp
         xbu = vfs.flags.get("xbu")
         if xbu and not runhook(

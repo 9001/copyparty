@@ -9,7 +9,7 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/splash.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
-{{ html_head }}
+{{- html_head }}
 </head>
 
 <body>
@@ -18,12 +18,16 @@
 		<a id="a" href="{{ r }}/?h{{ re }}" class="af">refresh</a>
 		<a id="v" href="{{ r }}/?hc" class="af">connect</a>
 
-		{%- if this.uname == '*' %}
-			<p id="b">howdy stranger &nbsp; <small>(you're not logged in)</small></p>
-		{%- else %}
-			<a id="c" href="{{ r }}/?pw=x" class="logout">logout</a>
-			<p><span id="m">welcome back,</span> <strong>{{ this.uname|e }}</strong></p>
-		{%- endif %}
+			{%- if this.uname == '*' %}
+		<p id="b">howdy stranger &nbsp; <small>(you're not logged in)</small></p>
+			{%- else %}
+				{%- if this.args.idp_logout %}
+		<a id="c" href="{{ this.args.idp_logout }}" class="logout">logout</a>
+				{%- else %}
+		<a id="c" href="{{ r }}/?pw=x" class="logout">logout</a>
+				{%- endif %}
+		<p><span id="m">welcome back,</span> <strong id="un">{{ this.uname|e }}</strong></p>
+			{%- endif %}
 		{%- endif %}
 
 		{%- if msg %}
@@ -37,9 +41,9 @@
 			<table class="vols">
 				<thead><tr><th>%</th><th>speed</th><th>eta</th><th>idle</th><th>dir</th><th>file</th></tr></thead>
 				<tbody>
-					{% for u in ups %}
+					{%- for u in ups %}
 					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
-					{% endfor %}
+					{%- endfor %}
 				</tbody>
 			</table>
 		{%- endif %}
@@ -49,9 +53,9 @@
 			<table class="vols">
 				<thead><tr><th>%</th><th>sent</th><th>speed</th><th>eta</th><th>idle</th><th></th><th>dir</th><th>file</th></tr></thead>
 				<tbody>
-					{% for u in dls %}
+					{%- for u in dls %}
 					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td>{{ u[4] }}</td><td>{{ u[5] }}</td><td><a href="{{ u[6] }}">{{ u[7]|e }}</a></td><td>{{ u[8] }}</td></tr>
-					{% endfor %}
+					{%- endfor %}
 				</tbody>
 			</table>
 		{%- endif %}
@@ -70,11 +74,11 @@
 			<table class="vols">
 				<thead><tr><th>vol</th><th id="t">action</th><th>status</th></tr></thead>
 				<tbody>
-					{% for mp in avol %}
+					{%- for mp in avol %}
 					{%- if mp in vstate and vstate[mp] %}
 					<tr><td><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a class="s" href="{{ r }}{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
 					{%- endif %}
-					{% endfor %}
+					{%- endfor %}
 				</tbody>
 			</table>
 		</td></tr></table>
@@ -87,18 +91,18 @@
 		{%- if rvol %}
 		<h1 id="f">you can browse:</h1>
 		<ul>
-			{% for mp in rvol %}
+			{%- for mp in rvol %}
 			<li><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
-			{% endfor %}
+			{%- endfor %}
 		</ul>
 		{%- endif %}
 
 		{%- if wvol %}
 		<h1 id="g">you can upload to:</h1>
 		<ul>
-			{% for mp in wvol %}
+			{%- for mp in wvol %}
 			<li><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
-			{% endfor %}
+			{%- endfor %}
 		</ul>
 		{%- endif %}
 
@@ -110,64 +114,83 @@
 				<input type="password" id="lp" name="cppwd" placeholder=" password" />
 				<input type="hidden" name="uhash" id="uhash" value="x" />
 				<input type="submit" id="ls" value="Unlock" />
-				{% if ahttps %}
+				{%- if ahttps %}
 				<a id="w" href="{{ ahttps }}">switch to https</a>
-				{% endif %}
+				{%- endif %}
 			</form>
 		</div>
 		{%- else %}
 		<h1 id="l">login for more:</h1>
 		<div>
+			{%- if this.args.idp_login %}
+			<ul><li>
+				<a href="{{ this.args.idp_login | replace("{dst}",r+"/"+qvpath) }}">{{ this.args.idp_login_t }}</a>
+				{%- if this.args.ao_have_pw %}or alternatively:{%- endif %}
+			</li></ul>
+			{%- endif %}
+			{%- if this.args.ao_have_pw %}
 			<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
 				<input type="hidden" id="la" name="act" value="login" />
-				{% if this.args.usernames %}
+				{%- if this.args.usernames %}
 				<input type="text" id="lu" name="uname" placeholder=" username" size="12" />
 				<input type="password" id="lp" name="cppwd" placeholder=" password" size="12" />
-				{% else %}
+				{%- else %}
 				<input type="password" id="lp" name="cppwd" placeholder=" password" />
-				{% endif %}
+				{%- endif %}
 				<input type="hidden" name="uhash" id="uhash" value="x" />
 				<input type="submit" id="ls" value="login" />
-				{% if chpw %}
+				{%- if chpw %}
 				<a id="x" href="#">change password</a>
-				{% endif %}
-				{% if ahttps %}
+				{%- endif %}
+				{%- if ahttps %}
 				<a id="w" href="{{ ahttps }}">switch to https</a>
-				{% endif %}
+				{%- endif %}
 			</form>
+			{%- endif %}
 		</div>
 		{%- endif %}
 
 		<h1 id="cc">other stuff:</h1>
 		<ul>
+			{%- if ahttps %}
+			<li><a id="wb" href="{{ ahttps }}">switch to https</a></li>
+			{%- endif %}
+
 			{%- if this.uname in this.args.idp_adm_set %}
 			<li><a id="ag" href="{{ r }}/?idp">view idp cache</a></li>
-			{% endif %}
+			{%- endif %}
 
 			{%- if this.uname != '*' and this.args.shr %}
 			<li><a id="y" href="{{ r }}/?shares">edit shares</a></li>
-			{% endif %}
+			{%- endif %}
 
-			{% if k304 or k304vis %}
-			{% if k304 %}
+			{%- if k304 or k304vis %}
+			{%- if k304 %}
 			<li><a id="h" href="{{ r }}/?cc&setck=k304=n">disable k304</a> (currently enabled)
 			{%- else %}
 			<li><a id="i" href="{{ r }}/?cc&setck=k304=y" class="r">enable k304</a> (currently disabled)
-			{% endif %}
+			{%- endif %}
 			<blockquote id="j">enabling k304 will disconnect your client on every HTTP 304, which can prevent some buggy proxies from getting stuck (suddenly not loading pages), <em>but</em> it will also make things slower in general</blockquote></li>
-			{% endif %}
+			{%- endif %}
 
-			{% if no304 or no304vis %}
-			{% if no304 %}
+			{%- if no304 or no304vis %}
+			{%- if no304 %}
 			<li><a id="ab" href="{{ r }}/?cc&setck=no304=n">disable no304</a> (currently enabled)
 			{%- else %}
 			<li><a id="ac" href="{{ r }}/?cc&setck=no304=y" class="r">enable no304</a> (currently disabled)
-			{% endif %}
+			{%- endif %}
 			<blockquote id="ad">enabling no304 will disable all caching; try this if k304 wasn't enough. This will waste a huge amount of network traffic!</blockquote></li>
-			{% endif %}
+			{%- endif %}
 
 			<li><a id="af" href="{{ r }}/?ru">show recent uploads</a></li>
 			<li><a id="k" href="{{ r }}/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
+
+			{%- if this.uname != '*' and not in_shr %}
+			<li><form method="post" enctype="multipart/form-data">
+				<input type="hidden" name="act" value="logout" />
+				<input type="submit" id="lo" value="logout “{{ this.uname|e }}” everywhere" />
+			</form></li>
+			{%- endif %}
 		</ul>
 
 	</div>

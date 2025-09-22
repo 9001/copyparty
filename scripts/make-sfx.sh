@@ -41,7 +41,7 @@ help() { exec cat <<'EOF'
 # `no-cm` saves ~89k by removing easymde/codemirror
 #   (the fancy markdown editor)
 #
-# `no-hl` saves ~41k by removing syntax hilighting in the text viewer
+# `no-hl` saves ~41k by removing syntax highlighting in the text viewer
 #
 # `no-fnt` saves ~9k by removing the source-code-pro font
 #   (browsers will try to use 'Consolas' instead)
@@ -217,6 +217,8 @@ necho() {
 	tar -zxf $f
 	mv pyftpdlib-*/pyftpdlib .
 	rm -rf pyftpdlib-* pyftpdlib/test
+	patch -s -p1 <../scripts/patches/pyftpdlib-win313.patch
+	patch -s -p1 <../scripts/patches/pyftpdlib-fe80.patch
 	for f in pyftpdlib/_async{hat,ore}.py; do
 		[ -e "$f" ] || continue;
 		iawk 'NR<4||NR>27||!/^#/;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' $f

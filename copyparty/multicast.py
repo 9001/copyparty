@@ -15,7 +15,7 @@ from ipaddress import (
 )
 
 from .__init__ import MACOS, TYPE_CHECKING
-from .util import Daemon, Netdev, find_prefix, min_ex, spack
+from .util import IP6_LL, IP64_LL, Daemon, Netdev, find_prefix, min_ex, spack
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -145,7 +145,7 @@ class MCast(object):
         all_selected = ips[:]
 
         # discard non-linklocal ipv6
-        ips = [x for x in ips if ":" not in x or x.startswith("fe80")]
+        ips = [x for x in ips if ":" not in x or x.startswith(IP6_LL)]
 
         if not ips:
             raise NoIPs()
@@ -183,7 +183,7 @@ class MCast(object):
                 srv.ips[oth_ip.split("/")[0]] = ipaddress.ip_network(oth_ip, False)
 
             # gvfs breaks if a linklocal ip appears in a dns reply
-            ll = {k: v for k, v in srv.ips.items() if k.startswith(("169.254", "fe80"))}
+            ll = {k: v for k, v in srv.ips.items() if k.startswith(IP64_LL)}
             rt = {k: v for k, v in srv.ips.items() if k not in ll}
 
             if self.args.ll or not rt:

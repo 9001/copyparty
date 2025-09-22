@@ -431,6 +431,8 @@ class VFS(object):
 
         self.get_dbv = self._get_dbv
         self.ls = self._ls
+        self.canonical = self._canonical
+        self.dcanonical = self._dcanonical
 
     def __repr__(self) -> str:
         return "VFS(%s)" % (
@@ -624,7 +626,7 @@ class VFS(object):
         vrem = vjoin(self.vpath[len(dbv.vpath) :].lstrip("/"), vrem)
         return dbv, vrem
 
-    def canonical(self, rem: str, resolve: bool = True) -> str:
+    def _canonical(self, rem: str, resolve: bool = True) -> str:
         """returns the canonical path (fully-resolved absolute fs path)"""
         ap = self.realpath
         if rem:
@@ -632,7 +634,7 @@ class VFS(object):
 
         return absreal(ap) if resolve else ap
 
-    def dcanonical(self, rem: str) -> str:
+    def _dcanonical(self, rem: str) -> str:
         """resolves until the final component (filename)"""
         ap = self.realpath
         if rem:
@@ -640,6 +642,44 @@ class VFS(object):
 
         ad, fn = os.path.split(ap)
         return os.path.join(absreal(ad), fn)
+
+    def _canonical_shr(self, rem: str, resolve: bool = True) -> str:
+        """returns the canonical path (fully-resolved absolute fs path)"""
+        ap = self.realpath
+        if rem:
+            ap += "/" + rem
+
+        rap = absreal(ap)
+        if self.shr_files:
+            assert self.shr_src  # !rm
+            vn, rem = self.shr_src
+            chk = absreal(os.path.join(vn.realpath, rem))
+            if chk != rap:
+                # not the dir itself; assert file allowed
+                ad, fn = os.path.split(rap)
+                if chk != ad or fn not in self.shr_files:
+                    return "\n\n"
+
+        return rap if resolve else ap
+
+    def _dcanonical_shr(self, rem: str) -> str:
+        """resolves until the final component (filename)"""
+        ap = self.realpath
+        if rem:
+            ap += "/" + rem
+
+        ad, fn = os.path.split(ap)
+        ad = absreal(ad)
+        if self.shr_files:
+            assert self.shr_src  # !rm
+            vn, rem = self.shr_src
+            chk = absreal(os.path.join(vn.realpath, rem))
+            if chk != absreal(ap):
+                # not the dir itself; assert file allowed
+                if ad != chk or fn not in self.shr_files:
+                    return "\n\n"
+
+        return os.path.join(ad, fn)
 
     def _ls_nope(
         self, *a, **ka
@@ -881,6 +921,15 @@ class VFS(object):
                 return None
 
         if "xvol" in self.flags:
+            self_ap = self.realpath + os.sep
+            if aps.startswith(self_ap):
+                vp = aps[len(self_ap) :]
+                if ANYWIN:
+                    vp = vp.replace(os.sep, "/")
+                vn2, _ = self._find(vp)
+                if self == vn2:
+                    return self
+
             all_aps = self.shr_all_aps or self.root.all_aps
 
             for vap, vns in all_aps:
@@ -967,6 +1016,14 @@ class AuthSrv(object):
         self.indent = ""
         self.is_lxc = args.c == ["/z/initcfg"]
 
+        self._vf0b = {
+            "tcolor": self.args.tcolor,
+            "du_iwho": self.args.du_iwho,
+            "shr_who": self.args.shr_who if self.args.shr else "no",
+        }
+        self._vf0 = self._vf0b.copy()
+        self._vf0["d2d"] = True
+
         # fwd-decl
         self.vfs = VFS(log_func, "", "", "", AXS(), {})
         self.acct: dict[str, str] = {}  # uname->pw
@@ -1005,7 +1062,10 @@ class AuthSrv(object):
         yield prev, True
 
     def vf0(self):
-        return {"d2d": True, "tcolor": self.args.tcolor}
+        return self._vf0.copy()
+
+    def vf0b(self):
+        return self._vf0b.copy()
 
     def idp_checkin(
         self, broker: Optional["BrokerCli"], uname: str, gname: str
@@ -1098,6 +1158,9 @@ class AuthSrv(object):
                         rejected = True
             if rejected:
                 continue
+
+            if gn == self.args.grp_all:
+                gn = ""
 
             # if ap/vp has a user/group placeholder, make sure to keep
             # track so the same user/group is mapped when setting perms;
@@ -1208,6 +1271,7 @@ class AuthSrv(object):
         self.load_idp_db(bool(self.idp_accs))
         ret = {un: gns[:] for un, gns in self.idp_accs.items()}
         ret.update({zs: [""] for zs in acct if zs not in ret})
+        grps[self.args.grp_all] = list(ret.keys())
         for gn, uns in grps.items():
             for un in uns:
                 try:
@@ -1315,6 +1379,10 @@ class AuthSrv(object):
                 zt = split_cfg_ln(ln)
                 for zs, za in zt.items():
                     zs = zs.lstrip("-")
+                    if "=" in zs:
+                        t = "WARNING: found an option named [%s] in your [global] config; did you mean to say [%s: %s] instead?"
+                        zs1, zs2 = zs.split("=", 1)
+                        self.log(t % (zs, zs1, zs2), 3)
                     if za is True:
                         self._e("└─argument [{}]".format(zs))
                     else:
@@ -1324,6 +1392,10 @@ class AuthSrv(object):
             if cat == cata:
                 try:
                     u, p = [zs.strip() for zs in ln.split(":", 1)]
+                    if "=" in u and not p:
+                        t = "WARNING: found username [%s] in your [accounts] config; did you mean to say [%s: %s] instead?"
+                        zs1, zs2 = u.split("=", 1)
+                        self.log(t % (u, zs1, zs2), 3)
                     self._l(ln, 5, "account [{}], password [{}]".format(u, p))
                     acct[u] = p
                 except:
@@ -1394,6 +1466,10 @@ class AuthSrv(object):
                     zd = split_cfg_ln(ln)
                     fstr = ""
                     for sk, sv in zd.items():
+                        if "=" in sk:
+                            t = "WARNING: found a volflag named [%s] in your config; did you mean to say [%s: %s] instead?"
+                            zs1, zs2 = sk.split("=", 1)
+                            self.log(t % (sk, zs1, zs2), 3)
                         bad = re.sub(r"[a-z0-9_-]", "", sk).lstrip("-")
                         if bad:
                             err = "bad characters [{}] in volflag name [{}]; "
@@ -1634,6 +1710,7 @@ class AuthSrv(object):
                     # accept both , and : as separators between usernames
                     zs1, zs2 = x.replace("=", ":").split(":", 1)
                     grps[zs1] = zs2.replace(":", ",").split(",")
+                    grps[zs1] = [x.strip() for x in grps[zs1]]
                 except:
                     t = '\n  invalid value "{}" for argument --grp, must be groupname:username1,username2,...'
                     raise Exception(t.format(x))
@@ -1685,6 +1762,10 @@ class AuthSrv(object):
                     self.log("\n{0}\n{1}{0}".format(t, "\n".join(slns)))
                     raise
 
+        self.args.have_idp_hdrs = bool(self.args.idp_h_usr or self.args.idp_hm_usr)
+        self.args.have_ipu_or_ipr = bool(self.args.ipu or self.args.ipr)
+        self.setup_auth_ord()
+
         self.setup_pwhash(acct)
         defpw = acct.copy()
         self.setup_chpw(acct)
@@ -1697,7 +1778,7 @@ class AuthSrv(object):
 
             mount = cased
 
-        if not mount and not self.args.idp_h_usr:
+        if not mount and not self.args.have_idp_hdrs:
             # -h says our defaults are CWD at root and read/write for everyone
             axs = AXS(["*"], ["*"], None, None)
             ehint = ""
@@ -1721,12 +1802,15 @@ class AuthSrv(object):
                     files = os.listdir(E.cfg)
                 except:
                     files = []
-                hits = [x for x in files if x.lower().endswith(".conf")]
+                hits = [
+                    x
+                    for x in files
+                    if x.lower().endswith(".conf") and not x.startswith(".")
+                ]
                 if hits:
                     t = "Hint: Found some config files in [%s], but these were not automatically loaded because they are in the wrong place%s %s\n"
                     self.log(t % (E.cfg, ehint, ", ".join(hits)), 3)
-            zvf = {"tcolor": self.args.tcolor}
-            vfs = VFS(self.log_func, absreal("."), "", "", axs, zvf)
+            vfs = VFS(self.log_func, absreal("."), "", "", axs, self.vf0b())
             if not axs.uread:
                 self.badcfg1 = True
         elif "" not in mount:
@@ -1870,7 +1954,7 @@ class AuthSrv(object):
 
         if missing_users:
             zs = ", ".join(k for k in sorted(missing_users))
-            if self.args.idp_h_usr:
+            if self.args.have_idp_hdrs:
                 t = "the following users are unknown, and assumed to come from IdP: "
                 self.log(t + zs, c=6)
             else:
@@ -1880,6 +1964,16 @@ class AuthSrv(object):
 
         if LEELOO_DALLAS in all_users:
             raise Exception("sorry, reserved username: " + LEELOO_DALLAS)
+
+        zsl = []
+        for usr in list(acct)[:]:
+            zs = acct[usr].strip()
+            if not zs:
+                zs = ub64enc(os.urandom(48)).decode("ascii")
+                zsl.append(usr)
+            acct[usr] = zs
+        if zsl:
+            self.log("generated random passwords for users %r" % (zsl,), 6)
 
         seenpwds = {}
         for usr, pwd in acct.items():
@@ -2201,12 +2295,12 @@ class AuthSrv(object):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
-            zs = "forget_ip gid nrand tail_who u2abort u2ow uid ups_who zip_who"
+            zs = "forget_ip gid nrand tail_who th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
 
-            zs = "convt tail_fd tail_rate tail_tmax"
+            zs = "aconvt convt tail_fd tail_rate tail_tmax"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = float(vol.flags[k])
@@ -2249,6 +2343,11 @@ class AuthSrv(object):
                 vol.lim.chown = "chown" in vol.flags
                 vol.lim.uid = vol.flags["uid"]
                 vol.lim.gid = vol.flags["gid"]
+
+            vol.flags["du_iwho"] = n_du_who(vol.flags["du_who"])
+
+            if not enshare:
+                vol.flags["shr_who"] = "no"
 
             if vol.flags.get("og"):
                 self.args.uqe = True
@@ -2537,7 +2636,7 @@ class AuthSrv(object):
             if not self.args.no_voldump:
                 self.log(t)
 
-            if have_e2d or self.args.idp_h_usr:
+            if have_e2d or self.args.have_idp_hdrs:
                 t = self.chk_sqlite_threadsafe()
                 if t:
                     self.log("\n\033[{}\033[0m\n".format(t))
@@ -2692,6 +2791,8 @@ class AuthSrv(object):
 
                     shn.shr_files = set(fns)
                     shn.ls = shn._ls_shr
+                    shn.canonical = shn._canonical_shr
+                    shn.dcanonical = shn._dcanonical_shr
                 else:
                     shn.ls = shn._ls
 
@@ -2756,6 +2857,7 @@ class AuthSrv(object):
                 "dcrop": vf["crop"],
                 "dth3x": vf["th3x"],
                 "u2ts": vf["u2ts"],
+                "shr_who": vf["shr_who"],
                 "frand": bool(vf.get("rand")),
                 "lifetime": vf.get("lifetime") or 0,
                 "unlist": vf.get("unlist") or "",
@@ -2764,16 +2866,19 @@ class AuthSrv(object):
             js_htm = {
                 "SPINNER": self.args.spinner,
                 "s_name": self.args.bname,
+                "idp_login": self.args.idp_login,
                 "have_up2k_idx": "e2d" in vf,
                 "have_acode": not self.args.no_acode,
                 "have_c2flac": self.args.allow_flac,
                 "have_c2wav": self.args.allow_wav,
                 "have_shr": self.args.shr,
+                "shr_who": vf["shr_who"],
                 "have_zip": not self.args.no_zip,
                 "have_mv": not self.args.no_mv,
                 "have_del": not self.args.no_del,
                 "have_unpost": int(self.args.unpost),
-                "have_emp": self.args.emp,
+                "have_emp": int(self.args.emp),
+                "md_no_br": int(vf.get("md_no_br") or 0),
                 "ext_th": vf.get("ext_th_d") or {},
                 "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
                 "sba_md": vf.get("md_sba") or "",
@@ -2824,10 +2929,22 @@ class AuthSrv(object):
             zs = str(vol.flags.get("tcolor") or self.args.tcolor)
             vol.flags["tcolor"] = zs.lstrip("#")
 
+    def setup_auth_ord(self) -> None:
+        ao = [x.strip() for x in self.args.auth_ord.split(",")]
+        if "idp" in ao:
+            zi = ao.index("idp")
+            ao = ao[:zi] + ["idp-hm", "idp-h"] + ao[zi:]
+        zsl = "pw idp-h idp-hm ipu".split()
+        pw, h, hm, ipu = [ao.index(x) if x in ao else 99 for x in zsl]
+        self.args.ao_idp_before_pw = min(h, hm) < pw
+        self.args.ao_h_before_hm = h < hm
+        self.args.ao_ipu_wins = ipu == 0
+        self.args.ao_have_pw = pw < 99 or not self.args.have_idp_hdrs
+
     def load_idp_db(self, quiet=False) -> None:
         # mutex me
         level = self.args.idp_store
-        if level < 2 or not self.args.idp_h_usr:
+        if level < 2 or not self.args.have_idp_hdrs:
             return
 
         assert sqlite3  # type: ignore  # !rm
@@ -2884,7 +3001,7 @@ class AuthSrv(object):
         n = []
         q = "insert into us values (?,?,?)"
         accs = list(self.acct)
-        if self.args.idp_h_usr and self.args.idp_cookie:
+        if self.args.have_idp_hdrs and self.args.idp_cookie:
             accs.extend(self.idp_accs.keys())
         for uname in accs:
             if uname not in ases:
@@ -3416,6 +3533,30 @@ class AuthSrv(object):
         self.log("generated config:\n\n" + "\n".join(ret))
 
 
+def n_du_who(s: str) -> int:
+    if s == "all":
+        return 9
+    if s == "auth":
+        return 7
+    if s == "w":
+        return 5
+    if s == "rw":
+        return 4
+    if s == "a":
+        return 3
+    return 0
+
+
+def n_ver_who(s: str) -> int:
+    if s == "all":
+        return 9
+    if s == "auth":
+        return 6
+    if s == "a":
+        return 3
+    return 0
+
+
 def split_cfg_ln(ln: str) -> dict[str, Any]:
     # "a, b, c: 3" => {a:true, b:true, c:3}
     ret = {}
@@ -3448,7 +3589,9 @@ def expand_config_file(
 
     if os.path.isdir(fp):
         names = list(sorted(os.listdir(fp)))
-        cnames = [x for x in names if x.lower().endswith(".conf")]
+        cnames = [
+            x for x in names if x.lower().endswith(".conf") and not x.startswith(".")
+        ]
         if not cnames:
             t = "warning: tried to read config-files from folder '%s' but it does not contain any "
             if names:

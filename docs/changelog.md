@@ -1,4 +1,210 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0828-2014  `v1.19.7`  chdir
+
+## 🧪 new features
+
+* new option `chdir` to change the PWD (process working-directory) before volumes are mapped 14555d58
+
+## 🩹 bugfixes
+
+* fix using empty folders as statefile storage ([v1.19.6](https://github.com/9001/copyparty/releases/tag/v1.19.6) made this a bit too strict) 0d96786e
+* holding I/K to scroll through folders quickly now works better 914686ec
+
+## 🔧 other changes
+
+* #717 docker: fix the image repo metadata (thx @EmilyxFox!) 6f087117
+* docker: change `$HOME` to `/state` 01cf20a0 d1f75229
+  * and use the new `chdir` option to preserve old config-file semantics 14555d58
+  * helps avoid statefiles accidentally landing in `/w` as a consequence of misconfiguration
+
+## 🌠 fun facts
+
+* this release was made at [RevSpace NL](https://a.ocv.me/pub/g/nerd-stuff/PXL_20250828_202820075.jpg?cache) 
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0827-2038  `v1.19.6`  auth-precedence
+
+## 🧪 new features
+
+* #673 add Portuguese translation (thx anonymous!) 4b8c2215
+  * ...and enable the Polish translation (whoops) 8f235be6
+* #689 add option to control authentication priority/precedence 543b7ea9
+* url-parameter `?dl` forces file download instead of displaying in-browser 48d6224e
+* #533 more ways to make the QR-code always-visible in the console 2848941e
+* #695 option to log invalid xml from clients 28b93d79
+* #552 configurable markdown newline behavior 0491123b
+  * and tweak the styling of monospace in links 68503444
+
+## 🩹 bugfixes
+
+* #628 FTP-server now accepts connections from IPv6 link-local addresses 978801d0
+* incorrect assumption that all IPv6 link-local addresses start with `fe80` d39c74c1
+* ftp: fix file rename d40f061a
+* u2c: couldn't upload files located at the very top of the unix file hierarchy 599e82f2
+* #699 markdown-editor: fix panic if the table-formatter is executed on something that isn't a table 4c042b3c
+
+## 🔧 other changes
+
+* #696 a volume can be one single file, not just folders aa1c9213
+* #442 strongly prefer XDG_CONFIG_HOME as config location 35472557
+* #691 album-art collected from audio-files can now become folder thumbnails 0b50fde3
+* allow spaces in more of the comma-separated options d30240b4
+* docs:
+  * mention config requirements for [syncing folders](https://github.com/9001/copyparty/#folder-sync) with u2c 6cd0a396 59f142cd
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0821-2319  `v1.19.5`  it runs on iOS
+
+## 🧪 new features
+
+* #328 run copyparty on iPhones; see [install on iOS](https://github.com/9001/copyparty#install-on-iOS) in the readme ca98d54f
+  * cannot run in the background, doesn't have full access to your files, and is slightly buggy, but it *works*
+  * [running on android](https://github.com/9001/copyparty#install-on-android) gives you a much better experience
+* save the qr-code to a file (txt/svg/png) 202ddeac
+
+## 🩹 bugfixes
+
+* #661 fix incorrect `rproxy` hint in the logs 6c76614e
+* #649 fix js-crash when tapping in the exactly correct place (thx @hahaslav for debugging!) 0de07d8e
+* #628 ftpd: fix banning IPv6 clients 6d76254c
+
+## 🔧 other changes
+
+* #296 nixos: support non-flake setups (thx @Sorixelle!) 20ef74cd 32593670
+* config-parser catches and explains a few more common mistakes cc65b1b5
+* docs:
+  * #490, #199: readme: confirm that combining copyparty and syncthing is safe c51371c7
+  * #377 improved authelia docker example (thx @xFuture603!) cd8771fa 
+  * mention the homebrew formulae f9cb2c15
+  * #651 versus.md: fix hfs3 comparison (thx @rejetto!) 7a4973fa
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0817-1556  `v1.19.4`  take two (fix cfg vols)
+
+## ℹ️ this upgrade is a one-way ticket
+
+* your up2k database (`.hist/up2k.db`), used by the `e2d` filesystem indexing feature, **will be upgraded to a new format** which older copyparty versions cannot read. A backup of each database will be created automatically, named `up2k.db.bak.SOMETHING.v5`. If you need to downgrade to a previous version: Shutdown copyparty, delete these files: `up2k.db up2k.db-shm up2k.db-wal` and then copy `up2k.db.bak.*.v5` to `up2k.db`
+
+## 🧪 new features
+
+* new translations:
+  * #551 Swedish (thx @Bevinsky!) d676a86f
+  * #551 Korean (thx @nyqui!) 4e878d2f
+* #581 new theme: phi95 (thx @varphi-online!) d8662aeb
+* #567 .raw image thumbnails (thx @ar-nelson!) 0177a9b4
+  * available in docker-images `iv` and `dj`
+* #561 epub thumbnails (thx @Scotsguy!) 9435e6b2
+* #252 music thumbnails use embdded coverart if available 98d117b8
+  * thumbnails folder `.hist/th` must be deleted to take effect
+* #530 show username of uploaders in file listings; requires `a` (admin) permission 4df033ec
+* #604 a new group `@acct` which automatically contains all known usernames 68907eaf
+* controlpanel has a dedicated "logout all sessions" button, similar to the logout-link in the browser f4a3fba2
+* #397 accounts can be restricted to certian IPs 62e072a2
+* #504 automatic login through tailscale auth a4649d1e
+* #533 sticky qr-code with `--qr-pin 1` 1ebe06f5
+* #572 button to abort copy/move 715d374e
+* #618 "download selected files" didn't work on firefox 52 (winxp) dcc6b1b4
+* max number of cookies to allow can be configured 6303effe
+  * good if you have too many selfhosted services on one domain (but will beware of the spec-mandataed max length of the cookie field!)
+
+## 🩹 bugfixes
+
+* fix xvol/xdev edgecases:
+  * #603 rootless vfs 554cc2f3 
+  * false-positive with overlapping volumes d9046f7e
+* #573 ftp: attempting an upload into read-only folder no longer kills the connection 3aa8b7aa
+* #306 adjust navpane for `--rp-loc` (location-based proxying)
+* #556 more sensible config expansion order f4727f8e
+  * #624 ...which broke things bf1fdcab
+* the video player now stays fullscreen between videos 782e2f1d
+* heif thumbnailing with libvips
+
+## 🔧 other changes
+
+* #253 build nix-packages from source (thx @toast003, @chinponya!) 187cae25
+* #616 logfiles will have a plaintext severity column if `--no-ansi` d4cf42e7
+* #598 separate option `--ac-convt` for audio transcoding timeout d5623057
+* #596 users with a blank password gets a strong random-generated one 7f448750
+* copyparty.exe: upgrade to python 3.13.7
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0810-1226  `v1.19.1`  archlinux fix
+
+## 🧪 new features
+
+* new translations:
+  * #486 French (thx @Tr3yWay996, @Packingdustry, @Alee14, @jakubiakfr, @Equinoxs!) e9ddfccf 7aa21483 b87f8f1b
+  * #463 Polish (thx @pufereq and @daimond113!) 392a4db5
+  * #537 Nynorsk (thx @chinatsu!) 3931bc27
+* #549 custom mdns domain 3c78c6a8
+
+## 🩹 bugfixes
+
+* #539 FTP glitches when running on windows 8ba98877
+* #555 global-config didn't load through PRTY_CONFIG (thx @icxes!) 074e106e
+* macos: could take a while to establish webdav connection from finder a01870b7
+* ux:
+  * dropdown colors 347cf6a5
+  * case-sensitivity in filters e5e82295
+  * iOS being too enthusiastic about using saved passwords 03acd65e
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0807-2213  `v1.19.0`  usernames
+
+## 🧪 new features
+
+* #511 login with username and password (not just password) can now optionally be enabled with `--usernames` 346515cc
+  * if you have enabled password hashing (`ah-alg: argon2` or similar) then you will need to hash your passwords again after enabling usernames, hashing them as `username:password:`
+* #468 add Greek translation (thx @chamdim!) 50f46187 392abd06
+* #471 add Czech translation (thx @kubakubakuba!) c9556583
+* #515 support systemd socket acivation (thx @mati1210!) 9b9d2a92
+* #523 add QR-code to the connectpage bcc3b156
+* #513 optional EOL-conversion for texteditor 8b31ed88
+* controlpanel refresh-button now toggles automatic refresh 7ae84dea
+
+## 🩹 bugfixes
+
+* fix stuck uploads when the up2k database (`e2d`) is not enabled 4a043568
+  * if more than 60'000 files were uploaded and there were several dupes of some files, they could get stuck and never upload
+  * upload performance is improved remarkably by enabling `e2d` so such huge uploads non-e2d had not been tested in a long time 
+* #467 #470 fix ui-crash when exporting links of all uploaded files to clipboard (thx @geekalaa!) 0df1901f
+* #487 fix ui-crash when the location url-part is `//` 0f55a1ae
+* fix viewing `.MD` files (8a0746c6)
+
+## 🔧 other changes
+
+* when a reverse-proxy is detected, force explicit configuration of `--rproxy` to obtain correct client IP 3f8cb7e8
+  * a bit inconvenient, but helps prevent potentially-dangerous misconfiguration
+  * the necessary configuration changes are explained in the serverlog (you can't miss it)
+  * thanks to @person4268 for pointing out that there was room for improvements!
+* failed login attempts now only log a sha512 hash of the provided password
+  * to see login-attempts with incorrect passwords as plaintext like before, `log-badpwd: 1`
+* #502 add systemd user services and templated services (thx @icxes!) 34d98e99
+* #475 improve helptext for multivalue global-options c2ac57a2
+* #475 add [chungus.conf](https://github.com/9001/copyparty/blob/hovudstraum/docs/chungus.conf), massive extensive nonsensical demo config b664ebb0
+* try to detect proxies with incorrect caching behavior 9e980bb5
+* recent-uploads now support ie9 a57f7cc2
+* languages and themes are now dropdowns a9ee4f24
+* copyparty.exe: upgrade python to 3.13.6 a98360f2
+* introduce [copyparty-en.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-en.py), english-only edition of copyparty-sfx.py to save space 33497e6b
+
+## 🗿 known issues 
+
+* the `copyparty.pyz` in this release is english-only, and does not include the translations -- they got lost in transit while adjusting the buildscripts to make `copyparty-en.py`
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0804-0013  `v1.18.10`  idp speedboost
 
 ## 🧪 new features

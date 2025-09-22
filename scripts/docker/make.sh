@@ -102,12 +102,18 @@ filt=
             # arm takes forever so make it top priority
             [ ${a::3} == arm ] && nice= || nice=-n20
 
+            # not sure if this is necessary or if inherit-annotations=false was enough, but won't hurt
+            readarray -t annot < <(awk <Dockerfile.$i '/org.opencontainers.image/{sub(/[^\.]+/,"");sub(/[" \\]+$/,"");sub(/"/,"");print"--annotation";print"org"$0}')
+            annot+=( --annotation "org.opencontainers.image.created=$( date -u +%Y-%m-%dT%H:%M:%SZ )" )
+
             # --pull=never does nothing at all btw
             (set -x
             nice $nice podman build \
                 --squash \
                 --pull=never \
                 --from localhost/alpine-$a \
+                --inherit-annotations=false \
+                "${annot[@]}" \
                 -t copyparty-$i-$a$suf \
                 -f Dockerfile.$i . ||
                     (echo $? $i-$a >> err; printf '%096d\n' $(seq 1 42))

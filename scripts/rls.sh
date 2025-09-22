@@ -43,6 +43,8 @@ while [ "$1" ]; do
     shift
 done
 
+./make-pyz.sh 
+
 ./make-sfx.sh re lang eng "$@" 
 mv ../dist/copyparty-{sfx,en}.py
 mv ../dist/copyparty-{int,sfx}.py
