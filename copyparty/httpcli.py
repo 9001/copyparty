@@ -4214,7 +4214,7 @@ class HttpCli(object):
         #
         # force download
 
-        if "dl" in self.ouparam or "opds" in self.uparam:
+        if "dl" in self.ouparam:
             cdis = gen_content_disposition(os.path.basename(req_path))
             self.out_headers["Content-Disposition"] = cdis
 
@@ -6425,6 +6425,7 @@ class HttpCli(object):
 
         url_suf = self.urlq({}, ["k"])
         is_ls = "ls" in self.uparam
+        is_opds = "opds" in self.uparam
         is_js = self.args.force_js or self.cookies.get("js") == "y"
 
         if not is_ls and not add_og and self.ua.startswith(("curl/", "fetch")):
@@ -6432,19 +6433,16 @@ class HttpCli(object):
             is_ls = True
 
         tpl = "browser"
-        is_opds = False
         if "b" in self.uparam:
             tpl = "browser2"
             is_js = False
-        elif "opds" in self.uparam:
+        elif is_opds:
             # Display directory listing as OPDS v1.2 catalog feed
             if not (self.args.opds or "opds" in self.vn.flags):
                 raise Pebkac(405, "OPDS is disabled in server config")
             if not self.can_read:
                 raise Pebkac(401, "OPDS requires read permission")
-            is_opds = True
-            tpl = "opds"
-            is_js = False
+            is_js = is_ls = False
 
         vf = vn.flags
         ls_ret = {
@@ -6574,10 +6572,13 @@ class HttpCli(object):
         dirs = []
         files = []
         ptn_hr = RE_HR
+        use_abs_url = is_opds or (
+            not is_ls and not is_js and not self.trailing_slash and vpath
+        )
         for fn in ls_names:
             base = ""
             href = fn
-            if not is_ls and not is_js and not self.trailing_slash and vpath:
+            if use_abs_url:
                 base = "/" + vpath + "/"
                 href = base + fn
 
@@ -6664,7 +6665,6 @@ class HttpCli(object):
                 "ext": ext,
                 "dt": dt,
                 "ts": int(linf.st_mtime),
-                "_fspath": fspath,
             }
             if is_dir:
                 dirs.append(item)
@@ -6678,6 +6678,7 @@ class HttpCli(object):
             self.cookies.get("idxh") == "y"
             and "ls" not in self.uparam
             and "v" not in self.uparam
+            and not is_opds
         ):
             idx_html = set(["index.htm", "index.html"])
             for item in files:
@@ -6847,43 +6848,30 @@ class HttpCli(object):
         dirs.sort(key=itemgetter("name"))
 
         if is_opds:
+            url_base = "%s://%s%s" % (
+                "https" if self.is_https else "http",
+                self.host,
+                self.args.SR,
+            )
             # exclude files which don't match --opds-exts
             allowed_exts = vf.get("opds_exts") or self.args.opds_exts
-
             if allowed_exts:
                 files = [
                     x for x in files if x["name"].rsplit(".", 1)[-1] in allowed_exts
                 ]
             for item in dirs:
-                href = item["href"]
+                href = url_base + item["href"]
                 href += ("&" if "?" in href else "?") + "opds"
-
-                zd = datetime.fromtimestamp(max(0, item["ts"]), UTC)
-                item["iso8601"] = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (
-                    zd.year,
-                    zd.month,
-                    zd.day,
-                    zd.hour,
-                    zd.minute,
-                    zd.second,
-                )
+                item["iso8601"] = "%sZ" % (item["dt"].replace(" ", "T"))
 
             for item in files:
-                href = item["href"]
-                href += ("&" if "?" in href else "?") + "opds"
-
-                zd = datetime.fromtimestamp(max(0, item["ts"]), UTC)
-                item["iso8601"] = "%04d-%02d-%02dT%02d:%02d:%02dZ" % (
-                    zd.year,
-                    zd.month,
-                    zd.day,
-                    zd.hour,
-                    zd.minute,
-                    zd.second,
-                )
+                href = url_base + item["href"]
+                href += ("&" if "?" in href else "?") + "dl"
+                item["iso8601"] = "%sZ" % (item["dt"].replace(" ", "T"))
 
                 if "rmagic" in self.vn.flags:
-                    item["mime"] = guess_mime(item["name"], item["_fspath"])
+                    ap = "%s/%s" % (fsroot, item["name"])
+                    item["mime"] = guess_mime(item["name"], ap)
                 else:
                     item["mime"] = guess_mime(item["name"])
 
@@ -6897,6 +6885,13 @@ class HttpCli(object):
                     item["jpeg_thumb_href"] = href + "&th=jf"
                     item["jpeg_thumb_href_hires"] = item["jpeg_thumb_href"] + "3"
 
+            j2a["files"] = files
+            j2a["dirs"] = dirs
+            html = self.j2s("opds", **j2a)
+            mime = "application/atom+xml;profile=opds-catalog"
+            self.reply(html.encode("utf-8", "replace"), mime=mime)
+            return True
+
         if is_js:
             j2a["ls0"] = cgv["ls0"] = {
                 "dirs": dirs,
@@ -6904,9 +6899,6 @@ class HttpCli(object):
                 "taglist": taglist,
             }
             j2a["files"] = []
-        elif is_opds:
-            j2a["files"] = files
-            j2a["dirs"] = dirs
         else:
             j2a["files"] = dirs + files
 
@@ -7057,9 +7049,5 @@ class HttpCli(object):
                 self.html_head = zs.replace("\n\n", "\n")
 
         html = self.j2s(tpl, **j2a)
-        if is_opds:
-            mime = "application/atom+xml;profile=opds-catalog"
-        else:
-            mime = None
-        self.reply(html.encode("utf-8", "replace"), mime=mime)
+        self.reply(html.encode("utf-8", "replace"))
         return True
