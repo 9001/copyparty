@@ -6883,9 +6883,9 @@ class HttpCli(object):
                 )
 
                 if "rmagic" in self.vn.flags:
-                    item["mime"] = guess_mime(fn, item["_fspath"])
+                    item["mime"] = guess_mime(item["name"], item["_fspath"])
                 else:
-                    item["mime"] = guess_mime(fn)
+                    item["mime"] = guess_mime(item["name"])
 
                 # Make sure we can actually generate JPEG thumbnails
                 if (
