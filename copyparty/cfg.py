@@ -144,7 +144,7 @@ def vf_cmap() -> dict[str, str]:
         "mte",
         "mth",
         "mtp",
-        "opds_allowed",
+        "opds_exts",
         "xac",
         "xad",
         "xar",
@@ -331,7 +331,7 @@ flagcats = {
     },
     "opds": {
         "opds": "enable OPDS",
-        "opds_allowed": "file formats to list in OPDS feeds; leave empty to show everything"
+        "opds_exts": "file formats to list in OPDS feeds; leave empty to show everything"
     },
     "textfiles": {
         "md_no_br": "newline only on double-newline or two tailing spaces",

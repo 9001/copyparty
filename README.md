@@ -1058,7 +1058,7 @@ to unauthenticated requests and enable [filekeys](#filekeys) to prevent guessing
 `-vbooks:books:r,ed:g:c,fk,opds`
 
 by default, not all file types will be listed in opds feeds. to change this, add the extension to 
-`--opds-allowed` (volflag: `opds_allowed`), or empty the list to list everything
+`--opds-exts` (volflag: `opds_exts`), or empty the list to list everything
 
 
 ## recent uploads

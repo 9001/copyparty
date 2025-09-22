@@ -6575,11 +6575,11 @@ class HttpCli(object):
 
         no_zip = bool(self._can_zip(vf))
 
-        volflag_opds_allowed = vf.get("opds_allowed")
-        if volflag_opds_allowed is not None:
-            opds_no_filter = len(volflag_opds_allowed) == 0
+        volflag_opds_exts = vf.get("opds_exts")
+        if volflag_opds_exts is not None:
+            opds_no_filter = len(volflag_opds_exts) == 0
         else:
-            opds_no_filter = len(self.args.opds_allowed) == 0
+            opds_no_filter = len(self.args.opds_exts) == 0
 
         dirs = []
         files = []
@@ -6644,7 +6644,7 @@ class HttpCli(object):
                 ext = ptn_hr.sub("@", fn.rsplit(".", 1)[1])
                 if len(ext) > 16:
                     ext = ext[:16]
-                if is_opds and not opds_no_filter and ext not in self.args.opds_allowed:
+                if is_opds and not opds_no_filter and ext not in self.args.opds_exts:
                     continue
             else:
                 ext = "%"

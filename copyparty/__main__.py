@@ -1435,7 +1435,7 @@ def add_smb(ap):
 def add_opds(ap):
     ap2 = ap.add_argument_group("OPDS options")
     ap2.add_argument("--opds", action="store_true", help="enable opds -- allows e-book readers to browse and download files (volflag=opds)")
-    ap2.add_argument("--opds-allowed", metavar="T,T", type=u, default="epub,cbz,pdf", help="file formats to list in OPDS feeds; leave empty to show everything (volflag=opds_allowed)")
+    ap2.add_argument("--opds-exts", metavar="T,T", type=u, default="epub,cbz,pdf", help="file formats to list in OPDS feeds; leave empty to show everything (volflag=opds_exts)")
 
 def add_handlers(ap):
     ap2 = ap.add_argument_group("handlers (see --help-handlers)")
