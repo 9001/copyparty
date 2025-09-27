@@ -131,7 +131,7 @@ class MParser(object):
 
 def au_unpk(
     log: "NamedLogger", fmt_map: dict[str, str], abspath: str, vn: Optional[VFS] = None
-) -> str:
+) -> Optional[str]:
     ret = ""
     maxsz = 1024 * 1024 * 64
     try:
@@ -178,23 +178,26 @@ def au_unpk(
 
         elif pk == "epub":
             fi = get_cover_from_epub(log, abspath)
-            assert fi  # !rm
 
         else:
             raise Exception("unknown compression %s" % (pk,))
 
-        fsz = 0
-        with os.fdopen(fd, "wb") as fo:
-            while True:
-                buf = fi.read(32768)
-                if not buf:
-                    break
+        if fi:
+            fsz = 0
+            with os.fdopen(fd, "wb") as fo:
+                while True:
+                    buf = fi.read(32768)
+                    if not buf:
+                        break
 
-                fsz += len(buf)
-                if fsz > maxsz:
-                    raise Exception("zipbomb defused")
+                    fsz += len(buf)
+                    if fsz > maxsz:
+                        raise Exception("zipbomb defused")
 
-                fo.write(buf)
+                    fo.write(buf)
+        else:
+            wunlink(log, ret, vn.flags if vn else VF_CAREFUL)
+            return None
 
         return ret
 
@@ -422,10 +425,20 @@ def get_cover_from_epub(log: "NamedLogger", abspath: str) -> Optional[IO[bytes]]
             # This might be an EPUB2 file, try the legacy way of specifying covers
             coverimage_path = _get_cover_from_epub2(log, package_root, package_ns)
 
-        # This url is either absolute (in the .epub) or relative to the package document
-        adjusted_cover_path = urljoin(rootfile_path, coverimage_path)
+        if coverimage_path:
+            # This url is either absolute (in the .epub) or relative to the package document
+            adjusted_cover_path = urljoin(rootfile_path, coverimage_path)
 
-        return z.open(adjusted_cover_path)
+            try:
+                return z.open(adjusted_cover_path)
+            except KeyError:
+                log(
+                    "epub: cover specified in package document, but doesn't exist: %s"
+                    % (adjusted_cover_path,)
+                )
+        else:
+            log("epub: no cover found in %s" % (abspath,))
+        return None
 
 
 def _get_cover_from_epub2(

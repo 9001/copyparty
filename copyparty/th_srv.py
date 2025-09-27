@@ -378,6 +378,16 @@ class ThumbSrv(object):
 
             if ext in self.args.au_unpk:
                 ap_unpk = au_unpk(self.log, self.args.au_unpk, abspath, vn)
+                if not ap_unpk:
+                    # This file doesn't have a thumbnail
+                    self.worker_cleanup(abspath, ap_unpk, tpath, None, vn)
+                    try:
+                        # create empty thumbnail, otherwise would try again next time
+                        open(tpath, "ab").close()
+                    except OSError:
+                        pass
+                    continue
+
             else:
                 ap_unpk = abspath
 
@@ -451,39 +461,42 @@ class ThumbSrv(object):
                         except:
                             pass
 
-            if abspath != ap_unpk:
-                wunlink(self.log, ap_unpk, vn.flags)
-
             try:
                 atomic_move(self.log, ttpath, tpath, vn.flags)
             except Exception as ex:
                 if not os.path.exists(tpath):
                     t = "failed to move  [%s]  to  [%s]:  %r"
                     self.log(t % (ttpath, tpath, ex), 3)
-                pass
 
-            untemp = []
-            with self.mutex:
-                subs = self.busy[tpath]
-                del self.busy[tpath]
-                self.ram.pop(ttpath, None)
-                untemp = self.untemp.pop(ttpath, None) or []
-
-            for ap in untemp:
-                try:
-                    wunlink(self.log, ap, VF_CAREFUL)
-                except:
-                    pass
-
-            for x in subs:
-                with x:
-                    x.notify_all()
-
-            with self.memcond:
-                self.memcond.notify_all()
+            self.worker_cleanup(abspath, ap_unpk, tpath, ttpath, vn)
 
         with self.mutex:
             self.nthr -= 1
+
+    def worker_cleanup(self, abspath, ap_unpk, tpath, ttpath, vn):
+        if abspath != ap_unpk and ap_unpk:
+            wunlink(self.log, ap_unpk, vn.flags)
+
+        untemp = []
+        with self.mutex:
+            subs = self.busy[tpath]
+            del self.busy[tpath]
+            if ttpath:
+                self.ram.pop(ttpath, None)
+            untemp = self.untemp.pop(ttpath, None) or []
+
+        for ap in untemp:
+            try:
+                wunlink(self.log, ap, VF_CAREFUL)
+            except:
+                pass
+
+        for x in subs:
+            with x:
+                x.notify_all()
+
+        with self.memcond:
+            self.memcond.notify_all()
 
     def fancy_pillow(self, im: "Image.Image", fmt: str, vn: VFS) -> "Image.Image":
         # exif_transpose is expensive (loads full image + unconditional copy)
