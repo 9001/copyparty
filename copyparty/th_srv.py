@@ -695,7 +695,7 @@ class ThumbSrv(object):
             return
 
         c: Union[str, int] = "90"
-        t = "FFmpeg failed (probably a corrupt video file):\n"
+        t = "FFmpeg failed (probably a corrupt file):\n"
         if (
             (not self.args.th_ff_jpg or time.time() - int(self.args.th_ff_jpg) < 60)
             and cmd[-1].lower().endswith(b".webp")
