@@ -7100,7 +7100,15 @@ class HttpCli(object):
                 if zs not in ("", "-"):
                     ogh["og:site_name"] = zs
 
+                try:
+                    zs1, zs2 = file["tags"]["res"].split("x")
+                    file["tags"][".resw"] = zs1
+                    file["tags"][".resh"] = zs2
+                except:
+                    pass
+
                 tagmap = {}
+
                 if is_au:
                     title = str(vn.flags.get("og_title_a") or "")
                     ogh["og:type"] = "music.song"
@@ -7114,14 +7122,22 @@ class HttpCli(object):
                     title = str(vn.flags.get("og_title_v") or "")
                     ogh["og:type"] = "video.other"
                     ogh["og:video"] = j2a["og_raw"]
+                    
                     tagmap = {
                         "title": "og:title",
                         ".dur": "og:video:duration",
+                        ".resw": "og:video:width",
+                        ".resh": "og:video:height",
                     }
                 elif is_pic:
                     title = str(vn.flags.get("og_title_i") or "")
                     ogh["twitter:card"] = "summary_large_image"
                     ogh["twitter:image"] = ogh["og:image"] = j2a["og_raw"]
+
+                    tagmap = {
+                        ".resw": "og:image:width",
+                        ".resh": "og:image:height",
+                    }
 
                 try:
                     for k, v in file["tags"].items():
