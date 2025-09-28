@@ -21,7 +21,7 @@ services:
       - 'traefik.enable=true'
       - 'traefik.http.routers.fs.rule=Host(`fs.example.com`)'
       - 'traefik.http.routers.fs.entrypoints=http'
-      #- 'traefik.http.routers.fs.middlewares=authelia@docker'  # TODO: ???
+      - 'traefik.http.routers.fs.middlewares=ak-forwardauth@docker' # using authentik built-in docker outpost
     stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
     environment:
       LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE
@@ -29,9 +29,11 @@ services:
 
       PYTHONUNBUFFERED: 1
       # ensures log-messages are not delayed (but can reduce speed a tiny bit)
+    networks:
+      - proxy
 
   traefik:
-    image: traefik:v2.11
+    image: traefik:latest
     container_name: traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # WARNING: this gives traefik full root-access to the host OS, but is recommended/required(?) by traefik
@@ -44,6 +46,12 @@ services:
       - '--providers.docker=true'
       - '--providers.docker.exposedByDefault=false'
       - '--entrypoints.web.address=:80'
+    labels:
+      - "traefik.enable=true"
+      #To allow for custom headers to be forwarded
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+    networks:
+      - proxy
 
   postgresql:
     image: docker.io/library/postgres:12-alpine
@@ -63,6 +71,8 @@ services:
       POSTGRES_DB: authentik
     env_file:
       - .env
+    networks:
+      - authentik-backend
 
   redis:
     image: docker.io/library/redis:alpine
@@ -77,6 +87,8 @@ services:
       timeout: 3s
     volumes:
       - redis:/data:z
+    networks:
+      - authentik-backend
 
   authentik_server:
     image: ghcr.io/goauthentik/server:2024.2.1
@@ -100,6 +112,30 @@ services:
     depends_on:
       - postgresql
       - redis
+    labels:
+    # Https setup with Cloudflare as DNS provider for certresolver
+      - "traefik.enable=true"
+      - "traefik.http.routers.authentik.entrypoints=http"
+      - "traefik.http.routers.authentik.rule=Host(`auth.example.com`)"
+      - "traefik.http.middlewares.authentik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.authentik.middlewares=authentik-https-redirect"
+      - "traefik.http.routers.authentik-secure.entrypoints=https"
+
+      - "traefik.http.routers.authentik-secure.rule=Host(`auth.example.com`)"
+      - "traefik.http.routers.authentik-secure.tls=true"
+      - "traefik.http.routers.authentik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.authentik-secure.service=authentik"
+      - "traefik.http.services.authentik.loadbalancer.server.port=9000"
+      - "traefik.docker.network=proxy"
+
+      # ForwardAuth middleware → embedded outpost (internal URL!) will work for all services on the same docker network
+      - "traefik.http.middlewares.ak-forwardauth.forwardauth.address=http://authentik-server:9000/outpost.goauthentik.io/auth/traefik"
+      - "traefik.http.middlewares.ak-forwardauth.forwardauth.trustForwardHeader=true"
+      # Choose which headers you want forwarded to the backend
+      - "traefik.http.middlewares.ak-forwardauth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid"
+    networks:
+      - proxy
+      - authentik-backend
 
   authentik_worker:
     image: ghcr.io/goauthentik/server:2024.2.1
@@ -129,3 +165,10 @@ services:
     depends_on:
       - postgresql
       - redis
+    networks:
+      - proxy
+      - authentik-backend
+networks:
+  proxy:
+    external: true
+  authentik-backend:
