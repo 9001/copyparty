@@ -18,10 +18,23 @@ services:
     ports:
       - 3923
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.fs.rule=Host(`fs.example.com`)'
-      - 'traefik.http.routers.fs.entrypoints=http'
+      - "traefik.enable=true"
+      - "traefik.http.routers.fs.entrypoints=http"
+      - "traefik.http.routers.fs.rule=Host(`fs.example.com`)"
+      - "traefik.http.middlewares.fs-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.fs.middlewares=fs-https-redirect"
+      - "traefik.http.routers.fs-secure.entrypoints=https"
+
+      - "traefik.http.routers.fs-secure.rule=Host(`fs.example.com`)"
+      - "traefik.http.routers.fs-secure.tls=true"
+      - "traefik.http.routers.fs-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.fs-secure.service=fs"
+      - "traefik.http.services.fs.loadbalancer.server.port=3923"
+      
       - 'traefik.http.routers.fs.middlewares=ak-forwardauth@docker' # using authentik built-in docker outpost
+      - "traefik.docker.network=proxy"
+    depends_on:
+      - authentik_server
     stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
     environment:
       LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE
@@ -107,6 +120,7 @@ services:
     env_file:
       - .env
     ports:
+    #can be commented out if you only want to access authentik via traefik
       - 9000
       - 9443
     depends_on:
@@ -131,8 +145,8 @@ services:
       # ForwardAuth middleware → embedded outpost (internal URL!) will work for all services on the same docker network
       - "traefik.http.middlewares.ak-forwardauth.forwardauth.address=http://authentik-server:9000/outpost.goauthentik.io/auth/traefik"
       - "traefik.http.middlewares.ak-forwardauth.forwardauth.trustForwardHeader=true"
-      # Choose which headers you want forwarded to the backend
-      - "traefik.http.middlewares.ak-forwardauth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups,X-authentik-entitlements,X-authentik-email,X-authentik-name,X-authentik-uid"
+      # Choose which headers you want forwarded to the backend from https://docs.goauthentik.io/add-secure-apps/providers/proxy/server_traefik/
+      - "traefik.http.middlewares.ak-forwardauth.forwardauth.authResponseHeaders=X-authentik-username,X-authentik-groups"
     networks:
       - proxy
       - authentik-backend
@@ -168,6 +182,8 @@ services:
     networks:
       - proxy
       - authentik-backend
+
+#you have to manually create this network before starting docker-compose
 networks:
   proxy:
     external: true
