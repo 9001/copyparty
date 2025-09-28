@@ -12,9 +12,9 @@ To control more than just letting users through to your instance, make sure to a
 
 This will allow you to use copyparty's existing config mechanisms to manage users from your SSO. Add the relevant user/s to the su group to given them superuser privilleges within copyparty.
 
-Ensure to create the external network proxy (not needed if everything you want behind traefik is is the same docker-compose stack).To create the "proxy" docker network see https://docs.docker.com/reference/cli/docker/network/create/
+Make sure to create the external network `proxy` (not needed if everything you want behind traefik is is the same docker-compose stack).To create the `proxy` docker network see https://docs.docker.com/reference/cli/docker/network/create/
 
-for an basic example:
+for a basic example:
  `docker network create -d bridge proxy`
 
 this is based on:
