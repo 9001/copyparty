@@ -15,7 +15,7 @@ from ipaddress import (
 )
 
 from .__init__ import MACOS, TYPE_CHECKING
-from .util import Daemon, Netdev, find_prefix, min_ex, spack
+from .util import IP6_LL, IP64_LL, Daemon, Netdev, find_prefix, min_ex, spack
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -96,7 +96,10 @@ class MCast(object):
     def create_servers(self) -> list[str]:
         bound: list[str] = []
         netdevs = self.hub.tcpsrv.netdevs
-        ips = [x[0] for x in self.hub.tcpsrv.bound]
+        blist = self.hub.tcpsrv.bound
+        if self.args.http_no_tcp:
+            blist = self.hub.tcpsrv.seen_eps
+        ips = [x[0] for x in blist]
 
         if "::" in ips:
             ips = [x for x in ips if x != "::"] + list(
@@ -145,7 +148,7 @@ class MCast(object):
         all_selected = ips[:]
 
         # discard non-linklocal ipv6
-        ips = [x for x in ips if ":" not in x or x.startswith("fe80")]
+        ips = [x for x in ips if ":" not in x or x.startswith(IP6_LL)]
 
         if not ips:
             raise NoIPs()
@@ -183,11 +186,7 @@ class MCast(object):
                 srv.ips[oth_ip.split("/")[0]] = ipaddress.ip_network(oth_ip, False)
 
             # gvfs breaks if a linklocal ip appears in a dns reply
-            ll = {
-                k: v
-                for k, v in srv.ips.items()
-                if k.startswith("169.254") or k.startswith("fe80")
-            }
+            ll = {k: v for k, v in srv.ips.items() if k.startswith(IP64_LL)}
             rt = {k: v for k, v in srv.ips.items() if k not in ll}
 
             if self.args.ll or not rt:

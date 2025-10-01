@@ -120,7 +120,7 @@ function esc(txt) {
 function basenames(txt) {
     return (txt + '').replace(/https?:\/\/[^ \/]+\//g, '/').replace(/js\?_=[a-zA-Z]{4}/g, 'js');
 }
-if ((document.location + '').indexOf(',rej,') + 1)
+if ((location + '').indexOf(',rej,') + 1)
     window.onunhandledrejection = function (e) {
         var err = e.reason;
         try {
@@ -179,6 +179,9 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
 
     if (!/\.js($|\?)/.exec(url))
         return;  // chrome debugger
+
+    if (url.indexOf('extension://') + 1)
+        return;
 
     if (url.indexOf(' > eval') + 1 && !evalex_fatal)
         return;  // md timer
@@ -738,7 +741,7 @@ function assert_vp(path) {
     if (path.indexOf('//') + 1)
         throw 'nonlocal1: ' + path;
 
-    var o = window.location.origin;
+    var o = location.origin;
     if (have_URL && (new URL(path, o)).origin != o)
         throw 'nonlocal2: ' + path;
 }
@@ -890,7 +893,7 @@ function uricom_adec(arr, li) {
 
 
 function get_evpath() {
-    var ret = document.location.pathname;
+    var ret = location.pathname;
 
     if (ret.indexOf('/') !== 0)
         ret = '/' + ret;
@@ -957,15 +960,93 @@ function f2f(val, nd) {
 }
 
 
+var HSZ_U = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 function humansize(b, terse) {
-    var i = 0, u = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-    while (b >= 1000 && i < u.length - 1) {
-        b /= 1024;
-        i += 1;
-    }
+    var i = 0;
+    while (b >= 1000 && i < 5) { b /= 1024; i += 1; }
     return (f2f(b, b >= 100 ? 0 : b >= 10 ? 1 : 2) +
-        ' ' + (terse ? u[i].charAt(0) : u[i]));
+        ' ' + (terse ? HSZ_U[i].charAt(0) : HSZ_U[i]));
 }
+function humansize_su(b) {
+    var i = 0;
+    while (b >= 1000 && i < 5) { b /= 1024; i += 1; }
+    return [b, HSZ_U[i]];
+}
+function humansize_0(b) {
+    return '' + b;
+}
+function humansize_1(b) {
+    return ('' + b).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+function humansize_2g(b) {
+    var z = humansize_su(b), u = z[1].charAt(0); b = z[0];
+    return [f2f(b, b >= 100 ? 0 : b >= 10 ? 1 : 2) + ' ' + u, u];
+}
+function humansize_3g(b) {
+    var z = humansize_su(b), u = z[1].charAt(0); b = z[0];
+    return [f2f(b, b >= 10 ? 0 : 1) + ' ' + u, u];
+}
+function humansize_4g(b) {
+    var z = humansize_su(b), u = z[1]; b = z[0];
+    return [parseFloat(b.toFixed(b >= 100 ? 0 : b >= 10 ? 1 : 2)) + ' ' + u, u.charAt(0)];
+}
+function humansize_5g(b) {
+    var z = humansize_su(b), u = z[1]; b = z[0];
+    return [parseFloat(b.toFixed(b >= 10 ? 0 : 1)) + ' ' + u, u.charAt(0)];
+}
+function humansize_2(b) {
+    return humansize_2g(b)[0];
+}
+function humansize_3(b) {
+    return humansize_3g(b)[0];
+}
+function humansize_4(b) {
+    return humansize_4g(b)[0];
+}
+function humansize_5(b) {
+    return humansize_5g(b)[0];
+}
+function humansize_2c(b) {
+    var v = humansize_2g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_3c(b) {
+    var v = humansize_3g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_4c(b) {
+    var v = humansize_4g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_5c(b) {
+    var v = humansize_5g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_fuzzy(b) {
+    if (b <= 0) return "yes";
+	if (b <= 80) return "hullkort";
+	if (b <= 368640) return "5¼ DD";
+	if (b <= 1474560) return "save icon";
+	if (b <= 2880000) return "3½ Extended";
+	if (b <= 13107200) return "C90 Tape";
+	if (b <= 21000000) return "Floptical";
+	if (b <= 33554432) return "MPMan F10";
+	if (b <= 50000000) return "creditcardCD";
+	if (b <= 100663296) return "Zipdisk";
+	if (b <= 170000000) return "MD";
+	if (b <= 220200960) return "8cm CD";
+	if (b <= 737280000) return "CD-R";
+	if (b <= 900000000) return "UMD";
+	if (b <= 1300000000) return "GD-ROM";
+	if (b <= 4700000000) return "DVD";
+	if (b <= 9400000000) return "DVD-DL";
+	return "LTO";
+}
+var humansize_fmts = ['0', '1', '2', '2c', '3', '3c', '4', '4c', '5', '5c', 'fuzzy'];
+window.filesizefun = (function () {
+    var v = sread('fszfmt', humansize_fmts);
+    return window['humansize_' + (v || window.dfszf)] || humansize_1;
+})();
 
 
 function humantime(v) {
@@ -1017,9 +1098,13 @@ function lhumantime(v) {
     if (!L || tp.length < 2 || tp[1].indexOf('$') + 1)
         return t;
 
-    var ret = '';
-    for (var a = 0; a < tp.length; a += 2)
-        ret += tp[a] + ' ' + L['ht_' + tp[a + 1] + (tp[a]==1?1:2)] + L.ht_and;
+    var u, n, ret = '';
+    for (var a = 0; a < tp.length; a += 2) {
+        n = tp[a];
+        u = L.ht_h5 ? (n==1 ? 1 : (n>1&&n<5) ? 2 : 5) :
+            (n==1 ? 1 : 2);
+        ret += tp[a] + ' ' + L['ht_' + tp[a + 1] + u] + L.ht_and;
+    }
 
     return ret.slice(0, -L.ht_and.length);
 }
@@ -1246,20 +1331,23 @@ function hist_replace(url) {
 
 function sethash(hv) {
     if (window.history && history.replaceState) {
-        hist_replace(document.location.pathname + document.location.search + '#' + hv);
+        hist_replace(location.pathname + location.search + '#' + hv);
     }
     else {
-        document.location.hash = hv;
+        location.hash = hv;
     }
 }
 
 
 function dl_file(url) {
     console.log('DL [%s]', url);
-    var o = mknod('a');
+    qsr('#dlfth');
+    var o = mknod('a', 'dlfth');
     o.setAttribute('href', url);
     o.setAttribute('download', '');
-    o.click();
+    document.body.appendChild(o);
+    ebi('dlfth').click();
+    qsr('#dlfth');
 }
 
 
@@ -1814,12 +1902,12 @@ var modal = (function () {
     };
 
     var onkey = function (e) {
-        var k = (e.code || e.key) + '',
+        var k = (e.key || e.code) + '',
             eok = ebi('modal-ok'),
             eng = ebi('modal-ng'),
             ae = document.activeElement;
 
-        if (k == 'Space' && ae && (ae === eok || ae === eng))
+        if ((k == 'Space' || k == 'Spacebar' || k == ' ') && ae && (ae === eok || ae === eng))
             k = 'Enter';
 
         if (k.endsWith('Enter')) {
@@ -2171,6 +2259,19 @@ function bchrome() {
 }
 bchrome();
 
+var XC_CMSG = {
+    502: "bad gateway (server offline)",
+    503: "server offline",
+    504: "gateway timeout (server busy)",
+    529: "gateway timeout (server busy)",
+    520: "unknown error from server",
+    521: "server offline",
+    523: "server offline",
+    522: "proxy timeout (server busy)",
+    524: "proxy timeout (server busy)",
+    598: "proxy timeout (server busy)",
+    599: "proxy timeout (server busy)",
+};
 var cf_cha_t = 0;
 function xhrchk(xhr, prefix, e404, lvl, tag) {
     if (xhr.status < 400 && xhr.status >= 200)
@@ -2194,6 +2295,9 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
 
     if (xhr.status == 404)
         return toast.err(0, prefix + e404 + suf, tag);
+
+    if (XC_CMSG[xhr.status])
+        errtxt = XC_CMSG[xhr.status];
 
     if (!xhr.status && !errtxt)
         return toast.err(0, prefix + L.xhr0);

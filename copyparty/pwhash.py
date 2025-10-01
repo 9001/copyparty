@@ -25,6 +25,7 @@ class PWHash(object):
         self.args = args
 
         zsl = args.ah_alg.split(",")
+        zsl = [x.strip() for x in zsl]
         alg = zsl[0]
         if alg == "none":
             alg = ""
@@ -146,6 +147,10 @@ class PWHash(object):
 
     def cli(self) -> None:
         import getpass
+
+        if self.args.usernames:
+            t = "since you have enabled --usernames, please provide username:password"
+            print(t)
 
         while True:
             try:

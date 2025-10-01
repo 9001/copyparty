@@ -63,7 +63,7 @@ class TestVFS(unittest.TestCase):
         cfgdir = os.path.join(here, "res", "idp")
 
         # globals are applied by main so need to cheat a little
-        xcfg = {"idp_h_usr": "x-idp-user", "idp_h_grp": "x-idp-group"}
+        xcfg = {"idp_h_usr": ["x-idp-user"], "idp_h_grp": "x-idp-group"}
 
         return here, cfgdir, xcfg
 
@@ -121,6 +121,8 @@ class TestVFS(unittest.TestCase):
         self.assertNodes(au.vfs.nodes["vg"], ["iga"])
         self.assertApEq(au.vfs.nodes["vu"].realpath, "")
         self.assertApEq(au.vfs.nodes["vg"].realpath, "")
+        self.assertApEq(au.vfs.nodes["vu"].nodes["iua"].realpath, "/uiua")
+        self.assertApEq(au.vfs.nodes["vg"].nodes["iga"].realpath, "/giga")
         self.assertAxs(au.vfs.axs, [])
         self.assertAxsAt(au, "vu/iua", [["iua"]])  # same as:
         self.assertAxs(self.nav(au, "vu/iua").axs, [["iua"]])

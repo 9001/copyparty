@@ -12,6 +12,7 @@ import queue
 from .__init__ import ANYWIN
 from .authsrv import AuthSrv
 from .broker_util import BrokerCli, ExceptionalQueue, NotExQueue
+from .fsutil import ramdisk_chk
 from .httpsrv import HttpSrv
 from .util import FAKE_MP, Daemon, HMaccas
 
@@ -56,6 +57,7 @@ class MpWorker(BrokerCli):
 
         # starting to look like a good idea
         self.asrv = AuthSrv(args, None, False)
+        ramdisk_chk(self.asrv)
 
         # instantiate all services here (TODO: inheritance?)
         self.iphash = HMaccas(os.path.join(self.args.E.cfg, "iphash"), 8)
@@ -99,6 +101,7 @@ class MpWorker(BrokerCli):
             if dest == "reload":
                 self.logw("mpw.asrv reloading")
                 self.asrv.reload()
+                ramdisk_chk(self.asrv)
                 self.logw("mpw.asrv reloaded")
                 continue
 

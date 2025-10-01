@@ -15,9 +15,15 @@ rm -rf /z/base
 rm -rf /var/cache/apk/* /root/.cache
 
 # initial config; common for all flavors
-mkdir /cfg /w
-chmod 777 /cfg /w
-echo % /cfg > initcfg
+mkdir /state /cfg /w
+chmod 777 /state /cfg /w
+cat >initcfg <<'EOF'
+[global]
+  chdir: /w
+  no-crt
+
+% /cfg
+EOF
 
 # unpack sfx and dive in
 python3 copyparty-sfx.py --version
@@ -45,6 +51,12 @@ python3 -m compileall -qj4 site-packages sqlite3 xml
 find -name __pycache__ |
   grep -E 'ty/web/|/pycpar' |
   tr '\n' '\0' | xargs -0 rm -rf
+
+
+
+
+
+smoketest() {
 
 # two-for-one:
 # 1) smoketest copyparty even starts
@@ -81,6 +93,96 @@ kill $pid; wait $pid
 
 # output from -e2d
 rm -rf .hist /cfg/copyparty
+
+}
+
+smoketest
+
+
+
+
+
+[ "$1" == min ] && {
+  # shrink amd64 from 45.5 to 33.2 MiB
+
+  # libstdc++ is pulled in by libmpdec++ in libmpdec; keep libmpdec.so
+  cd /usr/lib ; rm -rf \
+  libmpdec++.so* \
+  libncurses* \
+  libpanelw* \
+  libreadline* \
+  libstdc++.so* \
+  --
+
+  cd /usr/lib/python3.*/lib-dynload/ ; rm -rf \
+  *audioop.* \
+  _asyncio.* \
+  _ctypes_test.* \
+  _curses* \
+  _test* \
+  _xx* \
+  ossaudio.* \
+  readline.* \
+  xx* \
+  --
+
+  # keep http/client for u2c
+  cd /usr/lib/python3.*/ ; rm -rf \
+  site-packages/*.dist-info \
+  aifc.py \
+  asyncio \
+  bdb.py \
+  cgi.py \
+  config-3.*/Makefile \
+  ctypes/macholib \
+  dbm \
+  difflib.py \
+  doctest.py \
+  email/_header_value_parser.py \
+  html \
+  http/cookiejar.* \
+  http/server.* \
+  imaplib.py \
+  importlib/resources \
+  mailbox.py \
+  nntplib.py \
+  pickletools.py \
+  pydoc.py \
+  smtplib.py \
+  statistics.py \
+  tomllib \
+  unittest \
+  urllib/request.* \
+  venv \
+  wsgiref \
+  xml/dom \
+  xml/sax \
+  xmlrpc \
+  --
+
+  set +x
+  find -iname '*.pyc' |
+  grep -viE 'tftpy' |
+  while IFS= read -r x; do
+    y="$(printf '%s\n' "$x" | sed -r 's`/__pycache__/([^/]+)\.cpython-312\.pyc$`/\1.py`')"
+    [ -e "$y" ] || continue
+    [ "$y" = "$x" ] && continue
+    rm "$y"
+    mv "$x" "${y}c"
+  done
+  find -iname __pycache__ -print0 | xargs -0 rm -rf --
+  rm -rf /a
+  set -x
+
+  smoketest
+
+  # printf '%s\n' 'FROM localhost/copyparty-min-amd64' 'COPY a /' 'RUN /bin/ash /a' >Dockerfile
+  # podman rmi localhost/m2 ; podman build --squash-all -t m2 . && podman images && podman run --rm -it localhost/m2 --exit=idx && podman images
+}
+
+
+
+
 
 # goodbye
 exec rm innvikler.sh

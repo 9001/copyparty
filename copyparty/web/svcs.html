@@ -31,19 +31,20 @@
             <br />
             <span class="os win lin mac">placeholders:</span>
             <span class="os win">
-                {% if accs %}<code><b id="pw0">{{ pw }}</b></code>=password, {% endif %}<code><b>W:</b></code>=mountpoint
+                {% if accs %}{% if un %}<code><b id="un0">{{ un }}</b></code>=username, <code><b id="up0">{{ unpw }}</b></code>=username:password, {% endif %}<code><b id="pw0">{{ pw }}</b></code>=password, {% endif %}<code><b>W:</b></code>=mountpoint
             </span>
             <span class="os lin mac">
-                {% if accs %}<code><b id="pw0">{{ pw }}</b></code>=password, {% endif %}<code><b>mp</b></code>=mountpoint
+                {% if accs %}{% if un %}<code><b id="un0">{{ un }}</b></code>=username, <code><b id="up0">{{ unpw }}</b></code>=username:password, {% endif %}<code><b id="pw0">{{ pw }}</b></code>=password, {% endif %}<code><b>mp</b></code>=mountpoint
             </span>
             {% if accs %}<a href="#" id="setpw">use real password</a>{% endif %}
+            <a href="#" id="qr">show qr</a>
         </p>
 
 
 
-        {% if args.idp_h_usr %}
+        {% if args.have_idp_hdrs %}
         <p style="line-height:2em"><b>WARNING:</b> this server is using IdP-based authentication, so this stuff may not work as advertised. Depending on server config, these commands can probably only be used to access areas which don't require authentication, unless you auth using any non-IdP accounts defined in the copyparty config. Please see <a href="https://github.com/9001/copyparty/blob/hovudstraum/docs/idp.md#connecting-webdav-clients">the IdP docs</a></p>
-        {% endif %}
+        {%- endif %}
 
 
 
@@ -53,50 +54,64 @@
         <div class="os win">
             <p>if you can, install <a href="https://winfsp.dev/rel/">winfsp</a>+<a href="https://downloads.rclone.org/rclone-current-windows-amd64.zip">rclone</a> and then paste this in cmd:</p>
             <pre>
-                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
+                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user={{ b_un }} pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>W:</b>
             </pre>
             <ul>
-                {% if s %}
+                {%- if s %}
                 <li>running <code>rclone mount</code> on LAN (or just dont have valid certificates)? add <code>--no-check-certificate</code></li>
-                {% endif %}
+                {%- endif %}
                 <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
             </ul>
 
             <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="{{ r }}/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
             <pre>
+                {%- if un %}
+                net use <b>w:</b> http{{ s }}://{{ ep }}/{{ rvp }}{% if accs %} <b>{{ pw }}</b> /user:{{ b_un }}{% endif %}
+                {%- else %}
                 net use <b>w:</b> http{{ s }}://{{ ep }}/{{ rvp }}{% if accs %} k /user:<b>{{ pw }}</b>{% endif %}
+                {%- endif %}
             </pre>
         </div>
 
         <div class="os lin">
             <p>rclone (v1.63 or later) is recommended:</p>
             <pre>
-                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user=k pass=<b>{{ pw }}</b>{% endif %}
+                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user={{ b_un }} pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>mp</b>
             </pre>
             <ul>
-                {% if s %}
+                {%- if s %}
                 <li>running <code>rclone mount</code> on LAN (or just dont have valid certificates)? add <code>--no-check-certificate</code></li>
-                {% endif %}
+                {%- endif %}
                 <li>running <code>rclone mount</code> as root? add <code>--allow-other</code></li>
                 <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
             </ul>
             <p>alternatively use davfs2 (requires root, is slower, forgets lastmodified-timestamp on upload):</p>
             <pre>
                 yum install davfs2
+                {%- if un %}
+                {% if accs %}printf '%s\n' {{ b_un }} <b>{{ pw }}</b> | {% endif %}mount -t davfs -ouid=1000 http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b>
+                {%- else %}
                 {% if accs %}printf '%s\n' <b>{{ pw }}</b> k | {% endif %}mount -t davfs -ouid=1000 http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b>
+                {%- endif %}
             </pre>
+            {%- if accs %}
             <p>make davfs2 automount on boot:</p>
             <pre>
+                {%- if un %}
+                printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} {{ b_un }} <b>{{ pw }}</b>" >> /etc/davfs2/secrets
+                {%- else %}
                 printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>{{ pw }}</b> k" >> /etc/davfs2/secrets
+                {%- endif %}
                 printf '%s\n' "http{{ s }}://{{ ep }}/{{ rvp }} <b>mp</b> davfs rw,user,uid=1000,noauto 0 0" >> /etc/fstab
             </pre>
+            {%- endif %}
             <p>or the emergency alternative (gnome/gui-only):</p>
             <!-- gnome-bug: ignores vp -->
             <pre>
                 {%- if accs %}
-                echo <b>{{ pw }}</b> | gio mount dav{{ s }}://k@{{ ep }}/{{ rvp }}
+                echo <b>{{ pw }}</b> | gio mount dav{{ s }}://{{ b_un }}@{{ ep }}/{{ rvp }}
                 {%- else %}
                 gio mount -a dav{{ s }}://{{ ep }}/{{ rvp }}
                 {%- endif %}
@@ -106,18 +121,18 @@
 
         <div class="os mac">
             <pre>
-                osascript -e ' mount volume "http{{ s }}://k:<b>{{ pw }}</b>@{{ ep }}/{{ rvp }}" '
+                osascript -e ' mount volume "http{{ s }}://{{ b_un }}:<b>{{ pw }}</b>@{{ ep }}/{{ rvp }}" '
             </pre>
             <p>or you can open up a Finder, press command-K and paste this instead:</p>
             <pre>
-                http{{ s }}://k:<b>{{ pw }}</b>@{{ ep }}/{{ rvp }}
+                http{{ s }}://{{ b_un }}:<b>{{ pw }}</b>@{{ ep }}/{{ rvp }}
             </pre>
 
-            {% if s %}
+            {%- if s %}
             <p><em>replace <code>https</code> with <code>http</code> if it doesn't work</em></p>
-            {% endif %}
+            {%- endif %}
         </div>
-        {% endif %}
+        {%- endif %}
 
 
 
@@ -126,51 +141,71 @@
 
         <div class="os win">
             <p>if you can, install <a href="https://winfsp.dev/rel/">winfsp</a>+<a href="https://downloads.rclone.org/rclone-current-windows-amd64.zip">rclone</a> and then paste this in cmd:</p>
-            {% if args.ftp %}
+            {%- if args.ftp %}
             <p>connect with plaintext FTP:</p>
             <pre>
+                {%- if un %}
+                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false
+                {%- else %}
                 rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false
+                {%- endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ rvp }} <b>W:</b>
             </pre>
-            {% endif %}
-            {% if args.ftps %}
+            {%- endif %}
+            {%- if args.ftps %}
             <p>connect with TLS-encrypted FTPS:</p>
             <pre>
+                {%- if un %}
+                rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false explicit_tls=true
+                {%- else %}
                 rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
+                {%- endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftps:{{ rvp }} <b>W:</b>
             </pre>
-            {% endif %}
+            {%- endif %}
             <ul>
-                {% if args.ftps %}
+                {%- if args.ftps %}
                 <li>running on LAN (or just dont have valid certificates)? add <code>no_check_certificate=true</code> to the config command</li>
-                {% endif %}
+                {%- endif %}
                 <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
             </ul>
             <p>if you want to use the native FTP client in windows instead (please dont), press <code>win+R</code> and run this command:</p>
             <pre>
+                {%- if un %}
+                explorer {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}{{ b_un }}:<b>{{ pw }}</b>@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
+                {%- else %}
                 explorer {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}<b>{{ pw }}</b>:k@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
+                {%- endif %}
             </pre>
         </div>
 
         <div class="os lin">
-            {% if args.ftp %}
+            {%- if args.ftp %}
             <p>connect with plaintext FTP:</p>
             <pre>
+                {%- if un %}
+                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false
+                {%- else %}
                 rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false
+                {%- endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ rvp }} <b>mp</b>
             </pre>
-            {% endif %}
-            {% if args.ftps %}
+            {%- endif %}
+            {%- if args.ftps %}
             <p>connect with TLS-encrypted FTPS:</p>
             <pre>
+                {%- if un %}
+                rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false explicit_tls=true
+                {%- else %}
                 rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
+                {%- endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftps:{{ rvp }} <b>mp</b>
             </pre>
-            {% endif %}
+            {%- endif %}
             <ul>
-                {% if args.ftps %}
+                {%- if args.ftps %}
                 <li>running on LAN (or just dont have valid certificates)? add <code>no_check_certificate=true</code> to the config command</li>
-                {% endif %}
+                {%- endif %}
                 <li>running <code>rclone mount</code> as root? add <code>--allow-other</code></li>
                 <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
             </ul>
@@ -178,7 +213,7 @@
             <!-- gnome-bug: ignores vp -->
             <pre>
                 {%- if accs %}
-                echo <b>{{ pw }}</b> | gio mount ftp{{ "" if args.ftp else "s" }}://k@{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
+                echo <b>{{ pw }}</b> | gio mount ftp{{ "" if args.ftp else "s" }}://{{ b_un }}@{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
                 {%- else %}
                 gio mount -a ftp{{ "" if args.ftp else "s" }}://{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
                 {%- endif %}
@@ -188,10 +223,10 @@
         <div class="os mac">
             <p>note: FTP is read-only on macos; please use WebDAV instead</p>
             <pre>
-                open {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}k:<b>{{ pw }}</b>@{% else %}anonymous:@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
+                open {{ "ftp" if args.ftp else "ftps" }}://{% if accs %}{{ b_un }}:<b>{{ pw }}</b>@{% else %}anonymous:@{% endif %}{{ host }}:{{ args.ftp or args.ftps }}/{{ rvp }}
             </pre>
         </div>
-        {% endif %}
+        {%- endif %}
 
 
 
@@ -203,11 +238,11 @@
             <span class="os lin">doesn't need root</span>
         </p>
         <pre>
-            partyfuse.py{% if accs %} -a <b>{{ pw }}</b>{% endif %} http{{ s }}://{{ ep }}/{{ rvp }} <b><span class="os win">W:</span><span class="os lin mac">mp</span></b>
+            partyfuse.py{% if accs %} -a <b>{{ unpw }}</b>{% endif %} http{{ s }}://{{ ep }}/{{ rvp }} <b><span class="os win">W:</span><span class="os lin mac">mp</span></b>
         </pre>
-        {% if s %}
+        {%- if s %}
         <ul><li>if you are on LAN (or just dont have valid certificates), add <code>-td</code></li></ul>
-        {% endif %}
+        {%- endif %}
         <p>
             you can use <a href="{{ r }}/.cpr/a/u2c.py">u2c.py</a> to upload (sometimes faster than web-browsers)
         </p>
@@ -215,6 +250,10 @@
 
         {% if args.smb %}
         <h1>SMB / CIFS</h1>
+
+        {%- if un %}
+        <h2>not available on this server because <code>--usernames</code> is enabled in the server config</h2>
+        {%- else %}
 
         <div class="os win">
             <pre>
@@ -233,7 +272,8 @@
         <pre class="os mac">
             open 'smb://<b>{{ pw }}</b>:k@{{ host }}/a'
         </pre>
-        {% endif %}
+        {%- endif %}
+        {%- endif %}
 
 
 
@@ -246,7 +286,7 @@
                 { "Version": "15.0.0", "Name": "copyparty",
                 "RequestURL": "http{{ s }}://{{ ep }}/{{ rvp }}",
                 "Headers": {
-                    {% if accs %}"pw": "<b>{{ pw }}</b>", {% endif %}"accept": "url"
+                    {% if accs %}"pw": "<b>{{ unpw }}</b>", {% endif %}"accept": "url"
                 },
                 "DestinationType": "ImageUploader, TextUploader, FileUploader",
                 "Body": "MultipartFormData", "URL": "{response}",
@@ -259,7 +299,7 @@
                 { "Name": "copyparty",
                 "RequestURL": "http{{ s }}://{{ ep }}/{{ rvp }}",
                 "Headers": {
-                    {% if accs %}"pw": "<b>{{ pw }}</b>", {% endif %}"accept": "url"
+                    {% if accs %}"pw": "<b>{{ unpw }}</b>", {% endif %}"accept": "url"
                 },
                 "DestinationType": "ImageUploader, TextUploader, FileUploader",
                 "FileFormName": "f" }
@@ -277,7 +317,9 @@
                 { "Name": "copyparty",
                 "RequestURL": "http{{ s }}://{{ ep }}/{{ rvp }}",
                 "Headers": {
-                    {% if accs %}"pw": "<b>{{ pw }}</b>",{% endif %}
+                    {%- if accs %}
+                    "pw": "<b>{{ unpw }}</b>",
+                    {%- endif %}
                     "accept": "json"
                 },
                 "ResponseURL": "{{ '{{fileurl}}' }}",
@@ -294,7 +336,7 @@
 
             <pre class="dl" name="flameshot.sh">
                 #!/bin/bash
-                pw="<b>{{ pw }}</b>"
+                pw="<b>{{ unpw }}</b>"
                 url="http{{ s }}://{{ ep }}/{{ rvp }}"
                 filename="$(date +%Y-%m%d-%H%M%S).png"
                 flameshot gui -s -r | curl -sT- "$url$filename?want=url&pw=$pw" | xsel -ib

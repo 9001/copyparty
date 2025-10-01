@@ -200,6 +200,25 @@ class QrCode(object):
 
         return "\n".join(rows)
 
+    def to_png(self, zoom, pad, bg, fg, ap) -> None:
+        from PIL import Image
+
+        tab = self.modules
+        sz = self.size
+        psz = sz + pad * 2
+        if bg:
+            img = Image.new("RGB", (psz, psz), bg)
+        else:
+            img = Image.new("RGBA", (psz, psz), (0, 0, 0, 0))
+            fg = (fg[0], fg[1], fg[2], 255)
+        for y in range(sz):
+            for x in range(sz):
+                if tab[y][x]:
+                    img.putpixel((x + pad, y + pad), fg)
+        if zoom != 1:
+            img = img.resize((sz * zoom, sz * zoom), Image.Resampling.NEAREST)
+        img.save(ap)
+
     def _draw_function_patterns(self) -> None:
         # Draw horizontal and vertical timing patterns
         for i in range(self.size):

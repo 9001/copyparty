@@ -18,6 +18,13 @@ ngs=(
     dj-{ppc64le,s390x,arm}
 )
 
+err=
+for x in awk jq podman python3 tar wget ; do
+    command -v $x >/dev/null && continue
+    err=1; echo ERROR: missing dependency: $x
+done
+[ $err ] && exit 1
+
 for v in "$@"; do
     [ "$v" = clean  ] && clean=1
     [ "$v" = hclean ] && hclean=1
@@ -56,7 +63,7 @@ filt=
     for a in $sarchs; do  # arm/v6
         podman pull --arch=$a alpine:latest
     done
-    
+
     podman images --format "{{.ID}} {{.History}}" |
     awk '/library\/alpine/{print$1}' |
     while read id; do
@@ -102,12 +109,18 @@ filt=
             # arm takes forever so make it top priority
             [ ${a::3} == arm ] && nice= || nice=-n20
 
+            # not sure if this is necessary or if inherit-annotations=false was enough, but won't hurt
+            readarray -t annot < <(awk <Dockerfile.$i '/org.opencontainers.image/{sub(/[^\.]+/,"");sub(/[" \\]+$/,"");sub(/"/,"");print"--annotation";print"org"$0}')
+            annot+=( --annotation "org.opencontainers.image.created=$( date -u +%Y-%m-%dT%H:%M:%SZ )" )
+
             # --pull=never does nothing at all btw
             (set -x
             nice $nice podman build \
                 --squash \
                 --pull=never \
                 --from localhost/alpine-$a \
+                --inherit-annotations=false \
+                "${annot[@]}" \
                 -t copyparty-$i-$a$suf \
                 -f Dockerfile.$i . ||
                     (echo $? $i-$a >> err; printf '%096d\n' $(seq 1 42))

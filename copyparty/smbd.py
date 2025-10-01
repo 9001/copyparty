@@ -246,24 +246,29 @@ class SMB(object):
 
             ap = absreal(ap)
             xbu = vfs.flags.get("xbu")
-            if xbu and not runhook(
-                self.nlog,
-                None,
-                self.hub.up2k,
-                "xbu.smb",
-                xbu,
-                ap,
-                vpath,
-                "",
-                "",
-                "",
-                0,
-                0,
-                "1.7.6.2",
-                time.time(),
-                "",
-            ):
-                yeet("blocked by xbu server config: %r" % (vpath,))
+            if xbu:
+                hr = runhook(
+                    self.nlog,
+                    None,
+                    self.hub.up2k,
+                    "xbu.smb",
+                    xbu,
+                    ap,
+                    vpath,
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    "1.7.6.2",
+                    time.time(),
+                    "",
+                )
+                t = hr.get("rejectmsg") or ""
+                if t or not hr:
+                    if not t:
+                        t = "blocked by xbu server config: %r" % (vpath,)
+                    yeet(t)
 
         ret = bos.open(ap, flags, *a, mode=chmod, **ka)
         if wr:
@@ -318,7 +323,7 @@ class SMB(object):
             t = "blocked rename (no-move-acc %s): /%s @%s"
             yeet(t % (vfs1.axs.umove, vp1, uname))
 
-        self.hub.up2k.handle_mv(uname, "1.7.6.2", vp1, vp2)
+        self.hub.up2k.handle_mv("", uname, "1.7.6.2", vp1, vp2)
         try:
             bos.makedirs(ap2, vf=vfs2.flags)
         except:
@@ -373,7 +378,7 @@ class SMB(object):
             t = "blocked utime (no-write-acc %s): /%s @%s"
             yeet(t % (vfs.axs.uwrite, vpath, uname))
 
-        return bos.utime(ap, times)
+        bos.utime_c(info, ap, int(times[1]), False)
 
     def _p_exists(self, vpath: str) -> bool:
         # ap = "?"

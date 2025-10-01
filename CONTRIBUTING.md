@@ -6,13 +6,13 @@ but please:
 
 
 
-# do not use AI / LMM when writing code
+# do not use AI / LLM when writing code
 
 copyparty is 100% organic, free-range, human-written software!
 
 > ⚠ you are now entering a no-copilot zone
 
-the *only* place where LMM/AI *may* be accepted is for [localization](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice#translations) if you are fluent and have confirmed that the translation is accurate.
+the *only* place where LLM/AI *may* be accepted is for [localization](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice#translations) if you are fluent and have confirmed that the translation is accurate.
 
 sorry for the harsh tone, but this is important to me 🙏
 

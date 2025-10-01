@@ -52,6 +52,7 @@ from .__init__ import (
     VT100,
     WINDOWS,
     EnvParams,
+    unicode,
 )
 from .__version__ import S_BUILD_DT, S_VERSION
 from .stolen import surrogateescape
@@ -110,9 +111,17 @@ E_ADDR_NOT_AVAIL = _ens("EADDRNOTAVAIL WSAEADDRNOTAVAIL")
 E_ADDR_IN_USE = _ens("EADDRINUSE WSAEADDRINUSE")
 E_ACCESS = _ens("EACCES WSAEACCES")
 E_UNREACH = _ens("EHOSTUNREACH WSAEHOSTUNREACH ENETUNREACH WSAENETUNREACH")
+E_FS_MEH = _ens("EPERM EACCES ENOENT ENOTCAPABLE")
+E_FS_CRIT = _ens("EIO EFAULT EUCLEAN ENOTBLK")
 
 IP6ALL = "0:0:0:0:0:0:0:0"
+IP6_LL = ("fe8", "fe9", "fea", "feb")
+IP64_LL = ("fe8", "fe9", "fea", "feb", "169.254")
 
+UC_CDISP = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._"
+BC_CDISP = UC_CDISP.encode("ascii")
+UC_CDISP_SET = set(UC_CDISP)
+BC_CDISP_SET = set(BC_CDISP)
 
 try:
     import fcntl
@@ -369,6 +378,13 @@ DAV_ALLPROP_L = [
 DAV_ALLPROPS = set(DAV_ALLPROP_L)
 
 
+FAVICON_MIMES = {
+    "gif": "image/gif",
+    "png": "image/png",
+    "svg": "image/svg+xml",
+}
+
+
 MIMES = {
     "opus": "audio/ogg; codecs=opus",
     "owa": "audio/webm; codecs=opus",
@@ -399,6 +415,9 @@ application swf=x-shockwave-flash m3u=vnd.apple.mpegurl db3=vnd.sqlite3 sqlite=v
 text ass=plain ssa=plain
 image jpg=jpeg xpm=x-xpixmap psd=vnd.adobe.photoshop jpf=jpx tif=tiff ico=x-icon djvu=vnd.djvu
 image heic=heic-sequence heif=heif-sequence hdr=vnd.radiance svg=svg+xml
+image arw=x-sony-arw cr2=x-canon-cr2 crw=x-canon-crw dcr=x-kodak-dcr dng=x-adobe-dng erf=x-epson-erf
+image k25=x-kodak-k25 kdc=x-kodak-kdc mrw=x-minolta-mrw nef=x-nikon-nef orf=x-olympus-orf
+image pef=x-pentax-pef raf=x-fuji-raf raw=x-panasonic-raw sr2=x-sony-sr2 srf=x-sony-srf x3f=x-sigma-x3f
 audio caf=x-caf mp3=mpeg m4a=mp4 mid=midi mpc=musepack aif=aiff au=basic qcp=qcelp
 video mkv=x-matroska mov=quicktime avi=x-msvideo m4v=x-m4v ts=mp2t
 video asf=x-ms-asf flv=x-flv 3gp=3gpp 3g2=3gpp2 rmvb=vnd.rn-realmedia-vbr
@@ -420,7 +439,7 @@ EXTS["vnd.mozilla.apng"] = "png"
 MAGIC_MAP = {"jpeg": "jpg"}
 
 
-DEF_EXP = "self.ip self.ua self.uname self.host cfg.name cfg.logout vf.scan vf.thsize hdr.cf_ipcountry srv.itime srv.htime"
+DEF_EXP = "self.ip self.ua self.uname self.host cfg.name cfg.logout vf.scan vf.thsize hdr.cf-ipcountry srv.itime srv.htime"
 
 DEF_MTE = ".files,circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash"
 
@@ -536,6 +555,8 @@ def py_desc() -> str:
     ofs = py_ver.find(".final.")
     if ofs > 0:
         py_ver = py_ver[:ofs]
+    if "free-threading" in sys.version:
+        py_ver += "t"
 
     host_os = platform.system()
     compiler = platform.python_compiler().split("http")[0]
@@ -645,6 +666,9 @@ class NotUTF8(Exception):
 def read_utf8(log: Optional["NamedLogger"], ap: Union[str, bytes], strict: bool) -> str:
     with open(ap, "rb") as f:
         buf = f.read()
+
+    if buf.startswith(b"\xef\xbb\xbf"):
+        buf = buf[3:]
 
     try:
         return buf.decode("utf-8", "strict")
@@ -1111,16 +1135,18 @@ class ProgressPrinter(threading.Thread):
         sigblock()
         tp = 0
         msg = None
-        no_stdout = self.args.q
+        slp_pr = self.args.scan_pr_r
+        slp_ps = min(slp_pr, self.args.scan_st_r)
+        no_stdout = self.args.q or slp_pr == slp_ps
         fmt = " {}\033[K\r" if VT100 else " {} $\r"
         while not self.end:
-            time.sleep(0.1)
+            time.sleep(slp_ps)
             if msg == self.msg or self.end:
                 continue
 
             msg = self.msg
             now = time.time()
-            if msg and now - tp > 10:
+            if msg and now - tp >= slp_pr:
                 tp = now
                 self.log("progress: %r" % (msg,), 6)
 
@@ -1178,21 +1204,21 @@ class MTHash(object):
             for nch in range(nchunks):
                 self.work_q.put(nch)
 
-            ex = ""
+            ex: Optional[Exception] = None
             for nch in range(nchunks):
                 qe = self.done_q.get()
                 try:
                     nch, dig, ofs, csz = qe
                     chunks[nch] = (dig, ofs, csz)
                 except:
-                    ex = ex or str(qe)
+                    ex = ex or qe  # type: ignore
 
                 if pp:
                     mb = (fsz - nch * chunksz) // (1024 * 1024)
                     pp.msg = prefix + str(mb) + suffix
 
             if ex:
-                raise Exception(ex)
+                raise ex
 
             ret = []
             for n in range(nchunks):
@@ -1209,7 +1235,7 @@ class MTHash(object):
             try:
                 v = self.hash_at(ofs)
             except Exception as ex:
-                v = str(ex)  # type: ignore
+                v = ex  # type: ignore
 
             self.done_q.put(v)
 
@@ -1567,10 +1593,12 @@ def vol_san(vols: list["VFS"], txt: bytes) -> bytes:
         bvp = vol.vpath.encode("utf-8")
         bvph = b"$hist(/" + bvp + b")"
 
-        txt = txt.replace(bap, bvp)
-        txt = txt.replace(bhp, bvph)
-        txt = txt.replace(bap.replace(b"\\", b"\\\\"), bvp)
-        txt = txt.replace(bhp.replace(b"\\", b"\\\\"), bvph)
+        if bap:
+            txt = txt.replace(bap, bvp)
+            txt = txt.replace(bap.replace(b"\\", b"\\\\"), bvp)
+        if bhp:
+            txt = txt.replace(bhp, bvph)
+            txt = txt.replace(bhp.replace(b"\\", b"\\\\"), bvph)
 
         if vol.histpath != vol.dbpath:
             bdp = vol.dbpath.encode("utf-8")
@@ -1749,12 +1777,12 @@ class MultipartParser(object):
                 continue
 
             if m.group(1).lower() != "form-data":
-                raise Pebkac(400, "not form-data: {}".format(ln))
+                raise Pebkac(400, "not form-data: %r" % (ln,))
 
             try:
                 field = self.re_cdisp_field.match(ln).group(1)  # type: ignore
             except:
-                raise Pebkac(400, "missing field name: {}".format(ln))
+                raise Pebkac(400, "missing field name: %r" % (ln,))
 
             try:
                 fn = self.re_cdisp_file.match(ln).group(1)  # type: ignore
@@ -1926,7 +1954,7 @@ def get_boundary(headers: dict[str, str]) -> str:
     ct = headers["content-type"]
     m = re.match(ptn, ct, re.IGNORECASE)
     if not m:
-        raise Pebkac(400, "invalid content-type for a multipart post: {}".format(ct))
+        raise Pebkac(400, "invalid content-type for a multipart post: %r" % (ct,))
 
     return m.group(2)
 
@@ -2068,6 +2096,29 @@ def gencookie(
     )
 
 
+def gen_content_disposition(fn: str) -> str:
+    safe = UC_CDISP_SET
+    bsafe = BC_CDISP_SET
+    fn = fn.replace("/", "_").replace("\\", "_")
+    zb = fn.encode("utf-8", "xmlcharrefreplace")
+    if not PY2:
+        zbl = [
+            chr(x).encode("utf-8")
+            if x in bsafe
+            else "%{:02X}".format(x).encode("ascii")
+            for x in zb
+        ]
+    else:
+        zbl = [unicode(x) if x in bsafe else "%{:02X}".format(ord(x)) for x in zb]
+
+    ufn = b"".join(zbl).decode("ascii")
+    afn = "".join([x if x in safe else "_" for x in fn]).lstrip(".")
+    while ".." in afn:
+        afn = afn.replace("..", ".")
+
+    return "attachment; filename=\"%s\"; filename*=UTF-8''%s" % (afn, ufn)
+
+
 def humansize(sz: float, terse: bool = False) -> str:
     for unit in HUMANSIZE_UNITS:
         if sz < 1024:
@@ -2075,6 +2126,7 @@ def humansize(sz: float, terse: bool = False) -> str:
 
         sz /= 1024.0
 
+    assert unit  # type: ignore  # !rm
     if terse:
         return "%s%s" % (str(sz)[:4].rstrip("."), unit[:1])
     else:
@@ -2227,14 +2279,14 @@ def odfusion(
     ret = base.copy()
     if oth.startswith("+"):
         for k in words1:
-            ret[k] = True
+            ret[k] = True  # type: ignore
     elif oth[:1] in ("-", "/"):
         for k in words1:
-            ret.pop(k, None)
+            ret.pop(k, None)  # type: ignore
     else:
         ret = ODict.fromkeys(words0, True)
 
-    return ret
+    return ret  # type: ignore
 
 
 def ipnorm(ip: str) -> str:
@@ -2606,6 +2658,24 @@ def set_fperms(f: Union[typing.BinaryIO, typing.IO[Any]], vf: dict[str, Any]) ->
         os.fchown(fno, vf["uid"], vf["gid"])
 
 
+def trystat_shutil_copy2(log: "NamedLogger", src: bytes, dst: bytes) -> bytes:
+    try:
+        return shutil.copy2(src, dst)
+    except:
+        # ignore failed mtime on linux+ntfs; for example:
+        # shutil.py:437 <copy2>: copystat(src, dst, follow_symlinks=follow_symlinks)
+        # shutil.py:376 <copystat>: lookup("utime")(dst, ns=(st.st_atime_ns, st.st_mtime_ns),
+        # [PermissionError] [Errno 1] Operation not permitted, '/windows/_videos'
+        _, _, tb = sys.exc_info()
+        for _, _, fun, _ in traceback.extract_tb(tb):
+            if fun == "copystat":
+                if log:
+                    t = "warning: failed to retain some file attributes (timestamp and/or permissions) during copy from %r to %r:\n%s"
+                    log(t % (src, dst, min_ex()), 3)
+                return dst  # close enough
+        raise
+
+
 def _fs_mvrm(
     log: "NamedLogger", src: str, dst: str, atomic: bool, flags: dict[str, Any]
 ) -> bool:
@@ -2644,7 +2714,7 @@ def _fs_mvrm(
                 t = "something appeared at dst; aborting rename %r ==> %r"
                 log(t % (src, dst), 1)
                 return False
-            osfun(*args)
+            osfun(*args)  # type: ignore
             if attempt:
                 now = time.time()
                 t = "%sd in %.2f sec, attempt %d: %r"
@@ -2694,7 +2764,7 @@ def atomic_move(log: "NamedLogger", src: str, dst: str, flags: dict[str, Any]) -
                 os.unlink(bdst)
             except:
                 pass
-            shutil.move(bsrc, bdst)
+            shutil.move(bsrc, bdst)  # type: ignore
 
 
 def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
@@ -2737,6 +2807,8 @@ def get_df(abspath: str, prune: bool) -> tuple[int, int, str]:
 if not ANYWIN and not MACOS:
 
     def siocoutq(sck: socket.socket) -> int:
+        assert fcntl  # type: ignore  # !rm
+        assert termios  # type: ignore  # !rm
         # SIOCOUTQ^sockios.h == TIOCOUTQ^ioctl.h
         try:
             zb = fcntl.ioctl(sck.fileno(), termios.TIOCOUTQ, b"AAAA")
@@ -2951,6 +3023,27 @@ def load_ipu(
     return ip_u, nm
 
 
+def load_ipr(
+    log: "RootLogger", iprs: list[str], defer_mutex: bool = False
+) -> dict[str, NetMap]:
+    ret = {}
+    for ipr in iprs:
+        try:
+            zs, uname = ipr.split("=")
+            cidrs = zs.split(",")
+        except:
+            t = "\n  invalid value %r for argument --ipr; must be CIDR[,CIDR[,...]]=UNAME (192.168.0.0/16=amelia)"
+            raise Exception(t % (ipr,))
+        try:
+            nm = NetMap(["::"], cidrs, True, True, defer_mutex)
+        except Exception as ex:
+            t = "failed to translate --ipr into netmap, probably due to invalid config: %r"
+            log("root", t % (ex,), 1)
+            raise
+        ret[uname] = nm
+    return ret
+
+
 def yieldfile(fn: str, bufsz: int) -> Generator[bytes, None, None]:
     readsz = min(bufsz, 128 * 1024)
     with open(fsenc(fn), "rb", bufsz) as f:
@@ -2980,6 +3073,17 @@ def justcopy(
             time.sleep(slp)
 
     return tlen, "checksum-disabled", "checksum-disabled"
+
+
+def eol_conv(
+    fin: Generator[bytes, None, None], conv: str
+) -> Generator[bytes, None, None]:
+    crlf = conv.lower() == "crlf"
+    for buf in fin:
+        buf = buf.replace(b"\r", b"")
+        if crlf:
+            buf = buf.replace(b"\n", b"\r\n")
+        yield buf
 
 
 def hashcopy(
@@ -3068,7 +3172,7 @@ def sendfile_kern(
         try:
             req = min(0x2000000, upper - ofs)  # 32 MiB
             if use_poll:
-                poll.poll(10000)
+                poll.poll(10000)  # type: ignore
             else:
                 select.select([], [out_fd], [], 10)
             n = os.sendfile(out_fd, in_fd, ofs, req)
@@ -3124,8 +3228,9 @@ def statdir(
         else:
             src = "listdir"
             fun: Any = os.lstat if lstat else os.stat
+            btop_ = os.path.join(btop, b"")
             for name in os.listdir(btop):
-                abspath = os.path.join(btop, name)
+                abspath = btop_ + name
                 try:
                     yield (fsdec(name), fun(abspath))
                 except Exception as ex:
@@ -3164,7 +3269,9 @@ def rmdirs(
 
     stats = statdir(logger, scandir, lstat, top, False)
     dirs = [x[0] for x in stats if stat.S_ISDIR(x[1].st_mode)]
-    dirs = [os.path.join(top, x) for x in dirs]
+    if dirs:
+        top_ = os.path.join(top, "")
+        dirs = [top_ + x for x in dirs]
     ok = []
     ng = []
     for d in reversed(dirs):
@@ -3355,7 +3462,9 @@ NICEB = NICES.encode("utf-8")
 
 
 def runcmd(
-    argv: Union[list[bytes], list[str]], timeout: Optional[float] = None, **ka: Any
+    argv: Union[list[bytes], list[str], list["LiteralString"]],
+    timeout: Optional[float] = None,
+    **ka: Any
 ) -> tuple[int, str, str]:
     isbytes = isinstance(argv[0], (bytes, bytearray))
     oom = ka.pop("oom", 0)  # 0..1000
@@ -3374,19 +3483,19 @@ def runcmd(
     if ANYWIN:
         if isbytes:
             if argv[0] in CMD_EXEB:
-                argv[0] += b".exe"
+                argv[0] += b".exe"  # type: ignore
         else:
             if argv[0] in CMD_EXES:
-                argv[0] += ".exe"
+                argv[0] += ".exe"  # type: ignore
 
     if ka.pop("nice", None):
         if WINDOWS:
             ka["creationflags"] = 0x4000
         elif NICEB:
             if isbytes:
-                argv = [NICEB] + argv
+                argv = [NICEB] + argv  # type: ignore
             else:
-                argv = [NICES] + argv
+                argv = [NICES] + argv  # type: ignore
 
     p = sp.Popen(argv, stdout=cout, stderr=cerr, **ka)
 
@@ -3398,10 +3507,10 @@ def runcmd(
             pass
 
     if not timeout or PY2:
-        bout, berr = p.communicate(sin)
+        bout, berr = p.communicate(sin)  # type: ignore
     else:
         try:
-            bout, berr = p.communicate(sin, timeout=timeout)
+            bout, berr = p.communicate(sin, timeout=timeout)  # type: ignore
         except sp.TimeoutExpired:
             if kill == "n":
                 return -18, "", ""  # SIGCONT; leave it be
@@ -3411,7 +3520,7 @@ def runcmd(
                 killtree(p.pid)
 
             try:
-                bout, berr = p.communicate(timeout=1)
+                bout, berr = p.communicate(timeout=1)  # type: ignore
             except:
                 bout = b""
                 berr = b""
@@ -3567,7 +3676,7 @@ def runihook(
     verbose: bool,
     cmd: str,
     vol: "VFS",
-    ups: list[tuple[str, int, int, str, str, str, int]],
+    ups: list[tuple[str, int, int, str, str, str, int, str]],
 ) -> bool:
     _, chk, fork, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
     bcmd = [sfsenc(x) for x in acmd]
@@ -3834,7 +3943,7 @@ def runhook(
     txt: str,
 ) -> dict[str, Any]:
     assert broker or up2k  # !rm
-    args = (broker or up2k).args
+    args = (broker or up2k).args  # type: ignore
     verbose = args.hook_v
     vp = vp.replace("\\", "/")
     ret = {"rc": 0}
@@ -3852,6 +3961,7 @@ def runhook(
                     if broker:
                         broker.say("up2k.hook_fx", k, v, vp)
                     else:
+                        assert up2k  # !rm
                         up2k.fx_backlog.append((k, v, vp))
                 elif k == "reloc" and v:
                     # idk, just take the last one ig
@@ -4011,6 +4121,8 @@ def termsize() -> tuple[int, int]:
     env = os.environ
 
     def ioctl_GWINSZ(fd: int) -> Optional[tuple[int, int]]:
+        assert fcntl  # type: ignore  # !rm
+        assert termios  # type: ignore  # !rm
         try:
             cr = sunpack(b"hh", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"AAAA"))
             return cr[::-1]
@@ -4140,7 +4252,7 @@ def _pkg_resource_exists(pkg: str, name: str) -> bool:
 
 
 def stat_resource(E: EnvParams, name: str):
-    path = os.path.join(E.mod, name)
+    path = E.mod_ + name
     if os.path.exists(path):
         return os.stat(fsenc(path))
     return None
@@ -4187,7 +4299,7 @@ def _has_resource(name: str):
 
 
 def has_resource(E: EnvParams, name: str):
-    return _has_resource(name) or os.path.exists(os.path.join(E.mod, name))
+    return _has_resource(name) or os.path.exists(E.mod_ + name)
 
 
 def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
@@ -4212,7 +4324,7 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
                 stream = codecs.getreader(enc)(stream)
             return stream
 
-    ap = os.path.join(E.mod, name)
+    ap = E.mod_ + name
 
     if PY2:
         return codecs.open(ap, "r", encoding=enc)  # type: ignore

@@ -4,6 +4,7 @@ var XHR = XMLHttpRequest,
 	img_re = /\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
 
 // please add translations in alphabetic order, but keep "eng" and "nor" first
+// (lines ending with //m are machine translations)
 var Ls = {
 	"eng": {
 		"tt": "English",
@@ -113,6 +114,7 @@ var Ls = {
 		"gou": 'parent folder">up',
 		"gon": 'next folder">next',
 		"logout": "Logout ",
+		"login": "Login",
 		"access": " access",
 		"ot_close": "close submenu",
 		"ot_search": "search for files by attributes, path / name, music tags, or any combination of those$N$N&lt;code&gt;foo bar&lt;/code&gt; = must contain both «foo» and «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = must contain «foo» but not «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start with «yana» and be an «opus» file$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contain exactly «try unite»$N$Nthe date format is iso-8601, like$N&lt;code&gt;2009-12-31&lt;/code&gt; or &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
@@ -207,6 +209,7 @@ var Ls = {
 		"u_nav_b": '<a href="#" id="modal-ok">Files</a><a href="#" id="modal-ng">One folder</a>',
 
 		"cl_opts": "switches",
+		"cl_hfsz": "filesize",
 		"cl_themes": "theme",
 		"cl_langs": "language",
 		"cl_ziptype": "folder download",
@@ -299,13 +302,15 @@ var Ls = {
 		"mt_mloop": "loop the open folder\">🔁 loop",
 		"mt_mnext": "load the next folder and continue\">📂 next",
 		"mt_mstop": "stop playback\">⏸ stop",
-		"mt_cflac": "convert flac / wav to opus\">flac",
-		"mt_caac": "convert aac / m4a to opus\">aac",
-		"mt_coth": "convert all others (not mp3) to opus\">oth",
+		"mt_cflac": "convert flac / wav to {0}\">flac",
+		"mt_caac": "convert aac / m4a to {0}\">aac",
+		"mt_coth": "convert all others (not mp3) to {0}\">oth",
 		"mt_c2opus": "best choice for desktops, laptops, android\">opus",
 		"mt_c2owa": "opus-weba, for iOS 17.5 and newer\">owa",
 		"mt_c2caf": "opus-caf, for iOS 11 through 17\">caf",
 		"mt_c2mp3": "use this on very old devices\">mp3",
+		"mt_c2flac": "best sound quality, but huge downloads\">flac",
+		"mt_c2wav": "uncompressed playback (even bigger)\">wav",
 		"mt_c2ok": "nice, good choice",
 		"mt_c2nd": "that's not the recommended output format for your device, but that's fine",
 		"mt_c2ng": "your device does not seem to support this output format, but let's try anyways",
@@ -424,6 +429,7 @@ var Ls = {
 		"fcp_ok": "copy OK",
 		"fp_busy": "moving {0} items...\n\n{1}",
 		"fcp_busy": "copying {0} items...\n\n{1}",
+		"fp_abrt": "aborting...",
 		"fp_err": "move failed:\n",
 		"fcp_err": "copy failed:\n",
 		"fp_confirm": "move these {0} items here?",
@@ -741,6 +747,7 @@ var Ls = {
 		"gou": 'naviger ett nivå opp">opp',
 		"gon": 'naviger til mappen etter denne">neste',
 		"logout": "Logg ut ",
+		"login": "Logg inn",
 		"access": " tilgang",
 		"ot_close": "lukk verktøy",
 		"ot_search": "søk etter filer ved å angi filnavn, mappenavn, tid, størrelse, eller metadata som sangtittel / artist / osv.$N$N&lt;code&gt;foo bar&lt;/code&gt; = inneholder både «foo» og «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = inneholder «foo» men ikke «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = starter med «yana», filtype «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = «try unite» eksakt$N$Ndatoformat er iso-8601, så f.eks.$N&lt;code&gt;2009-12-31&lt;/code&gt; eller &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
@@ -850,7 +857,7 @@ var Ls = {
 		"cl_hcancel": "kolonne-skjuling avbrutt",
 
 		"ct_grid": '田 ikoner',
-		"ct_ttips": 'hvis hjelpetekst ved å holde musen over ting">ℹ️ tips',
+		"ct_ttips": 'vis hjelpetekst ved å holde musen over ting">ℹ️ tips',
 		"ct_thumb": 'vis miniatyrbilder istedenfor ikoner$NSnarvei: T">🖼️ bilder',
 		"ct_csel": 'bruk tastene CTRL og SHIFT for markering av filer i ikonvisning">merk',
 		"ct_ihop": 'bla ned til sist viste bilde når bildeviseren lukkes">g⮯',
@@ -875,8 +882,8 @@ var Ls = {
 
 		"cut_az": "last opp filer i alfabetisk rekkefølge, istedenfor minste-fil-først$N$Nalfabetisk kan gjøre det lettere å anslå om alt gikk bra, men er bittelitt tregere på fiber / LAN",
 
-		"cut_nag": "meldingsvarsel når opplastning er ferdig$N(kun on nettleserfanen ikke er synlig)",
-		"cut_sfx": "lydvarsel når opplastning er ferdig$N(kun on nettleserfanen ikke er synlig)",
+		"cut_nag": "meldingsvarsel når opplastning er ferdig$N(kun om nettleserfanen ikke er synlig)",
+		"cut_sfx": "lydvarsel når opplastning er ferdig$N(kun om nettleserfanen ikke er synlig)",
 
 		"cut_mt": "raskere befaring ved å bruke hele CPU'en$N$Ndenne funksjonen anvender web-workers$Nog krever mer RAM (opptil 512 MiB ekstra)$N$Ngjør https 30% raskere, http 4.5x raskere\">mt",
 
@@ -910,7 +917,7 @@ var Ls = {
 		"mt_loop": "spill den samme sangen om og om igjen\">🔁",
 		"mt_one": "spill kun én sang\">1️⃣",
 		"mt_shuf": "sangene i hver mappe$Nspilles i tilfeldig rekkefølge\">🔀",
-		"mt_aplay": "forsøk å starte avspilling hvis linken du klikket på for å åpne nettsiden inneholder en sang-ID$N$Nhvis denne deaktiveres så vil heller ikke nettside-URLen bli oppdatert med sang-ID'er når musikk spilles, i tilfelle innstillingene skulle gå tapt og nettsiden lastes på ny\">a▶",
+		"mt_aplay": "forsøk å starte avspilling hvis linken du klikket på for å åpne nettsiden inneholder en sang-ID$N$Nhvis denne deaktiveres så vil heller ikke nettside-URL'en bli oppdatert med sang-ID'er når musikk spilles, i tilfelle innstillingene skulle gå tapt og nettsiden lastes på ny\">a▶",
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
 		"mt_prescan": "ved behov, bla til neste mappe$Nslik at nettleseren lar oss$Nfortsette å spille musikk\">bla",
 		"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
@@ -927,13 +934,15 @@ var Ls = {
 		"mt_mloop": "repeter hele mappen\">🔁 gjenta",
 		"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
 		"mt_mstop": "stopp avspilling\">⏸ stopp",
-		"mt_cflac": "konverter flac / wav-filer til opus\">flac",
-		"mt_caac": "konverter aac / m4a-filer til to opus\">aac",
-		"mt_coth": "konverter alt annet (men ikke mp3) til opus\">andre",
+		"mt_cflac": "konverter flac / wav-filer til {0}\">flac",
+		"mt_caac": "konverter aac / m4a-filer til to {0}\">aac",
+		"mt_coth": "konverter alt annet (men ikke mp3) til {0}\">andre",
 		"mt_c2opus": "det beste valget for alle PCer og Android\">opus",
 		"mt_c2owa": "opus-weba, for iOS 17.5 og nyere\">owa",
 		"mt_c2caf": "opus-caf, for iOS 11 tilogmed 17\">caf",
 		"mt_c2mp3": "bra valg for steinalder-utstyr (slår aldri feil)\">mp3",
+		"mt_c2flac": "gir best lydkvalitet, men eter nettet ditt\">flac",
+		"mt_c2wav": "helt rå lydstrøm (bruker enda mere data enn flac)\">wav",
 		"mt_c2ok": "bra valg!",
 		"mt_c2nd": "ikke det foretrukne valget for din enhet, men funker sikkert greit",
 		"mt_c2ng": "ser virkelig ikke ut som enheten din takler dette formatet... men ok, vi prøver",
@@ -1052,6 +1061,7 @@ var Ls = {
 		"fcp_ok": "kopiering OK",
 		"fp_busy": "flytter {0} filer...\n\n{1}",
 		"fcp_busy": "kopierer {0} filer...\n\n{1}",
+		"fp_abrt": "avbryter...",
 		"fp_err": "flytting feilet:\n",
 		"fcp_err": "kopiering feilet:\n",
 		"fp_confirm": "flytt disse {0} filene hit?",
@@ -1368,6 +1378,7 @@ var Ls = {
 		"gou": '顶部">up',
 		"gon": '下一项">next',
 		"logout": " 登出",
+		"login": "登录", //m
 		"access": " 访问",
 		"ot_close": "关闭子菜单",
 		"ot_search": "按属性、路径/名称、音乐标签或上述内容的任意组合搜索文件$N$N&lt;code&gt;foo bar&lt;/code&gt; = 必须包含 «foo» 和 «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = 包含 «foo» 而不包含 «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = 以 «yama» 为开头的 «opus» 文件$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = 正好包含 «try unite»$N$N时间格式为 iso-8601, 比如:$N&lt;code&gt;2009-12-31&lt;/code&gt; or &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
@@ -1554,13 +1565,15 @@ var Ls = {
 		"mt_mloop": "循环打开的文件夹\">🔁 循环",
 		"mt_mnext": "加载下一个文件夹并继续\">📂 下一首",
 		"mt_mstop": "停止播放\">⏸ 停止", //m
-		"mt_cflac": "将 flac / wav 转换为 opus\">flac",
-		"mt_caac": "将 aac / m4a 转换为 opus\">aac",
-		"mt_coth": "将所有其他（不是 mp3）转换为 opus\">oth",
+		"mt_cflac": "将 flac / wav 转换为 {0}\">flac",
+		"mt_caac": "将 aac / m4a 转换为 {0}\">aac",
+		"mt_coth": "将所有其他（不是 mp3）转换为 {0}\">oth",
 		"mt_c2opus": "适合桌面电脑、笔记本电脑和安卓设备的最佳选择\">opus", //m
 		"mt_c2owa": "opus-weba（适用于 iOS 17.5 及更新版本）\">owa", //m
 		"mt_c2caf": "opus-caf（适用于 iOS 11 到 iOS 17）\">caf", //m
 		"mt_c2mp3": "适用于非常旧的设备\">mp3", //m
+		"mt_c2flac": "最佳音质，但下载量很大\">flac", //m
+		"mt_c2wav": "无压缩播放（更占空间）\">wav", //m
 		"mt_c2ok": "不错的选择！", //m
 		"mt_c2nd": "这不是您的设备推荐的输出格式，但应该没问题。", //m
 		"mt_c2ng": "您的设备似乎不支持此输出格式，不过我们还是试试看吧。", //m
@@ -1604,7 +1617,7 @@ var Ls = {
 
 		"f_dls": '当前文件夹中的文件链接已\n更改为下载链接',
 
-		"f_partial": "要安全下载正在上传的文件，请点击没有 <code>.PARTIAL</code> 文件扩展名的同名文件。请按取消或 Escape 执行此操作。\n\n按 OK / Enter 将忽略此警告并继续下载 <code>.PARTIAL</code> 临时文件，这几乎肯定会导致数据损坏。",
+		"f_partial": "要安全下载正在上传的文件，请点击没有 <code>.PARTIAL</code> 文件扩展名的同名文件。请按取消或 Escape 执行此操作。\n\n按 确定 / Enter 将忽略此警告并继续下载 <code>.PARTIAL</code> 临时文件，这几乎肯定会导致数据损坏。",
 
 		"ft_paste": "粘贴 {0} 项$N快捷键: ctrl-V",
 		"fr_eperm": '无法重命名：\n你在此文件夹中没有 “移动” 权限',
@@ -1679,6 +1692,7 @@ var Ls = {
 		"fcp_ok": "复制成功", //m
 		"fp_busy": "正在移动 {0} 项...\n\n{1}",
 		"fcp_busy": "正在复制 {0} 项...\n\n{1}", //m
+		"fp_abrt": "正在中止...", //m
 		"fp_err": "移动失败：\n",
 		"fcp_err": "复制失败：\n", //m
 		"fp_confirm": "将这些 {0} 项移动到这里？",
@@ -1887,6 +1901,641 @@ var Ls = {
 
 		"lang_set": "刷新以使更改生效？",
 	},
+	"cze": {
+		"tt": "Čeština",
+
+		"cols": {
+			"c": "tlačítka akcí",
+			"dur": "doba trvání",
+			"q": "kvalita / bitrate",
+			"Ac": "audio kodek",
+			"Vc": "video kodek",
+			"Fmt": "formát / kontejner",
+			"Ahash": "kontrolní součet audia",
+			"Vhash": "kontrolní součet videa",
+			"Res": "rozlišení",
+			"T": "typ souboru",
+			"aq": "kvalita zvuku / bitrate",
+			"vq": "kvalita videa / bitrate",
+			"pixfmt": "podvzorkování / struktura pixelů",
+			"resw": "horizontální rozlišení",
+			"resh": "vertikální rozlišení",
+			"chs": "audio kanály",
+			"hz": "vzorkovací frekvence"
+		},
+
+		"hks": [
+			[
+				"různé",
+				["ESC", "zavřít různé věci"],
+
+				"správce souborů",
+				["G", "přepnout seznam / zobrazení mřížky"],
+				["T", "přepnout náhledy / ikony"],
+				["⇧ A/D", "velikost náhledů"],
+				["ctrl-K", "smazat vybrané"],
+				["ctrl-X", "vyjmout výběr do schránky"],
+				["ctrl-C", "kopírovat výběr do schránky"],
+				["ctrl-V", "vložit (přesunout/kopírovat) zde"],
+				["Y", "stáhnout vybrané"],
+				["F2", "přejmenovat vybrané"],
+
+				"výběr souborů",
+				["space", "přepnout výběr souboru"],
+				["↑/↓", "posunout kurzor výběru"],
+				["ctrl ↑/↓", "posunout kurzor a zobrazení"],
+				["⇧ ↑/↓", "vybrat předchozí/následující soubor"],
+				["ctrl-A", "vybrat všechny soubory / složky"],
+			], [
+				"navigace",
+				["B", "přepnout drobečkovou navigaci / navigační panel"],
+				["I/K", "předchozí/následující složka"],
+				["M", "nadřazená složka (nebo sbalit aktuální)"],
+				["V", "přepnout složky / textové soubory v navigačním panelu"],
+				["A/D", "velikost navigačního panelu"],
+			], [
+				"audio přehrávač",
+				["J/L", "předchozí/následující skladba"],
+				["U/O", "přeskočit 10 sekund zpět/vpřed"],
+				["0..9", "přejít na 0%..90%"],
+				["P", "přehrát/pozastavit (také spustit)"],
+				["S", "vybrat přehrávanou skladbu"],
+				["Y", "stáhnout skladbu"],
+			], [
+				"prohlížeč obrázků",
+				["J/L, ←/→", "předchozí/následující obrázek"],
+				["Home/End", "první/poslední obrázek"],
+				["F", "celá obrazovka"],
+				["R", "otočit po směru hodinových ručiček"],
+				["⇧ R", "otočit proti směru hodinových ručiček"],
+				["S", "vybrat obrázek"],
+				["Y", "stáhnout obrázek"],
+			], [
+				"video přehrávač",
+				["U/O", "přeskočit 10 sekund zpět/vpřed"],
+				["P/K/Space", "přehrát/pozastavit"],
+				["C", "pokračovat přehráváním následující"],
+				["V", "smyčka"],
+				["M", "ztlumit"],
+				["[ and ]", "nastavit interval smyčky"],
+			], [
+				"prohlížeč textových souborů",
+				["I/K", "předchozí/následující soubor"],
+				["M", "zavřít textový soubor"],
+				["E", "upravit textový soubor"],
+				["S", "vybrat soubor (pro vyjmutí/kopírování/přejmenování)"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Zrušit",
+
+		"enable": "Povolit",
+		"danger": "NEBEZPEČÍ",
+		"clipped": "zkopírováno do schránky",
+
+		"ht_s1": "sekunda",
+		"ht_s2": "sekundy",
+		"ht_s5": "sekund",
+		"ht_m1": "minuta",
+		"ht_m2": "minuty",
+		"ht_m5": "minut",
+		"ht_h1": "hodina",
+		"ht_h2": "hodiny",
+		"ht_h5": "hodin",
+		"ht_d1": "den",
+		"ht_d2": "dny",
+		"ht_d5": "dní",
+		"ht_and": " a ",
+
+		"goh": "ovládací panel",
+		"gop": 'předchozí sourozenec">předchozí',
+		"gou": 'nadřazená složka">nahoru',
+		"gon": 'následující složka">následující',
+		"logout": "Odhlásit ",
+		"login": "Přihlásit se", //m
+		"access": " přístup",
+		"ot_close": "zavřít podnabídku",
+		"ot_search": "hledat soubory podle atributů, cesty / názvu, hudebních tagů nebo jejich kombinace$N$N&lt;code&gt;foo bar&lt;/code&gt; = musí obsahovat jak «foo» tak «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = musí obsahovat «foo» ale ne «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = začíná na «yana» a je to «opus» soubor$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = obsahuje přesně «try unite»$N$Nformát data je iso-8601, jako$N&lt;code&gt;2009-12-31&lt;/code&gt; nebo &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: smazat vaše nedávné nahrání nebo zrušit nedokončené",
+		"ot_bup": "bup: základní nahrávač, podporuje i netscape 4.0",
+		"ot_mkdir": "mkdir: vytvořit nový adresář",
+		"ot_md": "new-md: vytvořit nový markdown dokument",
+		"ot_msg": "msg: poslat zprávu do logu serveru",
+		"ot_mp": "možnosti přehrávače médií",
+		"ot_cfg": "možnosti konfigurace",
+		"ot_u2i": 'up2k: nahrát soubory (pokud máte oprávnění k zápisu) nebo přepnout do vyhledávacího režimu a podívat se, zda existují někde na serveru$N$Nnahrávání je obnovitelné, vícevláknové a časové značky souborů jsou zachovány, ale používá více CPU než [🎈]&nbsp; (základní nahrávač)<br /><br />během nahrávání se tato ikona stává indikátorem průběhu!',
+		"ot_u2w": 'up2k: nahrát soubory s podporou obnovení (zavřete prohlížeč a stejné soubory přetáhněte později)$N$Nvícevláknové a časové značky souborů jsou zachovány, ale používá více CPU než [🎈]&nbsp; (základní nahrávač)<br /><br />během nahrávání se tato ikona stává indikátorem průběhu!',
+		"ot_noie": 'Prosím použijte Chrome / Firefox / Edge',
+
+		"ab_mkdir": "vytvořit adresář",
+		"ab_mkdoc": "nový markdown dokument",
+		"ab_msg": "poslat zprávu do logu serveru",
+
+		"ay_path": "přejít na složky",
+		"ay_files": "přejít na soubory",
+
+		"wt_ren": "přejmenovat vybrané položky$NKlávesová zkratka: F2",
+		"wt_del": "smazat vybrané položky$NKlávesová zkratka: ctrl-K",
+		"wt_cut": "vyjmout vybrané položky &lt;small&gt;(pak je vložit někam jinam)&lt;/small&gt;$NKlávesová zkratka: ctrl-X",
+		"wt_cpy": "kopírovat vybrané položky do schránky$N(pro vložení někam jinam)$NKlávesová zkratka: ctrl-C",
+		"wt_pst": "vložit dříve vyjmutý / zkopírovaný výběr$NKlávesová zkratka: ctrl-V",
+		"wt_selall": "vybrat všechny soubory$NKlávesová zkratka: ctrl-A (když je zaměřen soubor)",
+		"wt_selinv": "invertovat výběr",
+		"wt_zip1": "stáhnout tuto složku jako archiv",
+		"wt_selzip": "stáhnout výběr jako archiv",
+		"wt_seldl": "stáhnout výběr jako samostatné soubory$NKlávesová zkratka: Y",
+		"wt_npirc": "kopírovat informace o stopě ve formátu irc",
+		"wt_nptxt": "kopírovat informace o stopě v prostém textu",
+		"wt_m3ua": "přidat do m3u playlistu (klikněte později na <code>📻kopírovat</code>)",
+		"wt_m3uc": "kopírovat m3u playlist do schránky",
+		"wt_grid": "přepnout zobrazení mřížky / seznamu$NKlávesová zkratka: G",
+		"wt_prev": "předchozí stopa$NKlávesová zkratka: J",
+		"wt_play": "přehrát / pozastavit$NKlávesová zkratka: P",
+		"wt_next": "následující stopa$NKlávesová zkratka: L",
+
+		"ul_par": "paralelní nahrávání:",
+		"ut_rand": "náhodné názvy souborů",
+		"ut_u2ts": "kopírovat časovou značku poslední změny$Nz vašeho souborového systému na server\">📅",
+		"ut_ow": "přepsat existující soubory na serveru?$N🛡️: nikdy (místo toho vytvoří nový název souboru)$N🕒: přepsat pokud je soubor na serveru starší než váš$N♻️: vždy přepsat pokud se soubory liší",
+		"ut_mt": "pokračovat v hashování ostatních souborů během nahrávání$N$Nmožná zakázat pokud je vaše CPU nebo HDD bottleneckem",
+		"ut_ask": 'požádat o potvrzení před zahájením nahrávání">💭',
+		"ut_pot": "zlepšit rychlost nahrávání na pomalých zařízeních$Nzjednodušením UI",
+		"ut_srch": "skutečně nenahrávat, místo toho zkontrolovat zda soubory již $N existují na serveru (prohledá všechny složky které můžete číst)",
+		"ut_par": "pozastavit nahrávání nastavením na 0$N$Nzvýšit pokud je vaše připojení pomalé / vysoká latence$N$Nponechat na 1 v LAN nebo pokud je HDD serveru bottleneckem",
+		"ul_btn": "přetáhněte soubory / složky<br>sem (nebo sem klikněte)",
+		"ul_btnu": "N A H R Á T",
+		"ul_btns": "H L E D A T",
+
+		"ul_hash": "hash",
+		"ul_send": "odeslat",
+		"ul_done": "hotovo",
+		"ul_idle1": "zatím nejsou zařazena žádná nahrávání",
+		"ut_etah": "průměrná rychlost &lt;em&gt;hashování&lt;/em&gt; a odhadovaný čas do dokončení",
+		"ut_etau": "průměrná rychlost &lt;em&gt;nahrávání&lt;/em&gt; a odhadovaný čas do dokončení",
+		"ut_etat": "průměrná &lt;em&gt;celková&lt;/em&gt; rychlost a odhadovaný čas do dokončení",
+
+		"uct_ok": "úspěšně dokončeno",
+		"uct_ng": "nedobré: selhalo / odmítnuto / nenalezeno",
+		"uct_done": "celkem",
+		"uct_bz": "hashování nebo nahrávání",
+		"uct_q": "nečinné, čekající",
+
+		"utl_name": "název souboru",
+		"utl_ulist": "seznam",
+		"utl_ucopy": "kopírovat",
+		"utl_links": "odkazy",
+		"utl_stat": "stav",
+		"utl_prog": "průběh",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "CHYBA",
+		"utl_oserr": "chyba OS",
+		"utl_found": "nalezeno",
+		"utl_defer": "odložit",
+		"utl_yolo": "YOLO",
+		"utl_done": "hotovo",
+
+		"ul_flagblk": "soubory byly přidány do fronty</b><br>nicméně v jiné kartě prohlížeče běží up2k,<br>takže čekáme až skončí",
+		"ul_btnlk": "konfigurace serveru uzamkla tento přepínač v tomto stavu",
+
+		"udt_up": "Nahrávání",
+		"udt_srch": "Hledání",
+		"udt_drop": "přetáhněte to sem",
+
+		"u_nav_m": '<h6>jasnačka, co máte?</h6><code>Enter</code> = Soubory (jeden nebo více)\n<code>ESC</code> = Jednu složku (včetně podsložek)',
+		"u_nav_b": '<a href="#" id="modal-ok">Soubory</a><a href="#" id="modal-ng">Jedna složka</a>',
+
+		"cl_opts": "přepínače",
+		"cl_themes": "téma",
+		"cl_langs": "jazyk",
+		"cl_ziptype": "stahování složky",
+		"cl_uopts": "up2k přepínače",
+		"cl_favico": "favicon",
+		"cl_bigdir": "velké adresáře",
+		"cl_hsort": "#řazení",
+		"cl_keytype": "notace kláves",
+		"cl_hiddenc": "skryté sloupce",
+		"cl_hidec": "skrýt",
+		"cl_reset": "resetovat",
+		"cl_hpick": "klepněte na záhlaví sloupců pro skrytí v tabulce níže",
+		"cl_hcancel": "skrývání sloupců zrušeno",
+
+		"ct_grid": '田 mřížka',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ nápovědy',
+		"ct_thumb": 'v zobrazení mřížky přepnout ikony nebo náhledy$NKlávesová zkratka: T">🖼️ náhledy',
+		"ct_csel": 'použít CTRL a SHIFT pro výběr souborů v zobrazení mřížky">výběr',
+		"ct_ihop": 'když se zavře prohlížeč obrázků, posunout dolů k naposledy zobrazenému souboru">g⮯',
+		"ct_dots": 'zobrazit skryté soubory (pokud to server povoluje)">dotfiles',
+		"ct_qdel": 'při mazání souborů požádat o potvrzení jen jednou">rychlé mazání',
+		"ct_dir1st": 'řadit složky před soubory">📁 první',
+		"ct_nsort": 'přirozené řazení (pro názvy souborů s úvodními číslicemi)">přirozené řazení',
+		"ct_utc": 'zobrazit všechny časy v UTC">UTC',
+		"ct_readme": 'zobrazit README.md v seznamech složek">📜 readme',
+		"ct_idxh": 'zobrazit index.html místo seznamu složky">htm',
+		"ct_sbars": 'zobrazit posuvníky">⟊',
+
+		"cut_umod": "pokud soubor na serveru již existuje, aktualizovat časovou značku posledního změny serveru tak, aby odpovídala vašemu lokálnímu souboru (vyžaduje oprávnění k zápisu+mazání)\">re📅",
+
+		"cut_turbo": "yolo tlačítko, pravděpodobně to NECHCETE povolit:$N$Npoužijte to pokud jste nahrávali obrovské množství souborů a museli jste restartovat z nějakého důvodu a chcete pokračovat v nahrávání ASAP$N$Ntoto nahradí hash-kontrolu jednoduchým <em>&quot;má to stejnou velikost souboru na serveru?&quot;</em> takže pokud se obsah souborů liší, NEBUDE nahrán$N$Nměli byste to vypnout když nahrávání skončí a pak znovu &quot;nahrát&quot; stejné soubory aby je klient ověřil\">turbo",
+
+		"cut_datechk": "nemá žádný efekt pokud není povoleno turbo tlačítko$N$Nsnižuje yolo faktor o trochu; kontroluje zda časové značky souborů na serveru odpovídají vašim$N$Nměl by <em>teoreticky</em> zachytit většinu nedokončených / poškozených nahrávání, ale není náhradou za ověřovací průchod s turbem vypnutým poté\">kontrola data",
+
+		"cut_u2sz": "velikost (v MiB) každého kusu nahrávání; velké hodnoty lépe létají přes atlantik. Zkuste nízké hodnoty na velmi nespolehlivých připojeních",
+
+		"cut_flag": "zajistit aby nahrávala jen jedna karta najednou $N -- ostatní karty to musí mít také povoleno $N -- ovlivňuje jen karty na stejné doméně",
+
+		"cut_az": "nahrávat soubory v abecedním pořadí, spíše než nejmenší-soubor-první$N$Nabecední pořadí může usnadnit kontrolu zda se něco pokazilo na serveru, ale činí nahrávání mírně pomalejší na optice / LAN",
+
+		"cut_nag": "notifikace OS když nahrávání skončí$N(jen pokud prohlížeč nebo karta není aktivní)",
+		"cut_sfx": "zvukové upozornění když nahrávání skončí$N(jen pokud prohlížeč nebo karta není aktivní)",
+
+		"cut_mt": "použít vícevláknové zpracování pro zrychlení hashování souborů$N$Ntoto používá web-workers a vyžaduje$Nvíce RAM (až 512 MiB navíc)$N$Ndělá https o 30% rychlejší a http 4,5x rychlejší\">mt",
+
+		"cut_wasm": "použijte wasm místo vestavěného hashování prohlížeče; zlepšuje rychlost na prohlížečích založených na chrome ale zvyšuje zátěž CPU, mnoho starších verzí chrome má chyby které způsobují že prohlížeč spotřebuje veškerou RAM a spadne pokud je toto povoleno\">wasm",
+
+		"cft_text": "text favicon (prázdné a obnovte pro zakázání)",
+		"cft_fg": "barva popředí",
+		"cft_bg": "barva pozadí",
+
+		"cdt_lim": "maximální počet souborů k zobrazení ve složce",
+		"cdt_ask": "při posunování na konec,$Nmísto načítání více souborů,$N se zeptat co dělat",
+		"cdt_hsort": "kolik pravidel řazení (&lt;code&gt;,sorthref&lt;/code&gt;) zahrnout do media-URL. Nastavení na 0 bude také ignorovat pravidla řazení zahrnutá v media odkazech při kliknutí na ně",
+
+		"tt_entree": "zobrazit navigační panel (postranní strom adresářů)$NKlávesová zkratka: B",
+		"tt_detree": "zobrazit drobečkovou navigaci$NKlávesová zkratka: B",
+		"tt_visdir": "posunout k vybrané složce",
+		"tt_ftree": "přepnout strom složek / textové soubory$NKlávesová zkratka: V",
+		"tt_pdock": "zobrazit nadřazené složky v ukotveném panelu nahoře",
+		"tt_dynt": "automaticky rozrůstat jak se strom rozšiřuje",
+		"tt_wrap": "zalomení řádků",
+		"tt_hover": "odhalit přetékající řádky při najetí$N( ruší posun pokud kurzor myši $N&nbsp; není v levém okraji )",
+
+		"ml_pmode": "na konci složky...",
+		"ml_btns": "příkazy",
+		"ml_tcode": "transkódovat",
+		"ml_tcode2": "transkódovat na",
+		"ml_tint": "odstín",
+		"ml_eq": "audio ekvalizér",
+		"ml_drc": "kompresor dynamického rozsahu",
+
+		"mt_loop": "smyčka/opakovat jednu skladbu\">🔁",
+		"mt_one": "zastavit po jedné skladbě\">1️⃣",
+		"mt_shuf": "zamíchat skladby v každé složce\">🔀",
+		"mt_aplay": "automatické přehrávání pokud je ID skladby v odkazu kterým jste přišli na server$N$Nzakázání toho také zastaví aktualizaci URL stránky s ID skladby při přehrávání hudby, aby se zabránilo automatickému přehrávání pokud se tato nastavení ztratí ale URL zůstane\">a▶",
+		"mt_preload": "začít načítat následující skladbu před koncem pro plynulé přehrávání\">přednahrání",
+		"mt_prescan": "přejít do následující složky před tím než$Nskončí poslední skladba, aby byl webprohlížeč$Nspokojen aby nezastavil přehrávání\">nav",
+		"mt_fullpre": "zkusit přednahrát celou skladbu;$N✅ povolit na <b>nespolehlivých</b> připojeních,$N❌ <b>zakázat</b> na pomalých připojeních pravděpodobně\">úplné",
+		"mt_fau": "na telefonech zabránit zastavení hudby, pokud se další píseň nenahraje dostatečně rychle (může způsobit chybné zobrazení tagů)\">☕️",
+		"mt_waves": "vlnový posuvník:$Nzobrazit amplitudu zvuku v posuvníku\">~s",
+		"mt_npclip": "zobrazit tlačítka pro kopírování aktuálně přehrávané písně do schránky\">/np",
+		"mt_m3u_c": "zobrazit tlačítka pro kopírování$Nvybraných písní jako položky m3u8 playlistu\">📻",
+		"mt_octl": "integrace s OS (mediální klávesy / osd)\">os-ctl",
+		"mt_oseek": "povolit posunování přes integraci s OS$N$Npoznámka: na některých zařízeních (iPhone),$Nto nahradí tlačítko další písně\">seek",
+		"mt_oscv": "zobrazit obal alba v osd\">art",
+		"mt_follow": "udržet přehrávanou stopu v zobrazení\">🎯",
+		"mt_compact": "kompaktní ovládání\">⟎",
+		"mt_uncache": "vymazat cache &nbsp;(zkuste to, pokud váš prohlížeč uložil$Nporušenou kopii písně a odmítá ji přehrát)\">uncache",
+		"mt_mloop": "opakovat otevřenou složku\">🔁 loop",
+		"mt_mnext": "načíst další složku a pokračovat\">📂 next",
+		"mt_mstop": "zastavit přehrávání\">⏸ stop",
+		"mt_cflac": "převést flac / wav na {0}\">flac",
+		"mt_caac": "převést aac / m4a na {0}\">aac",
+		"mt_coth": "převést všechny ostatní (ne mp3) na {0}\">oth",
+		"mt_c2opus": "nejlepší volba pro desktopy, laptopy, android\">opus",
+		"mt_c2owa": "opus-weba, pro iOS 17.5 a novější\">owa",
+		"mt_c2caf": "opus-caf, pro iOS 11 až 17\">caf",
+		"mt_c2mp3": "použijte na velmi starých zařízeních\">mp3",
+		"mt_c2flac": "nejlepší kvalita zvuku, ale obrovské stahování\">flac",
+		"mt_c2wav": "nekomprimované přehrávání (ještě větší)\">wav",
+		"mt_c2ok": "výborně, dobrá volba",
+		"mt_c2nd": "to není doporučený výstupní formát pro vaše zařízení, ale v pořádku",
+		"mt_c2ng": "vaše zařízení, zdá se, nepodporuje tento výstupní formát, ale zkusíme to",
+		"mt_xowa": "v iOS jsou chyby bránící přehrávání na pozadí s tímto formátem; použijte prosím caf nebo mp3",
+		"mt_tint": "úroveň pozadí (0-100) na posuvníku$Nabyste učinili ukládání do vyrovnávací paměti méně rušivým",
+		"mt_eq": "povoluje ekvalizér a ovládání zisku;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standardní 100% hlasitost (nezměněno)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standardní stereo (nezměněno)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% levý-pravý crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = odstranění vokálů :^)$N$Npovolení ekvalizéru činí alba bez mezer zcela bez mezer, takže to nechte zapnuté se všemi hodnotami na nule (kromě width = 1), pokud vám na tom záleží",
+		"mt_drc": "povoluje kompresor dynamického rozsahu (vyrovnávač hlasitosti / brickwaller); také povolí EQ pro vyvážení špaget, takže nastavte všechna EQ pole kromě 'width' na 0, pokud to nechcete$N$Nsnižuje hlasitost zvuku nad THRESHOLD dB; pro každý RATIO dB za THRESHOLD je 1 dB výstupu, takže výchozí hodnoty tresh -24 a ratio 12 znamenají, že by nikdy nemělo být hlasitější než -22 dB a je bezpečné zvýšit boost ekvalizéru na 0.8, nebo dokonce 1.8 s ATK 0 a obrovským RLS jako 90 (funguje pouze ve firefoxu; RLS je max 1 v jiných prohlížečích)$N$N(viz wikipedia, vysvětlují to mnohem lépe)",
+
+		"mb_play": "přehrát",
+		"mm_hashplay": "přehrát tento audio soubor?",
+		"mm_m3u": "stiskněte <code>Enter/OK</code> pro Přehrání\nstiskněte <code>ESC/Zrušit</code> pro Úpravu",
+		"mp_breq": "potřebujete firefox 82+ nebo chrome 73+ nebo iOS 15+",
+		"mm_bload": "nyní se načítá...",
+		"mm_bconv": "převádí se na {0}, čekejte prosím...",
+		"mm_opusen": "váš prohlížeč nemůže přehrát aac / m4a soubory;\ntranscoding na opus je nyní povolen",
+		"mm_playerr": "přehrávání selhalo: ",
+		"mm_eabrt": "Pokus o přehrávání byl zrušen",
+		"mm_enet": "Vaše internetové připojení je nestabilní",
+		"mm_edec": "Tento soubor je údajně poškozený??",
+		"mm_esupp": "Váš prohlížeč nerozumí tomuto audio formátu",
+		"mm_eunk": "Neznámá chyba",
+		"mm_e404": "Nelze přehrát audio; chyba 404: Soubor nenalezen.",
+		"mm_e403": "Nelze přehrát audio; chyba 403: Přístup odepřen.\n\nZkuste stisknout F5 pro obnovení, možná jste se odhlásili",
+		"mm_e500": "Nelze přehrát audio; chyba 500: Zkontrolujte logy serveru.",
+		"mm_e5xx": "Nelze přehrát audio; chyba serveru ",
+		"mm_nof": "žádné další audio soubory v okolí nenalezeny",
+		"mm_prescan": "Hledám hudbu k dalšímu přehrání...",
+		"mm_scank": "Další píseň nalezena:",
+		"mm_uncache": "cache vymazána; všechny písně se znovu stáhnou při dalším přehrávání",
+		"mm_hnf": "tato píseň již neexistuje",
+
+		"im_hnf": "tento obrázek již neexistuje",
+
+		"f_empty": 'tato složka je prázdná',
+		"f_chide": 'toto skryje sloupec «{0}»\n\nmůžete odkrýt sloupce v záložce nastavení',
+		"f_bigtxt": "tento soubor má {0} MiB -- opravdu zobrazit jako text?",
+		"f_bigtxt2": "zobrazit pouze konec souboru? to také povolí sledování/tailing, zobrazí nově přidané řádky textu v reálném čase",
+		"fbd_more": '<div id="blazy">zobrazuji <code>{0}</code> z <code>{1}</code> souborů; <a href="#" id="bd_more">zobraz {2}</a> nebo <a href="#" id="bd_all">zobraz všechny</a></div>',
+		"fbd_all": '<div id="blazy">zobrazuji <code>{0}</code> z <code>{1}</code> souborů; <a href="#" id="bd_all">zobraz všechny</a></div>',
+		"f_anota": "pouze {0} z {1} položek bylo vybráno;\npro výběr celé složky nejprve přejděte na konec",
+
+		"f_dls": 'odkazy na soubory v aktuální složce byly\nzměněny na odkazy ke stažení',
+
+		"f_partial": "Pro bezpečné stažení souboru, který se aktuálně nahrává, klikněte prosím na soubor se stejným názvem, ale bez přípony <code>.PARTIAL</code>. Stiskněte prosím Zrušit nebo Escape.\n\nStisknutím OK / Enter ignorujete toto varování a pokračujete ve stahování <code>.PARTIAL</code> dočasného souboru, což téměř jistě vyústí jako poškozená data.",
+
+		"ft_paste": "vložit {0} položek$NKlávesová zkratka: ctrl-V",
+		"fr_eperm": 'nelze přejmenovat:\nnemáte oprávnění “přesunout” v této složce',
+		"fd_eperm": 'nelze smazat:\nnemáte oprávnění “smazat” v této složce',
+		"fc_eperm": 'nelze vyjmout:\nnemáte oprávnění “přesunout” v této složce',
+		"fp_eperm": 'nelze vložit:\nnemáte oprávnění “zapisovat” v této složce',
+		"fr_emore": "vyberte alespoň jednu položku k přejmenování",
+		"fd_emore": "vyberte alespoň jednu položku ke smazání",
+		"fc_emore": "vyberte alespoň jednu položku k vyjmutí",
+		"fcp_emore": "vyberte alespoň jednu položku k zkopírování do schránky",
+
+		"fs_sc": "sdílet složku, ve které se nacházíte",
+		"fs_ss": "sdílet vybrané soubory",
+		"fs_just1d": "nelze vybrat více než jednu složku,\nnebo míchat soubory a složky v jednom výběru",
+		"fs_abrt": "❌ zrušit",
+		"fs_rand": "🎲 náhodný.název",
+		"fs_go": "✅ vytvořit sdílení",
+		"fs_name": "název",
+		"fs_src": "zdroj",
+		"fs_pwd": "heslo",
+		"fs_exp": "vypršení",
+		"fs_tmin": "min",
+		"fs_thrs": "hodin",
+		"fs_tdays": "dní",
+		"fs_never": "navždy",
+		"fs_pname": "volitelný název odkazu; bude náhodný, pokud je prázdný",
+		"fs_tsrc": "soubor nebo složka ke sdílení",
+		"fs_ppwd": "volitelné heslo",
+		"fs_w8": "vytváření sdílení...",
+		"fs_ok": "stiskněte <code>Enter/OK</code> pro zkopírování do schránky\nstiskněte <code>ESC/Zrušit</code> pro zavření",
+
+		"frt_dec": "může opravit některé případy porušených názvů souborů\">url-decode",
+		"frt_rst": "resetovat změněné názvy souborů zpět na původní\">↺ reset",
+		"frt_abrt": "zrušit a zavřít toto okno\">❌ cancel",
+		"frb_apply": "PŘEJMENOVAT",
+		"fr_adv": "dávkové / metadata / přejmenování podle vzoru\">pokročilé",
+		"fr_case": "regex citlivý na velikost písmen\">velikost",
+		"fr_win": "názvy bezpečné pro windows; nahradit <code>&lt;&gt;:&quot;\\|?*</code> japonskými plnošířkovými znaky\">win",
+		"fr_slash": "nahradit <code>/</code> znakem který nezpůsobí vytvoření nových složek\">žádné /",
+		"fr_re": "vzor regex hledání k aplikaci na původní názvy souborů; zachycené skupiny mohou být odkazovány v poli formátu níže jako &lt;code&gt;(1)&lt;/code&gt; a &lt;code&gt;(2)&lt;/code&gt; atd.",
+		"fr_fmt": "inspirováno foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; je nahrazeno názvem skladby,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; přeskočí [tuto] část pokud je umělec prázdný$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; doplní číslo stopy na 2 číslice",
+		"fr_pdel": "smazat",
+		"fr_pnew": "uložit jako",
+		"fr_pname": "zadejte název pro vaše nové přednastavení",
+		"fr_aborted": "zrušeno",
+		"fr_lold": "starý název",
+		"fr_lnew": "nový název",
+		"fr_tags": "tagy pro vybrané soubory (pouze pro čtení, jen pro referenci):",
+		"fr_busy": "přejmenovávám {0} položek...\n\n{1}",
+		"fr_efail": "přejmenování selhalo:\n",
+		"fr_nchg": "{0} z nových názvů bylo změněno kvůli <code>win</code> a/nebo <code>žádné /</code>\n\nPokračovat s těmito změněnými novými názvy?",
+
+		"fd_ok": "mazání OK",
+		"fd_err": "mazání selhalo:\n",
+		"fd_none": "nic nebylo smazáno; možná blokováno konfigurací serveru (xbd)?",
+		"fd_busy": "mažu {0} položek...\n\n{1}",
+		"fd_warn1": "SMAZAT těchto {0} položek?",
+		"fd_warn2": "<b>Poslední šance!</b> Nelze vrátit zpět. Smazat?",
+
+		"fc_ok": "vyjmout {0} položek",
+		"fc_warn": 'vyjmout {0} položek\n\nale: pouze <b>tato</b> karta prohlížeče je může vložit\n(protože výběr je tak absolutně masivní)',
+
+		"fcc_ok": "zkopírováno {0} položek do schránky",
+		"fcc_warn": 'zkopírováno {0} položek do schránky\n\nale: pouze <b>tato</b> karta prohlížeče je může vložit\n(protože výběr je tak absolutně masivní)',
+
+		"fp_apply": "použít tyto názvy",
+		"fp_ecut": "nejprve vyjměte nebo zkopírujte nějaké soubory / složky k vložení / přesunutí\n\npoznámka: můžete vyjmout / vložit přes různé karty prohlížeče",
+		"fp_ename": "{0} položek sem nelze přesunout protože názvy jsou již obsazené. Dejte jim nové názvy níže pro pokračování, nebo název nechte prázdný pro přeskočení:",
+		"fcp_ename": "{0} položek sem nelze zkopírovat protože názvy jsou již obsazené. Dejte jim nové názvy níže pro pokračování, nebo název nechte prázdný pro přeskočení:",
+		"fp_emore": "stále jsou některé kolize názvů souborů k opravě",
+		"fp_ok": "přesun OK",
+		"fcp_ok": "kopírování OK",
+		"fp_busy": "přesouvám {0} položek...\n\n{1}",
+		"fcp_busy": "kopíruji {0} položek...\n\n{1}",
+		"fp_abrt": "přerušuji...", //m
+		"fp_err": "přesun selhal:\n",
+		"fcp_err": "kopírování selhalo:\n",
+		"fp_confirm": "přesunout těchto {0} položek sem?",
+		"fcp_confirm": "zkopírovat těchto {0} položek sem?",
+		"fp_etab": 'selhalo čtení schránky z jiné karty prohlížeče',
+		"fp_name": "nahrávání souboru z vašeho zařízení. Dejte mu název:",
+		"fp_both_m": '<h6>vyberte co vložit</h6><code>Enter</code> = Přesunout {0} souborů z «{1}»\n<code>ESC</code> = Nahrát {2} souborů z vašeho zařízení',
+		"fcp_both_m": '<h6>vyberte co vložit</h6><code>Enter</code> = Kopírovat {0} souborů z «{1}»\n<code>ESC</code> = Nahrát {2} souborů z vašeho zařízení',
+		"fp_both_b": '<a href="#" id="modal-ok">Přesunout</a><a href="#" id="modal-ng">Nahrát</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Kopírovat</a><a href="#" id="modal-ng">Nahrát</a>',
+
+		"mk_noname": "napište název do textového pole vlevo předtím než to uděláte :p",
+
+		"tv_load": "Načítání textového dokumentu:\n\n{0}\n\n{1}% ({2} z {3} MiB načteno)",
+		"tv_xe1": "nelze načíst textový soubor:\n\nchyba ",
+		"tv_xe2": "404, soubor nenalezen",
+		"tv_lst": "seznam textových souborů v",
+		"tvt_close": "návrat do zobrazení složky$NKlávesová zkratka: M (nebo Esc)\">❌ zavřít",
+		"tvt_dl": "stáhnout tento soubor$NKlávesová zkratka: Y\">💾 stáhnout",
+		"tvt_prev": "zobrazit předchozí dokument$NKlávesová zkratka: i\">⬆ předchozí",
+		"tvt_next": "zobrazit následující dokument$NKlávesová zkratka: K\">⬇ další",
+		"tvt_sel": "vybrat soubor &nbsp; ( pro vyjmutí / kopírování / mazání / ... )$NKlávesová zkratka: S\">výběr",
+		"tvt_edit": "otevřít soubor v textovém editoru$NKlávesová zkratka: E\">✏️ upravit",
+		"tvt_tail": "sledovat soubor pro změny; zobrazit nové řádky v reálném čase\">📡 sledovat",
+		"tvt_wrap": "zalamování slov\">↵",
+		"tvt_atail": "zamknout posun na konec stránky\">⚓",
+		"tvt_ctail": "dekódovat barvy terminálu (ansi escape kódy)\">🌈",
+		"tvt_ntail": "limit zpětného posouvání (kolik bajtů textu ponechat načtených)",
+
+		"m3u_add1": "skladba přidána do m3u playlistu",
+		"m3u_addn": "{0} skladeb přidáno do m3u playlistu",
+		"m3u_clip": "m3u playlist nyní zkopírován do schránky\n\nměli byste vytvořit nový textový soubor pojmenovaný něco.m3u a vložit playlist do tohoto dokumentu; toto ho učiní přehratelným",
+
+		"gt_vau": "nezobrazovat videa, jen přehrát zvuk\">🎧",
+		"gt_msel": "povolit výběr souborů; ctrl-klik na soubor pro přepsání$N$N&lt;em&gt;když aktivní: dvojklik na soubor / složku pro otevření&lt;/em&gt;$N$NKlávesová zkratka: S\">výběr více",
+		"gt_crop": "ořez náhledů na střed\">ořez",
+		"gt_3x": "náhledy s vysokým rozlišením\">3x",
+		"gt_zoom": "zoom",
+		"gt_chop": "rozdělit",
+		"gt_sort": "řadit podle",
+		"gt_name": "název",
+		"gt_sz": "velikost",
+		"gt_ts": "datum",
+		"gt_ext": "typ",
+		"gt_c1": "více zkrátit názvy souborů (zobrazit méně)",
+		"gt_c2": "méně zkrátit názvy souborů (zobrazit více)",
+
+		"sm_w8": "hledám...",
+		"sm_prev": "výsledky hledání níže jsou z předchozího dotazu:\n  ",
+		"sl_close": "zavřít výsledky hledání",
+		"sl_hits": "zobrazuji {0} zásahů",
+		"sl_moar": "načíst více",
+
+		"s_sz": "velikost",
+		"s_dt": "datum",
+		"s_rd": "cesta",
+		"s_fn": "název",
+		"s_ta": "tagy",
+		"s_ua": "nahráno@",
+		"s_ad": "pokročilé",
+		"s_s1": "minimum MiB",
+		"s_s2": "maximum MiB",
+		"s_d1": "min. iso8601",
+		"s_d2": "max. iso8601",
+		"s_u1": "nahráno po",
+		"s_u2": "a/nebo před",
+		"s_r1": "cesta obsahuje &nbsp; (oddělené mezerami)",
+		"s_f1": "název obsahuje &nbsp; (negace s -ne)",
+		"s_t1": "tagy obsahují &nbsp; (^=začátek, konec=$)",
+		"s_a1": "specifické vlastnosti metadat",
+
+		"md_eshow": "nelze vykreslit ",
+		"md_off": "[📜<em>readme</em>] zakázáno v [⚙️] -- dokument skryt",
+
+		"badreply": "Selhalo parsování odpovědi ze serveru",
+
+		"xhr403": "403: Přístup odepřen\n\nzkuste stisknout F5, možná jste se odhlásili",
+		"xhr0": "neznámý (pravděpodobně ztraceno spojení se serverem, nebo server je offline)",
+		"cf_ok": "omlouváme se za to -- DD" + wah + "oS ochrana se aktivovala\n\nvěci by se měly obnovit asi za 30 sekund\n\npokud se nic nestane, stiskněte F5 pro obnovení stránky",
+		"tl_xe1": "nelze vypsat podsložky:\n\nchyba ",
+		"tl_xe2": "404: Složka nenalezena",
+		"fl_xe1": "nelze vypsat soubory ve složce:\n\nchyba ",
+		"fl_xe2": "404: Složka nenalezena",
+		"fd_xe1": "nelze vytvořit podsložku:\n\nchyba ",
+		"fd_xe2": "404: Nadřazená složka nenalezena",
+		"fsm_xe1": "nelze odeslat zprávu:\n\nchyba ",
+		"fsm_xe2": "404: Nadřazená složka nenalezena",
+		"fu_xe1": "selhalo načtení unpost seznamu ze serveru:\n\nchyba ",
+		"fu_xe2": "404: Soubor nenalezen??",
+
+		"fz_tar": "nekomprimovaný gnu-tar soubor (linux / mac)",
+		"fz_pax": "nekomprimovaný tar formátu pax (pomalejší)",
+		"fz_targz": "gnu-tar s gzip kompresí úrovně 3$N$Nto je obvykle velmi pomalé, takže$Npoužijte místo toho nekomprimovaný tar",
+		"fz_tarxz": "gnu-tar s xz kompresí úrovně 1$N$Nto je obvykle velmi pomalé, takže$Npoužijte místo toho nekomprimovaný tar",
+		"fz_zip8": "zip s utf8 názvy souborů (možná problematické na windows 7 a starších)",
+		"fz_zipd": "zip s tradičními cp437 názvy souborů, pro opravdu starý software",
+		"fz_zipc": "cp437 s crc32 vypočítaným brzy,$Npro MS-DOS PKZIP v2.04g (říjen 1993)$N(trvá déle zpracovat před začátkem stahování)",
+
+		"un_m1": "můžete smazat vaše nedávné nahrání (nebo zrušit nedokončené) níže",
+		"un_upd": "obnovit",
+		"un_m4": "nebo sdílet soubory viditelné níže:",
+		"un_ulist": "zobrazit",
+		"un_ucopy": "kopírovat",
+		"un_flt": "volitelný filtr:&nbsp; URL musí obsahovat",
+		"un_fclr": "vymazat filtr",
+		"un_derr": 'unpost-delete selhalo:\n',
+		"un_f5": 'něco se pokazilo, zkuste prosím obnovit, nebo stiskněte F5',
+		"un_uf5": "omlouváme se ale musíte obnovit stránku (například stisknutím F5 nebo CTRL-R) předtím než toto nahrávání může být zrušeno",
+		"un_nou": '<b>varování:</b> server je příliš zaneprázdněn pro zobrazení nedokončených nahrávání; za chvíli klikněte na odkaz "obnovit"',
+		"un_noc": '<b>varování:</b> unpost plně nahraných souborů není povoleno/dovoleno v konfiguraci serveru',
+		"un_max": "zobrazuji prvních 2000 souborů (použijte filtr)",
+		"un_avail": "{0} nedávných nahrávání může být smazáno<br />{1} nedokončených může být zrušeno",
+		"un_m2": "řazeno podle času nahrávání; nejnovější první:",
+		"un_no1": "počkej! žádná nahrávání nejsou dostatečně nedávná",
+		"un_no2": "počkej! žádná nahrávání odpovídající tomuto filtru nejsou dostatečně nedávná",
+		"un_next": "smazat dalších {0} souborů níže",
+		"un_abrt": "zrušit",
+		"un_del": "smazat",
+		"un_m3": "načítám vaše nedávné nahrání...",
+		"un_busy": "mažu {0} souborů...",
+		"un_clip": "{0} odkazů zkopírováno do schránky",
+
+		"u_https1": "měli byste",
+		"u_https2": "přejít na https",
+		"u_https3": "pro lepší výkon",
+		"u_ancient": "váš prohlížeč je úctyhodně starý -- možná byste měli <a href=\"#\" onclick=\"goto('bup')\">použít bup</a>",
+		"u_nowork": "vyžadován firefox 53+ nebo chrome 57+ nebo iOS 11+",
+		"tail_2old": "vyžadován firefox 105+ nebo chrome 71+ nebo iOS 14.5+",
+		"u_nodrop": "váš prohlížeč je příliš starý pro nahrávání přetažením (drag-and-drop)",
+		"u_notdir": "toto není složka!\n\nváš prohlížeč je příliš starý,\nzkuste prosím soubory přetáhnout",
+		"u_uri": "pro přetažení obrázků z jiných oken prohlížeče,\nje prosím přetáhněte na velké tlačítko pro nahrávání",
+		"u_enpot": "přepnout na <a href=\"#\">potato UI</a> (může zrychlit nahrávání)",
+		"u_depot": "přepnout na <a href=\"#\">fancy UI</a> (může zpomalit nahrávání)",
+		"u_gotpot": "přepínám na potato UI pro zrychlení nahrávání,\n\npokud nesouhlasíte, klidně jej přepněte zpět!",
+		"u_pott": "<p>soubory: &nbsp; <b>{0}</b> dokončeno, &nbsp; <b>{1}</b> selhalo, &nbsp; <b>{2}</b> nahrává se, &nbsp; <b>{3}</b> ve frontě</p>",
+		"u_ever": "toto je základní nahrávání; up2k vyžaduje alespoň<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": "toto je základní nahrávání; <a href=\"#\" id=\"u2yea\">up2k</a> je lepší",
+		"u_uput": "optimalizovat pro rychlost (přeskočit kontrolní součet)",
+		"u_ewrite": "nemáte oprávnění k zápisu do této složky",
+		"u_eread": "nemáte oprávnění ke čtení této složky",
+		"u_enoi": "vyhledávání souborů není povoleno v konfiguraci serveru",
+		"u_enoow": "přepsání zde nebude fungovat; je vyžadováno oprávnění k mazání",
+		"u_badf": "Těchto {0} souborů (z celkem {1}) bylo přeskočeno, pravděpodobně kvůli oprávněním v souborovém systému:\n\n",
+		"u_blankf": "Těchto {0} souborů (z celkem {1}) je prázdných; přesto je nahrát?\n\n",
+		"u_applef": "Těchto {0} souborů (z celkem {1}) je pravděpodobně nežádoucích;\nStiskněte <code>OK/Enter</code> pro PŘESKOČENÍ následujících souborů,\nStiskněte <code>Zrušit/ESC</code> pro Zahrnutí a NAHRÁNÍ i těchto souborů:\n\n",
+		"u_just1": "\nMožná to bude fungovat lépe, když vyberete pouze jeden soubor",
+		"u_ff_many": "pokud používáte <b>Linux / MacOS / Android,</b> takové množství souborů <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>může</em> shodit Firefox!</a>\npokud se to stane, zkuste to prosím znovu (nebo použijte Chrome).",
+		"u_up_life": "Tento upload bude smazán ze serveru\n{0} po jeho dokončení",
+		"u_asku": "Nahrát {0} souborů do <code>{1}</code>",
+		"u_unpt": "toto nahrávání můžete vrátit zpět / smazat pomocí 🧯 vlevo nahoře",
+		"u_bigtab": "chystám se zobrazit {0} souborů\n\nto může shodit váš prohlížeč, jste si jisti?",
+		"u_scan": "Skenuji soubory...",
+		"u_dirstuck": "procházení adresáře se zaseklo při pokusu o přístup k následujícím {0} položkám; budou přeskočeny:",
+		"u_etadone": "Hotovo ({0}, {1} souborů)",
+		"u_etaprep": "(příprava na nahrávání)",
+		"u_hashdone": "hashování dokončeno",
+		"u_hashing": "hashování",
+		"u_hs": "navazuji spojení...",
+		"u_started": "soubory se nyní nahrávají; viz [🚀]",
+		"u_dupdefer": "duplikát; bude zpracován po všech ostatních souborech",
+		"u_actx": "klikněte na tento text, abyste zabránili ztrátě<br />výkonu při přepínání do jiných oken/záložek",
+		"u_fixed": "OK!&nbsp; Opraveno 👍",
+		"u_cuerr": "nepodařilo se nahrát část {0} z {1};\npatrně neškodné, pokračuji\n\nsoubor: {2}",
+		"u_cuerr2": "server odmítl nahrání (část {0} z {1});\nzopakuji později\n\nsoubor: {2}\n\nchyba ",
+		"u_ehstmp": "zopakuji pokus; viz vpravo dole",
+		"u_ehsfin": "server odmítl požadavek na dokončení nahrávání; opakuji pokus...",
+		"u_ehssrch": "server odmítl požadavek na vyhledávání; opakuji pokus...",
+		"u_ehsinit": "server odmítl požadavek na zahájení nahrávání; opakuji pokus...",
+		"u_eneths": "síťová chyba při navazování spojení pro nahrávání; opakuji pokus...",
+		"u_enethd": "síťová chyba při ověřování existence cíle; opakuji pokus...",
+		"u_cbusy": "čekám, až nám server po síťovém problému začne znovu důvěřovat...",
+		"u_ehsdf": "na serveru došlo místo na disku!\n\nbudu to zkoušet dál, pro případ, že někdo\nuvolní dostatek místa pro pokračování",
+		"u_emtleak1": "vypadá to, že váš webový prohlížeč může mít únik paměti (memory leak);\nprosím",
+		"u_emtleak2": " <a href=\"{0}\">přejděte na https (doporučeno)</a> nebo ",
+		"u_emtleak3": " ",
+		"u_emtleakc": "zkuste následující:\n<ul><li>stiskněte <code>F5</code> pro obnovení stránky</li><li>poté vypněte tlačítko &nbsp;<code>mt</code>&nbsp; v &nbsp;<code>⚙️ nastavení</code></li><li>a zkuste nahrávání znovu</li></ul>Nahrávání bude o něco pomalejší, ale co se dá dělat.\nOmlouváme se za potíže!\n\nPS: chrome v107 <a href=\"https://bugs.chromium.org/p/chromium/issues/detail?id=1354816\" target=\"_blank\">obsahuje opravu</a> pro tento problém",
+		"u_emtleakf": "zkuste následující:\n<ul><li>stiskněte <code>F5</code> pro obnovení stránky</li><li>poté zapněte <code>🥔</code> (potato) v rozhraní nahrávání<li>a zkuste nahrávání znovu</li></ul>\nPS: firefox snad <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\">bude mít opravu</a> v některé z příštích verzí",
+		"u_s404": "nenalezeno na serveru",
+		"u_expl": "vysvětlit",
+		"u_maxconn": "většina prohlížečů omezuje počet na 6, ale firefox umožňuje toto navýšit pomocí <code>connections-per-server</code> v <code>about:config</code>",
+		"u_tu": "<p class=\"warn\">VAROVÁNÍ: turbo zapnuto, <span>&nbsp;klient nemusí detekovat a obnovit nedokončené nahrávání; viz nápovědu u tlačítka turbo</span></p>",
+		"u_ts": "<p class=\"warn\">VAROVÁNÍ: turbo zapnuto, <span>&nbsp;výsledky vyhledávání mohou být nesprávné; viz nápovědu u tlačítka turbo</span></p>",
+		"u_turbo_c": "turbo je vypnuto v konfiguraci serveru",
+		"u_turbo_g": "vypínám turbo, protože nemáte oprávnění\nk výpisu adresářů na tomto svazku",
+		"u_life_cfg": 'automatické smazání po <input id="lifem" p="60" /> min (nebo <input id="lifeh" p="3600" /> hodinách)',
+		"u_life_est": 'nahrání bude smazáno <span id="lifew" tt="local time">---</span>',
+		"u_life_max": 'tato složka vynucuje\nmax. životnost {0}',
+		"u_unp_ok": 'unpost je povoleno pro {0}',
+		"u_unp_ng": 'unpost NEBUDE povoleno',
+		"ue_ro": 'váš přístup k této složce je pouze pro čtení\n\n',
+		"ue_nl": 'momentálně nejste přihlášeni',
+		"ue_la": 'momentálně jste přihlášeni jako "{0}"',
+		"ue_sr": 'momentálně jste v režimu vyhledávání souborů\n\npřepněte do režimu nahrávání kliknutím na lupu 🔎 (vedle velkého tlačítka HLEDAT) a zkuste nahrávání znovu\n\nomlouváme se',
+		"ue_ta": 'zkuste nahrávání znovu, nyní by to mělo fungovat',
+		"ue_ab": "tento soubor se již nahrává do jiné složky a toto nahrávání musí být dokončeno předtím, než může být soubor nahrán jinam.\n\nMůžete zrušit a zapomenout na původní nahrávání pomocí levého horního 🧯",
+		"ur_1uo": "OK: Soubor úspěšně nahrán",
+		"ur_auo": "OK: Všech {0} souborů úspěšně nahráno",
+		"ur_1so": "OK: Soubor nalezen na serveru",
+		"ur_aso": "OK: Všech {0} souborů nalezeno na serveru",
+		"ur_1un": "Nahrání selhalo, omlouváme se",
+		"ur_aun": "Všech {0} nahrání selhalo, omlouváme se",
+		"ur_1sn": "Soubor NEBYL nalezen na serveru",
+		"ur_asn": "{0} souborů NEBYLO nalezeno na serveru",
+		"ur_um": "Dokončeno;\n{0} nahrání OK,\n{1} nahrání selhalo, omlouváme se",
+		"ur_sm": "Dokončeno;\n{0} souborů nalezeno na serveru,\n{1} souborů NENALEZENO na serveru",
+
+		"lang_set": "obnovit stránku, aby se změna projevila?",
+	},
 	"deu": {
 		"tt": "Deutsch",
 
@@ -1995,6 +2644,7 @@ var Ls = {
 		"gou": 'zum übergeordneter Ordner springen">hoch',
 		"gon": 'zum nächsten Ordner springen">nächst.',
 		"logout": "Abmelden ",
+		"login": "Anmelden", //m
 		"access": " Zugriff",
 		"ot_close": "Submenu schliessen",
 		"ot_search": "Dateien nach Attributen, Pfad/Name, Musiktags oder beliebiger Kombination suchen$N$N&lt;code&gt;foo bar&lt;/code&gt; = muss «foo» und «bar» enthalten,$N&lt;code&gt;foo -bar&lt;/code&gt; = muss «foo» aber nicht «bar» enthalten,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = beginnt mit «yana» und ist «opus»-Datei$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = genau «try unite» enthalten$N$NDatumsformat ist iso-8601, z.B.$N&lt;code&gt;2009-12-31&lt;/code&gt; oder &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
@@ -2181,13 +2831,15 @@ var Ls = {
 		"mt_mloop": "offenen Ordner wiederholen\">🔁 Schleife",
 		"mt_mnext": "nächsten Ordner laden und fortfahren\">📂 nächster",
 		"mt_mstop": "Wiedergabe beenden\">⏸ Stop",
-		"mt_cflac": "FLAC / WAV zu OPUS konvertierebn\">flac",
-		"mt_caac": "AAC / M4A zu OPUS konvertieren\">aac",
-		"mt_coth": "Convertiere alle Dateien (die nicht MP3 sind) zu OPUS\">oth",
+		"mt_cflac": "FLAC / WAV zu {0} konvertierebn\">flac",
+		"mt_caac": "AAC / M4A zu {0} konvertieren\">aac",
+		"mt_coth": "Convertiere alle Dateien (die nicht MP3 sind) zu {0}\">oth",
 		"mt_c2opus": "Beste Wahl für Desktops, Laptops, Android\">opus",
 		"mt_c2owa": "opus-weba, für iOS 17.5 und neuer\">owa",
 		"mt_c2caf": "opus-caf, für iOS 11 bis 17\">caf",
 		"mt_c2mp3": "benutze dieses Format für ältere Geräte\">mp3",
+		"mt_c2flac": "beste Klangqualität, aber große Downloads\">flac", //m
+		"mt_c2wav": "unkomprimierte Wiedergabe (noch größer)\">wav", //m
 		"mt_c2ok": "Gute Wahl, Chef!",
 		"mt_c2nd": "Das ist nicht das empfohlene Ausgabeformat für dein Gerät, aber passt schon",
 		"mt_c2ng": "Dein Gerät scheint dieses Ausgabeformat nicht zu unterstützen, aber lass trotzdem mal probieren",
@@ -2306,6 +2958,7 @@ var Ls = {
 		"fcp_ok": "Kopieren OK",
 		"fp_busy": "Verschiebe {0} Elemente...\n\n{1}",
 		"fcp_busy": "Kopiere {0} Elemente...\n\n{1}",
+		"fp_abrt": "Abbrechen...", //m
 		"fp_err": "Verschieben fehlgeschlagen:\n",
 		"fcp_err": "Kopieren fehlgeschlagen:\n",
 		"fp_confirm": "Diese {0} Elemente hierher verschieben?",
@@ -2430,7 +3083,7 @@ var Ls = {
 
 		"u_https1": "für bessere Performance solltest du",
 		"u_https2": "auf HTTPS wechseln",
-		"u_https3": "",
+		"u_https3": " ",
 		"u_ancient": 'Dein Browser ist verdammt antik -- vielleicht solltest du <a href="#" onclick="goto(\'bup\')">stattdessen bup benutzen</a>',
 		"u_nowork": "Benötigt Firefox 53+ oder Chrome 57+ oder iOS 11+",
 		"tail_2old": "Benötigt Firefox 105+ oder Chrome 71+ oder iOS 14.5+",
@@ -2480,7 +3133,7 @@ var Ls = {
 		"u_ehsdf": "Server hat kein Speicherplatz mehr!\n\nwerde es erneut versuchen, falls jemand\ngenug Platz schafft um fortzufahren",
 		"u_emtleak1": "scheint, als ob dein Browser ein Memory Leak hätte;\nbitte",
 		"u_emtleak2": ' <a href="{0}">wechsle auf HTTPS (empfohlen)</a> oder ',
-		"u_emtleak3": '',
+		"u_emtleak3": ' ',
 		"u_emtleakc": 'versuche folgendes:\n<ul><li>drücke <code>F5</code> um die Seite neu zu laden</li><li>deaktivere dann den &nbsp;<code>mt</code>&nbsp; Button in den &nbsp;<code>⚙️ Einstellungen</code></li><li>und versuche den Upload nochmal.</li></ul>Uploads werden etwas langsamer sein, aber man kann ja nicht alles haben.\nSorry für die Umstände !\n\nPS: Chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">hat ein Bugfix</a> dafür',
 		"u_emtleakf": 'versuche folgendes:\n<ul><li>drücke <code>F5</code> um die Seite neu zu laden</li><li>aktivere dann <code>🥔</code> (potato) im Upload UI<li>und versuche den Upload nochmal</li></ul>\nPS: Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">hat hoffentlich irgendwann ein Bugfix</a>',
 		"u_s404": "nicht auf dem Server gefunden",
@@ -2514,6 +3167,637 @@ var Ls = {
 
 		"lang_set": "Neuladen um Änderungen anzuwenden?",
 	},
+	"epo": {
+		"tt": "Esperanto",
+
+		"cols": {
+			"c": "ago-butonoj",
+			"dur": "daŭro",
+			"q": "kvalito / bitrapido",
+			"Ac": "sonkodeko",
+			"Vc": "videokodeko",
+			"Fmt": "formato / ujo",
+			"Ahash": "kontrolsumo de aŭdio",
+			"Vhash": "kontrolsumo de video",
+			"Res": "distingivo",
+			"T": "dosiertipo",
+			"aq": "kvalito / bitrapido de aŭdio",
+			"vq": "kvalito / bitrapido de video",
+			"pixfmt": "specimenado / strukturo de bilderoj",
+			"resw": "horizontala distingivo",
+			"resh": "vertikala distingivo",
+			"chs": "nombro de aŭdio-kanaloj",
+			"hz": "sonpecrapido"
+		},
+
+		"hks": [
+			[
+				"misc",
+				["ESK", "malfermi variajn aferojn"],
+
+				"file-manager",
+				["G", "baskuli inter lista kaj krada vido"],
+				["T", "baskuli montradon de bildetoj"],
+				["⇧ A/D", "grandeco de bildetoj"],
+				["stir-K", "forigi elektitajn"],
+				["stir-X", "eltondi elektaĵon al tondujo"],
+				["stir-C", "kopii elektaĵon al tondujo"],
+				["stir-V", "alglui (movi/kopii) ĉi tien"],
+				["Y", "elŝuti elektitajn"],
+				["F2", "alinomi elektitajn"],
+
+				"file-list-sel",
+				["spacoklavo", "baskuli elektadon de dosieroj"],
+				["↑/↓", "movi elektado-kursoron"],
+				["stir ↑/↓", "movi kursoron kaj vidujon"],
+				["⇧ ↑/↓", "elekti (mal)sekvan dosieron"],
+				["stir-A", "elekti ĉiujn dosier(uj)ojn"],
+			], [
+				"navigation",
+				["B", "baskuli inter paĝnivela kaj arbovida navigo"],
+				["I/K", "(mal-)sekva dosierujo"],
+				["M", "parent folder (or unexpand current)"],
+				["V", "baskuli inter montrado de dosierujoj aŭ tekst-dosieroj en toggle folders / textfiles en arbovida navig-panelo"],
+				["A/D", "grandeco de arbovida navig-panelo"],
+			], [
+				"audio-player",
+				["J/L", "(mal-)sekva kanto"],
+				["U/O", "iri 10 sekundoj (mal)antaŭen"],
+				["0..9", "iri al 0%..90%"],
+				["P", "ludi/paŭzigi (ankaŭ komencas)"],
+				["S", "elekti ludantan kanton"],
+				["Y", "elŝuti kanton"],
+			], [
+				"image-viewer",
+				["J/L, ←/→", "(mal)sekva bildo"],
+				["Home/End", "unua/lasta bildo"],
+				["F", "plenekrana vido"],
+				["R", "turni dekstrumen"],
+				["⇧ R", "turni maldekstrumen"],
+				["S", "elekti bildon"],
+				["Y", "elŝuti bildon"],
+			], [
+				"video-player",
+				["U/O", "iri 10 sekundoj (mal)antaŭen"],
+				["P/K/Spaco", "ludi/paŭzigi"],
+				["C", "??continue playing next"],
+				["V", "cikla ludado"],
+				["M", "silentigi"],
+				["[ and ]", "agordi intervalon de cikla ludado"],
+			], [
+				"textfile-viewer",
+				["I/K", "(mal)sekva dosiero"],
+				["M", "fermi dosieron"],
+				["E", "redakti dosieron"],
+				["S", "elekti dosieron (por eltondado/kopiado/alinomado)"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Rezigni",
+
+		"enable": "Ŝalti",
+		"danger": "DANĜERO",
+		"clipped": "kopiita al tondujo",
+
+		"ht_s1": "sekundo",
+		"ht_s2": "sekundoj",
+		"ht_m1": "minuto",
+		"ht_m2": "minutoj",
+		"ht_h1": "horo",
+		"ht_h2": "horoj",
+		"ht_d1": "tago",
+		"ht_d2": "tagoj",
+		"ht_and": " kaj ",
+
+		"goh": "stirpanelo",
+		"gop": 'malsekva dosierujo">malsekva',
+		"gou": 'supra dosierujo">supren',
+		"gon": 'sekva dosierujo">sekva',
+		"logout": "Adiaŭi kiel ",
+		"login": "Ensaluti",
+		"access": " atingo",
+		"ot_close": "fermi submenuon",
+		"ot_search": "serĉi dosierojn per atributoj, indiko / nomo, etikedoj de muziko aŭ ĉiu kombinaĵo de tiuj parametroj$N$N&lt;code&gt;foo bar&lt;/code&gt; = devas enhavi ambaŭ «foo» kaj «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = devas enhavi «foo», sed ne «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = komenci per «yana» kaj esti dosieron de formato «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = enhavi precipe «try unite»$N$Nformato de datoj estas iso-8601, ekzemple$N&lt;code&gt;2009-12-31&lt;/code&gt; aŭ &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: forigi viaj plej lastaj alŝutoj, aŭ ĉesigi nefinigitajn",
+		"ot_bup": "bup: fundamenta alŝutilo, funkias eĉ kun netscape 4.0",
+		"ot_mkdir": "mkdir: krei novan dosierujon",
+		"ot_md": "new-md: krei novan markdown-dosieron",
+		"ot_msg": "msg: sendi mesaĝon al servila protokolo",
+		"ot_mp": "agordoj de medialudilo",
+		"ot_cfg": "aliaj agordoj",
+		"ot_u2i": 'up2k: alŝuti dosierojn (se vi havas skribo-atingon) aŭ ŝalti ŝerc-reĝimon por determini, ĉu dosieroj jam ekzistas ie ĉe la servilo$N$Nalŝutoj estas daŭrigeblaj, plurfadenaj, kaj prezervas tempindikojn, sed ĝi estas pli procesor-intensa ol [🎈]&nbsp; (la fundamenta alŝutilo)<br /><br />dum alŝutado, ĉi tiu simbolo iĝas plenumindikilo!',
+		"ot_u2w": 'up2k: alŝuti dosierojn kun subteno de daŭrigeblo (fermu vian retumilon kaj demetu la samajn dosierojn poste)$N$Nalŝutoj estas daŭrigeblaj, plurfadenaj, kaj prezervas tempindikojn, sed ĝi estas pli procesor-intensa ol [🎈]&nbsp; (la fundamenta alŝutilo)<br /><br />dum alŝutado, ĉi tiu simbolo iĝas plenumindikilo!',
+		"ot_noie": 'Bonvolu uzi retumilojn Chrome / Firefox / Edge',
+
+		"ab_mkdir": "krei dosierujon",
+		"ab_mkdoc": "krei markdown-dosieron",
+		"ab_msg": "sendi mesaĝon al protokolo",
+
+		"ay_path": "iri al dosierujoj",
+		"ay_files": "iri al dosieroj",
+
+		"wt_ren": "alinomi elektitajn aĵojn$NFulmoklavo: F2",
+		"wt_del": "forigi elektitajn aĵojn$NFulmoklavo: stir-K",
+		"wt_cut": "eltondi elektitajn aĵojn &lt;small&gt;(do alglui ien aliloke)&lt;/small&gt;$NFulmoklavo: stir-X",
+		"wt_cpy": "kopii elektitajn aĵojn al tondujo$N(por alglui ien aliloke)$NFulmoklavo: stir-C",
+		"wt_pst": "alglui antaŭe eltonditajn / kopiitajn aĵojn$NFulmoklavo: stir-V",
+		"wt_selall": "elekti ĉiujn dosierojn$NFulmoklavo: stir-A (se dosiero estas elektita)",
+		"wt_selinv": "inversigi elektaĵon",
+		"wt_zip1": "elŝuti dosierujon kiel arkivo",
+		"wt_selzip": "elŝuti elektaĵon kiel arkivo",
+		"wt_seldl": "elŝuti elektaĵon kiel apartaj dosieroj$NFulmoklavo: Y",
+		"wt_npirc": "kopii IRC-formatan muzikaĵ-informon",
+		"wt_nptxt": "kopii tekstan muzikaĵ-informon",
+		"wt_m3ua": "aldoni al m3u-ludliston (klaku butonon <code>📻copy</code> poste)",
+		"wt_m3uc": "kopii m3u-ludliston al tondujo",
+		"wt_grid": "baskuli kradan / listan vidon$NFulmoklavo: G",
+		"wt_prev": "malsekva muzikaĵo$NFulmoklavo: J",
+		"wt_play": "ludi / paŭzigi$NFulmoklavo: P",
+		"wt_next": "sekva muzikaĵo$NFulmoklavo: L",
+
+		"ul_par": "paralelaj alŝutoj:",
+		"ut_rand": "hazardigi dosiernomojn",
+		"ut_u2ts": "kopii la tempon de lasta modifo$Nel via dosiersistemo al la servilo\">📅",
+		"ut_ow": "ĉu anstataŭigi dosierojn ĉe la servilo?$N🛡️: neniam (dosiero estos alŝutita kun nova dosiernomo)$N🕒: anstataŭigi, se servila dosiero estas pli malnova ol via$N♻️: ĉiam anstataŭigi, se dosieroj estas malsamaj",
+		"ut_mt": "daŭri kalkuladon de kontrolsumoj por aliaj dosieroj dum alŝutado$N$Nmalŝaltinda, se via procesoro aŭ disko ne estas sufiĉe rapidaj",
+		"ut_ask": 'peti konfirmon antaŭ komenco de alŝutado">💭',
+		"ut_pot": "plirapidigi alŝutadon por malrapidaj komputiloj$Nper malkomplikado de fasado",
+		"ut_srch": "ne alŝuti ion ajn, nur kontroli, ke la dosieroj $N jam ekzistas ĉe la servilo (ĉiuj dosierujoj, kiuj vi povas legi, estos skanitaj)",
+		"ut_par": "paŭzi alŝutadon per agordado kiel 0$N$Npligrandigi, se via konekto estas malrapida aŭ malfruema$N$Nagordi kiel 1, se la loka reto aŭ servila disko ne estas sufiĉe rapidaj",
+		"ul_btn": "demeti dosier(uj)ojn<br>ĉi tien (aŭ alklaki ĉi tien)",
+		"ul_btnu": "A L Ŝ U T I",
+		"ul_btns": "S E R Ĉ I",
+
+		"ul_hash": "k-sumado",
+		"ul_send": "sendado",
+		"ul_done": "finita",
+		"ul_idle1": "neniuj alŝutoj envicigitaj",
+		"ut_etah": "meza rapido de &lt;em&gt;kontrolsumado&lt;/em&gt;, kaj pritaksita tempo ĝis la fino",
+		"ut_etau": "meza rapido de &lt;em&gt;alŝutado&lt;/em&gt;, kaj pritaksita tempo ĝis la fino",
+		"ut_etat": "meza &lt;em&gt;tuta&lt;/em&gt; rapido, kaj pritaksita tempo ĝis la fino",
+
+		"uct_ok": "sukcese plenumita",
+		"uct_ng": "malbona: malsukceso / malakcepto / ne trovita (no good)",
+		"uct_done": "ambaŭ ok kaj ng",
+		"uct_bz": "kontrolsumado aŭ alŝutado (busy)",
+		"uct_q": "envicigita (queue)",
+
+		"utl_name": "dosiernomo",
+		"utl_ulist": "listigi",
+		"utl_ucopy": "kopii",
+		"utl_links": "ligilojn",
+		"utl_stat": "stato",
+		"utl_prog": "progreso",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "ERARO",
+		"utl_oserr": "OS-eraro",
+		"utl_found": "trovita",
+		"utl_defer": "postigita",
+		"utl_yolo": "rapidega",
+		"utl_done": "finita",
+
+		"ul_flagblk": "la dosieroj estis aldonita al la vico,</b><br>sed alia langeto de retumilo jam alŝutas dosierojn per up2k,<br>do tiu alŝutado devas finiĝi unue",
+		"ul_btnlk": "la agordado de servilo ne permesas ŝanĝi tiun agordon",
+
+		"udt_up": "Alŝuti",
+		"udt_srch": "Serĉi",
+		"udt_drop": "demetu ĉi tien",
+
+		"u_nav_m": '<h6>do, kion vi havas ĉi tie?</h6><code>Enter</code> = Dosierojn (unu al multaj)\n<code>ESK</code> = Unu dosierujon (eble kun subdosierujoj)',
+		"u_nav_b": '<a href="#" id="modal-ok">Dosierojn</a><a href="#" id="modal-ng">Unu dosierujo</a>',
+
+		"cl_opts": "ŝaltiloj",
+		"cl_themes": "etoso",
+		"cl_langs": "lingvo",
+		"cl_ziptype": "elŝutado de dosieroj",
+		"cl_uopts": "agordoj de up2k",
+		"cl_favico": "retpaĝsimbolo",
+		"cl_bigdir": "grandaj ujoj",
+		"cl_hsort": "#ordigo",
+		"cl_keytype": "skemo de fulmoklavoj",
+		"cl_hiddenc": "kaŝitaj kolumnoj",
+		"cl_hidec": "kaŝi",
+		"cl_reset": "restarigi",
+		"cl_hpick": "alklaki la kapojn de kolumnoj por kasi en la suban tabelon",
+		"cl_hcancel": "kaŝado de kolumno nuligita",
+
+		"ct_grid": '田 krado',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ ŝpruchelpiloj',
+		"ct_thumb": 'dum krado-vido, baskuli montradon de simboloj aŭ bildetoj$NFulmoklavo: T">🖼️ bildetoj',
+		"ct_csel": 'uzi STIR kaj MAJ por elekti dosierojn en krado-vido">elekto',
+		"ct_ihop": 'montri la lastan viditan bildo-dosieron post fermado de bildo-vidilo">g⮯',
+		"ct_dots": 'montri kaŝitajn dosierojn (se servilo permesas)">kaŝitaj',
+		"ct_qdel": 'peti konfirmon nur unufoje antaŭ forigado">rapid-forig.',
+		"ct_dir1st": 'ordigi dosierujojn antaŭ dosieroj">📁 unue',
+		"ct_nsort": 'numera ordigo de dosiernomoj (ekz. &lt;code&gt;2&lt;/code&gt; antaŭ &lt;code&gt;11&lt;/code&gt;)">№.ord',
+		"ct_utc": 'montri ĉiuj datoj kaj tempoj per UTC">UTC',
+		"ct_readme": 'montri enhavon de README.md en listaĵo de dosieroj">📜 readme',
+		"ct_idxh": 'montri paĝon index.html anstataŭ listaĵo de dosieroj">htm',
+		"ct_sbars": 'montri rulumskalojn">⟊',
+
+		"cut_umod": "se dosiero jam ekzistas en la servilo, ŝanĝi la tempon de lasta modifo laŭ via dosiero (bezonas permesojn write+delete)\">re📅igi",
+
+		"cut_turbo": "rapidigi alŝutojn KOSTE DE TUTA KONTROLADO:$N$Nuzinda, se vi alŝutis grandegajn dosierojn, devis haltigi la alŝutadon, kaj nun volas daŭrigi ĝin rapidege$N$Nse ĉi tiu agordo estas ŝaltita, anstataŭ kontrolsumado, la servilo nur kontrolas, ĉu la grando de via kaj servila dosieroj estas samaj, kaj ne realŝutas dosierojn kun samaj grandoj$N$Npost ĉio finiĝis, vi devus malŝalti ĉi tiun agordon, do provi &quot;alŝuti&quot; la tiuj samaj dosieroj — la kontrolsumado rekomencos kaj ne realŝutos ion ajn, se la alŝutado vere sukcesis\">rapidega",
+
+		"cut_datechk": "efektas nur se &quot;rapidega&quot; alŝutado estas ŝaltita$N$Nete plibonigas fidindon de kontrolado, per kontrolado de modifo-tempoj aldone al grandoj$N$N<em>teorie</em> estas sufiĉe por detekti nefinigitajn aŭ difektitajn alŝutojn, sed ne estas kompleta alternativo por sen-&quot;rapidega&quot; kontrolado\">dato-kontrolo",
+
+		"cut_u2sz": "grando (en MiBoj) de ĉiu alŝutanta ero; grandaj valoroj estas pli bonaj por longdistancaj konektoj, malgrandajn por malalt-kvalitaj konektoj",
+
+		"cut_flag": "certigi, ke nur unu langeto alŝutas samttempe $N -- aliaj langetoj devas ankaŭ ŝalti ĉi tiun agordon $N -- nur funkcias por langetoj de sama domajno",
+
+		"cut_az": "alŝuti dosierojn en alfabeta ordigo anstataŭ &quot;plej malgrandaj unue&quot;$N$Nalfabeta ordo igas pli simple vidi, ke okazis eraroj en la servilo, sed estas pli malrapida sur tre rapidaj konektoj (ekz. en la loka reto aŭ per fibrooptiko)",
+
+		"cut_nag": "sciigi per operaciumo je fino de alŝutado$N(nur se ĉi tiu langeto de retumilo ne estas aktiva)",
+		"cut_sfx": "sciigi per sono je fino de alŝutado$N(nur se ĉi tiu langeto de retumilo ne estas aktiva)",
+
+		"cut_mt": "kontrolsumi dosierojn pli rapide per multaj fadenoj$N$Nuzas teknologio Web Worker, bezonas pli da labormemoro (maksimume 512 MiB)$N$Nplirapidigas https je 30%, http je 4.5x\">mf",
+
+		"cut_wasm": "uzi WASM-modulon anstataŭ kontrolsumilaj funkcioj de retumilo; plirapidigas kontrolsumadon sur Chrome-bazitaj retumiloj, sed ankaŭ pli procesor-intensa; malnovaj versioj de Chrome havas difektojn, kiuj misuzas la tutan labormemoron kaj kraŝas la retumilon, se ĉi tiu agordo estas ŝaltita\">wasm",
+
+		"cft_text": "teksto de retpaĝsimbolo (blankigu kaj reŝargu la paĝon por malŝalti)",
+		"cft_fg": "teksta koloro",
+		"cft_bg": "fona koloro",
+
+		"cdt_lim": "maks. nombro de dosieroj por montri en dosierujo",
+		"cdt_ask": "je malsupro de paĝo, peti por ago$Nanstataŭ ŝarĝi pli da dosieroj",
+		"cdt_hsort": "kiom da ordigo-reguloj (&lt;code&gt;,sorthref&lt;/code&gt;) inkludi en adreso de la paĝo. Se agordita kiel 0, reguloj, inkluditaj en la adreso, estos ignoritaj",
+
+		"tt_entree": "montri arbovidan navig-panelon$NFulmoklavo: B",
+		"tt_detree": "montri paĝnivelan navig-panelon$NFulmoklavo: B",
+		"tt_visdir": "rulumi al elektita dosierujo",
+		"tt_ftree": "baskuli dosieruj-arban aŭ teksto-dosieran vidon$NFulmoklavo: V",
+		"tt_pdock": "fiksi patrajn dosierojn sur supro de panelo",
+		"tt_dynt": "aŭtomate pligrandigi panelon",
+		"tt_wrap": "linifaldo",
+		"tt_hover": "montri kompletajn nomojn sur musumo$N( paneas rulumadon, se la kursoro de muso $N&nbsp; ne estas en la maldekstra malplenaĵo )",
+
+		"ml_pmode": "je la fino de dosierujo...",
+		"ml_btns": "komandoj",
+		"ml_tcode": "transkodi",
+		"ml_tcode2": "transkodi al",
+		"ml_tint": "kolorado",
+		"ml_eq": "ekvalizilo",
+		"ml_drc": "kompresoro",
+
+		"mt_loop": "ripeti unu kanton\">🔁",
+		"mt_one": "haltigi post unu kanto\">1️⃣",
+		"mt_shuf": "ludi ĉiu dosierujo en hazarda ordo\">🔀",
+		"mt_aplay": "ludi aŭtomate, se ligilo enhavas identigilon de kanto$N$Nmalŝaltado de ĉi tiu agordo ankaŭ malŝaltas ĝisdatigadon de paĝ-adreso, por ke ludado ne rekomenciĝas, se la paĝo estos poste malfermita sen aliaj agordoj\">a▶",
+		"mt_preload": "komenci ŝargadon de sekva kanto antaŭ la fino de la nuna, por kontinua ludado\">antaŭŝarg.",
+		"mt_prescan": "eniri la sekvan dosierujon antaŭ la fino de la lasta kanto, $Npor ke la retumilo ne interrompis la ludadon\">nav",
+		"mt_fullpre": "antaŭŝargi la tutan kanton;$N✅ ŝalti por <b>malaltkvalitaj</b> konektoj,$N❌ eble <b>malŝalti</b> por malrapidaj konektoj\">full",
+		"mt_fau": "por poŝtelefonoj: komenci sekvan kanton, eĉ se ĝi ne estis tute ŝargita (povas difektigi la montradon de muzikaĵ-etikedoj)\">☕️",
+		"mt_waves": "bildigo:$Nmontri amplitudon de ludanta kanto en ludadbreto\">~",
+		"mt_npclip": "montri butonojn por kopiado de ludanta kanto\">/np",
+		"mt_m3u_c": "montri butonojn por kopiado de elektitaj kantoj kiel m3u8-ludlisto\">📻",
+		"mt_octl": "integrado kun operaciumo (medio-klavoj kaj montriloj)\">integr.",
+		"mt_oseek": "movi tra kanto per operaciumaj stiriloj$N$Nnoto: en iuj komputiloj  (iPhone),$N ĉi tiu agordo anstataŭigas la butonon de sekva kanto\">movado",
+		"mt_oscv": "montri album-bildojn en montriloj\">bildo",
+		"mt_follow": "rulumi la pagon, por ke la ludanta kanto restas videbla\">🎯",
+		"mt_compact": "kompaktaj ruliloj\">⟎",
+		"mt_uncache": "malplenigi kaŝmemoron &nbsp;(uzinda, se via retumilo kaŝmemoris$Ndifektitan kopion de kanto, kaj ne povas ludi ĝin)\">🗑️ kaŝmem.",
+		"mt_mloop": "ripeti la nunan dosierujon\">🔁 ripeti",
+		"mt_mnext": "ŝargi la sekvan dosierujon kaj daŭrigi\">📂 sekva",
+		"mt_mstop": "haltigi ludadon\">⏸ haltigi",
+		"mt_cflac": "konverti el flac / wav al {0}\">flac",
+		"mt_caac": "konverti el aac / m4a al {0}\">aac",
+		"mt_coth": "konverti aliajn (krom mp3) al {0}\">aliaj",
+		"mt_c2opus": "pli bona elekto por propraj komputiloj kaj Android\">opus",
+		"mt_c2owa": "opus-weba, por iOS 17.5 kaj pli novaj\">owa",
+		"mt_c2caf": "opus-caf, por iOS 11-17\">caf",
+		"mt_c2mp3": "por tre malnovaj iloj\">mp3",
+		"mt_c2flac": "plej bona sonkvalito, sed grandegaj elŝutoj\">flac",
+		"mt_c2wav": "sendensigita ludado (pli bonaj elŝutoj)\">wav",
+		"mt_c2ok": "bona elekto",
+		"mt_c2nd": "ĉi tiu formato ne estas rekomendita por via aparato, sed ĝi ankaŭ funkcios",
+		"mt_c2ng": "via aparato ŝajne ne subtenas ĉi tiun formaton, sed ni provu uzi ĝin malgraŭe",
+		"mt_xowa": "estas difektoj en iOS, kiuj preventas fonan ludadon per ĉi tiu formato; bonvolu uzi caf aŭ mp3 anstataŭe",
+		"mt_tint": "travideblo (0-100) de ludadbreto$Nvi povas ŝanĝi ĝin, se ĝi aspektas tro distre dum ŝargado",
+		"mt_eq": "ŝaltas ekvalizilon kaj stirilon de plifortigado;$N$Nboost (plifortigado) &lt;code&gt;0&lt;/code&gt; = senmodifa 100%a laŭteco$N$Nwidth (larĝo) &lt;code&gt;1 &nbsp;&lt;/code&gt; = senmodifa dukanala sono$Nwidth (larĝo) &lt;code&gt;0.5&lt;/code&gt; = 50% miksado inter maldekstra kaj dekstra kanaloj$Nwidth (larĝo) &lt;code&gt;0 &nbsp;&lt;/code&gt; = unukanala sono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = senvokigo :^)$N$Nŝaltita ekvalizilo ankaŭ forigas paŭzojn inter muzikaĵoj en senpaŭzaj albumoj, agordi ĉion kiel 0 (sed 'width' kiel 1), se vi volas nur tion",
+		"mt_drc": "ŝaltas kompresoron de dinamiko (glatigas laŭtecon de muzikaĵoj); ankaŭ ŝaltas ekvalizilon, do agordu ĉion (sed 'width') kiel 0, se vi ne volas ĝin; $N$Nplimalgrandigas laŭtecon de aŭdio super sojlo-valoro ('tresh') da dB; ĉiu proporcio-valoro ('ratio') da dB post 'tresh' 1 dB estos eligita, do implicitaj valoroj (tresh = -24, ratio = 12) faras, ke laŭteco neniam pli grandas ol -22 dB; tiel estas sendanĝera agordi 'boost'on kiel 0.8 aŭ eĉ 1.8 dum ATK = 0 kaj grandega RLS, kiel 90 (funkcias nur en Firefox, RLS estas maksimume 1 en aliaj retumiloj)$N$N(rigardu vikipedion, ĝi klariĝas pli bone)",
+
+		"mb_play": "ludi",
+		"mm_hashplay": "ludi ĉi tiun aŭdiodosieron?",
+		"mm_m3u": "premu <code>Enter/OK</code> por ludado \npremu <code>ESK/Rezigni</code> por redaktado",
+		"mp_breq": "bezonas Firefox 82+, Chrome 73+ aŭ iOS 15+",
+		"mm_bload": "ŝargado...",
+		"mm_bconv": "konvertado al formato {0}, bonvolu atendi...",
+		"mm_opusen": "via retumilo ne povas ludi dosierojn de formatoj aac / m4a;\ntranskodado al opus estas ŝaltigita",
+		"mm_playerr": "ludado malsukcesis: ",
+		"mm_eabrt": "Klopodo de ludado estis nuligita",
+		"mm_enet": "Via retkonekto estas nestabila",
+		"mm_edec": "Ĉi tiu dosiero estas ŝajne difektita??",
+		"mm_esupp": "Via retumilo ne komprenas ĉi tiun aŭdio-formaton",
+		"mm_eunk": "Nekonata eraro",
+		"mm_e404": "Ne povas ludi aŭdiaĵon; eraro 404: Dosiero ne trovita.",
+		"mm_e403": "Ne povas ludi aŭdiaĵon; eraro 403: Atingo malpermesita.\n\nKlopodu reŝargi paĝon per klavo F5, eble via seanco senvalidiĝis",
+		"mm_e500": "Ne povas ludi aŭdiaĵon; eraro 500: Rigardu la protokolojn de servilo.",
+		"mm_e5xx": "Ne povas ludi aŭdiaĵon; servila eraro ",
+		"mm_nof": "neniuj aŭdio-dosieroj trovitaj proksime",
+		"mm_prescan": "Serĉado por sekva aŭdiaĵo...",
+		"mm_scank": "Sekva muzikaĵo trovita:",
+		"mm_uncache": "kaŝmemoro malplenigita; ĉiuj muzikaĵoj estos reelŝutitaj dum sekva ludado",
+		"mm_hnf": "ĉi tiu muzikaĵo ne ekzistas plu",
+
+		"im_hnf": "ĉi tiu bildo ne ekzistas plu",
+
+		"f_empty": 'ĉi tiu dosierujo estas malplena',
+		"f_chide": 'ĉi tiu ago kaŝos kolumnon «{0}»\n\nvi povas malkaŝi kolumnojn en agordoj',
+		"f_bigtxt": "ĉi tiu dosiero estas {0}-MiB-granda -- ĉu vere malfermi kiel teksto?",
+		"f_bigtxt2": "ĉu malfermi nur la finon de dosiero? ĉi tiu reĝimo ankaŭ ŝaltos tujan ĝisdatigon, novaj linioj estos tuj montritaj",
+		"fbd_more": '<div id="blazy"><code>{0}</code> de <code>{1}</code> dosieroj montrataj; <a href="#" id="bd_more">montri {2}</a> aŭ <a href="#" id="bd_all">montri ĉiujn</a></div>',
+		"fbd_all": '<div id="blazy"><code>{0}</code> de <code>{1}</code> dosieroj montrataj; <a href="#" id="bd_all">montri ĉiujn</a></div>',
+		"f_anota": "nur {0} de {1} eroj estis elektita;\nrulumi al la malsupro por elekti la tutan dosierujon",
+
+		"f_dls": 'la ligiloj de dosieroj en ĉi tiu dosierujo estis\nanstataŭigitaj per elŝuto-ligiloj',
+
+		"f_partial": "Por sendifekta elŝuto de nune-alŝutata dosiero, elektu dosieron kun sama nomo, sed sen etendaĵo <code>.PARTIAL</code>. Bonvolu uzi la butonon \"Rezigni\" aŭ klavon ESK por fari tion.\n\nSe vi uzas OK / Enter, la provizora dosiero <code>.PARTIAL</code> estos elŝutita, kiu tre probable enhavas nekompletajn datumojn.",
+
+		"ft_paste": "alglui {0} erojn$NFulmoklavo: stir-V",
+		"fr_eperm": 'ne povas alinomi:\nvi ne havas permeson “move” en ĉi tiu dosierujo',
+		"fd_eperm": 'ne povas forigi:\nvi ne havas permeson “delete” en ĉi tiu dosierujo',
+		"fc_eperm": 'ne povas eltondi:\nvi ne havas permeson “move” en ĉi tiu dosierujo',
+		"fp_eperm": 'ne povas alglui:\nvi ne havas permeson “write” en ĉi tiu dosierujo',
+		"fr_emore":  "elekti almenaŭ unu aĵon por alinomi",
+		"fd_emore":  "elekti almenaŭ unu aĵon por forigi",
+		"fc_emore":  "elekti almenaŭ unu aĵon por eltondi",
+		"fcp_emore": "elekti almenaŭ unu aĵon por kopii al tondujo",
+
+		"fs_sc": "kunhavigi la aktualan dosierujon",
+		"fs_ss": "kunhavigi la elektitajn dosierojn",
+		"fs_just1d": "vi ne povas elekti pli ol unu dosierujon\naŭ miksi dosierojn kaj dosierujojn en elektaĵo",
+		"fs_abrt": "❌ ĉesigi",
+		"fs_rand": "🎲 haz. nomo",
+		"fs_go": "✅ krei komunaĵon",
+		"fs_name": "nomo",
+		"fs_src": "indiko",
+		"fs_pwd": "pasvorto",
+		"fs_exp": "tempolimo",
+		"fs_tmin": "min",
+		"fs_thrs": "horoj",
+		"fs_tdays": "tagoj",
+		"fs_never": "eterna",
+		"fs_pname": "nomo de ligilo; estos hazarde kreita, se malplena",
+		"fs_tsrc": "dosier(uj)o por kunhavigi",
+		"fs_ppwd": "pasvorto (nedeviga)",
+		"fs_w8": "kreado de komunaĵo...",
+		"fs_ok": "premu <code>Enter/OK</code> por kopii al tondujo\npremu <code>ESK/Rezigni</code> por fermi",
+
+		"frt_dec": "povas ripari difektitajn dosiernomojn\">url-malkodo",
+		"frt_rst": "reagordi modifitajn dosiernomojn al originalaj\">↺ malfari",
+		"frt_abrt": "ĉesigi operacion kaj fermi ĉi tiun fenestron\">❌ rezigni",
+		"frb_apply": "ALINOMI",
+		"fr_adv": "amasa / metadatuma / ŝablona alinomado\">altnivela",
+		"fr_case": "uskleciva regula esprimo\">uskleco",
+		"fr_win": "Windows-taŭgaj nomoj; signoj <code>&lt;&gt;:&quot;\\|?*</code> estos anstataŭigitaj per japanaj duobla-larĝaj signoj\">win",
+		"fr_slash": "anstataŭigi <code>/</code>n per signo, kiu ne devigas kreadon de novaj dosierujoj\">sen /",
+		"fr_re": "ŝablono de regula esprimo, kiu estos aplikita al originalaj dosiernomoj; kaptogrupoj povas esti referencita en formatkampo, ekz. &lt;code&gt;(1)&lt;/code&gt;, &lt;code&gt;(2)&lt;/code&gt; k.t.p.",
+		"fr_fmt": "inspirita de foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; anstataŭigitas per nomo de muzikaĵo,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; preterpasas [ĉi tiun] parton, se artisto ne estas specifita$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; aldonas nulojn en trakonombro ĝis 2 ciferoj",
+		"fr_pdel": "forigi",
+		"fr_pnew": "konservi kiel",
+		"fr_pname": "nomu vian novan ŝablonon",
+		"fr_aborted": "ĉesigita",
+		"fr_lold": "malnova nomo",
+		"fr_lnew": "nova nomo",
+		"fr_tags": "etikedoj por elektitaj dosieroj (ne redakteblas, nur por referenco):",
+		"fr_busy": "alinomado de {0} aĵoj...\n\n{1}",
+		"fr_efail": "alinomado malsukcesis:\n",
+		"fr_nchg": "{0} da novaj nomoj estis modifita pro reguloj <code>win</code> kaj/aŭ <code>sen /</code>\n\nĈu daŭrigi kun modifitaj nomoj?",
+
+		"fd_ok": "forigado sukcesis",
+		"fd_err": "forigado malsukcesis:\n",
+		"fd_none": "nenio estis forigita; eble servila eraro malpermesis ĝin (xbd)?",
+		"fd_busy": "forigado de {0} aĵoj...\n\n{1}",
+		"fd_warn1": "ĉu FORIGI ĉi tiujn {0} aĵojn?",
+		"fd_warn2": "<b>Averto!</b> Ĉi tiu ago ne malfareblas. Ĉu forigi?",
+
+		"fc_ok": "{0} aĵoj eltonditaj",
+		"fc_warn": '{0} aĵoj eltonditaj\n\nnur <b>ĉi tiu</b> langeto de retumilo povas alglui ilin\n(pro la grando de elektaĵo)',
+
+		"fcc_ok": "{0} aĵoj kopiitaj al tondujo",
+		"fcc_warn": '{0} aĵoj kopiitaj al tondujo\n\nnur <b>ĉi tiu</b> langeto de retumilo povas alglui ilin\n(pro la grando de elektaĵo)',
+
+		"fp_apply": "uzi ĉi tiujn nomojn",
+		"fp_ecut": "unue eltondi aŭ kopii dosier(uj)ojn, do alglui ĝin poste\n\nnoto: tondujo ankaŭ funkcias inter aliaj langetoj de retumilo",
+		"fp_ename": "{0} aĵoj ne povas esti movitaj, ĉar iliaj nomoj estas jam uzataj. Alinomi ilin sube aŭ lasi la nomokampojn malplenaj por preterpasi:",
+		"fcp_ename": "{0} aĵoj ne povas esti kopiitaj, ĉar iliaj nomoj estas jam uzataj. Alinomi ilin sube aŭ lasi la nomokampojn malplenaj por preterpasi:",
+		"fp_emore": "ankoraŭ restas koincidoj de dosiernomoj, kiuj bezonas solvon",
+		"fp_ok": "movado sukcesis",
+		"fcp_ok": "kopiado sukcesis",
+		"fp_busy": "movado de {0} aĵoj...\n\n{1}",
+		"fcp_busy": "kopiado {0} aĵoj...\n\n{1}",
+		"fp_abrt": "ĉesigado...",
+		"fp_err": "movado malsukcesis:\n",
+		"fcp_err": "kopiado malsukcesis:\n",
+		"fp_confirm": "ĉu movi tiujn {0} aĵojn ĉi tien?",
+		"fcp_confirm": "ĉu kopii tiujn {0} aĵojn ĉi tien?",
+		"fp_etab": 'eraro dum legado de tondujo el alia langeto de retumilo',
+		"fp_name": "alŝutado de dosiero el via aparato. Nomi ĝin:",
+		"fp_both_m":  '<h6>elektu, kion alglui</h6><code>Enter</code> = Movi {0} dosierojn al «{1}»\n<code>ESK</code> = Alŝuti {2} dosierojn el via aparato',
+		"fcp_both_m": '<h6>elektu, kion alglui</h6><code>Enter</code> = Kopii {0} dosierojn al «{1}»\n<code>ESK</code> = Alŝuti {2} dosierojn el via aparato',
+		"fp_both_b": '<a href="#" id="modal-ok">Movi</a><a href="#" id="modal-ng">Alŝuti</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Kopii</a><a href="#" id="modal-ng">Alŝuti</a>',
+
+		"mk_noname": "tajpu nomon en tekstokampo maldekstre antaŭ vi faras ĉi tion :p",
+
+		"tv_load": "Ŝargado de teksto-dokumento:\n\n{0}\n\n{1}% ({2} da {3} MiB ŝargita)",
+		"tv_xe1": "ne povas ŝargi teksto-dosieron:\n\neraro ",
+		"tv_xe2": "404, dosiero ne trovita",
+		"tv_lst": "listo de teksto-dosieroj en",
+		"tvt_close": "reveni al vido de dosierujo$NFulmoklavo: M (aŭ Esk)\">❌ fermi",
+		"tvt_dl": "elŝuti ĉi tiun dosieron$NFulmoklavo: Y\">💾 elŝuti",
+		"tvt_prev": "montri malsekvan dokumenton$NFulmoklavo: i\">⬆ malsekva",
+		"tvt_next": "montri sekvan dokumenton$NFulmoklavo: K\">⬇ sekva",
+		"tvt_sel": "elekti dosieron &nbsp; ( por eltondado / kopiado / forigado / ... )$NFulmoklavo: S\">elekti",
+		"tvt_edit": "malfermi dosieron en teksto-redaktilo$NFulmoklavo: E\">✏️ redakti",
+		"tvt_tail": "observi ŝanĝojn en dosiero; novaj linioj estos tuje montritaj\">📡 gvati",
+		"tvt_wrap": "linifaldo\">↵",
+		"tvt_atail": "alpingli rulumadon al malsupro de paĝo\">⚓",
+		"tvt_ctail": "malkodi ANSI-kodojn de terminal-koloroj\">🌈",
+		"tvt_ntail": "limo de rulumado (kiom da bajtoj de teksto konservi en memoro)",
+
+		"m3u_add1": "muzikaĵo aldonita al m3u-ludlisto",
+		"m3u_addn": "{0} muzikaĵoj aldonitaj al m3u-ludlisto",
+		"m3u_clip": "m3u-ludlisto kopiita al tondujo\n\nvi devus krei tekst-dosieron kun etendaĵo <code>.m3u</code> kaj alglui la tekston en ĝi por krei uzeblan ludliston",
+
+		"gt_vau": "ne montri videojn, nur ludi muzikaĵojn\">🎧",
+		"gt_msel": "ŝalti elektado-reĝimon; stir-klaki dosieron por ne-elekta ago$N$N&lt;em&gt;kiam ŝaltita: duoblaklako por malfermi dosier(uj)on&lt;/em&gt;$N$NFulmoklavo: S\">elektado",
+		"gt_crop": "stuci bildetojn\">stuci",
+		"gt_3x": "alt-kvalitaj bildetoj\">3x",
+		"gt_zoom": "grando",
+		"gt_chop": "nomlongo",
+		"gt_sort": "ordigi per",
+		"gt_name": "nomo",
+		"gt_sz": "grando",
+		"gt_ts": "dato",
+		"gt_ext": "tipo",
+		"gt_c1": "pli mallongaj dosiernomoj",
+		"gt_c2": "pli longaj dosiernomoj",
+
+		"sm_w8": "serĉado...",
+		"sm_prev": "serĉrezultoj sube venas al la lasta informpeto:\n  ",
+		"sl_close": "fermi serĉrezultojn",
+		"sl_hits": "montrado de {0} kongruaĵoj",
+		"sl_moar": "ŝargi pli",
+
+		"s_sz": "grando",
+		"s_dt": "dato",
+		"s_rd": "vojo",
+		"s_fn": "nomo",
+		"s_ta": "etikedoj",
+		"s_ua": "alŝut📅",
+		"s_ad": "aliaj",
+		"s_s1": "minimuma MiB",
+		"s_s2": "maksimuma MiB",
+		"s_d1": "min. iso8601",
+		"s_d2": "maks. iso8601",
+		"s_u1": "alŝutita post",
+		"s_u2": "kaj/aŭ antaŭ",
+		"s_r1": "vojo enhavas &nbsp; (apartigi per spacoj)",
+		"s_f1": "nomo enhavas &nbsp; (negacii per minuso)",
+		"s_t1": "etikedoj enhavas &nbsp; (^=komenco, fino=$)",
+		"s_a1": "ecoj de metadatumoj",
+
+		"md_eshow": "ne povas montri ",
+		"md_off": "[📜<em>readme</em>] malŝaltita en [⚙️] -- dokumento kaŝita",
+
+		"badreply": "Eraro dum legado de respondo al servilo",
+
+		"xhr403": "403: Atingo malpermesita\n\nklopodu reŝargi paĝon per klavo F5, eble via seanco senvalidiĝis",
+		"xhr0": "nekonata (eble konekto al servilo estis perdita, aŭ servilo ne funkcias)",
+		"cf_ok": "pardonon -- DD" + wah + "oS-protekto aktiviĝis\n\nĉio devus esti bona 30 sekundoj post\n\nse nenio okazas, reŝargi per klavo F5",
+		"tl_xe1": "ne povas listigi subdosierujojn:\n\neraro ",
+		"tl_xe2": "404: Dosierujo ne trovita",
+		"fl_xe1": "ne povas listigi dosierojn en dosierujo:\n\neraro ",
+		"fl_xe2": "404: Dosierujo ne trovita",
+		"fd_xe1": "ne povas krei subdosierujon:\n\neraro ",
+		"fd_xe2": "404: Patra dosierujo ne trovita",
+		"fsm_xe1": "ne povas sendi mesaĝon:\n\neraro ",
+		"fsm_xe2": "404: Patra dosierujo ne trovita",
+		"fu_xe1": "ne povas ŝargi malsend-liston el servilo:\n\neraro ",
+		"fu_xe2": "404: Dosiero ne trovita??",
+
+		"fz_tar": "nedensigita dosiero GNU TAR (linux / mac)",
+		"fz_pax": "nedensigita PAX-formata dosiero TAR (malpli rapide)",
+		"fz_targz": "GNU TAR, densigita per 3a nivelo de GZip$N$Nkutime tre malrapida, do$Nuzu nedensigitan TARon anstataŭe",
+		"fz_tarxz": "GNU TAR, densigita per 1a nivelo de XZ$N$Nkutime tre malrapida, do$Nuzu nedensigitan TARon anstataŭe",
+		"fz_zip8": "Zip kun dosiernomoj laŭ UTF-8 (eble difektiĝis je Windows 7 kaj pli malnovaj)",
+		"fz_zipd": "Zip kun dosiernomoj laŭ CP437, por tre malnovaj programoj (esperantaj diakritaĵoj ne funkcios)",
+		"fz_zipc": "Zip, cp437, CRC-kontrolsumoj prekalkulitaj,$Npor MS-DOS PKZIP v2.04g (oktobro 1993)$N(bezonas pli da tempo antaŭ komenco de elŝuto)",
+
+		"un_m1": "vi povas forigi viajn lastajn alŝutojn (aŭ ĉesigi nefinigitajn) sube",
+		"un_upd": "reŝargi",
+		"un_m4": "aŭ kunhavigi la dosierojn sube:",
+		"un_ulist": "montri",
+		"un_ucopy": "kopii",
+		"un_flt": "nedeviga filtrilo:&nbsp; URL devas enhavi",
+		"un_fclr": "vakigi filtrilon",
+		"un_derr": 'malalŝutado malsukcesis:\n',
+		"un_f5": 'io difektiĝis, bonvolu reŝargi aŭ uzi klavon F5',
+		"un_uf5": "pardonu, sed vi devas reŝargi la paĝon (F5 aŭ Stir+R) antaŭ ĉesigi ĉi tiun alŝuton",
+		"un_nou": '<b>averto:</b> servilo estas tro okupara por montri nefinigitajn alŝutojn; klaku la butonon "reŝargi" post kelkaj sekundoj',
+		"un_noc": '<b>averto:</b> malalŝutado de tute alŝutitaj dosieroj estas malpermesita laŭ agordoj de servilo',
+		"un_max": "unuaj 2000 dosieroj montritaj (uzi filtrilon por vidi aliajn)",
+		"un_avail": "{0} lastaj alŝutoj forigeblas<br />{1} nefinigitajn ĉesigeblas",
+		"un_m2": "ordigita per alŝuto-tempo, plej lastaj unue:",
+		"un_no1": "neniuj sufiĉe lastaj alŝutoj",
+		"un_no2": "neniuj sufiĉe lastaj alŝutoj, kongruaj laŭ filtrilo",
+		"un_next": "forigi la sekvajn {0} dosierojn sube",
+		"un_abrt": "ĉesigi",
+		"un_del": "forigi",
+		"un_m3": "ŝargado de viaj lastaj alŝutoj...",
+		"un_busy": "forigado de {0} dosieroj...",
+		"un_clip": "{0} ligiloj kopiitaj al tondujo",
+
+		"u_https1": "vi devas",
+		"u_https2": "ŝalti HTTPS-protokolon",
+		"u_https3": "por pli bona rendimento",
+		"u_ancient": 'via retumilo estas vere antikva -- eble vi devus <a href="#" onclick="goto(\'bup\')">uzi alŝutilon bup anstataŭe</a>',
+		"u_nowork": "Firefox 53+ aŭ Chrome 57+ aŭ iOS 11+ necesas",
+		"tail_2old": "Firefox 105+ aŭ Chrome 71+ aŭ iOS 14.5+ necesas",
+		"u_nodrop": 'via retumilo estas tro malnova por ŝova-kaj-demeta alŝutado',
+		"u_notdir": "tio ne estas dosierujo!\n\nvia retumilo estas tro malnova,\nbonvolu ŝovu kaj demetu anstataŭe",
+		"u_uri": "por ŝovi-kaj-demeti bildon de aliaj fenestroj de retumiloj,\nbonvolu demeti ĝin sur la grandan alŝut-butonon",
+		"u_enpot": 'uzi <a href="#">simplan fasadon</a> (povas plirapidigi alŝutojn)',
+		"u_depot": 'uzi <a href="#">elegantan fasadon</a> (povas plimalrapidigi alŝutojn)',
+		"u_gotpot": 'ŝaltado de simpla fasado por pli rapidaj alŝutoj,\n\nvi povas malŝalti ĝin, se ĝi ne plaĉas al vi!',
+		"u_pott": "<p>dosieroj: &nbsp; <b>{0}</b> finitaj, &nbsp; <b>{1}</b> eraroj, &nbsp; <b>{2}</b> alŝutataj, &nbsp; <b>{3}</b> envicigitaj</p>",
+		"u_ever": "ĉi tiu estas fundamenta alŝutilo; up2k postulas almenaŭ retumilojn<br>Chrome 21 // Firefox 13 // Edge 12 // Opera 12 // Safari 5.1",
+		"u_su2k": 'ĉi tiu estas fundamenta alŝutilo; <a href="#" id="u2yea">up2k</a> estas pli bona',
+		"u_uput": 'optimumigi por rapideco (ne kalkuli kontrolsumojn)',
+		"u_ewrite": 'vi ne havas permeson skribi en ĉi tiun dosierujon',
+		"u_eread": 'vi ne havas permeson legi ĉi tiun dosierujon',
+		"u_enoi": 'serĉado de dosieroj estas malŝaltita en servilaj agordoj',
+		"u_enoow": "anstataŭigo ne funkcios ĉi tie; forigo-permeso necesas",
+		"u_badf": 'Ĉi tiuj {0} de {1} dosieroj estis preterpasitaj, eble pro permesoj de dosiersistemo:\n\n',
+		"u_blankf": 'Ĉi tiuj {0} de {1} dosieroj estas blankaj; ĉu alŝuti malgraŭ tio?\n\n',
+		"u_applef": 'Ĉi tiuj {0} de {1} dosieroj estas eble nedezirataj;\nPremu <code>OK/Enter</code> por PRETERPASI ilin,\nPremu <code>Rezigni/ESK</code> por ignori ĉi tiun mesaĝon kaj ALŜUTI ilin:\n\n',
+		"u_just1": '\nEble ĝi funkcios pli bone, se vi elektas nur unu dosieron',
+		"u_ff_many": "se vi uzas operaciumojn <b>Linux / MacOS / Android,</b> ĉi tiu kvanto de dosieroj <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>povas</em> kraŝi retumilon Firefox!</a>\nse ĉi tio okazos, klopodu denove (aŭ uzu Chrome-on).",
+		"u_up_life": "Ĉi tiu alŝuto estos forigita de servilo\n{0} post kompletado",
+		"u_asku": 'alŝuti ĉi tiujn {0} dosierojn al <code>{1}</code>',
+		"u_unpt": "vi povas malalŝuti / forigi ĉi tiun alŝuton per 🧯 supre-maldesktre",
+		"u_bigtab": '{0} dosieroj montrotaj\n\nĉi tiu povas kraŝi vian retumilon, ĉu daŭrigi?',
+		"u_scan": 'Skanado de dosieroj...',
+		"u_dirstuck": 'skanilo haltis dum atingado de sekvaj {0} dosieroj; ili estos preterpasitaj:',
+		"u_etadone": 'Finita ({0}, {1} dosieroj)',
+		"u_etaprep": '(preparado por alŝutado)',
+		"u_hashdone": 'kontrolsumita',
+		"u_hashing": 'k-sumado',
+		"u_hs": 'kvitanco...',
+		"u_started": "la dosieroj estas alŝutataj; rigardu [🚀]",
+		"u_dupdefer": "duplikatoj; estos traktita post ĉiuj aliaj dosieroj",
+		"u_actx": "alklaku ĉi tiun tekston por eviti malrapidigon<br />dum uzado de aliaj fenestroj/langetoj",
+		"u_fixed": "Bone!&nbsp; Riparita 👍",
+		"u_cuerr": "alŝutado de ero {0} de {1} malsukcesis;\neble malgravas, alŝutado daŭrigas\n\ndosiero: {2}",
+		"u_cuerr2": "servilo rifuzis alŝutadon (ero {0} de {1});\nprovos denove poste\n\ndosiero: {2}\n\neraro ",
+		"u_ehstmp": "reprovos poste; rigardu sube-dekstre",
+		"u_ehsfin": "servilo rifuzis peton por finigi alŝutadon; reprovado...",
+		"u_ehssrch": "servilo rifuzis peton por ŝerco; reprovado...",
+		"u_ehsinit": "servilo rifuzis peton por komenco de alŝutado; reprovado...",
+		"u_eneths": "reta eraro dum alŝutada kvitanco; reprovado...",
+		"u_enethd": "reta eraro dum kontrolo de ekzistado de cela dosiero; reprovado...",
+		"u_cbusy": "atendado, por ke la servilo estas atingebla post reta eraro...",
+		"u_ehsdf": "servilo ne havas sufiĉe da diskospaco!\n\nla alŝutado reprovos daŭre, okaze de iu liberigas\nsufiĉe da diskospaco",
+		"u_emtleak1": "ŝajnas, ke via retumilo likas memoron; \nbonvolu",
+		"u_emtleak2": ' <a href="{0}">uzi protokolon HTTPS (rekomendita)</a> aŭ ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'provu fari tiel:\n<ul><li>reŝargu la paĝon per klavo <code>F5</code></li><li>, do malŝalti la butonon &nbsp;<code>mt</code>&nbsp; en la &nbsp;<code>⚙️ agordoj</code></li><li>kaj reprovu alŝuton</li></ul>Alŝuto estos pli malrapida, sed nenio fareblas.\nPardonon por la ĝenaĵo!\n\nPS: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">korektis ĉi tion</a>',
+		"u_emtleakf": 'provu fari tiel:\n<ul><li>reŝargu la paĝon per klavo <code>F5</code></li><li>, do malŝalti la butonon &nbsp;<code>mt</code>&nbsp; en la &nbsp;<code>⚙️ agordoj</code></li><li>kaj reprovu alŝuton</li></ul>\nPS: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">espereble korektos ĉi tion</a> baldaŭ',
+		"u_s404": "ne trovita ĉe la servilo",
+		"u_expl": "klarigi",
+		"u_maxconn": "plimulto da retumiloj ne permesas uzi pli ol 6, sed Firefox havas agordon <code>connections-per-server</code> en <code>about:config</code>, per kiu la limo ŝanĝeblas",
+		"u_tu": '<p class="warn">AVERTO: rapidega reĝimo ŝaltita, <span>&nbsp;kliento povas ne detekti kaj daŭrigi nefinigitajn alŝutojn; rigardu la ŝpruchelpilon de rapidega-butono</span></p>',
+		"u_ts": '<p class="warn">AVERTO: rapidega reĝimo ŝaltita, <span>&nbsp;serĉrezultoj povas esti eraraj; rigardu la ŝpruchelpilon de rapidega-butono</span></p>',
+		"u_turbo_c": "rapidega reĝimo estas malpermesita laŭ servilaj agordoj",
+		"u_turbo_g": "rapidega reĝimo estas malpermesita, ĉar vi\nne rajtas listigi dosierujojn en ĉi tiu datumportilo",
+		"u_life_cfg": 'aŭtoforigado post <input id="lifem" p="60" /> minutoj (aŭ <input id="lifeh" p="3600" /> horoj)',
+		"u_life_est": 'alŝuto estos forigita je <span id="lifew" tt="local time">---</span>',
+		"u_life_max": 'ĉi tiu dosierujo postulas \naŭtoforigadon de dosieroj post {0}',
+		"u_unp_ok": 'malalŝuto permesitas por {0}',
+		"u_unp_ng": 'malalŝuto NE estos permesita',
+		"ue_ro": 'via atingo de ĉi tiu dosierujo estas nur-lega\n\n',
+		"ue_nl": 'vi ne estas ensalutita',
+		"ue_la": 'vi estas ensalutita kiel "{0}"',
+		"ue_sr": 'vi estas en serĉo-reĝimo nun\n\nŝanĝi al alŝuto-reĝimo per lupeo-simbolo 🔎 (apude de la grandega SERĈO-butono), kaj provu alŝuti denove\n\npardonon',
+		"ue_ta": 'provu alŝuti denove, ĝi devus funkcii nun',
+		"ue_ab": "ĉi tiu dosiero estas jam alŝutata en alian dosierujon, tiu alŝutado devas esti finigita antaŭ alŝutado de la sama dosiero en alian lokon.\n\nVi povas ĉesigi la nunan alŝutadon per butonon 🧯 supre-maldekstre",
+		"ur_1uo": "OK: Dosiero sukcese alŝutita",
+		"ur_auo": "OK: Ĉiuj {0} dosieroj sukcese alŝutitaj",
+		"ur_1so": "OK: Dosiero trovita ĉe la servilo",
+		"ur_aso": "OK: Ĉiuj {0} dosieroj trovitaj ĉe la serviloj",
+		"ur_1un": "Alŝutado malsukcesis, pardonon",
+		"ur_aun": "Ĉiuj {0} alŝutadoj malsukcesis, pardonon",
+		"ur_1sn": "Dosiero estis NE trovita ĉe la servilo",
+		"ur_asn": "La {0} dosieroj estis NE trovitaj ĉe la servilo",
+		"ur_um": "Finita;\n{0} alŝutoj sukcesis,\n{1} alŝutoj malsukcesis, pardonon",
+		"ur_sm": "Finita;\n{0} dosieroj trovitaj ĉe la servilo,\n{1} dosieroj NE trovitaj ĉe la servilo",
+
+		"lang_set": "ĉu reŝargi paĝon por efektivigi lingvo-ŝanĝon?",
+	},
 	"fin": {
 		"tt": "Suomi",
 
@@ -2543,7 +3827,7 @@ var Ls = {
 				["ESC", "sulje asioita"],
 
 				"file-manager",
-				["G", "vaihda lista/ruudukkonäkymään"],
+				["G", "vaihda lista/kuvanäkymään"],
 				["T", "vaihda pienoiskuviin/kuvakkeisiin"],
 				["⇧ A/D", "pienoiskuvien koko"],
 				["ctrl-K", "poista valitut"],
@@ -2558,13 +3842,13 @@ var Ls = {
 				["↑/↓", "siirrä valintaosoitinta"],
 				["ctrl ↑/↓", "siirrä osoitinta ja näkymää"],
 				["⇧ ↑/↓", "valitse edellinen/seuraava tiedosto"],
-				["ctrl-A", "valitse kaikki tiedostot / kansiot"],
+				["ctrl-A", "valitse kaikki tiedostot / hakemistot"],
 			], [
 				"navigation",
 				["B", "näytä linkkipolku"],
 				["I/K", "siirry edelliseen/seuraavaan hakemistoon"],
 				["M", "siirry ylähakemistoon/supista nykyinen hakemisto"],
-				["V", "näytä kansiot/tekstitiedostot navigointipaneelissa"],
+				["V", "näytä hakemistot/tekstitiedostot navigointipaneelissa"],
 				["A/D", "navigointipaneelin koko"],
 			], [
 				"audio-player",
@@ -2617,16 +3901,17 @@ var Ls = {
 		"ht_d2": "päivää",
 		"ht_and": " ja ",
 
-		"goh": "ohjauspaneeli",
+		"goh": "hallintapaneeli",
 		"gop": 'viereinen hakemisto">edell',
 		"gou": 'ylempi hakemisto">ylös',
 		"gon": 'seuraava hakemisto">seur',
 		"logout": "Kirjaudu ulos ",
+		"login": "Kirjaudu sisään", //m
 		"access": " -oikeudet",
 		"ot_close": "sulje alavalikko",
 		"ot_search": "etsi tiedostoja ominaisuuksien, tiedostopolun tai -nimen, musiikkitägien tai näiden yhdistelmän perusteella$N$N&lt;code&gt;foo bar&lt;/code&gt; = täytyy sisältää sekä «foo» että «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = täytyy sisältää «foo» mutta ei «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = alkaa «yana» ja on «opus»-tiedosto$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = sisältää täsmälleen «try unite»$N$Npäivämäärän muoto on iso-8601, kuten$N&lt;code&gt;2009-12-31&lt;/code&gt; tai &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
 		"ot_unpost": "unpost: poista viimeaikaiset tai keskeytä keskeneräiset lataukset",
-		"ot_bup": "bup: tiedostojen 'perus'lähetysohjelma, tukee jopa netscape 4.0:aa",
+		"ot_bup": "bup: tiedostojen 'perus'lähetysohjelma, tukee jopa netscape 4.0",
 		"ot_mkdir": "mkdir: luo uusi hakemisto",
 		"ot_md": "new-md: luo uusi markdown-dokumentti",
 		"ot_msg": "msg: lähetä viesti palvelinlokiin",
@@ -2640,7 +3925,7 @@ var Ls = {
 		"ab_mkdoc": "luo markdown-tiedosto",
 		"ab_msg": "lähetä viesti palvelinlokiin",
 
-		"ay_path": "siirry kansioihin",
+		"ay_path": "siirry hakemistoihin",
 		"ay_files": "siirry tiedostoihin",
 
 		"wt_ren": "uudelleennimeä valitut kohteet$NPikanäppäin: F2",
@@ -2650,29 +3935,29 @@ var Ls = {
 		"wt_pst": "liitä aiemmin leikatut / kopioidut valinnat$NPikanäppäin: ctrl-V",
 		"wt_selall": "valitse kaikki tiedostot$NPikanäppäin: ctrl-A (kun tiedosto on kohdistettu)",
 		"wt_selinv": "valitse vastakkaiset tiedostot",
-		"wt_zip1": "lataa tämä kansio pakattuna",
+		"wt_zip1": "lataa tämä hakemisto pakattuna",
 		"wt_selzip": "lataa valitut kohteet pakattuna",
 		"wt_seldl": "lataa valitut kohteet paketoimatta$NPikanäppäin: Y",
 		"wt_npirc": "kopioi kappaletiedot IRC-muotoilulla",
 		"wt_nptxt": "kopioi kappaletiedot ilman muotoilua",
 		"wt_m3ua": "lisää m3u-soittolistaan (klikkaa <code>📻kopioi</code> myöhemmin)",
 		"wt_m3uc": "kopioi m3u-soittolista leikepöydälle",
-		"wt_grid": "vaihda ruudukko- ja listanäkymän välillä$NPikanäppäin: G",
+		"wt_grid": "vaihda kuva- ja listanäkymän välillä$NPikanäppäin: G",
 		"wt_prev": "edellinen kappale$NPikanäppäin: J",
 		"wt_play": "toista / pysäytä$NPikanäppäin: P",
 		"wt_next": "seuraava kappale$NPikanäppäin: L",
 
-		"ul_par": "rinnakkaisten latausten lkm:",
+		"ul_par": "rinnakkaislatausten lkm:",
 		"ut_rand": "satunnaisgeneroidut tiedostonimet",
 		"ut_u2ts": "kopioi viimeksi muokattu aikaleima$Ntiedostojärjestelmästäsi palvelimelle\">📅",
 		"ut_ow": "korvaa olemassa olevat tiedostot palvelimella?$N🛡️: ei koskaan (luo sen sijaan uuden tiedostonimen)$N🕒: korvaa jos palvelintiedosto on vanhempi kuin omasi$N♻️: korvaa aina jos tiedostot ovat erilaisia",
-		"ut_mt": "jatka muiden tiedostojen tiivisteiden laskemista latauksen aikana$N$kannattanee poistaa käytöstä, mikäli prosessori tai kovalevy on vanhempaa mallia",
+		"ut_mt": "jatka muiden tiedostojen tiivisteiden laskemista latauksen aikana$N$Nkannattanee poistaa käytöstä, mikäli prosessori tai kovalevy on vanhempaa mallia",
 		"ut_ask": 'kysy vahvistusta ennen latauksen aloittamista">💭',
-		"ut_pot": "paranna latausnopeutta hitailla laitteilla$Ntekemällä käyttöliittymäästä vähemmän monimutkaisen",
+		"ut_pot": "paranna latausnopeutta hitailla laitteilla$Nvähentämällä käyttöliittymän monimutkaisuutta",
 		"ut_srch": "lataamisen sijaan tarkista, ovatko tiedostot jo $N olemassa palvelimella (käy läpi kaikki hakemistot, joihin sinulla on read-oikeudet)",
-		"ut_par": "keskeytä lataukset asettamalla se 0:aan$N$Nnosta, jos yhteytesi on hidas tai viive on suuri$N$Npidä se 1:ssä lähiverkossa tai jos palvelimen kovalevy on pullonkaula",
-		"ul_btn": "vedä tiedostoja / kansioita<br>tähän (tai napsauta tätä)",
-		"ul_btnu": "L A T A A",
+		"ut_par": "keskeytä lataukset asettamalla se nollaan$N$Nnosta, jos yhteytesi on hidas tai viive on suuri$N$Npidä se 1:ssä lähiverkossa tai jos palvelimen kovalevy on pullonkaula",
+		"ul_btn": "vedä tiedostoja / hakemistoja tähän<br>(tai klikkaa minua)",
+		"ul_btnu": "L Ä H E T Ä",
 		"ul_btns": "E T S I",
 
 		"ul_hash": "tiiviste",
@@ -2712,31 +3997,31 @@ var Ls = {
 		"udt_srch": "Etsi",
 		"udt_drop": "pudota se tähän",
 
-		"u_nav_m": '<h6>selvä, mitäs sulla on?</h6><code>Enter</code> = Tiedostoja (yksi tai useampi)\n<code>ESC</code> = Yksi kansio (mukaan lukien alikansiot)',
-		"u_nav_b": '<a href="#" id="modal-ok">Tiedostoja</a><a href="#" id="modal-ng">Yksi kansio</a>',
+		"u_nav_m": '<h6>selvä, mitäs sulla on?</h6><code>Enter</code> = Tiedostoja (yksi tai useampi)\n<code>ESC</code> = Yksi hakemisto (mukaan lukien alihakemistot)',
+		"u_nav_b": '<a href="#" id="modal-ok">Tiedostoja</a><a href="#" id="modal-ng">Yksi hakemisto</a>',
 
-		"cl_opts": "kytkimet",
+		"cl_opts": "asetukset",
 		"cl_themes": "teema",
 		"cl_langs": "kieli",
-		"cl_ziptype": "kansion lataus",
+		"cl_ziptype": "hakemiston pakkaustyyppi",
 		"cl_uopts": "up2k-kytkimet",
 		"cl_favico": "favicon",
 		"cl_bigdir": "suuret hakemistot",
-		"cl_hsort": "#lajittelu",
-		"cl_keytype": "sävellajin notaatio",
+		"cl_hsort": "#sort",
+		"cl_keytype": "sävellajin notaatiotyyppi",
 		"cl_hiddenc": "piilotetut sarakkeet",
 		"cl_hidec": "piilota",
 		"cl_reset": "palauta",
 		"cl_hpick": "napauta sarakeotsikoita piilottaaksesi alla olevassa taulukossa",
 		"cl_hcancel": "sarakkeiden piilotus peruttu",
 
-		"ct_grid": '田 RUUDUKKO',
-		"ct_ttips": '◔ ◡ ◔">ℹ️ ammattilaisvinkit',
-		"ct_thumb": 'RUUDUKKOnäkymässä, vaihda kuvakkeihin tai pienoiskuviin$NPikanäppäin: T">🖼️ pienoiskuvat',
-		"ct_csel": 'käytä CTRL ja SHIFT tiedostojen valintaan RUUDUKKOnäkymässä">val',
+		"ct_grid": '田 kuvanäkymä',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ vihjelaatikot',
+		"ct_thumb": 'valitse kuvakkeiden / pienoiskuvien välillä kuvanäkymässä $NPikanäppäin: T">🖼️ pienoiskuvat',
+		"ct_csel": 'käytä CTRL ja SHIFT tiedostojen valintaan kuvanäkymässä">valitse',
 		"ct_ihop": 'kun kuvakatselin suljetaan, vieritä alas viimeksi katsottuun tiedostoon">g⮯',
 		"ct_dots": 'näytä piilotetut tiedostot (jos palvelin sallii)">piilotiedostot',
-		"ct_qdel": 'tiedostoja poistaessa, kysy vahvistusta vain kerran">qdel',
+		"ct_qdel": 'kysy vahvistusta vain kerran tiedostoja poistaessa">qdel',
 		"ct_dir1st": 'lajittele hakemistot ennen tiedostoja">📁 ensin',
 		"ct_nsort": 'luonnollinen lajittelu (tiedostonimille jotka ovat numeroalkuisia)">nsort',
 		"ct_utc": 'näytä kaikki aikaleimat UTC-ajassa">UTC',
@@ -2746,9 +4031,9 @@ var Ls = {
 
 		"cut_umod": "jos tiedosto on jo olemassa palvelimella, päivitä palvelimen viimeksi muokattu aikaleima vastaamaan paikallista tiedostoasi (vaatii write- ja delete-oikeudet)\">re📅",
 
-		"cut_turbo": "yolo-painike, ET todennäköisesti halua ottaa tätä käyttöön:$N$Nkäytä tätä jos latasit valtavan määrän tiedostoja ja jouduit käynnistämään uudelleen jostain syystä, ja haluat jatkaa latausta ASAP$N$Ntämä korvaa tiivistetarkistuksen yksinkertaisella <em>&quot;onko tällä sama tiedostokoko palvelimella?&quot;</em> joten jos tiedoston sisältö on erilainen sitä EI ladata$N$Nsinun pitäisi poistaa tämä käytöstä kun lataus on valmis, ja sitten &quot;ladata&quot; samat tiedostot uudelleen antaaksesi asiakkaan varmistaa ne\">turbo",
+		"cut_turbo": "yolo-painike -- et todennäköisesti halua ottaa tätä käyttöön:$N$Nkäytä tätä jos latasit valtavan määrän tiedostoja ja jouduit käynnistämään uudelleen jostain syystä, ja haluat jatkaa latausta välittömästi$N$Ntämä korvaa tiivistetarkistuksen yksinkertaisella <em>&quot;onko tällä sama tiedostokoko palvelimella?&quot;</em> joten jos tiedoston sisältö on erilainen sitä EI ladata$N$Nsinun pitäisi poistaa tämä käytöstä kun lataus on valmis, ja sitten &quot;ladata&quot; samat tiedostot uudelleen antaaksesi selaimesi varmistaa ne\">turbo",
 
-		"cut_datechk": "ei vaikutusta ellei turbo-painike ole käytössä$N$Nvähentää yolo-tekijää hieman; tarkistaa vastaavatko tiedostojen aikaleimat palvelimella omia$N$Npitäisi <em>teoriassa</em> napata useimmat keskeneräiset / vioittuneet lataukset, mutta ei ole korvike varmistuskierrokselle turbo poistettuna käytöstä jälkeenpäin\">päiväys-tark",
+		"cut_datechk": "ei vaikutusta ellei turbo-painike ole käytössä$N$Nvähentää yolo-tekijää hieman; tarkistaa vastaavatko tiedostojen aikaleimat palvelimella omia$N$Npitäisi <em>teoriassa</em> napata useimmat keskeneräiset / vioittuneet lataukset, mutta ei ole korvike varmistuskierrokselle turbo poistettuna käytöstä jälkeenpäin\">päiväysvarmistin",
 
 		"cut_u2sz": "kunkin lähetyspalan koko (MiB:ssä); suuret arvot lentävät paremmin atlantin yli. kokeile pieniä arvoja erittäin heikoilla yhteyksillä",
 
@@ -2767,61 +4052,63 @@ var Ls = {
 		"cft_fg": "edustaväri",
 		"cft_bg": "taustaväri",
 
-		"cdt_lim": "tiedostojen enimmäismäärä näytettäväksi kansiossa",
-		"cdt_ask": "sivun lopussa,$Nsen sijaan että lataa automaattisesti lisää tiedostoja,$Nkysy mitä tehdä",
+		"cdt_lim": "tiedostojen enimmäismäärä näytettäväksi hakemistossa",
+		"cdt_ask": "sivun lopussa, sen sijaan että lataa $Nautomaattisesti lisää tiedostoja, kysy mitä tehdä",
 		"cdt_hsort": "kuinka monta lajittelusääntöä (&lt;code&gt;,sorthref&lt;/code&gt;) sisällyttää media-URL:eihin. Tämän asettaminen nollaan jättää myös huomioimatta media-linkeissä sisällytetyt lajittelusäännöt kun napsautat niitä",
 
 		"tt_entree": "näytä navigointipaneeli$NPikanäppäin: B",
 		"tt_detree": "näytä linkkipolku$NPikanäppäin: B",
-		"tt_visdir": "näytä valittu kansio",
+		"tt_visdir": "näytä valittu hakemisto",
 		"tt_ftree": "vaihda linkkipolku- / tekstitiedostonäkymään$NPikanäppäin: V",
-		"tt_pdock": "näytä yläkansiot telakoitussa paneelissa ylhäällä",
+		"tt_pdock": "näytä ylähakemistot telakoitussa paneelissa ylhäällä",
 		"tt_dynt": "kasvata automaattisesti hakemistosyvyyden kasvaessa",
 		"tt_wrap": "rivitys",
 		"tt_hover": "paljasta ylivuotavat rivit leijutettaessa$N( rikkoo vierityksen ellei hiiri $N&nbsp; ole vasemmassa marginaalissa )",
 
-		"ml_pmode": "kansion lopussa...",
+		"ml_pmode": "hakemiston lopussa...",
 		"ml_btns": "komennot",
-		"ml_tcode": "transkoodaa",
-		"ml_tcode2": "transkoodaa muotoon",
+		"ml_tcode": "muunna nämä",
+		"ml_tcode2": "tähän muotoon",
 		"ml_tint": "sävy",
 		"ml_eq": "taajuuskorjain",
 		"ml_drc": "dynaaminen alueen kompressori",
 
 		"mt_loop": "toista samaa kappaletta\">🔁",
-		"mt_one": "lopeta yhden kappaleen jälkeen\">1️⃣",
-		"mt_shuf": "satunnaistoisto\">🔀",
+		"mt_one": "lopeta yhden toiston jälkeen\">1️⃣",
+		"mt_shuf": "aktivoi satunnaistoisto\">🔀",
 		"mt_aplay": "automaattitoisto jos linkissä jolla pääsit palvelimelle oli kappale-ID$N$Ntämän poistaminen käytöstä pysäyttää myös sivun URL:n päivittämisen kappale-ID:lla musiikkia toistettaessa, estääksesi automaattitoiston jos nämä asetukset menetetään mutta URL säilyy\">a▶",
 		"mt_preload": "aloita seuraavan kappaleen lataaminen lähellä loppua, mahdollistaen saumattoman toiston\">esilataus",
-		"mt_prescan": "siirry seuraavaan kansioon ennen viimeisen kappaleen$Nloppumista, pitäen verkkoselaimen tyytyväisenä$Njotta se ei pysäytä toistoa\">nav",
-		"mt_fullpre": "yritä esiladata koko kappale;$N✅ ota käyttöön <b>heikoilla</b> yhteyksillä,$N❌ <b>poista käytöstä</b> hitailla yhteyksillä\">täysi",
+		"mt_prescan": "siirry seuraavaan hakemistoon ennen viimeisen kappaleen$Nloppumista, pitäen verkkoselaimen tyytyväisenä$Njotta se ei pysäytä toistoa\">nav",
+		"mt_fullpre": "yritä esiladata koko kappale;$N✅ ota käyttöön <b>heikoilla</b> yhteyksillä,$N❌ <b>poista käytöstä</b> hitailla yhteyksillä\">esi+",
 		"mt_fau": "puhelimissa: estä musiikin pysähtyminen jos seuraava kappale ei esilataudu tarpeeksi nopeasti (voi aiheuttaa ongelmia kappaletietojen näyttämisessä)\">☕️",
 		"mt_waves": "aaltomuoto-hakupalkki:$Nnäytä äänenvahvuus selaimessa\">~s",
 		"mt_npclip": "näytä painikkeet parhaillaan soivan kappaleen leikepöydälle kopioimiseen\">/np",
 		"mt_m3u_c": "näytä painikkeet valittujen$Nkappaleiden kopioimiseen m3u8-soittolistana leikepöydälle\">📻",
 		"mt_octl": "käyttöjärjestelmäintegraatio (medianäppäimet / osd)\">os-ctl",
-		"mt_oseek": "salli haku käyttöjärjestelmäintegraation kautta$N$Nhuom: joissakin laitteissa (iPhonet),$Ntämä korvaa seuraava-kappale-painikkeen\">kelaus",
-		"mt_oscv": "näytä albumin kansi osd:ssä\">taide",
+		"mt_oseek": "salli haku käyttöjärjestelmäintegraation kautta$N$Nhuom: joissakin laitteissa (iPhonet),$Ntämä korvaa 'seuraava kappale' -painikkeen\">kelaus",
+		"mt_oscv": "näytä albumin kansi osd:ssä\">kansikuvat",
 		"mt_follow": "pidä soiva kappale näkyvissä\">🎯",
 		"mt_compact": "kompaktit säätimet\">⟎",
 		"mt_uncache": "tyhjennä välimuisti &nbsp;(kokeile tätä jos selaimesi välimuistissa on$Nrikkinäinen kopio kappaleesta)\">uncache",
-		"mt_mloop": "toista avoinna olevaa hakemistoa loputtomasti\">🔁 silmukka",
-		"mt_mnext": "lataa seuraava kansio ja jatka\">📂 seuraava",
+		"mt_mloop": "toista avoinna olevaa hakemistoa loputtomasti\">🔁 alkuun",
+		"mt_mnext": "lataa seuraava hakemisto ja jatka\">📂 seuraava",
 		"mt_mstop": "pysäytä toisto\">⏸ pysäytä",
-		"mt_cflac": "muunna flac / wav opus-muotoon\">flac",
-		"mt_caac": "muunna aac / m4a opus-muotoon\">aac",
-		"mt_coth": "muunna kaikki muut paitsi mp3 opus-muotoon\">muut",
+		"mt_cflac": "muunna flac / wav {0}-muotoon\">flac",
+		"mt_caac": "muunna aac / m4a {0}-muotoon\">aac",
+		"mt_coth": "muunna kaikki muut paitsi mp3 {0}-muotoon\">muut",
 		"mt_c2opus": "paras valinta pöytäkoneille, kannettaville, androidille\">opus",
 		"mt_c2owa": "opus-weba, iOS 17.5:lle ja uudemmille\">owa",
 		"mt_c2caf": "opus-caf, iOS 11:lle - 17:lle\">caf",
 		"mt_c2mp3": "käytä tätä erittäin vanhoissa laitteissa\">mp3",
+		"mt_c2flac": "paras äänenlaatu, mutta isot lataukset\">flac", //m
+		"mt_c2wav": "pakkaamaton toisto (vielä suurempi tiedosto)\">wav", //m
 		"mt_c2ok": "hienoa, hyvä valinta",
 		"mt_c2nd": "tuo ei ole suositeltu formaatti laitteellesi, mutta tee miten lystäät",
 		"mt_c2ng": "laitteesi ei näytä tukevan tätä formaattia, mutta yritetään nyt silti",
 		"mt_xowa": "iOS:ssä on bugeja jotka estävät taustatoiston tällä formaatilla; käytä caf:ia tai mp3:a sen sijaan",
 		"mt_tint": "taustan taso (0-100) liukupalkissa$Ntehden puskuroinnista vähemmän häiritsevän",
 		"mt_eq": "aktivoi taajuuskorjaimen ja vahvistussäätimen;$N$Nvahvistus &lt;code&gt;0&lt;/code&gt; = normaali 100% äänenvoimakkuus (muokkaamaton)$N$Nleveys &lt;code&gt;1 &nbsp;&lt;/code&gt; = normaali stereo (muokkaamaton)$Nleveys &lt;code&gt;0.5&lt;/code&gt; = 50% vasen-oikea ristisyöttö$Nleveys &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nvahvistus &lt;code&gt;-0.8&lt;/code&gt; &amp; leveys &lt;code&gt;10&lt;/code&gt; = laulun poisto :^)$N$Nequalizerin käyttöönotto tekee saumattomista albumeista täysin saumattomia, joten jätä se päälle kaikilla arvoilla nollassa (paitsi leveys = 1) jos välität siitä",
-		"mt_drc": "aktivoi dynaamisen alueen kompressorin (äänenvoimakkuuden tasoittaja / tiiliseinättäjä); ottaa myös käyttöön EQ:n tasapainottamaan spagettia, joten aseta kaikki EQ-kentät paitsi 'leveys' 0:aan jos et halua sitä$N$Nalentaa äänenvoimakkuutta KYNNYS dB:n yläpuolella; jokaisesta SUHDE dB:stä KYNNYKSEN yli tulee 1 dB ulos, joten oletusarvot kynnys -24 ja suhde 12 tarkoittaa ettei sen pitäisi koskaan tulla kovempaa kuin -22 dB ja on turvallista nostaa equalizerin vahvistus 0.8:aan, tai jopa 1.8:aan ATK 0:lla ja valtavalla RLS:llä kuten 90 (toimii vain firefoxissa; RLS on max 1 muissa selaimissa)$N$N(katso wikipedia, he selittävät sen paljon paremmin)",
+		"mt_drc": "aktivoi dynaamisen alueen kompressorin; ottaa myös käyttöön taajuuskorjaimen tasapainottamaan spagettia, joten aseta kaikki EQ-kentät paitsi 'leveys' nollaan jos et halua sitä$N$Nalentaa äänenvoimakkuutta KYNNYS dB:n yläpuolella; jokaisesta SUHDE dB:stä KYNNYKSEN yli tulee 1 dB ulos, joten oletusarvot kynnys -24 ja suhde 12 tarkoittaa ettei sen pitäisi koskaan tulla kovempaa kuin -22 dB ja on turvallista nostaa equalizerin vahvistus 0.8:aan, tai jopa 1.8:aan ATK 0:lla ja valtavalla RLS:llä kuten 90 (toimii vain firefoxissa; RLS on max 1 muissa selaimissa)$N$N(katso wikipedia, he selittävät sen paljon paremmin)",
 
 		"mb_play": "toista",
 		"mm_hashplay": "soita tämä äänitiedosto?",
@@ -2846,33 +4133,33 @@ var Ls = {
 		"mm_uncache": "välimuisti tyhjennetty; kaikki kappaleet ladataan uudelleen seuraavalla toistolla",
 		"mm_hnf": "tuota kappaletta ei enää ole olemassa",
 
-"		im_hnf": "tuota kuvaa ei enää ole olemassa",
+		"im_hnf": "tuota kuvaa ei enää ole olemassa",
 
-		"f_empty": 'tämä kansio on tyhjä',
+		"f_empty": 'tämä hakemisto on tyhjä',
 		"f_chide": 'tämä piilottaa sarakkeen «{0}»\n\nvoit palauttaa sarakkeet asetuksista',
 		"f_bigtxt": "tämä tiedosto on {0} Mt kokoinen -- näytetäänkö silti tekstinä?",
 		"f_bigtxt2": "näytetäänkö vain tiedoston loppu? tämä myös mahdollistaa seuraamisen/tailing, näyttäen uudet tekstirivit reaaliaikaisesti",
 		"fbd_more": '<div id="blazy">näytetään <code>{0}</code> / <code>{1}</code> tiedostoa; <a href="#" id="bd_more">näytä {2}</a> tai <a href="#" id="bd_all">näytä kaikki</a></div>',
 		"fbd_all": '<div id="blazy">näytetään <code>{0}</code> / <code>{1}</code> tiedostoa; <a href="#" id="bd_all">näytä kaikki</a></div>',
-		"f_anota": "vain {0} / {1} kohdetta valittiin;\nvalitaksesi koko kansion, vieritä ensin loppuun",
+		"f_anota": "vain {0} / {1} kohdetta valittiin;\nvalitaksesi koko hakemiston, vieritä ensin loppuun",
 
-		"f_dls": 'nykyisen kansion tiedostolinkit on\nvaihdettu latauslinkeiksi',
+		"f_dls": 'nykyisen hakemiston tiedostolinkit on\nvaihdettu latauslinkeiksi',
 
 		"f_partial": "Ladataksesi turvallisesti tiedoston joka on parhaillaan latautumassa, klikkaa tiedostoa jolla on sama nimi mutta ilman <code>.PARTIAL</code> päätettä. Paina PERUUTA tai Escape tehdäksesi tämän.\n\nOK / Enter painaminen sivuuttaa tämän varoituksen ja jatkaa <code>.PARTIAL</code> väliaikaistiedoston lataamista, mikä todennäköisesti antaa sinulle vioittunutta dataa.",
 
 		"ft_paste": "liitä {0} kohdetta$NPikanäppäin: ctrl-V",
-		"fr_eperm": 'ei voida nimetä uudelleen:\nsinulla ei ole “move”-oikeutta tässä kansiossa',
-		"fd_eperm": 'ei voida poistaa:\nsinulla ei ole “delete” oikeutta tässä kansiossa',
-		"fc_eperm": 'ei voida leikata:\nsinulla ei ole “move” oikeutta tässä kansiossa',
-		"fp_eperm": 'ei voida liittää:\nsinulla ei ole “write” oikeutta tässä kansiossa',
+		"fr_eperm": 'ei voida nimetä uudelleen:\nsinulla ei ole “move”-oikeutta tässä hakemistossa',
+		"fd_eperm": 'ei voida poistaa:\nsinulla ei ole “delete” oikeutta tässä hakemistossa',
+		"fc_eperm": 'ei voida leikata:\nsinulla ei ole “move” oikeutta tässä hakemistossa',
+		"fp_eperm": 'ei voida liittää:\nsinulla ei ole “write” oikeutta tässä hakemistossa',
 		"fr_emore": "valitse vähintään yksi kohde uudelleennimettäväksi",
 		"fd_emore": "valitse vähintään yksi kohde poistettavaksi",
 		"fc_emore": "valitse vähintään yksi kohde leikattavaksi",
 		"fcp_emore": "valitse vähintään yksi kohde kopioitavaksi leikepöydälle",
 
-		"fs_sc": "jaa kansio jossa olet",
+		"fs_sc": "jaa hakemisto jossa olet",
 		"fs_ss": "jaa valitut tiedostot",
-		"fs_just1d": "et voi valita useampaa kuin yhtä kansiota,\ntai sekoittaa tiedostoja ja kansioita yhdessä valinnassa",
+		"fs_just1d": "et voi valita useampaa kuin yhtä,\ntai sekoittaa tiedostoja ja hakemistoja yhdessä valinnassa",
 		"fs_abrt": "❌ keskeytä",
 		"fs_rand": "🎲 joku.nimi",
 		"fs_go": "✅ luo share",
@@ -2885,10 +4172,10 @@ var Ls = {
 		"fs_tdays": "päivää",
 		"fs_never": "ikuinen",
 		"fs_pname": "valinnainen linkin nimi; on satunnainen jos tyhjä",
-		"fs_tsrc": "jaettava tiedosto tai kansio",
+		"fs_tsrc": "jaettava tiedosto tai hakemisto",
 		"fs_ppwd": "valinnainen salasana",
 		"fs_w8": "luodaan sharea...",
-		"fs_ok": "paina <code>Enter/OK</code> lisätäksesi leikepöydälle\npaina <code>ESC/Cancel</code> sulkeaksesi",
+		"fs_ok": "paina <code>Enter/OK</code> lisätäksesi leikepöydälle\npaina <code>ESC/Peruuta</code> sulkeaksesi",
 
 		"frt_dec": "saattaa korjata joitakin rikkinäisiä tiedostonimiä\">url-decode",
 		"frt_rst": "palauta muokatut tiedostonimet takaisin alkuperäisiksi\">↺ palauta",
@@ -2897,7 +4184,7 @@ var Ls = {
 		"fr_adv": "erä / liitännäistiedot / kaava uudelleennimeäminen\">lisäasetukset",
 		"fr_case": "isot ja pienet kirjaimet erottava regex\">kirjainkoko",
 		"fr_win": "windows-yhteensopivat nimet; korvaa <code>&lt;&gt;:&quot;\\|?*</code> japanilaisilla leveillä merkeillä\">win",
-		"fr_slash": "korvaa <code>/</code> merkillä joka ei aiheuta uusien kansioiden luomista\">ei /",
+		"fr_slash": "korvaa <code>/</code> merkillä joka ei aiheuta uusien hakemistoiden luomista\">ei /",
 		"fr_re": "regex hakukuvio jota käytetään alkuperäisiin tiedostonimiin; kaappausryhmiin voi viitata alla olevassa muotoilukentässä kuten &lt;code&gt;(1)&lt;/code&gt; ja &lt;code&gt;(2)&lt;/code&gt; ja niin edelleen",
 		"fr_fmt": "foobar2000 innoittama:$N&lt;code&gt;(title)&lt;/code&gt; korvataan kappaleen nimellä,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; sivuuttaa [tämän] osan jos artisti on tyhjä$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; ",
 		"fr_pdel": "poista",
@@ -2925,7 +4212,7 @@ var Ls = {
 		"fcc_warn": 'kopioitiin {0} kohdetta leikepöydälle\n\nmutta: vain <b>tämä</b> selain-välilehti voi liittää ne\n(koska valinta on niin valtavan suuri)',
 
 		"fp_apply": "käytä näitä nimiä",
-		"fp_ecut": "leikkaa tai kopioi ensin joitakin tiedostoja / kansioita liitettäväksi / siirrettäväksi\n\nhuom: voit leikata / liittää eri selain-välilehtien välillä",
+		"fp_ecut": "leikkaa tai kopioi ensin joitakin tiedostoja / hakemistoja liitettäväksi / siirrettäväksi\n\nhuom: voit leikata / liittää eri selain-välilehtien välillä",
 		"fp_ename": "{0} kohdetta ei voida siirtää tänne koska nimet ovat jo käytössä. Anna niille uudet nimet alla jatkaaksesi, tai tyhjennä nimi ohittaaksesi ne:",
 		"fcp_ename": "{0} kohdetta ei voida kopioida tänne koska nimet ovat jo käytössä. Anna niille uudet nimet alla jatkaaksesi, tai tyhjennä nimi ohittaaksesi ne:",
 		"fp_emore": "tiedostonimien törmäyksiä on vielä korjaamatta",
@@ -2933,6 +4220,7 @@ var Ls = {
 		"fcp_ok": "kopiointi OK",
 		"fp_busy": "siirretään {0} kohdetta...\n\n{1}",
 		"fcp_busy": "kopioidaan {0} kohdetta...\n\n{1}",
+		"fp_abrt": "keskeytetään...", //m
 		"fp_err": "siirto epäonnistui:\n",
 		"fcp_err": "kopiointi epäonnistui:\n",
 		"fp_confirm": "siirrä nämä {0} kohdetta tänne?",
@@ -2949,8 +4237,8 @@ var Ls = {
 		"tv_load": "Ladataan tekstidokumenttia:\n\n{0}\n\n{1}% ({2} / {3} Mt ladattu)",
 		"tv_xe1": "tekstitiedoston lataaminen epäonnistui:\n\nvirhe ",
 		"tv_xe2": "404, tiedostoa ei löydy",
-		"tv_lst": "tekstitiedostojen lista kansiossa",
-		"tvt_close": "palaa kansionäkymään$NPikanäppäin: M (tai Esc)\">❌ sulje",
+		"tv_lst": "tekstitiedostojen lista hakemistossa",
+		"tvt_close": "palaa hakemistonäkymään$NPikanäppäin: M (tai Esc)\">❌ sulje",
 		"tvt_dl": "lataa tämä tiedosto$NPikanäppäin: Y\">💾 lataa",
 		"tvt_prev": "näytä edellinen dokumentti$NPikanäppäin: i\">⬆ edell",
 		"tvt_next": "näytä seuraava dokumentti$NPikanäppäin: K\">⬇ seur",
@@ -2967,8 +4255,8 @@ var Ls = {
 		"m3u_clip": "m3u soittolista nyt kopioitu leikepöydälle\n\nsinun tulisi luoda uusi tekstitiedosto nimeltä jotain.m3u ja liittää soittolista siihen dokumenttiin; tämä tekee siitä soitettavan",
 
 		"gt_vau": "älä näytä videoita, toista vain ääni\">🎧",
-		"gt_msel": "ota käyttöön tiedostojen valinta; ctrl-klikkaa tiedostoa ohittaaksesi$N$N&lt;em&gt;kun aktiivinen: tuplaklikkaa tiedostoa / kansiota avataksesi sen&lt;/em&gt;$N$NPikanäppäin: S\">monivalinta",
-		"gt_crop": "keskitä-rajaa pienoiskuvat\">rajaa",
+		"gt_msel": "aktivoi tiedostonvalintatila; ctrl-klikkaa ohittaaksesi valitsemisen väliaikaisesti$N$N&lt;em&gt;tuplaklikkaa tiedostoa / hakemistoa avataksesi sen&lt;/em&gt;$N$NPikanäppäin: S\">valitsin",
+		"gt_crop": "rajaa pienoiskuvat keskeltä\">rajaa",
 		"gt_3x": "korkearesoluutioiset pienoiskuvat\">3x",
 		"gt_zoom": "zoomaa",
 		"gt_chop": "pilko",
@@ -3012,28 +4300,28 @@ var Ls = {
 		"xhr403": "403: Pääsy kielletty\n\nkokeile painaa F5, ehkä sinut kirjattiin ulos",
 		"xhr0": "tuntematon (todennäköisesti yhteys palvelimeen katosi, tai palvelin on pois päältä)",
 		"cf_ok": "sori siitä -- DD" + wah + "oS suojaus aktivoitui\n\nasioiden pitäisi jatkua noin 30 sekunnissa\n\njos mitään ei tapahdu, paina F5 ladataksesi sivun uudelleen",
-		"tl_xe1": "alikansioiden listaaminen epäonnistui:\n\nvirhe ",
-		"tl_xe2": "404: Kansiota ei löydy",
-		"fl_xe1": "kansion tiedostojen listaaminen epäonnistui:\n\nvirhe ",
-		"fl_xe2": "404: Kansiota ei löydy",
-		"fd_xe1": "alikansion luominen epäonnistui:\n\nvirhe ",
-		"fd_xe2": "404: Yläkansiota ei löydy",
+		"tl_xe1": "alihakemistojen listaaminen epäonnistui:\n\nvirhe ",
+		"tl_xe2": "404: hakemistoa ei löydy",
+		"fl_xe1": "hakemiston tiedostojen listaaminen epäonnistui:\n\nvirhe ",
+		"fl_xe2": "404: hakemistoa ei löydy",
+		"fd_xe1": "alihakemiston luominen epäonnistui:\n\nvirhe ",
+		"fd_xe2": "404: Ylähakemistoa ei löydy",
 		"fsm_xe1": "viestin lähettäminen epäonnistui:\n\nvirhe ",
-		"fsm_xe2": "404: Yläkansiota ei löydy",
+		"fsm_xe2": "404: Ylähakemistoa ei löydy",
 		"fu_xe1": "unpost-listan lataaminen palvelimelta epäonnistui:\n\nvirhe ",
 		"fu_xe2": "404: Tiedostoa ei löydy??",
 
 		"fz_tar": "pakkaamaton gnu-tar tiedosto (linux / mac)",
 		"fz_pax": "pakkaamaton pax-formaatin tar (hitaampi)",
-		"fz_targz": "gnu-tar gzip tason 3 pakkauksella$N$NTämä on yleensä hyvin hidasta, $Nkäytä pakkamatonta tar:ia sen sijaan",
-		"fz_tarxz": "gnu-tar xz tason 1 pakkauksella$N$NTämä on yleensä hyvin hidasta, $Nkäytä pakkamatonta tar:ia sen sijaan",
+		"fz_targz": "gnu-tar gzip tason 3 pakkauksella$N$Nyleensä hyvin hidas, $Nkäytä pakkamatonta tar:ia tämän sijasta",
+		"fz_tarxz": "gnu-tar xz tason 1 pakkauksella$N$Nyleensä hyvin hidas, $Nkäytä pakkamatonta tar:ia tämän sijasta",
 		"fz_zip8": "zip utf8-tiedostonimillä (suattaapi olla epävakaa windows 7:ssa ja vanhemmissa)",
 		"fz_zipd": "zip perinteisillä cp437 tiedostonimillä esihistoriallisille ohjelmistoille",
 		"fz_zipc": "cp437, jossa crc32 laskettu aikaisin,$NMS-DOS PKZIP v2.04g:lle (lokakuu 1993)$N(kestää kauemmin käsitellä ennen latauksen alkua)",
 
-		"un_m1": "voit poistaa viimeaikaiset latauksesi (tai keskeyttää keskeneräiset) alla",
+		"un_m1": "voit poistaa tuoreet tai keskeyttää keskeneräiset latauksesi alta",
 		"un_upd": "päivitä",
-		"un_m4": "tai jaa alla näkyvät tiedostot:",
+		"un_m4": "tai jakaa alla näkyvät tiedostot:",
 		"un_ulist": "näytä",
 		"un_ucopy": "kopioi",
 		"un_flt": "valinnainen suodatin:&nbsp; URL:n täytyy sisältää",
@@ -3041,8 +4329,8 @@ var Ls = {
 		"un_derr": 'unpost-poisto epäonnistui:\n',
 		"un_f5": 'jotain hajosi, kokeile päivitystä tai paina F5',
 		"un_uf5": "pahoittelen mutta sinun täytyy päivittää sivu (esimerkiksi painamalla F5 tai CTRL-R) ennen kuin tämä lataus voidaan keskeyttää",
-		"un_nou": '<b>varoitus:</b> palvelin liian kiireinen näyttääkseen keskeneräiset lataukset; klikkaa "päivitä" linkkiä hetken kuluttua',
-		"un_noc": '<b>varoitus:</b> täysin ladattujen tiedostojen unpost ei ole käytössä/sallittu palvelimen asetuksissa',
+		"un_nou": '<b>huom!</b> palvelin liian kiireinen näyttääkseen keskeneräiset lataukset; klikkaa "päivitä" linkkiä hetken kuluttua',
+		"un_noc": '<b>huom!</b> täysin ladattujen tiedostojen unpost ei ole käytössä/sallittu palvelimen asetuksissa',
 		"un_max": "näytetään ensimmäiset 2000 tiedostoa (käytä suodatinta)",
 		"un_avail": "{0} viimeaikaista latausta voidaan poistaa<br />{1} keskeneräistä voidaan keskeyttää",
 		"un_m2": "järjestetty latausajan mukaan; viimeisimmät ensin:",
@@ -3069,15 +4357,15 @@ var Ls = {
 		"u_gotpot": 'vaihdetaan peruna UI:hin paremman latausnopeuden vuoksi,\n\ntee miten lystäät, jos ei kelpaa!',
 		"u_pott": "<p>tiedostot: &nbsp; <b>{0}</b> valmis, &nbsp; <b>{1}</b> epäonnistui, &nbsp; <b>{2}</b> kiireinen, &nbsp; <b>{3}</b> jonossa</p>",
 		"u_ever": "tämä on peruslatain; up2k tarvitsee vähintään<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
-		"u_su2k": 'tämä on peruslatain; <a href="#" id="u2yea">up2k</a> on parempi',
-		"u_uput": 'optimoi nopeuteen (ohita tarkistussumma)',
-		"u_ewrite": 'sinulla ei ole move-oikeutta tähän kansioon',
-		"u_eread": 'sinulla ei ole read-oikeutta tähän kansioon',
+		"u_su2k": 'peruslatain; <a href="#" id="u2yea">up2k</a> on parempi',
+		"u_uput": 'optimoi latausnopeus (älä laske tarkistussummia)',
+		"u_ewrite": 'sinulla ei ole move-oikeutta tähän hakemistoon',
+		"u_eread": 'sinulla ei ole read-oikeutta tähän hakemistoon',
 		"u_enoi": 'tiedostohaku ei ole käytössä palvelimen asetuksissa',
 		"u_enoow": "ylikirjoitus ei toimi täällä; tarvitaan “Delete”-oikeus",
 		"u_badf": 'Nämä {0} tiedostoa ({1} yhteensä) ohitettiin, mahdollisesti tiedostojärjestelmän oikeuksien vuoksi:\n\n',
 		"u_blankf": 'Nämä {0} tiedostoa ({1} yhteensä) ovat tyhjiä; ladataanko ne silti?\n\n',
-		"u_applef": 'Nämä {0} tiedostoa ({1} yhteensä) ovat todennäköisesti ei-toivottuja;\nPaina <code>OK/Enter</code> OHITTAAKSESI seuraavat tiedostot,\nPaina <code>Cancel/ESC</code> jos ET halua sulkea pois, ja LATAA nekin:\n\n',
+		"u_applef": 'Nämä {0} tiedostoa ({1} yhteensä) ovat todennäköisesti ei-toivottuja;\nPaina <code>OK/Enter</code> OHITTAAKSESI seuraavat tiedostot,\nPaina <code>Peruuta/ESC</code> jos ET halua sulkea pois, ja LATAA nekin:\n\n',
 		"u_just1": '\nEhkä toimii paremmin jos valitset vain yhden tiedoston',
 		"u_ff_many": "jos käytät <b>Linux / MacOS / Android,</b> niin tämä määrä tiedostoja <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>saattaa</em> kaataa Firefoxin!</a>\njos niin käy, kokeile uudelleen (tai käytä Chromea).",
 		"u_up_life": "Tämä lataus poistetaan palvelimelta\n{0} sen valmistumisen jälkeen",
@@ -3119,15 +4407,15 @@ var Ls = {
 		"u_turbo_g": "poistetaan turbo käytöstä koska sinulla ei ole\nhakemistolistausoikeuksia tässä asemassa",
 		"u_life_cfg": 'automaattinen poisto <input id="lifem" p="60" /> min kuluttua (tai <input id="lifeh" p="3600" /> tuntia)',
 		"u_life_est": 'lataus poistetaan <span id="lifew" tt="paikallinen aika">---</span>',
-		"u_life_max": 'tämä kansio pakottaa\nmaksimi elinajan {0}',
+		"u_life_max": 'tämä hakemisto pakottaa\nmaksimi elinajan {0}',
 		"u_unp_ok": 'unpost on sallittu {0}',
 		"u_unp_ng": 'unpost EI ole sallittu',
-		"ue_ro": 'sinulla on vain read-oikeus tähän kansioon\n\n',
+		"ue_ro": 'sinulla on vain read-oikeus tähän hakemistoon\n\n',
 		"ue_nl": 'et ole tällä hetkellä kirjautunut sisään',
 		"ue_la": 'olet tällä hetkellä kirjautunut sisään nimellä "{0}"',
 		"ue_sr": 'olet tällä hetkellä tiedostohaku-tilassa\n\nvaihda lataus-tilaan klikkaamalla suurennuslasia 🔎 (suuren HAKU napin vieressä), ja yritä latausta uudelleen\n\npahoittelen',
 		"ue_ta": 'yritä latausta uudelleen, sen pitäisi toimia nyt',
-		"ue_ab": "tätä tiedostoa ladataan jo toiseen kansioon, ja se lataus täytyy suorittaa loppuun ennen kuin tiedostoa voidaan ladata muualle.\n\nVoit keskeyttää ja unohtaa alkuperäisen latauksen käyttämällä vasemmalla ylhäällä olevaa 🧯",
+		"ue_ab": "tätä tiedostoa ladataan jo toiseen hakemistoon, ja se lataus täytyy suorittaa loppuun ennen kuin tiedostoa voidaan ladata muualle.\n\nVoit keskeyttää ja unohtaa alkuperäisen latauksen käyttämällä vasemmalla ylhäällä olevaa 🧯",
 		"ur_1uo": "OK: Tiedosto ladattu onnistuneesti",
 		"ur_auo": "OK: Kaikki {0} tiedostoa ladattu onnistuneesti",
 		"ur_1so": "OK: Tiedosto löytyi palvelimelta",
@@ -3139,7 +4427,5058 @@ var Ls = {
 		"ur_um": "Valmis;\n{0} latausta OK,\n{1} latausta epäonnistui, pahoittelen",
 		"ur_sm": "Valmis;\n{0} tiedostoa löytyi palvelimelta,\n{1} tiedostoa EI löytynyt palvelimelta",
 
-		"lang_set": "päivitetäänkö sivu muutoksen voimaansaattamiseksi?",
+		"lang_set": "ladataanko sivu uudestaan kielen vaihtamiseksi?",
+	},
+	"fra": {
+		"tt": "français",
+
+		"cols": {
+			"c": "bouton d'action",
+			"dur": "durée",
+			"q": "qualité / débit binaire",
+			"Ac": "codec audio",
+			"Vc": "codec vidéo",
+			"Fmt": "format / conteneur",
+			"Ahash": "somme de contrôle audio",
+			"Vhash": "somme de contrôle vidéo",
+			"Res": "résolution",
+			"T": "type de fichier",
+			"aq": "qualité audio / débit binaire",
+			"vq": "qualité vidéo / débit binaire",
+			"pixfmt": "sous-échantillonnage / structure de pixel",
+			"resw": "résolution horizontale",
+			"resh": "résolution verticale",
+			"chs": "canaux audio",
+			"hz": "fréquence"
+		},
+
+		"hks": [
+			[
+				"misc",
+				["Échap", "ferme divers menus"],
+
+				"gestionaire de fichiers",
+				["G", "activer vue en liste / vue en grille"],
+				["T", "activer les miniatures / icônes"],
+				["⇧ A/D", "taille des miniatures"],
+				["ctrl-K", "suprimer la sélection"],
+				["ctrl-X", "couper la sélection au presse-papier"],
+				["ctrl-C", "copier la sélection au presse-papier"],
+				["ctrl-V", "coller (déplacer/copier) ici"],
+				["Y", "télécharger la sélection"],
+				["F2", "renomer la sélection"],
+
+				"file-list-sel",
+				["Espace", "activer la sélection de fichiers"],
+				["↑/↓", "déplacer le selecteur"],
+				["ctrl ↑/↓", "déplacer le curseur et la zone d'affichage"],
+				["⇧ ↑/↓", "sélectioner le fichier précédent/suivant"],
+				["ctrl-A", "sélectionner tout les fichiers / dossiers"],
+			], [
+				"navigation",
+				["B", "basculer la vue en fil d'Ariane / panneau de navigation"],
+				["I/K", "dossier précédent/suivant"],
+				["M", "dossier parent (ou réduire le dossier actuel)"],
+				["V", "activer les dossiers / fichiers texte dans le volet de navigation"],
+				["A/D", "taille du volet de navigation"],
+			], [
+				"lecteur-audio",
+				["J/L", "chanson précédente/suivante"],
+				["U/O", "sauter 10s en arrière/avant"],
+				["0..9", "sauter à 0%..90%"],
+				["P", "lecture/pause (démarre également la lecture)"],
+				["S", "sélectionner la chanson en cours"],
+				["Y", "télécharger le morceau"],
+			], [
+				"visionneuse d'image",
+				["J/L, ←/→", "image précédente/suivante"],
+				["Début/Fin, ⭦/Fin", "première/dernière image"],
+				["F", "plein écran"],
+				["R", "rotation horaire"],
+				["⇧ R", "rotation antihoraire"],
+				["S", "sélectionner l'image"],
+				["Y", "télécharger l'image"],
+			], [
+				"lecteur vidéo",
+				["U/O", "sauter 10s en arrière/avant"],
+				["P/K/Espace", "lecture/pause"],
+				["C", "continuer de lire la suivante"],
+				["V", "lire en boucle"],
+				["M", "couper le son"],
+				["[ and ]", "définir l'intervalle de boucle"],
+			], [
+				"visionneuse de texte",
+				["I/K", "fichier précédent/suivant"],
+				["M", "fermer le fichier texte"],
+				["E", "modifier le fichier texte"],
+				["S", "sélectioner le fichier (pour le couper/copier/renommer)"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Annuler",
+
+		"enable": "Activer",
+		"danger": "DANGER",
+		"clipped": "copié dans le presse-papier",
+
+		"ht_s1": "seconde",
+		"ht_s2": "secondes",
+		"ht_m1": "minute",
+		"ht_m2": "minutes",
+		"ht_h1": "heure",
+		"ht_h2": "heures",
+		"ht_d1": "jour",
+		"ht_d2": "jours",
+		"ht_and": " et ",
+
+		"goh": "panneau-de-commande",
+		"gop": 'élément "frère" précédent">précédent',
+		"gou": 'dossier parent">haut',
+		"gon": 'dossier suivant">suivant',
+		"logout": "Déconnexion ",
+		"login": "Se connecter", //m
+		"access": " accès",
+		"ot_close": "fermer le sous-menu",
+		"ot_search": "chercher des fichiers par leurs attributs, chemin / nom, tag musicaux, ou nimporte quelle combinaison de ces options$N$N&lt;code&gt;foo bar&lt;/code&gt; = doit contenir à la fois «foo» et «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = doit contenir «foo» mais pas «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = commence par «yana» et est un fichier «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contient exactement «try unite»$N$Nle format de date est iso-8601, comme$N&lt;code&gt;2009-12-31&lt;/code&gt; ou &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: supprimer vos téléchargements récents, ou annuler ceux en cours",
+		"ot_bup": "bup: téléverseur de base, prend même en charge netscape 4.0",
+		"ot_mkdir": "mkdir: créer un nouveau répertoire",
+		"ot_md": "new-md: créer un nouveau document markdown",
+		"ot_msg": "msg: envoyer un message au journal du serveur",
+		"ot_mp": "options du lecteur multimedia",
+		"ot_cfg": "options de configuration",
+		"ot_u2i": 'up2k : téléverser des fichiers (si vous avez un accès en écriture) ou basculer en mode recherche pour voir s\'ils existent quelque part sur le serveur$N$Nles téléversements peuvent être repris, ils sont multithreadé, et les horodatages des fichiers sont préservés, mais cela utilise plus de CPU que [🎈]&nbsp; (le téléverseur de base)<br /><br />pendant les téléversements, cette icône devient un indicateur de progression!',
+		"ot_u2w": 'up2k : téléverser des fichiers avec prise en charge de la reprise (fermez votre navigateur et déposez les mêmes fichiers plus tard)$N$multithreadé, et les horodatages des fichiers sont préservés, mais cela utilise plus de CPU que [🎈]&nbsp; (le téléverseur de base)<br /><br />pendant les téléversements, cette icône devient un indicateur de progression!',
+		"ot_noie": 'Utilisez Chrome / Firefox / Edge',
+
+		"ab_mkdir": "créer un nouveau répertoire",
+		"ab_mkdoc": "faire un nouveau document markdown",
+		"ab_msg": "envoyer un message au journal du serveur",
+
+		"ay_path": "passer aux dossiers",
+		"ay_files": "passer aux fichiers",
+
+		"wt_ren": "renommer les éléments sélectionnés$NHotkey: F2",
+		"wt_del": "supprimer les éléments sélectionnés$NHotkey: ctrl-K",
+		"wt_cut": "couper les éléments sélectionnés &lt;small&gt;(puis coller ailleurs)&lt;/small&gt;$NHotkey: ctrl-X",
+		"wt_cpy": "copier les éléments sélectionnés dans le presse-papiers$N(pour les coller ailleurs)$NHotkey: ctrl-C",
+		"wt_pst": "coller une sélection précédemment coupée / copiée$NHotkey: ctrl-V",
+		"wt_selall": "sélectionner tous les fichiers$NHotkey: ctrl-A (lorsque le fichier est sélectionné)",
+		"wt_selinv": "inverser la sélection",
+		"wt_zip1": "télécharger ce dossier en tant qu'archive",
+		"wt_selzip": "télécharger la sélection en tant qu'archive",
+		"wt_seldl": "télécharger la sélection en tant que fichiers séparés$NHotkey: Y",
+		"wt_npirc": "copier les informations de la musique au format irc",
+		"wt_nptxt": "copier les informations de la musique en texte brut",
+		"wt_m3ua": "ajouter à la playlist m3u (cliquez sur <code>📻copier</code> plus tard)",
+		"wt_m3uc": "copier la playlist m3u dans le presse-papiers",
+		"wt_grid": "basculer entre la vue en grille / liste$NHotkey: G",
+		"wt_prev": "musique précédente$NHotkey: J",
+		"wt_play": "lecture / pause$NHotkey: P",
+		"wt_next": "musique suivante$NHotkey: L",
+
+		"ul_par": "téléversements parallèles:",
+		"ut_rand": "attribution de noms de fichiers aléatoires",
+		"ut_u2ts": "copier l'horodatage de dernière modification$Nde votre système de fichiers vers le serveur\">📅",
+		"ut_ow": "écraser les fichiers existants sur le serveur?$N🛡️: jamais (générera un nouveau nom de fichier à la place)$N🕒: écraser si le fichier sur le serveur est plus ancien que le vôtre$N♻️: toujours écraser si les fichiers sont différents",
+		"ut_mt": "continuer à calculer la somme de contrôle d'autres fichiers pendant le téléversement$N$Npeut-être désactiver si votre CPU ou HDD est la cause de perte de performances",
+		"ut_ask": 'demander confirmation avant le début du téléversement">💭',
+		"ut_pot": "améliorer la vitesse de téléversement sur les appareils lents$Nen simplifiant l'interface utilisateur",
+		"ut_srch": "ne pas réellement téléverser, mais vérifier si les fichiers existent déjà$N sur le serveur (scannera tous les dossiers que vous pouvez lire)",
+		"ut_par": "mettre en pause les téléversements en le réglant sur 0$N$Naugmenter si votre connexion est lente / à forte latence$N$Nle garder à 1 sur le LAN ou si le HDD du serveur est un goulot d'étranglement",
+		"ul_btn": "déposer des fichiers / dossiers<br>ici (ou cliquez sur moi)",
+		"ul_btnu": "T É L É V E R S E R",
+		"ul_btns": "C H E R C H E R",
+
+		"ul_hash": "somme de contrôle",
+		"ul_send": "envoyer",
+		"ul_done": "terminé",
+		"ul_idle1": "aucun téléversement n'est encore dans la file d'attente",
+		"ut_etah": "moyenne &lt;em&gt;hashing&lt;/em&gt; vitesse, et temps estimé jusqu'à la fin",
+		"ut_etau": "moyenne &lt;em&gt;upload&lt;/em&gt; vitesse et temps estimé jusqu'à la fin",
+		"ut_etat": "moyenne &lt;em&gt;total&lt;/em&gt; vitesse et temps estimé jusqu'à la fin",
+
+		"uct_ok": "terminé avec succès",
+		"uct_ng": "non réussi : échoué / rejeté / non trouvé",
+		"uct_done": "terminés et échoué combinés",
+		"uct_bz": "hachage ou téléversement",
+		"uct_q": "inactif, en attente",
+
+		"utl_name": "nom de fichier",
+		"utl_ulist": "liste",
+		"utl_ucopy": "copie",
+		"utl_links": "liens",
+		"utl_stat": "état",
+		"utl_prog": "progrès",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "ERREUR",
+		"utl_oserr": "OS-ERREUR",
+		"utl_found": "trouvé",
+		"utl_defer": "état",
+		"utl_yolo": "YOLO",
+		"utl_done": "terminé",
+
+		"ul_flagblk": "les fichiers ont été ajoutés à la file d'attente</b><br>cependant, il y a un processus up2k actif dans un autre onglet du navigateur,<br>en attente qu'il finisse d'abord",
+		"ul_btnlk": "la configuration du serveur a verrouillé cette options dans cet état",
+
+		"udt_up": "Téléverser",
+		"udt_srch": "Chercher",
+		"udt_drop": "déposer ici",
+
+		"u_nav_m": '<h6>aight, ques-que tu à ?</h6><code>Enter</code> = Fichiers (un ou plus)\n<code>ESC</code> = Un dossier (sous-dossiers inclus)',
+		"u_nav_b": '<a href="#" id="modal-ok">Fichiers</a><a href="#" id="modal-ng">Un dossier</a>',
+
+		"cl_opts": "options",
+		"cl_themes": "thème",
+		"cl_langs": "langue",
+		"cl_ziptype": "téléchargement de dossier",
+		"cl_uopts": "up2k",
+		"cl_favico": "favicon",
+		"cl_bigdir": "gros dossiers",
+		"cl_hsort": "#sort",
+		"cl_keytype": "notation des touches",
+		"cl_hiddenc": "colonnes masquées",
+		"cl_hidec": "masquer",
+		"cl_reset": "réinitialiser",
+		"cl_hpick": "cliquez sur les en-têtes de colonnes pour les masquer dans le tableau ci-dessous",
+		"cl_hcancel": "masquage des colonnes annulé",
+
+		"ct_grid": '田 grille',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ infobulles',
+		"ct_thumb": 'vue en grille, activer les icônes ou les miniatures$NHotkey: T">🖼️ minia',
+		"ct_csel": 'utiliser CTRL et MAJ pour selectioner des fichiers en vue en grille">sel',
+		"ct_ihop": 'quand le visionneuse d\'image est fermé, faire defiller vers le bas jusqu\'au dernier fichier">g⮯',
+		"ct_dots": 'voir les fichiers caché (si le serveur le permet)">dotfiles',
+		"ct_qdel": 'ne demander qu\'une confirmation lors de la suppression de fichiers>qdel',
+		"ct_dir1st": 'trier les dossiers avant les fichiers">📁 first',
+		"ct_nsort": 'triage par numérotation (pour les nom de fichiers qui sont numérotés)">nsort',
+		"ct_utc": 'voir tout les horodatage en format UTC">UTC',
+		"ct_readme": 'voir le fichier README.md dans le listage des dossiers">📜 readme',
+		"ct_idxh": 'voir une version html (index.html) au-lieu du listage des dossiers normal">htm',
+		"ct_sbars": 'montrer la barre de defilement">⟊',
+
+		"cut_umod": "si un fichier existe déjà sur le server, mettre à jour l'horodatage de dernière modification du serveur pour qu'il corresponde à votre fichier local (nécessite des autorisations d'écriture et de suppression)\">re📅",
+
+		"cut_turbo": "le bouton yolo, vous ne voulez probablement PAS activer ceci:$N$Nutilisez ceci si vous téléchargez une grande quantité de fichiers et que vous devez redémarrer pour une raison quelconque, et que vous souhaitez continuer le téléchargement dès que possible$N$Ncela remplace la vérification de hachage par une simple <em>&quot;est-ce que cela a la même taille de fichier sur le serveur?&quot;</em> donc si le contenu du fichier est différent, il ne sera PAS téléchargé$N$Nvous devriez désactiver cela lorsque le téléchargement est terminé, puis &quot;télécharger&quot; les mêmes fichiers à nouveau pour laisser le client les vérifier\">turbo",
+
+		"cut_datechk": "n'a aucun effet à moins que le bouton turbo ne soit activé$N$Nréduit le facteur yolo d'un tout petit peu ; vérifie si les horodatages des fichiers sur le serveur correspondent aux vôtres$N$Ndevrait <em>théoriquement</em> attraper la plupart des téléchargements inachevés / corrompus, mais n'est pas un substitut à un passage de vérification avec turbo désactivé par la suite\">date-chk",
+
+		"cut_u2sz": "taille (en MiB) de chaque morceau de téléversement; des grosse valeurs vont mieux passer si la distance entre le serveur et vous est trés grande. Si vous avez une connection trés instable, essayer de plus petites valeurs",
+
+		"cut_flag": "s'assurer qu'un seul onglet est entrain de mettre un fichier en ligne a la fois $N -- les autres onglets doivent avoir cette option activé aussi $N -- affecte seulement les onglets qui sont sur le même domaine",
+
+		"cut_az": "mettre en ligne les fichiers dans l'ordre alphabétique, plutôt que le plus petit fichier en premier$N$Nl'ordre alphabétique peut rendre la lecture plus douce sur pour les yeux si quelque chose s'est mal passé sur le serveur, mais cela rend le téléversement légèrement plus lent sur fibre / LAN",
+
+		"cut_nag": "recevoir une notification via l'OS quand un téléversement finit$N(seulement si le navigateur ou l'onglet n'est pas actif)",
+		"cut_sfx": "alerte audible quand le téléversement finit$N(seulement si le navigateur ou l'onglet n'est pas actif)",
+
+		"cut_mt": "utiliser le calcul de somme de contrôle multithreadé pour accelerer le processus$N$Ncela utilise des web-workers et nécessite$Nplus de RAM (jusqu'à 512 MiB supplémentaires)$N$NCela rend https 30% plus rapide, http 4.5x plus rapide\">mt",
+
+		"cut_wasm": "utiliser wasm au lieu du hachage intégré du navigateur; améliore la vitesse sur les navigateurs basés sur chrome mais augmente la charge CPU, et de nombreuses anciennes versions de chrome ont des bugs qui font que le navigateur consomme toute la RAM et plante si cela est activé\">wasm",
+
+		"cft_text": "text favicon (laisser vide et rafraîchir pour désactiver)",
+		"cft_fg": "couleur de premier plan",
+		"cft_bg": "couleur d'arrière-plan",
+
+		"cdt_lim": "nombre maximum de fichiers à afficher dans un dossier",
+		"cdt_ask": "lorsque vous faites défiler vers le bas,$Nau lieu de charger plus de fichiers,$Ndemander quoi faire",
+		"cdt_hsort": "combien de règles de tri (&lt;code&gt;,sorthref&lt;/code&gt;) à inclure dans les media-URLs. Définir cette valeur à 0 ignorera également les règles de tri incluses dans les liens média lorsque vous cliquez dessus.",
+
+		"tt_entree": "afficher le panneau de navigation (arborescence des dossiers)$NHotkey: B",
+		"tt_detree": "afficher le fil d’Ariane$NHotkey: B",
+		"tt_visdir": "faire défiler jusqu'au dossier sélectionné",
+		"tt_ftree": "basculer l'arborescence des dossiers / fichiers texte$NHotkey: V",
+		"tt_pdock": "afficher les dossiers parents dans un panneau ancré en haut",
+		"tt_dynt": "croissance automatique à mesure que l'arborescence s'étend",
+		"tt_wrap": "retour à la ligne",
+		"tt_hover": "révéler les lignes débordantes au survol$N( interrompt le défilement à moins que le curseur de la souris ne soit dans la gouttière gauche )",
+
+		"ml_pmode": "à la fin du dossier…",
+		"ml_btns": "cmds",
+		"ml_tcode": "transcoder",
+		"ml_tcode2": "transcoder vers",
+		"ml_tint": "teinte",
+		"ml_eq": "égaliseur audio",
+		"ml_drc": "compresseur de plage dynamique",
+
+		"mt_loop": "répéter en boucle une musique\">🔁",
+		"mt_one": "stopper après une musique\">1️⃣",
+		"mt_shuf": "mélanger les musiques dans chaque dossiers\">🔀",
+		"mt_aplay": "jouer automatiquement si le lien utilisé pour accéder au serveur a un song-ID $N$N, désactiver cela arrêtera également la mise à jour de l'URL de la page avec les song-IDs lors de la lecture de la musique, pour éviter la lecture automatique si ces paramètres sont perdus mais que l'URL reste\">a▶",
+		"mt_preload": "commencer à charger la prochaine chanson près de la fin pour une lecture sans interruption\">preload",
+		"mt_prescan": "explorer le dossier suivant avant la dernière musique$Nne finisse, pour garder le navigateur content$Npour qu'il n'arrête pas la lecture\">nav",
+		"mt_fullpre": "essayer de pré-charger la musique entière;$N✅ activer en cas de connection instable,$N❌ désactiver en revanche sur une connection lente va probablement être mieux\">full",
+		"mt_fau": "sur téléphone, empêche la musique de s'arrêter de jouer si la prochaine n'est pas pré-chargée assez rapidement (peut rendre l'affichage des tags buggé)\">☕️",
+		"mt_waves": "barre de progression en spectrograme:$Nmontrer l'amplitude audio dans la miniature\">~s",
+		"mt_npclip": "montrer les boutons pour copier le morceau en cours de lecture\">/np",
+		"mt_m3u_c": "montrer les boutons pour copier les$morceaux sélectionnées en tant qu'entrées de playlist m3u8\">📻",
+		"mt_octl": "intégration os (touches de raccourci multimédia / osd)\">os-ctl",
+		"mt_oseek": "permettre la recherche via l'intégration os$N$Nremarque : sur certains appareils (iPhones),$Ncela remplace le bouton de la chanson suivante\">seek",
+		"mt_oscv": "montrer la couverture de l'album dans l'osd\">art",
+		"mt_follow": "garder la piste en cours défilée dans la vue\">🎯",
+		"mt_compact": "contrôles compacts\">⟎",
+		"mt_uncache": "effacer le cache &nbsp;(essayez ceci si votre navigateur a mis en cache$Nun copie défectueuse d'une chanson, ce qui empêche sa lecture)\">uncache",
+		"mt_mloop": "lire en boucle le dossier ouvert\">🔁 loop",
+		"mt_mnext": "charger le dossier suivant et continuer\">📂 next",
+		"mt_mstop": "arrêter la lecture\">⏸ stop",
+		"mt_cflac": "convertir flac / wav en {0}\">flac",
+		"mt_caac": "convertir aac / m4a en {0}\">aac",
+		"mt_coth": "convertir tout les autres (pas mp3) en {0}\">oth",
+		"mt_c2opus": "meilleur choix pour PC fixe, PC portable, android\">opus",
+		"mt_c2owa": "opus-weba, pour iOS 17.5 et supérieur\">owa",
+		"mt_c2caf": "opus-caf, pour iOS 11 à 17\">caf",
+		"mt_c2mp3": "utilisez ceci sur des appareils très anciens\">mp3",
+		"mt_c2flac": "meilleure qualité sonore, mais téléchargements énormes\">flac",
+		"mt_c2wav": "lecture non compressée (encore plus gros)\">wav",
+		"mt_c2ok": "bien, bon choix",
+		"mt_c2nd": "ce n'est pas le format de sortie recommandé pour votre appareil, mais ça devrait aller",
+		"mt_c2ng": "votre appareil ne semble pas prendre en charge ce format de sortie, mais essayons quand même",
+		"mt_xowa": "il y a des bugs dans iOS qui empeche d'avoir une lecture en ariere plan en utilisant ce format; utilisez caf ou mp3 à la place",
+		"mt_tint": "niveau d’arrière-plan (0–100) de la barre de progression$Npour rendre la mise en mémoire tampon moins gênante",
+		"mt_eq": "active l'égaliseur et le contrôle de gain;$N$Nboost &lt;code&gt;0&lt;/code&gt; = volume standard 100% (non modifié)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = stéréo standard (non modifié)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% de crossfeed gauche-droite$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = suppression vocale :^)$N$Nl'activation de l'égaliseur rend les albums gapless entièrement gapless, alors laissez-le activé avec toutes les valeurs à zéro (sauf largeur = 1) si vous vous en souciez",
+		"mt_drc": "active le compresseur de plage dynamique (aplanisseur de volume / brickwaller); activera également l'EQ pour équilibrer les choses, donc définissez tous les champs EQ sauf 'width' sur 0 si vous ne le voulez pas$N$Ndiminue le volume de l'audio au-dessus de THRESHOLD dB; pour chaque RATIO dB au-delà de THRESHOLD, il y a 1 dB de sortie, donc des valeurs par défaut de tresh -24 et ratio 12 signifient qu'il ne devrait jamais être plus fort que -22 dB et qu'il est sûr d'augmenter le boost de l'égaliseur à 0.8, ou même 1.8 avec ATK 0 et un énorme RLS comme 90 (ne fonctionne que dans firefox; RLS est max 1 dans les autres navigateurs)$N$N(voir wikipedia, ils expliquent cela beaucoup mieux)",
+
+		"mb_play": "lecture",
+		"mm_hashplay": "lire ce fichier audio ?",
+		"mm_m3u": "appuyez sur <code>Entrée/OK</code> pour lire\nappuyez sur <code>Échap/Annuler</code> pour modifier",
+		"mp_breq": "nécessite firefox 82+ ou chrome 73+ ou iOS 15+",
+		"mm_bload": "chargement en cours…",
+		"mm_bconv": "conversion en {0}, veuillez patienter…",
+		"mm_opusen": "votre navigateur ne peut pas lire les fichiers aac / m4a ;\nle transcodage en opus est maintenant activé",
+		"mm_playerr": "échec de la lecture : ",
+		"mm_eabrt": "La tentative de lecture a été annulée",
+		"mm_enet": "Votre connexion internet est instable ou inexistante",
+		"mm_edec": "Ce fichier est supposément corrompu??",
+		"mm_esupp": "Votre navigateur ne comprend pas ce format audio",
+		"mm_eunk": "Erreur inconnue",
+		"mm_e404": "Impossible de lire l'audio ; erreur 404 : fichier introuvable.",
+		"mm_e403": "Impossible de lire l'audio ; erreur 403 : accès refusé.\n\nEssayez d'appuyer sur F5 pour recharger, peut-être que vous avez été déconnecté",
+		"mm_e500": "Impossible de lire l'audio ; erreur 500 : vérifiez les journaux du serveur.",
+		"mm_e5xx": "Impossible de lire l'audio ; erreur serveur ",
+		"mm_nof": "Pas d'autres fichiers audio trouvés par ici",
+		"mm_prescan": "En recherche d'une autre musique à lire…",
+		"mm_scank": "Prochaine musique trouvée :",
+		"mm_uncache": "cache vidé ; toutes les chansons seront retéléchargées lors de la prochaine lecture",
+		"mm_hnf": "cette chanson n'existe plus",
+
+		"im_hnf": "cette image n'existe plus",
+
+		"f_empty": 'ce dossier est vide',
+		"f_chide": 'ceci va cacher les colonnes «{0}»\n\ntu peut les réafficher dans les options',
+		"f_bigtxt": "ce fichier fait {0} MiB -- tu veut vraiment le voir en tant que texte ?",
+		"f_bigtxt2": "voir seulement la fin du fichier à la place ? ceci activera aussi le suivi en temps réel, affichant les nouvelles lignes de texte au fur et à mesure",
+		"fbd_more": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_more">show {2}</a> or <a href="#" id="bd_all">show all</a></div>',
+		"fbd_all": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_all">show all</a></div>',
+		"f_anota": "seulement {0} des {1} elements sont selectioné;\npour selectioner le dossier entier, fait défiler jusqu'au fond",
+
+		"f_dls": 'le lien de fichier dans le répertoire actuel\nà été changé en lien de téléchargement',
+
+		"f_partial": "Pour télécharger de façon sécurisée un fichier qui est entrain de se faire téléverser, cliquez sur le fichier qui a le même nom, mais sans l'extension de fichier <code>.PARTIAL</code>. Choisissez ANNULER ou appuiez sur la touche Échap pour faire cela.\n\nAppuyer sur OK / Entrée ignorera cet avertissement et continuera à télécharger le fichier temporaire <code>.PARTIAL</code> à la place, ce qui donnera presque certainement des données corrompues.",
+
+		"ft_paste": "coller {0} éléments$NHotkey: ctrl-V",
+		"fr_eperm": 'impossible de renommer:\n vous n\'avez pas la permission “move” dans ce dossier',
+		"fd_eperm": 'impossible de supprimer:\nvous n\'avez pas la permission “delete” dans ce dossier',
+		"fc_eperm": 'impossible de couper:\nvous n\'avez pas la permission “move” dans ce dossier',
+		"fp_eperm": 'impossible de coller:\nvous n\'avez pas la permission “write” dans ce dossier',
+		"fr_emore": "sélectionnez au moins un élément à renommer",
+		"fd_emore": "sélectionnez au moins un élément à supprimer",
+		"fc_emore": "sélectionnez au moins un élément à couper",
+		"fcp_emore": "sélectionnez au moins un élément à copier dans le presse-papiers",
+
+		"fs_sc": "partager le dossier dans lequel vous vous trouvez",
+		"fs_ss": "partager les fichiers sélectionnés",
+		"fs_just1d": "vous ne pouvez pas sélectionner plus d'un dossier,\nou mélanger des fichiers et des dossiers dans une seule sélection",
+		"fs_abrt": "❌ abandonner",
+		"fs_rand": "🎲 nom.aleatoire",
+		"fs_go": "✅ créer partage",
+		"fs_name": "nom",
+		"fs_src": "source",
+		"fs_pwd": "mdp",
+		"fs_exp": "expiration",
+		"fs_tmin": "min",
+		"fs_thrs": "heures",
+		"fs_tdays": "jours",
+		"fs_never": "éternel",
+		"fs_pname": "nom de lien optionnel ; sera aléatoire si vide",
+		"fs_tsrc": "le fichier ou le dossier à partager",
+		"fs_ppwd": "mot de passe optionnel",
+		"fs_w8": "création du partage…",
+		"fs_ok": "appuyez sur <code>Entrée/OK</code> pour le Presse-papiers\nappuyez sur <code>Échap/Annuler</code> pour fermer",
+
+		"frt_dec": "peut potentiellement réparer certaines instances de noms de fichiers cassés\">url-decode",
+		"frt_rst": "réinitialiser les noms de fichiers modifiés à leurs originaux\">↺ reset",
+		"frt_abrt": "abandonner et fermer cette fenêtre\">❌ cancel",
+		"frb_apply": "APPLIQUER RENOMMER",
+		"fr_adv": "renommage par lot / métadonnées / motif\">advanced",
+		"fr_case": "regex sensible à la casse\">case",
+		"fr_win": "noms windows-safe; remplacer <code>&lt;&gt;:&quot;\\|?*</code> par des caractères japonais en pleine largeur\">win",
+		"fr_slash": "remplacer <code>/</code> par un caractère qui ne provoque pas la création de nouveaux dossiers\">no /",
+		"fr_re": "modèle de recherche regex à appliquer aux noms de fichiers originaux ; les groupes capturés peuvent être référencés dans le champ de format ci-dessous comme &lt;code&gt;(1)&lt;/code&gt; et &lt;code&gt;(2)&lt;/code&gt; et ainsi de suite",
+		"fr_fmt": "inspiré par foobar2000 : $N&lt;code&gt;(title)&lt;/code&gt; est remplacé par le titre de la chanson, $N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; saute [cette] partie si l'artiste est vide, $N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; remplit le numéro de piste à 2 chiffres",
+		"fr_pdel": "supprimer",
+		"fr_pnew": "enregistrer sous",
+		"fr_pname": "donnez un nom pour le nouveau preset",
+		"fr_aborted": "abandonné",
+		"fr_lold": "ancien nom",
+		"fr_lnew": "nouveau nom",
+		"fr_tags": "tags pour les fichier selectioné (lecture-seule, juste pour référence):",
+		"fr_busy": "renomage de {0} items…\n\n{1}",
+		"fr_efail": "renomage a échoué:\n",
+		"fr_nchg": "{0} des nouveaux noms ont été modifiés en raison de <code>win</code> et/ou <code>no /</code>\n\nOK pour continuer avec ces nouveaux noms modifiés ?",
+
+		"fd_ok": "suppression réussie",
+		"fd_err": "impossible de supprimer:\n",
+		"fd_none": "rien n'a été supprimé ; peut-être bloqué par la configuration du serveur (xbd) ?",
+		"fd_busy": "suppression de {0} éléments…\n\n{1}",
+		"fd_warn1": "SUPPRIMER ces {0} éléments ?",
+		"fd_warn2": "<b>Dernière chance !</b> Impossible de revenir en arrière. Supprimer ?",
+
+		"fc_ok": "couper {0} éléments",
+		"fc_warn": 'couper {0} éléments\n\nmais : seul <b>cet</b> onglets peut les coller\n(puisque la sélection est si absolument massive)',
+
+		"fcc_ok": "copié {0} éléments dans le presse-papiers",
+		"fcc_warn": 'copié {0} éléments dans le presse-papiers\n\nmais : seul <b>cet</b> onglet peut les coller\n(puisque la sélection est si absolument massive)',
+
+		"fp_apply": "utiliser ces noms",
+		"fp_ecut": "en premier, coupez ou copiez quelques fichiers / dossiers à coller / déplacer\n\nnote: vous pouvez couper / coller a travers different onglets",
+		"fp_ename": "{0} éléments ne peuvent pas être déplacés ici parceque leurs noms sont déjà pris. Donnez leurs un nouveau nom ci-dessous pour continuer, ou laissez les vides pour les sauter:",
+		"fcp_ename": "{0} éléments ne peuvent pas être copiés ici parce que les noms sont déjà pris. Donnez-leur un nouveau nom ci-dessous pour continuer, ou laissez-les vides pour les sauter :",
+		"fp_emore": "il reste encore des collisions de noms de fichiers à corriger",
+		"fp_ok": "déplacement OK",
+		"fcp_ok": "copie OK",
+		"fp_busy": "déplacement de {0} éléments…\n\n{1}",
+		"fcp_busy": "copie de {0} éléments…\n\n{1}",
+		"fp_abrt": "abandon en cours...", //m
+		"fp_err": "deplacement échoué:\n",
+		"fcp_err": "copie échouée:\n",
+		"fp_confirm": "déplacer ces {0} éléments ici ?",
+		"fcp_confirm": "copier ces {0} éléments ici ?",
+		"fp_etab": 'lecture du presse-papier venant d\'un autre onglet échoué',
+		"fp_name": "téléversement d'un fichier de votre apareil. Donnez lui un nom:",
+		"fp_both_m": '<h6>choisisez ce qu\'il faut coller</h6><code>Entrer</code> = Déplacer {0} fichiers de «{1}»\n<code>ESC</code> = Téléverser {2} fichiers de votre appareil',
+		"fcp_both_m": '<h6>choisissez ce qu\'il faut coller</h6><code>Entrer</code> = Copier {0} fichiers de «{1}»\n<code>ESC</code> = Téléverser {2} fichiers de votre appareil',
+		"fp_both_b": '<a href="#" id="modal-ok">Déplacer</a><a href="#" id="modal-ng">Téléverser</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Copier</a><a href="#" id="modal-ng">Téléverser</a>',
+
+		"mk_noname": "entrez un nom dans le champ de texte à gauche avant de faire ça :p",
+
+		"tv_load": "Chargement du document texte:\n\n{0}\n\n{1}% ({2} de {3} MiB chargés)",
+		"tv_xe1": "impossible de charger le fichier texte:\n\nerreur",
+		"tv_xe2": "404, fichier introuvable",
+		"tv_lst": "liste des fichiers texte dans",
+		"tvt_close": "retour a la vue de dossier$NHotkey: M (ou Échap)\">❌ fermer",
+		"tvt_dl": "télécharger ce fichier$NHotkey: Y\">💾 télécharger",
+		"tvt_prev": "montrer le document précédent$NHotkey: i\">⬆ précédent",
+		"tvt_next": "montrer le document suivant$NHotkey: K\">⬇ suivant",
+		"tvt_sel": "sélectionner le fichier &nbsp; ( pour couper / copier / supprimer / … )$NHotkey: S\">sel",
+		"tvt_edit": "ouvrir le fichier dans l'éditeur de texte$NHotkey: E\">✏️ modifier",
+		"tvt_tail": "surveiller le fichier pour les changements; montrer les nouvelles lignes en temps réel\">📡 suivre",
+		"tvt_wrap": "retour à la ligne\">↵",
+		"tvt_atail": "ancrer le défilement au fond de la page\">⚓",
+		"tvt_ctail": "décoder les couleurs du terminal (ansi escape codes)\">🌈",
+		"tvt_ntail": "limite de défilement en arrière (combien d'octets de texte à garder chargé)",
+
+		"m3u_add1": "musique ajoutée à la playlist m3u",
+		"m3u_addn": "{0} musiques ajoutées à la playlist m3u",
+		"m3u_clip": "la playlist m3u est maintenant copiée dans le presse-papier\n\nvous devriez créer un nouveau fichier texte nommé par exemple playlist.m3u et coller la playlist dans ce fichier ; cela la rendra lisible en tant que playlist",
+
+		"gt_vau": "ne pas voir les vidéos, juste jouer l'audio\">🎧",
+		"gt_msel": "activer la séléction de fichiers ; ctrl-clic sur un fichier pour override écraser$N$N<em>quand actif : double-cliquer sur un fichier / dossier pour l'ouvrir</em>$N$NHotkey: S\">multiséléction",
+		"gt_crop": "rogner les miniatures au centre\"&gt;rogner",
+		"gt_3x": "miniatures haute résolution\">3x",
+		"gt_zoom": "zoomer",
+		"gt_chop": "rogner",
+		"gt_sort": "trier par",
+		"gt_name": "nom",
+		"gt_sz": "taille",
+		"gt_ts": "date",
+		"gt_ext": "type",
+		"gt_c1": "tronquer les noms de fichiers (montrer moins)",
+		"gt_c2": "tronquer les noms de fichiers (montrer plus)",
+
+		"sm_w8": "recherche…",
+		"sm_prev": "les résultats de recherche ci-dessous proviennent d'une requête précédente:\n  ",
+		"sl_close": "fermer les résultats de recherche",
+		"sl_hits": "affichage de {0} résultats",
+		"sl_moar": "chercher plus",
+
+		"s_sz": "taille",
+		"s_dt": "date",
+		"s_rd": "chemin",
+		"s_fn": "nom",
+		"s_ta": "tags",
+		"s_ua": "up@",
+		"s_ad": "adv.",
+		"s_s1": "minimum MiB",
+		"s_s2": "maximum MiB",
+		"s_d1": "min. iso8601",
+		"s_d2": "max. iso8601",
+		"s_u1": "téléverser après",
+		"s_u2": "et/ou avant",
+		"s_r1": "le chemin contient &nbsp; (séparé par des espaces)",
+		"s_f1": "le nom contient &nbsp; (négation avec -nope)",
+		"s_t1": "les tags contiennent &nbsp; (^=début, fin=$)",
+		"s_a1": "propriétés de métadonnées spécifiques",
+
+		"md_eshow": "impossible d'afficher le rendu ",
+		"md_off": "[📜<em>readme</em>] disabled in [⚙️] -- document caché",
+
+		"badreply": "Échec de l'analyse de la réponse du serveur",
+
+		"xhr403": "403: Accès refusé\n\nessayez d'appuyer sur F5, peut-être que vous avez été déconnecté",
+		"xhr0": "inconnu (vous avez probablement perdu la connexion au serveur, ou le serveur est hors ligne)",
+		"cf_ok": "désolé pour cela -- la protection DD" + wah + "oS a été déclenché\n\nles choses devraient reprendre dans environ 30 secondes\n\nsi rien ne se passe, appuyez sur F5 pour recharger la page",
+		"tl_xe1": "impossible de lister les sous-dossiers:\n\nerreur ",
+		"tl_xe2": "404: Dossier introuvable",
+		"fl_xe1": "impossible de lister les fichiers dans le dossier:\n\nerreur ",
+		"fl_xe2": "404: Dossier introuvable",
+		"fd_xe1": "impossible de créer le sous-dossier:\n\nerreur ",
+		"fd_xe2": "404: Dossier parent introuvable",
+		"fsm_xe1": "impossible d'envoyer le message:\n\nerreur ",
+		"fsm_xe2": "404: Dossier parent introuvable",
+		"fu_xe1": "échec du chargement de la liste des unpost du serveur:\n\nerreur ",
+		"fu_xe2": "404: Fichier introuvable??",
+
+		"fz_tar": "fichier gnu-tar non compressé (linux / mac)",
+		"fz_pax": "tar au format pax non compressé (plus lent)",
+		"fz_targz": "gnu-tar avec compression gzip niveau 3$N$Ncela est généralement très lent, donc$Nutilisez plutôt tar non compressé",
+		"fz_tarxz": "gnu-tar avec compression xz niveau 1$N$Ncela est généralement très lent, donc$Nutilisez plutôt tar non compressé",
+		"fz_zip8": "zip avec noms de fichiers utf8 (peut être instable sur windows 7 et versions antérieures)",
+		"fz_zipd": "zip avec noms de fichiers cp437 traditionnels, pour les très anciens logiciels",
+		"fz_zipc": "cp437 avec crc32 calculé tôt,$Nfor MS-DOS PKZIP v2.04g (octobre 1993)$N(prend plus de temps à charger avant que le téléchargement ne commence)",
+
+		"un_m1": "vous pouvez supprimer vos téléchargements récents (ou annuler ceux en cours) ci-dessous",
+		"un_upd": "rafraîchir",
+		"un_m4": "ou partager les fichiers visibles ci-dessous:",
+		"un_ulist": "montrer",
+		"un_ucopy": "copier",
+		"un_flt": "filtre optionnel:&nbsp; l'URL doit contenir",
+		"un_fclr": "effacer le filtre",
+		"un_derr": 'échec de l\'unpost-delete:\n',
+		"un_f5": 'quelque chose a cassé, veuillez essayer de rafraîchir ou d\'appuyer sur F5',
+		"un_uf5": "désolé mais vous devez rafraîchir la page (par exemple en appuyant sur F5 ou CTRL-R) avant que ce téléchargement puisse être annulé",
+		"un_nou": '<b>warning:</b> serveur trop occupé pour afficher les téléversements non finis; cliquez sur le lien "rafraîchir" dans un instant',
+		"un_noc": '<b>warning:</b> unpost des fichiers entièrement téléchargés n\'est pas activé/permis dans la configuration du serveur',
+		"un_max": "affichage des 2000 premiers fichiers (utilisez le filtre)",
+		"un_avail": "{0} téléchargements récents peuvent être supprimés<br />{1} ceux en cours peuvent être annulés",
+		"un_m2": "triés par date de téléchargement; les plus récents en premier:",
+		"un_no1": "sike! aucun téléchargement n'est suffisamment récent",
+		"un_no2": "sike! aucun téléchargement correspondant à ce filtre n'est suffisamment récent",
+		"un_next": "supprimer les {0} fichiers suivants ci-dessous",
+		"un_abrt": "abandonner",
+		"un_del": "supprimer",
+		"un_m3": "chargement de vos téléchargements récents…",
+		"un_busy": "suppression de {0} fichiers…",
+		"un_clip": "{0} liens copiés dans le presse-papiers",
+
+		"u_https1": "vous devriez",
+		"u_https2": "passer à https",
+		"u_https3": "pour de meilleure performances",
+		"u_ancient": 'votre navigateur est impressionnamment ancien -- vous devriez peut-être <a href="#" onclick="goto(\'bup\')">utiliser bup à la place</a>',
+		"u_nowork": "nécessite firefox 53+ ou chrome 57+ ou iOS 11+",
+		"tail_2old": "nécessite firefox 105+ ou chrome 71+ ou iOS 14.5+",
+		"u_nodrop": 'votre navigateur est trop ancien pour le téléversement par glisser-déposer',
+		"u_notdir": "ce n'est pas un dossier!\n\nvotre navigateur est trop ancien,\nveuillez essayer le glisser-déposer à la place",
+		"u_uri": "pour glisser-déposer des images depuis d'autres fenêtres de navigateur,\nveuillez les déposer sur le gros bouton de téléversement",
+		"u_enpot": 'passer à <a href="#">l\'interface utilisateur potato</a> (peut améliorer la vitesse de téléversement)',
+		"u_depot": 'passer à <a href="#">l\'interface utilisateur fancy</a> (peut réduire la vitesse de téléversement)',
+		"u_gotpot": 'passage à l\'interface utilisateur potato pour une vitesse de téléversement améliorée,\n\nn\'hésitez pas à revenir en arrière si ça ne vous plaît pas !',
+		"u_pott": "<p>fichiers: &nbsp; <b>{0}</b> fini, &nbsp; <b>{1}</b> échoué, &nbsp; <b>{2}</b> en cours, &nbsp; <b>{3}</b> en attente</p>",
+		"u_ever": "ceci est le téléverseur de base ; up2k nécessite au moins chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'ceci est le téléverseur de base; <a href="#" id="u2yea">up2k</a> est meilleur',
+		"u_uput": 'optimiser pour la vitesse (ignorer la somme de contrôle)',
+		"u_ewrite": 'vous n\'avez pas accès en écriture à ce dossier',
+		"u_eread": 'vous n\'avez pas accès en lecture à ce dossier',
+		"u_enoi": 'la recherche de fichiers n\'est pas activée dans la configuration du serveur',
+		"u_enoow": "l'écrasage ne fonctionnera pas ici; besoin de permissions de suppression",
+		"u_badf": 'Ces {0} fichiers (sur {1} au total) ont été ignorés, probablement en raison de permissions système de fichiers:\n\n',
+		"u_blankf": 'Ces {0} fichiers (sur {1} au total) sont vides; les téléverser quand même ?\n\n',
+		"u_applef": 'Ces {0} fichiers (sur {1} au total) sont probablement indésirables;\nAppuyez sur <code>OK/Enter</code> pour IGNORER les fichiers suivants,\nAppuyez sur <code>Annuler/Échap</code> pour NE PAS exclure, et TÉLÉVERSER ceux-ci également:\n\n',
+		"u_just1": '\nPeut-être que cela fonctionne mieux si vous sélectionnez juste un fichier',
+		"u_ff_many": "si vous utilisez <b>Linux / MacOS / Android,</b> alors ce nombre de fichiers <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>peut</em> faire planter Firefox!</a>\nSi cela se produit, veuillez réessayer (ou utiliser Chrome).",
+		"u_up_life": "Ce téléversement va être supprimé du serveur\n{0} après son achèvement",
+		"u_asku": 'téléverser ces {0} fichiers vers <code>{1}</code>',
+		"u_unpt": "vous pouvez défaire / supprimer ce téléversement en utilisant le 🧯 en haut à gauche",
+		"u_bigtab": 'sur le point d\'afficher {0} fichiers\n\ncela peut faire planter votre navigateur, êtes-vous sûr ?',
+		"u_scan": 'Analyse des fichiers…',
+		"u_dirstuck": 'l\'itérateur de répertoire est bloqué en essayant d\'accéder aux {0} éléments suivants ; il sera ignoré :',
+		"u_etadone": 'Terminé ({0}, {1} fichiers)',
+		"u_etaprep": '(préparation au téléversement)',
+		"u_hashdone": 'calcul de la somme de contrôle terminé',
+		"u_hashing": 'calcul de la somme de contrôle',
+		"u_hs": 'établissement d\'une liaison…',
+		"u_started": "les fichiers sont maintenant en cours de téléversement ; voir [🚀]",
+		"u_dupdefer": "dupliqué ; sera traité après tous les autres fichiers",
+		"u_actx": "cliquez sur ce texte pour éviter la perte de<br />performance lors du passage à d'autres fenêtres/onglets",
+		"u_fixed": "OK!&nbsp; Résolu 👍",
+		"u_cuerr": "echec du téléversement du morceau {0} de {1};\nprobablement inoffensif, poursuite\n\nfichier : {2}",
+		"u_cuerr2": "le serveur a rejeté le téléversement (morceau {0} de {1});\nréessaiera plus tard\n\nfichier : {2}\n\nerreur ",
+		"u_ehstmp": "réessaiera ; voir en bas à droite",
+		"u_ehsfin": "le serveur a rejeté la demande de finalisation du téléversement ; nouvelle tentative…",
+		"u_ehssrch": "le serveur a rejeté la demande d'effectuer une recherche ; nouvelle tentative…",
+		"u_ehsinit": "le serveur a rejeté la demande d'initier le téléversement ; nouvelle tentative…",
+		"u_eneths": "erreur réseau lors de l'exécution de l'initialisation du téléversement ; nouvelle tentative…",
+		"u_enethd": "erreur réseau lors du test de l'existence de la cible ; nouvelle tentative…",
+		"u_cbusy": "attente que le serveur nous fasse à nouveau confiance après un problème réseau…",
+		"u_ehsdf": "le serveur est à court d'espace disque !\n\nil va continuer de réessayer, au cas où quelqu'un\nlibérerait suffisamment d'espace pour continuer",
+		"u_emtleak1": "il semble que votre navigateur web ait une fuite de mémoire ;\nveuillez",
+		"u_emtleak2": ' <a href="{0}">passer à https (recommandé)</a> ou ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'essayez la solution suivante:\n<ul><li>appuyez sur <code>F5</code> pour rafraîchir la page</li><li>ensuite désactivez le bouton &nbsp;<code>mt</code>&nbsp; dans les &nbsp;<code>⚙️ paramètres</code></li><li>et réessayez ce téléversement</li></ul>Les téléversements seront un peu plus lents, mais tant pis.\nDésolé pour le dérangement !\n\nPS : chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">a un correctif</a> pour cela',
+		"u_emtleakf": 'essayez la solution suivante:\n<ul><li>appuyez sur <code>F5</code> pour rafraîchir la page</li><li>ensuite activez <code>🥔</code> (pomme de terre) dans l\'interface de téléversement</li><li>et réessayez ce téléversement</li></ul>\nPS : firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">aura probablement un correctif</a> à un moment donné',
+		"u_s404": "pas trouvé sur le serveur",
+		"u_expl": "expliquer",
+		"u_maxconn": "la plupart des navigateur limite ceci à 6, mais firefox vous permet de l'augmenter avec <code>connections-per-server</code> dans <code>about:config</code>",
+		"u_tu": '<p class="warn">WARNING: turbo enclenché, <span>&nbsp;le client peut ne pas détecter et reprendre les téléversements incomplets ; voir l\'info-bulle du bouton turbo</span></p>',
+		"u_ts": '<p class="warn">WARNING: turbo enclenché, <span>&nbsp;les résultats de recherche peuvent être incorrects ; voir l\'info-bulle du bouton turbo</span></p>',
+		"u_turbo_c": "turbo est désactivé dans la configuration du serveur",
+		"u_turbo_g": "désactivation de turbo car vous n'avez pas de\nprivilèges de listing de répertoires dans ce volume",
+		"u_life_cfg": 'suppression automatique après <input id="lifem" p="60" /> min (ou <input id="lifeh" p="3600" /> heures)',
+		"u_life_est": 'le téléversement sera supprimé <span id="lifew" tt="local time">---</span>',
+		"u_life_max": 'ce dossier impose une\ndurée de vie maximale de {0}',
+		"u_unp_ok": 'unpost est autorisé pour {0}',
+		"u_unp_ng": 'unpost ne sera PAS autorisé',
+		"ue_ro": 'votre accès à ce dossier est en lecture seule\n\n',
+		"ue_nl": 'vous n\'êtes actuellement pas connecté',
+		"ue_la": 'vous êtes actuellement connecté en tant que "{0}"',
+		"ue_sr": 'vous êtes actuellement en mode recherche de fichiers\n\nchangez en mode téléversement en cliquant sur la loupe 🔎 (à côté du grand bouton RECHERCHER), et essayez de téléverser à nouveau\n\ndésolé',
+		"ue_ta": 'essayez de téléverser à nouveau, cela devrait fonctionner maintenant',
+		"ue_ab": "ce fichier a déjà été téléversé dans un autre dossier, et ce téléversement doit être terminé avant que le fichier puisse être téléversé ailleurs.\n\nVous pouvez annuler et oublier le téléversement initial en utilisant le bouton 🧯 en haut à gauche.",
+		"ur_1uo": "OK: Fichier téléversé avec succès",
+		"ur_auo": "OK: Tous les {0} fichiers téléversés avec succès",
+		"ur_1so": "OK: Fichier trouvé sur le serveur",
+		"ur_aso": "OK: Tous les {0} fichiers trouvés sur le serveur",
+		"ur_1un": "Échec du téléversement, désolé",
+		"ur_aun": "Tous les {0} téléversements ont échoué, désolé",
+		"ur_1sn": "Fichier NON trouvé sur le serveur",
+		"ur_asn": "Les {0} fichiers n'ont PAS ÉTÉ trouvés sur le serveur",
+		"ur_um": "Terminé;\n{0} téléversements OK,\n{1} téléversements échoués, désolé",
+		"ur_sm": "Terminé;\n{0} fichiers trouvés sur le serveur,\n{1} fichiers NON trouvés sur le serveur",
+
+		"lang_set": "rafraîchir pour que les changements prennent effet ?",
+	},
+	"grc": {
+		"tt": "Ελληνικά",
+
+		"cols": {
+			"c": "κουμπιά ενεργειών",
+			"dur": "διάρκεια",
+			"q": "ποιότητα / bitrate",
+			"Ac": "κωδικοποιητής ήχου",
+			"Vc": "κωδικοποιητής βίντεο",
+			"Fmt": "μορφή / container",
+			"Ahash": "checksum ήχου",
+			"Vhash": "checksum βίντεο",
+			"Res": "ανάλυση",
+			"T": "τύπος αρχείου",
+			"aq": "ποιότητα ήχου / bitrate",
+			"vq": "ποιότητα βίντεο / bitrate",
+			"pixfmt": "subsampling / δομή εικονοστοιχείων",
+			"resw": "οριζόντια ανάλυση",
+			"resh": "κάθετη ανάλυση",
+			"chs": "κανάλια ήχου",
+			"hz": "συχνότητα δειγματοληψίας"
+		},
+
+		"hks": [
+			[
+				"διάφορα",
+				["ESC", "κλείσιμο διαφόρων λειτουργιών"],
+
+				"διαχειριστής αρχείων",
+				["G", "εναλλαγή λίστας / πλέγματος"],
+				["T", "εναλλαγή μικρογραφιών / εικονιδίων"],
+				["⇧ A/D", "μέγεθος μικρογραφιών"],
+				["ctrl-K", "διαγραφή επιλεγμένων"],
+				["ctrl-X", "αποκοπή επιλογής στο πρόχειρο"],
+				["ctrl-C", "αντιγραφή επιλογής στο πρόχειρο"],
+				["ctrl-V", "επικόλληση (μετακίνηση/αντιγραφή) εδώ"],
+				["Y", "λήψη επιλεγμένων"],
+				["F2", "μετονομασία επιλεγμένων"],
+
+				"λίστα αρχείων",
+				["space", "εναλλαγή επιλογής αρχείου"],
+				["↑/↓", "μετακίνηση δείκτη επιλογής"],
+				["ctrl ↑/↓", "μετακίνηση δείκτη και προβολής"],
+				["⇧ ↑/↓", "επιλογή προηγούμενου/επόμενου αρχείου"],
+				["ctrl-A", "επιλογή όλων των αρχείων / φακέλων"]
+			], [
+				"πλοήγηση",
+				["B", "εναλλαγή σε καρτέλες διαδρομών / δέντρο διαδρομών"],
+				["I/K", "προηγούμενος/επόμενος φάκελος"],
+				["M", "γονικός φάκελος (ή σμίκρυνση τρέχοντος)"],
+				["V", "εναλλαγή φακέλων / δέντρο αρχείων κειμένου"],
+				["A/D", "μέγεθος πίνακα πλοήγησης"]
+			], [
+				"μουσική",
+				["J/L", "προηγούμενο/επόμενο τραγούδι"],
+				["U/O", "μετάβαση 10δευτ πίσω/μπροστά"],
+				["0..9", "μετάβαση στο 0%..90%"],
+				["P", "αναπαραγωγή/παύση (ξεκινάει κιόλας)"],
+				["S", "επιλογή αναπαραγόμενου τραγουδιού"],
+				["Y", "λήψη τραγουδιού"]
+			], [
+				"εικόνες",
+				["J/L, ←/→", "προηγούμενη/επόμενη εικόνα"],
+				["Home/End", "πρώτη/τελευταία εικόνα"],
+				["F", "πλήρης οθόνη"],
+				["R", "περιστροφή δεξιόστροφα"],
+				["⇧ R", "περιστροφή αριστερόστροφα"],
+				["S", "επιλογή εικόνας"],
+				["Y", "λήψη εικόνας"]
+			], [
+				"βίντεο",
+				["U/O", "μετάβαση 10δευτ πίσω/μπροστά"],
+				["P/K/Space", "αναπαραγωγή/παύση"],
+				["C", "συνέχεια στο επόμενο"],
+				["V", "επανάληψη"],
+				["M", "σίγαση"],
+				["[ και ]", "ορισμός διαστήματος επανάληψης"]
+			], [
+				"αρχεία κειμένου",
+				["I/K", "προηγούμενο/επόμενο αρχείο"],
+				["M", "κλείσιμο αρχείου"],
+				["E", "επεξεργασία αρχείου"],
+				["S", "επιλογή αρχείου (για αποκοπή/αντιγραφή/μετονομασία)"]
+			]
+		],
+
+		"m_ok": "Εντάξει",
+		"m_ng": "Άκυρο",
+
+		"enable": "Ενεργοποίηση",
+		"danger": "ΚΙΝΔΥΝΟΣ",
+		"clipped": "αντιγράφηκε στο πρόχειρο",
+
+		"ht_s1": "δευτερόλεπτο",
+		"ht_s2": "δευτερόλεπτα",
+		"ht_m1": "λεπτό",
+		"ht_m2": "λεπτά",
+		"ht_h1": "ώρα",
+		"ht_h2": "ώρες",
+		"ht_d1": "μέρα",
+		"ht_d2": "μέρες",
+		"ht_and": " και ",
+
+		"goh": "πίνακας ελέγχου",
+		"gop": 'προηγούμενος φάκελος στο ίδιο επίπεδο">προηγούμενο',
+		"gou": 'γονικός φάκελος">πάνω',
+		"gon": 'επόμενος φάκελος">επόμενο',
+		"logout": "Αποσύνδεση ",
+		"login": "Σύνδεση", //m
+		"access": " πρόσβαση",
+		"ot_close": "κλείσιμο υπομενού",
+		"ot_search": "αναζήτηση αρχείων με βάση χαρακτηριστικά, διαδρομή / όνομα, μουσικά tags ή οποιονδήποτε συνδυασμό$N$N&lt;code&gt;foo bar&lt;/code&gt; = πρέπει να περιέχει και τα «foo» και «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = πρέπει να περιέχει το «foo» αλλά όχι το «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = να ξεκινά με «yana» και να είναι αρχείο «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = να περιέχει ακριβώς «try unite»$N$Nη μορφή ημερομηνίας είναι iso-8601, όπως$N&lt;code&gt;2009-12-31&lt;/code&gt; ή &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: διαγραφή πρόσφατων μεταφορτώσεων ή ακύρωση ανολοκλήρωτων",
+		"ot_bup": "bup: βασικός uploader, υποστηρίζει μέχρι και netscape 4.0",
+		"ot_mkdir": "mkdir: δημιουργία νέου φακέλου",
+		"ot_md": "new-md: δημιουργία νέου markdown εγγράφου",
+		"ot_msg": "msg: αποστολή μηνύματος στο server log",
+		"ot_mp": "επιλογές media player",
+		"ot_cfg": "επιλογές ρυθμίσεων",
+		"ot_u2i": 'up2k: ανέβασε αρχεία (αν έχεις δικαίωμα εγγραφής) ή ενεργοποίησε τη λειτουργία αναζήτησης για να δεις αν υπάρχουν ήδη στο server$N$Nοι μεταφορτώσεις συνεχίζονται αν διακοπούν, είναι πολυνηματικές και διατηρούν τις χρονοσφραγίδες, αλλά καταναλώνουν περισσότερο CPU από τον [🎈]&nbsp; (βασικός uploader)<br /><br />κατά τη διάρκεια της μεταφόρτωσης, αυτό το εικονίδιο δείχνει την πρόοδό της!',
+		"ot_u2w": 'up2k: ανέβασε αρχεία με υποστήριξη συνέχισης (κλείσε τον browser και ρίξε τα ίδια αρχεία ξανά μετά)$N$Nπολυνηματικό, διατηρεί τις χρονοσφραγίδες, αλλά καταναλώνει περισσότερο CPU από τον [🎈]&nbsp; (βασικός uploader)<br /><br />κατά τη διάρκεια της μεταφόρτωσης, αυτό το εικονίδιο δείχνει την πρόοδό της!',
+		"ot_noie": 'Χρησιμοποίησε Chrome / Firefox / Edge',
+
+		"ab_mkdir": "δημιουργία φακέλου",
+		"ab_mkdoc": "νέο markdown έγγραφο",
+		"ab_msg": "στείλε μήνυμα στο server log",
+
+		"ay_path": "πήγαινε σε φακέλους",
+		"ay_files": "πήγαινε σε αρχεία",
+
+		"wt_ren": "μετονομασία επιλεγμένων$NΣυντόμευση: F2",
+		"wt_del": "διαγραφή επιλεγμένων$NΣυντόμευση: ctrl-K",
+		"wt_cut": "αποκοπή επιλεγμένων &lt;small&gt;(και επικόλληση αλλού)&lt;/small&gt;$NΣυντόμευση: ctrl-X",
+		"wt_cpy": "αντιγραφή επιλεγμένων στο πρόχειρο$N(για επικόλληση αλλού)$NΣυντόμευση: ctrl-C",
+		"wt_pst": "επικόλληση αποκομμένων / αντεγραμμένων$NΣυντόμευση: ctrl-V",
+		"wt_selall": "επιλογή όλων$NΣυντόμευση: ctrl-A (με το αρχείο επιλεγμένο)",
+		"wt_selinv": "αντιστροφή επιλογής",
+		"wt_zip1": "κατέβασμα φακέλου ως συμπιεσμένο αρχείο",
+		"wt_selzip": "κατέβασμα επιλογής ως συμπιεσμένο αρχείο",
+		"wt_seldl": "κατέβασμα επιλογής ως μεμονωμένα αρχεία$NΣυντόμευση: Y",
+		"wt_npirc": "αντιγραφή πληροφοριών τραγουδιού σε μορφή irc",
+		"wt_nptxt": "αντιγραφή πληροφοριών τραγουδιού ως κείμενο",
+		"wt_m3ua": "προσθήκη σε m3u λίστα αναπαραγωγής (μετά πάτησε <code>📻αντιγραφή</code>)",
+		"wt_m3uc": "αντιγραφή m3u λίστας αναπαραγωγής στο πρόχειρο",
+		"wt_grid": "εναλλαγή πλέγματος / λίστας$NΣυντόμευση: G",
+		"wt_prev": "προηγούμενο κομμάτι$NΣυντόμευση: J",
+		"wt_play": "αναπαραγωγή / παύση$NΣυντόμευση: P",
+		"wt_next": "επόμενο κομμάτι$NΣυντόμευση: L",
+
+		"ul_par": "παράλληλες μεταφορτώσεις:",
+		"ut_rand": "τυχαιοποίηση ονομάτων αρχείων",
+		"ut_u2ts": "αντιγραφή της τελευταίας τροποποιημένης χρονοσφραγίδας αλλαγής$Nαπό το σύστημά σου στον server\">📅",
+		"ut_ow": "αντικατάσταση σε ήδη υπάρχοντα αρχεία του server?$N🛡️: ποτέ (θα δημιουργηθεί νέο όνομα)$N🕒: αν το αρχείο του server είναι παλαιότερο$N♻️: πάντα να αντικαθίστανται αν διαφέρουν",
+		"ut_mt": "συνέχιση υπολογισμού hash για άλλα αρχεία κατά τη μεταφόρτωση$N$Nαπενεργοποίησέ το αν η CPU ή ο δίσκος σου ζορίζονται",
+		"ut_ask": 'επιβεβαίωση πριν ξεκινήσει η μεταφόρτωση">💭',
+		"ut_pot": "βελτίωση ταχύτητας μεταφόρτωσης σε αργές συσκευές$Nμε απλοποίηση του UI",
+		"ut_srch": "μην ανεβάζεις, έλεγξε αν τα αρχεία$Nυπάρχουν ήδη στον server (ψάχνει σε όλους τους φακέλους που έχεις πρόσβαση)",
+		"ut_par": "κάνε παύση στις μεταφορτώσεις βάζοντάς το 0$N$Nαύξησε το αν έχεις αργή/μεγάλη καθυστέρηση σύνδεσης$N$Nκράτα το 1 σε LAN ή αν ο server έχει αργό δίσκο",
+		"ul_btn": "ρίξε αρχεία / φακέλους<br>εδώ (ή κάνε κλικ σε μένα)",
+		"ul_btnu": "Μ Ε Τ Α Φ Ο Ρ Τ Ω Σ Η",
+		"ul_btns": "Α Ν Α Ζ Η Τ Η Σ Η",
+
+		"ul_hash": "υπολογισμός hash",
+		"ul_send": "αποστολή",
+		"ul_done": "ολοκληρώθηκε",
+		"ul_idle1": "καμία μεταφόρτωση στην ουρά για την ώρα",
+		"ut_etah": "μέση ταχύτητα &lt;em&gt;υπολογισμού hash&lt;/em&gt; και εκτίμηση χρόνου μέχρι την ολοκλήρωση",
+		"ut_etau": "μέση ταχύτητα &lt;em&gt;μεταφόρτωσης&lt;/em&gt; και εκτίμηση χρόνου μέχρι την ολοκλήρωση",
+		"ut_etat": "μέση &lt;em&gt;συνολική&lt;/em&gt; ταχύτητα και εκτίμηση χρόνου μέχρι την ολοκλήρωση",
+
+		"uct_ok": "ολοκληρώθηκε επιτυχώς",
+		"uct_ng": "no-good: απέτυχε / απορρίφθηκε / δεν βρέθηκε",
+		"uct_done": "ολοκληρωμένα και αποτυχημένα",
+		"uct_bz": "κάνει hash ή μεταφορτώνει",
+		"uct_q": "σε αναμονή, εκκρεμεί",
+
+		"utl_name": "όνομα αρχείου",
+		"utl_ulist": "λίστα",
+		"utl_ucopy": "αντιγραφή",
+		"utl_links": "σύνδεσμοι",
+		"utl_stat": "κατάσταση",
+		"utl_prog": "πρόοδος",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "ΣΦΑΛΜΑ",
+		"utl_oserr": "ΣΦ-ΛΕ",
+		"utl_found": "βρέθηκε",
+		"utl_defer": "αναβολή",
+		"utl_yolo": "YOLO",
+		"utl_done": "έγινε",
+
+		"ul_flagblk": "τα αρχεία προστέθηκαν στην ουρά</b><br>αλλά υπάρχει άλλη ενεργή μεταφόρτωση σε άλλη καρτέλα,<br>οπότε περίμενε να τελειώσει αυτό πρώτα",
+		"ul_btnlk": "ο διακομιστής έχει κλειδώσει αυτήν την επιλογή σε αυτήν την κατάσταση",
+
+		"udt_up": "Μεταφόρτωση",
+		"udt_srch": "Αναζήτηση",
+		"udt_drop": "ρίξ' το εδώ",
+
+		"u_nav_m": '<h6>οκ, τι έχουμε εδώ;</h6><code>Enter</code> = Αρχεία (ένα ή περισσότερα)\n<code>ESC</code> = Ένας φάκελος (μαζί με υποφακέλους)',
+		"u_nav_b": '<a href="#" id="modal-ok">Αρχεία</a><a href="#" id="modal-ng">Ένας φάκελος</a>',
+
+		"cl_opts": "διακόπτες",
+		"cl_themes": "θέμα",
+		"cl_langs": "γλώσσα",
+		"cl_ziptype": "λήψη φακέλου",
+		"cl_uopts": "διακόπτες μεταφόρτωσης",
+		"cl_favico": "favicon",
+		"cl_bigdir": "μεγάλοι φάκελοι",
+		"cl_hsort": "#ταξινόμηση",
+		"cl_keytype": "σημείωση πλήκτρων",
+		"cl_hiddenc": "κρυφές στήλες",
+		"cl_hidec": "κρύψε",
+		"cl_reset": "επανεκκίνηση",
+		"cl_hpick": "πάτησε στις κεφαλίδες στηλών για να τις κρύψεις στον πίνακα παρακάτω",
+		"cl_hcancel": "η απόκρυψη στηλών ακυρώθηκε",
+
+		"ct_grid": '田 το πλέγμα',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ συμβουλές εργαλείων',
+		"ct_thumb": 'σε προβολή πλέγματος, εναλλαγή εικονιδίων ή μικρογραφιών$NΠλήκτρο συντόμευσης: T">🖼️ μικρογραφίες',
+		"ct_csel": 'χρησιμοποίησε CTRL και SHIFT για επιλογή αρχείων σε προβολή πλέγματος">επιλογή',
+		"ct_ihop": 'όταν η προβολή εικόνων κλείνει, κάνε scroll στο τελευταίο προβαλλόμενο αρχείο">g⮯',
+		"ct_dots": 'εμφάνιση κρυφών αρχείων (αν το επιτρέπει ο server)">dotfiles',
+		"ct_qdel": 'όταν διαγράφεις αρχεία, ζήτα επιβεβαίωση μόνο μία φορά">γρήγορη διαγραφή',
+		"ct_dir1st": 'ταξινόμηση φακέλων πριν από τα αρχεία">📁 πρώτα',
+		"ct_nsort": 'φυσική ταξινόμηση (για ονόματα αρχείων με αριθμούς στην αρχή)">φυσική ταξινόμηση',
+		"ct_utc": 'εμφάνιση όλων των ημερομηνιών σε UTC">UTC',
+		"ct_readme": 'εμφάνιση README.md στις λίστες φακέλων">📜 πληροφορίες',
+		"ct_idxh": 'εμφάνιση index.html αντί για λίστα φακέλων">html',
+		"ct_sbars": 'εμφάνιση μπαρών κύλισης">⟊',
+
+		"cut_umod": "αν το αρχείο υπάρχει ήδη στον server, ενημέρωσέ το με την τελευταία χρονοσφραγίδα τροποποίησης για να ταιριάζει με το τοπικό αρχείο (απαιτεί δικαιώματα εγγραφής+διαγραφής)\">re📅",
+
+		"cut_turbo": "το κουμπί yolo, πιθανόν να ΜΗΝ ΘΕΛΕΙΣ να το ενεργοποιήσεις:$N$Nχρησιμοποίησέ το αν μεταφορτώνεις πολλά αρχεία και χρειάστηκε να ξαναρχίσεις, και θες να συνεχίσεις τη μεταφότρωση όσο το δυνατόν πιο γρήγορα$N$Nαντικαθιστά τον έλεγχο hash με απλό <em>&quot;έχει το ίδιο μέγεθος αρχείου στον server?&quot;</em> οπότε αν το περιεχόμενο είναι διαφορετικό, ΔΕΝ θα ανέβει$N$Nπρέπει να το κλείσεις όταν τελειώσει η μεταφόρτωση και μετά να &quot;μεταφορτώσεις&quot; πάλι τα ίδια αρχεία για να τα επιβεβαιώσει το τοπικό σου πρόγραμμα\">turbo",
+
+		"cut_datechk": "δεν επηρεάζει τίποτα εκτός αν το turbo είναι ενεργοποιημένο$N$Nμειώνει λίγο τον παράγοντα yolo; ελέγχει αν οι χρονοσφραγίδες στο διακομιστή ταιριάζουν με τα δικά σου$N$Nπιάνει <em>θεωρητικά</em> τις περισσότερες μισοτελειωμένες/κατεστραμμένες μεταφορτώσεις, αλλά δεν αντικαθιστά τον έλεγχο με το turbo απενεργοποιημένο μετέπειτα\">έλεγχος ημερομηνίας",
+
+		"cut_u2sz": "μέγεθος (σε MiB) κάθε κομματιού μεταφόρτωσης; μεγάλες τιμές λειτουργούν καλύτερα σε μεγαλύτερες αποστάσεις διακομιστή-πελάτη. Δοκίμασε μικρές τιμές σε πολύ άστατες συνδέσεις",
+
+		"cut_flag": "εξασφαλίζει ότι μόνο μία καρτέλα μεταφορτώνει κάθε φορά $N -- οι άλλες καρτέλες πρέπει να το έχουν κι αυτές ενεργό $N -- επηρεάζει μόνο τις καρτέλες που βρίσκονται στο ίδιο διεύθυνση",
+
+		"cut_az": "μεταφόρτωσε τα αρχεία αλφαβητικά, αντί για το μικρότερο αρχείο, πρώτα$N$Nη αλφαβητική σειρά βοηθά να καταλάβεις αν κάτι χάλασε στο διακομιστή αλλά κάνει το ανέβασμα λίγο πιο αργό σε fiber / LAN",
+
+		"cut_nag": "ειδοποίηση λειτουργικού συστήματος όταν τελειώσει η μεταφόρτωση$N(μόνο αν ο browser ή η καρτέλα δεν είναι ενεργά)",
+		"cut_sfx": "ηχητική ειδοποίηση όταν τελειώσει η μεταφόρτωση$N(μόνο αν ο browser ή η καρτέλα δεν είναι ενεργά)",
+
+		"cut_mt": "χρησιμοποίησε multithreading για να επιταχύνεις το hashing των αρχείων$N$Nχρησιμοποιεί web-workers και χρειάζεται$Nπερισσότερη RAM (μέχρι 512 MiB επιπλέον)$N$Nκάνει το https 30% πιο γρήγορο, το http 4.5x πιο γρήγορο\">mt",
+
+		"cut_wasm": "χρησιμοποίησε wasm αντί για τον ενσωματωμένο hasher του browser; βελτιώνει την ταχύτητα σε chrome-based browsers αλλά αυξάνει το φορτίο της CPU, και παλιές εκδόσεις chrome έχουν bugs που κάνουν το browser να τρώει όλη τη RAM και να κρασάρει αν ενεργοποιηθεί\">wasm",
+
+		"cft_text": "κείμενο favicon (κενό και ανανέωση για απενεργοποίηση)",
+		"cft_fg": "χρώμα προσκηνίου",
+		"cft_bg": "χρώμα παρασκηνίου",
+
+		"cdt_lim": "μέγιστος αριθμός αρχείων προς εμφάνιση σε ένα φάκελο",
+		"cdt_ask": "όταν φτάνεις στο τέλος,$Nαντί να φορτώσει περισσότερα αρχεία,$Nρωτά τι να κάνει",
+		"cdt_hsort": "πόσους κανόνες ταξινόμησης (&lt;code&gt;,sorthref&lt;/code&gt;) να συμπεριλάβει σε URLs πολυμέσων. Αν το βάλεις 0 αγνοεί και κανόνες ταξινόμησης στους συνδέσμους πολυμέσων",
+
+		"tt_entree": "εμφάνιση navpane (δέντρο διαδρομών)$NΠλήκτρο συντόμευσης: B",
+		"tt_detree": "εμφάνιση breadcrumbs (καρτέλες διαδρομών)$NΠλήκτρο συντόμευσης: B",
+		"tt_visdir": "κύλιση στον επιλεγμένο φάκελο",
+		"tt_ftree": "εναλλαγή δέντρου διαδρομών / αρχείων κειμένου$NΠλήκτρο συντόμευσης: V",
+		"tt_pdock": "εμφάνιση γονικών φακέλων σε σταθερή μπάρα επάνω",
+		"tt_dynt": "αυτόματη επέκταση καθώς επεκτείνεται το δέντρο διαδρομών",
+		"tt_wrap": "αναδίπλωση λέξεων",
+		"tt_hover": "αποκάλυψη των γραμμών που ξεπερνούν το πλάτος με το ποντίκι πάνω τους$N( σπάει το scroll εκτός αν το ποντίκι $N&nbsp; είναι στην αριστερή στήλη )",
+
+		"ml_pmode": "στο τέλος του φακέλου...",
+		"ml_btns": "εντολές",
+		"ml_tcode": "μετακωδικοποίηση",
+		"ml_tcode2": "μετακωδικοποίηση σε",
+		"ml_tint": "φίλτρο χρώματος",
+		"ml_eq": "ισοσταθμιστής ήχου",
+		"ml_drc": "συμπιεστής δυναμικής εμβέλειας",
+
+		"mt_loop": "επανάληψη ενός τραγουδιού\">🔁",
+		"mt_one": "σταμάτα μετά από ένα τραγούδι\">1️⃣",
+		"mt_shuf": "τυχαία σειρά τραγουδιών σε κάθε φάκελο\">🔀",
+		"mt_aplay": "αυτόματη αναπαραγωγή αν υπάρχει song-ID στη διεύθυνση που μπήκες στο διακομιστή$N$Nη απενεργοποίηση αυτού, σταματά το URL από το να ενημερώνεται με τα song-ID ενώ παίζει η μουσική για να αποτραπεί η αυτόματη αναπαραγωγή αν χαθούν αυτές οι ρυθμίσεις αλλά το URL παραμείνει το ίδιο\">a▶",
+		"mt_preload": "ξεκίνα  τη φόρτωση του επόμενου τραγουδιού κοντά στο τέλος για συνεχόμενη ακρόαση\">προφόρτωση",
+		"mt_prescan": "πήγαινε στον επόμενο φάκελο πριν τελειώσει το τελευταίο τραγούδι$Nγια να μη σταματήσει το πρόγραμμα περιήγησης να παίζει μουσική\">nav",
+		"mt_fullpre": "προσπάθησε να προφορτώσεις ολόκληρο το τραγούδι;$N✅ ενεργό σε <b>αναξιόπιστες</b> συνδέσεις,$N❌ πιθανότατα απενεργοποιημένο σε αργές συνδέσεις\">πλήρες",
+		"mt_fau": "σε κινητά, πρόλαβε να μην σταματήσει η μουσική αν το επόμενο τραγούδι δεν προφορτώθηκε γρήγορα (μπορεί να προκαλέσει πρόβλημα στην εμφάνιση των ετικετών)\">☕️",
+		"mt_waves": "γραμμή αναζήτησης κυματομορφής:$Nεμφάνιση έντασης ήχου στην μπάρα αναζήτησης\">~s",
+		"mt_npclip": "εμφάνισε κουμπιά για αντιγραφή του τρέχοντος τραγουδιού\">/np",
+		"mt_m3u_c": "εμφάνισε κουμπιά για αντιγραφή των$Nεπιλεγμένων τραγουδιών ως καταχωρήσεις λίστας m3u8\">📻",
+		"mt_octl": "ενσωμάτωση στο λειτουργικό σύστημα (σηντομεύσεις πλήκτρων πολυμέσων / osd)\">έλεγχος-OS",
+		"mt_oseek": "επιτρέπει την αναζήτηση μέσω ενσωμάτωσης του λειτουργικού συστήματος$N$Nσημείωση: σε μερικές συσκευές (iPhones),$Nαντικαθιστά το κουμπί επόμενου τραγουδιού\">αναζήτηση",
+		"mt_oscv": "εμφάνιση εξωφύλλου άλμπουμ σε osd\">εξώφυλλο",
+		"mt_follow": "κρατά το τρέχον κομμάτι ορατό κατά την κύλιση\">🎯",
+		"mt_compact": "συμπαγή κουμπιά ελέγχου\">⟎",
+		"mt_uncache": "καθάρισε την προσωρινή μνήμη &nbsp;(δοκίμασε αυτό αν ο browser έχει αποθηκεύσει$Nχαλασμένο αντίγραφο τραγουδιού και αρνείται να παίξει)\">εκκαθάριση",
+		"mt_mloop": "τυχαία αναπαραγωγή στον ανοικτό φάκελο\">🔁 τυχαία αναπαραγωγή",
+		"mt_mnext": "φόρτωση επόμενου φακέλου και συνέχιση\">📂 επόμενο",
+		"mt_mstop": "σταμάτησε την αναπαραγωγή\">⏸ σταμάτημα",
+		"mt_cflac": "μετατροπή flac / wav σε {0}\">flac",
+		"mt_caac": "μετατροπή aac / m4a σε {0}\">aac",
+		"mt_coth": "μετατροπή όλων των άλλων (εκτός των mp3) σε {0}\">άλλο",
+		"mt_c2opus": "καλύτερη επιλογή για desktop, laptop, android\">opus",
+		"mt_c2owa": "opus-weba, για iOS 17.5 και νεότερα\">owa",
+		"mt_c2caf": "opus-caf, για iOS 11 έως 17\">caf",
+		"mt_c2mp3": "χρησιμοποίησε αυτό σε πολύ παλιές συσκευές\">mp3",
+		"mt_c2flac": "βέλτιστη ποιότητα ήχου αλλά τεράστιο αρχείο για μεταφόρτωση\">flac",
+		"mt_c2wav": "ασυμπίεστη αναπαραγωγή (ακόμα μεγαλύτερο αρχείο)\">wav",
+		"mt_c2ok": "μια χαρά, σοφή επιλογή",
+		"mt_c2nd": "δεν είναι η προτεινόμενη μορφή εξόδου για τη συσκευή σου, αλλά αυτό είναι ok",
+		"mt_c2ng": "η συσκευή σου φαίνεται να μην υποστηρίζει αυτήν τη μορφή εξόδου, αλλά ας το δοκιμάσουμε ούτως ή άλλως",
+		"mt_xowa": "υπάρχουν bugs σε iOS που εμποδίζουν την αναπαραγωγή στο παρασκήνιο με αυτήν τη μορφή· χρησιμοποίησε caf ή mp3 αντ’ αυτού",
+		"mt_tint": "επίπεδο φόντου (0-100) στην μπάρα αναζήτησης$Nγια να κάνεις το buffering λιγότερο ενοχλητικό",
+		"mt_eq": "ενεργοποιεί τον ισοσταθμιστή και τον έλεγχο ενίσχυσης;$N$Nενίσχυση &lt;code&gt;0&lt;/code&gt; = στάνταρ 100% ένταση (απαράλλαχτη)$N$Nεύρος &lt;code&gt;1 &nbsp;&lt;/code&gt; = στάνταρ στερεοφωνικό (απαράλλαχτο)$Nεύρος &lt;code&gt;0.5&lt;/code&gt; = 50% αριστερά-δεξιά μίξη ήχου$Nεύρος &lt;code&gt;0 &nbsp;&lt;/code&gt; = μονοφωνικό$N$Nενίσχυση &lt;code&gt;-0.8&lt;/code&gt; &amp; εύρος &lt;code&gt;10&lt;/code&gt; = αφαίρεση φωνής :^)$N$Nη ενεργοποίηση του ισοσταθμιστή κάνει τα άλμπουμ χωρίς κενά, να παίζουν χωρίς καθόλου κενά, οπότε άφησέ το ενεργό με όλες τις τιμές στο μηδέν (εκτός από εύρος = 1) αν σε νοιάζει",
+		"mt_drc": "ενεργοποιεί τον συμπιεστή δυναμικής εμβέλειας (εξομάλυνση έντασης / ακραία συμπίεση έντασης); θα ενεργοποιήσει και τον ισοσταθμιστή για να ισορροπήσει τον ήχο, οπότε βάλε όλα τα πεδία ισοσταθμιστή εκτός από το 'εύρος' στο 0 αν δεν το θες$N$Nχαμηλώνει την ένταση του ήχου πάνω από το όριο (THRESHOLD) dB; για κάθε RATIO dB πέρα από το όριο υπάρχει 1 dB εξόδου, οπότε οι προεπιλεγμένες τιμές όριο -24 και 'λόγος' 12 σημαίνουν ότι δεν θα ξεπεράσει ποτέ τα -22 dB και είναι ασφαλές να αυξήσεις την ενίσχυση ισοσταθμιστή σε 0.8, ή και 1.8 με ATK 0 και μεγάλο RLS όπως 90 (δουλεύει μόνο σε firefox· το RLS είναι max 1 σε άλλους browsers)$N$N(δες wikipedia, το εξηγούν καλύτερα)",
+
+		"mb_play": "παίξε",
+		"mm_hashplay": "να παίξω αυτό το αρχείο ήχου;",
+		"mm_m3u": "πάτα <code>Enter/Εντάξει</code> για Αναπαραγωγή\nπάτα <code>ESC/Άκυρο</code> για Επεξεργασία",
+		"mp_breq": "χρειάζεται firefox 82+ ή chrome 73+ ή iOS 15+",
+		"mm_bload": "φορτώνει...",
+		"mm_bconv": "μετατροπή σε {0}, περίμενε...",
+		"mm_opusen": "ο browser σου δεν παίζει αρχεία aac / m4a;\nη μετατροπή σε opus είναι τώρα ενεργή",
+		"mm_playerr": "η αναπαραγωγή, απέτυχε: ",
+		"mm_eabrt": "Η προσπάθεια αναπαραγωγής ακυρώθηκε",
+		"mm_enet": "Η σύνδεση του ίντερνέτ σου είναι χάλια",
+		"mm_edec": "Το αρχείο αυτό είναι μάλλον κατεστραμμένο;;",
+		"mm_esupp": "Ο browser σου δεν καταλαβαίνει αυτή τη μορφή ήχου",
+		"mm_eunk": "Άγνωστο σφάλμα",
+		"mm_e404": "Αδύνατη η αναπαραγωγή ήχου; σφάλμα 404: Το αρχείο δεν βρέθηκε.",
+		"mm_e403": "Αδύνατη η αναπαραγωγή ήχου; σφάλμα 403: Άρνηση πρόσβασης.\n\nΔοκίμασε F5 για επαναφόρτωση, ίσως να έχεις αποσυνδεθεί",
+		"mm_e500": "Αδύνατη η αναπαραγωγή ήχου; σφάλμα 500: Έλεγξε τα logs του διακομιστή.",
+		"mm_e5xx": "Αδύνατη η αναπαραγωγή ήχου; σφάλμα διακομιστή",
+		"mm_nof": "δεν βρέθηκαν άλλα αρχεία ήχου τριγύρω",
+		"mm_prescan": "Αναζήτηση μουσικής για επόμενο τραγούδι...",
+		"mm_scank": "Βρέθηκε το επόμενο τραγούδι:",
+		"mm_uncache": "κρυφή μνήμη καθαρίστηκε· όλα τα τραγούδια θα ξανακατεβούν στην επόμενη αναπαραγωγή",
+		"mm_hnf": "το τραγούδι αυτό πλέον δεν υπάρχει",
+
+		"im_hnf": "η εικόνα αυτή πλέον δεν υπάρχει",
+
+		"f_empty": "αυτός ο φάκελος είναι άδειος",
+		"f_chide": "αυτό θα κρύψει τη στήλη «{0}»\n\nμπορείς να εμφανίσεις τις στήλες από τις ρυθμίσεις",
+		"f_bigtxt": "αυτό το αρχείο είναι {0} MiB σε μέγεθος — σίγουρα θέλεις να το δεις ως κείμενο;",
+		"f_bigtxt2": "να δεις μόνο το τέλος του αρχείου αντί για όλο; αυτό ενεργοποιεί και το following/tailing, που δείχνει νέες γραμμές που προστίθενται ζωντανά",
+		"fbd_more": '<div id="blazy">εμφανίζονται <code>{0}</code> από <code>{1}</code> αρχεία; <a href="#" id="bd_more">δείξε {2}</a> ή <a href="#" id="bd_all">δείξε τα όλα</a></div>',
+		"fbd_all": '<div id="blazy">εμφανίζονται <code>{0}</code> από <code>{1}</code> αρχεία; <a href="#" id="bd_all">δείξε όλα</a></div>',
+		"f_anota": "μόνο {0} από τα {1} αντικείμενα επιλέχθηκαν;\nγια να επιλέξεις ολόκληρο το φάκελο, κύλησε πρώτα μέχρι κάτω",
+
+		"f_dls": 'οι σύνδεσμοι αρχείων στον τρέχοντα φάκελο έχουν\nμετατραπεί σε συνδέσμους λήψης',
+
+		"f_partial": "Για να κατεβάσεις με ασφάλεια ένα αρχείο που ανεβαίνει, κλίκαρε το αρχείο με το ίδιο όνομα, αλλά χωρίς την κατάληξη <code>.PARTIAL</code>. Πάτα Άκυρο ή Escape για να σταματήσεις.\n\nΠάτα Εντάξει / Enter αν αγνοείς την προειδοποίηση και κατέβασε το <code>.PARTIAL</code> αρχείο, που σχεδόν σίγουρα θα είναι κατεστραμμένο.",
+
+		"ft_paste": "επικόλλησε {0} αντικείμενα$NΠλήκτρο συντόμευσης: ctrl-V",
+		"fr_eperm": 'δεν μπορεί να μετονομαστεί:\nδεν έχεις δικαίωμα “μετακίνησης” σε αυτόν το φάκελο',
+		"fd_eperm": 'δεν μπορεί να διαγραφεί:\nδεν έχεις δικαίωμα “διαγραφής” σε αυτόν το φάκελο',
+		"fc_eperm": 'δεν μπορεί να κοπεί:\nδεν έχεις δικαίωμα “μετακίνησης” σε αυτόν το φάκελο',
+		"fp_eperm": 'δεν μπορεί να επικολληθεί:\nδεν έχεις δικαίωμα “εγγραφής” σε αυτόν το φάκελο',
+		"fr_emore": "επίλεξε τουλάχιστον ένα αντικείμενο για μετονομασία",
+		"fd_emore": "επίλεξε τουλάχιστον ένα αντικείμενο για διαγραφή",
+		"fc_emore": "επίλεξε τουλάχιστον ένα αντικείμενο για αποκοπή",
+		"fcp_emore": "επίλεξε τουλάχιστον ένα αντικείμενο για αντιγραφή στο πρόχειρο",
+
+		"fs_sc": "μοιράσου το φάκελο που βρίσκεσαι",
+		"fs_ss": "μοιράσου τα επιλεγμένα αρχεία",
+		"fs_just1d": "δεν μπορείς να επιλέξεις περισσότερους από έναν φακέλους,\nή να αναμείξεις αρχεία και φακέλους στην ίδια επιλογή",
+		"fs_abrt": "❌ ακύρωση",
+		"fs_rand": "🎲 τυχαίο όνομα",
+		"fs_go": "✅ δημιούργησε κοινή χρήση",
+		"fs_name": "όνομα",
+		"fs_src": "πηγή",
+		"fs_pwd": "κωδικός",
+		"fs_exp": "λήξη",
+		"fs_tmin": "λεπτά",
+		"fs_thrs": "ώρες",
+		"fs_tdays": "ημέρες",
+		"fs_never": "αιώνιο",
+		"fs_pname": "προαιρετικό όνομα συνδέσμου; αν είναι κενό, θα είναι τυχαίο",
+		"fs_tsrc": "το αρχείο ή ο φάκελος προς κοινή χρήση",
+		"fs_ppwd": "προαιρετικός κωδικός",
+		"fs_w8": "δημιουργία κοινής χρήσης...",
+		"fs_ok": "πάτα <code>Enter/Εντάξει</code> για Πρόχειρο\nπάτα <code>ESC/Άκυρο</code> για Κλείσιμο",
+
+		"frt_dec": "μπορεί να διορθώσει μερικές περιπτώσεις κατεστραμμένων ονομάτων αρχείων\">αποκωδικοποίηση url",
+		"frt_rst": "επανέφερε τα ονόματα αρχείων στα αρχικά τους\">↺ επαναφορά",
+		"frt_abrt": "ακύρωσε και κλείσε αυτό το παράθυρο\">❌ ακύρωση",
+		"frb_apply": "ΕΦΑΡΜΟΓΗ ΜΕΤΟΝΟΜΑΣΙΑΣ",
+		"fr_adv": "μαζική / μεταδεδομένα / μετονομασία με πρότυπα\">προχωρημένη",
+		"fr_case": "regex με διάκριση πεζών/κεφαλαίων\">case",
+		"fr_win": "ασφαλή ονόματα για windows; αντικαθιστά <code>&lt;&gt;:&quot;\\|?*</code> με ιαπωνικούς χαρακτήρες πλήρους πλάτους\">win",
+		"fr_slash": "αντικαθίσταται <code>/</code> με χαρακτήρα που δεν δημιουργεί νέους φακέλους\">όχι /",
+		"fr_re": "μοτίβα αναζήτησης (regex) για αναζήτηση στα αρχικά ονόματα; τα καταγραφόμενα groups μπορούν να χρησιμοποιηθούν στο πεδίο μορφοποίησης παρακάτω όπως &lt;code&gt;(1)&lt;/code&gt; και &lt;code&gt;(2)&lt;/code&gt; και ούτω καθεξής",
+		"fr_fmt": "εμπνευσμένο από foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; αντικαθίσταται από τίτλο τραγουδιού,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; παραλείπει το [this] αν το artist είναι κενό$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; γεμίζει τον αριθμό κομματιού σε 2 ψηφία",
+		"fr_pdel": "διαγραφή",
+		"fr_pnew": "αποθήκευση ως",
+		"fr_pname": "δώσε όνομα για τη νέα προεπιλογή",
+		"fr_aborted": "ακυρώθηκε",
+		"fr_lold": "παλιό όνομα",
+		"fr_lnew": "νέο όνομα",
+		"fr_tags": "ετικέτες για τα επιλεγμένα αρχεία (μόνο για ανάγνωση):",
+		"fr_busy": "μετονομασία {0} αντικειμένων...\n\n{1}",
+		"fr_efail": "αποτυχία μετονομασίας:\n",
+		"fr_nchg": "{0} από τα νέα ονόματα άλλαξαν λόγω <code>win</code> και/ή <code>όχι /</code>\n\nΕίναι ΟΚ να συνεχίσουμε με αυτά τα ονόματα;",
+
+		"fd_ok": "διαγραφή OK",
+		"fd_err": "αποτυχία διαγραφής:\n",
+		"fd_none": "δεν διαγράφηκε τίποτα; ίσως μπλοκαρισμένο από τις ρυθμίσεις του διακομιστή (xbd);",
+		"fd_busy": "διαγραφή {0} αντικειμένων...\n\n{1}",
+		"fd_warn1": "ΔΙΑΓΡΑΦΗ αυτών των {0} αντικειμένων;",
+		"fd_warn2": "<b>Τελευταία ευκαιρία!</b> Δεν υπάρχει αναίρεση. Διαγραφή;",
+
+		"fc_ok": "αποκοπή {0} αντικειμένων",
+		"fc_warn": 'αποκοπή {0} αντικειμένων\n\nαλλά: μόνο <b>αυτή</b> η καρτέλα browser μπορεί να τα επικολλήσει\n(λόγω πολύ μεγάλης επιλογής)',
+
+		"fcc_ok": "αντιγράφηκαν {0} αντικείμενα στο πρόχειρο",
+		"fcc_warn": "αντιγράφηκαν {0} αντικείμενα στο πρόχειρο\n\nαλλά: μόνο <b>αυτή</b> η καρτέλα browser μπορεί να τα επικολλήσει\n(λόγω πολύ μεγάλης επιλογής)",
+
+		"fp_apply": "χρησιμοποίησε αυτά τα ονόματα",
+		"fp_ecut": "πρώτα κάνε αποκοπή ή αντιγραφή κάποιων αρχείων / φακέλων για επικόλληση / μετακίνηση\n\nσημείωση: μπορείς να αποκόπτεις / επικολλάς ανάμεσα σε διαφορετικές καρτέλες browser",
+		"fp_ename": "τα {0} αντικείμενα δεν μπορούν να μετακινηθούν εδώ γιατί τα ονόματα υπάρχουν ήδη. Δώσε νέα ονόματα παρακάτω για να συνεχίσεις, ή άφησε κενό για να τα αγνοήσεις:",
+		"fcp_ename": "τα {0} αντικείμενα δεν μπορούν να αντιγραφούν εδώ γιατί τα ονόματα υπάρχουν ήδη. Δώσε νέα ονόματα παρακάτω για να συνεχίσεις, ή άφησε κενό για να τα αγνοήσεις:",
+		"fp_emore": "υπάρχουν ακόμα συγκρούσεις ονομάτων που πρέπει να διορθωθούν",
+		"fp_ok": "μετακίνηση OK",
+		"fcp_ok": "αντιγραφή OK",
+		"fp_busy": "μετακίνηση {0} αντικειμένων...\n\n{1}",
+		"fcp_busy": "αντιγραφή {0} αντικειμένων...\n\n{1}",
+		"fp_abrt": "γίνεται ακύρωση...", //m
+		"fp_err": "αποτυχία μετακίνησης:\n",
+		"fcp_err": "αποτυχία αντιγραφής:\n",
+		"fp_confirm": "να μετακινηθούν αυτά τα {0} αντικείμενα εδώ;",
+		"fcp_confirm": "να αντιγραφούν αυτά τα {0} αντικείμενα εδώ;",
+		"fp_etab": "αποτυχία ανάγνωσης πρόχειρου από άλλη καρτέλα browser",
+		"fp_name": "μεταφόρτωση αρχείου από τη συσκευή σου. Δώσε του όνομα:",
+		"fp_both_m": '<h6>διάλεξε τι θα επικολλήσεις</h6><code>Enter</code> = Μετακίνηση {0} αρχείων από «{1}»\n<code>ESC</code> = Μεταφόρτωση {2} αρχείων από τη συσκευή σου',
+		"fcp_both_m": '<h6>διάλεξε τι θα επικολλήσεις</h6><code>Enter</code> = Αντιγραφή {0} αρχείων από «{1}»\n<code>ESC</code> = Μεταφόρτωση {2} αρχείων από τη συσκευή σου',
+		"fp_both_b": '<a href="#" id="modal-ok">Μετακίνηση</a><a href="#" id="modal-ng">Μεταφόρτωση</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Αντιγραφή</a><a href="#" id="modal-ng">Μεταφόρτωση</a>',
+
+		"mk_noname": "γράψε ένα όνομα στο πεδίο κειμένου αριστερά πριν το κάνεις :p",
+
+		"tv_load": "Φόρτωση αρχείου κειμένου:\n\n{0}\n\n{1}% ({2} από {3} MiB φορτωμένα)",
+		"tv_xe1": "αδυναμία φόρτωσης αρχείου κειμένου:\n\nσφάλμα ",
+		"tv_xe2": "404, αρχείο δεν βρέθηκε",
+		"tv_lst": "λίστα αρχείων κειμένου σε",
+		"tvt_close": "επιστροφή στην προβολή φακέλου$NΣυντόμευση: M (ή Esc)\">❌ κλείσιμο",
+		"tvt_dl": "κατέβασε αυτό το αρχείο$NΣυντόμευση: Y\">💾 λήψη",
+		"tvt_prev": "προβολή προηγούμενου εγγράφου$NΣυντόμευση: i\">⬆ προηγούμενο",
+		"tvt_next": "προβολή επόμενου εγγράφου$NΣυντόμευση: K\">⬇ επόμενο",
+		"tvt_sel": "επέλεξε αρχείο &nbsp; (για αποκοπή / αντιγραφή / διαγραφή / ...)$NΣυντόμευση: S\">επιλογή",
+		"tvt_edit": "άνοιγμα αρχείου στον επεξεργαστή κειμένου$NΣυντόμευση: E\">✏️ επεξεργασία",
+		"tvt_tail": "παρακολούθηση αρχείου για αλλαγές; εμφάνιση νέων γραμμών σε πραγματικό χρόνο\">📡 παρακολούθηση",
+		"tvt_wrap": "αναδίπλωση λέξεων\">↵",
+		"tvt_atail": "κλείδωμα κύλισης στο κάτω μέρος\">⚓",
+		"tvt_ctail": "αποκωδικοποίηση χρωμάτων τερματικού (ansi escape codes)\">🌈",
+		"tvt_ntail": "όριο κύλισης (πόσα bytes κειμένου να κρατούνται φορτωμένα)",
+
+		"m3u_add1": "το τραγούδι προστέθηκε στη λίστα m3u",
+		"m3u_addn": "προστέθηκαν {0} τραγούδια στη λίστα m3u",
+		"m3u_clip": "η λίστα m3u αντιγράφηκε στο πρόχειρο\n\nπρέπει να φτιάξεις ένα νέο αρχείο κειμένου με όνομα η_λίστα_μου.m3u και να επικολλήσεις τη λίστα μέσα· αυτό θα το καταστήσει αναπαράξιμο",
+
+		"gt_vau": "μην δείχνεις το βίντεο, παίξε μόνο τον ήχο\">🎧",
+		"gt_msel": "ενεργοποίηση επιλογής αρχείων; ctrl-κλικ σε αρχείο για παράκαμψη$N$N&lt;em&gt;όταν είναι ενεργό: διπλό κλικ σε αρχείο / φάκελο το ανοίγει&lt;/em&gt;$N$NΣυντόμευση: S\">πολλαπλή επιλογή",
+		"gt_crop": "κεντραρισμένη περικοπή μικρογραφιών\">περικοπή",
+		"gt_3x": "μικρογραφίες υψηλής ανάλυσης\">3x",
+		"gt_zoom": "ζουμ",
+		"gt_chop": "κόψε",
+		"gt_sort": "ταξινόμηση κατά",
+		"gt_name": "όνομα",
+		"gt_sz": "μέγεθος",
+		"gt_ts": "ημερομηνία",
+		"gt_ext": "τύπος",
+		"gt_c1": "μεγαλύτερη περικοπή ονομάτων αρχείων (δείξε λιγότερα)",
+		"gt_c2": "μικρότερη περικοπή ονομάτων αρχείων (δείξε περισσότερα)",
+
+		"sm_w8": "αναζήτηση...",
+		"sm_prev": "τα παρακάτω αποτελέσματα αναζήτησης προέρχονται από προηγούμενη αναζήτηση:\n  ",
+		"sl_close": "κλείσιμο αποτελεσμάτων αναζήτησης",
+		"sl_hits": "εμφανίζονται {0} αποτελέσματα",
+		"sl_moar": "φόρτωσε περισσότερα",
+
+		"s_sz": "μέγεθος",
+		"s_dt": "ημερομηνία",
+		"s_rd": "μονοπάτι",
+		"s_fn": "όνομα",
+		"s_ta": "ετικέτες",
+		"s_ua": "ανέβηκε@",
+		"s_ad": "προχωρ.",
+		"s_s1": "ελάχιστο σε MiB",
+		"s_s2": "μέγιστο σε MiB",
+		"s_d1": "ελάχιστο iso8601",
+		"s_d2": "μέγιστο iso8601",
+		"s_u1": "μεταφορτώθηκε αργότερα",
+		"s_u2": "και/ή πριν",
+		"s_r1": "το μονοπάτι περιέχει &nbsp; (χωρισμένα με κενό)",
+		"s_f1": "το όνομα περιέχει &nbsp; (άρνηση με -nope)",
+		"s_t1": "οι ετικέτες περιέχουν &nbsp; (^=αρχή, τέλος=$)",
+		"s_a1": "συγκεκριμένες ιδιότητες μεταδεδομένων",
+
+		"md_eshow": "δεν μπορεί να εμφανιστεί ",
+		"md_off": "[📜<em>readme</em>] απενεργοποιημένο στο [⚙️] -- κρυμμένο έγγραφο",
+
+		"badreply": "Αποτυχία ανάλυσης απάντησης από το διακομιστή",
+
+		"xhr403": "403: Πρόσβαση αρνήθηκε\n\nδοκίμασε το F5, ίσως αποσυνδέθηκες",
+		"xhr0": "άγνωστο (πιθανόν αποσύνδεση από το διακομιστή ή ο διακομιστής είναι εκτός σύνδεσης)",
+		"cf_ok": "συγγνώμη γι' αυτό -- η προστασία DD" + wah + "oS ενεργοποιήθηκε\n\nοι διαδικασίες θα συνεχιστούν σε περίπου 30 δευτερόλεπτα\n\nαν δεν γίνει τίποτα, πάτα F5 για επαναφόρτωση",
+		"tl_xe1": "αδύνατη η λίστα υποφακέλων:\n\nσφάλμα ",
+		"tl_xe2": "404: Ο φάκελος δεν βρέθηκε",
+		"fl_xe1": "αδύνατη η λίστα αρχείων σε φάκελο:\n\nσφάλμα ",
+		"fl_xe2": "404: Ο φάκελος δεν βρέθηκε",
+		"fd_xe1": "αδύνατη η δημιουργία υποφακέλου:\n\nσφάλμα ",
+		"fd_xe2": "404: Ο γονικός φάκελος δεν βρέθηκε",
+		"fsm_xe1": "αδύνατη η αποστολή μηνύματος:\n\nσφάλμα ",
+		"fsm_xe2": "404: Ο γονικός φάκελος δεν βρέθηκε",
+		"fu_xe1": "αποτυχία φόρτωσης λίστας unpost από το διακομιστή:\n\nσφάλμα ",
+		"fu_xe2": "404: Το αρχείο δεν βρέθηκε??",
+
+		"fz_tar": "μη συμπιεσμένο αρχείο gnu-tar (linux / mac)",
+		"fz_pax": "μη συμπιεσμένο pax-format tar (πιο αργό)",
+		"fz_targz": "gnu-tar με συμπίεση gzip επίπεδο 3$N$Nσυνήθως πολύ αργό, οπότε$Nχρησιμοποίησε καλύτερα μη συμπιεσμένο tar",
+		"fz_tarxz": "gnu-tar με συμπίεση xz επίπεδο 1$N$Nσυνήθως πολύ αργό, οπότε$Nχρησιμοποίησε καλύτερα μη συμπιεσμένο tar",
+		"fz_zip8": "zip με ονόματα αρχείων utf8 (ίσως να κολλάει σε windows 7 και παλιότερα)",
+		"fz_zipd": "zip με παραδοσιακά ονόματα cp437, για πολύ παλιό λογισμικό",
+		"fz_zipc": "cp437 με crc32 υπολογισμένο νωρίτερα,$Nγια MS-DOS PKZIP v2.04g (οκτώβριος 1993)$N(παίρνει παραπάνω χρόνο πριν ξεκινήσει η μεταφόρτωση)",
+
+		"un_m1": "μπορείς να διαγράψεις τα πρόσφατα αρχεία που μεταφόρτωσες (ή να ακυρώσεις τα μισοτελειωμένα) παρακάτω",
+		"un_upd": "ανανέωση",
+		"un_m4": "ή μοιράσου τα αρχεία που βλέπεις παρακάτω:",
+		"un_ulist": "εμφάνιση",
+		"un_ucopy": "αντιγραφή",
+		"un_flt": "προαιρετικό φίλτρο:&nbsp; η διεύθυνση πρέπει να περιέχει",
+		"un_fclr": "καθαρισμός φίλτρου",
+		"un_derr": "αποτυχία διαγραφής unpost:\n",
+		"un_f5": "κάτι χάλασε, δοκίμασε την ανανέωση ή πάτα F5",
+		"un_uf5": "συγγνώμη αλλά πρέπει να ανανεώσεις τη σελίδα (πχ με F5 ή CTRL-R) πριν ακυρώσεις αυτήν την αποστολή",
+		"un_nou": "<b>προσοχή:</b> ο διακομιστής είναι πολύ φορτωμένος για να δείξει μισοτελειωμένες αποστολές· πάτα την ανανέωση, σε λίγο",
+		"un_noc": "<b>προσοχή:</b> το unpost των ολοκληρωμένων αρχείων δεν επιτρέπεται από τη ρύθμιση του διακομιστή",
+		"un_max": "εμφανίζονται τα πρώτα 2000 αρχεία (χρησιμοποίησε φίλτρο)",
+		"un_avail": "μπορείς να διαγράψεις {0} πρόσφατα αρχεία<br />μπορείς να ακυρώσεις {1} μισοτελειωμένες αποστολές",
+		"un_m2": "ταξινομημένα κατά χρόνο μεταφόρτωσης; τα πιο πρόσφατα πρώτα:",
+		"un_no1": "άκυρο! καμία μεταφόρτωση δεν είναι αρκετά πρόσφατη",
+		"un_no2": "άκυρο! καμία μεταφόρτωση με αυτό το φίλτρο δεν είναι αρκετά πρόσφατη",
+		"un_next": "διάγραψε τα επόμενα {0} αρχεία παρακάτω",
+		"un_abrt": "άκυρο",
+		"un_del": "διαγραφή",
+		"un_m3": "φορτώνω τις πρόσφατες μεταφορτώσεις σου...",
+		"un_busy": "διαγράφω {0} αρχεία...",
+		"un_clip": "αντιγράφηκαν {0} σύνδεσμοι στο πρόχειρο",
+
+		"u_https1": "πρέπει",
+		"u_https2": "μετάβαση σε https",
+		"u_https3": "για καλύτερη απόδοση",
+		"u_ancient": 'ο browser σου είναι εντυπωσιακά απαρχαιωμένος — ίσως να <a href="#" onclick="goto(\'bup\')">χρησιμοποιήσεις το bup αντί γι\' αυτό</a>',
+		"u_nowork": "χρειάζεται firefox 53+ ή chrome 57+ ή iOS 11+",
+		"tail_2old": "χρειάζεται firefox 105+ ή chrome 71+ ή iOS 14.5+",
+		"u_nodrop": "ο browser σου είναι πολύ παλιός για drag&amp;drop μεταφορτώσεις",
+		"u_notdir": "αυτός δεν είναι φάκελος!\n\nο browser σου είναι πολύ παλιός,\nδοκίμασε drag&amp;drop αντ' αυτού",
+		"u_uri": "για να κάνεις drag&amp;drop εικόνων από άλλα παράθυρα browser,\nρίξ' τες πάνω στο μεγάλο κουμπί μεταφόρτωσης",
+		"u_enpot": 'άλλαξε στο <a href="#">potato UI</a> (ίσως ανεβάζει πιο γρήγορα)',
+		"u_depot": 'άλλαξε στο <a href="#">fancy UI</a> (ίσως ανεβάζει πιο αργά)',
+		"u_gotpot": "αλλάζω στο potato UI για πιο γρήγορη μεταφόρτωση,\n\nμπορείς να το αλλάξεις πάλι αν θες!",
+		"u_pott": "<p>αρχεία: &nbsp; <b>{0}</b> ολοκληρωμένα, &nbsp; <b>{1}</b> αποτυχημένα, &nbsp; <b>{2}</b> σε εξέλιξη, &nbsp; <b>{3}</b> σε ουρά</p>",
+		"u_ever": "αυτός είναι ο βασικός uploader; το up2k θέλει τουλάχιστον<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'αυτός είναι ο βασικός uploader; το <a href="#" id="u2yea">up2k</a> είναι καλύτερο',
+		"u_uput": "βελτιστοποίηση για ταχύτητα (παράλειψη ελέγχου ακεραιότητας)",
+		"u_ewrite": "δεν έχεις δικαίωμα εγγραφής σε αυτόν τον φάκελο",
+		"u_eread": "δεν έχεις δικαίωμα ανάγνωσης σε αυτόν τον φάκελο",
+		"u_enoi": "η αναζήτηση αρχείων δεν είναι ενεργοποιημένη στο αρχείο ρυθμίσεων του διακομιστή",
+		"u_enoow": "δεν μπορείς να κάνεις αντικατάσταση εδώ· χρειάζεται δικαίωμα Διαγραφής",
+		"u_badf": "Αυτά τα {0} αρχεία (από {1} συνολικά) παραλείφθηκαν, πιθανώς λόγω δικαιωμάτων συστήματος αρχείων:\n\n",
+		"u_blankf": "Αυτά τα {0} αρχεία (από {1} συνολικά) είναι άδεια / κενά· να τα μεταφορτώσω έτσι κι αλλιώς;\n\n",
+		"u_applef": "Αυτά τα {0} αρχεία (από {1} συνολικά) πιθανώς δεν είναι επιθυμητά;\nΠάτα <code>Εντάξει/Enter</code> για ΝΑ ΑΓΝΟΗΘΟΥΝ τα παρακάτω αρχεία,\nΠάτα <code>Άκυρο/ESC</code> για ΝΑ ΜΗΝ ΑΠΟΚΛΕΙΣΤΟΥΝ και να ΜΕΤΑΦΟΡΤΩΘΟΎΝ κι αυτά:\n\n",
+		"u_just1": "\nΊσως δουλέψει καλύτερα αν επιλέξεις μόνο ένα αρχείο",
+		"u_ff_many": "αν χρησιμοποιείς <b>Linux / MacOS / Android,</b> τότε τόσα αρχεία <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>μπορεί</em> να κατάρρευση του Firefox!</a>\nαν γίνει αυτό, δοκίμασε ξανά (ή χρησιμοποίησε τον Chrome).",
+		"u_up_life": "Αυτή η μεταφόρτωση θα διαγραφεί από το διακομιστή\n{0} μετά την ολοκλήρωσή της",
+		"u_asku": "μεταφόρτωση αυτών των {0} αρχείων στο <code>{1}</code>",
+		"u_unpt": "μπορείς να αναιρέσεις / διαγράψεις αυτήν τη μεταφόρτωση χρησιμοποιώντας το 🧯, πάνω αριστερά",
+		"u_bigtab": "θα εμφανιστούν {0} αρχεία\n\nαυτό μπορεί να κάνει τον browser σου να κολλήσει, είσαι σίγουρος;",
+		"u_scan": "Σάρωση αρχείων...",
+		"u_dirstuck": "ο επεξεργαστής φακέλων κόλλησε προσπαθώντας να προσπελάσει τα εξής {0} αντικείμενα· θα τα παραλείψει:",
+		"u_etadone": "Ολοκληρώθηκε ({0}, {1} αρχεία)",
+		"u_etaprep": "(προετοιμασία για μεταφόρτωση)",
+		"u_hashdone": "το hashing ολοκληρώθηκε",
+		"u_hashing": "υπολογισμός hash",
+		"u_hs": "handshaking...",
+		"u_started": "τα αρχεία ανεβαίνουν τώρα· δες τα στο [🚀]",
+		"u_dupdefer": "διπλότυπο; θα επεξεργαστεί μετά από όλα τα άλλα αρχεία",
+		"u_actx": "πάτα αυτό το κείμενο για να μην χάσεις<br />απόδοση όταν αλλάζεις παράθυρα/καρτέλες",
+		"u_fixed": "ΟΚ!&nbsp; Το διόρθωσα 👍",
+		"u_cuerr": "αποτυχία μεταφόρτωσης τμήματοςς {0} από {1};\nπιθανώς ακίνδυνο, συνεχίζω\n\nαρχείο: {2}",
+		"u_cuerr2": "ο διακομιστής απέρριψε τη μεταφόρτωση (τμήμα {0} από {1});\nθα ξαναδοκιμάσει αργότερα\n\nαρχείο: {2}\n\nσφάλμα ",
+		"u_ehstmp": "θα ξαναδοκιμάσει; δες κάτω δεξιά",
+		"u_ehsfin": "ο διακομιστής απέρριψε το αίτημα ολοκλήρωσης της μεταφόρτωσης; ξαναδοκιμάζει...",
+		"u_ehssrch": "ο διακομιστής απέρριψε το αίτημα αναζήτησης; ξαναδοκιμάζει...",
+		"u_ehsinit": "ο διακομιστής απέρριψε το αίτημα για εκκίνηση μεταφόρτωσης; ξαναδοκιμάζει...",
+		"u_eneths": "σφάλμα δικτύου κατά το handshake μεταφόρτωσης; ξαναδοκιμάζει...",
+		"u_enethd": "σφάλμα δικτύου κατά τον έλεγχο ύπαρξης στόχου; ξαναδοκιμάζει...",
+		"u_cbusy": "ο διακομιστής περιμένει να μας εμπιστευτεί ξανά μετά από πρόβλημα δικτύου...",
+		"u_ehsdf": "ο διακομιστής έμεινε από χώρο στο δίσκο!\n\nθα συνεχίσει να ξαναδοκιμάζει,\nσε περίπτωση που κάποιος\nελευθερώσει αρκετό χώρο για συνέχεια",
+		"u_emtleak1": "φαίνεται πως ο browser σου έχει διαρροή μνήμης;\nπαρακαλώ",
+		"u_emtleak2": ' <a href="{0}">αλλαγή σε https (συνιστάται)</a> ή ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'δοκίμασε τα εξής:\n<ul><li>πάτα <code>F5</code> για ανανέωση σελίδας</li><li>μετά απενεργοποίησε το &nbsp;<code>mt</code>&nbsp; κουμπί στις &nbsp;<code>⚙️ ρυθμίσεις</code></li><li>και δοκίμασε ξανά τη μεταφόρτωση</li></ul>Οι μεταφορτώσιες θα είναι λίγο πιο αργές, αλλά ok.\nΣυγγνώμη για την ταλαιπωρία!\n\nPS: το chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">έχει διόρθωση γι\' αυτό</a>',
+		"u_emtleakf": 'δοκίμασε τα εξής:\n<ul><li>πάτα <code>F5</code> για ανανέωση σελίδας</li><li>μετά άνοιξε το <code>🥔</code> (potato) στο UI μεταφόρτωσης<li>και δοκίμασε ξανά τη μεταφόρτωση</li></ul>\nPS: ο firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">ελπίζει να φτιάξει αυτό το bug</a> κάποια στιγμή',
+		"u_s404": "δεν βρέθηκε στο διακομιστή",
+		"u_expl": "επεξήγηση",
+		"u_maxconn": "οι περισσότεροι browser το περιορίζουν στα 6, αλλά ο firefox σου επιτρέπει να το αυξήσεις με <code>connections-per-server</code> στο <code>about:config</code>",
+		"u_tu": '<p class="warn">ΠΡΟΕΙΔΟΠΟΙΗΣΗ: το turbo είναι ενεργοποιημένο, <span>&nbsp;το πρόγραμμα πελάτη ίσως να μην ανιχνεύσει και να μην ξαναεκκινήσει μισοτελειωμένες μεταφορτώσεις; δες τα tooltip του κουμπιού turbo</span></p>',
+		"u_ts": '<p class="warn">ΠΡΟΕΙΔΟΠΟΙΗΣΗ: το turbo είναι ενεργοποιημένο, <span>&nbsp;τα αποτελέσματα αναζήτησης μπορεί να είναι λάθος; δες τα tooltip του κουμπιού turbo</span></p>',
+		"u_turbo_c": "το turbo είναι απενεργοποιημένο στο αρχείο ρυθμίσεων του διακομιστή",
+		"u_turbo_g": "απενεργοποιώ το turbo επειδή δεν έχεις δικαίωμα\nγια τη λίστα φακέλων σε αυτόν τον τόμο",
+		"u_life_cfg": 'αυτόματη διαγραφή μετά από <input id="lifem" p="60" /> λεπτά (ή <input id="lifeh" p="3600" /> ώρες)',
+		"u_life_est": 'η μεταφόρτωση θα διαγραφεί <span id="lifew" tt="τοπική ώρα">---</span>',
+		"u_life_max": 'αυτός ο φάκελος επιβάλλει\nμέγιστη διάρκεια ζωής {0}',
+		"u_unp_ok": "επιτρέπεται το unpost για {0}",
+		"u_unp_ng": "δεν επιτρέπεται το unpost",
+		"ue_ro": "έχεις μόνο δικαίωμα ανάγνωσης σε αυτόν το φάκελο\n\n",
+		"ue_nl": "δεν είσαι συνδεδεμένος τώρα",
+		"ue_la": 'είσαι συνδεδεμένος ως "{0}"',
+		"ue_sr": "είσαι σε λειτουργία αναζήτησης αρχείων\n\nπήγαινε σε λειτουργία μεταφόρτωσης πατώντας το 🔎 (δίπλα στο μεγάλο κουμπί ΑΝΑΖΗΤΗΣΗΣ) και δοκίμασε πάλι\n\nσυγγνώμη",
+		"ue_ta": "δοκίμασε να μεταφορτώσεις εκ νέου, θα πρέπει να δουλέψει τώρα",
+		"ue_ab": "αυτό το αρχείο ανεβαίνει σε άλλο φάκελο και η μεταφόρτωση πρέπει να ολοκληρωθεί πριν ανέβει αλλού.\n\nΜπορείς να ακυρώσεις και να ξεχάσεις την αρχική μεταφόρτωση με το κουμπί 🧯 πάνω αριστερά",
+		"ur_1uo": "ΟΚ: Το αρχείο ανέβηκε επιτυχώς",
+		"ur_auo": "ΟΚ: Και τα {0} αρχεία ανέβηκαν επιτυχώς",
+		"ur_1so": "ΟΚ: Το αρχείο βρέθηκε στο διακομιστή",
+		"ur_aso": "ΟΚ: Και τα {0} αρχεία βρέθηκαν στο διακομιστή",
+		"ur_1un": "Η μεταφόρτωση απέτυχε, συγγνώμη",
+		"ur_aun": "Και οι {0} μεταφορτώσεις απέτυχαν, συγγνώμη",
+		"ur_1sn": "Το αρχείο ΔΕΝ βρέθηκε στο διακομιστή",
+		"ur_asn": "Τα {0} αρχεία ΔΕΝ βρέθηκαν στο διακομιστή",
+		"ur_um": "Ολοκληρώθηκε;\n{0} μεταφορτώσεις είναι OK,\n{1} μεταφορτώσεις απέτυχαν, συγγνώμη",
+		"ur_sm": "Ολοκληρώθηκε;\n{0} αρχεία βρέθηκαν στο διακομιστή,\n{1} αρχεία ΔΕΝ βρέθηκαν στο διακομιστή",
+
+		"lang_set": "ανανέωση σελίδας για εφαρμογή της αλλαγής;"
+	},
+	"ita": {
+		"tt": "Italiano",
+
+		"cols": {
+			"c": "pulsanti azione",
+			"dur": "durata",
+			"q": "qualità / bitrate",
+			"Ac": "codec audio",
+			"Vc": "codec video",
+			"Fmt": "formato / container",
+			"Ahash": "checksum audio",
+			"Vhash": "checksum video",
+			"Res": "risoluzione",
+			"T": "tipo file",
+			"aq": "qualità audio / bitrate",
+			"vq": "qualità video / bitrate",
+			"pixfmt": "subsampling / struttura pixel",
+			"resw": "risoluzione orizzontale",
+			"resh": "risoluzione verticale",
+			"chs": "canali audio",
+			"hz": "frequenza di campionamento"
+		},
+
+		"hks": [
+			[
+				"varie",
+				["ESC", "chiudi vari elementi"],
+
+				"file-manager",
+				["G", "alterna vista lista / griglia"],
+				["T", "alterna miniature / icone"],
+				["⇧ A/D", "dimensione miniature"],
+				["ctrl-K", "elimina selezionati"],
+				["ctrl-X", "taglia selezione negli appunti"],
+				["ctrl-C", "copia selezione negli appunti"],
+				["ctrl-V", "incolla (sposta/copia) qui"],
+				["Y", "scarica selezionati"],
+				["F2", "rinomina selezionati"],
+
+				"file-list-sel",
+				["spazio", "alterna selezione file"],
+				["↑/↓", "sposta cursore selezione"],
+				["ctrl ↑/↓", "sposta cursore e viewport"],
+				["⇧ ↑/↓", "seleziona file prec/succ"],
+				["ctrl-A", "seleziona tutti i file / cartelle"],
+			], [
+				"navigation",
+				["B", "alterna breadcrumb / pannello nav"],
+				["I/K", "cartella prec/succ"],
+				["M", "cartella genitore (o comprimi corrente)"],
+				["V", "alterna cartelle / file di testo nel pannello nav"],
+				["A/D", "dimensione pannello nav"],
+			], [
+				"audio-player",
+				["J/L", "brano prec/succ"],
+				["U/O", "salta 10sec indietro/avanti"],
+				["0..9", "salta a 0%..90%"],
+				["P", "play/pausa (avvia anche)"],
+				["S", "seleziona brano in riproduzione"],
+				["Y", "scarica brano"],
+			], [
+				"image-viewer",
+				["J/L, ←/→", "immagine prec/succ"],
+				["Home/End", "prima/ultima immagine"],
+				["F", "schermo intero"],
+				["R", "ruota in senso orario"],
+				["⇧ R", "ruota in senso antiorario"],
+				["S", "seleziona immagine"],
+				["Y", "scarica immagine"],
+			], [
+				"video.player",
+				["U/O", "salta 10sec indietro/avanti"],
+				["P/K/Spazio", "play/pausa"],
+				["C", "continua riproduzione successivo"],
+				["V", "loop"],
+				["M", "muto"],
+				["[ e ]", "imposta intervallo loop"],
+			], [
+				"textfile-viewer",
+				["I/K", "file prec/succ"],
+				["M", "chiudi file di testo"],
+				["E", "modifica file di testo"],
+				["S", "seleziona file (per taglia/copia/rinomina)"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Annulla",
+
+		"enable": "Abilita",
+		"danger": "PERICOLO",
+		"clipped": "copiato negli appunti",
+
+		"ht_s1": "secondo",
+		"ht_s2": "secondi",
+		"ht_m1": "minuto",
+		"ht_m2": "minuti",
+		"ht_h1": "ora",
+		"ht_h2": "ore",
+		"ht_d1": "giorno",
+		"ht_d2": "giorni",
+		"ht_and": " e ",
+
+		"goh": "control-panel",
+		"gop": 'cartella sorella precedente">prec',
+		"gou": 'cartella genitore">su',
+		"gon": 'prossima cartella">succ',
+		"logout": "Logout ",
+		"login": "Accedi", //m
+		"access": " accesso",
+		"ot_close": "chiudi sottomenu",
+		"ot_search": "cerca file per attributi, percorso / nome, tag musicali, o qualsiasi combinazione di questi$N$N&lt;code&gt;foo bar&lt;/code&gt; = deve contenere sia «foo» che «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = deve contenere «foo» ma non «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = inizia con «yana» ed è un file «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contiene esattamente «try unite»$N$Nil formato data è iso-8601, come$N&lt;code&gt;2009-12-31&lt;/code&gt; o &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: elimina i tuoi caricamenti recenti, o interrompi quelli non completati",
+		"ot_bup": "bup: uploader di base, supporta anche netscape 4.0",
+		"ot_mkdir": "mkdir: crea una nuova directory",
+		"ot_md": "new-md: crea un nuovo documento markdown",
+		"ot_msg": "msg: invia un messaggio al log del server",
+		"ot_mp": "opzioni lettore multimediale",
+		"ot_cfg": "opzioni di configurazione",
+		"ot_u2i": 'up2k: carica file (se hai accesso in scrittura) o attiva la modalità ricerca per vedere se esistono già da qualche parte sul server$N$NI caricamenti sono ripristinabili, multithreaded, e i timestamp dei file vengono preservati, ma usa più CPU di [🎈]&nbsp; (l\'uploader di base)<br /><br />durante i caricamenti, questa icona diventa un indicatore di progresso!',
+		"ot_u2w": 'up2k: carica file con supporto per il ripristino (chiudi il browser e trascina gli stessi file più tardi)$N$NMultithreaded, e i timestamp dei file vengono preservati, ma usa più CPU di [🎈]&nbsp; (l\'uploader di base)<br /><br />durante i caricamenti, questa icona diventa un indicatore di progresso!',
+		"ot_noie": 'Perfavore usa Chrome / Firefox / Edge',
+
+		"ab_mkdir": "crea directory",
+		"ab_mkdoc": "nuovo doc markdown",
+		"ab_msg": "invia msg al log srv",
+
+		"ay_path": "salta alle cartelle",
+		"ay_files": "salta ai file",
+
+		"wt_ren": "rinomina elementi selezionati$NTasto rapido: F2",
+		"wt_del": "elimina elementi selezionati$NTasto rapido: ctrl-K",
+		"wt_cut": "taglia elementi selezionati &lt;small&gt;(poi incolla altrove)&lt;/small&gt;$NTasto rapido: ctrl-X",
+		"wt_cpy": "copia elementi selezionati negli appunti$N(per incollarli altrove)$NTasto rapido: ctrl-C",
+		"wt_pst": "incolla una selezione precedentemente tagliata / copiata$NTasto rapido: ctrl-V",
+		"wt_selall": "seleziona tutti i file$NTasto rapido: ctrl-A (quando il file è focalizzato)",
+		"wt_selinv": "inverti selezione",
+		"wt_zip1": "scarica questa cartella come archivio",
+		"wt_selzip": "scarica selezione come archivio",
+		"wt_seldl": "scarica selezione come file separati$NTasto rapido: Y",
+		"wt_npirc": "copia info traccia formato irc",
+		"wt_nptxt": "copia info traccia testo semplice",
+		"wt_m3ua": "aggiungi alla playlist m3u (clicca <code>📻copia</code> dopo)",
+		"wt_m3uc": "copia playlist m3u negli appunti",
+		"wt_grid": "alterna vista griglia / lista$NTasto rapido: G",
+		"wt_prev": "traccia precedente$NTasto rapido: J",
+		"wt_play": "play / pausa$NTasto rapido: P",
+		"wt_next": "traccia successiva$NTasto rapido: L",
+
+		"ul_par": "caricamenti paralleli:",
+		"ut_rand": "randomizza nomi file",
+		"ut_u2ts": "copia il timestamp di ultima modifica$Ndal tuo filesystem al server\">📅",
+		"ut_ow": "sovrascrivere file esistenti sul server?$N🛡️: mai (genererà un nuovo nome file)$N🕒: sovrascrivi se il file del server è più vecchio del tuo$N♻️: sovrascrivi sempre se i file sono diversi",
+		"ut_mt": "continua l'hashing di altri file durante il caricamento$N$NProva a disabilitare se la tua CPU o HDD è un collo di bottiglia",
+		"ut_ask": 'chiedi conferma prima che inizi il caricamento">💭',
+		"ut_pot": "migliora la velocità di caricamento su dispositivi lenti$Nrendendo l'interfaccia meno complessa",
+		"ut_srch": "non caricare realmente, invece controlla se i file esistono già $N sul server (scansionerà tutte le cartelle che puoi leggere)",
+		"ut_par": "metti in pausa i caricamenti impostandolo a 0$N$NAumenta se la tua connessione è lenta / alta latenza$N$NMantienilo a 1 su LAN o se l'HDD del server è un collo di bottiglia",
+		"ul_btn": "trascina file / cartelle<br>qui (o cliccami)",
+		"ul_btnu": "C A R I C A",
+		"ul_btns": "C E R C A",
+
+		"ul_hash": "hash",
+		"ul_send": "invia",
+		"ul_done": "fatto",
+		"ul_idle1": "nessun caricamento ancora in coda",
+		"ut_etah": "velocità media di &lt;em&gt;hashing&lt;/em&gt;, e tempo stimato al completamento",
+		"ut_etau": "velocità media di &lt;em&gt;caricamento&lt;/em&gt; e tempo stimato al completamento",
+		"ut_etat": "velocità &lt;em&gt;totale&lt;/em&gt; media e tempo stimato al completamento",
+
+		"uct_ok": "completato con successo",
+		"uct_ng": "non-valido: fallito / rifiutato / non-trovato",
+		"uct_done": "ok e ng combinati",
+		"uct_bz": "hashing o caricamento",
+		"uct_q": "inattivo, in attesa",
+
+		"utl_name": "nome file",
+		"utl_ulist": "lista",
+		"utl_ucopy": "copia",
+		"utl_links": "link",
+		"utl_stat": "stato",
+		"utl_prog": "progresso",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "ERRORE",
+		"utl_oserr": "Errore-SO",
+		"utl_found": "trovato",
+		"utl_defer": "rinvia",
+		"utl_yolo": "YOLO",
+		"utl_done": "finito",
+
+		"ul_flagblk": "i file sono stati aggiunti alla coda</b><br>tuttavia c'è un up2k occupato in un'altra scheda del browser,<br>quindi aspetto che quello finisca prima",
+		"ul_btnlk": "la configurazione del server ha bloccato questo interruttore in questo stato",
+
+		"udt_up": "Carica",
+		"udt_srch": "Cerca",
+		"udt_drop": "lascialo qui",
+
+		"u_nav_m": '<h6>ok, cosa hai?</h6><code>Invio</code> = File (uno o più)\n<code>ESC</code> = Una cartella (incluse sottocartelle)',
+		"u_nav_b": '<a href="#" id="modal-ok">File</a><a href="#" id="modal-ng">Una cartella</a>',
+
+		"cl_opts": "opzioni",
+		"cl_themes": "tema",
+		"cl_langs": "lingua",
+		"cl_ziptype": "download cartella",
+		"cl_uopts": "opzioni up2k",
+		"cl_favico": "favicon",
+		"cl_bigdir": "cartelle grandi",
+		"cl_hsort": "#ordinamento",
+		"cl_keytype": "notazione tasti",
+		"cl_hiddenc": "colonne nascoste",
+		"cl_hidec": "nascondi",
+		"cl_reset": "reset",
+		"cl_hpick": "tocca le intestazioni delle colonne per nascondere nella tabella sottostante",
+		"cl_hcancel": "nascondere colonne annullato",
+
+		"ct_grid": '田 griglia',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltip',
+		"ct_thumb": 'nella vista griglia, alterna icone o miniature$NTasto rapido: T">🖼️ miniature',
+		"ct_csel": 'usa CTRL e SHIFT per la selezione file nella vista griglia">sel',
+		"ct_ihop": 'quando il visualizzatore immagini è chiuso, scorri fino all\'ultimo file visualizzato">g⮯',
+		"ct_dots": 'mostra file nascosti (se il server lo permette)">dotfile',
+		"ct_qdel": 'quando elimini file, chiedi conferma solo una volta">qdel',
+		"ct_dir1st": 'ordina cartelle prima dei file">📁 prima',
+		"ct_nsort": 'ordinamento naturale (per nomi file con cifre iniziali)">nsort',
+		"ct_utc": 'mostra tutte le date/ore in UTC">UTC',
+		"ct_readme": 'mostra README.md negli elenchi cartelle">📜 readme',
+		"ct_idxh": 'mostra index.html invece dell\'elenco cartelle">htm',
+		"ct_sbars": 'mostra barre di scorrimento">⟊',
+
+		"cut_umod": "se un file esiste già sul server, aggiorna il timestamp di ultima modifica del server per farlo coincidere con il tuo file locale (richiede permessi di scrittura+eliminazione)\">re📅",
+
+		"cut_turbo": "il pulsante yolo, probabilmente NON lo vuoi abilitare:$N$NUsalo se stavi caricando una grande quantità di file e hai dovuto riavviare per qualche motivo, e vuoi continuare il caricamento il prima possibile$N$NQuesto sostituisce il controllo hash con un semplice <em>&quot;questo ha la stessa dimensione file sul server?&quot;</em> quindi se il contenuto del file è diverso NON verrà caricato$N$NDovresti spegnere questo quando il caricamento è finito, e poi &quot;caricare&quot; di nuovo gli stessi file per far verificare al client\">turbo",
+
+		"cut_datechk": "non ha effetto a meno che il pulsante turbo sia abilitato$N$NRiduce il fattore yolo di una piccola quantità; controlla se i timestamp dei file sul server corrispondono ai tuoi$N$NDovrebbe <em>teoricamente</em> catturare la maggior parte dei caricamenti non finiti / corrotti, ma non è un sostituto per fare un passaggio di verifica con turbo disabilitato dopo\">date-chk",
+
+		"cut_u2sz": "dimensione (in MiB) di ogni chunk di caricamento; valori grandi volano meglio attraverso l'atlantico. Prova valori bassi su connessioni molto inaffidabili",
+
+		"cut_flag": "assicura che solo una scheda stia caricando alla volta $N -- anche le altre schede devono avere questo abilitato $N -- influisce solo sulle schede dello stesso dominio",
+
+		"cut_az": "carica file in ordine alfabetico, invece che dal file più piccolo prima$N$NL'ordine alfabetico può rendere più facile controllare a occhio se qualcosa è andato storto sul server, ma rende il caricamento leggermente più lento su fibra / LAN",
+
+		"cut_nag": "notifica SO quando il caricamento si completa$N(solo se il browser o la scheda non è attiva)",
+		"cut_sfx": "allarme sonoro quando il caricamento si completa$N(solo se il browser o la scheda non è attiva)",
+
+		"cut_mt": "usa multithreading per accelerare l'hashing dei file$N$NQuesto usa web-worker e richiede$Npiù RAM (fino a 512 MiB extra)$N$NRende https 30% più veloce, http 4.5x più veloce\">mt",
+
+		"cut_wasm": "usa wasm invece dell'hasher integrato del browser; migliora la velocità sui browser basati su chrome ma aumenta il carico CPU, e molte versioni vecchie di chrome hanno bug che fanno consumare tutta la RAM al browser e crashare se questo è abilitato\">wasm",
+
+		"cft_text": "testo favicon (vuoto e aggiorna per disabilitare)",
+		"cft_fg": "colore primo piano",
+		"cft_bg": "colore sfondo",
+
+		"cdt_lim": "numero massimo di file da mostrare in una cartella",
+		"cdt_ask": "quando scorri verso il fondo,$Ninvece di caricare più file,$Nchiedi cosa fare",
+		"cdt_hsort": "quante regole di ordinamento (&lt;code&gt;,sorthref&lt;/code&gt;) includere negli URL multimediali. Impostandolo a 0 ignorerà anche le regole di ordinamento incluse nei link multimediali quando li clicchi",
+
+		"tt_entree": "mostra pannello nav (barra laterale albero directory)$NTasto rapido: B",
+		"tt_detree": "mostra breadcrumb$NTasto rapido: B",
+		"tt_visdir": "scorri alla cartella selezionata",
+		"tt_ftree": "alterna albero cartelle / file di testo$NTasto rapido: V",
+		"tt_pdock": "mostra cartelle genitore in un pannello ancorato in alto",
+		"tt_dynt": "crescita automatica mentre l'albero si espande",
+		"tt_wrap": "a capo parola",
+		"tt_hover": "rivela righe che traboccano al passaggio del mouse$N( interrompe lo scorrimento a meno che il cursore $N&nbsp; del mouse non sia nella grondaia sinistra )",
+
+		"ml_pmode": "alla fine della cartella...",
+		"ml_btns": "comandi",
+		"ml_tcode": "transcodifica",
+		"ml_tcode2": "transcodifica in",
+		"ml_tint": "tinta",
+		"ml_eq": "equalizzatore audio",
+		"ml_drc": "compressore gamma dinamica",
+
+		"mt_loop": "loop/ripeti una canzone\">🔁",
+		"mt_one": "fermati dopo una canzone\">1️⃣",
+		"mt_shuf": "mescola le canzoni in ogni cartella\">🔀",
+		"mt_aplay": "autoplay se c'è un song-ID nel link che hai cliccato per accedere al server$N$NDisabilitando questo fermerà anche l'aggiornamento dell'URL della pagina con song-ID quando riproduci musica, per prevenire autoplay se queste impostazioni vengono perse ma l'URL rimane\">a▶",
+		"mt_preload": "inizia a caricare la prossima canzone verso la fine per riproduzione senza interruzioni\">preload",
+		"mt_prescan": "vai alla prossima cartella prima che finisca l'ultima canzone$Nmantenendo felice il browser web$Ncosì non si ferma la riproduzione\">nav",
+		"mt_fullpre": "prova a precaricare l'intera canzone;$N✅ abilita su connessioni <b>inaffidabili</b>,$N❌ <b>disabilita</b> su connessioni lente probabilmente\">full",
+		"mt_fau": "sui telefoni, previeni che la musica si fermi se la prossima canzone non si precarica abbastanza velocemente (può rendere glitchy la visualizzazione dei tag)\">☕️",
+		"mt_waves": "barra di ricerca forma d'onda:$Nmostra ampiezza audio nello scrubber\">~s",
+		"mt_npclip": "mostra pulsanti per copiare negli appunti la canzone attualmente in riproduzione\">/np",
+		"mt_m3u_c": "mostra pulsanti per copiare negli appunti le$Ncanzoni selezionate come voci playlist m3u8\">📻",
+		"mt_octl": "integrazione so (tasti multimediali / osd)\">os-ctl",
+		"mt_oseek": "permetti ricerca attraverso integrazione so$N$Nnota: su alcuni dispositivi (iPhone),$Nquesto sostituisce il pulsante canzone successiva\">seek",
+		"mt_oscv": "mostra copertina album in osd\">art",
+		"mt_follow": "mantieni la traccia in riproduzione scorrevole nella vista\">🎯",
+		"mt_compact": "controlli compatti\">⟎",
+		"mt_uncache": "pulisci cache &nbsp;(prova ad attivare se il tuo browser ha messo in cache$Nuna copia rotta di una canzone e si rifiuta di riprodurla)\">uncache",
+		"mt_mloop": "loop della cartella aperta\">🔁 loop",
+		"mt_mnext": "carica la prossima cartella e continua\">📂 succ",
+		"mt_mstop": "ferma riproduzione\">⏸ stop",
+		"mt_cflac": "converti flac / wav in {0}\">flac",
+		"mt_caac": "converti aac / m4a in {0}\">aac",
+		"mt_coth": "converti tutti gli altri (non mp3) in {0}\">oth",
+		"mt_c2opus": "scelta migliore per desktop, laptop, android\">opus",
+		"mt_c2owa": "opus-weba, per iOS 17.5 e più recenti\">owa",
+		"mt_c2caf": "opus-caf, per iOS 11 fino a 17\">caf",
+		"mt_c2mp3": "usa questo su dispositivi molto vecchi\">mp3",
+		"mt_c2flac": "qualità audio migliore, ma download pesanti\">flac", //m
+		"mt_c2wav": "riproduzione non compressa (ancora più grande)\">wav", //m
+		"mt_c2ok": "bene, buona scelta",
+		"mt_c2nd": "quello non è il formato di output raccomandato per il tuo dispositivo, ma va bene",
+		"mt_c2ng": "il tuo dispositivo non sembra supportare questo formato di output, ma proviamo comunque",
+		"mt_xowa": "ci sono bug in iOS che prevengono la riproduzione in background usando questo formato; usa caf o mp3 invece",
+		"mt_tint": "livello sfondo (0-100) sulla barra di ricerca$Nper rendere il buffering meno distraente",
+		"mt_eq": "abilita l'equalizzatore e controllo guadagno;$N$Nboost &lt;code&gt;0&lt;/code&gt; = volume standard 100% (non modificato)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = stereo standard (non modificato)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% crossfeed sinistra-destra$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = rimozione vocale :^)$N$Nabilitando l'equalizzatore rende gli album senza interruzioni completamente senza interruzioni, quindi lascialo acceso con tutti i valori a zero (eccetto width = 1) se ti importa di quello",
+		"mt_drc": "abilita il compressore gamma dinamica (appiattitore volume / brickwaller); abiliterà anche EQ per bilanciare gli spaghetti, quindi imposta tutti i campi EQ eccetto 'width' a 0 se non lo vuoi$N$NAbbassa il volume dell'audio sopra THRESHOLD dB; per ogni RATIO dB oltre THRESHOLD c'è 1 dB di output, quindi i valori di default di tresh -24 e ratio 12 significa che non dovrebbe mai diventare più forte di -22 dB ed è sicuro aumentare il boost equalizzatore a 0.8, o anche 1.8 con ATK 0 e un RLS enorme come 90 (funziona solo in firefox; RLS è max 1 in altri browser)$N$N(vedi wikipedia, lo spiegano molto meglio)",
+
+		"mb_play": "riproduci",
+		"mm_hashplay": "riprodurre questo file audio?",
+		"mm_m3u": "premi <code>Invio/OK</code> per Riprodurre\npremi <code>ESC/Annulla</code> per Modificare",
+		"mp_breq": "serve firefox 82+ o chrome 73+ o iOS 15+",
+		"mm_bload": "ora caricando...",
+		"mm_bconv": "convertendo in {0}, attendi...",
+		"mm_opusen": "il tuo browser non può riprodurre file aac / m4a;\ntranscodifica in opus ora abilitata",
+		"mm_playerr": "riproduzione fallita: ",
+		"mm_eabrt": "Il tentativo di riproduzione è stato cancellato",
+		"mm_enet": "La tua connessione internet è instabile",
+		"mm_edec": "Questo file è presumibilmente corrotto??",
+		"mm_esupp": "Il tuo browser non capisce questo formato audio",
+		"mm_eunk": "Errore Sconosciuto",
+		"mm_e404": "Non è stato possibile riprodurre audio; errore 404: File non trovato.",
+		"mm_e403": "Non è stato possibile riprodurre audio; errore 403: Accesso negato.\n\nProva a premere F5 per ricaricare, forse sei stato disconnesso",
+		"mm_e500": "Non è stato possibile riprodurre audio; errore 500: Controlla i log del server.",
+		"mm_e5xx": "Non è stato possibile riprodurre audio; errore server ",
+		"mm_nof": "non trovo altri file audio nelle vicinanze",
+		"mm_prescan": "Cercando musica da riprodurre dopo...",
+		"mm_scank": "Trovata la prossima canzone:",
+		"mm_uncache": "cache pulita; tutte le canzoni si riscaricheranno alla prossima riproduzione",
+		"mm_hnf": "quella canzone non esiste più",
+
+		"im_hnf": "quell'immagine non esiste più",
+
+		"f_empty": 'questa cartella è vuota',
+		"f_chide": 'questo nasconderà la colonna «{0}»\n\npuoi mostrare le colonne nella scheda impostazioni',
+		"f_bigtxt": "questo file è {0} MiB grande -- visualizzare davvero come testo?",
+		"f_bigtxt2": "visualizzare solo la fine del file invece? questo abiliterà anche following/tailing, mostrando righe di testo appena aggiunte in tempo reale",
+		"fbd_more": '<div id="blazy">mostrando <code>{0}</code> di <code>{1}</code> file; <a href="#" id="bd_more">mostra {2}</a> o <a href="#" id="bd_all">mostra tutti</a></div>',
+		"fbd_all": '<div id="blazy">mostrando <code>{0}</code> di <code>{1}</code> file; <a href="#" id="bd_all">mostra tutti</a></div>',
+		"f_anota": "solo {0} dei {1} elementi sono stati selezionati;\nper selezionare l'intera cartella, prima scorri fino in fondo",
+
+		"f_dls": 'i link dei file nella cartella corrente sono stati\ncambiati in link di download',
+
+		"f_partial": "Per scaricare in sicurezza un file che è attualmente in fase di caricamento, clicca il file che ha lo stesso nome, ma senza l'estensione <code>.PARTIAL</code>. Premi ANNULLA o Escape per farlo.\n\nPremendo OK / Invio ignorerai questo avviso e continuerai a scaricare il file <code>.PARTIAL</code> scratch, che quasi sicuramente ti darà dati corrotti.",
+
+		"ft_paste": "incolla {0} elementi$NTasto rapido: ctrl-V",
+		"fr_eperm": 'impossibile rinominare:\nnon hai il permesso “sposta” in questa cartella',
+		"fd_eperm": 'impossibile eliminare:\nnon hai il permesso “elimina” in questa cartella',
+		"fc_eperm": 'impossibile tagliare:\nnon hai il permesso “sposta” in questa cartella',
+		"fp_eperm": 'impossibile incollare:\nnon hai il permesso “scrivi” in questa cartella',
+		"fr_emore": "seleziona almeno un elemento da rinominare",
+		"fd_emore": "seleziona almeno un elemento da eliminare",
+		"fc_emore": "seleziona almeno un elemento da tagliare",
+		"fcp_emore": "seleziona almeno un elemento da copiare negli appunti",
+
+		"fs_sc": "condividi la cartella in cui ti trovi",
+		"fs_ss": "condividi i file selezionati",
+		"fs_just1d": "non puoi selezionare più di una cartella,\no mescolare file e cartelle in una selezione",
+		"fs_abrt": "❌ interrompi",
+		"fs_rand": "🎲 nome.casuale",
+		"fs_go": "✅ crea condivisione",
+		"fs_name": "nome",
+		"fs_src": "sorgente",
+		"fs_pwd": "password",
+		"fs_exp": "scadenza",
+		"fs_tmin": "min",
+		"fs_thrs": "ore",
+		"fs_tdays": "giorni",
+		"fs_never": "eterno",
+		"fs_pname": "nome link opzionale; sarà casuale se vuoto",
+		"fs_tsrc": "il file o cartella da condividere",
+		"fs_ppwd": "password opzionale",
+		"fs_w8": "creando condivisione...",
+		"fs_ok": "premi <code>Invio/OK</code> per Appunti\npremi <code>ESC/Annulla</code> per Chiudere",
+
+		"frt_dec": "può risolvere alcuni casi di nomi file corrotti\">url-decode",
+		"frt_rst": "ripristina nomi file modificati a quelli originali\">↺ reset",
+		"frt_abrt": "interrompi e chiudi questa finestra\">❌ annulla",
+		"frb_apply": "APPLICA RINOMINA",
+		"fr_adv": "rinomina batch / metadata / pattern\">avanzato",
+		"fr_case": "regex case-sensitive\">maiusc",
+		"fr_win": "nomi sicuri per windows; sostituisce <code>&lt;&gt;:&quot;\\|?*</code> con caratteri giapponesi fullwidth\">win",
+		"fr_slash": "sostituisce <code>/</code> con un carattere che non causa la creazione di nuove cartelle\">no /",
+		"fr_re": "pattern di ricerca regex da applicare ai nomi file originali; i gruppi di cattura possono essere referenziati nel campo formato sottostante come &lt;code&gt;(1)&lt;/code&gt; e &lt;code&gt;(2)&lt;/code&gt; e così via",
+		"fr_fmt": "ispirato da foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; è sostituito dal titolo della canzone,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; salta [questa] parte se artista è vuoto$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; aggiunge padding al numero traccia a 2 cifre",
+		"fr_pdel": "elimina",
+		"fr_pnew": "salva come",
+		"fr_pname": "fornisci un nome per il tuo nuovo preset",
+		"fr_aborted": "interrotto",
+		"fr_lold": "nome vecchio",
+		"fr_lnew": "nome nuovo",
+		"fr_tags": "tag per i file selezionati (sola lettura, solo per riferimento):",
+		"fr_busy": "rinominando {0} elementi...\n\n{1}",
+		"fr_efail": "rinomina fallita:\n",
+		"fr_nchg": "{0} dei nuovi nomi sono stati alterati a causa di <code>win</code> e/o <code>no /</code>\n\nOK per continuare con questi nuovi nomi alterati?",
+
+		"fd_ok": "eliminazione OK",
+		"fd_err": "eliminazione fallita:\n",
+		"fd_none": "niente è stato eliminato; forse bloccato dalla configurazione server (xbd)?",
+		"fd_busy": "eliminando {0} elementi...\n\n{1}",
+		"fd_warn1": "ELIMINARE questi {0} elementi?",
+		"fd_warn2": "<b>Ultima possibilità!</b> Nessun modo per annullare. Eliminare?",
+
+		"fc_ok": "tagliati {0} elementi",
+		"fc_warn": 'tagliati {0} elementi\n\nma: solo <b>questa</b> scheda-browser può incollarli\n(dato che la selezione è così assolutamente massiva)',
+
+		"fcc_ok": "copiati {0} elementi negli appunti",
+		"fcc_warn": 'copiati {0} elementi negli appunti\n\nma: solo <b>questa</b> scheda-browser può incollarli\n(dato che la selezione è così assolutamente massiva)',
+
+		"fp_apply": "usa questi nomi",
+		"fp_ecut": "prima taglia o copia alcuni file / cartelle da incollare / spostare\n\nnota: puoi tagliare / incollare attraverso diverse schede del browser",
+		"fp_ename": "{0} elementi non possono essere spostati qui perché i nomi sono già presi. Dai loro nuovi nomi qui sotto per continuare, o lascia vuoto il nome per saltarli:",
+		"fcp_ename": "{0} elementi non possono essere copiati qui perché i nomi sono già presi. Dai loro nuovi nomi qui sotto per continuare, o lascia vuoto il nome per saltarli:",
+		"fp_emore": "ci sono ancora alcune collisioni di nomi file rimaste da risolvere",
+		"fp_ok": "spostamento OK",
+		"fcp_ok": "copia OK",
+		"fp_busy": "spostando {0} elementi...\n\n{1}",
+		"fcp_busy": "copiando {0} elementi...\n\n{1}",
+		"fp_abrt": "annullamento in corso...", //m
+		"fp_err": "spostamento fallito:\n",
+		"fcp_err": "copia fallita:\n",
+		"fp_confirm": "spostare questi {0} elementi qui?",
+		"fcp_confirm": "copiare questi {0} elementi qui?",
+		"fp_etab": 'fallito leggere appunti da altra scheda browser',
+		"fp_name": "caricando un file dal tuo dispositivo. Dagli un nome:",
+		"fp_both_m": '<h6>scegli cosa incollare</h6><code>Invio</code> = Sposta {0} file da «{1}»\n<code>ESC</code> = Carica {2} file dal tuo dispositivo',
+		"fcp_both_m": '<h6>scegli cosa incollare</h6><code>Invio</code> = Copia {0} file da «{1}»\n<code>ESC</code> = Carica {2} file dal tuo dispositivo',
+		"fp_both_b": '<a href="#" id="modal-ok">Sposta</a><a href="#" id="modal-ng">Carica</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Copia</a><a href="#" id="modal-ng">Carica</a>',
+
+		"mk_noname": "scrivi un nome nel campo di testo a sinistra prima di farlo :p",
+
+		"tv_load": "Caricando documento di testo:\n\n{0}\n\n{1}% ({2} di {3} MiB caricati)",
+		"tv_xe1": "impossibile caricare file di testo:\n\nerrore ",
+		"tv_xe2": "404, file non trovato",
+		"tv_lst": "lista di file di testo in",
+		"tvt_close": "torna alla vista cartella$NTasto rapido: M (o Esc)\">❌ chiudi",
+		"tvt_dl": "scarica questo file$NTasto rapido: Y\">💾 scarica",
+		"tvt_prev": "mostra documento precedente$NTasto rapido: i\">⬆ prec",
+		"tvt_next": "mostra documento successivo$NTasto rapido: K\">⬇ succ",
+		"tvt_sel": "seleziona file &nbsp; ( per taglia / copia / elimina / ... )$NTasto rapido: S\">sel",
+		"tvt_edit": "apri file nell'editor di testo$NTasto rapido: E\">✏️ modifica",
+		"tvt_tail": "monitora file per cambiamenti; mostra nuove righe in tempo reale\">📡 segui",
+		"tvt_wrap": "a capo parola\">↵",
+		"tvt_atail": "blocca scorrimento in fondo alla pagina\">⚓",
+		"tvt_ctail": "decodifica colori terminale (codici escape ansi)\">🌈",
+		"tvt_ntail": "limite scrollback (quanti byte di testo mantenere caricati)",
+
+		"m3u_add1": "canzone aggiunta alla playlist m3u",
+		"m3u_addn": "{0} canzoni aggiunte alla playlist m3u",
+		"m3u_clip": "playlist m3u ora copiata negli appunti\n\ndovresti creare un nuovo file di testo chiamato qualcosa.m3u e incollare la playlist in quel documento; questo la renderà riproducibile",
+
+		"gt_vau": "non mostrare video, riproduci solo l'audio\">🎧",
+		"gt_msel": "abilita selezione file; ctrl-click un file per sovrascrivere$N$N&lt;em&gt;quando attivo: doppio-click un file / cartella per aprirlo&lt;/em&gt;$N$NTasto rapido: S\">multiselezione",
+		"gt_crop": "ritaglia miniature al centro\">ritaglia",
+		"gt_3x": "miniature hi-res\">3x",
+		"gt_zoom": "zoom",
+		"gt_chop": "taglia",
+		"gt_sort": "ordina per",
+		"gt_name": "nome",
+		"gt_sz": "dimensione",
+		"gt_ts": "data",
+		"gt_ext": "tipo",
+		"gt_c1": "tronca nomi file di più (mostra meno)",
+		"gt_c2": "tronca nomi file di meno (mostra di più)",
+
+		"sm_w8": "cercando...",
+		"sm_prev": "i risultati di ricerca qui sotto sono da una query precedente:\n  ",
+		"sl_close": "chiudi risultati ricerca",
+		"sl_hits": "mostrando {0} risultati",
+		"sl_moar": "carica altro",
+
+		"s_sz": "dimensione",
+		"s_dt": "data",
+		"s_rd": "percorso",
+		"s_fn": "nome",
+		"s_ta": "tag",
+		"s_ua": "car@",
+		"s_ad": "avanz.",
+		"s_s1": "MiB minimo",
+		"s_s2": "MiB massimo",
+		"s_d1": "iso8601 min.",
+		"s_d2": "iso8601 max.",
+		"s_u1": "caricato dopo",
+		"s_u2": "e/o prima",
+		"s_r1": "percorso contiene &nbsp; (separato da spazi)",
+		"s_f1": "nome contiene &nbsp; (nega con -nope)",
+		"s_t1": "tag contiene &nbsp; (^=inizio, fine=$)",
+		"s_a1": "proprietà metadata specifiche",
+
+		"md_eshow": "impossibile renderizzare ",
+		"md_off": "[📜<em>readme</em>] disabilitato in [⚙️] -- documento nascosto",
+
+		"badreply": "Fallito nel parsare risposta dal server",
+
+		"xhr403": "403: Accesso negato\n\nprova a premere F5, forse sei stato disconnesso",
+		"xhr0": "sconosciuto (probabilmente persa connessione al server, o server offline)",
+		"cf_ok": "scusa per quello -- la protezione DD" + wah + "oS è entrata in azione\n\nle cose dovrebbero riprendere in circa 30 sec\n\nse non succede niente, premi F5 per ricaricare la pagina",
+		"tl_xe1": "impossibile elencare sottocartelle:\n\nerrore ",
+		"tl_xe2": "404: Cartella non trovata",
+		"fl_xe1": "impossibile elencare file nella cartella:\n\nerrore ",
+		"fl_xe2": "404: Cartella non trovata",
+		"fd_xe1": "impossibile creare sottocartella:\n\nerrore ",
+		"fd_xe2": "404: Cartella genitore non trovata",
+		"fsm_xe1": "impossibile inviare messaggio:\n\nerrore ",
+		"fsm_xe2": "404: Cartella genitore non trovata",
+		"fu_xe1": "fcaricamento fallito per la lista unpost dal server:\n\nerrore ",
+		"fu_xe2": "404: File non trovato??",
+
+		"fz_tar": "file gnu-tar non compresso (linux / mac)",
+		"fz_pax": "tar formato pax non compresso (più lento)",
+		"fz_targz": "gnu-tar con compressione gzip livello 3$N$NSolitamente è molto lento, quindi$Nusa tar non compresso",
+		"fz_tarxz": "gnu-tar con compressione xz livello 1$N$NQuesto è solitamente molto lento, quindi$Nusa tar non compresso",
+		"fz_zip8": "zip con nomi file utf8 (forse instabile su windows 7 e precedenti)",
+		"fz_zipd": "zip con nomi file cp437 tradizionali, per software molto vecchio",
+		"fz_zipc": "cp437 con crc32 calcolato presto,$Nper MS-DOS PKZIP v2.04g (ottobre 1993)$N(ci vuole più tempo per elaborare prima che possa iniziare il download)",
+
+		"un_m1": "puoi eliminare i tuoi caricamenti recenti (o interrompere quelli non finiti) qui sotto",
+		"un_upd": "aggiorna",
+		"un_m4": "o condividi i file visibili qui sotto:",
+		"un_ulist": "mostra",
+		"un_ucopy": "copia",
+		"un_flt": "filtro opzionale:&nbsp; URL deve contenere",
+		"un_fclr": "resetta filtro",
+		"un_derr": 'unpost-delete fallito:\n',
+		"un_f5": 'qualcosa si è rotto, prova un aggiornamento o premi F5',
+		"un_uf5": "scusa ma devi aggiornare la pagina (per esempio premendo F5 o CTRL-R) prima che questo caricamento possa essere interrotto",
+		"un_nou": '<b>avviso:</b> server troppo occupato per mostrare caricamenti non finiti; clicca il link "aggiorna" tra un po\'',
+		"un_noc": '<b>avviso:</b> unpost di file completamente caricati non è abilitato/permesso nella configurazione server',
+		"un_max": "mostrando primi 2000 file (usa il filtro)",
+		"un_avail": "{0} caricamenti recenti possono essere eliminati<br />{1} non finiti possono essere interrotti",
+		"un_m2": "ordinati per tempo di caricamento; più recenti prima:",
+		"un_no1": "scherzo! nessun caricamento è abbastanza recente",
+		"un_no2": "scherzo! nessun caricamento che corrisponde a quel filtro è abbastanza recente",
+		"un_next": "elimina i prossimi {0} file qui sotto",
+		"un_abrt": "interrompi",
+		"un_del": "elimina",
+		"un_m3": "caricando i tuoi caricamenti recenti...",
+		"un_busy": "eliminando {0} file...",
+		"un_clip": "{0} link copiati negli appunti",
+
+		"u_https1": "dovresti",
+		"u_https2": "passare a https",
+		"u_https3": "per prestazioni migliori",
+		"u_ancient": 'il tuo browser è incredibilmente antico -- forse dovresti <a href="#" onclick="goto(\'bup\')">usare bup invece</a>',
+		"u_nowork": "serve firefox 53+ o chrome 57+ o iOS 11+",
+		"tail_2old": "serve firefox 105+ o chrome 71+ o iOS 14.5+",
+		"u_nodrop": 'il tuo browser è troppo vecchio per il caricamento drag-and-drop',
+		"u_notdir": "quella non è una cartella!\n\nil tuo browser è troppo vecchio,\nprova dragdrop invece",
+		"u_uri": "per trascinare immagini da altre finestre del browser,\nrilasciale sul pulsante upload grande",
+		"u_enpot": 'passa alla <a href="#">UI patata</a> (può migliorare velocità upload)',
+		"u_depot": 'passa alla <a href="#">UI elegante</a> (può ridurre velocità upload)',
+		"u_gotpot": 'passando alla UI patata per migliorare velocità upload,\n\nsentiti libero di non essere d\'accordo e tornare indietro!',
+		"u_pott": "<p>file: &nbsp; <b>{0}</b> finiti, &nbsp; <b>{1}</b> falliti, &nbsp; <b>{2}</b> occupati, &nbsp; <b>{3}</b> in coda</p>",
+		"u_ever": "questo è l'uploader di base; up2k necessita almeno<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'questo è l\'uploader di base; <a href="#" id="u2yea">up2k</a> è migliore',
+		"u_uput": 'velocizza (salta checksum)',
+		"u_ewrite": 'non hai accesso in scrittura a questa cartella',
+		"u_eread": 'non hai accesso in lettura a questa cartella',
+		"u_enoi": 'file-search non è abilitato nella configurazione server',
+		"u_enoow": "non puoi sovrascrivere qui; serve permesso Elimina",
+		"u_badf": 'Questi {0} file (di {1} totali) sono stati saltati, probabilmente a causa di permessi filesystem:\n\n',
+		"u_blankf": 'Questi {0} file (di {1} totali) sono vuoti; caricarli comunque?\n\n',
+		"u_applef": 'Questi {0} file (di {1} totali) sono probabilmente indesiderabili;\nPremi <code>OK/Invio</code> per SALTARE i seguenti file,\nPremi <code>Annulla/ESC</code> per NON escludere, e CARICARE anche quelli:\n\n',
+		"u_just1": '\nForse funziona meglio se selezioni solo un file',
+		"u_ff_many": "se stai usando <b>Linux / MacOS / Android,</b> allora questa quantità di file <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>potrebbe</em> far crashare Firefox!</a>\nse succede, riprova (o usa Chrome).",
+		"u_up_life": "Questo caricamento sarà eliminato dal server\n{0} dopo che si completa",
+		"u_asku": 'caricare questi {0} file in <code>{1}</code>',
+		"u_unpt": "puoi annullare / eliminare questo caricamento usando 🧯 in alto a sinistra",
+		"u_bigtab": 'sto per mostrare {0} file\n\nquesto potrebbe far crashare il tuo browser, sei sicuro?',
+		"u_scan": 'Scansionando file...',
+		"u_dirstuck": 'iteratore directory si è bloccato tentando di accedere ai seguenti {0} elementi; salterò:',
+		"u_etadone": 'Fatto ({0}, {1} file)',
+		"u_etaprep": '(preparando per caricare)',
+		"u_hashdone": 'hashing completato',
+		"u_hashing": 'hash',
+		"u_hs": 'handshaking...',
+		"u_started": "i file ora sono in caricamento; vedi [🚀]",
+		"u_dupdefer": "duplicato; sarà processato dopo tutti gli altri file",
+		"u_actx": "clicca questo testo per prevenire perdita di<br />prestazioni quando cambi ad altre finestre/schede",
+		"u_fixed": "OK!&nbsp; Risolto 👍",
+		"u_cuerr": "caricamento fallito del chunk {0} di {1};\nprobabilmente innocuo, continuo\n\nfile: {2}",
+		"u_cuerr2": "il server ha rifiutato il caricamento (chunk {0} di {1});\nriproverò più tardi\n\nfile: {2}\n\nerrore ",
+		"u_ehstmp": "riproverò; vedi in basso a destra",
+		"u_ehsfin": "il server ha rifiutato la richiesta di finalizzare caricamento; riprovando...",
+		"u_ehssrch": "il server ha rifiutato la richiesta di eseguire ricerca; riprovando...",
+		"u_ehsinit": "il server ha rifiutato la richiesta di iniziare caricamento; riprovando...",
+		"u_eneths": "errore di rete durante handshake per upload; riprovando...",
+		"u_enethd": "errore di rete durante test esistenza target; riprovando...",
+		"u_cbusy": "aspettando che il server si fidi di noi di nuovo dopo un problema di rete...",
+		"u_ehsdf": "il server ha finito lo spazio su disco!\n\ncontinuerò a riprovare, nel caso qualcuno\nliberi abbastanza spazio per continuare",
+		"u_emtleak1": "sembra che il tuo browser possa avere un memory leak;\nper favore",
+		"u_emtleak2": ' <a href="{0}">passa a https (raccomandato)</a> o ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'prova quanto segue:\n<ul><li>premi <code>F5</code> per aggiornare la pagina</li><li>poi disabilita il pulsante &nbsp;<code>mt</code>&nbsp; nelle &nbsp;<code>⚙️ impostazioni</code></li><li>e riprova quel caricamento</li></ul>I caricamenti saranno un po\' più lenti, ma pazienza.\nScusa per il disturbo !\n\nPS: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">ha un bugfix</a> per questo',
+		"u_emtleakf": 'prova quanto segue:\n<ul><li>premi <code>F5</code> per aggiornare la pagina</li><li>poi abilita <code>🥔</code> (patata) nell\'UI caricamento<li>e riprova quel caricamento</li></ul>\nPS: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">avrà sperabilmente un bugfix</a> ad un certo punto',
+		"u_s404": "non trovato sul server",
+		"u_expl": "spiega",
+		"u_maxconn": "la maggior parte dei browser limita questo a 6, ma firefox ti permette di alzarlo con <code>connections-per-server</code> in <code>about:config</code>",
+		"u_tu": '<p class="warn">AVVISO: turbo abilitato, <span>&nbsp;client potrebbe non rilevare e riprendere caricamenti incompleti; vedi tooltip pulsante turbo</span></p>',
+		"u_ts": '<p class="warn">AVVISO: turbo abilitato, <span>&nbsp;risultati ricerca possono essere incorretti; vedi tooltip pulsante turbo</span></p>',
+		"u_turbo_c": "turbo è disabilitato nella configurazione server",
+		"u_turbo_g": "disabilitando turbo perché non hai\nprivilegi di elenco directory all'interno di questo volume",
+		"u_life_cfg": 'auto-elimina dopo <input id="lifem" p="60" /> min (o <input id="lifeh" p="3600" /> ore)',
+		"u_life_est": 'caricamento sarà eliminato <span id="lifew" tt="ora locale">---</span>',
+		"u_life_max": 'questa cartella impone una\nvita massima di {0}',
+		"u_unp_ok": 'unpost è permesso per {0}',
+		"u_unp_ng": 'unpost NON sarà permesso',
+		"ue_ro": 'il tuo accesso a questa cartella è solo-Lettura\n\n',
+		"ue_nl": 'attualmente non sei loggato',
+		"ue_la": 'attualmente sei loggato come "{0}"',
+		"ue_sr": 'attualmente sei in modalità file-search\n\npassa alla modalità upload cliccando la lente d\'ingrandimento 🔎 (accanto al grande pulsante CERCA), e prova a caricare di nuovo\n\nscusa',
+		"ue_ta": 'prova a caricare di nuovo, dovrebbe funzionare ora',
+		"ue_ab": "questo file è già in caricamento in un'altra cartella, e quel caricamento deve essere completato prima che il file possa essere caricato altrove.\n\nPuoi interrompere e dimenticare il caricamento iniziale usando l'🧯 in alto a sinistra",
+		"ur_1uo": "OK: File caricato con successo",
+		"ur_auo": "OK: Tutti i {0} file caricati con successo",
+		"ur_1so": "OK: File trovato sul server",
+		"ur_aso": "OK: Tutti i {0} file trovati sul server",
+		"ur_1un": "Caricamento fallito, scusa",
+		"ur_aun": "Tutti i {0} caricamenti falliti, scusa",
+		"ur_1sn": "File NON trovato sul server",
+		"ur_asn": "I {0} file NON sono stati trovati sul server",
+		"ur_um": "Finito;\n{0} caricamenti OK,\n{1} caricamenti falliti, scusa",
+		"ur_sm": "Finito;\n{0} file trovati sul server,\n{1} file NON trovati sul server",
+
+		"lang_set": "aggiornare per rendere effettivo il cambiamento?",
+	},
+	"kor": {
+		"tt": "한국어",
+
+		"cols": {
+			"c": "작업 버튼",
+			"dur": "길이",
+			"q": "품질/비트레이트",
+			"Ac": "오디오 코덱",
+			"Vc": "비디오 코덱",
+			"Fmt": "형식/컨테이너",
+			"Ahash": "오디오 체크섬",
+			"Vhash": "비디오 체크섬",
+			"Res": "해상도",
+			"T": "파일 유형",
+			"aq": "오디오 품질/비트레이트",
+			"vq": "비디오 품질/비트레이트",
+			"pixfmt": "서브샘플링/픽셀 구조",
+			"resw": "가로 해상도",
+			"resh": "세로 해상도",
+			"chs": "오디오 채널",
+			"hz": "샘플레이트"
+		},
+
+		"hks": [
+			[
+				"기타",
+				["ESC", "다양한 창 닫기"],
+
+				"파일 관리자",
+				["G", "목록/그리드 보기 전환"],
+				["T", "썸네일/아이콘 전환"],
+				["⇧ A/D", "썸네일 이미지 크기"],
+				["ctrl-K", "선택 항목 삭제"],
+				["ctrl-X", "선택 항목 잘라내기"],
+				["ctrl-C", "선택 항목 복사"],
+				["ctrl-V", "여기에 붙여넣기 (이동/복사)"],
+				["Y", "선택 항목 다운로드"],
+				["F2", "선택 항목 이름 바꾸기"],
+
+				"파일 목록 선택",
+				["space", "파일 선택/해제"],
+				["↑/↓", "선택 커서 이동"],
+				["ctrl ↑/↓", "커서와 뷰포트 동시 이동"],
+				["⇧ ↑/↓", "이전/다음 파일 선택"],
+				["ctrl-A", "모든 파일/폴더 선택"],
+			], [
+				"탐색",
+				["B", "브레드크럼/탐색창 전환"],
+				["I/K", "이전/다음 폴더"],
+				["M", "상위 폴더 (또는 현재 항목 닫기)"],
+				["V", "탐색창에 폴더/텍스트 파일 표시 전환"],
+				["A/D", "탐색창 크기"],
+			], [
+				"오디오 플레이어",
+				["J/L", "이전/다음 곡"],
+				["U/O", "10초 뒤로/앞으로 건너뛰기"],
+				["0..9", "0%..90% 지점으로 이동"],
+				["P", "재생/일시정지 (시작 포함)"],
+				["S", "재생 중인 곡 선택"],
+				["Y", "곡 다운로드"],
+			], [
+				"이미지 뷰어",
+				["J/L, ←/→", "이전/다음 이미지"],
+				["Home/End", "첫/마지막 이미지"],
+				["F", "전체 화면"],
+				["R", "시계 방향으로 회전"],
+				["⇧ R", "반시계 방향으로 회전"],
+				["S", "이미지 선택"],
+				["Y", "이미지 다운로드"],
+			], [
+				"비디오 플레이어",
+				["U/O", "10초 뒤로/앞으로 건너뛰기"],
+				["P/K/Space", "재생/일시정지"],
+				["C", "다음 파일 계속 재생"],
+				["V", "반복"],
+				["M", "음소거"],
+				["[ 와 ]", "반복 구간 설정"],
+			], [
+				"텍스트 파일 뷰어",
+				["I/K", "이전/다음 파일"],
+				["M", "텍스트 파일 닫기"],
+				["E", "텍스트 파일 편집"],
+				["S", "파일 선택 (잘라내기/복사/이름 바꾸기용)"],
+			]
+		],
+
+		"m_ok": "확인",
+		"m_ng": "취소",
+
+		"enable": "활성화",
+		"danger": "위험",
+		"clipped": "클립보드에 복사되었습니다",
+
+		"ht_s1": "초",
+		"ht_s2": "초",
+		"ht_m1": "분",
+		"ht_m2": "분",
+		"ht_h1": "시간",
+		"ht_h2": "시간",
+		"ht_d1": "일",
+		"ht_d2": "일",
+		"ht_and": " ",
+
+		"goh": "제어판",
+		"gop": '이전 형제 폴더">이전',
+		"gou": '상위 폴더">위로',
+		"gon": '다음 폴더">다음',
+		"logout": "로그아웃 ",
+		"login": "로그인", //m
+		"access": " 액세스",
+		"ot_close": "하위 메뉴 닫기",
+		"ot_search": "속성, 경로/이름, 음악 태그 또는 이들의 조합으로 파일을 검색합니다.$N$N&lt;code&gt;foo bar&lt;/code&gt; = «foo»와 «bar»를 모두 포함해야 함,$N&lt;code&gt;foo -bar&lt;/code&gt; = «foo»는 포함하지만 «bar»는 포함하지 않아야 함,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = «yana»로 시작하고 «opus» 파일이어야 함$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = 정확히 «try unite»를 포함해야 함$N$N날짜 형식은 ISO-8601입니다. 예:$N&lt;code&gt;2009-12-31&lt;/code&gt; 또는 &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "주워담기: 최근 업로드한 항목을 삭제하거나 미완료된 업로드를 중단합니다",
+		"ot_bup": "bup: 기본 업로더. 넷스케이프 4.0도 지원합니다",
+		"ot_mkdir": "mkdir: 새 디렉터리를 만듭니다",
+		"ot_md": "new-md: 새 마크다운 문서를 만듭니다",
+		"ot_msg": "msg: 서버 로그에 메시지를 보냅니다",
+		"ot_mp": "미디어 플레이어 옵션",
+		"ot_cfg": "구성 옵션",
+		"ot_u2i": 'up2k: (쓰기 권한이 있는 경우) 파일을 업로드하거나, 검색 모드로 전환하여 서버 어딘가에 파일이 있는지 확인합니다.$N$N업로드는 재개 가능하고, 멀티스레드로 작동하며, 파일 타임스탬프가 보존되지만, [🎈] (기본 업로더)보다 CPU를 더 많이 사용합니다.<br /><br />업로드 중에는 이 아이콘이 진행률 표시창이 됩니다!',
+		"ot_u2w": 'up2k: 이어올리기 기능을 지원하는 파일 업로더입니다 (브라우저를 닫았다가 나중에 동일한 파일을 끌어다 놓으세요).$N$N멀티스레드로 작동하며, 파일 타임스탬프가 보존되지만, [🎈] (기본 업로더)보다 CPU를 더 많이 사용합니다.<br /><br />업로드 중에는 이 아이콘이 진행률 표시창이 됩니다!',
+		"ot_noie": 'Chrome / Firefox / Edge를 사용해주세요',
+
+		"ab_mkdir": "디렉터리 만들기",
+		"ab_mkdoc": "새 마크다운 문서",
+		"ab_msg": "서버 로그에 메시지 보내기",
+
+		"ay_path": "폴더로 건너뛰기",
+		"ay_files": "파일로 건너뛰기",
+
+		"wt_ren": "선택한 항목 이름 바꾸기$N단축키: F2",
+		"wt_del": "선택한 항목 삭제$N단축키: ctrl-K",
+		"wt_cut": "선택한 항목 잘라내기 &lt;small&gt;(다른 곳에 붙여넣기용)&lt;/small&gt;$N단축키: ctrl-X",
+		"wt_cpy": "선택한 항목 클립보드에 복사$N(다른 곳에 붙여넣기용)$N단축키: ctrl-C",
+		"wt_pst": "이전에 잘라내거나 복사한 항목 붙여넣기$N단축키: ctrl-V",
+		"wt_selall": "모든 파일 선택$N단축키: ctrl-A (파일에 포커스된 경우)",
+		"wt_selinv": "선택 반전",
+		"wt_zip1": "이 폴더를 압축 파일로 다운로드",
+		"wt_selzip": "선택 항목을 압축 파일로 다운로드",
+		"wt_seldl": "선택 항목을 개별 파일로 다운로드$N단축키: Y",
+		"wt_npirc": "IRC 형식 트랙 정보 복사",
+		"wt_nptxt": "일반 텍스트 트랙 정보 복사",
+		"wt_m3ua": "m3u 재생 목록에 추가 (나중에 <code>📻복사</code> 클릭)",
+		"wt_m3uc": "m3u 재생 목록을 클립보드에 복사",
+		"wt_grid": "그리드/목록 보기 전환$N단축키: G",
+		"wt_prev": "이전 트랙$N단축키: J",
+		"wt_play": "재생/일시정지$N단축키: P",
+		"wt_next": "다음 트랙$N단축키: L",
+
+		"ul_par": "동시 업로드:",
+		"ut_rand": "파일명 무작위로 만들기",
+		"ut_u2ts": "사용자 파일 시스템의 마지막 수정 타임스탬프를$N서버에 복사\">📅",
+		"ut_ow": "서버에 있는 기존 파일을 덮어쓸까요?$N🛡️: 안 함 (대신 새 파일 이름 생성)$N🕒: 서버 파일이 더 오래된 경우 덮어쓰기$N♻️: 파일이 다르면 항상 덮어쓰기",
+		"ut_mt": "업로드 중 다른 파일 해싱 계속하기$N$NCPU 또는 HDD가 병목 현상을 일으키는 경우 비활성화하세요",
+		"ut_ask": '업로드 시작 전 확인 요청">💭',
+		"ut_pot": "느린 기기에서 UI를 단순화하여$N업로드 속도 향상",
+		"ut_srch": "실제로 업로드하는 대신, 파일이 이미 서버에 있는지 확인합니다$N(읽을 수 있는 모든 폴더를 스캔합니다)",
+		"ut_par": "0으로 설정하여 업로드 일시정지$N$N연결이 느리거나 지연 시간이 길면 늘리세요$N$NLAN 환경이거나 서버 HDD가 병목 현상을 일으키면 1로 유지하세요",
+		"ul_btn": "파일/폴더를 여기에<br>끌어다 놓거나 클릭하세요",
+		"ul_btnu": "업 로 드",
+		"ul_btns": "검 색",
+
+		"ul_hash": "해싱",
+		"ul_send": "전송",
+		"ul_done": "완료",
+		"ul_idle1": "대기 중인 업로드가 없습니다",
+		"ut_etah": "평균 &lt;em&gt;해싱&lt;/em&gt; 속도 및 예상 완료 시간",
+		"ut_etau": "평균 &lt;em&gt;업로드&lt;/em&gt; 속도 및 예상 완료 시간",
+		"ut_etat": "평균 &lt;em&gt;총&lt;/em&gt; 속도 및 예상 완료 시간",
+
+		"uct_ok": "성공적으로 완료됨",
+		"uct_ng": "문제 발생: 실패/거부/찾을 수 없음",
+		"uct_done": "완료됨 (성공 및 문제 발생 포함)",
+		"uct_bz": "해싱 또는 업로드 중",
+		"uct_q": "대기 중, 보류 중",
+
+		"utl_name": "파일명",
+		"utl_ulist": "목록",
+		"utl_ucopy": "복사",
+		"utl_links": "링크",
+		"utl_stat": "상태",
+		"utl_prog": "진행률",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "오류",
+		"utl_oserr": "OS 오류",
+		"utl_found": "찾음",
+		"utl_defer": "보류",
+		"utl_yolo": "YOLO",
+		"utl_done": "완료",
+
+		"ul_flagblk": "파일이 대기열에 추가되었습니다.</b><br>하지만 다른 브라우저 탭에서 up2k가 실행 중이므로,<br>해당 작업이 끝날 때까지 기다립니다.",
+		"ul_btnlk": "서버 구성에서 이 스위치를 현재 상태로 잠갔습니다.",
+
+		"udt_up": "업로드",
+		"udt_srch": "검색",
+		"udt_drop": "여기에 놓으세요",
+
+		"u_nav_m": '<h6>자, 갖고 있는 게 무엇인가?</h6><code>Enter</code> = 파일 (하나 이상)\n<code>ESC</code> = 폴더 하나 (하위 폴더 포함)',
+		"u_nav_b": '<a href="#" id="modal-ok">파일</a><a href="#" id="modal-ng">폴더 하나</a>',
+
+		"cl_opts": "스위치",
+		"cl_themes": "테마",
+		"cl_langs": "언어",
+		"cl_ziptype": "폴더 다운로드",
+		"cl_uopts": "up2k 스위치",
+		"cl_favico": "파비콘",
+		"cl_bigdir": "큰 디렉터리",
+		"cl_hsort": "#sort",
+		"cl_keytype": "조성 표기법",
+		"cl_hiddenc": "숨겨진 열",
+		"cl_hidec": "숨기기",
+		"cl_reset": "초기화",
+		"cl_hpick": "아래 테이블에서 숨기고 싶은 열의 헤더를 탭하세요",
+		"cl_hcancel": "열 숨기기가 중단되었습니다",
+
+		"ct_grid": "田 그리드",
+		"ct_ttips": '◔ ◡ ◔">ℹ️ 도움말',
+		"ct_thumb": '그리드 보기에서 아이콘 또는 미리보기 이미지 전환$N단축키: T">🖼️ 미리보기',
+		"ct_csel": '그리드 보기에서 CTRL과 SHIFT를 사용하여 파일 선택">선택',
+		"ct_ihop": '이미지 뷰어를 닫으면 마지막으로 본 파일로 스크롤">g⮯',
+		"ct_dots": '숨김 파일 표시 (서버가 허용하는 경우)">숨김파일',
+		"ct_qdel": '파일 삭제 시 한 번만 확인 요청">빠른삭제',
+		"ct_dir1st": '폴더를 파일보다 먼저 정렬">📁 먼저',
+		"ct_nsort": '자연어 정렬 (파일명의 숫자를 인식)">자연어정렬',
+		"ct_utc": '모든 날짜/시간을 UTC로 표시">UTC',
+		"ct_readme": '폴더 목록에 README.md 표시">📜 readme',
+		"ct_idxh": '폴더 목록 대신 index.html 표시">htm',
+		"ct_sbars": '스크롤바 표시">⟊',
+
+		"cut_umod": '파일이 서버에 이미 있는 경우, 서버의 마지막 수정 타임스탬프를 로컬 파일과 일치하도록 업데이트합니다 (쓰기+삭제 권한 필요).\">re📅',
+
+		"cut_turbo": 'YOLO 버튼. 아마 활성화하고 싶지 않으실 겁니다.$N$N대량의 파일을 업로드하다가 어떤 이유로 재시작해야 할 때, 최대한 빨리 업로드를 계속하고 싶을 때 사용하세요.$N$N이 옵션은 해시 확인을 단순히 <em>&quot;서버에 동일한 파일 크기를 가진 파일이 있는가?&quot;</em>로 대체하므로, 파일 내용만 다를 경우 업로드되지 않습니다.$N$N업로드가 끝나면 이 옵션을 끄고, 동일한 파일을 다시 \"업로드\"하여 클라이언트가 검증하도록 해야 합니다.\">turbo',
+
+		"cut_datechk": '터보 버튼이 활성화되어 있지 않으면 효과가 없습니다.$N$NYOLO의 위험성을 약간 줄여줍니다. 서버의 파일 타임스탬프가 사용자의 것과 일치하는지 확인합니다.$N$N<em>이론적으로는</em> 대부분의 미완료/손상된 업로드를 잡아내지만, 터보를 비활성화하고 검증 과정을 거치는 것을 대체할 수는 없습니다.\">날짜확인',
+
+		"cut_u2sz": "각 업로드 청크의 크기 (MiB)입니다. 큰 값은 태평양을 건너는 데 더 유리합니다. 매우 불안정한 연결에서는 낮은 값을 시도해보세요.",
+
+		"cut_flag": '한 번에 하나의 탭만 업로드하도록 보장합니다.$N-- 다른 탭도 이 옵션을 활성화해야 합니다.$N-- 동일한 도메인의 탭에만 영향을 미칩니다.',
+
+		"cut_az": '가장 작은 파일 우선이 아닌 알파벳 순서로 파일을 업로드합니다.$N$N알파벳 순서는 서버에서 문제가 발생했는지 눈으로 확인하기 쉽게 해주지만, 광랜/LAN 환경에서는 업로드 속도가 약간 느려집니다.',
+
+		"cut_nag": '업로드 완료 시 OS 알림$N(브라우저나 탭이 활성화되지 않은 경우에만)',
+		"cut_sfx": '업로드 완료 시 소리 알림$N(브라우저나 탭이 활성화되지 않은 경우에만)',
+
+		"cut_mt": '멀티스레딩을 사용하여 파일 해싱 속도를 높입니다.$N$N이 기능은 웹 워커를 사용하며$N더 많은 RAM이 필요합니다 (추가적으로 최대 512 MiB).$N$Nhttps는 30% 더 빠르게, http는 4.5배 더 빠르게 만듭니다.\">mt',
+
+		"cut_wasm": '브라우저 내장 해셔 대신 wasm을 사용합니다. 크롬 기반 브라우저에서 속도를 향상시키지만 CPU 부하를 증가시키며, 많은 구버전 크롬에는 이 기능을 활성화하면 모든 RAM을 소모하고 충돌하는 버그가 있습니다.\">wasm',
+
+		"cft_text": "파비콘 텍스트 (비워두고 새로고침하면 비활성화됨)",
+		"cft_fg": "전경색",
+		"cft_bg": "배경색",
+
+		"cdt_lim": "폴더에 표시할 최대 파일 수",
+		"cdt_ask": "맨 아래로 스크롤할 때$N더 많은 파일을 불러오는 대신$N무엇을 할지 묻기",
+		"cdt_hsort": "미디어 URL에 포함할 정렬 규칙 (&lt;code&gt;,sorthref&lt;/code&gt;)의 수. 0으로 설정하면 미디어 링크를 클릭할 때 포함된 정렬 규칙도 무시됩니다.",
+
+		"tt_entree": "탐색 창 (디렉터리 트리 사이드바) 표시$N단축키: B",
+		"tt_detree": "이동 경로 표시$N단축키: B",
+		"tt_visdir": "선택한 폴더로 스크롤하기",
+		"tt_ftree": "폴더 트리/텍스트 파일 전환$N단축키: V",
+		"tt_pdock": "상위 폴더를 상단에 고정된 창에 표시",
+		"tt_dynt": "트리가 확장될 때 자동으로 너비 증가",
+		"tt_wrap": "자동 줄 바꿈",
+		"tt_hover": "마우스를 올리면 넘어가는 줄 표시$N(마우스 커서가 왼쪽 여백에$N&nbsp; 있지 않으면 스크롤이 깨짐)",
+
+		"ml_pmode": "폴더 끝에서...",
+		"ml_btns": "명령",
+		"ml_tcode": "트랜스코딩",
+		"ml_tcode2": "다음으로 트랜스코딩",
+		"ml_tint": "틴트",
+		"ml_eq": "오디오 이퀄라이저",
+		"ml_drc": "다이내믹 레인지 압축기",
+
+		"mt_loop": "한 곡 반복 재생\">🔁",
+		"mt_one": "한 곡 재생 후 중지\">1️⃣",
+		"mt_shuf": "각 폴더의 곡을 무작위 재생\">🔀",
+		"mt_aplay": "서버에 접속한 링크에 곡 ID가 있으면 자동 재생$N$N이것을 비활성화하면 음악 재생 시 페이지 URL이 곡 ID로 업데이트되지 않아, 이 설정이 손실되고 URL이 남아있을 경우 자동 재생되는 것을 방지합니다.\">a▶",
+		"mt_preload": "끊김 없는 재생을 위해 다음 곡을 미리 불러오기 시작\">미리로드",
+		"mt_prescan": "마지막 곡이 끝나기 전에 다음 폴더로 이동하여$N웹브라우저가 재생을 멈추지 않도록 합니다.\">탐색",
+		"mt_fullpre": "전체 곡을 미리 불러오기 시도;$N✅ <b>불안정한</b> 연결에서 활성화,$N❌ <b>느린</b> 연결에서는 아마도 비활성화\">전체",
+		"mt_fau": "폰에서 다음 곡이 충분히 빨리 미리 불러오지 않아 음악이 멈추는 것을 방지합니다 (태그 표시가 불안정해질 수 있음).\">☕️",
+		"mt_waves": "파형 탐색 바:$N탐색 바에 오디오 진폭 표시\">~s",
+		"mt_npclip": "현재 재생 중인 곡을 클립보드에 복사하는 버튼 표시\">/np",
+		"mt_m3u_c": "선택한 곡을 m3u8 재생 목록 항목으로$N클립보드에 복사하는 버튼 표시\">📻",
+		"mt_octl": "OS 통합 (미디어 단축키/OSD)\">os-ctl",
+		"mt_oseek": "OS 통합을 통해 탐색 허용$N$N참고: 일부 기기 (iPhone)에서는$N이것이 다음 곡 버튼을 대체합니다.\">탐색",
+		"mt_oscv": "OSD에 앨범 커버 표시\">아트",
+		"mt_follow": "재생 중인 트랙이 보이도록 스크롤 유지\">🎯",
+		"mt_compact": "컴팩트 컨트롤\">⟎",
+		"mt_uncache": "캐시 지우기 (브라우저가 곡의 깨진 사본을 캐시하여$N재생이 안되는 경우 시도해보세요)\">캐시삭제",
+		"mt_mloop": "열린 폴더 반복\">🔁 반복",
+		"mt_mnext": "다음 폴더 불러오고 계속\">📂 다음",
+		"mt_mstop": "재생 중지\">⏸ 중지",
+		"mt_cflac": "flac/wav를 {0}로 변환\">flac",
+		"mt_caac": "aac/m4a를 {0}로 변환\">aac",
+		"mt_coth": "다른 모든 것 (mp3 제외)을 {0}로 변환\">기타",
+		"mt_c2opus": "데스크톱, 노트북, 안드로이드 환경에 최적\">opus",
+		"mt_c2owa": "iOS 17.5 이상용 opus-weba\">owa",
+		"mt_c2caf": "iOS 11부터 17까지용 opus-caf\">caf",
+		"mt_c2mp3": "매우 오래된 기기에서 사용\">mp3",
+		"mt_c2flac": "최고 음질이지만 다운로드 용량이 큼\">flac",
+		"mt_c2wav": "비압축 재생 (더 큼)\">wav",
+		"mt_c2ok": "네, 좋은 선택입니다",
+		"mt_c2nd": "기기에 권장되는 출력 형식이 아니지만 괜찮습니다",
+		"mt_c2ng": "기기가 이 출력 형식을 지원하지 않는 것 같지만, 시도해 보겠습니다",
+		"mt_xowa": "iOS에서 이 형식의 백그라운드 재생이 안되는 버그가 있습니다. 대신 caf나 mp3를 사용해주세요.",
+		"mt_tint": "탐색 바의 배경 레벨 (0-100)$N버퍼링이 덜 눈시리게 만듦",
+		"mt_eq": "이퀄라이저 및 게인 제어 활성화;$N$Nboost &lt;code&gt;0&lt;/code&gt; = 표준 100% 볼륨 (수정 없음)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = 표준 스테레오 (수정 없음)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% 좌우 크로스피드$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = 모노$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = 보컬 제거 :^)$N$N이퀄라이저를 활성화하면 끊김 없는 앨범이 온전히 끊김 없이 재생되므로, 그 점이 중요하다면 모든 값을 0으로 두고 (width=1 제외) 켜두세요.",
+		"mt_drc": "다이내믹 레인지 컴프레서(볼륨 평탄화/벽돌화)를 활성화합니다. 스파게티의 균형을 맞추기 위해 EQ도 활성화되므로, 원하지 않으면 'width'를 제외한 모든 EQ 필드를 0으로 설정하세요.$N$NTHRESHOLD dB 이상의 오디오 볼륨을 낮춥니다. THRESHOLD를 초과하는 모든 RATIO dB에 대해 1dB의 출력이 있으므로, 기본값인 tresh -24 및 ratio 12는 볼륨이 -22dB보다 커지지 않음을 의미하며, 이퀄라이저 부스트를 0.8 또는 ATK 0과 큰 RLS (예: 90)를 사용하여 1.8까지 안전하게 높일 수 있습니다 (firefox에서만 작동, 다른 브라우저에서는 RLS 최대 1).$N$N(위키백과를 참조하세요, 훨씬 더 잘 설명되어 있습니다)",
+
+		"mb_play": "재생",
+		"mm_hashplay": "이 오디오 파일을 재생할까요?",
+		"mm_m3u": "<code>Enter/확인</code>을 눌러 재생\n<code>ESC/취소</code>를 눌러 편집",
+		"mp_breq": "Firefox 82+, Chrome 73+ 또는 iOS 15+ 필요",
+		"mm_bload": "불러오는 중...",
+		"mm_bconv": "{0}(으)로 변환 중, 잠시만 기다려주세요...",
+		"mm_opusen": "브라우저가 aac/m4a 파일을 재생할 수 없습니다.\nopus로의 트랜스코딩이 활성화되었습니다.",
+		"mm_playerr": "재생 실패: ",
+		"mm_eabrt": "재생 시도가 취소되었습니다",
+		"mm_enet": "인터넷 연결이 불안정합니다",
+		"mm_edec": "이 파일이 손상된 것 같습니다??",
+		"mm_esupp": "브라우저가 이 오디오 형식을 이해하지 못합니다",
+		"mm_eunk": "알 수 없는 오류",
+		"mm_e404": "오디오를 재생할 수 없습니다; 오류 404: 파일을 찾을 수 없습니다.",
+		"mm_e403": "오디오를 재생할 수 없습니다; 오류 403: 접근이 거부되었습니다.\n\nF5를 눌러 새로고침 해보세요, 로그아웃되었을 수 있습니다",
+		"mm_e500": "오디오를 재생할 수 없습니다; 오류 500: 서버 로그를 확인하세요.",
+		"mm_e5xx": "오디오를 재생할 수 없습니다; 서버 오류 ",
+		"mm_nof": "주변에서 더 이상 오디오 파일을 찾을 수 없습니다",
+		"mm_prescan": "다음에 재생할 음악을 찾는 중...",
+		"mm_scank": "다음 곡을 찾았습니다:",
+		"mm_uncache": "캐시가 지워졌습니다. 모든 곡은 다음 재생 시 다시 다운로드됩니다.",
+		"mm_hnf": "그 곡이 더 이상 존재하지 않습니다",
+
+		"im_hnf": "그 이미지가 더 이상 존재하지 않습니다",
+
+		"f_empty": '이 폴더는 비어 있습니다',
+		"f_chide": '«{0}» 열을 숨깁니다.\n\n설정 탭에서 열을 다시 표시할 수 있습니다.',
+		"f_bigtxt": "이 파일은 {0} MiB입니다 -- 정말 텍스트로 보시겠습니까?",
+		"f_bigtxt2": "대신 파일의 끝부분만 보시겠습니까? 이렇게 하면 실시간으로 새로 추가되는 텍스트 줄을 보여주는 팔로잉/테일링 기능도 활성화됩니다.",
+		"fbd_more": '<div id="blazy"><code>{1}</code>개 파일 중 <code>{0}</code>개 표시 중; <a href="#" id="bd_more">{2}개 더 보기</a> 또는 <a href="#" id="bd_all">모두 보기</a></div>',
+		"fbd_all": '<div id="blazy"><code>{1}</code>개 파일 중 <code>{0}</code>개 표시 중; <a href="#" id="bd_all">모두 보기</a></div>',
+		"f_anota": "{1}개 항목 중 {0}개만 선택되었습니다.\n전체 폴더를 선택하려면 먼저 맨 아래로 스크롤하세요.",
+
+		"f_dls": '현재 폴더의 파일 링크가\n다운로드 링크로 변경되었습니다',
+
+		"f_partial": "현재 업로드 중인 파일을 안전하게 다운로드하려면, 파일 이름이 같지만 <code>.PARTIAL</code> 확장자가 없는 파일을 클릭하세요. 이 경고를 무시하려면 \"취소\" 또는 ESC를 누르세요.\n\n\"확인\"/Enter를 누르면 이 경고를 무시하고 <code>.PARTIAL</code> 임시 파일을 계속 다운로드하며, 이 경우 거의 확실히 손상된 데이터를 받게 됩니다.",
+
+		"ft_paste": "{0}개 항목 붙여넣기$N단축키: ctrl-V",
+		"fr_eperm": "이름을 바꿀 수 없습니다:\n이 폴더에 \"이동\" 권한이 없습니다",
+		"fd_eperm": "삭제할 수 없습니다:\n이 폴더에 \"삭제\" 권한이 없습니다",
+		"fc_eperm": "잘라낼 수 없습니다:\n이 폴더에 \"이동\" 권한이 없습니다",
+		"fp_eperm": "붙여넣을 수 없습니다\n이 폴더에 \"쓰기\" 권한이 없습니다",
+		"fr_emore": "이름을 바꿀 항목을 하나 이상 선택하세요",
+		"fd_emore": "삭제할 항목을 하나 이상 선택하세요",
+		"fc_emore": "잘라낼 항목을 하나 이상 선택하세요",
+		"fcp_emore": "클립보드에 복사할 항목을 하나 이상 선택하세요",
+
+		"fs_sc": "현재 폴더 공유",
+		"fs_ss": "선택한 파일 공유",
+		"fs_just1d": "하나 이상의 폴더를 선택하거나,\n파일과 폴더를 한 번에 섞어 선택할 수 없습니다",
+		"fs_abrt": "❌ 중단",
+		"fs_rand": "🎲 무작위 이름",
+		"fs_go": "✅ 공유 생성",
+		"fs_name": "이름",
+		"fs_src": "소스",
+		"fs_pwd": "비밀번호",
+		"fs_exp": "만료",
+		"fs_tmin": "분",
+		"fs_thrs": "시간",
+		"fs_tdays": "일",
+		"fs_never": "영원",
+		"fs_pname": "선택적 링크 이름; 비워두면 무작위로 생성",
+		"fs_tsrc": "공유할 파일 또는 폴더",
+		"fs_ppwd": "비밀번호 (선택사항)",
+		"fs_w8": "공유 생성 중...",
+		"fs_ok": "<code>Enter/OK</code>를 눌러 클립보드에 복사\n<code>ESC/Cancel</code>를 눌러 닫기",
+
+		"frt_dec": "깨진 파일 이름의 일부 경우를 수정할 수 있습니다\">url-디코드",
+		"frt_rst": "수정된 파일 이름을 원래대로 되돌립니다\">↺ 초기화",
+		"frt_abrt": "이 창을 중단하고 닫습니다\">❌ 취소",
+		"frb_apply": "이름 바꾸기 적용",
+		"fr_adv": "배치/메타데이터/패턴 이름 바꾸기\">고급",
+		"fr_case": "대소문자 구분 정규식\">대소문자",
+		"fr_win": "Windows 안전 이름; <code>&lt;&gt;:&quot;\\|?*</code>를 일본어 전각 문자로 바꿉니다\">win",
+		"fr_slash": "<code>/</code>를 새 폴더를 만들지 않는 문자로 바꿉니다\">/ 없음",
+		"fr_re": "원본 파일 이름에 적용할 정규식 검색 패턴; 캡처링 그룹은 아래 형식 필드에서 &lt;code&gt;(1)&lt;/code&gt;, &lt;code&gt;(2)&lt;/code&gt; 등으로 참조할 수 있습니다",
+		"fr_fmt": "foobar2000에서 영감을 받음:$N&lt;code&gt;(title)&lt;/code&gt;은(는) 곡 제목으로 대체됨,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt;은(는) 아티스트가 비어 있으면 [이] 부분을 건너뜀$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt;은(는) 트랙 번호를 2자리로 채움",
+		"fr_pdel": "삭제",
+		"fr_pnew": "다른 이름으로 저장",
+		"fr_pname": "새 프리셋의 이름을 입력하세요",
+		"fr_aborted": "중단됨",
+		"fr_lold": "이전 이름",
+		"fr_lnew": "새 이름",
+		"fr_tags": "선택한 파일의 태그 (읽기 전용, 참조용):",
+		"fr_busy": "{0}개 항목 이름 바꾸는 중...\n\n{1}",
+		"fr_efail": "이름 바꾸기 실패:\n",
+		"fr_nchg": "<code>win</code> 및/또는 <code>/ 없음</code>으로 인해 새 이름 중 {0}개가 변경되었습니다.\n\n이 변경된 새 이름으로 계속하시겠습니까?",
+
+		"fd_ok": "삭제 확인",
+		"fd_err": "삭제 실패:\n",
+		"fd_none": "아무것도 삭제되지 않았습니다. 서버 구성 (xbd)에 의해 차단되었을 수 있습니다.",
+		"fd_busy": "삭제 중 {0}개 항목...\n\n{1}",
+		"fd_warn1": "이 {0}개 항목을 삭제하시겠습니까?",
+		"fd_warn2": "<b>마지막 기회입니다!</b> 되돌릴 수 없습니다. 삭제하시겠습니까?",
+
+		"fc_ok": "{0}개 항목 잘라내기 완료",
+		"fc_warn": "{0}개 항목 잘라내기 완료\n\n하지만: 선택 항목이 너무 커서 <b>이</b> 브라우저 탭에서만 붙여넣을 수 있습니다",
+
+		"fcc_ok": "{0}개 항목을 클립보드에 복사했습니다",
+		"fcc_warn": "{0}개 항목을 클립보드에 복사했습니다\n\n하지만: 선택 항목이 너무 커서 <b>이</b> 브라우저 탭에서만 붙여넣을 수 있습니다",
+
+		"fp_apply": "이 이름 사용",
+		"fp_ecut": "붙여넣거나 이동하려면 먼저 파일/폴더를 잘라내거나 복사하세요\n\n참고: 다른 브라우저 탭 간에 잘라내기/붙여넣기를 할 수 있습니다",
+		"fp_ename": "이름이 이미 사용 중이므로 {0}개 항목을 여기로 이동할 수 없습니다. 계속하려면 아래에 새 이름을 지정하거나, 이름을 비워두면 건너뜁니다:",
+		"fcp_ename": "이름이 이미 사용 중이므로 {0}개 항목을 여기로 복사할 수 없습니다. 계속하려면 아래에 새 이름을 지정하거나, 이름을 비워두면 건너뜁니다:",
+		"fp_emore": "아직 해결해야 할 파일 이름 충돌이 남아 있습니다",
+		"fp_ok": "이동 완료",
+		"fcp_ok": "복사 완료",
+		"fp_busy": "{0}개 항목 이동 중...\n\n{1}",
+		"fcp_busy": "{0}개 항목 복사 중...\n\n{1}",
+		"fp_abrt": "취소 중...",
+		"fp_err": "이동 실패:\n",
+		"fcp_err": "복사 실패:\n",
+		"fp_confirm": "이 {0}개 항목을 여기로 이동하시겠습니까?",
+		"fcp_confirm": "이 {0}개 항목을 여기로 복사하시겠습니까?",
+		"fp_etab": '다른 브라우저 탭에서 클립보드를 읽지 못했습니다',
+		"fp_name": "기기에서 파일을 업로드합니다. 이름을 지정하세요:",
+		"fp_both_m": '<h6>붙여넣을 항목 선택</h6><code>Enter</code> = «{1}»에서 파일 {0}개 이동\n<code>ESC</code> = 기기에서 파일 {2}개 업로드',
+		"fcp_both_m": '<h6>붙여넣을 항목 선택</h6><code>Enter</code> = «{1}»에서 파일 {0}개 복사\n<code>ESC</code> = 기기에서 파일 {2}개 업로드',
+		"fp_both_b": '<a href="#" id="modal-ok">이동</a><a href="#" id="modal-ng">업로드</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">복사</a><a href="#" id="modal-ng">업로드</a>',
+
+		"mk_noname": "왼쪽 텍스트 필드에 이름을 먼저 입력해주세요 :p",
+
+		"tv_load": "텍스트 문서 불러오는 중:\n\n{0}\n\n{1}% ({3} MiB 중 {2} MiB 로드됨)",
+		"tv_xe1": "텍스트 파일을 불러올 수 없습니다:\n\n오류 ",
+		"tv_xe2": "404, 파일을 찾을 수 없음",
+		"tv_lst": "텍스트 파일 목록",
+		"tvt_close": "폴더 보기로 돌아가기$N단축키: M (또는 Esc)\">❌ 닫기",
+		"tvt_dl": "이 파일 다운로드$N단축키: Y\">💾 다운로드",
+		"tvt_prev": "이전 문서 보기$N단축키: i\">⬆ 이전",
+		"tvt_next": "다음 문서 보기$N단축키: K\">⬇ 다음",
+		"tvt_sel": "파일 선택 &nbsp; (잘라내기/복사/삭제/...용)$N단축키: S\">선택",
+		"tvt_edit": "텍스트 편집기에서 파일 열기$N단축키: E\">✏️ 편집",
+		"tvt_tail": "파일 변경 사항 모니터링; 실시간으로 새 줄 표시\">📡 팔로우",
+		"tvt_wrap": "자동 줄 바꿈\">↵",
+		"tvt_atail": "페이지 하단으로 스크롤 고정\">⚓",
+		"tvt_ctail": "터미널 색상 디코딩 (ANSI 이스케이프 코드)\">🌈",
+		"tvt_ntail": "스크롤백 제한 (불러온 상태로 유지할 텍스트 바이트 수)",
+
+		"m3u_add1": "m3u 재생 목록에 곡이 추가되었습니다",
+		"m3u_addn": "{0}개의 곡이 m3u 재생 목록에 추가되었습니다",
+		"m3u_clip": "m3u 재생 목록이 클립보드에 복사되었습니다\n\n something.m3u와 같은 이름의 새 텍스트 파일을 만들고 그 문서에 재생 목록을 붙여넣으면 재생할 수 있습니다.",
+
+		"gt_vau": "비디오를 표시하지 않고 오디오만 재생\">🎧",
+		"gt_msel": "파일 선택 활성화; ctrl-클릭하여 파일 재정의$N$N&lt;em&gt;활성 시: 파일/폴더를 두 번 클릭하여 열기&lt;/em&gt;$N$N단축키: S\">다중선택",
+		"gt_crop": "썸네일 중앙 자르기\">자르기",
+		"gt_3x": "고해상도 썸네일\">3x",
+		"gt_zoom": "확대/축소",
+		"gt_chop": "자르기",
+		"gt_sort": "정렬 기준",
+		"gt_name": "이름",
+		"gt_sz": "크기",
+		"gt_ts": "날짜",
+		"gt_ext": "유형",
+		"gt_c1": "파일명 더 많이 생략하기 (더 적게 표시)",
+		"gt_c2": "파일명 덜 생략하기 (더 많이 표시)",
+
+		"sm_w8": "검색 중...",
+		"sm_prev": "아래 검색 결과는 이전 검색어에 대한 결과입니다:\n  ",
+		"sl_close": "검색 결과 닫기",
+		"sl_hits": "{0}개 결과 표시 중",
+		"sl_moar": "더 불러오기",
+
+		"s_sz": "크기",
+		"s_dt": "날짜",
+		"s_rd": "경로",
+		"s_fn": "이름",
+		"s_ta": "태그",
+		"s_ua": "업로드 시점",
+		"s_ad": "고급",
+		"s_s1": "최소 MiB",
+		"s_s2": "최대 MiB",
+		"s_d1": "최소 ISO-8601",
+		"s_d2": "최대 ISO-8601",
+		"s_u1": "이후",
+		"s_u2": "이전",
+		"s_r1": "경로에 포함 &nbsp; (공백으로 구분)",
+		"s_f1": "이름에 포함 &nbsp; (-로 제외)",
+		"s_t1": "태그에 포함 &nbsp; (^=시작, 끝=$)",
+		"s_a1": "특정 메타데이터 속성",
+
+		"md_eshow": "렌더링할 수 없음 ",
+		"md_off": "[📜<em>readme</em>]가 [⚙️]에서 비활성화됨 -- 문서 숨김",
+
+		"badreply": "서버로부터의 응답을 구문 분석하지 못했습니다",
+
+		"xhr403": "403: 접근 거부됨\n\nF5를 눌러보세요, 로그아웃되었을 수 있습니다",
+		"xhr0": "알 수 없음 (서버와의 연결이 끊겼거나 서버가 오프라인일 수 있습니다)",
+		"cf_ok": "죄송합니다 -- DD" + wah + "oS 보호 기능이 작동했습니다\n\n약 30초 후에 다시 정상적으로 작동할 것입니다\n\n아무 일도 일어나지 않으면 F5를 눌러 페이지를 새로고침하세요",
+		"tl_xe1": "하위 폴더를 나열할 수 없습니다:\n\n오류 ",
+		"tl_xe2": "404: 폴더를 찾을 수 없음",
+		"fl_xe1": "폴더의 파일을 나열할 수 없습니다:\n\n오류 ",
+		"fl_xe2": "404: 폴더를 찾을 수 없음",
+		"fd_xe1": "하위 폴더를 만들 수 없습니다:\n\n오류 ",
+		"fd_xe2": "404: 상위 폴더를 찾을 수 없음",
+		"fsm_xe1": "메시지를 보낼 수 없습니다:\n\n오류 ",
+		"fsm_xe2": "404: 상위 폴더를 찾을 수 없음",
+		"fu_xe1": "서버에서 주워담기 목록을 불러오지 못했습니다:\n\n오류 ",
+		"fu_xe2": "404: 파일을 찾을 수 없음??",
+
+		"fz_tar": "압축되지 않은 gnu-tar 파일 (linux / mac)",
+		"fz_pax": "압축되지 않은 pax 형식 tar (느림)",
+		"fz_targz": "gzip 레벨 3 압축이 적용된 gnu-tar$N$N이것은 보통 매우 느리므로$N압축되지 않은 tar를 대신 사용하세요",
+		"fz_tarxz": "xz 레벨 1 압축이 적용된 gnu-tar$N$N이것은 보통 매우 느리므로$N압축되지 않은 tar를 대신 사용하세요",
+		"fz_zip8": "utf8 파일 이름이 포함된 zip (windows 7 및 이전 버전에서 문제가 있을 수 있음)",
+		"fz_zipd": "정말 오래된 소프트웨어를 위한 전통적인 cp437 파일 이름이 포함된 zip",
+		"fz_zipc": "MS-DOS PKZIP v2.04g (1993년 10월)용으로$Ncrc32가 미리 계산된 cp437$N(다운로드 시작 전 처리 시간이 더 걸림)",
+
+		"un_m1": "아래에서 최근 업로드를 삭제하거나 미완료된 업로드를 중단할 수 있습니다",
+		"un_upd": "새로고침",
+		"un_m4": "또는 아래에 보이는 파일을 공유할 수 있습니다:",
+		"un_ulist": "보기",
+		"un_ucopy": "복사",
+		"un_flt": "선택적 필터:&nbsp; URL에 포함되어야 함",
+		"un_fclr": "필터 지우기",
+		"un_derr": '주워담기-삭제 실패:\n',
+		"un_f5": '문제가 발생했습니다, 새로고침하거나 F5를 눌러보세요',
+		"un_uf5": "죄송하지만, 이 업로드를 중단하기 전에 페이지를 새로고침해야 합니다 (예: F5 또는 CTRL-R 누르기).",
+		"un_nou": '<b>경고:</b> 서버가 너무 바빠서 미완료 업로드를 표시할 수 없습니다; 잠시 후 "새로고침" 링크를 클릭하세요',
+		"un_noc": '<b>경고:</b> 완전히 업로드된 파일의 주워담기가 서버 구성에서 활성화/허용되지 않았습니다',
+		"un_max": "처음 2000개 파일을 표시합니다 (필터를 사용하세요)",
+		"un_avail": "{0}개의 최근 업로드를 삭제할 수 있습니다<br />{1}개의 미완료 업로드를 중단할 수 있습니다",
+		"un_m2": "업로드 시간순으로 정렬됨. 가장 최근 항목이 먼저 표시:",
+		"un_no1": "아쉽다! 충분히 최근인 업로드가 없습니다.",
+		"un_no2": "아쉽다! 해당 필터와 일치하는 최근 업로드가 없습니다.",
+		"un_next": "아래의 다음 {0}개 파일 삭제",
+		"un_abrt": "중단",
+		"un_del": "삭제",
+		"un_m3": "최근 업로드 로드 중...",
+		"un_busy": "{0}개 파일 삭제 중...",
+		"un_clip": "{0}개의 링크가 클립보드에 복사되었습니다",
+
+		"u_https1": "더 나은 성능을 위해",
+		"u_https2": "https로 전환",
+		"u_https3": "하는 것이 좋습니다",
+		"u_ancient": '브라우저가 정말 오래되었네요 -- 아마도 <a href="#" onclick="goto(\'bup\')">bup을 대신 사용</a>해야 할 것 같습니다',
+		"u_nowork": "Firefox 53+, Chrome 57+ 또는 iOS 11+가 필요합니다",
+		"tail_2old": "Firefox 105+, Chrome 71+ 또는 iOS 14.5+가 필요합니다",
+		"u_nodrop": '브라우저가 너무 오래되어 드래그 앤 드롭 업로드를 지원하지 않습니다',
+		"u_notdir": '폴더가 아닙니다!\n\n브라우저가 너무 오래되었습니다,\n대신 드래그드롭을 시도해보세요',
+		"u_uri": '다른 브라우저 창에서 이미지를 드래그드롭하려면,\n큰 업로드 버튼 위로 떨어뜨려주세요',
+		"u_enpot": '<a href="#">단순 UI로 전환</a> (업로드 속도가 향상될 수 있음)',
+		"u_depot": '<a href="#">화려한 UI로 전환</a> (업로드 속도가 감소할 수 있음)',
+		"u_gotpot": '업로드 속도 향상을 위해 단순 UI로 전환합니다,\n\n언제든지 다시 전환하셔도 좋습니다!',
+		"u_pott": "<p>파일: &nbsp; <b>{0}</b> 완료, &nbsp; <b>{1}</b> 실패, &nbsp; <b>{2}</b> 처리 중, &nbsp; <b>{3}</b> 대기 중</p>",
+		"u_ever": "이것은 기본 업로더입니다. up2k는 최소한 다음 버전이 필요합니다:<br>Chrome 21 // Firefox 13 // Edge 12 // Opera 12 // Safari 5.1",
+		"u_su2k": '이것은 기본 업로더입니다. <a href="#" id="u2yea">up2k</a>가 더 좋습니다',
+		"u_uput": '속도 최적화 (체크섬 건너뛰기)',
+		"u_ewrite": '이 폴더에 쓰기 권한이 없습니다',
+		"u_eread": '이 폴더에 읽기 권한이 없습니다',
+		"u_enoi": '파일 검색이 서버 구성에서 활성화되지 않았습니다',
+		"u_enoow": '여기서는 덮어쓰기가 작동하지 않습니다. 삭제 권한이 필요합니다',
+		"u_badf": '총 {1}개 중 다음 {0}개의 파일은 파일 시스템 권한 문제 등으로 건너뛰었습니다:\n\n',
+		"u_blankf": '총 {1}개 중 다음 {0}개의 파일은 비어있습니다. 그래도 업로드하시겠습니까?\n\n',
+		"u_applef": '총 {1}개 중 다음 {0}개의 파일은 아마도 불필요한 파일일 것입니다.\n다음 파일을 건너뛰려면 <code>확인/Enter</code>를 누르세요,\n해당 파일도 업로드하려면 <code>취소/ESC</code>를 누르세요:\n\n',
+		"u_just1": '\n파일을 하나만 선택하면 더 잘 작동할 수 있습니다',
+		"u_ff_many": '<b>리눅스/macOS/안드로이드</b>를 사용 중이라면, 이 정도의 파일 수는 <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">Firefox를 <em>충돌시킬 수 있습니다!</em></a>\n만약 그런 일이 발생하면 다시 시도하거나 Chrome을 사용해주세요.',
+		"u_up_life": '이 업로드는 완료 후 {0} 뒤에\n서버에서 삭제됩니다',
+		"u_asku": '이 {0}개의 파일을 <code>{1}</code>(으)로 업로드하시겠습니까?',
+		"u_unpt": '왼쪽 상단의 🧯를 사용하여 이 업로드를 취소/삭제할 수 있습니다',
+		"u_bigtab": '{0}개의 파일을 표시하려고 합니다\n\n브라우저가 충돌할 수 있습니다, 계속 진행합니까?',
+		"u_scan": '파일 스캔 중...',
+		"u_dirstuck": '디렉터리 반복자가 다음 {0}개 항목에 접근하는 데 실패하여 건너뜁니다:',
+		"u_etadone": '완료 ({0}, {1}개 파일)',
+		"u_etaprep": '(업로드 준비 중)',
+		"u_hashdone": '해싱 완료',
+		"u_hashing": '해시',
+		"u_hs": '핸드셰이킹 중...',
+		"u_started": '파일이 현재 업로드 중입니다. [🚀] 참조',
+		"u_dupdefer": '중복됨. 다른 모든 파일 처리 후 처리됩니다',
+		"u_actx": "다른 창/탭으로 전환 시 성능 저하를<br />방지하려면 이 텍스트를 클릭하세요",
+		"u_fixed": "OK!&nbsp; 해결됐습니다 👍",
+		"u_cuerr": "{1} 중 청크 {0} 업로드 실패;\n아마 문제 없을 겁니다. 계속 진행합니다\n\n파일: {2}",
+		"u_cuerr2": "서버가 업로드를 거부했습니다 (청크 {0}/{1});\n나중에 다시 시도합니다\n\n파일: {2}\n\n오류 ",
+		"u_ehstmp": "다시 시도합니다; 오른쪽 하단 참조",
+		"u_ehsfin": "서버가 업로드 완료 요청을 거부했습니다. 재시도 중...",
+		"u_ehssrch": "서버가 검색 수행 요청을 거부했습니다. 재시도 중...",
+		"u_ehsinit": "서버가 업로드 시작 요청을 거부했습니다. 재시도 중...",
+		"u_eneths": "업로드 핸드셰이크 중 네트워크 오류 발생. 재시도 중...",
+		"u_enethd": "대상 존재 여부 테스트 중 네트워크 오류 발생; 재시도 중...",
+		"u_cbusy": '네트워크 문제 후 서버가 다시 우리를 신뢰할 때까지 기다리는 중...',
+		"u_ehsdf": '서버 디스크 공간이 부족합니다!\n\n누군가 계속할 수 있을 만큼의 공간을\n비워줄 경우를 대비해 계속 재시도합니다',
+		"u_emtleak1": "웹 브라우저에 메모리 누수가 있는 것 같습니다.\n",
+		"u_emtleak2": ' <a href="{0}">https로 전환 (권장)</a>하거나 ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": '다음을 시도해보세요:\n<ul><li><code>F5</code>를 눌러 페이지를 새로고침하세요</li><li>그런 다음 <code>⚙️ 설정</code>에서 &nbsp;<code>mt</code>&nbsp; 버튼을 비활성화하세요</li><li>그리고 다시 그 업로드를 시도해보세요</li></ul>업로드가 조금 느려지겠지만, 어쩔 수 없죠.\n불편을 드려 죄송합니다!\n\nPS: 이 버그는 Chrome v107에서 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">수정되었습니다</a>.',
+		"u_emtleakf": '다음을 시도해보세요:\n<ul><li><code>F5</code>를 눌러 페이지를 새로고침하세요</li><li>그런 다음 업로드 UI에서 <code>🥔</code>(단순 UI)를 활성화하세요<li>그리고 다시 그 업로드를 시도해보세요</li></ul>\nPS: Firefox에서 <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">언젠가 이 버그가 수정될 거라 믿습니다</a>.',
+		"u_s404": '서버에서 찾을 수 없음',
+		"u_expl": '설명',
+		"u_maxconn": "대부분의 브라우저는 이를 6으로 제한하지만, Firefox에서는 <code>about:config</code>에서 <code>connections-per-server</code> 설정값으로 높일 수 있습니다.",
+		"u_tu": '<p class="warn">경고: 터보가 활성화되어 <span>클라이언트가 불완전한 업로드를 감지하고 재개하지 못할 수 있습니다. 터보 버튼의 툴팁을 참조하세요</span></p>',
+		"u_ts": '<p class="warn">경고: 터보가 활성화되어 <span>검색 결과가 부정확할 수 있습니다. 터보 버튼의 툴팁을 참조하세요</span></p>',
+		"u_turbo_c": "터보가 서버 구성에서 비활성화되었습니다",
+		"u_turbo_g": '이 볼륨 내에서 디렉터리 목록 권한이 없으므로\n터보를 비활성화합니다',
+		"u_life_cfg": '자동 삭제 시간 <input id="lifem" p="60" /> 분 (또는 <input id="lifeh" p="3600" /> 시간)',
+		"u_life_est": '업로드가 <span id="lifew" tt="현지 시간">---</span>에 삭제됩니다',
+		"u_life_max": '이 폴더는 최대 수명을\n{0}(으)로 강제합니다',
+		"u_unp_ok": '주워담기는 {0} 동안 허용됩니다',
+		"u_unp_ng": '주워담기는 허용되지 않습니다',
+		"ue_ro": '이 폴더에 대한 접근은 읽기 전용입니다\n\n',
+		"ue_nl": '현재 로그인되어 있지 않습니다',
+		"ue_la": '현재 \'{0}\'(으)로 로그인되어 있습니다',
+		"ue_sr": '현재 파일 검색 모드입니다\n\n큰 "검색" 버튼 옆의 돋보기 🔎를 클릭하여 업로드 모드로 전환한 후 다시 업로드해보세요\n\n죄송합니다',
+		"ue_ta": '다시 업로드해보세요, 이제 작동할 겁니다',
+		"ue_ab": '이 파일은 이미 다른 폴더로 업로드 중이며, 파일이 다른 곳에 업로드되기 전에 해당 업로드가 완료되어야 합니다.\n\n왼쪽 상단의 🧯를 사용하여 초기 업로드를 중단하고 잊을 수 있습니다.',
+		"ur_1uo": "OK: 파일이 성공적으로 업로드되었습니다",
+		"ur_auo": "OK: 모든 {0}개의 파일이 성공적으로 업로드되었습니다",
+		"ur_1so": "OK: 서버에서 파일을 찾았습니다",
+		"ur_aso": "OK: 서버에서 모든 {0}개의 파일을 찾았습니다",
+		"ur_1un": "업로드에 실패했습니다, 죄송",
+		"ur_aun": "모든 {0}개의 업로드에 실패했습니다, 죄송",
+		"ur_1sn": "서버에서 파일을 찾지 못했습니다",
+		"ur_asn": "서버에서 {0}개의 파일을 찾지 못했습니다",
+		"ur_um": "완료;\n{0}개 업로드 성공,\n{1}개 업로드 실패, 죄송",
+		"ur_sm": "완료;\n서버에서 {0}개 파일 찾음,\n서버에서 {1}개 파일 찾지 못함",
+
+		"lang_set": '변경 사항을 적용하기 위해 새로고침하시겠습니까?'
+	},
+	"nld": {
+		"tt": "Nederlands",
+
+		"cols": {
+			"c": "Action knoppen",
+			"dur": "Duratie",
+			"q": "Kwaliteit / bitrate",
+			"Ac": "Audio codec",
+			"Vc": "Video codec",
+			"Fmt": "Formaat / container",
+			"Ahash": "Audio checksum",
+			"Vhash": "Video checksum",
+			"Res": "Resolution",
+			"T": "Bestandstype",
+			"aq": "Audio kwaliteit / bitrate",
+			"vq": "Video kwaliteit / bitrate",
+			"pixfmt": "Subsampling / pixel structure",
+			"resw": "Horizontale resolutie",
+			"resh": "Verticale resolutie",
+			"chs": "Audiokanalen",
+			"hz": "Samplefrequentie"
+		},
+
+		"hks": [
+			[
+				"diversen",
+				["ESC", "Sluit verschillende dingen"],
+
+				"bestand beheer",
+				["G", "Verwissel tussen list / grid weergave"],
+				["T", "Verwissel tussen miniaturen / iconen"],
+				["⇧ A/D", "Thumbnail formaat"],
+				["ctrl-K", "Verwijder geselecteerde"],
+				["ctrl-X", "Knip selectie naar klembord"],
+				["ctrl-C", "Kopieer selectie naar klembord"],
+				["ctrl-V", "Hier plakken (verplaatsen/kopieëren)"],
+				["Y", "Download geselecteerde"],
+				["F2", "Hernoem geselecteerde"],
+
+				"bestand-lijst-selectie",
+				["space", "wissel bestand selectie"],
+				["↑/↓", "verplaats selectie cursor"],
+				["ctrl ↑/↓", "verplaats cursor en scherm"],
+				["⇧ ↑/↓", "select vorige/volgende bestand"],
+				["ctrl-A", "selecteer alle bestanden / mappen"],
+			], [
+				"navigatie",
+				["B", "verwissel breadcrumbs / navpane"],
+				["I/K", "Vorige/volgende map"],
+				["M", "Bovenliggende map (of huidige uitvouwen)"],
+				["V", "Berwissel map / tekstbestand in navpane"],
+				["A/D", "Navpane formaat"],
+			], [
+				"muziek-speler",
+				["J/L", "Vorige/volgende song"],
+				["U/O", "Skip 10sec terug/vooruit"],
+				["0..9", "Spring naar 0%..90%"],
+				["P", "Speel/pauzeer (start ook)"],
+				["S", "Selecteer afspelende song"],
+				["Y", "Download song"],
+			], [
+				"afbeelding viewer",
+				["J/L, ←/→", "Vorige/volgende afbeelding"],
+				["Home/End", "Eerste/laatste afbeelding"],
+				["F", "Volledig scherm"],
+				["R", "Draai rechtsom"],
+				["⇧ R", "Draai linksom"],
+				["S", "Selecteer afbeelding"],
+				["Y", "Download afbeelding"],
+			], [
+				"video-speler",
+				["U/O", "Skip 10sec terug/vooruit"],
+				["P/K/Space", "Speel/pauze"],
+				["C", "Verder met volgende"],
+				["V", "herhaal"],
+				["M", "stil"],
+				["[ and ]", "zet herhaal interval"],
+			], [
+				"tekstbestand-viewer",
+				["I/K", "vorige/volgende bestand"],
+				["M", "sluit tekst bestand"],
+				["E", "bewerk tekst bestand"],
+				["S", "selecteer bestand (voor knip/kopie/hernoem)"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Annuleren",
+
+		"enable": "Inschakelen",
+		"danger": "GEVAARLIJK",
+		"clipped": "Gekopieërd naar klembord",
+
+		"ht_s1": "seconde",
+		"ht_s2": "secondes",
+		"ht_m1": "minuut",
+		"ht_m2": "minuten",
+		"ht_h1": "uur",
+		"ht_h2": "uur",
+		"ht_d1": "dag",
+		"ht_d2": "dagen",
+		"ht_and": " en ",
+
+		"goh": "Beheer-paneel",
+		"gop": 'Vorige map">Vorige',
+		"gou": 'Bovenligende map">Omhoog',
+		"gon": 'Volgende map">Volgende',
+		"logout": "Uitloggen ",
+		"login": "Inloggen", //m
+		"access": " Toegang",
+		"ot_close": "Sluit onder-menu",
+		"ot_search": "Zoek voor bestanden bij attributes, pad / naam, muziek tags, of elk andere combinatie tussen$N$N&lt;code&gt;foo bar&lt;/code&gt; = moet beide «foo» en «bar» bevatten,$N&lt;code&gt;foo -bar&lt;/code&gt; = moet «foo» bevatten maar geen «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = start met «yana» en moet een «opus» bestand zijn$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = moet precies «try unite» bevatten$N$Nde datum formaat is iso-8601, zoals$N&lt;code&gt;2009-12-31&lt;/code&gt; of &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: verwijder je recente uploads, of onvoltooide uploads afbreken",
+		"ot_bup": "bup: Basisuploader, supports zelfs netscape 4.0",
+		"ot_mkdir": "mkdir: Maak een nieuwe map",
+		"ot_md": "new-md: Maak een nieuwe markdown bestand",
+		"ot_msg": "msg: Verstuur een bericht naar de server logs",
+		"ot_mp": "Media speler opties",
+		"ot_cfg": "Configuratie opties",
+		"ot_u2i": 'up2k: upload bestanden (als je schrijf toegang hebt) of verwissel naar zoek-mode om te zien of ze ergens bestaan op de server$N$Nuploads zijn hervatbaar, multithreaded, en bestandstijdstempels blijven behouden, maar het gebruikt meer CPU dan [🎈]&nbsp; (de basic uploader)<br /><br />tijdens het uploaden, dit icoon word dan een progress indicatie!',
+		"ot_u2w": 'up2k: upload bestanden met hervattings ondersteuning (sluit je webbrowser en selecteer dezelfde bestand later opnieuw)$N$Nmultithreaded, en bestandstijdstempels blijven behouden, maar het gebruikt meer CPU dan [🎈]&nbsp; (de basic uploader)<br /><br />tijdens het uploaden, dit icoon word dan een progress indicatie!',
+		"ot_noie": 'Gebruik alstublieft Chrome / Firefox / Edge',
+
+		"ab_mkdir": "maak map",
+		"ab_mkdoc": "nieuw markdown doc",
+		"ab_msg": "verstuur msg naar srv log",
+
+		"ay_path": "skip naar mappen",
+		"ay_files": "skip naar bestanden",
+
+		"wt_ren": "Hernoem geselecteerde items$NHotkey: F2",
+		"wt_del": "Berwijder geselecteerde items$NHotkey: ctrl-K",
+		"wt_cut": "Knip geselecteerde items &lt;small&gt;(en plak het ergens anders)&lt;/small&gt;$NHotkey: ctrl-X",
+		"wt_cpy": "Kopieer geselecteerde items naar klembord$N(om te plakken ergens anders)$NHotkey: ctrl-C",
+		"wt_pst": "Plak eeen laatst geknipte / gekopieërde selectie$NHotkey: ctrl-V",
+		"wt_selall": "Selecteer alle bestanden$NHotkey: ctrl-A (wanneer bestand gefocused is)",
+		"wt_selinv": "Selectie omkeren",
+		"wt_zip1": "Download deze map als archief",
+		"wt_selzip": "Download selectie als archief",
+		"wt_seldl": "Download selectie als losse bestanden$NHotkey: Y",
+		"wt_npirc": "Kopieer irc-geformarteerde track info",
+		"wt_nptxt": "Kopieer platte tekst track info",
+		"wt_m3ua": "Aan m3u afspeellijst toevoegen (klik <code>📻kopieer</code> later)",
+		"wt_m3uc": "Kopieer m3u playlist naar klembord",
+		"wt_grid": "Verwissel grid / lijst weergave$NHotkey: G",
+		"wt_prev": "Vorig nummer$NHotkey: J",
+		"wt_play": "Afspelen / pauzeer$NHotkey: P",
+		"wt_next": "Volgend nummer$NHotkey: L",
+
+		"ul_par": "Parallel uploads:",
+		"ut_rand": "Willekeurige bestandsnaam",
+		"ut_u2ts": "Kopieer de laatste-gewijzigde tijdstamp$Nvan je bestandsysteem naar de server\">📅",
+		"ut_ow": "Overschrijf bestaande bestanden op de server?$N🛡️: nooit (zal in plaats daarvan een nieuwe bestandsnaam genereren)$N🕒: overschrijven als de server-bestand ouder is dan het geüploade bestand$N♻️: altijd overschrijven als de bestanden verschillend zijn",
+		"ut_mt": "Ga door met hashen van andere bestanden tijdens het uploaden$N$Moet je misschien uitschakelen als je CPU of HDD het niet aan kan",
+		"ut_ask": 'Vraag voor bevestiging voordat het uploaden start">💭',
+		"ut_pot": "Verbeter de uploadsnelheid voor langzame apparaten$Ndoor de interface minder complex te maken",
+		"ut_srch": "Niet uploaden, maar check of de bestanden als op de server bestaan$N (checkt alle mappen die waar jij toegang op hebt)",
+		"ut_par": "Pauzeer bij zetten het op 0$N$Nverhoog als je verbinding traag is$N$Nhou het op 1 als je netwerk of server HDD het niet aankan",
+		"ul_btn": "Drop bestanden / mappen<br>hier (of klik mij)",
+		"ul_btnu": "U P L O A D",
+		"ul_btns": "Z O E K E N",
+
+		"ul_hash": "Hashing",
+		"ul_send": "Versturen",
+		"ul_done": "Klaar",
+		"ul_idle1": "Geen uploads in wachtrij",
+		"ut_etah": "Gemiddelde &lt;em&gt;hashing&lt;/em&gt; snelheid en geschatte tijd tot de voltooiing",
+		"ut_etau": "Gemiddelde &lt;em&gt;verzend&lt;/em&gt; snelheid en geschatte tijd tot voltooiing",
+		"ut_etat": "Gemiddelde &lt;em&gt;totale&lt;/em&gt; snelheid en geschatte tijd tot voltooiing",
+
+		"uct_ok": "Succesvol afgerond",
+		"uct_ng": "Niet goed: gefaald / geweigerd / niet gevonden",
+		"uct_done": "ok en ng gecombineerd",
+		"uct_bz": "Hashing van uploads",
+		"uct_q": "Inactief, in afwachting",
+
+		"utl_name": "Bestandsnaam",
+		"utl_ulist": "Lijst",
+		"utl_ucopy": "Kopieer",
+		"utl_links": "Links",
+		"utl_stat": "Status",
+		"utl_prog": "Vooruitgang",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "FOUT",
+		"utl_oserr": "OS-FOUT",
+		"utl_found": "gevonden",
+		"utl_defer": "Uitgesteld",
+		"utl_yolo": "YOLO",
+		"utl_done": "klaar",
+
+		"ul_flagblk": "De bestanden zijn toegevoegd aan de wachtrij</b><br>maar er is een drukke up2k bezig in een andere tabblad,<br>wachten totdat die eerst klaar is",
+		"ul_btnlk": "De server configuratie heeft deze schakelaar versleuteld in deze staat",
+
+		"udt_up": "Upload",
+		"udt_srch": "Zoeken",
+		"udt_drop": "Laat hier los",
+
+		"u_nav_m": '<h6>Hey, wat heb jij daar?</h6><code>Enter</code> = Bestanden (een of meer)\n<code>ESC</code> = Een map (inclusief submappen)',
+		"u_nav_b": '<a href="#" id="modal-ok">Bestanden</a><a href="#" id="modal-ng">Een map</a>',
+
+		"cl_opts": "Switches",
+		"cl_themes": "Thema",
+		"cl_langs": "Taal",
+		"cl_ziptype": "Download map als",
+		"cl_uopts": "up2k switches",
+		"cl_favico": "Favicon",
+		"cl_bigdir": "Item limiet in map",
+		"cl_hsort": "#sorteer",
+		"cl_keytype": "Key notaties",
+		"cl_hiddenc": "Verborgen kolomen",
+		"cl_hidec": "Verborgen",
+		"cl_reset": "Reset",
+		"cl_hpick": "Tik op de kolomkoppen om ze in de onderstaande tabel te verbergen",
+		"cl_hcancel": "Kolumn verbergen geannuleerd",
+
+		"ct_grid": '田 grid',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
+		"ct_thumb": 'In grid-overzicht, wissel tussen iconen of thumbnails$NHotkey: T">🖼️ thumbs',
+		"ct_csel": 'Gebruik CTRL en SHIFT voor de bestand selectie in grid-overzicht>sel',
+		"ct_ihop": 'Als je afbeeldingviewer afsluit, scroll omlaag naar de laatst bekeken bestand">g⮯',
+		"ct_dots": 'Laat verborgen bestanden zien (als de server dat toestaat)">dotfiles',
+		"ct_qdel": 'Waneeer je een bestand verwijderd, vraag eenmalig om bevestiging">qdel',
+		"ct_dir1st": 'Sorteer mappen eerst en dan de bestanden">📁 first',
+		"ct_nsort": 'Natural sort (voor bestandsnamen dat beginnen met getallen)">nsort',
+		"ct_readme": 'Laat README.md in mappen lijst zien">📜 readme',
+		"ct_utc": 'Toon alle datums en tijden in UTC">UTC',
+		"ct_idxh": 'Laat index.html zien in plaats van de map overzicht">htm',
+		"ct_sbars": 'Laat scrollbars zien">⟊',
+
+		"cut_umod": "Als een bestand al bestaat op de server, update de 'gewijzigd' waarde op het bestand wat op de server staat met het bestand wat je geupload hebt (vereist schrijf+verwijder rechten)\">re📅",
+
+		"cut_turbo": "De yolo knop, die wil jij waarschijnlijk NIET actief wilt hebben:$N$Ngebruik dit als je heel veel bestanden gaat uploaden EN je moest het herstarten voor een reden en je wilt doorgaan met uploaden ASAP$N$Ndit vervangt de hash-check met een simpele <em>&quot;heeft dit dezelfde bestands groote op de server?&quot;</em>, zo als de bestands inhoud verschillend is, dan worden ze NIET geupload$N$NJe zou deze optie weer uit moeten zetten als de upload klaar is en dan &quot;upload&quot; de zelfde bestanden opnieuw uploaden zo de client het kan verifieren\">turbo",
+
+		"cut_datechk": "Heeft geen effect tenzij de turbo knop actief is$N$Nverminder de yolo factor (een klein beetje); controlleert of de bestand tijdstamp op de server hetzelfde is met het geuploade bestand$N$Ndit zou <em>in theorie</em> de meest onvoltooide/onvoledige uploads, maar dit is geen vervaning voor de verificatie-check met de turbo knop uitgeschakeld daarna\">date-chk",
+
+		"cut_u2sz": "Grote (in MiB) voor elk geuploade stuk; grote waardes vliegen beter over de Atlantische Oceaan. Probeer lage waardes op zeer onstabiele verbindingen",
+
+		"cut_flag": "Alleen een tabblad kan bestanden uploaden $N -- andere tabbladen moeten deze optie ook actief hebben $N -- dit heeft alleen effect op de tabbladen die op hetzelfde domain zijn",
+
+		"cut_az": "Bestanden uploaden in alfabetische volgorde, in plaats van kleinste bestanden eerst$N$Nalfabetische volgorde kan het makkelijker maken om te zien of er wat fout is gegaan op de server, dit maakt het uploaden ietsjes trager op fiber / LAN",
+
+		"cut_nag": "Systeem notificatie weergeven als een upload voltooid is$N(alleen als de browser of tabblad niet actief is)",
+		"cut_sfx": "Geluid waarschuwing afspelen als een upload voltooid is$N(alleen als de browser of tabblad niet actief is)",
+
+		"cut_mt": "Gebruik multithreading om bestands-hashing te versnellen$N$Ndit gebruikt web-workers en vereist$Nmeer geheugen (tot wel 512 MiB extra)$N$Nmaakt https 30% sneller en http 4.5x sneller\">mt",
+
+		"cut_wasm": "Gebruik wasm in plaats van de webbrowser ingebouwde hasher; verbetert de snelheid op chrome-gebaseerde webbrowsers maar verhoogd CPU gebruik, veel oude versie van chrome hebben een bug dat een geheugen lek heeft, dat kan alle geheugen in gebruik nemen en crashen als dit actief is\">wasm",
+
+		"cft_text": "Favicon tekst (laat leeg en vernieuw om uit te schakelen)",
+		"cft_fg": "Voorgrondkleur",
+		"cft_bg": "Achtergrondkleur",
+
+		"cdt_lim": "Max aantal bestanden laten zien in een map",
+		"cdt_ask": "Als helemaal naar beneden gescrolld bent,$Nin plaats van meer inladen,$Nvraag wat het moet doen",
+		"cdt_hsort": "Hoeveel sorteerregels (&lt;code&gt;,sorthref&lt;/code&gt;) moeten er in media-URL's worden opgenomen? Als je dit op 0 instelt, worden de sorteerregels in medialinks ook genegeerd wanneer erop geklikt word.",
+
+		"tt_entree": "Laat navpane zien (directoryboom zijbalk)$NHotkey: B",
+		"tt_detree": "Laat breadcrumbs zien$NHotkey: B",
+		"tt_visdir": "Scroll naar geselecteerde map",
+		"tt_ftree": "Verwissel tussen directoryboom / tekst bestanden$NHotkey: V",
+		"tt_pdock": "Laat bovenliggende mappen zien in een vastgezet deelvenster bovenaan",
+		"tt_dynt": "Automatisch groeien naarmate de directoryboom zich uitbreidt",
+		"tt_wrap": "Automatische terugloop",
+		"tt_hover": "Laat overlopenden lijnen zien bij zweven$N(stopt het scrollen tenzij de muis in de linker gedeelte van het scherm is)",
+
+		"ml_pmode": "Aan het einde van de map...",
+		"ml_btns": "Cmds",
+		"ml_tcode": "Transcode",
+		"ml_tcode2": "Transcode naar",
+		"ml_tint": "Tint",
+		"ml_eq": "Audio-equalizer",
+		"ml_drc": "Dynamisch bereikcompressor",
+
+		"mt_loop": "Loop/herhaal een nummer\">🔁",
+		"mt_one": "Stop na een nummer\">1️⃣",
+		"mt_shuf": "Shuffle alle muziek in alle mappen\">🔀",
+		"mt_aplay": "Autoplay als er een song-ID staat in de link waarop je hebt geklikt om naar de server te gaan$N$NAls u dit uitschakelt, wordt de pagina-URL ook niet meer bijgewerkt met nummer-ID's tijdens het afspelen van muziek. Dit voorkomt automatisch afspelen als deze instellingen verloren gaan, maar de URL behouden blijft.\">a▶",
+		"mt_preload": "Begin het laden van de volgende nummer vlak voordat de huidige nummer het einde bereikt voor gapless playback\">preload",
+		"mt_prescan": "Ga naar de volgende map voordat de laatste nummer eindigd$NMaakt de webbrower blij$NZo het afspelen van muziek niet gestopt word\">nav",
+		"mt_fullpre": "Probeer het hele nummer vooraf te laden;$N✅ activeer dit op <b>onstabiele</b> verbindingen,$N❌ <b>zet uit</b> als je waarschijnlijk een trage verbinding hebt\">full",
+		"mt_fau": "Op telefoons, voorkom muziek van stoppen als de volgende nummer niet snel genoeg voorgeladen is (kan de weergave van tags glitchy maken)\">☕️",
+		"mt_waves": "Waveform zoekbar:$NToon audio-amplitude in de zoekbar\">~s",
+		"mt_npclip": "Knoppen tonen voor het clipboarden van het nummer dat op dat moment wordt afgespeeld\">/np",
+		"mt_m3u_c": "Knoppen tonen om de geselecteerde nummers als m3u8-afspeellijstitems te clipboarden\">📻",
+		"mt_octl": "OS-integratie (media hotkeys / osd)\">os-ctl",
+		"mt_oseek": "Zoeken via os-integratie mogelijk maken$N$NNotitie: op sommige toestellen (iPhones) dit vervcangt de volgende-nummer knop\">seek",
+		"mt_oscv": "Albumhoes weergeven in osd\">art",
+		"mt_follow": "Het afgespeelde nummer in beeld houden\">🎯",
+		"mt_compact": "Compacte bedieningselementen\">⟎",
+		"mt_uncache": "Cache wissen &nbsp;(Probeer dit als uw browser een kapotte kopie van een nummer heeft gecached, waardoor het niet afgespeeld kan worden)\">uncache",
+		"mt_mloop": "De open map herhalen\">🔁 loop",
+		"mt_mnext": "Laad de volgende map en ga verder\">📂 next",
+		"mt_mstop": "Stoppen met afspelen\">⏸ stop",
+		"mt_cflac": "flac / wav omzetten naar {0}\">flac",
+		"mt_caac": "aac / m4a omzetten naar {0}\">aac",
+		"mt_coth": "Alle andere bestanden (geen mp3) converteren naar {0}\">oth",
+		"mt_c2opus": "Beste keuze voor computers, laptops, android\">opus",
+		"mt_c2owa": "opus-weba, voor iOS 17.5 en nieuwer\">owa",
+		"mt_c2caf": "opus-caf, voor iOS 11 tot en met iOS 17\">caf",
+		"mt_c2mp3": "Gebruik dit hele oude toestellen\">mp3",
+		"mt_c2flac": "Beste geluidskwaliteit, maar grote downloads\">flac", //m
+		"mt_c2wav": "Ongemprimeerde weergave (nog groter)\">wav", //m
+		"mt_c2ok": "Mooi, goede keuze",
+		"mt_c2nd": "Dat is niet het aanbevolen uitvoerformaat voor uw apparaat, maar dat is prima",
+		"mt_c2ng": "Uw apparaat lijkt dit uitvoerformaat niet te ondersteunen, maar we gaan het toch proberen",
+		"mt_xowa": "iOS bevat bugs waardoor dit formaat niet op de achtergrond kan worden afgespeeld; gebruik in plaats daarvan caf of mp3.",
+		"mt_tint": "Achtergrond helderheid (0-100) op de zoekbalk om bufferen minder storend te maken",
+		"mt_eq": "Schakelt de equalizer en gain-control in;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standaard 100% volume (ongeweijzigd)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standaard stereo (ongeweijzigd)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% links-rechts crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = stemverwijdering :^)$N$NDoor de equalizer in te schakelen, worden gapless albums volledig gapless. Laat hem dus aanstaan met alle waarden op nul (behalve width = 1) als je dat belangrijk vindt.",
+		"mt_drc": "Schakelt de dynamic range compressor in (volume flattener / brickwaller); schakelt ook EQ in om de spaghetti te balanceren, dus zet alle EQ velden behalve ‘width’ op 0 als je dat niet wilt.$N$Nverlaagt het volume van audio boven THRESHOLD dB; voor elke RATIO dB voorbij THRESHOLD is er 1 dB output, dus standaardwaarden van tresh -24 en ratio 12 betekenen dat het nooit luider dan -22 dB zou moeten worden en het is veilig om de equalizer boost te verhogen tot 0.8, of zelfs 1.8 met ATK 0 en een enorme RLS zoals 90 (werkt alleen in firefox; RLS is max 1 in andere browsers)$N$N(zie wikipedia, die legt het veel beter uit)",
+
+		"mb_play": "Afspelen",
+		"mm_hashplay": "Deze audio bestand afspelen?",
+		"mm_m3u": "Druk op <code>Enter/OK</code> om af te spelen\nDruk op <code>ESC/Annuleren</code> om te bewerken",
+		"mp_breq": "Heeft firefox 82+ of chrome 73+ of iOS 15+",
+		"mm_bload": "Aan het laden...",
+		"mm_bconv": "Opmzetten naar {0}, even geduld...",
+		"mm_opusen": "Uw browser kan geen aac / m4a-bestanden afspelen;\ntranscodering naar opus is nu ingeschakeld",
+		"mm_playerr": "Afspelen mislukt: ",
+		"mm_eabrt": "De afspeelpoging is geannuleerd",
+		"mm_enet": "Je internetverbinding is onstabiel",
+		"mm_edec": "Dit bestand is vermoedelijk beschadigd??",
+		"mm_esupp": "Uw browser begrijpt deze audio-formaat niet",
+		"mm_eunk": "Onbekende fout",
+		"mm_e404": "Kan audio niet afspelen; fout 404: Bestand niet gevonden..",
+		"mm_e403": "Kan audio niet afspelen; fout 403: Toegang geweigerd.\n\nProbeer op F5 te drukken om opnieuw te laden, misschien ben je uitgelogd",
+		"mm_e500": "Kan geen audio afspelen; fout 500: Controleer serverlogs.",
+		"mm_e5xx": "Kan geen audio afspelen; serverfout ",
+		"mm_nof": "Geen audiobestanden meer vinden in de buurt",
+		"mm_prescan": "Op zoek naar muziek om als volgende te spelen...",
+		"mm_scank": "Het volgende nummer gevonden:",
+		"mm_uncache": "Cache gewist; alle nummers worden opnieuw gedownload bij de volgende keer afspelen",
+		"mm_hnf": "Dat liedje bestaat niet meer",
+
+		"im_hnf": "Deze afbeelding bestaat niet meer",
+
+		"f_empty": 'Deze map is leeg',
+		"f_chide": 'Dit verbergt kolom «{0}»\n\nje kunt kolommen verbergen op de instellingen tabblad',
+		"f_bigtxt": "Dit bestand is {0} MiB groot -- echt bekijken als tekst?",
+		"f_bigtxt2": "Wilt u alleen het einde van het bestand bekijken? Dit maakt ook volgen/tailen mogelijk, waarbij nieuw toegevoegde tekstregels in realtime worden weergegeven.",
+		"fbd_more": '<div id="blazy"><code>{0}</code> van de <code>{1}</code> bestanden weergegeven; <a href="#" id="bd_more">Toon {2}</a> of <a href="#" id="bd_all">Laat alles zien</a></div>',
+		"fbd_all": '<div id="blazy"><code>{0}</code> van de <code>{1}</code> bestanden weergegeven; <a href="#" id="bd_all">Laat alles zien</a></div>',
+		"f_anota": "Alleen {0} van de {1} items zijn geselecteerd;\nom de volledige map te selecteren, scrol je eerst naar beneden",
+
+		"f_dls": 'de bestandslinks in de huidige map zijn veranderd in downloadlinks',
+
+		"f_partial": "Om een bestand dat momenteel wordt geüpload veilig te downloaden, klikt u op het bestand met dezelfde bestandsnaam, maar zonder de bestandsextensie <code>.PARTIAL</code>. Druk op Annuleren of Escape om dit te doen.\n\nAls u op OK / Enter drukt, wordt deze waarschuwing genegeerd en gaat u verder met het downloaden van het gedeeltelijke <code>.PARTIAL</code> scratchbestand, waardoor u vrijwel zeker beschadigde gegevens krijgt.",
+
+		"ft_paste": "plakken {0} items$NHotkey: ctrl-V",
+		"fr_eperm": 'kan de naam niet wijzigen:\nje hebt geen “move” rechten in deze map',
+		"fd_eperm": 'kan niet verwijderen:\nje hebt geen “delete” rechten in deze map',
+		"fc_eperm": 'kan niet knippen:\nje hebt geen “move” rechten in deze map',
+		"fp_eperm": 'kan niet plakken:\nje hebt geen “schrijf” rechten in deze map',
+		"fr_emore": "selecteer ten minste één item om te hernoemen",
+		"fd_emore": "selecteer minstens één item om te verwijderen",
+		"fc_emore": "selecteer ten minste één item om te knippen",
+		"fcp_emore": "selecteer ten minste één item om naar het klembord te kopiëren",
+
+		"fs_sc": "Deel de map waarin je je bevindt",
+		"fs_ss": "De geselecteerde bestand(en) delen",
+		"fs_just1d": "U kunt niet meer dan één map selecteren\nof mix bestanden en mappen in één selectie",
+		"fs_abrt": "❌ Afbreken",
+		"fs_rand": "🎲 rand.naam",
+		"fs_go": "✅ Maak share",
+		"fs_name": "Naam",
+		"fs_src": "Bron",
+		"fs_pwd": "Wachtwoord",
+		"fs_exp": "Verloopt",
+		"fs_tmin": "min",
+		"fs_thrs": "uur",
+		"fs_tdays": "dag(en)",
+		"fs_never": "eeuwig",
+		"fs_pname": "Optionele linknaam; is willekeurig als deze leeg is",
+		"fs_tsrc": "Het bestand of de map die u wilt delen",
+		"fs_ppwd": "Optioneel wachtwoord",
+		"fs_w8": "Delen...",
+		"fs_ok": "Druk op <code>Enter/OK</code> naar klembord te zetten\Druk op <code>ESC/Annuleren</code> om te sluiten",
+
+		"frt_dec": "Kan sommige gevallen van gebroken bestandsnamen oplossen\">url-decode",
+		"frt_rst": "Gewijzigde bestandsnamen terugzetten naar de oorspronkelijke namen\">↺ reset",
+		"frt_abrt": "Afbreken en dit venster sluiten\">❌ Annuleren",
+		"frb_apply": "HERNOEMEN TOEPASSEN",
+		"fr_adv": "Batch / metadata / patroon hernoemen\">Geavanceerd",
+		"fr_case": "Hoofdlettergevoelige regex\">case",
+		"fr_win": "Windows-veilige namen; vervangen <code>&lt;&gt;:&quot;\\|?*</code> met japanse tekens over de volledige breedte\">win",
+		"fr_slash": "Vervang <code>/</code> met een teken waardoor er geen nieuwe mappen worden gemaakt\">geen /",
+		"fr_re": "Regex zoekpatroon om toe te passen op originele bestandsnamen; naar capturing groups kan worden verwezen in het onderstaande opmaakveld zoals &lt;code&gt;(1)&lt;/code&gt; en &lt;code&gt;(2)&lt;/code&gt; enzovoort",
+		"fr_fmt": "Geïnspireerd door foobar2000 :$N&lt;code&gt;(titel)&lt;/code&gt; wordt vervangen door de titel van het nummer,$N&lt;code&gt;[(artiest) - ](titel)&lt;/code&gt; sla [dit] gedeelte over als artiest leeg is$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; vult tracknummer op tot 2 cijfers (0X)",
+		"fr_pdel": "Verwijderen",
+		"fr_pnew": "Opslaan als",
+		"fr_pname": "Geef een naam op voor je nieuwe preset",
+		"fr_aborted": "Afgebroken",
+		"fr_lold": "Oude naam",
+		"fr_lnew": "Nieuwe naam",
+		"fr_tags": "Tags voor de geselecteerde bestanden (alleen-lezen, alleen ter referentie):",
+		"fr_busy": "Hernoemen van {0} items...\n\n{1}",
+		"fr_efail": "Hernoemen mislukt:\n",
+		"fr_nchg": "{0} van de nieuwe namen zijn gewijzigd als gevolg van <cod>win</code> en/of <code>geen /</code>\n\nOK om door te gaan met deze gewijzigde nieuwe namen?",
+
+		"fd_ok": "Verwijderen OK",
+		"fd_err": "Verwijderen mislukt:\n",
+		"fd_none": "Er is niets verwijderd; misschien geblokkeerd door serverconfiguratie (xbd)?",
+		"fd_busy": "{0} items verwijderen...\n\n{1}",
+		"fd_warn1": "VERWIJDER deze {0} items?",
+		"fd_warn2": "<b>LAATSTE KANS!</b> Geen manier om ongedaan te maken. Verwijderen?",
+
+		"fc_ok": "Knip {0} items",
+		"fc_warn": 'Knip {0} items\n\nmaar: alleen <b>deze</b> browser-tabblad kan weer plakken\n(omdat de selectie zo enorm is)',
+
+		"fcc_ok": "{0} items naar klembord gekopieerd",
+		"fcc_warn": '{0} items naar klembord gekopieerd\n\maar: alleen <b>deze</b> browser-tabblad kan weer plakken\n(omdat de selectie zo enorm is)',
+
+		"fp_apply": "Gebruik deze namen",
+		"fp_ecut": "Knip of kopieer eerst enkele bestanden/mappen om te verplaatsen/plakken\n\nnotitie: je kunt knippen/plakken in verschillende browsertabbladen",
+		"fp_ename": "{0} items kunnen hier niet worden verplaatst omdat de namen al in gebruik zijn. Geef ze hieronder een nieuwe naam om verder te gaan, of verwijder de naam om ze over te slaan:",
+		"fcp_ename": "{0} items kunnen hier niet worden gekopieerd omdat de namen al in gebruik zijn. Geef ze hieronder een nieuwe naam om verder te gaan, of verwijder de naam om ze over te slaan:",
+		"fp_emore": "Er zijn nog enkele bestandsnaambotsingen die moeten worden opgelost",
+		"fp_ok": "Verplaatsen OK",
+		"fcp_ok": "Kopiëren OK",
+		"fp_busy": "{0} items verplaatsen...\n\n{1}",
+		"fcp_busy": "{0} items kopiëren...\n\n{1}",
+		"fp_abrt": "afbreken...", //m
+		"fp_err": "Verplaatsen mislukt:\n",
+		"fcp_err": "Kopieëren mislukt:\n",
+		"fp_confirm": "Verplaats deze {0} items hierheen?",
+		"fcp_confirm": "Kopieer deze {0} items hier?",
+		"fp_etab": 'Kan klembord van ander browsertabblad niet lezen',
+		"fp_name": "Een bestand uploaden vanaf uw apparaat. Geef het een naam:",
+		"fp_both_m": '<h6>Kies wat je wilt plakken</h6><code>Enter</code> = Verplaatsen {0} bestanden van «{1}»\n<code>ESC</code> = Upload {2} bestanden van je apparaat',
+		"fcp_both_m": '<h6>Kies wat je wilt plakken</h6><code>Enter</code> = Kopieer {0} bestanden van «{1}»\n<code>ESC</code> = Upload {2} bestanden van je apparaat',
+		"fp_both_b": '<a href="#" id="modal-ok">Verplaats</a><a href="#" id="modal-ng">Upload</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Kopieer</a><a href="#" id="modal-ng">Upload</a>',
+
+		"mk_noname": "Voer een naam in het tekstveld aan de linkerkant voordat je verder gaat :p",
+
+		"tv_load": "Tekstdocument laden:\n\n{0}\n\n{1}% ({2} van de {3} MiB geladen)",
+		"tv_xe1": "Kon tekstbestand niet laden:\n\nfout ",
+		"tv_xe2": "404, bestand niet gevonden",
+		"tv_lst": "Lijst met tekstbestanden in",
+		"tvt_close": "Terugkeren naar mapweergave$NHotkey: M (of Esc)\">❌ Sluiten",
+		"tvt_dl": "Download dit bestand$NHotkey: Y\">💾 download",
+		"tvt_prev": "Vorig document tonen$NHotkey: i\">⬆ prev",
+		"tvt_next": "Volgende document tonen$NHotkey: K\">⬇ next",
+		"tvt_sel": "Selecteer bestand &nbsp; ( voor knip / verplaats / verwijder / ... )$NHotkey: S\">sel",
+		"tvt_edit": "Bestand openen in teksteditor$NHotkey: E\">✏️ bewerk",
+		"tvt_tail": "Bestand controleren op wijzigingen; nieuwe regels in realtime weergeven\">📡 volgen",
+		"tvt_wrap": "Automatische terugloop\">↵",
+		"tvt_atail": "Vergrendelen scroll naar onderkant van pagina\">⚓",
+		"tvt_ctail": "Kleuren van terminals decoderen (ansi escape codes)\">🌈",
+		"tvt_ntail": "Terugrollimiet (hoeveel tekst geladen moeten blijven)",
+
+		"m3u_add1": "Nummer toegevoegd aan m3u afspeellijst",
+		"m3u_addn": "{0} nummers toegevoegd aan m3u-afspeellijst",
+		"m3u_clip": "m3u-afspeellijst nu gekopieerd naar klembord\n\nje moet een nieuw tekstbestand maken met de naam iets.m3u en de afspeellijst in dat document plakken; dit maakt het afspeelbaar",
+
+		"gt_vau": "Laat geen video's zien, speel alleen de audio af\">🎧",
+		"gt_msel": "Schakel bestandsselectie in; ctrl-klik op een bestand om te openen$N$N&lt;em&gt;indien actief: dubbelklik op een bestand / map om het te openen&lt;/em&gt;$N$NHotkey: S\">multiselect",
+		"gt_crop": "Gecentreerde miniaturen\">crop",
+		"gt_3x": "Hi-res miniaturen\">3x",
+		"gt_zoom": "Zoom",
+		"gt_chop": "Verkorten",
+		"gt_sort": "Sorteer bij",
+		"gt_name": "naam",
+		"gt_sz": "grootte",
+		"gt_ts": "datum",
+		"gt_ext": "type",
+		"gt_c1": "Bestandsnamen meer inkorten (minder tonen)",
+		"gt_c2": "Bestandsnamen minder inkorten (meer tonen)",
+
+		"sm_w8": "Zoeken...",
+		"sm_prev": "Onderstaande zoekresultaten zijn afkomstig van een eerdere zoekopdracht:\n  ",
+		"sl_close": "Zoekresultaten sluiten",
+		"sl_hits": "Toont {0} treffers",
+		"sl_moar": "Laad meer",
+
+		"s_sz": "grootte",
+		"s_dt": "datum",
+		"s_rd": "pad",
+		"s_fn": "naam",
+		"s_ta": "tags",
+		"s_ua": "op@",
+		"s_ad": "adv.",
+		"s_s1": "Minimaal MiB",
+		"s_s2": "Maximaal MiB",
+		"s_d1": "Min. iso8601",
+		"s_d2": "Max. iso8601",
+		"s_u1": "Uploaded na",
+		"s_u2": "en/of voor",
+		"s_r1": "Pad bevad &nbsp; (spatie-gescheiden)",
+		"s_f1": "Naam bevat &nbsp; (ontkennen met -nope)",
+		"s_t1": "Tags bevat &nbsp; (^=start, einde=$)",
+		"s_a1": "Specifieke metadata-eigenschappen",
+
+		"md_eshow": "Kan niet weergeven ",
+		"md_off": "[📜<em>readme</em>] uitgeschakeld in [⚙️] -- document verborgen",
+
+		"badreply": "Mislukt om antwoord van server te parsen",
+
+		"xhr403": "403: Toegang geweigerd\n\nprobeer F5 in te drukken, misschien ben je uitgelogd",
+		"xhr0": "Onbekend (waarschijnlijk verbinding met server verloren of server is offline)",
+		"cf_ok": "Sorry daarvoor -- DD" + wah + "OS-bescherming ingeschakeld\n\nalles zou binnen ongeveer 30 seconden moeten hervatten\n\nals er niets gebeurt, druk dan op F5 om de pagina opnieuw te laden",
+		"tl_xe1": "Kon submappen niet weergeven:\n\nfout ",
+		"tl_xe2": "404: Map niet gevonden",
+		"fl_xe1": "Kon bestanden in map niet weergeven:\n\nfout ",
+		"fl_xe2": "404: Map niet gevonden",
+		"fd_xe1": "Kon submap niet aanmaken:\n\nfout ",
+		"fd_xe2": "404: Bovenliggende map niet gevonden",
+		"fsm_xe1": "Kon bericht niet verzenden:\n\nfout ",
+		"fsm_xe2": "404: Bovenliggende map niet gevonden",
+		"fu_xe1": "Mislukt om unpost lijst van server te laden:\n\nfout ",
+		"fu_xe2": "404: Bestand niet gevonden??",
+
+		"fz_tar": "gnu-tar bestand uitpakken (linux / mac)",
+		"fz_pax": "pax-formaat tar uitpakken (trager)",
+		"fz_targz": "gnu-tar met gzip niveau 3 compressie$N$Ndit is meestal erg langzaam, dus gebruik in plaats daarvan ongecomprimeerde tar",
+		"fz_tarxz": "gnu-tar met xz-niveau 1 compressie$N$Ndit is meestal erg langzaam, dus gebruik in plaats daarvan ongecomprimeerde tar",
+		"fz_zip8": "Zip met utf8 bestandsnamen (misschien onhandig op windows 7 en ouder)",
+		"fz_zipd": "Zip met traditionele cp437-bestandsnamen, voor echt oude software",
+		"fz_zipc": "cp437 met crc32 vroeg berekend$Nvoor MS-DOS PKZIP v2.04g (oktober 1993)$N(het duurt langer voordat het downloaden kan beginnen)",
+
+		"un_m1": "Hieronder kunt u uw recente uploads verwijderen (of onvoltooide uploads afbreken)",
+		"un_upd": "Vernieuwen",
+		"un_m4": "of deel de bestanden die hieronder zichtbaar zijn:",
+		"un_ulist": "Toon",
+		"un_ucopy": "Kopieer",
+		"un_flt": "Optionele filter:&nbsp; URL moet het volgende bevatten",
+		"un_fclr": "Reset filter",
+		"un_derr": 'unpost-verwijderen mislukt:\n',
+		"un_f5": 'Er is iets kapot, probeer te verversen of druk op F5',
+		"un_uf5": "Sorry, maar u moet de pagina vernieuwen (bijvoorbeeld door op F5 of CTRL-R te drukken) voordat deze upload kan worden afgebroken.",
+		"un_nou": '<b>Waarschuwing:</b> server te druk om onvoltooide uploads weer te geven; klik straks op de "refresh" link',
+		"un_noc": '<b>Waarschuwing:</b> unpost van volledig geüploade bestanden is niet ingeschakeld/toegestaan in de serverconfiguratie',
+		"un_max": "Toont de eerste 2000 bestanden (gebruik de filter)",
+		"un_avail": "{0} recente uploads kunnen worden verwijderd<br />{1} onvoltooide kunnen worden afgebroken",
+		"un_m2": "Gesorteerd op uploadtijd; meest recente eerst:",
+		"un_no1": "sike! geen enkele upload is recent genoeg",
+		"un_no2": "sike! geen uploads die aan dat filter voldoen zijn voldoende recent",
+		"un_next": "Verwijder de volgende {0} bestanden",
+		"un_abrt": "Afbreken",
+		"un_del": "Verwijderen",
+		"un_m3": "Je recente uploads laden...",
+		"un_busy": "Verwijderen van {0} bestanden...",
+		"un_clip": "{0} links gekopieerd naar klembord",
+
+		"u_https1": "Je moet",
+		"u_https2": "overschakelen naar https",
+		"u_https3": "voor betere prestaties",
+		"u_ancient": 'Je browser is indrukwekkend oud -- misschien moet je <a href="#" onclick="goto(\'bup\')">in plaats daarvan bup gebruiken</a>',
+		"u_nowork": "Je moet firefox 53+ of chrome 57+ of iOS 11+ hebben",
+		"tail_2old": "Je moet firefox 105+ of chrome 71+ of iOS 14.5+ hebben",
+		"u_nodrop": 'Je browser is te oud voor uploaden via slepen en neerzetten',
+		"u_notdir": "Dat is geen map!\n\nuw browser is te oud,\nprobeer in plaats daarvan sleep en neerzetten",
+		"u_uri": "Om afbeeldingen te slepen vanuit andere browser tabblad,\nplaats deze dan op de grote uploadknop",
+		"u_enpot": 'Overschakelen naar <a href="#">potato UI</a> (kan uploadsnelheid verbeteren)',
+		"u_depot": 'Overschakelen naar <a href="#">fancy UI</a> (kan uploadsnelheid verminderen)',
+		"u_gotpot": 'Overschakelen naar de potato UI voor verbeterde uploadsnelheid,\n\nVoel je vrij om het er niet mee eens te zijn en schakel terug!',
+		"u_pott": "<p>Bestanden: &nbsp; <b>{0}</b> klaar, &nbsp; <b>{1}</b> mislukt, &nbsp; <b>{2}</b> bezig, &nbsp; <b>{3}</b> in de wachtrij</p>",
+		"u_ever": "Dit is de basis uploader; up2k heeft minstens het volgende nodig<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'Dit is de basis uploader; <a href="#" id="u2yea">up2k</a> is beter',
+		"u_uput": 'Optimaliseren voor snelheid (checksum overslaan)',
+		"u_ewrite": 'Je hebt geen schrijftoegang tot deze map',
+		"u_eread": 'Je hebt geen leestoegang tot deze map',
+		"u_enoi": 'Zoeken naar bestanden is niet ingeschakeld in de serverconfiguratie',
+		"u_enoow": "Overschrijven zal hier niet werken; je heb verwijder toestemming nodig",
+		"u_badf": 'Deze {0} bestanden (van {1} totaal) zijn overgeslagen, mogelijk door bestandssysteemmachtigingen:\n\n',
+		"u_blankf": 'Deze {0} bestanden (van {1} totaal) zijn leeg; alsnog uploaden?\n\n',
+		"u_applef": 'Deze {0} bestanden (van {1} totaal) zijn waarschijnlijk ongewenst;\nKlik op <code>OK/Enter</code> om de volgende bestanden over te slaan,\Klik op <code>Annuleren/ESC</code> niet uit te sluiten en deze ook te uploaden:\n\n',
+		"u_just1": '\nMisschien werkt het beter als je slechts één bestand selecteert',
+		"u_ff_many": "Als je <b>Linux / MacOS / Android,</b> gebruikt dan <em>kan</em> deze hoeveelheid bestanden <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\">Firefox crashen!</a>\nals dat gebeurt, probeer het dan opnieuw (of gebruik Chrome).",
+		"u_up_life": "Deze upload wordt verwijderd van de server\n{0} nadat het is voltooid",
+		"u_asku": 'Upload deze {0} bestanden naar <code>{1}</code>',
+		"u_unpt": "Je kunt deze upload ongedaan maken / verwijderen met de linkerbovenhoek 🧯",
+		"u_bigtab": 'We staan op het punt om {0} bestanden te tonen\n\nDit kan uw browser laten crashen, weet je het zeker??',
+		"u_scan": 'Bestanden scannen...',
+		"u_dirstuck": 'Directory iterator liep vast bij het benaderen van het volgende {0} items; zal het volgende overslaan:',
+		"u_etadone": 'Klaar ({0}, {1} bestanden)',
+		"u_etaprep": '(klaarmaken om te uploaden)',
+		"u_hashdone": 'hashing klaar',
+		"u_hashing": 'Hash',
+		"u_hs": 'Hallo zeggen...',
+		"u_started": "De bestanden worden nu geüpload; zie [🚀]",
+		"u_dupdefer": "Duplicaat; wordt verwerkt na alle andere bestanden",
+		"u_actx": "klik op deze tekst om prestatieverlies</br>bij het overschakelen naar andere vensters/tabbladen te voorkomen",
+		"u_fixed": "OK!&nbsp; Fixed it 👍",
+		"u_cuerr": "Mislukt bij het uploaden van stuk {0} van {1};\nwaarschijnlijk ongevaarlijk, doorgaan\n\nbestand: {2}",
+		"u_cuerr2": "Upload door server geweigerd (stuk {0} van {1});\nzal later opnieuw proberen\n\nbestand: {2}\n\nfout ",
+		"u_ehstmp": "Zal opnieuw proberen; zie rechtsonder",
+		"u_ehsfin": "Server heeft het verzoek om de upload te finaliseren afgewezen; opnieuw proberen...",
+		"u_ehssrch": "Server heeft de zoekaanvraag afgewezen; opnieuw proberen...",
+		"u_ehsinit": "Server heeft het verzoek om het uploaden te starten afgewezen; opnieuw proberen...",
+		"u_eneths": "Netwerkfout tijdens het uitvoeren van de uploadhanddruk; opnieuw proberen...",
+		"u_enethd": "Netwerkfout tijdens het testen van het bestaan van het doel; opnieuw proberen...",
+		"u_cbusy": "Wachten tot de server ons weer vertrouwt na een netwerkstoring...",
+		"u_ehsdf": "Server heeft geen schijfruimte meer!\n\nzal blijven proberen, voor het geval iemand genoeg ruimte vrijmaakt om door te gaan",
+		"u_emtleak1": "Het lijkt erop dat uw webbrowser een geheugenlek heeft;\nprobeer",
+		"u_emtleak2": ' <a href="{0}">over te schakel over naar https (aanbevolen)</a> of ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'Probeer het volgende:\n<ul><li>druk op <code>F5</code> om de pagina te verversen</li><li>dan schakel de &nbsp;<code>mt</code>&nbsp; uit, deze knop staat in &nbsp;<code>⚙️ instellingen</code></li><li>en probeer de upload opnieuw</li></ul>Uploaden zal wat langzamer gaan, maar ja.\nSorry voor de problemen!\n\nPS: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">heeft een bugfix</a> voor dit',
+		"u_emtleakf": '{robeer het volgende:\n<ul><li>druk op <code>F5</code> om de pagina te verversen</li><li>dan activeer <code>🥔</code> (aardappel) in de upload scherm<li>en probeer de upload opnieuw</li></ul>\nPS: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">heeft mogelijk een fix</a> op een gegeven moment',
+		"u_s404": "Niet gevonden op server",
+		"u_expl": "Leg uit",
+		"u_maxconn": "De meeste browsers beperken dit tot 6, maar firefox laat je dit verhogen met <code>network.http.max-persistent-connections-per-server</code> in <code>about:config</code>",
+		"u_tu": '<p class="warn">WAARSCHUWING: turbo ingeschakeld, <span>&nbsp;webbrowser detecteert en hervat onvolledige uploads mogelijk niet; zie de tooltip van de turboknop</span></p>',
+		"u_ts": '<p class="warn">WAARSCHUWING: turbo ingeschakeld, <span>&nbsp;zoekresultaten kunnen onjuist zijn; zie turbo-knop tooltip</span></p>',
+		"u_turbo_c": "Turbo is uitgeschakeld in serverconfiguratie",
+		"u_turbo_g": "Turbo uitgeschakeld, je geen recht om mappen in deze volume te tonen",
+		"u_life_cfg": 'Automatisch verwijderen na <input id="lifem" p="60" /> minuten (of <input id="lifeh" p="3600" /> uur)',
+		"u_life_est": 'Upload wordt verwijderd <span id="lifew" tt="local time">---</span>',
+		"u_life_max": 'Deze map dwingt een\nmaximale levensduur van {0} af',
+		"u_unp_ok": 'unpost is toegestaan voor {0}',
+		"u_unp_ng": 'unpost zijn NIET toegestaan',
+		"ue_ro": 'Je toegang tot deze map is alleen-lezen\n\n',
+		"ue_nl": 'Je bent momenteel niet ingelogd',
+		"ue_la": 'Je bent momenteel aangemeld als "{0}"',
+		"ue_sr": 'U bevindt zich momenteel in de bestandszoekmodus\n\nschakel over naar uploadmodus door op het vergrootglas te klikken 🔎 (naast de grote ZOEK-knop), en probeer opnieuw te uploaden\n\nsorry',
+		"ue_ta": 'Probeer opnieuw te uploaden, het zou nu moeten werken',
+		"ue_ab": "Dit bestand wordt al geüpload naar een andere map en die upload moet worden voltooid voordat het bestand naar een andere map kan worden geüpload.\n\nU kunt de eerste upload afbreken en laten vergeten met de linkerbovenhoek 🧯",
+		"ur_1uo": "OK: Bestand succesvol geüpload",
+		"ur_auo": "OK: Alle {0} bestanden succesvol geüpload",
+		"ur_1so": "OK: Bestand gevonden op server",
+		"ur_aso": "OK: Alle {0} bestanden gevonden op server",
+		"ur_1un": "Uploaden mislukt, sorry",
+		"ur_aun": "Alle {0} uploads mislukt, sorry",
+		"ur_1sn": "Bestand NIET gevonden op server",
+		"ur_asn": "De {0} bestanden zijn NIET gevonden op de server",
+		"ur_um": "Voltooid;\n{0} upload(s) OK,\n{1} upload(s) mislukt, sorry",
+		"ur_sm": "Voltooid;\n{0} bestand(en) gevonden op de server,\n{1} bestand(en) NIET gevonden op de server",
+
+		"lang_set": "Vernieuw de pagina om de wijziging door te voeren?",
+	},
+	"nno": {
+		"tt": "Nynorsk",
+
+		"cols": {
+			"c": "handlingsknappar",
+			"dur": "varigheit",
+			"q": "kvalitet / bitrate",
+			"Ac": "lydformat",
+			"Vc": "videoformat",
+			"Fmt": "format / innpakning",
+			"Ahash": "lydkontrollsum",
+			"Vhash": "videokontrollsum",
+			"Res": "oppløysing",
+			"T": "filtype",
+			"aq": "lydkvalitet / bitrate",
+			"vq": "videokvalitet / bitrate",
+			"pixfmt": "fargekoding / detaljnivå",
+			"resw": "horisontal oppløysing",
+			"resh": "vertikal oppløysing",
+			"chs": "lydkanaler",
+			"hz": "lydoppløsing"
+		},
+
+		"hks": [
+			[
+				"ymse",
+				["ESC", "lukk saker og ting"],
+
+				"filbehandlar",
+				["G", "listevisning eller ikon"],
+				["T", "miniatyrbilder på/av"],
+				["⇧ A/D", "ikonstorleik"],
+				["ctrl-K", "slett valde"],
+				["ctrl-X", "klipp ut valde"],
+				["ctrl-C", "kopiér åt utklippstavle"],
+				["ctrl-V", "lim inn (flytt/kopiér)"],
+				["Y", "last ned valde"],
+				["F2", "endre namn på valde"],
+
+				"filmarkering",
+				["space", "markér fil"],
+				["↑/↓", "flytt markør"],
+				["ctrl ↑/↓", "flytt markør og scroll"],
+				["⇧ ↑/↓", "velg forr./neste fil"],
+				["ctrl-A", "velg alle filer / mapper"],
+			], [
+				"navigering",
+				["B", "mappehierarki eller filsti"],
+				["I/K", "forr./neste mappe"],
+				["M", "eitt nivå opp (eller lukk)"],
+				["V", "vis mapper eller tekstfiler"],
+				["A/D", "panelstorleik"],
+			], [
+				"musikkspelar",
+				["J/L", "forr./neste song"],
+				["U/O", "hopp 10sek bak/fram"],
+				["0..9", "hopp åt 0%..90%"],
+				["P", "pause, eller start / fortsett"],
+				["S", "marker spelande song"],
+				["Y", "last ned song"],
+			], [
+				"bildevisar",
+				["J/L, ←/→", "forr./neste bilde"],
+				["Home/End", "første/siste bilde"],
+				["F", "fullskjermvisning"],
+				["R", "rotér åt høyre"],
+				["⇧ R", "rotér åt venstre"],
+				["S", "markér bilde"],
+				["Y", "last ned bilde"],
+			], [
+				"videospelar",
+				["U/O", "hopp 10sek bak/fram"],
+				["P/K/Space", "pause / fortsett"],
+				["C", "fortsett åt neste fil"],
+				["V", "gjenta avspeling"],
+				["M", "lyd av/på"],
+				["[ og ]", "gjentaksintervall"],
+			], [
+				"dokumentvisar",
+				["I/K", "forr./neste fil"],
+				["M", "lukk tekstdokument"],
+				["E", "redigér tekstdokument"],
+				["S", "markér fil (for F2/ctrl-x/...)"],
+				["Y", "last ned tekstfil"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Avbryt",
+
+		"enable": "Aktiv",
+		"danger": "VARSKU",
+		"clipped": "kopiert åt utklippstavla",
+
+		"ht_s1": "sekund",
+		"ht_s2": "sekund",
+		"ht_m1": "minutt",
+		"ht_m2": "minutt",
+		"ht_h1": "time",
+		"ht_h2": "timar",
+		"ht_d1": "dag",
+		"ht_d2": "dagar",
+		"ht_and": " og ",
+
+		"goh": "kontrollpanel",
+		"gop": 'navigér åt mappa før den her">forr.',
+		"gou": 'navigér eitt nivå opp">opp',
+		"gon": 'navigér åt mappa etter den her">neste',
+		"logout": "Logg ut ",
+		"login": "Logg inn",
+		"access": " åtgang",
+		"ot_close": "lukk reiskap",
+		"ot_search": "søk etter filer ved å angje filnamn, mappenamn, tid, storleik, eller metadata som songtittel / artist / osv.$N$N&lt;code&gt;foo bar&lt;/code&gt; = inneheld båe «foo» og «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = innehold «foo» men ikkje «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = startar med «yana», filtype «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = «try unite» eksakt$N$Ndatoformat er iso-8601, så f.eks.$N&lt;code&gt;2009-12-31&lt;/code&gt; eller &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: slett filer som du nyleg har lastet opp; «angre-knappen»",
+		"ot_bup": "bup: tradisjonell / primitiv filopplasting,$N$Nfungerar i om lag samtlege nettlesarar",
+		"ot_mkdir": "mkdir: lag ei ny mappe",
+		"ot_md": "new-md: lag eit nytt markdown-dokument",
+		"ot_msg": "msg: send ein beskjed åt serverloggen",
+		"ot_mp": "musikkspelarinstillinger",
+		"ot_cfg": "andre innstillinger",
+		"ot_u2i": 'up2k: last opp filer (viss du har skriveåtgang) eller bytt åt søkemodus for å sjekke om filene finnast ein eller annan plass på serveren$N$Nopplastinger kan startast opp att etter avbrot, skjer stykkevis for potensielt høgare ytelse, og ivaretek datostempling -- men bruker litt meir prosessorkraft enn [🎈]&nbsp; (den primitive opplastaren "bup")<br /><br />mens opplastinger føregår så visast framdrifta her oppe!',
+		"ot_u2w": 'up2k: filopplasting med støtte for å starte opp att avbrotne opplastinger -- steng ned nettlesaren og drage dei same filene inn i nettlesaren igjen for å plukke opp att der du slapp$N$Nopplastinger skjer stykkevis for potensielt høgare ytelse, og ivaretek datostempling -- men bruker litt meir prosessorkraft enn [🎈]&nbsp; (den primitive opplastaren "bup")<br /><br />mens opplastinger føregår så visast framdrifta her oppe!',
+		"ot_noie": 'Fungerer mye betre i Chrome / Firefox / Edge',
+
+		"ab_mkdir": "lag mappe",
+		"ab_mkdoc": "nytt dokument",
+		"ab_msg": "send melding",
+
+		"ay_path": "gå videre åt mapper",
+		"ay_files": "gå videre åt filer",
+
+		"wt_ren": "gje nye namn åt dei valde filene$NSnarvei: F2",
+		"wt_del": "slett dei valde filene$NSnarvei: ctrl-K",
+		"wt_cut": "klipp ut dei valde filene &lt;small&gt;(for å lime inn ein annan plass)&lt;/small&gt;$NSnarvei: ctrl-X",
+		"wt_cpy": "kopiér dei valde filene åt utklippstavla$N(for å lime inn ein annan plass)$NSnarvei: ctrl-C",
+		"wt_pst": "lim inn filer (som tidligare blei klipt ut / kopiert ein annan plass)$NSnarvei: ctrl-V",
+		"wt_selall": "velg alle filer$NSnarvei: ctrl-A (mens fokus er på ei fil)",
+		"wt_selinv": "invertér utval",
+		"wt_zip1": "last ned denne mappa som eit arkiv",
+		"wt_selzip": "last ned dei valde filene som eit arkiv",
+		"wt_seldl": "last ned dei valde filene$NSnarvei: Y",
+		"wt_npirc": "kopiér songinfo (irc-formatert)",
+		"wt_nptxt": "kopiér songinfo",
+		"wt_m3ua": "legg song åt i m3u-speleliste$N(husk å klikk på <code>📻copy</code> senere)",
+		"wt_m3uc": "kopiér m3u-spelelista åt utklippstavla",
+		"wt_grid": "bytt mellom ikon og listevising$NSnarvei: G",
+		"wt_prev": "førre  song$NSnarvei: J",
+		"wt_play": "play / pause$NSnarvei: P",
+		"wt_next": "neste song$NSnarvei: L",
+
+		"ul_par": "samtidige handl.:",
+		"ut_rand": "finn opp nye tilfeldige filnamn",
+		"ut_u2ts": "gje fila på serveren same$Ntidsstempel som lokalt hos deg\">📅",
+		"ut_ow": "overskrive eksisterande filer på serveren?$N🛡️: aldri (finn på eit nytt filnamn i staden for)$N🕒: overskriv viss fila åt serveren er eldre$N♻️: alltid, gitt at innholdet er annleis",
+		"ut_mt": "fortsett å synfare køa mens opplasting føregår$N$Nskru denne av dersom du har ein$Ntreig prosessor eller harddisk",
+		"ut_ask": 'bekreft filutvalg før opplasting startar">💭',
+		"ut_pot": "forbetre ytinga på treige einheiter ved å$Nforenkle brukergrensesnittet",
+		"ut_srch": "gjer eit søk i staden for å laste opp --$Nleitar gjennom alle mappane du har lov åt å sjå",
+		"ut_par": "sett åt 0 for å midlertidig stoppe opplasting$N$Nhøge verdier (4 eller 8) kan gje betre yting,$Nspesielt på treige internettlinjer$N$Nbør ikkje vere høgare enn 1 på LAN$Neller viss serveren sin harddisk er treig",
+		"ul_btn": "slepp filer / mapper<br>her (eller klikk meg)",
+		"ul_btnu": "L A S T &nbsp; O P P",
+		"ul_btns": "F I L S Ø K",
+
+		"ul_hash": "synfar",
+		"ul_send": "&nbsp;send",
+		"ul_done": "total",
+		"ul_idle1": "ingen handlinger i køen",
+		"ut_etah": "snitthastigheit for &lt;em&gt;synfaring&lt;/em&gt; samt gjenståande tid",
+		"ut_etau": "snitthastigheit for &lt;em&gt;opplasting&lt;/em&gt; samt gjenståande tid",
+		"ut_etat": "&lt;em&gt;total&lt;/em&gt; snitthastigheit og gjenståande tid",
+
+		"uct_ok": "fullført uten problem",
+		"uct_ng": "fullført under tvil (duplikat, ikkje funne, ...)",
+		"uct_done": "fullført (enten &lt;em&gt;ok&lt;/em&gt; eller &lt;em&gt;ng&lt;/em&gt;)",
+		"uct_bz": "aktive handlinger (synfaring / opplasting)",
+		"uct_q": "køa",
+
+		"utl_name": "filnamn",
+		"utl_ulist": "vis",
+		"utl_ucopy": "kopiér",
+		"utl_links": "lenker",
+		"utl_stat": "status",
+		"utl_prog": "fremdrift",
+
+		// må vere korte:
+		"utl_404": "404",
+		"utl_err": "FEIL!",
+		"utl_oserr": "OS-feil",
+		"utl_found": "funnet",
+		"utl_defer": "seinare",
+		"utl_yolo": "YOLO",
+		"utl_done": "ferdig",
+
+		"ul_flagblk": "filene har blitt lagd i køa</b><br>men det er ein anna nettlesarfane som held på med synfaring eller opplasting akkurat no,<br>så venter åt den er ferdig først",
+		"ul_btnlk": "brytaren har blitt låst åt denne tilstanden i serverens konfigurasjon",
+
+		"udt_up": "Last opp",
+		"udt_srch": "Søk",
+		"udt_drop": "Slepp filene her",
+
+		"u_nav_m": '<h6>kva har du?</h6><code>Enter</code> = Filer (éin eller fleire)\n<code>ESC</code> = Éi mappe (inkludert undermapper)',
+		"u_nav_b": '<a href="#" id="modal-ok">Filer</a><a href="#" id="modal-ng">Éi mappe</a>',
+
+		"cl_opts": "brytarar",
+		"cl_themes": "utsjånad",
+		"cl_langs": "språk",
+		"cl_ziptype": "nedlasting av mapper",
+		"cl_uopts": "up2k-brytarar",
+		"cl_favico": "favicon",
+		"cl_bigdir": "store mapper",
+		"cl_hsort": "#sort",
+		"cl_keytype": "notasjon for musikalsk dur",
+		"cl_hiddenc": "skjulte kolonner",
+		"cl_hidec": "skjul",
+		"cl_reset": "nullstill",
+		"cl_hpick": "klikk på overskrifta åt kolonnene du ønskjer å skjule i tabellen nedanfor",
+		"cl_hcancel": "kolonne-skjuling avbrote",
+
+		"ct_grid": '田 ikon',
+		"ct_ttips": 'vis hjelpetekst ved å holde musa over ting">ℹ️ tips',
+		"ct_thumb": 'vis miniatyrbilder i staden for ikon$NSnarvei: T">🖼️ bilder',
+		"ct_csel": 'bruk tastane CTRL og SHIFT for markering av filer i ikonvising">merk',
+		"ct_ihop": 'bla ned åt sist viste bilde når bildevisaren lukkast">g⮯',
+		"ct_dots": 'vis skjulte filer (gitt at serveren tillèt det)">.synlig',
+		"ct_qdel": 'sletteknappen spør berre éin gong om stadfesting">hurtig🗑️',
+		"ct_dir1st": 'sortér slik at mapper kjem framanfor filer">📁 først',
+		"ct_nsort": 'naturlig sortering (skjønar tal i filnamn)">nsort',
+		"ct_utc": 'bruk UTC for alle klokkeslett">UTC',
+		"ct_readme": 'vis README.md nedanfor filene">📜 readme',
+		"ct_idxh": 'vis index.html i staden for filliste">htm',
+		"ct_sbars": 'vis rullgardiner / skrollefelt">⟊',
+
+		"cut_umod": 'i tilfelle ei fil du lastar opp alt finnast på serveren, så skal tidsstempelet åt serveren oppdaterast slik at det stemmer overeins med din lokale fil (krev rettigheitene write+delete)">re📅',
+
+		"cut_turbo": "forenkla synfaring ved opplasting; bør etter alt å døme <em>ikkje</em> skruast på:$N$Nnyttig dersom du var midt i ei svær opplasting som måtte startast på nytt av ein eller annan grunn, og du vil komme i gang igjen så raskt som i det heile mulig.$N$Nnår denne er skrudd på så forenklast synfaringa kraftig; i staden for å utføre ein trygg sjekk på om filene finnast på serveren i god stand, så sjekkast det kun om <em>filstorleiken</em> stemmer. Så dersom ein korrupt fil vere på serveren allerede, på same plass, med same storleik og namn, så blir det <em>ikkje oppdaga</em>.$N$Ndet anbefalast å kun benytte denne funksjonen for å komme seg raskt gjennom sjølve opplastinga, for så å skru den av, og åt slutt &quot;laste opp&quot; dei same filene éin gong åt -- slik at integriteten kan verifiserast\">turbo",
+
+		"cut_datechk": "har ingen effekt dersom turbo er skrudd av$N$Ngjer turbo bittelitt tryggare ved å sjekke datostemplinga på filene (i tillegg åt filstorleik)$N$N<em>burde</em> oppdage og gjenoppta dei fleste ufullstendige opplastinger, men er <em>ikkje</em> ein fullverdig erstatning for å deaktivere turbo og gjere ein skikkeleg sjekk\">date-chk",
+
+		"cut_u2sz": "storleik i megabyte for kvart bruddstykke for opplasting. Store verdiar flyg betre over atlanteren. Små verdiar kan vere betre på flettande ustabile samband",
+
+		"cut_flag": "samkøyrer nettlesarfaner slik at berre éin $N kan holde på med synfaring / opplasting $N -- andre faner må óg ha denne skrudd på $N -- fungerar kun innanom same domene",
+
+		"cut_az": "last opp filer i alfabetisk rekkefølge, i staden for minste-fil-først$N$Nalfabetisk kan gjere det lettare å anslå om alt gjekk bra, men er bittelitt treigare på fiber / LAN",
+
+		"cut_nag": "meldingsvarsel når opplasting er ferdig$N(kun om nettlesarfana ikkje er synlig)",
+		"cut_sfx": "lydvarsel når opplasting er ferdig$N(kun om nettlesarfanen ikkje er synlig)",
+
+		"cut_mt": "raskere synfaring ved å bruke heile CPU'en$N$Ndenne funksjonen nytter web-workers$Nog krev meir RAM (opptil 512 MiB ekstra)$N$Ngjer https 30% raskare, http 4.5x raskare\">mt",
+
+		"cut_wasm": "bruk wasm i staden for nettlesaren sin sha512-funksjon; gjev betre yting på chrome-baserte nettlesarar, men brukar meir CPU, og eldre versjoner av chrome toler det ikkje (et opp all RAM og kræsjer)\">wasm",
+
+		"cft_text": "ikontekst (blank ut og last siden på nytt for å deaktivere)",
+		"cft_fg": "farge",
+		"cft_bg": "bakgrunnsfarge",
+
+		"cdt_lim": "maks mengd filer å vise per mappe",
+		"cdt_ask": "vis knappar for å laste fleire filer nederst på sida i staden for å gradvis laste meir av mappea når man scroller ned",
+		"cdt_hsort": "antall sorteringsreglar (&lt;code&gt;,sorthref&lt;/code&gt;) som skal inkluderast når media-URL'ar genererast. Dersom denne er 0 så vil sorteringsreglar i URL'ar korkje bli generert eller lest",
+
+		"tt_entree": "bytt åt mappehierarki$NSnarvei: B",
+		"tt_detree": "bytt åt tradisjonell stivising$NSnarvei: B",
+		"tt_visdir": "bla ned åt den åpne mappa",
+		"tt_ftree": "bytt mellom filstruktur og tekstfiler$NSnarvei: V",
+		"tt_pdock": "vis dei overordna mappane i eit panel",
+		"tt_dynt": "øk bredda på panelet ettersom treet utvider seg",
+		"tt_wrap": "linjebryting",
+		"tt_hover": "vis heile mappenamnet når musepeikaren treff mappa$N( gjer diverre at scrollhjulet fusker dersom musepeikaren ikkje finn seg i grøfta )",
+
+		"ml_pmode": "ved enden av mappa",
+		"ml_btns": "knapper",
+		"ml_tcode": "konvertering",
+		"ml_tcode2": "konvertér til",
+		"ml_tint": "tint",
+		"ml_eq": "audio equalizer (tonejustering)",
+		"ml_drc": "compressor (volumutjevning)",
+
+		"mt_loop": "spel den same songen om og om igjen\">🔁",
+		"mt_one": "spel kun éin song\">1️⃣",
+		"mt_shuf": "songane i kvar mappe$Nspelast i tilfeldig rekkefølge\">🔀",
+		"mt_aplay": "prøv å starte avspeling viss linken du trykte på for å åpne nettsida inneheld ein song-ID$N$Nviss denne deaktiverast så vil heller ikkje nettside-URL'en bli oppdatert med song-ID'er når musikk spelast, i tilfelle innstillingane skulle gå tapt og nettsida lastast på ny\">a▶",
+		"mt_preload": "hent ned litt av neste song i forkant,$Nslik at pausa i overgangen blir mindre\">forsyn",
+		"mt_prescan": "ved behov, bla åt neste mappe$Nslik at nettlesaren lar oss$Nfortsetja å spele musikk\">bla",
+		"mt_fullpre": "hent ned heile neste song, ikkje berre litt:$N✅ skru på viss nettet ditt er <b>ustabilt</b>,$N❌ skru av viss nettet ditt er <b>treigt</b>\">full",
+		"mt_fau": "for telefoner: forhindre at avspeling stoppar viss nettet er for treigt åt å laste neste song i tide. Viss påskrudd kan det forårsake at songinfo ikkje visast korrekt i OS'et\">☕️",
+		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspelingsfeltet\">~s",
+		"mt_npclip": "vis knappar for å kopiere info om songen du høyrer på\">/np",
+		"mt_m3u_c": "vis knapper for å kopiere dei valde$Nsongene som innslag i ei m3u8-speleliste\">📻",
+		"mt_octl": "integrering med operativsystemet (fjernkontroll, infoskjerm)\">os-ctl",
+		"mt_oseek": "gje løyve åt spoling med fjernkontroll$N$Nmerk: på nokon eininger (iPhones) så vil$Ndette erstatte knappen for neste song\">spoling",
+		"mt_oscv": "vis albumcover på infoskjermen\">bilde",
+		"mt_follow": "bla slik at songen som spelast alltid er synleg\">🎯",
+		"mt_compact": "tettpakka spelarpanel\">⟎",
+		"mt_uncache": "prøv denne viss ein song ikkje spelar riktig\">oppfrisk",
+		"mt_mloop": "repetér heile mappa\">🔁 gjenta",
+		"mt_mnext": "hopp åt neste mappe og fortsett\">📂 neste",
+		"mt_mstop": "stopp avspeling\">⏸ stopp",
+		"mt_cflac": "konvertér flac / wav-filer åt {0}\">flac",
+		"mt_caac": "konvertér aac / m4a-filer åt to {0}\">aac",
+		"mt_coth": "konvertér alt anna (men ikkje mp3) åt {0}\">andre",
+		"mt_c2opus": "det beste valget for alle PCar og Android\">opus",
+		"mt_c2owa": "opus-weba, for iOS 17.5 og nyare\">owa",
+		"mt_c2caf": "opus-caf, for iOS 11 åt og med 17\">caf",
+		"mt_c2mp3": "bra valg for steinalder-utstyr (slår aldri feil)\">mp3",
+		"mt_c2flac": "gir best lydkvalitet, men et nettet ditt\">flac",
+		"mt_c2wav": "heilt rå lydstrøm (bruker enda meir data enn flac)\">wav",
+		"mt_c2ok": "bra valg!",
+		"mt_c2nd": "ikkje det føretrekte valget for din einheit, men funker sikkert greit",
+		"mt_c2ng": "ser verkelig ikkje ut som enheiten din taklar dette formatet... men ok, vi prøver",
+		"mt_xowa": "iOS har fortsatt problem med avspeling av owa-musikk i bakgrunnen. Bruk caf eller mp3 i staden for",
+		"mt_tint": "nivå av bakgrunnsfarge på søkestripa (0-100),$Ngjer oppdateringer mindre distraherande",
+		"mt_eq": "aktivér tonekontroll og forsterker;$N$Nboost &lt;code&gt;0&lt;/code&gt; = normal volumskala$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = normal stereo$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% blanding venstre-høgre$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = instrumental :^)$N$Nreduserer óg daudtid mellom songfiler",
+		"mt_drc": "aktivér volum-utjevning (dynamic range compressor); vil óg aktivere tonejustering, så sett alle EQ-feltene bortsett frå 'width' åt 0 viss du ikkje vil ha nokon EQ$N$Nfilteret vil dempe volumet på alt som er høgare enn TRESH dB; for kvar RATIO dB over grensa er det 1dB som treff høgtalarane, så standardverdiane tresh -24 og ratio 12 skal bety at volumet ikkje gjeng høgare enn -22 dB, slik at ein trygt kan øke boost-verdien i equalizeren åt rundt 0.8, eller 1.8 kombinert med ATK 0 og RLS 90 (berre mulig i firefox; andre nettlesarar tek ikkje høgare RLS enn 1)$N$Nwikipedia forklarar dette mykje betre forresten",
+
+		"mb_play": "lytt",
+		"mm_hashplay": "spel denne songen?",
+		"mm_m3u": "trykk <code>Enter/OK</code> for å spele\ntrykk <code>ESC/Avbryt</code> for å redigere",
+		"mp_breq": "krev firefox 82+, chrome 73+, eller iOS 15+",
+		"mm_bload": "lastar inn...",
+		"mm_bconv": "konverterer åt {0}, vent litt...",
+		"mm_opusen": "nettlesaren din skjønar ikkje aac / m4a;\nkonvertering åt opus er no aktivert",
+		"mm_playerr": "avspeling feilet: ",
+		"mm_eabrt": "Avspelingsforespørselen blei avbroten",
+		"mm_enet": "Nettet ditt er ustabilt",
+		"mm_edec": "Noko er galt med musikkfila",
+		"mm_esupp": "Nettleseren din skjønar ikkje filtypen",
+		"mm_eunk": "Ukjent feil",
+		"mm_e404": "Avspeling feilet: Fil ikkje funnet.",
+		"mm_e403": "Avspeling feilet: Høve nekta.\n\nKanskje du blei logget ut?\nPrøv å trykk F5 for å laste sida på nytt.",
+		"mm_e500": "Avspeling feilet: Rusk i maskineriet, sjekk serverloggen.",
+		"mm_e5xx": "Avspeling feilet: ",
+		"mm_nof": "finn ikkje flere songer i nærheita",
+		"mm_prescan": "Leitar etter neste song...",
+		"mm_scank": "Fann neste song:",
+		"mm_uncache": "alle songer vil lastast på nytt ved neste avspeling",
+		"mm_hnf": "songen finnast ikkje lenger",
+
+		"im_hnf": "bildet finnast ikkje lenger",
+
+		"f_empty": 'denne mappa er tom',
+		"f_chide": 'dette vil skjule kolonna «{0}»\n\nfana for "andre innstillinger" let deg vise kolonna igjen',
+		"f_bigtxt": "denne fila er heeile {0} MiB -- vis som tekst?",
+		"f_bigtxt2": "vil du sjå bunnen av filen i staden for? du vil da óg sjå nye linjer som blir lagd åt på slutten av filen i sanntid",
+		"fbd_more": '<div id="blazy">visar <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_more">vis {2}</a> eller <a href="#" id="bd_all">vis alle</a></div>',
+		"fbd_all": '<div id="blazy">visar <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_all">vis alle</a></div>',
+		"f_anota": "kun {0} av totalt {1} element blei markert;\nfor å velje alt må du bla åt bunnen av mappa først",
+
+		"f_dls": 'lenkane i denne mappa er no\nomgjort åt nedlastingsknappar',
+
+		"f_partial": "For å laste ned ei fil som enda ikkje er ferdig opplasta, klikk på filen som har same filnamn som denne, men uten <code>.PARTIAL</code> på slutten. Da vil serveren passe på at nedlastinga går bra. Derfor anbefalast det sterkt å trykkje AVBRYT eller Escape-tasten.\n\nViss du verkelig ønskjer å laste ned denne <code>.PARTIAL</code>-filen på ein ukontrollert måte, trykk OK / Enter for å ignorere denne advarselen. Slik vil du høgst sannsynleg motta korrupt data.",
+
+		"ft_paste": "Lim inn {0} filer$NSnarvei: ctrl-V",
+		"fr_eperm": 'kan ikkje endre namn:\ndu har ikkje høve åt “move” i denne mappa',
+		"fd_eperm": 'kan ikkje slette:\ndu har ikkje høve åt “delete” i denne mappa',
+		"fc_eperm": 'kan ikkje klippe ut:\ndu har ikkje høve åt “move” i denne mappa',
+		"fp_eperm": 'kan ikkje lime inn:\ndu har ikkje høve åt “write” i denne mappa',
+		"fr_emore": "vel minst éi fil som skal få nytt namn",
+		"fd_emore": "vel minst éi fil som skal slettast",
+		"fc_emore": "vel minst éi fil som skal klippast ut",
+		"fcp_emore": "vel minst éi fil som skal kopierast åt utklippstavla",
+
+		"fs_sc": "del mappa du er i no",
+		"fs_ss": "del dei valde filene",
+		"fs_just1d": "du kan ikkje markere flere mapper samtidig,\neller kombinere mapper og filer",
+		"fs_abrt": "❌ avbryt",
+		"fs_rand": "🎲 tilfeldig namn",
+		"fs_go": "✅ opprett deling",
+		"fs_name": "namn",
+		"fs_src": "kjelde",
+		"fs_pwd": "passord",
+		"fs_exp": "varigheit",
+		"fs_tmin": "min",
+		"fs_thrs": "timar",
+		"fs_tdays": "dagar",
+		"fs_never": "for evig",
+		"fs_pname": "valfri namn (blir litt tilfeldig ellers)",
+		"fs_tsrc": "fil/mappe som skal delast",
+		"fs_ppwd": "valfri passord",
+		"fs_w8": "opprettar deling...",
+		"fs_ok": "trykk <code>Enter/OK</code> for å kopiere lenka (for CTRL-V)\ntrykk <code>ESC/Avbryt</code> for å kun bekrefta",
+
+		"frt_dec": "kan korrigere visse ødelagte filnamn\">url-decode",
+		"frt_rst": "nullstillar endringar (tilbake åt dei originale filnamna)\">↺ reset",
+		"frt_abrt": "avbryt og lukk dette vindauget\">❌ avbryt",
+		"frb_apply": "IVERKSETT",
+		"fr_adv": "automasjon basert på metadata<br>og / eller mønster (regulære uttrykk)\">avansert",
+		"fr_case": "versalfølsomme uttrykk\">Aa",
+		"fr_win": "bytt ut bokstavane <code>&lt;&gt;:&quot;\\|?*</code> med$Ntilsvarande som windows ikkje får panikk av\">win",
+		"fr_slash": "bytt ut bokstaven <code>/</code> slik at den ikkje forårsakar at nye mapper opprettes\">ikke /",
+		"fr_re": "regex-mønster som køyrast på kvart filnamn. Grupper kan leses ut i format-feltet nedanfor, f.eks. &lt;code&gt;(1)&lt;/code&gt; og &lt;code&gt;(2)&lt;/code&gt; osv.",
+		"fr_fmt": "inspirert av foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; byttast ut med songtittel,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; dropper [dette] viss artist er blank$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; visar songnr. med 2 siffer",
+		"fr_pdel": "slett",
+		"fr_pnew": "lagre som",
+		"fr_pname": "gje innstillingane dine eit namn",
+		"fr_aborted": "avbrote",
+		"fr_lold": "gamalt namn",
+		"fr_lnew": "nytt namn",
+		"fr_tags": "metadata for dei valde filene (kun for referanse):",
+		"fr_busy": "endrar namn på {0} filer...\n\n{1}",
+		"fr_efail": "endring av namn feila:\n",
+		"fr_nchg": "{0} av namna blei justert pga. <code>win</code> og/eller <code>ikkje /</code>\n\nvil du fortsetja med dei nye namna som blei valde?",
+
+		"fd_ok": "sletting OK",
+		"fd_err": "sletting feila:\n",
+		"fd_none": "ingenting blei sletta; kanskje avvist av serverkonfigurasjon (xbd)?",
+		"fd_busy": "slettar {0} filer...\n\n{1}",
+		"fd_warn1": "SLETT disse {0} filene?",
+		"fd_warn2": "<b>Siste sjanse!</b> Dette kan ikkje angrast. Slett?",
+
+		"fc_ok": "klipte ut {0} filer",
+		"fc_warn": 'klipte ut {0} filer\n\nmen: kun <b>denne</b> nettlesarfana har muligheit åt å lime dei inn ein annan plass, siden antallet filer er helt hinsides',
+
+		"fcc_ok": "kopierte {0} filer åt utklippstavla",
+		"fcc_warn": 'kopierte {0} filer åt utklippstavla\n\nmen: kun <b>denne</b> nettlesarfana har muligheit åt å lime dei inn ein annan plass, sidan antallet filer er heilt på hi sida',
+
+		"fp_apply": "bekreft og lim inn no",
+		"fp_ecut": "du må klippe ut eller kopiere nokre filer / mapper først\n\nmerk: du kan gjerne jobbe på kryss av nettlesarfaner; klippe ut i éi fane, lime inn i ei anna",
+		"fp_ename": "{0} filer kan ikkje flyttast åt målmappa fordi det allereie finnast filer med same namn. Gi dei nye namn nedanfor, eller gje dei eit blankt namn for å hoppe over dei:",
+		"fcp_ename": "{0} filer kan ikkje kopierast åt målmappa fordi det allereie finnast filer med same namn. Gi dei nye namn nedanfor, eller gje dei eit blankt namn for å hoppe over dei:",
+		"fp_emore": "det er fortsatt fleire namn som må endrast",
+		"fp_ok": "flytting OK",
+		"fcp_ok": "kopiering OK",
+		"fp_busy": "flyttar {0} filer...\n\n{1}",
+		"fcp_busy": "kopierar {0} filer...\n\n{1}",
+		"fp_abrt": "avbryt...",
+		"fp_err": "flytting feila:\n",
+		"fcp_err": "kopiering feila:\n",
+		"fp_confirm": "flytt disse {0} filene hit?",
+		"fcp_confirm": "kopiér disse {0} filene hit?",
+		"fp_etab": 'kunne ikkje lese lista med filer frå den andre nettlesarfana',
+		"fp_name": "Lastar opp éi fil frå einheita di. Velg filnamn:",
+		"fp_both_m": '<h6>kva skal limast inn her?</h6><code>Enter</code> = Flytt {0} filer frå «{1}»\n<code>ESC</code> = Last opp {2} filer frå einheita din',
+		"fcp_both_m": '<h6>kva skal limes inn her?</h6><code>Enter</code> = Kopiér {0} filer frå «{1}»\n<code>ESC</code> = Last opp {2} filer frå einheita din',
+		"fp_both_b": '<a href="#" id="modal-ok">Flytt</a><a href="#" id="modal-ng">Last opp</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Kopiér</a><a href="#" id="modal-ng">Last opp</a>',
+
+		"mk_noname": "skriv inn eit namn i tekstboksa åt venstre først :p",
+
+		"tv_load": "Lastar inn tekstfil:\n\n{0}\n\n{1}% ({2} av {3} MiB lasta ned)",
+		"tv_xe1": "kunne ikkje laste tekstfil:\n\nfeil ",
+		"tv_xe2": "404, Fil ikkje funne",
+		"tv_lst": "tekstfiler i mappa",
+		"tvt_close": "gå tilbake åt mappa$NSnarvei: M (eller Esc)\">❌ lukk",
+		"tvt_dl": "last ned denne fila$NSnarvei: Y\">💾 last ned",
+		"tvt_prev": "vis førre dokument$NSnarvei: i\">⬆ forr.",
+		"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ neste",
+		"tvt_sel": "markér fila &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
+		"tvt_edit": "redigér fila$NSnarvei: E\">✏️ endre",
+		"tvt_tail": "overvak fila for endringar og vis nye linjer i sanntid\">📡 følg",
+		"tvt_wrap": "tekstbryting\">↵",
+		"tvt_atail": "hald dei nyaste linjene synlege (lås åt botnen av sida)\">⚓",
+		"tvt_ctail": "skjøn og vis terminalfargar (ansi-sekvensar)\">🌈",
+		"tvt_ntail": "maksgrense for antal bokstavar som skal visast i vindauget",
+
+		"m3u_add1": "songen blei lagd åt i m3u-spelelista",
+		"m3u_addn": "{0} songer blei lagde åt i m3u-spelelista",
+		"m3u_clip": "m3u-spelelista blei kopiert åt utklippstavla\n\nneste steg er å oppretta eit tekstdokument med filnamn som sluttar på <code>.m3u</code> og lime inn spelelista der",
+
+		"gt_vau": "ikkje vis videofiler, berre spel lyden\">🎧",
+		"gt_msel": "markér filer i staden for å åpne dei; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk ei fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
+		"gt_crop": "skjer ikona slik at dei passar betre\">✂",
+		"gt_3x": "høgare oppløysing på ikon\">3x",
+		"gt_zoom": "zoom",
+		"gt_chop": "trim",
+		"gt_sort": "sortér",
+		"gt_name": "namn",
+		"gt_sz": "størr.",
+		"gt_ts": "dato",
+		"gt_ext": "type",
+		"gt_c1": "redusér makslengde på filnamn",
+		"gt_c2": "auk makslengde på filnamn",
+
+		"sm_w8": "søker...",
+		"sm_prev": "søkeresultata er frå eit tidlegare søk:\n  ",
+		"sl_close": "lukk søkeresultat",
+		"sl_hits": "visar {0} treff",
+		"sl_moar": "hent fleire",
+
+		"s_sz": "størr.",
+		"s_dt": "dato",
+		"s_rd": "sti",
+		"s_fn": "namn",
+		"s_ta": "meta",
+		"s_ua": "up@",
+		"s_ad": "avns.",
+		"s_s1": "større enn ↓ MiB",
+		"s_s2": "mindre enn ↓ MiB",
+		"s_d1": "nyare enn &lt;dato&gt;",
+		"s_d2": "eldre enn",
+		"s_u1": "lasta opp etter",
+		"s_u2": "og/eller før",
+		"s_r1": "mappaamn inneheld",
+		"s_f1": "filnamn inneheld",
+		"s_t1": "song-info inneheld",
+		"s_a1": "konkrete eigenskapar",
+
+		"md_eshow": "visar forenkla ",
+		"md_off": "[📜<em>readme</em>] er skrudd av i [⚙️] -- dokument skjult",
+
+		"badreply": "Ugyldig svar frå serveren",
+
+		"xhr403": "403: Høve nekta\n\nkanskje du blei logga ut? prøv å trykk F5",
+		"xhr0": "ukjend (enten nettverksproblem eller serverkræsj)",
+		"cf_ok": "om orsak -- liten tilfeldig kontroll, alt OK\n\nting skal fortsetja om ca. 30 sekund\n\nviss ikkje noko skjer, trykk F5 for å laste sida på nytt",
+		"tl_xe1": "kunne ikkje hente undermapper:\n\nfeil ",
+		"tl_xe2": "404: Mappa finnast ikkje",
+		"fl_xe1": "kunne ikkje hente filer i mappa:\n\nfeil ",
+		"fl_xe2": "404: Mappa finnast ikkje",
+		"fd_xe1": "kan ikkje opprette ny mappe:\n\nfeil ",
+		"fd_xe2": "404: Den overordna mappa finnast ikkje",
+		"fsm_xe1": "kunne ikkje sende melding:\n\nfeil ",
+		"fsm_xe2": "404: Den overordna mappa finnast ikkje",
+		"fu_xe1": "kunne ikkje hente lista med nyleg opplastede filer frå serveren:\n\nfeil ",
+		"fu_xe2": "404: Fila finnast ikkje??",
+
+		"fz_tar": "ukomprimert gnu-tar arkiv, for linux og mac",
+		"fz_pax": "ukomprimert pax-tar arkiv, litt treigare",
+		"fz_targz": "gnu-tar pakket med gzip (nivå 3)$N$NNB: denne er veldig treig;$Nukomprimert tar er betre",
+		"fz_tarxz": "gnu-tar pakket med xz (nivå 1)$N$NNB: denne er veldig treig;$Nukomprimert tar er betre",
+		"fz_zip8": "zip med filnamn i utf8 (noko problematisk på windows 7 og eldre)",
+		"fz_zipd": "zip med filnamn i cp437, for høggamle maskiner",
+		"fz_zipc": "cp437 med tidlig crc32,$Nfor MS-DOS PKZIP v2.04g (oktober 1993)$N(øker behandlingstid på server)",
+
+		"un_m1": "nedanfor kan du angre / slette filer som du nyleg har lastet opp, eller avbryte ufullstendige opplastinger",
+		"un_upd": "oppdater",
+		"un_m4": "eller viss du vil dele nedlastings-lenkene:",
+		"un_ulist": "vis",
+		"un_ucopy": "kopiér",
+		"un_flt": "valgfritt filter:&nbsp; filnamn / filsti må inneholde",
+		"un_fclr": "nullstill filter",
+		"un_derr": 'unpost-sletting feilet:\n',
+		"un_f5": 'noko gjekk galt, prøv å oppdatere lista eller trykk F5',
+		"un_uf5": "om orsak, men du må laste sida på nytt (f.eks. ved å trykkje F5 eller CTRL-R) før denne opplastinga kan avbrytast",
+		"un_nou": '<b>advarsel:</b> kan ikkje vise ufullstendige opplastingar akkurat no; klikk på oppdater-lenka om litt',
+		"un_noc": '<b>advarsel:</b> angring av fullførte opplastingar er deaktivert i serverkonfigurasjonen',
+		"un_max": "visar dei første 2000 filene (bruk filteret for å snevre inn)",
+		"un_avail": "{0} nyleg opplasta filer kan slettast<br />{1} ufullstendige opplastingar kan avbrytast",
+		"un_m2": "sortert etter opplastingstid; nyaste først:",
+		"un_no1": "men nei, her var det jaggu ikkje noko som slettast kan",
+		"un_no2": "men nei, her var det jaggu ingenting som passa overens med filteret",
+		"un_next": "slett dei neste {0} filene nedanfor",
+		"un_abrt": "avbryt",
+		"un_del": "slett",
+		"un_m3": "hentar lista med nyleg opplasta filer...",
+		"un_busy": "slettar {0} filer...",
+		"un_clip": "{0} lenkar kopiert åt utklippstavla",
+
+		"u_https1": "du burde",
+		"u_https2": "bytte åt https",
+		"u_https3": "for høgare hastigheit",
+		"u_ancient": 'nettlesaren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup i staden for</a>',
+		"u_nowork": "krev firefox 53+, chrome 57+, eller iOS 11+",
+		"tail_2old": "krev firefox 105+, chrome 71+, eller iOS 14.5+",
+		"u_nodrop": 'nettlesaren din er for gamal åt å laste opp filer ved å drage dei inn i vindauget',
+		"u_notdir": "mottok ikkje mappa!\n\nnettlesaren din er for gamal,\nprøv å drage mappa inn i vindauget i staden for",
+		"u_uri": "for å laste opp bilder frå andre nettlesarvindauge,\nslipp bildet rett på den store last-opp-knappen",
+		"u_enpot": 'bytt åt <a href="#">enkelt UI</a> (gir sannsynleg raskere opplasting)',
+		"u_depot": 'bytt åt <a href="#">snæsent UI</a> (gir sannsynleg treigare opplasting)',
+		"u_gotpot": 'bytta åt eit enklare UI for å laste opp raskere,\n\ndu kan gjerne bytte tilbake altså!',
+		"u_pott": "<p>filer: &nbsp; <b>{0}</b> ferdig, &nbsp; <b>{1}</b> feilet, &nbsp; <b>{2}</b> behandlast, &nbsp; <b>{3}</b> i kø</p>",
+		"u_ever": "dette er den primitive opplastaren; up2k krev minst:<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'dette er den primitive opplastaren; <a href="#" id="u2yea">up2k</a> er betre',
+		"u_uput": 'litt raskare (uten sha512)',
+		"u_ewrite": 'du har ikkje høve til å skrive i denne mappa',
+		"u_eread": 'du har ikkje høve til å lese i denne mappa',
+		"u_enoi": 'filsøk er deaktivert i serverkonfigurasjonen',
+		"u_enoow": "kan ikkje overskrive filer her (Delete-rettigheiten er nødvendig)",
+		"u_badf": 'Disse {0} filene (av totalt {1}) kan ikkje leses, kanskje pga rettigheitsproblem i filsystemet på datamaskinen din:\n\n',
+		"u_blankf": 'Disse {0} filene (av totalt {1}) er blanke / uten innhald; ønskjer du å laste dei opp uansett?\n\n',
+		"u_applef": 'Disse {0} filene (av totalt {1}) er antakeleg uønska;\nTrykk <code>OK/Enter</code> for å HOPPE OVER disse filene,\nTrykk <code>Avbryt/ESC</code> for å LASTE OPP disse filene óg:\n\n',
+		"u_just1": '\nFunkar kanskje betre viss du berre tar éi fil om gangen',
+		"u_ff_many": 'Viss du bruker <b>Linux / MacOS / Android,</b> så kan dette antalet filer<br /><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank"><em>kanskje</em> kræsje Firefox!</a> Viss det skjer, så prøv igjen (eller bruk Chrome).',
+		"u_up_life": "Filene slettast frå serveren {0}\netter at opplastingen er fullført",
+		"u_asku": 'Laste opp disse {0} filene åt <code>{1}</code>',
+		"u_unpt": "Du kan angre / slette opplastinga med 🧯 oppe åt venstre",
+		"u_bigtab": 'Vil no vise {0} filer...\n\nDette kan kræsje nettlesaren din. Fortsette?',
+		"u_scan": 'Les mappane...',
+		"u_dirstuck": 'Nettleseren din fekk ikkje høve åt å lese følgande {0} filer/mapper, så dei blir hoppa over:',
+		"u_etadone": 'Ferdig ({0}, {1} filer)',
+		"u_etaprep": '(forberedar opplasting)',
+		"u_hashdone": 'synfaring ferdig',
+		"u_hashing": 'les',
+		"u_hs": 'serveren tenkjer...',
+		"u_started": "filene blir no lasta opp 🚀",
+		"u_dupdefer": "duplikat; vil bli håndtert åt slutt",
+		"u_actx": "klikk her for å forhindre tap av<br />yting ved bytte åt andre vindauge/faner",
+		"u_fixed": "OK!&nbsp; Løyste seg 👍",
+		"u_cuerr": "kunne ikkje laste opp del {0} av {1};\nsikkert greit, fortsetjar\n\nfil: {2}",
+		"u_cuerr2": "server nekta opplastinga (del {0} av {1});\nprøver igjen senere\n\nfil: {2}\n\nerror ",
+		"u_ehstmp": "prøver igjen; se mld nederst",
+		"u_ehsfin": "server nekta forespørselen om å ferdigstille filen; prøver igjen...",
+		"u_ehssrch": "server nekta forespørselen om å utføre søk; prøver igjen...",
+		"u_ehsinit": "server nekta forespørselen om å begynne ei ny opplasting; prøver igjen...",
+		"u_eneths": "eit problem med nettverket gjorde at avtale om opplasting ikkje kunne inngås; prøver igjen...",
+		"u_enethd": "eit problem med nettverket gjorde at filsjekk ikkje kunne utførast; prøver igjen...",
+		"u_cbusy": "ventar på klarering frå server etter eit lite nettverksglipp...",
+		"u_ehsdf": "serveren er full!\n\nprøver igjen regelmessig,\ni tilfelle nokon ryddar litt...",
+		"u_emtleak1": "uff, det er mulig at nettlesaren din har ei minnelekkasje...\nForeslår",
+		"u_emtleak2": ' helst at du <a href="{0}">byttar åt https</a>, eller ',
+		"u_emtleak3": ' at du ',
+		"u_emtleakc": 'prøver følgande:\n<ul><li>trykk F5 for å laste sida på nytt</li><li>så skru av &nbsp;<code>mt</code>&nbsp; brytaren under &nbsp;<code>⚙️ innstillinger</code></li><li>og prøv den same opplastinga igjen</li></ul>Opplasting vil gå litt treigare, men det får så vere.\nBeklager bryderiet!\n\nPS: feilen <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">skal vere fikset</a> i chrome v107',
+		"u_emtleakf": 'prøver følgende:\n<ul><li>trykk F5 for å laste sida på nytt</li><li>så skru på <code>🥔</code> ("enkelt UI") i opplastaren</li><li>og prøv den same opplastingen igjen</li></ul>\nPS: Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">fiksar forhåpentligvis feilen</a> ein eller annen gong',
+		"u_s404": "ikkje funne på serveren",
+		"u_expl": "forklar",
+		"u_maxconn": "dei fleste nettlesarar tillet ikkje meir enn 6, men firefox lar deg øke grensen med <code>connections-per-server</code> i <code>about:config</code>",
+		"u_tu": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;avbrotne opplastingar vil muligens ikkje oppdagast og gjenopptakast; hald musepeikaren over turbo-knappen for meir info</span></p>',
+		"u_ts": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;søkeresultat kan vere feil; hold musepeikaren over turbo-knappen for meir info</span></p>',
+		"u_turbo_c": "turbo er deaktivert i serverkonfigurasjonen",
+		"u_turbo_g": 'turbo blei deaktivert fordi du ikkje har\nhøve åt å sjå mappeinnhold i dette volumet',
+		"u_life_cfg": 'slett opplasting etter <input id="lifem" p="60" /> min (eller <input id="lifeh" p="3600" /> timar)',
+		"u_life_est": 'opplastingen slettast <span id="lifew" tt="lokal tid">---</span>',
+		"u_life_max": 'denne mappa tillet ikkje å \noppbevare filer i meir enn {0}',
+		"u_unp_ok": 'opplasting kan angrast i {0}',
+		"u_unp_ng": 'opplasting kan IKKE angrast',
+		"ue_ro": 'du har ikkje høve åt skriving i denne mappa\n\n',
+		"ue_nl": 'du er ikkje logga inn',
+		"ue_la": 'du er logga inn som "{0}"',
+		"ue_sr": 'du er i filsøk-modus\n\nbytt åt opplasting ved å klikke på forstørringsglaset 🔎 (ved siden av den store FILSØK-knappen) og prøv igjen\n\nsorry',
+		"ue_ta": 'prøv å last opp igjen, det burde fungere no',
+		"ue_ab": "den same filen er under opplasting åt ei anna mappe, og den må fullførast der før fila kan lastast opp andre plassar.\n\nDu kan avbryte og gløyme den påbegynte opplastinga ved hjelp av 🧯 oppe åt venstre",
+		"ur_1uo": "OK: Fila blei lastet opp",
+		"ur_auo": "OK: Alle {0} filene blei lastet opp",
+		"ur_1so": "OK: Fila blei funne på serveren",
+		"ur_aso": "OK: Alle {0} filene blei funne på serveren",
+		"ur_1un": "Opplasting feila!",
+		"ur_aun": "Alle {0} opplastingene gjekk feil!",
+		"ur_1sn": "Fila finnast IKKE på serveren",
+		"ur_asn": "Fann INGEN av dei {0} filene på serveren",
+		"ur_um": "Ferdig;\n{0} opplastingar gjekk bra,\n{1} opplastingar gjekk feil",
+		"ur_sm": "Ferdig;\n{0} filer blei funne,\n{1} filer finnast IKKJE på serveren",
+
+		"lang_set": "passar det å laste sida på nytt?",
+	},
+	"pol": {
+		"tt": "Polski",
+		"cols": {
+			"c": "przyciski akcji",
+			"dur": "czas trwania",
+			"q": "jakość / bitrate",
+			"Ac": "kodek audio",
+			"Vc": "kodek wideo",
+			"Fmt": "format / kontener",
+			"Ahash": "suma kontrolna audio",
+			"Vhash": "suma kontrolna wideo",
+			"Res": "rozdzielczość",
+			"T": "rodzaj pliku",
+			"aq": "jakość / bitrate audio",
+			"vq": "jakość / bitrate wideo",
+			"pixfmt": "podpróbkowanie / struktura pikseli",
+			"resw": "rozdzielczość pozioma",
+			"resh": "rozdzielczość pionowa",
+			"chs": "kanały audio",
+			"hz": "częstotliwość próbkowania"
+		},
+
+		"hks": [
+			[
+				"misc",
+				["ESC", "zamknij różne rzeczy"],
+
+				"file-manager",
+				["G", "przełącz widok lista / siatka"],
+				["T", "przełącz miniaturki / ikony"],
+				["⇧ A/D", "wielkość miniaturki"],
+				["ctrl-K", "usuń zaznaczone"],
+				["ctrl-X", "wytnij zaznaczone do schowka"],
+				["ctrl-C", "skopiuj zaznaczone do schowka"],
+				["ctrl-V", "wklej (przenieś/skopiuj) tutaj"],
+				["Y", "pobierz zaznaczone"],
+				["F2", "zmień nazwę zaznaczonych"],
+
+				"file-list-sel",
+				["spacja", "przełącz zaznaczanie plików"],
+				["↑/↓", "przenieś kursor zaznaczenia"],
+				["ctrl ↑/↓", "przenieś kursor i widok"],
+				["⇧ ↑/↓", "wybierz poprzedni/następny plik"],
+				["ctrl-A", "wybierz wszystkie pliki/foldery"],
+			], [
+				"navigation",
+				["B", "przełącz ścieżkę nawigacyjną / panel nawigacyjny"],
+				["I/K", "poprzedni/następny folder"],
+				["M", "folder nadrzędny (lub zwiń aktualny)"],
+				["V", "przełącz foldery / pliki tekstowe w panelu nawigacyjnym"],
+				["A/D", "rozmiar panelu nawigacyjnego"],
+			], [
+				"audio-player",
+				["J/L", "poprzedni/następny utwór"],
+				["U/O", "przejdź 10 sek. do tyłu/przodu"],
+				["0..9", "przeskocz do 0%..90%"],
+				["P", "odtwórz/pauza (również rozpoczyna)"],
+				["S", "wybierz odtwarzany utwór"],
+				["Y", "pobierz utwór"],
+			], [
+				"image-viewer",
+				["J/L, ←/→", "poprzednie/następne zdjęcie"],
+				["Home/End", "pierwsze/ostatnie zdjęcie"],
+				["F", "pełny ekran"],
+				["R", "obróć zgodnie ze wskaz. zegara"],
+				["⇧ R", "obróć przeciwnie do ruchu wskaz. zegara"],
+				["S", "wybierz zdjęcie"],
+				["Y", "pobierz zdjęcie"],
+			], [
+				"video-player",
+				["U/O", "przejdź 10 sek. do tyłu/przodu"],
+				["P/K/Spacja", "odtwórz/pauza"],
+				["C", "odtwarzaj następne po zakończeniu"],
+				["V", "odtwarzaj w pętli"],
+				["M", "wycisz"],
+				["[ i ]", "ustaw opóźnienie pętli"],
+			], [
+				"textfile-viewer",
+				["I/K", "poprzedni/następny plik"],
+				["M", "zamknij plik"],
+				["E", "edytuj plik"],
+				["S", "wybierz plik (do wycięcia/skopiowania/zmiany nazwy)"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Anuluj",
+
+		"enable": "Włącz",
+		"danger": "NIEBEZPIECZEŃSTWO",
+		"clipped": "skopiowano do schowka",
+
+		"ht_s1": "sekunda",
+		"ht_s2": "sekundy",
+		"ht_s5": "sekund",
+		"ht_m1": "minuta",
+		"ht_m2": "minuty",
+		"ht_m5": "minut",
+		"ht_h1": "godzina",
+		"ht_h2": "godziny",
+		"ht_h5": "godzin",
+		"ht_d1": "dzień",
+		"ht_d2": "dni",
+		"ht_and": " i ",
+
+		"goh": "panel sterowania",
+		"gop": 'poprzedni plik/folder">poprzedni',
+		"gou": 'nadrzędny folder">w górę',
+		"gon": 'następny folder">następny',
+		"logout": "Wyloguj ",
+		"login": "Zaloguj się", //m
+		"access": " dostęp",
+		"ot_close": "zamknij pod-menu",
+		"ot_search": "szukaj plików po atrybutach, ścieżce / nazwie, tagach muzyki, bądź dowolnej ich kombinacji$N$N&lt;code&gt;foo bar&lt;/code&gt; = musi zawierać «foo» oraz «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = musi zawierać «foo», lecz nie «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = musi zaczynać się od «yana» i być plikiem «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = zawierać dokładnie «try unite»$N$Nformatem daty jest iso-8601, czyli$N&lt;code&gt;2009-12-31&lt;/code&gt; lub &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: usuń ostatnio przesłane pliki lub przerwij przesyłanie",
+		"ot_bup": "bup: podstawowe przesyłanie danych, wspiera nawet netscape 4.0",
+		"ot_mkdir": "mkdir: tworzy nowy folder",
+		"ot_md": "new-md: tworzy nowy dokument markdown",
+		"ot_msg": "msg: wysyła wiadomość do loga serwera",
+		"ot_mp": "opcje odtwarzacza multimediów",
+		"ot_cfg": "opcje konfiguracji",
+		"ot_u2i": 'up2k: przesyła pliki (jeżeli masz dostęp do zapisu) lub uruchomia tryb wyszukiwania, aby sprawdzić czy już istnieją na serwerze$N$Nprzesyłanie można wznowić, jest wielowątkowe i znaczniki czasu są zachowywane, lecz zużywa więcej procesora niż [🎈]&nbsp; (podstawowe przesyłanie)<br /><br />podczas przesyłania ta ikona zamienia się w wskaźnik postępu!',
+		"ot_u2w": 'up2k: przesyła pliki z możliwością wznowienia (można zamknąć przeglądarkę i dokończyć przesyłanie plików później)$N$Njest wielowątkowy i zachowuje znaczniki czasu plików, lecz zużywa więcej procesora od [🎈]&nbsp; (podstawowego przesyłania)<br /><br />podczas przesyłania ta ikona zamienia się w wskaźnik postępu!',
+		"ot_noie": 'Użyj przeglądarki Chrome / Firefox / Edge',
+
+		"ab_mkdir": "stwórz folder",
+		"ab_mkdoc": "stwórz dok. markdown",
+		"ab_msg": "wyślij wiad. do logów serwera",
+
+		"ay_path": "przejdź do folderów",
+		"ay_files": "przejdź do plików",
+
+		"wt_ren": "zmień nazwę zaznaczonych elementów$NSkrót: F2",
+		"wt_del": "usuń zaznaczone elementy$NSkrót: ctrl-K",
+		"wt_cut": "wytnij zaznaczone elementy &lt;small&gt;(aby wkleić gdzie indziej)&lt;/small&gt;$NSkrót: ctrl-X",
+		"wt_cpy": "skopiuj zaznaczone pliki do schowka$N(aby wkleić gdzie indziej)$NSkrót: ctrl-C",
+		"wt_pst": "wklej wcześniej wycięte/skopiowane zaznaczenie$NSkrót: ctrl-V",
+		"wt_selall": "zaznacz wszystko$NHotkey: ctrl-A (when file focused)",
+		"wt_selinv": "odwróć zaznaczenie",
+		"wt_zip1": "pobierz folder jako archiwum",
+		"wt_selzip": "pobierz zaznaczone jako archiwum",
+		"wt_seldl": "pobierz zaznaczenie jako oddzielne pliki$NSkrót: Y",
+		"wt_npirc": "skopiuj informacje o utworze w formacie irc",
+		"wt_nptxt": "skopiuj informacje o utworze jako zwykły tekst",
+		"wt_m3ua": "dodaj to playlisty m3u (kliknij <code>📻copy</code> kliknij)",
+		"wt_m3uc": "skopiuj playlistę m3u do schowka",
+		"wt_grid": "przełącz widok siatki / listy$NSkrót: G",
+		"wt_prev": "poprzeni utwór$NSkrót: J",
+		"wt_play": "odtwórz / pauza$NSkrót: P",
+		"wt_next": "następny utwór$NSkrót: L",
+
+		"ul_par": "przesyłane równolegle:",
+		"ut_rand": "losuj nazwy plików",
+		"ut_u2ts": "kopiuj znacznik ostatniej modyfikacji$Nz twojego systemu plików na serwer\">📅",
+		"ut_ow": "nadpisywać istniejące pliki na serwerzę?$N🛡️: nigdy (wygeneruje nową nazwę)$N🕒: nadpisz jeśli pliki na serwerze są starsze niż przesyłane$N♻️: zawsze nadpisuj jeśli zawartość plików się różni",
+		"ut_mt": "hashuj inne pliki podczas przesyłania$N$Nmożna wyłączyć w przypadku wystąpienia wąskiego gardła na CPU lub HDD",
+		"ut_ask": 'pytaj o potwierdzenie rozpoczęcia przesyłania">💭',
+		"ut_pot": "przyspiesz przesyłanie na słabszych urządzeniach,$Nupraszczając interfejs",
+		"ut_srch": "nie przesyłaj plików, jedynie sprawdź czy istnieją$Njuż na serwerze (przeskanuje wszystkie foldery dostępne do odczytu)",
+		"ut_par": "zatrzymuje przesyłanie jeśli wynosi 0$N$Nzwiększ w przypadku jeśli twoja sieć jest wolna / ma duże opóźnienia$N$Nustaw wartość 1 w sieci lokalnej lub w przypadku wolnego dysku serwerowego",
+		"ul_btn": "upuść pliki / foldery<br>tutaj (lub kliknij mnie)",
+		"ul_btnu": "P R Z E Ś L I J",
+		"ul_btns": "S Z U K A J",
+
+		"ul_hash": "hashowanie",
+		"ul_send": "przesyłanie",
+		"ul_done": "gotowe",
+		"ul_idle1": "nic się jeszcze nie przesyła",
+		"ut_etah": "średnia prędkość &lt;em&gt;hashowania&lt;/em&gt i przewidywany czas do końca",
+		"ut_etau": "średnia prędkość &lt;em&gt;przesyłania&lt;/em&gt i przewidywany czas do końca",
+		"ut_etat": "średnia prędkość &lt;em&gt;ogólna&lt;/em&gt i przewidywany czas do końca",
+
+		"uct_ok": "zakończone pomyślnie",
+		"uct_ng": "zakończono niepowodzeniem (odrzucono, nie znaleziono, itp.)",
+		"uct_done": "zakończono z błędami",
+		"uct_bz": "w trakcie (oblicznie sumy kontrolnej, przesyłanie)",
+		"uct_q": "oczekujące",
+
+		"utl_name": "nazwa pliku",
+		"utl_ulist": "lista",
+		"utl_ucopy": "kopia",
+		"utl_links": "linki",
+		"utl_stat": "status",
+		"utl_prog": "postęp",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "BŁĄD",
+		"utl_oserr": "błąd OS",
+		"utl_found": "znaleziono",
+		"utl_defer": "opóźnij",
+		"utl_yolo": "YOLO",
+		"utl_done": "gotowe",
+
+		"ul_flagblk": "pliki zostały zakolejkowane,</b><br>lecz przesyłanie up2k już trwa (w innej zakładce),<br>oczekuję na zakończenie",
+		"ul_btnlk": "przełącznik zablokowany przez konfigurację serwera",
+
+		"udt_up": "Prześlij",
+		"udt_srch": "Szukaj",
+		"udt_drop": "upuść tutaj",
+
+		"u_nav_m": '<h6>co my tu mamy?</h6><code>Enter</code> = Pliki (jeden lub wiecej)\n<code>ESC</code> = Jeden folder (włącznie z podfolderami)',
+		"u_nav_b": '<a href="#" id="modal-ok">Pliki</a><a href="#" id="modal-ng">Jeden folder</a>',
+
+		"cl_opts": "przełączniki",
+		"cl_themes": "motyw",
+		"cl_langs": "język",
+		"cl_ziptype": "pobieranie folderów",
+		"cl_uopts": "przełączniki przesyłania (up2k)",
+		"cl_favico": "favicon (ikona w przeglądarce)",
+		"cl_bigdir": "duże foldery",
+		"cl_hsort": "#sortowanie",
+		"cl_keytype": "notacja klucza",  // not sure
+		"cl_hiddenc": "ukryte kolumny",
+		"cl_hidec": "ukryj",
+		"cl_reset": "zresetuj",
+		"cl_hpick": "kliknij nagłówki kolumn, aby ukryć je w tabeli niżej",
+		"cl_hcancel": "ukrywanie kolumn przerwane",
+
+		"ct_grid": '田 siatka',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ podpowiedzi',
+		"ct_thumb": 'w widoku siatki, przełącz ikony i miniaturki$NSkrót: T">🖼️ miniaturki',
+		"ct_csel": 'użyj CTRL i SHIFT do wybierania plików w widoku siatki">wybierz',
+		"ct_ihop": 'przejdź do ostatniego pliku po zamknięciu przeglądarki obrazów">g⮯',
+		"ct_dots": 'pokaż ukryte pliki (jeśli pozwala serwer)">ukryte',
+		"ct_qdel": 'pytaj o potwierdzenie przy usuwaniu tylko raz">pyt. us.',
+		"ct_dir1st": 'pokazuj foldery na początku">📁 najpierw',
+		"ct_nsort": 'naturalne sortowanie (dla numerowanych plików)">nsort',
+		"ct_utc": 'pokaż wszystkie daty/czas w UTC">UTC',
+		"ct_readme": 'pokazuj README.md w folderach">📜 readme',
+		"ct_idxh": 'pokazuj plik index.html zamiast zawartości folderu">htm',
+		"ct_sbars": 'pokazuj paski przewijania">⟊',
+
+		"cut_umod": "uaktualnij znacznik ostatniej modyfikacji pliku, tak aby pasował do pliku lokalnego jeżeli plik już istnieje na serwerze (wymaga dostępu zapisu i usuwania)\">📅 ponownie",
+
+		"cut_turbo": "przycisk „raz się żyje”, raczej NIE POWINIENEŚ tego włączać:$N$Nużywaj jeśli przesyłano ogromną liczbę plików i z jakiegoś powodu musisz przesłać pliki ponownie, kontynuując jak najszybciej$N$Nzamienia sprawdzanie sumy kontrolnej plików prostym <em>&quot;czy ten plik jest tego samego rozmiaru jak ten na serwerze?&quot;</em> więc jeśli pliki różnią się zawartością, ale są tego samego rozmiaru, NIE ZOSTANĄ przesłane ponownie$N$Nta opcja powinna zostać wyłączona po zakończeniu przesyłania, i potem &quot;przesłać&quot; te same pliki ponownie w celu weryfikacji\">turbo",
+
+		"cut_datechk": "przy wyłączonym przycisku turbo nic nie robi$N$Nleciutko zmniejsza czynnik „raz się żyje”; dodatkowo sprawdza czy znaczniki modyfikacji pliku przesyłanego zgadzają się z serwerem$N$N<em>teorytycznie</em> powinno złapać to większość niedokończonych / uszkodzonych plików, lecz nie jest zamiennikiem wykonania ponownego sprawdzenia bez włączonego trybu turbo\">spr-daty",
+
+		"cut_u2sz": "rozmiar (w MiB) każdego kawałka do przesłania; większe wartości szybciej latają po Atlantyku. Mniejsze wartości działają lepiej na bardzo niestabilnych połączeniach (neostrada?)",
+
+		"cut_flag": "zapewnia, że tylko jedna karta przesyła dane w danym momencie$N -- opcja musi być włączona na innych kartach $N - dotyczy tylko kart w tej samej domenie",
+
+		"cut_az": "przesyła pliki w kolejności alfabetycznej, zamiast rozpocząć od najmniejszego pliku$N$Nkolejność alfabetyczna może ułatwić oszacowanie, co mogło pójść nie tak na serwerze, lecz lekko spowalnia przesyłanie po światłowodzie lub w sieci lokalnej",
+
+		"cut_nag": "powiadomienie systemowe po zakończeniu przesyłania$N(tylko jeśli przeglądarka lub karta nie jest aktywna)",
+		"cut_sfx": "sygnał dźwiękowy po zakończeniu przesyłania$N(tylko jeśli przeklądarka lub karta nie jest aktywna)",
+
+		"cut_mt": "używaj wielowątkowości, aby przyspieszyć obliczanie sumy kontrolnej plików$N$Nużywa web workerów i wymaga$Nwięcej pamięci RAM (do 512 MiB)$N$Nprzyspiesza https o 30% i http 4,5-krotnie\">ww",
+
+		"cut_wasm": "używaj WASM zamiast wbudowanego hashera przeglądarki; zwiększa prędkość na Chrome'o-pochodnych przeglądarkach, zwiększając zużycie procesora, ponadto wiele starszych wersji Chrome'a zawiera błędy powodujące zeżarcie całej pamięci RAM komputera i przymusowe zamknięcie przeglądarki jeżeli ta opcja jest włączona\">wasm",
+
+		"cft_text": "tekst favicon (aby wyłączyć, usuń zawartość i przeładuj stronę)",
+		"cft_fg": "kolor tekstu",
+		"cft_bg": "kolor tła",
+
+		"cdt_lim": "maksymalna liczba plików do pokazania na raz w folderze",
+		"cdt_ask": "przy przewijaniu w dół,$Nzapytaj co robić,$Nzamiast wczytywać kolejne pliki",
+		"cdt_hsort": "ile zasad sortowania (&lt;code&gt;,sorthref&lt;/code&gt;) zawierać w generowanych linkach multimediów. Wartość 0 sprawi, że zasady sortowania zawarte w linkach multimediów przy otwarciu również będą ignorowane",
+
+		"tt_entree": "pokaż panel nawigacyjny (panel boczny z drzewem folderów)$NSkrót: B",
+		"tt_detree": "pokaż ślad nawigacyjny$NSkrót: B",
+		"tt_visdir": "przewiń do wybranego folderu",
+		"tt_ftree": "przełącz drzewo folderów / pliki tekstowe$NSkrót: V",
+		"tt_pdock": "pokaż foldery nadrzędne w przypiętym u góry panelu",
+		"tt_dynt": "rozszerzaj panel wraz z drzewem",
+		"tt_wrap": "zawijaj tekst",
+		"tt_hover": "pokazuj za długie linie po najechaniu kursorem$N( psuje przewijanie gdy $N&nbsp; kursor nie jest w lewym marginesie )",
+
+		"ml_pmode": "na końcu folderu...",
+		"ml_btns": "komendy",
+		"ml_tcode": "transkoduj",
+		"ml_tcode2": "transkoduj do",
+		"ml_tint": "odcień",
+		"ml_eq": "korektor dźwięku (equalizer)",
+		"ml_drc": "kompresor zasięgu dynamiki",
+
+		"mt_loop": "pętla/powtarzaj jeden utwór\">🔁",
+		"mt_one": "zatrzymaj po jednym utworze\">1️⃣",
+		"mt_shuf": "odtwarzaj losowo w każdym folderze\">🔀",
+		"mt_aplay": "autoodtwarzanie po kliknięciu linku do tego serwera, zawierającego identyfikator utworu$N$Nwyłączenie tej opcji zapobiegnie aktualizowaniu adresu strony podczas odtwarzania muzyki, aby zapobiec autoodtwarzaniu przy utracie ustawień\">a▶",
+		"mt_preload": "rozpocznij ładowanie kolejnego utworu blisko końca aktualnego w celu uzyskania odtwarzania bez przerw\">preload",
+		"mt_prescan": "przechodzi do następnego folderu przed zakończeniem ostatniego utworu,$Naby udobruchać przeglądarkę,$Nżeby nie zatrzymała odtwarzania\">naw",
+		"mt_fullpre": "próbuj zbuforować cały utwór;$N✅ włącz na <b>niestabilnych</b> połączeniach,$N❌ <b>wyłącz</b> na wolnych połączeniach\">pełnebuf",
+		"mt_fau": "nie zatrzymuj muzyki jeśli następna piosenka będzie się zbyt wolno buforować na telefonach (może sprawić, że tagi będą się niepoprawnie wyświetlać)\">☕️",
+		"mt_waves": "falisty pasek:$Npokazuj amplitudę dźwięku w pasku utworu\">~s",
+		"mt_npclip": "pokaż przyciski kopiowania aktualnie odtwarzanego utworu\">/np",
+		"mt_m3u_c": "pokaż przyciski kopiowania$Nwybranych piosenek jako playlista m3u8\">📻",
+		"mt_octl": "integracja z systemem operacyjnym (przyciski multimedialne / informacje o utworze)\">os-int",
+		"mt_oseek": "zezwól na przewijanie utworu poprzez integrację z systemem$N$Nuwaga: na niektórych urządzeniach (iPhone'y),$Nzamienia przycisk następnej piosenki\">seek",
+		"mt_oscv": "pokaż okładkę albumu w widoku systemu\">okładka",
+		"mt_follow": "podążaj za odtwarzanym utworem przewijając widok\">🎯",
+		"mt_compact": "kompaktowe sterowanie\">⟎",
+		"mt_uncache": "wyczyść pamięć podręczną &nbsp;(spróbuj jeśli przeglądarka$Nzachowała zepsutą kopię utworu, przez co nie odtwarza się ona)\">uncache",
+		"mt_mloop": "odtwarzaj utwory w folderze w pętli\">🔁 loop",
+		"mt_mnext": "wczytaj następny folder i kontynuuj\">📂 next",
+		"mt_mstop": "zatrzymaj odtwarzanie\">⏸ stop",
+		"mt_cflac": "przekonwertuj format flac / wav na {0}\">flac",
+		"mt_caac": "przekonwertuj format aac / m4a na {0}\">aac",
+		"mt_coth": "przekonwertuj wszystkie inne formaty (nie będące mp3) na {0}\">oth",
+		"mt_c2opus": "najlepszy wybór dla komputerów, laptopów i urządzeń z androidem\">opus",
+		"mt_c2owa": "opus-weba, dla iOS 17.5 i nowszych\">owa",
+		"mt_c2caf": "opus-caf, dla iOS 11 do 17\">caf",
+		"mt_c2mp3": "używaj na bardzo starych urządzeniach\">mp3",
+		"mt_c2flac": "najlepsza jakość dźwięku, ale ogromne pliki do pobrania\">flac", //m
+		"mt_c2wav": "nieskompresowane odtwarzanie (jeszcze większe)\">wav", //m
+		"mt_c2ok": "cudownie, dobry wybór",
+		"mt_c2nd": "ten format nie jest rekomendowany dla twojego urządzenia, ale nadal jest w porządku",
+		"mt_c2ng": "wygląda na to, że to urządzenie nie wspiera tego formatu, lecz spróbujmy i tak",
+		"mt_xowa": "iOS zawiera błędy uniemożliwiające odtwarzanie w tle używając tego formatu; wybierz caf lub mp3",
+		"mt_tint": "jasność tła (0-100) paska,$Naby zmniejszyć widoczność buforowania",
+		"mt_eq": "włącza korektor dźwięku (equalizer) i kontrolę wzmocnienia dźwięku;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standardowa głośność 100% (niezmodyfikowana)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standardowe stereo (niezmodyfikowane)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% crossfeed lewo-prawo$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = usuwanie wokalu :^)$N$Nwłączenie korektora sprawia, że albumy bezprzerwowe są w pełni bez przerw, więc jeśli jest to dla ciebie ważne, zostaw wszystko na 0 (poza width = 1)",
+		"mt_drc": "włącza kompresor zakresu dynamiki (normalizacja głośności); włącza również korektor w celu zbalansowania tego spaghetti, więc ustaw wszystkie opcje korektora, oprócz 'width',na 0, jeśli go nie chcesz$N$Nobniża głośność audio nad THRESHOLD (próg) dB; dla każdego RATIO (współczynnika) dB, będącego ponad THRESHOLDem jest 1 dB wyjścia, więc domyślne wartości progu -24 i współczynnika 12 znaczą, że nigdy nie powinno być głośniej niż -22 dB i bezpieczne jest zwiększenie wzmocnienia korektora do 0.8, lub nawet 1.8 z ATK 0 i ogromnym RLS, jak 90 (działa tylko na firefoxie, inne przeglądarki mają limit RLS 1)$N$N(na wikipedii tłumaczą to dużo lepiej)",
+
+		"mb_play": "odtwórz",
+		"mm_hashplay": "odtworzyć ten plik audio?",
+		"mm_m3u": "naciśnij <code>Enter/OK</code>, aby odtworzyć\nnaciśnij <code>ESC/Anuluj</code>, aby edytować",
+		"mp_breq": "wymagany jest Firefox 82+, Chrome 73+ lub iOS 15+",
+		"mm_bload": "wczytywanie...",
+		"mm_bconv": "konwertowanie do {0}, proszę czekać...",
+		"mm_opusen": "ta przeglądarka nie może odtwarzać plików aac / m4a;\ntranskodowanie do formatu opus włączone",
+		"mm_playerr": "odtwarzanie nie powiodło się: ",
+		"mm_eabrt": "Odtwarzanie zostało przerwane",
+		"mm_enet": "Połączenie z internetem jest słabe",
+		"mm_edec": "Ten plik wydaje się uszkodzony??",
+		"mm_esupp": "Twoja przeglądarka nie rozumie tego formatu audio",
+		"mm_eunk": "Nieznany błąd",
+		"mm_e404": "Nie można odtworzyć; błąd 404: Nie znaleziono pliku.",
+		"mm_e403": "Nie można odtworzyć; błąd 403: Odmowa dostępu.\n\nSpróbuj przeładować stronę (F5), może cię wylogowało",
+		"mm_e500": "Nie można odtworzyć; błąd 500: Sprawdź logi serwera.",
+		"mm_e5xx": "Nie można odtworzyć; błąd serwera",
+		"mm_nof": "nie znaleziono więcej plików audio",
+		"mm_prescan": "Szukanie kolejnego utworu...",
+		"mm_scank": "Znaleziono następną piosenkę:",
+		"mm_uncache": "wyczyszczono pamięć podręczną; wszystkie utwory zostaną pobrane ponownie przy następnym odtworzeniu",
+		"mm_hnf": "ten utwór już nie istnieje",
+
+		"im_hnf": "ten obraz już nie istnieje",
+
+		"f_empty": 'ten folder jest pusty',
+		"f_chide": 'schowa kolumnę «{0}»\n\nkolumny można ponownie pokazać w zakładce ustwaień',
+		"f_bigtxt": "ten plik waży {0} MiB -- na pewno pokazać jako tekst?",
+		"f_bigtxt2": "odczytać jedynie koniec pliku? włączy również śledzenie, pokazując nowo-dodane linie tekstu w czasie rzeczywistym",
+		"fbd_more": '<div id="blazy">pokazuję <code>{0}</code> z <code>{1}</code> plików; <a href="#" id="bd_more">pokaż {2}</a> lub <a href="#" id="bd_all">pokaż wszystko</a></div>',
+		"fbd_all": '<div id="blazy">pokazuję <code>{0}</code> z <code>{1}</code> files; <a href="#" id="bd_all">pokaż wszystko</a></div>',
+		"f_anota": "{0} z {1} elementów zostało wybranych;\naby pokazać cały folder, zjedź na dół",
+
+		"f_dls": 'linki do plików w aktualnym folderze\nzostały zmienione w linki pobierania',
+
+		"f_partial": "Aby bezpiecznie pobrać plik, który aktualnie jest przesyłany, wybierz plik o tej samej nazwie, lecz bez rozszerzenia <code>.PARTIAL</code>. Żeby to zrobić, naciśnij ANULUJ lub klawisz ESC.\n\nWciśnięcie OK / Enter zignoruje to ostrzeżenie i pobierze plik tymczasowy <code>.PARTIAL</code>, który prawie z pewnością będzie zepsuty",
+
+		"ft_paste": "wklej {0} elementów$NSkrót: ctrl-V",
+		"fr_eperm": 'nie można zmienić nazwy:\nnie posiadasz uprawnienia „move” w tym folderze',
+		"fd_eperm": 'nie można usunąć:\nnie posiadasz uprawnienia „delete” w tym folderze',
+		"fc_eperm": 'nie można wyciąć:\nnie posiadasz uprawnienia „move” w tym folderze',
+		"fp_eperm": 'nie można wkleić:\nnie posiadasz uprawnienia „write” w tym folderze',
+		"fr_emore": "wybierz przynajmniej jeden element do zmiany nazwy",
+		"fd_emore": "wybierz przynajmniej jeden element do usunięcia",
+		"fc_emore": "wybierz przynajmniej jeden element do wycięcia",
+		"fcp_emore": "wybierz przynajmniej jeden element do skopiowania",
+
+		"fs_sc": "udostępnij ten folder",
+		"fs_ss": "udostępnij zaznaczone pliki",
+		"fs_just1d": "nie można wybrać więcej niż jednego folderu,\nani mieszać plików i folderów w jednym zaznaczeniu",
+		"fs_abrt": "❌ przerwij",
+		"fs_rand": "🎲 losuj nazwę",
+		"fs_go": "✅ stwórz udostępnienie",
+		"fs_name": "nazwa",
+		"fs_src": "źródło",
+		"fs_pwd": "hasło",
+		"fs_exp": "wygaśnięcie",
+		"fs_tmin": "min",
+		"fs_thrs": "godz.",
+		"fs_tdays": "dni",
+		"fs_never": "na zawsze",
+		"fs_pname": "opcjonalna nazwa linku; zostanie wylosowana jeśli pusta",
+		"fs_tsrc": "plik lub folder do udostępnienia",
+		"fs_ppwd": "hasło (opcjonalnie)",
+		"fs_w8": "udostępnianie...",
+		"fs_ok": "naciśnij <code>Enter/OK</code>, aby skopiować do schowka\nnaciśnij <code>ESC/Anuluj</code>, aby zamknąć",
+
+		"frt_dec": "może naprawić niektóre zepsute nazwy plików\">dekoduj-url",
+		"frt_rst": "zresetuj zmodyfikowane nazwy plików do oryginalnych\">↺ zresetuj",
+		"frt_abrt": "przerwij i zamknij to okno\">❌ anuluj",
+		"frb_apply": "ZASTOSUJ ZMIANĘ NAZWY",
+		"fr_adv": "zmiana nazwy hurtowa / metadanych / wzorcem\">zaawansowane",
+		"fr_case": "rozróżnianie wielkości liter w regex\">wlit",
+		"fr_win": "nazwy bezpieczne dla systemu Windows; zamienia symbole <code>&lt;&gt;:&quot;\\|?*</code> na japońskie odpowiedniki\">win",
+		"fr_slash": "zamienia <code>/</code> symbolem, który nie tworzy nowych folderów\">brak /",
+		"fr_re": "wzorzec wyszukiwania regex stosowany do oryginalnych nazw plików; do grup przechwytywania można się odwołać w polu formatu poniżej, np.  &lt;code&gt;(1)&lt;/code&gt; i &lt;code&gt;(2)&lt;/code&gt; itd.",
+		"fr_fmt": "inspirowane programem foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; zostaje zamienione na tytuł utworu,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; pomija [tą] część jeśli pole artysty jest puste$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; wyrównuje numer utworu do 2 cyfr (np. 01, 06, 09, 16)",
+		"fr_pdel": "usuń",
+		"fr_pnew": "zapisz jako",
+		"fr_pname": "podaj nazwę nowego szablonu",
+		"fr_aborted": "anulowano",
+		"fr_lold": "poprzednia nazwa",
+		"fr_lnew": "nowa nazwa",
+		"fr_tags": "znaczniki dla wybranych plików (tylko do odczytu, w celach informacyjnych):",
+		"fr_busy": "zmienianie nazwy {0} plików...\n\n{1}",
+		"fr_efail": "zmiana nazwy zakończona niepowodzeniem:\n",
+		"fr_nchg": "{0} nowych nazw zostało zmienionych przez opcje <code>win</code> i/lub <code>brak /</code>\n\nKontynuować ze zmienionymi nazwami?",
+
+		"fd_ok": "usunięto",
+		"fd_err": "usuwanie zakończone niepowodzeniem:\n",
+		"fd_none": "nie usunięto nic; usunięcie mogło zostać zablokowane przez konfigurację serwera (xbd)?",
+		"fd_busy": "usuwanie {0} elementów...\n\n{1}",
+		"fd_warn1": "USUNĄĆ {0} elementów?",
+		"fd_warn2": "<b>OSTATNIA SZANSA!</b> Tej operacji nie da się cofnąć. Usunąć?",
+
+		"fc_ok": "wycięto {0} elementów",
+		"fc_warn": 'wycięto {0} elementów,\n\nlecz można je wkleić tylko w <b>tej</b> karcie\n(ze względu na ogromną ilość wybranych elementów)',
+
+		"fcc_ok": "skopiowano {0} elementów do schowka",
+		"fcc_warn": 'skopiowano {0} elementów,\n\nlecz można je wkleić tylko w <b>tej</b> karcie\n(ze względu na ogromną ilość wybranych elementów)',
+
+		"fp_apply": "zastosuj te nazwy",
+		"fp_ecut": "najpierw wytnij lub skopiuj pliki / foldery, aby je wkleić / przenieść\n\nuwaga: można wycinać / wklejać pomiędzy różnymi kartami przeglądarki",
+		"fp_ename": "Nie udało się przenieść {0} elementów, gdyż ich nazwy już istnieją w tym folderze. Nadaj im nowe nazwy poniżej, bądź zostaw pole nazwy puste, aby je pominąć:",
+		"fcp_ename": "Nie udało się przekopiować {0} elementów, gdyż ich nazwy już istnieją w tym folderze. Nadaj im nowe nazwy poniżej, bądź zostaw pole nazwy puste, aby je pominąć:",
+		"fp_emore": "pozostało jeszcze kilka kolizji nazw plików do poprawy",
+		"fp_ok": "przeniesiono",
+		"fcp_ok": "przekopiowano",
+		"fp_busy": "przenoszenie {0} elementów...\n\n{1}",
+		"fcp_busy": "kopiowanie {0} elementów...\n\n{1}",
+		"fp_abrt": "przerywanie...", //m
+		"fp_err": "nie udało się przenieść:\n",
+		"fcp_err": "nie udało się skopiować:\n",
+		"fp_confirm": "przenieść tutaj {0} elementy(ów)?",
+		"fcp_confirm": "skopiować tutaj {0} elementy(ów)?",
+		"fp_etab": 'nie udało się odczytać schowka z innej karty przeglądarki',
+		"fp_name": "przesyłanie pliku z twojego urządzenia. Nadaj nazwę:",
+		"fp_both_m": '<h6>wybierz metodę wklejenia</h6><code>Enter</code> = Przenieś {0} pliki(ów) z «{1}»\n<code>ESC</code> = Prześlij {2} pliki(ów) z twojego urządzenia',
+		"fcp_both_m": '<h6>wybierz metodę wklejenia</h6><code>Enter</code> = Skopiuj {0} pliki(ów) z «{1}»\n<code>ESC</code> = Prześlij {2} pliki(ów) z twojego urządzenia',
+		"fp_both_b": '<a href="#" id="modal-ok">Przenieś</a><a href="#" id="modal-ng">Prześlij</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Kopiuj</a><a href="#" id="modal-ng">Prześlij</a>',
+
+		"mk_noname": "wpisz nazwę do pola po lewej zanim to zrobisz :p",
+
+		"tv_load": "Wczytywanie pliku tekstowego:\n\n{0}\n\n{1}% (wczytano {2} z {3} MiB)",
+		"tv_xe1": "nie udało się wczytać pliku:\n\nbłąd ",
+		"tv_xe2": "404, nie znaleziono pliku",
+		"tv_lst": "lista plików tekstowych w",
+		"tvt_close": "powróć do widoku folderów$NSkrót: M (lub Esc)\">❌ zamknij",
+		"tvt_dl": "pobierz ten plik$NHotkey: Y\">💾 pobierz",
+		"tvt_prev": "pokaż poprzedni dokument$NSkrót: i\">⬆ poprzedni",
+		"tvt_next": "pokaż następny dokument$NSkrót: K\">⬇ następny",
+		"tvt_sel": "wybierz plik &nbsp; ( do wycięcia / skopiowania / usunięcia / itp. )$NSkrót: S\">wyb",
+		"tvt_edit": "otwórz plik w edytorze tekstu$NSkrót: E\">✏️ edytuj",
+		"tvt_tail": "śledź zmiany w pliku; pokazuj nowe linie w czasie rzeczywistym\">📡 śledź",
+		"tvt_wrap": "zawijaj tekst\">↵",
+		"tvt_atail": "utrzymuj widok na dole strony\">⚓",
+		"tvt_ctail": "dekoduj kolory terminala (sekwencje sterujące ANSI)\">🌈",
+		"tvt_ntail": "limit przewijania (ile bajtów tekstu przechowywać w pamięci)",
+
+		"m3u_add1": "dodano utwór do playlisty m3u",
+		"m3u_addn": "dodano {0} utwory(ów) do playlisty m3u",
+		"m3u_clip": "skopiowano playlistę m3u do schowka\n\nutwórz",
+
+		"gt_vau": "nie pokazuj obrazu, odtwarzaj tylko dźwięk\">🎧",
+		"gt_msel": "wybierz pliki; kliknij plik z wciśniętym klawiszem CTRL, aby zastąpić$N$N&lt;em&gt;gdy tryb jest aktywny, kliknij dwukrotnie na plik / folder, żeby go otworzyć&lt;/em&gt;$N$NSkrót: S\">wybierz wiele",
+		"gt_crop": "kadruj miniaturki do środka\">kadruj",
+		"gt_3x": "miniaturki w wysokiej rozdzielczości\">3x",
+		"gt_zoom": "przybliż",
+		"gt_chop": "przytnij",
+		"gt_sort": "sortuj według",
+		"gt_name": "nazwa",
+		"gt_sz": "rozmiar",
+		"gt_ts": "data",
+		"gt_ext": "typ",
+		"gt_c1": "przycinaj większą część nazw plików (pokazuj mniej)",
+		"gt_c2": "przycinaj mniejszą część nazw plików (pokazuj więcej)",
+
+		"sm_w8": "wyszukiwanie...",
+		"sm_prev": "wyniki wyszukiwania poniżej pochodzą z poprzedniego zapytania:\n  ",
+		"sl_close": "zamknij wyniki wyszukiwania",
+		"sl_hits": "pokazuję {0} wyniki(ów)",
+		"sl_moar": "pokaż więcej",
+
+		"s_sz": "rozmiar",
+		"s_dt": "data",
+		"s_rd": "ścieżka",
+		"s_fn": "nazwa",
+		"s_ta": "znaczniki",
+		"s_ua": "data przesłania",
+		"s_ad": "zaawansowane",
+		"s_s1": "min. rozmiar (MiB)",
+		"s_s2": "maks. rozmiar (MiB)",
+		"s_d1": "min. data iso8601",
+		"s_d2": "maks. data iso8601",
+		"s_u1": "przesłane po",
+		"s_u2": "i/lub przed",
+		"s_r1": "ścieżka zawiera &nbsp; (oddzielone spacją)",
+		"s_f1": "nazwa zawiera &nbsp; (odwróć za pomocą -nope)",
+		"s_t1": "znaczniki zawierają &nbsp; (^=start, koniec=$)",
+		"s_a1": "dokładne właściwości metadanych",
+
+		"md_eshow": "nie można wyświetlić ",
+		"md_off": "[📜<em>readme</em>] wyłączone w [⚙️] -- dokument ukryty",
+
+		"badreply": "Nie udało się przeanalizować odpowiedzi serwera",
+
+		"xhr403": "403: Odmowa dostępu.\n\nSpróbuj przeładować stronę (F5), możliwe, że cię wylogowano",
+		"xhr0": "nieznany (być może utracono połączenie z serwerem, lub jest on nieaktywny)",
+		"cf_ok": "przepraszamy, włączyła się ochrona przed DD" + wah + "oS\n\nwszystko powinno wrócić do normy za około 30 sekund\n\njeśli nic się nie zmieni, naciśnij klawisz F5, aby przeładować stronę",
+		"tl_xe1": "nie można wyświetlić podfolderów:\n\nbłąd ",
+		"tl_xe2": "404: Nie znaleziono folderu",
+		"fl_xe1": "nie można wyświetlić plików w folderze:\n\nbłąd ",
+		"fl_xe2": "404: Nie znaleziono folderu",
+		"fd_xe1": "nie można stworzyć podfolderu:\n\nbłąd ",
+		"fd_xe2": "404: Nie znaleziono folderu nadrzędnego",
+		"fsm_xe1": "nie można wysłać wiadomości:\n\nbłąd ",
+		"fsm_xe2": "404: Nie znaleziono folderu nadrzędnego",
+		"fu_xe1": "nie udało się wczytać listy unpost z serwera:\n\nbłąd ",
+		"fu_xe2": "404: Nie znaleziono pliku??",
+
+		"fz_tar": "nieskompresowane archiwum gnu-tar (linux / mac)",
+		"fz_pax": "nieskompresowane archiwum tar w formacie pax (wolniejsze)",
+		"fz_targz": "gnu-tar z kompresją gzip poziomu 3.,$N$Nzazwyczaj bardzo wolne, używaj nieskompresowanego tar",
+		"fz_tarxz": "gnu-tar z kompresją xz poziomu 3.$N$Nzazwyczaj bardzo wolne, używaj nieksompresowanego tar",
+		"fz_zip8": "zip z nazwami plików UTF-8 (może działać nieprawidłowo na systemie Windows 7 i starszych)",
+		"fz_zipd": "zip z nazwami plików cp437, dobre dla bardzo starego oprogramowania",
+		"fz_zipc": "cp437 z CRC32 obliczonym wcześniej,$Ndla MS-DOS PKZIP v2.04g (październik 1993)$N(przetwarzanie do pobrania trwa dłużej)",
+
+		"un_m1": "można usunąć ostatnio przesłane pliki (lub przerwać trwające) poniżej",
+		"un_upd": "odśwież",
+		"un_m4": "lub udostępnij pliki widoczne poniżej:",
+		"un_ulist": "pokaż",
+		"un_ucopy": "kopiuj",
+		"un_flt": "filtruj (opcjonalnie):&nbsp; URL musi zawierać",
+		"un_fclr": "wyczyść kryteria filtrowania",
+		"un_derr": 'nie udało się usunąć unpost:\n',
+		"un_f5": 'coś poszło nie tak, spróbuj odświeżyć lub wciśnij F5',
+		"un_uf5": "przed przerwaniem przesyłania trzeba odświeżyć stronę (za pomocą CTRL-R lub F5)",
+		"un_nou": '<b>ostrzeżenie:</b> serwer jest aktualnie zbyt obciążony, żeby pokazać niedokończone przesłania; kliknij link "odśwież" za chwilę',
+		"un_noc": '<b>ostrzeżenie:</b> unpost w pełni przesłanych plików jest wyłączone/zabronione w konfiguracji serwera',
+		"un_max": "pokazuję pierwsze 2000 plików (użyj filtrowania)",
+		"un_avail": "{0} ostatnio przesłanych elementów może zostać usunięte<br />{1} niedokończonych można przerwać",
+		"un_m2": "przesortowano po czasie przesłania; najnowsze elementy pierwsze: ",
+		"un_no1": "cholibka! żaden przesłany element nie jest wystarczająco niedawny",
+		"un_no2": "cholibka! żaden przesłany element pasujący do filtra nie jest wystarczająco niedawny",
+		"un_next": "usuń następne {0} pliki(ów) poniżej",
+		"un_abrt": "przerwij",
+		"un_del": "usuń",
+		"un_m3": "wczytywanie ostatnio przesłanych elementów...",
+		"un_busy": "usuwanie {0} plików...",
+		"un_clip": "skopiowano {0} linków do schowka",
+
+		"u_https1": "powinieneś przejść",
+		"u_https2": "na HTTPS w celu",
+		"u_https3": "uzyskania lepszej wydajności",
+		"u_ancient": 'twoja przeglądarka jest niezwykle zabytkowa -- powinieneś zamiast tego <a href="#" onclick="goto(\'bup\')">użyć bup</a>',
+		"u_nowork": "wymaga Firefox 53+, Chrome 57+ lub iOS 11+",
+		"tail_2old": "wymaga Firefox 105+, Chrome 71+ lub iOS 14.5+",
+		"u_nodrop": 'ta przeglądarka jest za stara, nie wspiera przesyłania "przeciągnij i upuść"',
+		"u_notdir": "to nie jest folder!\n\nta przeglądarka jest za stara\nspróbuj przeciągnąć i upuścić",
+		"u_uri": "aby przeciągnąć i upuścić obrazy z innych okien przeglądarki,\nupuść je na duży przycisk przesyłania",
+		"u_enpot": 'przełącz na <a href="#">lekki interfejs</a> (może zwiększyć prędkość przesyłania)',
+		"u_depot": 'przełącz na <a href="#">ładny interfejs</a> (może zmniejszyć prędkośc przesyłania)',
+		"u_gotpot": 'przełączanie na lekki interfejs w celu poprawy prędkości przesyłania,\n\nzawsze można przełączyć się na ładny interfejs!',
+		"u_pott": "<p>pliki: &nbsp; <b>{0}</b> ukończonych, &nbsp; <b>{1}</b> nie powiodło się, &nbsp; <b>{2}</b> w trakcie, &nbsp; <b>{3}</b> oczekujących</p>",
+		"u_ever": "podstawowe przesyłanie; up2k wymaga minimalnie przeglądarek:<br>Chrome 21 // Firefox 13 // Edge 12 // Opera 12 // Safari 5.1",
+		"u_su2k": 'podstawowe przesyłanie; <a href="#" id="u2yea">up2k</a> jest lepszy',
+		"u_uput": 'optymalizuj dla prędkości (pomijając spr. sum kontrolnych)',
+		"u_ewrite": 'nie masz dostępu do zapisu (write) w tym folderze',
+		"u_eread": 'nie masz dostępu do odczytu (read) tego folderu',
+		"u_enoi": 'wyszukiwanie plików jest wyłączone w konfiguracji serwera',
+		"u_enoow": "nadpisanie nie zadziała, wymagany dostęp do usuwania (delete)",
+		"u_badf": '{0} (z {1}) plików zostało pominiętych, prawdopodobnie przez opcje dostępu systemu plików:\n\n',
+		"u_blankf": '{0} (z {1}) plików jest pustych; przesłać mimo to?\n\n',
+		"u_applef": '{0} (z {1}) plików może być niepożądane;\nNaciśnij <code>OK/Enter</code>, aby pominąć je (wypisane poniżej);\nNaciśnij <code>Anuluj/ESC</code>, by je przesłać mimo to:\n\n',
+		"u_just1": '\nTa funkcja może działać lepiej z wybranym jednym plikiem',
+		"u_ff_many": "na systemach <b>Linux / MacOS / Android,</b> ta ilośc plików <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>może</em> spowodować przymusowe zamknięcie przeglądarki Firefox</a>\nw takim przypadku, spróbuj ponownie (lub użyj Chrome'a).",
+		"u_up_life": "Ten przesyłany plik zostanie usunięty z serwera\n{0} po zakończeniu przesyłania",
+		"u_asku": 'prześlij {0} pliki(ów) do <code>{1}</code>',
+		"u_unpt": "można cofnąć / usunąć ten przesłany plik za pomocą 🧯 w lewym górnym rogu",
+		"u_bigtab": 'zaraz pokażę {0} plików\n\nta operacja może zawiesić twoją przeglądarkę, na pewno kontynuować?',
+		"u_scan": 'Skanowanie plików...',
+		"u_dirstuck": 'iterator katalogów utknął podczas próby dostępu poniższych {0} elementów, pominięto:',
+		"u_etadone": 'Ukończono ({0}, {1} plików)',
+		"u_etaprep": '(przygotowywanie do przesłania)',
+		"u_hashdone": 'obliczono sumę kontrolną',
+		"u_hashing": 'obliczanie sumy kontrolnej',
+		"u_hs": 'nawiązywanie połączenia...',
+		"u_started": "rozpoczęto przesyłanie; zobacz w [🚀]",
+		"u_dupdefer": "duplikat; zostanie przetworzony na końcu",
+		"u_actx": "kliknij ten napis, aby zapobiec spadkowi <br />wydajności po zmianie aktywnego okna/karty przeglądarki",
+		"u_fixed": "OK!&nbsp; Naprawiono 👍",
+		"u_cuerr": "nie udało się przesłać fragmentu {0} z {1};\nprawdopodobnie niegroźne, kontynuowanie\n\nplik: {2}",
+		"u_cuerr2": "serwer odrzucił przesyłanie (kawałek {0} z {1});\nspróbuję ponownie później\n\nplik: {2}\n\nbłąd ",
+		"u_ehstmp": "spróbuję ponownie; więcej informacji w prawym dolnym rogu",
+		"u_ehsfin": "serwer odrzucił prośbę o zakończenie przesyłania; próbuję ponownie...",
+		"u_ehssrch": "serwer odrzucił prośbę o wykonanie wyszukania; próbuję ponownie...",
+		"u_ehsinit": "serwer odrzucił prośbę o rozpoczęcie przesyłania; próbuję ponownie...",
+		"u_eneths": "błąd sieci podczas negocjacji warunków przesyłania; próbuję ponownie...",
+		"u_enethd": "błąd sieci podczas sprawdzania istnienia celu; próbuję ponownie...",
+		"u_cbusy": "oczekiwanie na ponowne zaufanie serwera po błędzie sieci...",
+		"u_ehsdf": "brak miejsca na dysku serwera!\n\npróby będą ponawiane na wypadek\nzwolnienia wystarczająco dużo miejsca aby kontynuować",
+		"u_emtleak1": "wygląda na to, że twoja przeglądarka może mieć wyciek pamięci;\n",
+		"u_emtleak2": ' <a href="{0}">przejdź na HTTPS (zalecane)</a> lub ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'spróbuj:\n<ul><li>wciśnij <code>F5</code>, aby odświeżyć stronę</li><li>wyłącz przycisk &nbsp;<code>ww</code>&nbsp; w menu <code>⚙️ ustawienia</code></li><li>i spróbuj przesłać ponownie</li></ul>Prędkość przesyłania będzie niższa, ale cóż zrobisz.\nPrzepraszamy za problemu!\n\nPS: Chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">ma poprawkę tego błędu</a>.',
+		"u_emtleakf": 'spróbuj:\n<ul><li>wciśnij <code>F5</code>, aby odświeżyć stronę</li><li>włącz tryb <code>🥔</code> (lekkiego interfejsu) w interfejsie przesyłania<li>i spróbuj przesłać ponownie</li></ul>\nPS: Firefox może kiedyś mieć <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">poprawkę tego błędu</a>',
+		"u_s404": "nie znaleziono na serwerze",
+		"u_expl": "wytłumacz",
+		"u_maxconn": "większość przeglądarek ogranicza to do 6, ale Firefox pozwala zwiększyć tą wartość, ustawiając <code>connections-per-server</code> w <code>about:config</code>",
+		"u_tu": '<p class="warn">UWAGA: tryb turbo włączony, <span>&nbsp;klient może nie wykryć i nie kontynuować niedokończonych przesłań; patrz wskazówka przycisku turbo</span></p>',
+		"u_ts": '<p class="warn">UWAGA: tryb turbo włączony, <span>&nbsp;wyniki wyszukiwania mogą być niepoprawne; patrz wskazówka przycisku turbo</span></p>',
+		"u_turbo_c": "tryb turbo jest wyłączony w konfiguracji serwera",
+		"u_turbo_g": "wyłączanie trybu turbo, nie posiadasz dostępu\ndo listy katalogu w tym wolumenie",
+		"u_life_cfg": 'autousuwanie po <input id="lifem" p="60" /> min (lub <input id="lifeh" p="3600" /> godz.)',
+		"u_life_est": 'przesłany plik zostanie usunięty <span id="lifew" tt="local time">---</span>',
+		"u_life_max": 'ten folder wymaga\nmaks. czasu do usunięcia równego {0}',
+		"u_unp_ok": 'unpost jest dozwolony przez {0}',
+		"u_unp_ng": 'unpost NIE jest dozwolony',
+		"ue_ro": 'dostęp tylko-do-odczytu\n\n',
+		"ue_nl": 'nie jesteś zalogowany',
+		"ue_la": 'zalogowano jako "{0}"',
+		"ue_sr": 'jesteś w trybie wyszukiwania\n\nprzełącz się na tryb przesyłania, klikając lupę 🔎 (obok przycisku Szukaj), i spróbuj ponownie',
+		"ue_ta": 'spróbuj przesłać ponownie, wszystko powinno być w porządku',
+		"ue_ab": "ten plik już jest przesyłany do innego folderu, przesyłanie musi się zakończyć, zanim będzie mógł być on przesłany gdzie indziej.\n\nMożna przerwać pierwsze przesyłanie za pomocą 🧯 w lewym górnym rogu",
+		"ur_1uo": "OK: Plik przesłany pomyślnie",
+		"ur_auo": "OK: Wszystkie ({0}) pliki zostały przesłane pomyślnie",
+		"ur_1so": "OK: Znaleziono plik na serwerze",
+		"ur_aso": "OK: Znaleziono wszystkie ({0}) pliki na serwerze",
+		"ur_1un": "Przesyłanie nie powiodło się",
+		"ur_aun": "Wszystkie ({0}) przesłania nie powiodły się",
+		"ur_1sn": "NIE znaleziono pliku na serwerze",
+		"ur_asn": "NIE znaleziono {0} plików na serwerze",
+		"ur_um": "Zakończono;\n{0} przesłań OK,\n{1} przesłań nie powiodło się",
+		"ur_sm": "Zakończono;\nznaleziono {0} pliki(ów),\nnie znaleziono {1} pliki(ów) na serwerze",
+
+		"lang_set": "odśwież stronę (F5), aby zastosować zmianę.",
+	},
+	"por": {
+		"tt": "Português",
+
+		"cols": {
+			"c": "botões de ação",
+			"dur": "duração",
+			"q": "qualidade / bitrate",
+			"Ac": "codec de áudio",
+			"Vc": "codec de vídeo",
+			"Fmt": "formato / contêiner",
+			"Ahash": "checksum de áudio",
+			"Vhash": "checksum de vídeo",
+			"Res": "resolução",
+			"T": "tipo de arquivo",
+			"aq": "qualidade / bitrate de áudio",
+			"vq": "qualidade / bitrate de vídeo",
+			"pixfmt": "subamostragem / estrutura de pixel",
+			"resw": "resolução horizontal",
+			"resh": "resolução vertical",
+			"chs": "canais de áudio",
+			"hz": "taxa de amostragem"
+		},
+
+		"hks": [
+			[
+				"diversos",
+				["ESC", "fechar várias coisas"],
+
+				"gerenciador de arquivos",
+				["G", "alternar entre visualização de lista / grade"],
+				["T", "alternar entre miniaturas / ícones"],
+				["⇧ A/D", "tamanho da miniatura"],
+				["ctrl-K", "excluir selecionados"],
+				["ctrl-X", "recortar seleção para a área de transferência"],
+				["ctrl-C", "copiar seleção para a área de transferência"],
+				["ctrl-V", "colar (mover/copiar) aqui"],
+				["Y", "baixar selecionado"],
+				["F2", "renomear selecionado"],
+
+				"seleção de lista de arquivos",
+				["espaço", "alternar seleção de arquivo"],
+				["↑/↓", "mover cursor de seleção"],
+				["ctrl ↑/↓", "mover cursor e visualização"],
+				["⇧ ↑/↓", "selecionar arquivo anterior/próximo"],
+				["ctrl-A", "selecionar todos os arquivos / pastas"],
+			], [
+				"navegação",
+				["B", "alternar entre breadcrumbs / painel de navegação"],
+				["I/K", "pasta anterior/próxima"],
+				["M", "pasta pai (ou desexpandir a atual)"],
+				["V", "alternar entre pastas / arquivos de texto no painel de navegação"],
+				["A/D", "tamanho do painel de navegação"],
+			], [
+				"reprodutor de áudio",
+				["J/L", "música anterior/próxima"],
+				["U/O", "pular 10 segundos para trás/frente"],
+				["0..9", "pular para 0%..90%"],
+				["P", "reproduzir/pausar (também inicia)"],
+				["S", "selecionar a música que está tocando"],
+				["Y", "baixar música"],
+			], [
+				"visualizador de imagens",
+				["J/L, ←/→", "imagem anterior/próxima"],
+				["Home/End", "primeira/última imagem"],
+				["F", "tela cheia"],
+				["R", "girar no sentido horário"],
+				["⇧ R", "girar no sentido anti-horário"],
+				["S", "selecionar imagem"],
+				["Y", "baixar imagem"],
+			], [
+				"reprodutor de vídeo",
+				["U/O", "pular 10 segundos para trás/frente"],
+				["P/K/Espaço", "reproduzir/pausar"],
+				["C", "continuar reproduzindo o próximo"],
+				["V", "loop"],
+				["M", "mudo"],
+				["[ e ]", "definir intervalo de loop"],
+			], [
+				"visualizador de arquivos de texto",
+				["I/K", "arquivo anterior/próximo"],
+				["M", "fechar arquivo de texto"],
+				["E", "editar arquivo de texto"],
+				["S", "selecionar arquivo (para recortar/copiar/renomear)"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Cancelar",
+
+		"enable": "Ativar",
+		"danger": "PERIGO",
+		"clipped": "copiado para a área de transferência",
+
+		"ht_s1": "segundo",
+		"ht_s2": "segundos",
+		"ht_m1": "minuto",
+		"ht_m2": "minutos",
+		"ht_h1": "hora",
+		"ht_h2": "horas",
+		"ht_d1": "dia",
+		"ht_d2": "dias",
+		"ht_and": " e ",
+
+		"goh": "painel de controle",
+		"gop": 'pai anterior">anterior',
+		"gou": 'pasta pai">acima',
+		"gon": 'próxima pasta">próximo',
+		"logout": "Sair ",
+		"login": "Fazer login",
+		"access": " acesso",
+		"ot_close": "fechar submenu",
+		"ot_search": "procurar arquivos por atributos, caminho / nome, tags de música ou qualquer combinação deles$N$N&lt;code&gt;foo bar&lt;/code&gt; = deve conter ambos «foo» e «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = deve conter «foo» mas não «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = começar com «yana» e ser um arquivo «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = conter exatamente «try unite»$N$No formato de data é iso-8601, como$N&lt;code&gt;2009-12-31&lt;/code&gt; ou &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "despublicar: excluir seus uploads recentes, ou abortar os que não foram concluídos",
+		"ot_bup": "bup: uploader básico, até suporta netscape 4.0",
+		"ot_mkdir": "mkdir: criar um novo diretório",
+		"ot_md": "new-md: criar um novo documento markdown",
+		"ot_msg": "msg: enviar uma mensagem para o log do servidor",
+		"ot_mp": "opções do reprodutor de mídia",
+		"ot_cfg": "opções de configuração",
+		"ot_u2i": 'up2k: fazer upload de arquivos (se você tiver acesso de escrita) ou alternar para o modo de busca para ver se eles já existem em algum lugar no servidor$N$Nuploads são reiniciáveis, multithread, e os carimbos de data/hora dos arquivos são preservados, mas usa mais CPU que [🎈]&nbsp; (o uploader básico)<br /><br />durante os uploads, este ícone se torna um indicador de progresso!',
+		"ot_u2w": 'up2k: fazer upload de arquivos com suporte a retomada (feche seu navegador e solte os mesmos arquivos mais tarde)$N$Nmultithread, e os carimbos de data/hora dos arquivos são preservados, mas usa mais CPU que [🎈]&nbsp; (o uploader básico)<br /><br />durante os uploads, este ícone se torna um indicador de progresso!',
+		"ot_noie": 'Por favor, use Chrome / Firefox / Edge',
+
+		"ab_mkdir": "criar diretório",
+		"ab_mkdoc": "novo documento markdown",
+		"ab_msg": "enviar msg para o log do srv",
+
+		"ay_path": "pular para pastas",
+		"ay_files": "pular para arquivos",
+
+		"wt_ren": "renomear itens selecionados$NHotkey: F2",
+		"wt_del": "excluir itens selecionados$NHotkey: ctrl-K",
+		"wt_cut": "recortar itens selecionados &lt;small&gt;(depois colar em outro lugar)&lt;/small&gt;$NHotkey: ctrl-X",
+		"wt_cpy": "copiar itens selecionados para a área de transferência$N(para colá-los em outro lugar)$NHotkey: ctrl-C",
+		"wt_pst": "colar uma seleção previamente recortada / copiada$NHotkey: ctrl-V",
+		"wt_selall": "selecionar todos os arquivos$NHotkey: ctrl-A (quando o arquivo estiver em foco)",
+		"wt_selinv": "inverter seleção",
+		"wt_zip1": "baixar esta pasta como um arquivo compactado",
+		"wt_selzip": "baixar seleção como um arquivo compactado",
+		"wt_seldl": "baixar seleção como arquivos separados$NHotkey: Y",
+		"wt_npirc": "copiar informações da faixa em formato irc",
+		"wt_nptxt": "copiar informações da faixa em texto simples",
+		"wt_m3ua": "adicionar à playlist m3u (clique em <code>📻copiar</code> depois)",
+		"wt_m3uc": "copiar playlist m3u para a área de transferência",
+		"wt_grid": "alternar entre visualização de grade / lista$NHotkey: G",
+		"wt_prev": "faixa anterior$NHotkey: J",
+		"wt_play": "reproduzir / pausar$NHotkey: P",
+		"wt_next": "próxima faixa$NHotkey: L",
+
+		"ul_par": "uploads paralelos:",
+		"ut_rand": "randomizar nomes de arquivos",
+		"ut_u2ts": "copiar o carimbo de data/hora de última modificação$Ndo seu sistema de arquivos para o servidor\">📅",
+		"ut_ow": "substituir arquivos existentes no servidor?$N🛡️: nunca (irá gerar um novo nome de arquivo em vez disso)$N🕒: substituir se o arquivo no servidor for mais antigo que o seu$N♻️: sempre substituir se os arquivos forem diferentes",
+		"ut_mt": "continuar a fazer o hash de outros arquivos enquanto faz upload$N$Ntalvez desativar se sua CPU ou HDD for um gargalo",
+		"ut_ask": 'pedir confirmação antes do upload começar">💭',
+		"ut_pot": "melhorar a velocidade de upload em dispositivos lentos$Ntornando a UI menos complexa",
+		"ut_srch": "não fazer upload, em vez disso verificar se os arquivos já$N existem no servidor (irá escanear todas as pastas que você pode ler)",
+		"ut_par": "pausar uploads definindo para 0$N$naumentar se sua conexão for lenta / alta latência$N$nmanter em 1 em LAN ou se o HDD do servidor for um gargalo",
+		"ul_btn": "soltar arquivos / pastas<br>aqui (ou clique em mim)",
+		"ul_btnu": "U P L O A D",
+		"ul_btns": "B U S C A R",
+
+		"ul_hash": "hash",
+		"ul_send": "enviar",
+		"ul_done": "feito",
+		"ul_idle1": "nenhum upload está na fila ainda",
+		"ut_etah": "velocidade média de &lt;em&gt;hash&lt;/em&gt;, e tempo estimado até o fim",
+		"ut_etau": "velocidade média de &lt;em&gt;upload&lt;/em&gt; e tempo estimado até o fim",
+		"ut_etat": "velocidade média &lt;em&gt;total&lt;/em&gt; e tempo estimado até o fim",
+
+		"uct_ok": "concluído com sucesso",
+		"uct_ng": "ruim: falhou / rejeitado / não encontrado",
+		"uct_done": "ok e ruim combinados",
+		"uct_bz": "fazendo hash ou upload",
+		"uct_q": "ocioso, pendente",
+
+		"utl_name": "nome do arquivo",
+		"utl_ulist": "lista",
+		"utl_ucopy": "copiar",
+		"utl_links": "links",
+		"utl_stat": "status",
+		"utl_prog": "progresso",
+
+		// mantenha curto:
+		"utl_404": "404",
+		"utl_err": "ERRO",
+		"utl_oserr": "Erro-SO",
+		"utl_found": "encontrado",
+		"utl_defer": "adiar",
+		"utl_yolo": "YOLO",
+		"utl_done": "feito",
+
+		"ul_flagblk": "os arquivos foram adicionados à fila</b><br>no entanto, há um up2k ocupado em outra aba do navegador,<br>então esperando que ele termine primeiro",
+		"ul_btnlk": "a configuração do servidor bloqueou este interruptor neste estado",
+
+		"udt_up": "Upload",
+		"udt_srch": "Buscar",
+		"udt_drop": "solte aqui",
+
+		"u_nav_m": '<h6>certo, o que você tem?</h6><code>Enter</code> = Arquivos (um ou mais)\n<code>ESC</code> = Uma pasta (incluindo subpastas)',
+		"u_nav_b": '<a href="#" id="modal-ok">Arquivos</a><a href="#" id="modal-ng">Uma pasta</a>',
+
+		"cl_opts": "interruptores",
+		"cl_themes": "tema",
+		"cl_langs": "idioma",
+		"cl_ziptype": "download de pasta",
+		"cl_uopts": "interruptores up2k",
+		"cl_favico": "favicon",
+		"cl_bigdir": "grandes dirs",
+		"cl_hsort": "#sort",
+		"cl_keytype": "notação de tecla",
+		"cl_hiddenc": "colunas ocultas",
+		"cl_hidec": "ocultar",
+		"cl_reset": "resetar",
+		"cl_hpick": "toque nos cabeçalhos das colunas para ocultá-los na tabela abaixo",
+		"cl_hcancel": "ocultar coluna abortado",
+
+		"ct_grid": '田 a grade',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ dicas de ferramentas',
+		"ct_thumb": 'na visualização de grade, alternar entre ícones ou miniaturas$NHotkey: T">🖼️ miniaturas',
+		"ct_csel": 'usar CTRL e SHIFT para seleção de arquivo na visualização de grade">sel',
+		"ct_ihop": 'quando o visualizador de imagens for fechado, rolar para o último arquivo visualizado">g⮯',
+		"ct_dots": 'mostrar arquivos ocultos (se o servidor permitir)">dotfiles',
+		"ct_qdel": 'ao excluir arquivos, pedir confirmação apenas uma vez">qdel',
+		"ct_dir1st": 'ordenar pastas antes de arquivos">📁 primeiro',
+		"ct_nsort": 'ordem natural (para nomes de arquivos com dígitos iniciais)">nsort',
+		"ct_utc": 'mostrar todas as datas/horas em UTC">UTC',
+		"ct_readme": 'mostrar README.md nas listas de pastas">📜 readme',
+		"ct_idxh": 'mostrar index.html em vez de lista de pastas">htm',
+		"ct_sbars": 'mostrar barras de rolagem">⟊',
+
+		"cut_umod": "se um arquivo já existe no servidor, atualizar o carimbo de data/hora de última modificação do servidor para corresponder ao seu arquivo local (requer permissões de escrita+exclusão)\">re📅",
+
+		"cut_turbo": "o botão yolo, você provavelmente NÃO quer habilitar isso:$N$Nuse isto se você estava fazendo upload de uma enorme quantidade de arquivos e teve que reiniciar por algum motivo, e quer continuar o upload o mais rápido possível$N$Nisto substitui a verificação de hash por uma simples <em>&quot;este arquivo tem o mesmo tamanho no servidor?&quot;</em> então se o conteúdo do arquivo for diferente ele NÃO será enviado$N$Nvocê deve desativar isso quando o upload estiver concluído, e então &quot;enviar&quot; os mesmos arquivos novamente para permitir que o cliente os verifique\">turbo",
+
+		"cut_datechk": "não tem efeito a menos que o botão turbo esteja ativado$N$Nreduz o fator yolo por uma pequena quantidade; verifica se os carimbos de data/hora dos arquivos no servidor correspondem aos seus$N$ndeve <em>teoricamente</em> pegar a maioria dos uploads incompletos / corrompidos, mas não é um substituto para fazer uma verificação com o turbo desativado depois\">date-chk",
+
+		"cut_u2sz": "tamanho (em MiB) de cada bloco de upload; valores grandes voam melhor pelo atlântico. Tente valores baixos em conexões muito não confiáveis",
+
+		"cut_flag": "garantir que apenas uma aba esteja fazendo upload por vez $N -- outras abas devem ter isso ativado também $N -- só afeta abas no mesmo domínio",
+
+		"cut_az": "enviar arquivos em ordem alfabética, em vez de o menor primeiro$N$na ordem alfabética pode tornar mais fácil de verificar se algo deu errado no servidor, mas torna o upload um pouco mais lento em fibra / LAN",
+
+		"cut_nag": "notificação do SO quando o upload for concluído$N(somente se o navegador ou aba não estiver ativo)",
+		"cut_sfx": "alerta audível quando o upload for concluído$N(somente se o navegador ou aba não estiver ativo)",
+
+		"cut_mt": "usar multithreading para acelerar o hash de arquivos$N$nisto usa web-workers e requer$Nmais RAM (até 512 MiB extras)$N$ntorna https 30% mais rápido, http 4.5x mais rápido\">mt",
+
+		"cut_wasm": "usar wasm em vez do hasher embutido do navegador; melhora a velocidade em navegadores baseados em chrome mas aumenta a carga da CPU, e muitas versões antigas do chrome têm bugs que fazem o navegador consumir toda a RAM e travar se isso for ativado\">wasm",
+
+		"cft_text": "texto do favicon (deixe em branco e atualize para desativar)",
+		"cft_fg": "cor do primeiro plano",
+		"cft_bg": "cor do fundo",
+
+		"cdt_lim": "número máximo de arquivos para mostrar em uma pasta",
+		"cdt_ask": "ao rolar para o final,$nem vez de carregar mais arquivos,$nperguntar o que fazer",
+		"cdt_hsort": "quantas regras de ordenação (&lt;code&gt;,sorthref&lt;/code&gt;) incluir em URLs de mídia. Definir isso para 0 também ignorará as regras de ordenação incluídas em links de mídia quando você clicar neles",
+
+		"tt_entree": "mostrar painel de navegação (árvore de diretórios)$NHotkey: B",
+		"tt_detree": "mostrar breadcrumbs$NHotkey: B",
+		"tt_visdir": "rolar para a pasta selecionada",
+		"tt_ftree": "alternar entre árvore de pastas / arquivos de texto$NHotkey: V",
+		"tt_pdock": "mostrar pastas pai em um painel acoplado no topo",
+		"tt_dynt": "crescer automaticamente à medida que a árvore se expande",
+		"tt_wrap": "quebra de linha",
+		"tt_hover": "revelar linhas transbordando ao passar o mouse$N( quebra a rolagem a menos que o cursor do mouse $N&nbsp; esteja na margem esquerda )",
+
+		"ml_pmode": "ao final da pasta...",
+		"ml_btns": "comandos",
+		"ml_tcode": "transcodificar",
+		"ml_tcode2": "transcodificar para",
+		"ml_tint": "matiz",
+		"ml_eq": "equalizador de áudio",
+		"ml_drc": "compressor de faixa dinâmica",
+
+		"mt_loop": "loop/repetir uma música\">🔁",
+		"mt_one": "parar depois de uma música\">1️⃣",
+		"mt_shuf": "embaralhar as músicas em cada pasta\">🔀",
+		"mt_aplay": "reproduzir automaticamente se houver um ID de música no link que você clicou para acessar o servidor$N$ndesativar isso também impedirá que a URL da página seja atualizada com IDs de música ao tocar música, para evitar a reprodução automática se essas configurações forem perdidas mas a URL permanecer\">a▶",
+		"mt_preload": "começar a carregar a próxima música perto do final para uma reprodução sem interrupções\">preload",
+		"mt_prescan": "ir para a próxima pasta antes que a última música$Ntermine, mantendo o navegador feliz$Npara que ele não pare a reprodução\">nav",
+		"mt_fullpre": "tentar pré-carregar a música inteira;$N✅ ativar em conexões <b>não confiáveis</b>,$N❌ <b>desativar</b> em conexões lentas provavelmente\">full",
+		"mt_fau": "em telefones, evitar que a música pare se a próxima música não pré-carregar rápido o suficiente (pode fazer as tags aparecerem com falhas)\">☕️",
+		"mt_waves": "barra de busca de forma de onda:$Nmostrar amplitude de áudio no scrubber\">~s",
+		"mt_npclip": "mostrar botões para copiar a música que está tocando para a área de transferência\">/np",
+		"mt_m3u_c": "mostrar botões para copiar as$Nmúsicas selecionadas como entradas de playlist m3u8 para a área de transferência\">📻",
+		"mt_octl": "integração com o SO (atalhos de mídia / osd)\">os-ctl",
+		"mt_oseek": "permitir busca através da integração com o SO$N$nnota: em alguns dispositivos (iPhones),$nisto substitui o botão de próxima música\">seek",
+		"mt_oscv": "mostrar capa do álbum no osd\">art",
+		"mt_follow": "manter a faixa que está tocando rolando à vista\">🎯",
+		"mt_compact": "controles compactos\">⟎",
+		"mt_uncache": "limpar cache &nbsp;(tente isso se seu navegador armazenou em cache$Numa cópia quebrada de uma música e se recusa a tocar)\">uncache",
+		"mt_mloop": "loop na pasta aberta\">🔁 loop",
+		"mt_mnext": "carregar a próxima pasta e continuar\">📂 próximo",
+		"mt_mstop": "parar reprodução\">⏸ parar",
+		"mt_cflac": "converter flac / wav para {0}\">flac",
+		"mt_caac": "converter aac / m4a para {0}\">aac",
+		"mt_coth": "converter todos os outros (não mp3) para {0}\">oth",
+		"mt_c2opus": "melhor escolha para desktops, laptops, android\">opus",
+		"mt_c2owa": "opus-weba, para iOS 17.5 e mais recentes\">owa",
+		"mt_c2caf": "opus-caf, para iOS 11 a 17\">caf",
+		"mt_c2mp3": "use isso em dispositivos muito antigos\">mp3",
+		"mt_c2flac": "melhor qualidade de som, mas downloads enormes\">flac",
+		"mt_c2wav": "reprodução não comprimida (ainda maior)\">wav",
+		"mt_c2ok": "legal, boa escolha",
+		"mt_c2nd": "esse não é o formato de saída recomendado para o seu dispositivo, mas tudo bem",
+		"mt_c2ng": "seu dispositivo não parece suportar este formato de saída, mas vamos tentar mesmo assim",
+		"mt_xowa": "existem bugs no iOS que impedem a reprodução em segundo plano usando este formato; por favor, use caf ou mp3 em vez disso",
+		"mt_tint": "nível de fundo (0-100) na barra de busca$Npara tornar o buffer menos distrativo",
+		"mt_eq": "ativa o equalizador e o controle de ganho;$N$nimpulsão &lt;code&gt;0&lt;/code&gt; = volume padrão de 100% (não modificado)$N$nlargura &lt;code&gt;1 &nbsp;&lt;/code&gt; = estéreo padrão (não modificado)$nlargura &lt;code&gt;0.5&lt;/code&gt; = 50% de crossfeed esquerda-direita$nlargura &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$nimpulsão &lt;code&gt;-0.8&lt;/code&gt; & largura &lt;code&gt;10&lt;/code&gt; = remoção de vocal :^)$N$natvar o equalizador torna os álbuns sem interrupções totalmente sem interrupções, então deixe-o ligado com todos os valores em zero (exceto largura = 1) se você se importa com isso",
+		"mt_drc": "ativa o compressor de faixa dinâmica (nivelador de volume / brickwaller); também ativará o EQ para equilibrar o spaghetti, então defina todos os campos EQ exceto 'width' para 0 se você não quiser$N$nabaixa o volume do áudio acima do THRESHOLD dB; para cada RATIO dB após o THRESHOLD há 1 dB de saída, então os valores padrão de tresh -24 e ratio 12 significam que nunca deve ficar mais alto que -22 dB e é seguro aumentar o impulso do equalizador para 0.8, ou até 1.8 com ATK 0 e um enorme RLS como 90 (só funciona no firefox; RLS é no máximo 1 em outros navegadores)$N$n(veja a wikipedia, eles explicam muito melhor)",
+
+		"mb_play": "reproduzir",
+		"mm_hashplay": "reproduzir este arquivo de áudio?",
+		"mm_m3u": "pressione <code>Enter/OK</code> para Reproduzir\npressione <code>ESC/Cancelar</code> para Editar",
+		"mp_breq": "precisa do firefox 82+ ou chrome 73+ ou iOS 15+",
+		"mm_bload": "carregando...",
+		"mm_bconv": "convertendo para {0}, por favor, espere...",
+		"mm_opusen": "seu navegador não pode reproduzir arquivos aac / m4a;\na transcodificação para opus agora está ativada",
+		"mm_playerr": "reprodução falhou: ",
+		"mm_eabrt": "A tentativa de reprodução foi cancelada",
+		"mm_enet": "Sua conexão de internet está instável",
+		"mm_edec": "Este arquivo está supostamente corrompido??",
+		"mm_esupp": "Seu navegador não entende este formato de áudio",
+		"mm_eunk": "Erro Desconhecido",
+		"mm_e404": "Não foi possível reproduzir áudio; erro 404: Arquivo não encontrado.",
+		"mm_e403": "Não foi possível reproduzir áudio; erro 403: Acesso negado.\n\nTente pressionar F5 para recarregar, talvez você tenha saído da conta",
+		"mm_e500": "Não foi possível reproduzir áudio; erro 500: Verifique os logs do servidor.",
+		"mm_e5xx": "Não foi possível reproduzir áudio; erro do servidor ",
+		"mm_nof": "não encontrando mais arquivos de áudio por perto",
+		"mm_prescan": "Procurando música para tocar a seguir...",
+		"mm_scank": "Encontrei a próxima música:",
+		"mm_uncache": "cache limpo; todas as músicas serão baixadas novamente na próxima reprodução",
+		"mm_hnf": "essa música não existe mais",
+
+		"im_hnf": "essa imagem não existe mais",
+
+		"f_empty": 'esta pasta está vazia',
+		"f_chide": 'isso irá ocultar a coluna «{0}»\n\nvocê pode reexibir as colunas na aba de configurações',
+		"f_bigtxt": "este arquivo tem {0} MiB de tamanho -- realmente ver como texto?",
+		"f_bigtxt2": "ver apenas o final do arquivo em vez disso? isso também ativará o acompanhamento/tailing, mostrando linhas de texto recém-adicionadas em tempo real",
+		"fbd_more": '<div id="blazy">mostrando <code>{0}</code> de <code>{1}</code> arquivos; <a href="#" id="bd_more">mostrar {2}</a> ou <a href="#" id="bd_all">mostrar todos</a></div>',
+		"fbd_all": '<div id="blazy">mostrando <code>{0}</code> de <code>{1}</code> arquivos; <a href="#" id="bd_all">mostrar todos</a></div>',
+		"f_anota": "apenas {0} dos {1} itens foram selecionados;\npara selecionar a pasta inteira, primeiro role para o final",
+
+		"f_dls": 'os links de arquivo na pasta atual foram\nalterados para links de download',
+
+		"f_partial": "Para baixar com segurança um arquivo que está sendo enviado, por favor, clique no arquivo que tem o mesmo nome, mas sem a extensão <code>.PARTIAL</code>. Por favor, pressione CANCELAR ou Escape para fazer isso.\n\nPressionar OK / Enter irá ignorar este aviso e continuar baixando o arquivo temporário <code>.PARTIAL</code>, o que quase certamente lhe dará dados corrompidos.",
+
+		"ft_paste": "colar {0} itens$NHotkey: ctrl-V",
+		"fr_eperm": 'não é possível renomear:\nvocê não tem permissão de “mover” nesta pasta',
+		"fd_eperm": 'não é possível excluir:\nvocê não tem permissão de “excluir” nesta pasta',
+		"fc_eperm": 'não é possível recortar:\nvocê não tem permissão de “mover” nesta pasta',
+		"fp_eperm": 'não é possível colar:\nvocê não tem permissão de “escrever” nesta pasta',
+		"fr_emore": "selecione pelo menos um item para renomear",
+		"fd_emore": "selecione pelo menos um item para excluir",
+		"fc_emore": "selecione pelo menos um item para recortar",
+		"fcp_emore": "selecione pelo menos um item para copiar para a área de transferência",
+
+		"fs_sc": "compartilhar a pasta em que você está",
+		"fs_ss": "compartilhar os arquivos selecionados",
+		"fs_just1d": "você não pode selecionar mais de uma pasta,\nou misturar arquivos e pastas em uma seleção",
+		"fs_abrt": "❌ abortar",
+		"fs_rand": "🎲 nome aleatório",
+		"fs_go": "✅ criar compartilhamento",
+		"fs_name": "nome",
+		"fs_src": "fonte",
+		"fs_pwd": "senha",
+		"fs_exp": "expira",
+		"fs_tmin": "min",
+		"fs_thrs": "horas",
+		"fs_tdays": "dias",
+		"fs_never": "eterno",
+		"fs_pname": "nome do link opcional; será aleatório se em branco",
+		"fs_tsrc": "o arquivo ou pasta a ser compartilhado",
+		"fs_ppwd": "senha opcional",
+		"fs_w8": "criando compartilhamento...",
+		"fs_ok": "pressione <code>Enter/OK</code> para Copiar para a Área de Transferência\npressione <code>ESC/Cancelar</code> para Fechar",
+
+		"frt_dec": "pode consertar alguns casos de nomes de arquivos quebrados\">url-decode",
+		"frt_rst": "resetar nomes de arquivos modificados de volta para os originais\">↺ resetar",
+		"frt_abrt": "abortar e fechar esta janela\">❌ cancelar",
+		"frb_apply": "APLICAR RENOMEAÇÃO",
+		"fr_adv": "renomeação em lote / metadados / padrão\">avançado",
+		"fr_case": "regex sensível a maiúsculas e minúsculas\">case",
+		"fr_win": "nomes seguros para windows; substituir <code>&lt;&gt;:&quot;\\|?*</code> por caracteres japoneses de largura total\">win",
+		"fr_slash": "substituir <code>/</code> por um caractere que não cause a criação de novas pastas\">no /",
+		"fr_re": "padrão de busca regex para aplicar aos nomes de arquivos originais; grupos de captura podem ser referenciados no campo de formato abaixo como &lt;code&gt;(1)&lt;/code&gt; e &lt;code&gt;(2)&lt;/code&gt; e assim por diante",
+		"fr_fmt": "inspirado por foobar2000:$N&lt;code&gt;(título)&lt;/code&gt; é substituído pelo título da música,$N&lt;code&gt;[(artista) - ](título)&lt;/code&gt; pula esta parte se o artista estiver em branco$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; preenche o número da faixa com 2 dígitos",
+		"fr_pdel": "excluir",
+		"fr_pnew": "salvar como",
+		"fr_pname": "forneça um nome para seu novo preset",
+		"fr_aborted": "abortado",
+		"fr_lold": "nome antigo",
+		"fr_lnew": "novo nome",
+		"fr_tags": "tags para os arquivos selecionados (somente leitura, apenas para referência):",
+		"fr_busy": "renomeando {0} itens...\n\n{1}",
+		"fr_efail": "renomeação falhou:\n",
+		"fr_nchg": "{0} dos novos nomes foram alterados devido a <code>win</code> e/ou <code>no /</code>\n\nOK para continuar com estes novos nomes alterados?",
+
+		"fd_ok": "exclusão OK",
+		"fd_err": "exclusão falhou:\n",
+		"fd_none": "nada foi excluído; talvez bloqueado pela configuração do servidor (xbd)?",
+		"fd_busy": "excluindo {0} itens...\n\n{1}",
+		"fd_warn1": "EXCLUIR estes {0} itens?",
+		"fd_warn2": "<b>Última chance!</b> Não há como desfazer. Excluir?",
+
+		"fc_ok": "recortar {0} itens",
+		"fc_warn": 'recortar {0} itens\n\nmas: apenas <b>esta</b> aba do navegador pode colá-los\n(já que a seleção é tão absolutamente massiva)',
+
+		"fcc_ok": "copiado {0} itens para a área de transferência",
+		"fcc_warn": 'copiado {0} itens para a área de transferência\n\nmas: apenas <b>esta</b> aba do navegador pode colá-los\n(já que a seleção é tão absolutamente massiva)',
+
+		"fp_apply": "usar estes nomes",
+		"fp_ecut": "primeiro recorte ou copie alguns arquivos / pastas para colar / mover\n\nnota: você pode recortar / colar entre abas diferentes do navegador",
+		"fp_ename": "{0} itens não podem ser movidos para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco para pular:",
+		"fcp_ename": "{0} itens não podem ser copiados para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco para pular:",
+		"fp_emore": "ainda há algumas colisões de nome de arquivo para consertar",
+		"fp_ok": "movimento OK",
+		"fcp_ok": "cópia OK",
+		"fp_busy": "movendo {0} itens...\n\n{1}",
+		"fcp_busy": "copiando {0} itens...\n\n{1}",
+		"fp_abrt": "abortando...",
+		"fp_err": "movimento falhou:\n",
+		"fcp_err": "cópia falhou:\n",
+		"fp_confirm": "mover estes {0} itens para cá?",
+		"fcp_confirm": "copiar estes {0} itens para cá?",
+		"fp_etab": 'falha ao ler a área de transferência de outra aba do navegador',
+		"fp_name": "enviando um arquivo do seu dispositivo. Dê-lhe um nome:",
+		"fp_both_m": '<h6>escolha o que colar</h6><code>Enter</code> = Mover {0} arquivos de «{1}»\n<code>ESC</code> = Enviar {2} arquivos do seu dispositivo',
+		"fcp_both_m": '<h6>escolha o que colar</h6><code>Enter</code> = Copiar {0} arquivos de «{1}»\n<code>ESC</code> = Enviar {2} arquivos do seu dispositivo',
+		"fp_both_b": '<a href="#" id="modal-ok">Mover</a><a href="#" id="modal-ng">Enviar</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Copiar</a><a href="#" id="modal-ng">Enviar</a>',
+
+		"mk_noname": "digite um nome no campo de texto à esquerda antes de fazer isso :p",
+
+		"tv_load": "Carregando documento de texto:\n\n{0}\n\n{1}% ({2} de {3} MiB carregados)",
+		"tv_xe1": "não foi possível carregar o arquivo de texto:\n\nerro ",
+		"tv_xe2": "404, arquivo não encontrado",
+		"tv_lst": "lista de arquivos de texto em",
+		"tvt_close": "voltar para a visualização da pasta$NHotkey: M (ou Esc)\">❌ fechar",
+		"tvt_dl": "baixar este arquivo$NHotkey: Y\">💾 baixar",
+		"tvt_prev": "mostrar documento anterior$NHotkey: i\">⬆ anterior",
+		"tvt_next": "mostrar próximo documento$NHotkey: K\">⬇ próximo",
+		"tvt_sel": "selecionar arquivo &nbsp; ( para recortar / copiar / excluir / ... )$NHotkey: S\">sel",
+		"tvt_edit": "abrir arquivo no editor de texto$NHotkey: E\">✏️ editar",
+		"tvt_tail": "monitorar arquivo para alterações; mostrar novas linhas em tempo real\">📡 seguir",
+		"tvt_wrap": "quebra de linha\">↵",
+		"tvt_atail": "fixar rolagem no final da página\">⚓",
+		"tvt_ctail": "decodificar cores do terminal (códigos de escape ansi)\">🌈",
+		"tvt_ntail": "limite de rolagem para trás (quantos bytes de texto manter carregados)",
+
+		"m3u_add1": "música adicionada à playlist m3u",
+		"m3u_addn": "{0} músicas adicionadas à playlist m3u",
+		"m3u_clip": "playlist m3u agora copiada para a área de transferência\n\nvocê deve criar um novo arquivo de texto chamado something.m3u e colar a playlist nesse documento; isso a tornará reproduzível",
+
+		"gt_vau": "não mostrar vídeos, apenas tocar o áudio\">🎧",
+		"gt_msel": "ativar seleção de arquivo; ctrl-clique em um arquivo para substituir$N$n&lt;em&gt;quando ativo: clique duas vezes em um arquivo / pasta para abri-lo&&gt;t;/em&gt;$N$nHotkey: S\">multisseleção",
+		"gt_crop": "cortar miniaturas ao centro\">cortar",
+		"gt_3x": "miniaturas de alta resolução\">3x",
+		"gt_zoom": "zoom",
+		"gt_chop": "picar",
+		"gt_sort": "ordenar por",
+		"gt_name": "nome",
+		"gt_sz": "tamanho",
+		"gt_ts": "data",
+		"gt_ext": "tipo",
+		"gt_c1": "truncar nomes de arquivos mais (mostrar menos)",
+		"gt_c2": "truncar nomes de arquivos menos (mostrar mais)",
+
+		"sm_w8": "buscando...",
+		"sm_prev": "os resultados da busca abaixo são de uma consulta anterior:\n  ",
+		"sl_close": "fechar resultados da busca",
+		"sl_hits": "mostrando {0} resultados",
+		"sl_moar": "carregar mais",
+
+		"s_sz": "tamanho",
+		"s_dt": "data",
+		"s_rd": "caminho",
+		"s_fn": "nome",
+		"s_ta": "tags",
+		"s_ua": "up@",
+		"s_ad": "adv.",
+		"s_s1": "MiB mínimo",
+		"s_s2": "MiB máximo",
+		"s_d1": "iso8601 min.",
+		"s_d2": "iso8601 max.",
+		"s_u1": "enviado depois de",
+		"s_u2": "e/ou antes de",
+		"s_r1": "caminho contém &nbsp; (separado por espaço)",
+		"s_f1": "nome contém &nbsp; (negar com -nope)",
+		"s_t1": "tags contém &nbsp; (^=início, fim=$)",
+		"s_a1": "propriedades de metadados específicas",
+
+		"md_eshow": "não é possível renderizar ",
+		"md_off": "[📜<em>readme</em>] desativado em [⚙️] -- documento oculto",
+
+		"badreply": "Falha ao analisar a resposta do servidor",
+
+		"xhr403": "403: Acesso negado\n\ntente pressionar F5, talvez você tenha saído da conta",
+		"xhr0": "desconhecido (provavelmente perdeu a conexão com o servidor, ou o servidor está offline)",
+		"cf_ok": "desculpe por isso -- a proteção DD" + "oS foi ativada\n\nas coisas devem ser retomadas em cerca de 30 segundos\n\nse nada acontecer, pressione F5 para recarregar a página",
+		"tl_xe1": "não foi possível listar as subpastas:\n\nerro ",
+		"tl_xe2": "404: Pasta não encontrada",
+		"fl_xe1": "não foi possível listar os arquivos na pasta:\n\nerro ",
+		"fl_xe2": "404: Pasta não encontrada",
+		"fd_xe1": "não foi possível criar a subpasta:\n\nerro ",
+		"fd_xe2": "404: Pasta pai não encontrada",
+		"fsm_xe1": "não foi possível enviar a mensagem:\n\nerro ",
+		"fsm_xe2": "404: Pasta pai não encontrada",
+		"fu_xe1": "falha ao carregar a lista de despublicação do servidor:\n\nerro ",
+		"fu_xe2": "404: Arquivo não encontrado??",
+
+		"fz_tar": "arquivo gnu-tar não comprimido (linux / mac)",
+		"fz_pax": "tar de formato pax não comprimido (mais lento)",
+		"fz_targz": "gnu-tar com compressão gzip nível 3$N$nisto é geralmente muito lento, então$nuse tar não comprimido em vez disso",
+		"fz_tarxz": "gnu-tar com compressão xz nível 1$N$nisto é geralmente muito lento, então$nuse tar não comprimido em vez disso",
+		"fz_zip8": "zip com nomes de arquivos utf8 (pode ser instável no windows 7 e mais antigos)",
+		"fz_zipd": "zip com nomes de arquivos cp437 tradicionais, para software realmente antigo",
+		"fz_zipc": "cp437 com crc32 calculado antecipadamente,$npara MS-DOS PKZIP v2.04g (outubro de 1993)$n(leva mais tempo para processar antes que o download possa começar)",
+
+		"un_m1": "você pode excluir seus uploads recentes (ou abortar os que não foram concluídos) abaixo",
+		"un_upd": "atualizar",
+		"un_m4": "ou compartilhar os arquivos visíveis abaixo:",
+		"un_ulist": "mostrar",
+		"un_ucopy": "copiar",
+		"un_flt": "filtro opcional:&nbsp; a URL deve conter",
+		"un_fclr": "limpar filtro",
+		"un_derr": 'a exclusão da despublicação falhou:\n',
+		"un_f5": 'algo quebrou, por favor, tente uma atualização ou pressione F5',
+		"un_uf5": "desculpe, mas você tem que atualizar a página (por exemplo, pressionando F5 ou CTRL-R) antes que este upload possa ser abortado",
+		"un_nou": "<b>aviso:</b> o servidor está muito ocupado para mostrar uploads incompletos; clique no link \"atualizar\" em um momento",
+		"un_noc": "<b>aviso:</b> a despublicação de arquivos totalmente enviados não está ativada/permitida na configuração do servidor",
+		"un_max": "mostrando os primeiros 2000 arquivos (use o filtro)",
+		"un_avail": "{0} uploads recentes podem ser excluídos<br />{1} incompletos podem ser abortados",
+		"un_m2": "ordenado por tempo de upload; o mais recente primeiro:",
+		"un_no1": "sike! nenhum upload é suficientemente recente",
+		"un_no2": "sike! nenhum upload que corresponda a esse filtro é suficientemente recente",
+		"un_next": "excluir os próximos {0} arquivos abaixo",
+		"un_abrt": "abortar",
+		"un_del": "excluir",
+		"un_m3": "carregando seus uploads recentes...",
+		"un_busy": "excluindo {0} arquivos...",
+		"un_clip": "{0} links copiados para a área de transferência",
+
+		"u_https1": "você deveria",
+		"u_https2": "mudar para https",
+		"u_https3": "para um melhor desempenho",
+		"u_ancient": 'seu navegador é impressionantemente antigo -- talvez você devesse <a href="#" onclick="goto(\'bup\')">usar o bup em vez disso</a>',
+		"u_nowork": "precisa do firefox 53+ ou chrome 57+ ou iOS 11+",
+		"tail_2old": "precisa do firefox 105+ ou chrome 71+ ou iOS 14.5+",
+		"u_nodrop": 'seu navegador é muito antigo para upload de arrastar e soltar',
+		"u_notdir": "isso não é uma pasta!\n\nseu navegador é muito antigo,\npor favor, tente arrastar e soltar em vez disso",
+		"u_uri": "para arrastar e soltar imagens de outras janelas do navegador,\npor favor, solte-as no grande botão de upload",
+		"u_enpot": 'mudar para <a href="#">UI batata</a> (pode melhorar a velocidade de upload)',
+		"u_depot": 'mudar para <a href="#">UI chique</a> (pode reduzir a velocidade de upload)',
+		"u_gotpot": 'mudando para a UI batata para uma velocidade de upload melhorada,\n\nsinta-se à vontade para discordar e voltar!',
+		"u_pott": "<p>arquivos: &nbsp; <b>{0}</b> concluídos, &nbsp; <b>{1}</b> falhados, &nbsp; <b>{2}</b> ocupados, &nbsp; <b>{3}</b> na fila</p>",
+		"u_ever": "este é o uploader básico; up2k precisa de pelo menos<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'este é o uploader básico; <a href="#" id="u2yea">up2k</a> é melhor',
+		"u_uput": 'otimizar para velocidade (pular checksum)',
+		"u_ewrite": 'você não tem acesso de escrita a esta pasta',
+		"u_eread": 'você não tem acesso de leitura a esta pasta',
+		"u_enoi": 'a busca de arquivos não está ativada na configuração do servidor',
+		"u_enoow": "substituir não funcionará aqui; precisa de permissão de Excluir",
+		"u_badf": 'Estes {0} arquivos (de um total de {1}) foram ignorados, possivelmente devido a permissões do sistema de arquivos:\n\n',
+		"u_blankf": 'Estes {0} arquivos (de um total de {1}) estão em branco / vazios; enviá-los de qualquer maneira?\n\n',
+		"u_applef": 'Estes {0} arquivos (de um total de {1}) são provavelmente indesejáveis;\nPressione <code>OK/Enter</code> para PULAR os seguintes arquivos,\nPressione <code>Cancelar/ESC</code> para NÃO excluir, e ENVIAR esses também:\n\n',
+		"u_just1": '\nTalvez funcione melhor se você selecionar apenas um arquivo',
+		"u_ff_many": "se você estiver usando <b>Linux / MacOS / Android,</b> então essa quantidade de arquivos <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>pode</em> travar o Firefox!</a>\nse isso acontecer, por favor, tente novamente (ou use o Chrome).",
+		"u_up_life": "Este upload será excluído do servidor\n{0} após ser concluído",
+		"u_asku": 'enviar estes {0} arquivos para <code>{1}</code>',
+		"u_unpt": "você pode desfazer / excluir este upload usando o 🧯 no canto superior esquerdo",
+		"u_bigtab": 'prestes a mostrar {0} arquivos\n\nisto pode travar seu navegador, tem certeza?',
+		"u_scan": 'Escaneando arquivos...',
+		"u_dirstuck": 'o iterador de diretório travou ao tentar acessar os seguintes {0} itens; irá pular:',
+		"u_etadone": 'Concluído ({0}, {1} arquivos)',
+		"u_etaprep": '(preparando para enviar)',
+		"u_hashdone": 'hash concluído',
+		"u_hashing": 'hash',
+		"u_hs": 'handshaking...',
+		"u_started": "os arquivos estão sendo enviados agora; veja [🚀]",
+		"u_dupdefer": "duplicado; será processado após todos os outros arquivos",
+		"u_actx": "clique neste texto para evitar perda de<br />desempenho ao mudar para outras janelas/abas",
+		"u_fixed": "OK!&nbsp; Consertado 👍",
+		"u_cuerr": "falha ao enviar o bloco {0} de {1};\nprovavelmente inofensivo, continuando\n\narquivo: {2}",
+		"u_cuerr2": "o servidor rejeitou o upload (bloco {0} de {1});\ntentará novamente mais tarde\n\narquivo: {2}\n\nerro ",
+		"u_ehstmp": "tentará novamente; veja no canto inferior direito",
+		"u_ehsfin": "o servidor rejeitou a solicitação para finalizar o upload; tentando novamente...",
+		"u_ehssrch": "o servidor rejeitou a solicitação para realizar a busca; tentando novamente...",
+		"u_ehsinit": "o servidor rejeitou a solicitação para iniciar o upload; tentando novamente...",
+		"u_eneths": "erro de rede ao realizar o handshake de upload; tentando novamente...",
+		"u_enethd": "erro de rede ao testar a existência do alvo; tentando novamente...",
+		"u_cbusy": "esperando o servidor confiar em nós novamente após uma falha de rede...",
+		"u_ehsdf": "o servidor ficou sem espaço em disco!\n\ncontinuará tentando novamente, caso alguém\nlibere espaço suficiente para continuar",
+		"u_emtleak1": "parece que seu navegador pode ter um vazamento de memória;\npor favor,",
+		"u_emtleak2": ' <a href="{0}">mude para https (recomendado)</a> ou ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'tente o seguinte:\n<ul><li>pressione <code>F5</code> para atualizar a página</li><li>depois desative o botão &nbsp;<code>mt</code>&nbsp; nas &nbsp;<code>⚙️ configurações</code></li><li>e tente o upload novamente</li></ul>Os uploads serão um pouco mais lentos, mas tudo bem.\nDesculpe pelo problema !\n\nPS: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">tem uma correção de bug</a> para isso',
+		"u_emtleakf": 'tente o seguinte:\n<ul><li>pressione <code>F5</code> para atualizar a página</li><li>depois ative <code>🥔</code> (batata) na UI de upload<li>e tente o upload novamente</li></ul>\nPS: o firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">esperançosamente terá uma correção de bug</a> em algum momento',
+		"u_s404": "não encontrado no servidor",
+		"u_expl": "explicar",
+		"u_maxconn": "a maioria dos navegadores limita isso a 6, mas o firefox permite que você aumente com <code>connections-per-server</code> em <code>about:config</code>",
+		"u_tu": '<p class="warn">AVISO: turbo ativado, <span>&nbsp;o cliente pode não detectar e retomar uploads incompletos; veja a dica de ferramenta do botão turbo</span></p>',
+		"u_ts": '<p class="warn">AVISO: turbo ativado, <span>&nbsp;os resultados da busca podem estar incorretos; veja a dica de ferramenta do botão turbo</span></p>',
+		"u_turbo_c": "o turbo está desativado na configuração do servidor",
+		"u_turbo_g": "desativando o turbo porque você não tem\n privilégios de listagem de diretório neste volume",
+		"u_life_cfg": 'excluir automaticamente depois de <input id="lifem" p="60" /> min (ou <input id="lifeh" p="3600" /> horas)',
+		"u_life_est": 'o upload será excluído <span id="lifew" tt="local time">---</span>',
+		"u_life_max": 'esta pasta impõe um\n tempo de vida máximo de {0}',
+		"u_unp_ok": 'a despublicação é permitida para {0}',
+		"u_unp_ng": 'a despublicação NÃO será permitida',
+		"ue_ro": 'seu acesso a esta pasta é Somente Leitura\n\n',
+		"ue_nl": 'você não está logado no momento',
+		"ue_la": 'você está logado no momento como "{0}"',
+		"ue_sr": 'você está no modo de busca de arquivos no momento\n\nmude para o modo de upload clicando na lupa 🔎 (ao lado do grande botão BUSCAR), e tente enviar novamente\n\ndesculpe',
+		"ue_ta": 'tente enviar novamente, deve funcionar agora',
+		"ue_ab": "este arquivo já está sendo enviado para outra pasta, e esse upload deve ser concluído antes que o arquivo possa ser enviado para outro lugar.\n\nVocê pode abortar e esquecer o upload inicial usando o 🧯 no canto superior esquerdo",
+		"ur_1uo": "OK: Arquivo enviado com sucesso",
+		"ur_auo": "OK: Todos os {0} arquivos enviados com sucesso",
+		"ur_1so": "OK: Arquivo encontrado no servidor",
+		"ur_aso": "OK: Todos os {0} arquivos encontrados no servidor",
+		"ur_1un": "O upload falhou, desculpe",
+		"ur_aun": "Todos os {0} uploads falharam, desculpe",
+		"ur_1sn": "O arquivo NÃO foi encontrado no servidor",
+		"ur_asn": "Os {0} arquivos NÃO foram encontrados no servidor",
+		"ur_um": "Concluído;\n{0} uploads OK,\n{1} uploads falharam, desculpe",
+		"ur_sm": "Concluído;\n{0} arquivos encontrados no servidor,\n{1} arquivos NÃO encontrados no servidor",
+
+		"lang_set": "atualizar para a mudança ter efeito?"
 	},
 	"rus": {
 		"tt": "Русский",
@@ -3249,6 +9588,7 @@ var Ls = {
 		"gou": 'родительская папка">вверх',
 		"gon": 'следующая папка">след',
 		"logout": "Выйти ",
+		"login": "Войти", //m
 		"access": " доступ",
 		"ot_close": "закрыть подменю",
 		"ot_search": "искать файлы по атрибутам, пути / имени, музыкальным тегам или любой другой комбинации из следующих конструкций$N$N&lt;code&gt;foo bar&lt;/code&gt; = обязано содержать «foo» И «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = обязано содержать «foo», но не «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = начинается с «yana» и имеет расширение «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = содержит именно «try unite»$N$Nформат времени задаётся по стандарту iso-8601, например$N&lt;code&gt;2009-12-31&lt;/code&gt; или &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
@@ -3435,13 +9775,15 @@ var Ls = {
 		"mt_mloop": "повторять треки в папке\">🔁 цикл",
 		"mt_mnext": "загрузить следующую папку и продолжить в ней\">📂 след.",
 		"mt_mstop": "приостановить воспроизведение\">⏸ стоп",
-		"mt_cflac": "конвертировать flac / wav в opus\">flac",
-		"mt_caac": "конвертировать aac / m4a в opus\">aac",
-		"mt_coth": "конвертировать всё остальное (кроме mp3) в opus\">др.",
+		"mt_cflac": "конвертировать flac / wav в {0}\">flac",
+		"mt_caac": "конвертировать aac / m4a в {0}\">aac",
+		"mt_coth": "конвертировать всё остальное (кроме mp3) в {0}\">др.",
 		"mt_c2opus": "лучший вариант для компьютеров и устройств на Android\">opus",
 		"mt_c2owa": "opus-weba, для iOS 17.5 и выше\">owa",
 		"mt_c2caf": "opus-caf, для iOS 11-17\">caf",
 		"mt_c2mp3": "для очень старых устройств\">mp3",
+		"mt_c2flac": "лучшее качество звука, но большие файлы\">flac", //m
+		"mt_c2wav": "не сжатое воспроизведение (ещё больше)\">wav", //m
 		"mt_c2ok": "хороший выбор",
 		"mt_c2nd": "это не рекомендованный вариант формата для вашего устройства, но сойдёт",
 		"mt_c2ng": "не похоже, что ваше устройство поддерживает этот формат, но давайте попробуем и узнаем наверняка",
@@ -3515,7 +9857,7 @@ var Ls = {
 		"fs_tsrc": "путь к файлу или папке, которыми нужно поделиться",
 		"fs_ppwd": "пароль (необязательно)",
 		"fs_w8": "создаю доступ...",
-		"fs_ok": "нажмите <code>Enter/OK</code>, чтобы скопировать\nнажмите <code>ESC/Cancel</code>, чтобы закрыть",
+		"fs_ok": "нажмите <code>Enter/OK</code>, чтобы скопировать\nнажмите <code>ESC/Отмена</code>, чтобы закрыть",
 
 		"frt_dec": "может исправить некоторые случаи с некорректными именами файлов\">декодировать url",
 		"frt_rst": "сбросить изменённые имена обратно к оригинальным\">↺ сброс",
@@ -3560,6 +9902,7 @@ var Ls = {
 		"fcp_ok": "успешно скопировано",
 		"fp_busy": "перемещаю {0} файлов...\n\n{1}",
 		"fcp_busy": "копирую {0} файлов...\n\n{1}",
+		"fp_abrt": "прерывание...", //m
 		"fp_err": "ошибка перемещения:\n",
 		"fcp_err": "ошибка копирования:\n",
 		"fp_confirm": "переместить эти {0} файлов сюда?",
@@ -3876,6 +10219,7 @@ var Ls = {
 		"gou": 'carpeta de nivel superior">subir',
 		"gon": 'siguiente carpeta">siguiente',
 		"logout": "Cerrar sesión ",
+		"login": "Iniciar sesión", //m
 		"access": " acceso",
 		"ot_close": "cerrar submenú",
 		"ot_search": "buscar archivos por atributos, ruta / nombre, etiquetas de música, o cualquier combinación$N$N&lt;code&gt;foo bar&lt;/code&gt; = debe contener «foo» y «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = debe contener «foo» pero no «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = empieza con «yana» y es un archivo «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = contiene exactamente «try unite»$N$Nel formato de fecha es iso-8601, como$N&lt;code&gt;2009-12-31&lt;/code&gt; o &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
@@ -4061,13 +10405,15 @@ var Ls = {
 		"mt_mloop": 'repetir la carpeta actual">🔁 bucle',
 		"mt_mnext": 'cargar la siguiente carpeta y continuar">📂 sig',
 		"mt_mstop": 'detener reproducción">⏸ parar',
-		"mt_cflac": 'convertir flac / wav a opus">flac',
-		"mt_caac": 'convertir aac / m4a a opus">aac',
-		"mt_coth": 'convertir todos los demás (no mp3) a opus">oth',
+		"mt_cflac": 'convertir flac / wav a {0}">flac',
+		"mt_caac": 'convertir aac / m4a a {0}">aac',
+		"mt_coth": 'convertir todos los demás (no mp3) a {0}">oth',
 		"mt_c2opus": 'la mejor opción para ordenadores, portátiles, android">opus',
 		"mt_c2owa": 'opus-weba, para iOS 17.5 y superior">owa',
 		"mt_c2caf": 'opus-caf, para iOS 11 a 17">caf',
 		"mt_c2mp3": 'usar en dispositivos muy antiguos">mp3',
+		"mt_c2flac": "la mejor calidad de sonido,$Npero descargas muy grandes\">flac", //m
+		"mt_c2wav": "reproducción sin comprimir (aún más grande)\">wav", //m
 		"mt_c2ok": "bien, buena elección",
 		"mt_c2nd": "ese no es el formato de salida recomendado para tu dispositivo, pero está bien",
 		"mt_c2ng": "tu dispositivo no parece soportar este formato de salida, pero intentémoslo de todas formas",
@@ -4186,6 +10532,7 @@ var Ls = {
 		"fcp_ok": "copia correcta",
 		"fp_busy": "moviendo {0} elementos...\n\n{1}",
 		"fcp_busy": "copiando {0} elementos...\n\n{1}",
+		"fp_abrt": "cancelando...", //m
 		"fp_err": "fallo al mover:\n",
 		"fcp_err": "fallo al copiar:\n",
 		"fp_confirm": "¿mover estos {0} elementos aquí?",
@@ -4394,6 +10741,1268 @@ var Ls = {
 
 		"lang_set": "¿refrescar para que el cambio surta efecto?"
 	},
+	"swe": {
+		"tt": "Svenska",
+
+		"cols": {
+			"c": "aktion",
+			"dur": "längd",
+			"q": "kvalitet / bitrate",
+			"Ac": "ljudkodek",
+			"Vc": "videokodek",
+			"Fmt": "format / container",
+			"Ahash": "ljudchecksumma",
+			"Vhash": "videochecksumma",
+			"Res": "upplösning",
+			"T": "filtyp",
+			"aq": "ljudkvalitet / bitrate",
+			"vq": "videokvalitet / bitrate",
+			"pixfmt": "subsampling / pixelstruktur",
+			"resw": "horisontell upplösning",
+			"resh": "vertikal upplösning",
+			"chs": "antal ljudkanaler",
+			"hz": "samplingsfrekvens"
+		},
+
+		"hks": [
+			[
+				"övrigt",
+				["ESC", "stäng diverse paneler"],
+
+				"filhanterare",
+				["G", "växla mellan listvy / rutnät"],
+				["T", "växla mellan miniatyrer / ikoner"],
+				["⇧ A/D", "miniatyrstorlek"],
+				["ctrl-K", "radera urval"],
+				["ctrl-X", "klipp urval till urklipp"],
+				["ctrl-C", "kopiera urval till urklipp"],
+				["ctrl-V", "klistra in (kopiera/flytta) hit"],
+				["Y", "ladda ner urval"],
+				["F2", "byt namn på urval"],
+
+				"välja filer",
+				["Blanksteg", "växla val av fil"],
+				["↑/↓", "flytta filvalsmarkör"],
+				["ctrl ↑/↓", "flytta markör och vy"],
+				["⇧ ↑/↓", "välj föregående/nästa fil"],
+				["ctrl-A", "välj alla filer / mappar"],
+			], [
+				"navigation",
+				["B", "växla mellan brödsmulor / trädvy"],
+				["I/K", "föregående/nästa mapp"],
+				["M", "hoppa till överordnad mapp (eller kollapsa närvarande)"],
+				["V", "växla mellan mappar / textfiler i trädvy"],
+				["A/D", "trädvystorlek"],
+			], [
+				"ljudspelare",
+				["J/L", "föregående/nästa låt"],
+				["U/O", "hoppa 10sek bakåt/framåt"],
+				["0..9", "hoppa till 0%..90%"],
+				["P", "play/paus (startar även uppspelning)"],
+				["S", "välj låten som spelas"],
+				["Y", "ladda ner låt"],
+			], [
+				"bildvisare",
+				["J/L, ←/→", "föregående/nästa bild"],
+				["Hem/End", "första/sista bilden"],
+				["F", "helskärm"],
+				["R", "rotera medsols"],
+				["⇧ R", "rotera motsols"],
+				["S", "välj bild"],
+				["Y", "ladda ner bild"],
+			], [
+				"videospelare",
+				["U/O", "hoppa 10sek bakåt/framåt"],
+				["P/K/Blanksteg", "play/paus"],
+				["C", "fortsätt med nästa"],
+				["V", "loopa"],
+				["M", "stäng av ljud"],
+				["[ och ]", "ställ in loopintervall"],
+			], [
+				"textfilsvisare",
+				["I/K", "föregående/nästa fil"],
+				["M", "stäng textfil"],
+				["E", "redigera textfil"],
+				["S", "välj fil"],
+			]
+		],
+
+		"m_ok": "OK",
+		"m_ng": "Avbryt",
+
+		"enable": "Aktivera",
+		"danger": "VARNING",
+		"clipped": "kopierat till urklipp",
+
+		"ht_s1": "sekund",
+		"ht_s2": "sekunder",
+		"ht_m1": "minut",
+		"ht_m2": "minuter",
+		"ht_h1": "timme",
+		"ht_h2": "timmar",
+		"ht_d1": "dag",
+		"ht_d2": "dagar",
+		"ht_and": " och ",
+
+		"goh": "kontrollpanel",
+		"gop": 'föregående mapp">föreg.',
+		"gou": 'överordnad mapp">upp',
+		"gon": 'nästa mapp">nästa',
+		"logout": "Logga ut ",
+		"login": "Logga in", //m
+		"access": "-rättighet",
+		"ot_close": "stäng undermeny",
+		"ot_search": "sök efter filer via attribut, sökväg / namn, musiktaggar, eller någon kombination av dessa$N$N&lt;code&gt;foo bar&lt;/code&gt; = måste innehålla både «foo» och «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = måste innehålla «foo» men inte «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = måste börja med «yana» och vara en «opus»-fil$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = måste innehålla exakt «try unite»$N$Ndatumformatet är iso-8601, t.ex.$N&lt;code&gt;2009-12-31&lt;/code&gt; eller &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: radera dina senaste uppladdningar, eller avbryt pågående sådana",
+		"ot_bup": "bup: enkel uppladdare, stödjer t o m netscape 4.0",
+		"ot_mkdir": "mkdir: skapa en ny mapp",
+		"ot_md": "new-md: skapa ett nytt markdown-dokument",
+		"ot_msg": "msg: skicka ett meddelande till serverloggen",
+		"ot_mp": "mediaspelarinställningar",
+		"ot_cfg": "konfigurationsinställningar",
+		"ot_u2i": 'up2k: ladda upp filer (om du har skrivrättigheter) eller byt till sökläge för att se om de finns någonstans på servern$N$Nuppladdningarna är återupptagbara, multitrådade och filernas tidsstämpel bevaras, men den använder mer CPU än [🎈]&nbsp; (den enkla uppladdaren)<br /><br />under uppladdningens gång blir denna ikon en förloppsindikator!',
+		"ot_u2w": 'up2k: ladda upp filer med stöd för återupptagning (stäng din webbläsare och dra in samma filer senare)$N$Nmultitrådad och filernas tidsstämpel bevaras, men den använder mer CPU än [🎈]&nbsp; (den enkla uppladdaren)<br /><br />under uppladdningens gång blir denna ikon en förloppsindikator!',
+		"ot_noie": 'Var vänlig använd Chrome / Firefox / Edge',
+
+		"ab_mkdir": "skapa mapp",
+		"ab_mkdoc": "nytt markdown-dokument",
+		"ab_msg": "skicka medd. till serverlogg",
+
+		"ay_path": "hoppa till mappar",
+		"ay_files": "hoppa till filer",
+
+		"wt_ren": "byt namn på urval$NSnabbtangent: F2",
+		"wt_del": "radera urval$NSnabbtangent: ctrl-K",
+		"wt_cut": "klipp urval&lt;small&gt;(för att klistra in någonstans)&lt;/small&gt;$NSnabbtangent: ctrl-X",
+		"wt_cpy": "kopiera urval till urklipp$N(för att klistra in någonstans)$NSnabbtangent: ctrl-C",
+		"wt_pst": "klistra in tidigare urval$NSnabbtangent: ctrl-V",
+		"wt_selall": "välj alla filer$NSnabbtangent: ctrl-A (när en fil har fokus)",
+		"wt_selinv": "invertera urval",
+		"wt_zip1": "ladda ner denna mapp som ett arkiv",
+		"wt_selzip": "ladda ner urval som ett arkiv",
+		"wt_seldl": "ladda ner urval som separata filer$NSnabbtangent: Y",
+		"wt_npirc": "kopiera IRC-formatterad låtinfo",
+		"wt_nptxt": "kopiera låtinfo i klartext",
+		"wt_m3ua": "lägg till i m3u-spellista (klicka på <code>📻copy</code> senare)",
+		"wt_m3uc": "kopiera m3u-spellista till urklipp",
+		"wt_grid": "växla mellan rutnät och listvy$NSnabbtangent: G",
+		"wt_prev": "föregående låt$NSnabbtangent: J",
+		"wt_play": "play / paus$NSnabbtangent: P",
+		"wt_next": "nästa låt$NSnabbtangent: L",
+
+		"ul_par": "samtidiga uppladdningar:",
+		"ut_rand": "slumpa filnamn",
+		"ut_u2ts": "bevara tidsstämpeln för senaste ändring$Nfrån ditt filsystem till servern\">📅",
+		"ut_ow": "skriv över existerande filer på servern?$N🛡️: aldrig (skapar ett nytt filnamn istället)$N🕒: skriv över om serverns fil är äldre än din$N♻️: skriv alltid över om filerna skiljer sig",
+		"ut_mt": "fortsätt hasha filer under uppladdningens gång$N$Nstäng av om din CPU eller disk är en flaskhals",
+		"ut_ask": 'bekräfta innan uppladdningar påbörjas">💭',
+		"ut_pot": "förbättra uppladdningshastigheten på långsamma enheter$Ngenom att förenkla användargränssnittet",
+		"ut_srch": "ladda inte upp; kolla istället om filerna redan existerar på $N servern (detta kommer att skanna alla mappar med läsrättighet)",
+		"ut_par": "du kan pausa all uppladdning genom att sätta detta till 0$N$Nöka denna om din uppkoppling är långsam eller har hög latens$N$Nsätt till 1 över lokala nätverk eller om serverns disk är en flaskhals",
+		"ul_btn": "släpp filer / mappar<br>här (eller klicka)",
+		"ul_btnu": "L A D D A  U P P",
+		"ul_btns": "S Ö K",
+
+		"ul_hash": "hashar",
+		"ul_send": "skickar",
+		"ul_done": "klar",
+		"ul_idle1": "inga uppladdningar har köats",
+		"ut_etah": "medelhastighet för &lt;em&gt;hashning&lt;/em&gt;, och uppskattad återstående tid",
+		"ut_etau": "medelhastighet för &lt;em&gt;överföring&lt;/em&gt;, och uppskattad återstående tid",
+		"ut_etat": "&lt;em&gt;total&lt;/em&gt; medelhastighet, och uppskattad återstående tid",
+
+		"uct_ok": "lyckade",
+		"uct_ng": "no-good: misslyckade / avvisade / ej funna",
+		"uct_done": "ok och ng kombinerat",
+		"uct_bz": "pågående",
+		"uct_q": "köade",
+
+		"utl_name": "filnamn",
+		"utl_ulist": "visa",
+		"utl_ucopy": "kopiera",
+		"utl_links": "länkar",
+		"utl_stat": "status",
+		"utl_prog": "förlopp",
+
+		// keep short:
+		"utl_404": "404",
+		"utl_err": "FEL",
+		"utl_oserr": "OS-fel",
+		"utl_found": "hittad",
+		"utl_defer": "väntar",
+		"utl_yolo": "YOLO",
+		"utl_done": "klar",
+
+		"ul_flagblk": "filerna lades till i kön,</b><br>men det finns en upptagen up2k i en annan webbläsarflik,<br>så vi väntar på den först",
+		"ul_btnlk": "serverkonfigurationen har låst denna inställning",
+
+		"udt_up": "Ladda upp",
+		"udt_srch": "Sök",
+		"udt_drop": "släpp här",
+
+		"u_nav_m": '<h6>jaha, vad har du då?</h6><code>Enter</code> = Filer (en eller flera)\n<code>ESC</code> = En mapp (inklusive undermappar)',
+		"u_nav_b": '<a href="#" id="modal-ok">Filer</a><a href="#" id="modal-ng">En mapp</a>',
+
+		"cl_opts": "växlar",
+		"cl_themes": "tema",
+		"cl_langs": "språk",
+		"cl_ziptype": "mappnedladdning",
+		"cl_uopts": "up2k-inställningar",
+		"cl_favico": "favikon",
+		"cl_bigdir": "stora mappar",
+		"cl_hsort": "#sort.",
+		"cl_keytype": "tonartsnotering",
+		"cl_hiddenc": "dolda kolumner",
+		"cl_hidec": "dölj",
+		"cl_reset": "återställ",
+		"cl_hpick": "tryck på en kolumntitel för att dölja den i filvyn",
+		"cl_hcancel": "kolumndöljning avbruten",
+
+		"ct_grid": '田 rutnätet',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ tips',
+		"ct_thumb": 'växla mellan miniatyrer och ikoner i rutnätsvyn$NSnabbtangent: T">🖼️ miniatyrer',
+		"ct_csel": 'använd CTRL och SKIFT för urval av filer i rutnätsvyn">val',
+		"ct_ihop": 'skrolla till den senast visade filen när bildvisaren stängs">g⮯',
+		"ct_dots": 'visa dolda filer (om servern tillåter detta)">dolda',
+		"ct_qdel": 'bekräfta endast en gång när filer raderas">srad',
+		"ct_dir1st": 'sortera mappar före filer">📁 först',
+		"ct_nsort": 'naturlig sortering (för filnamn med ledande siffror)">nsort',
+		"ct_utc": 'visa alla datum och tider i UTC">UTC',
+		"ct_readme": 'visa README.md i listvyn">📜 läsmig',
+		"ct_idxh": 'visa index.html istället för listvyn">htm',
+		"ct_sbars": 'visa rullningslister">⟊',
+
+		"cut_umod": "om en fil redan existerar på servern, uppdatera serverns senast modifierade tidsstämpel till att matcha din lokala fil (kräver skriv+radera-rättighet)\">re📅",
+
+		"cut_turbo": "yolo-knappen, du vill förmodligen INTE aktivera denna:$N$Nanvänd denna om du höll på att ladda upp en stor mängd filer och var tvungen att stänga webbläsaren, och du vill fortsätta uppladdningen så fort som möjligt$N$Ndetta ersätter hash-checken med en enkel <em>&quot;har denna fil samma filstorlek på servern?&quot;</em>, så om filinnehållet skiljer sig kommer den INTE att laddas upp$N$Ndu bör stänga av denna när uppladdningen är klar och sedan &quot;ladda upp&quot; samma filer igen för att låta klienten verifiera dem\">turbo",
+
+		"cut_datechk": "har endast effekt med turbo-växeln påslagen$N$Nminskar yolo-faktorn lite grann; kollar om filtidsstämplarna på servern matchar dina$N$Ndetta <em>bör</em> fånga de flesta ofärdiga / korrumperade uppladdningarna, men kan inte ersätta ett fullständigt verifieringspass med turbo avstängt\">date-chk",
+
+		"cut_u2sz": "storlek (i MiB) för varje uppladdnings-chunk; stora värden flyger bättre över atlanten. Prova lägre värden på mycket opålitliga uppkopplingar",
+
+		"cut_flag": "garantera att endast en flik laddar upp samtidigt $N -- andra flikar måste också ha denna påslagen -- $N påverkar endast flikar på samma domän",
+
+		"cut_az": "ladda upp filer i alfabetisk ordning, snarare än mindre filer först$N$Nalfabetisk ordning kan göra det enklare att se var något har gått fel, men uppladdningen blir lite långsammare över fiber / lokala nätverk",
+
+		"cut_nag": "skicka en systemnotifikation när uppladdningar blir klara$N(endast om webbläsaren eller fliken inte är fokuserade)",
+		"cut_sfx": "ljudnotifikation när uppladdningar blir klara$N(endast om webbläsaren eller fliken inte är fokuserade)",
+
+		"cut_mt": "använd multitrådning för att accelerera filhashningen$N$Ndetta använder web-workers och kräver$Nmer RAM (upp till 512 MiB extra)$N$Nuppladdningar över https blir 30% snabbare, över http 4.5x snabbare\">mt",
+
+		"cut_wasm": "använd wasm istället för webbläsarens inbyggda hashare; förbättrar hastigheten i chrome-baserade webbläsare men ökar CPU-lasten, och många äldre versioner av chrome har buggar som får webbläsaren att konsumera allt RAM-minne och krascha om detta är påslaget\">wasm",
+
+		"cft_text": "favikon-text (låt stå tom och uppdatera sidan för att stänga av)",
+		"cft_fg": "förgrundsfärg",
+		"cft_bg": "bakgrundsfärg",
+
+		"cdt_lim": "högsta antal filer att visa in en mapp",
+		"cdt_ask": "när du når botten av vyn,$Nbe om en åtgärd istället för att ladda fler filer",
+		"cdt_hsort": "hur många sorteringsregler (&lt;code&gt;,sorthref&lt;/code&gt;) att inkludera i media-URL:er. Sätts detta till 0 kommer regler i klickade medialänkar även att ignoreras",
+
+		"tt_entree": "visa trädvy$NSnabbtangent: B",
+		"tt_detree": "visa brödsmulor$NSnabbtangent: B",
+		"tt_visdir": "skrolla till öppnad mapp",
+		"tt_ftree": "växla mellan trädvy och textfiler$NHotkey: V",
+		"tt_pdock": "visa överordnade mappar i en panel längst upp i vyn",
+		"tt_dynt": "väx vyn när trädet expanderar",
+		"tt_wrap": "automatisk radbrytning",
+		"tt_hover": "visa överlånga rader när muspekaren hovrar över dem$N( skrollhjulet fungerar ej såvida inte pekaren$Nstår till vänster )",
+
+		"ml_pmode": "vid mappens slut...",
+		"ml_btns": "komm.",
+		"ml_tcode": "konvertera",
+		"ml_tcode2": "konvertera till",
+		"ml_tint": "hy",
+		"ml_eq": "ljudutjämnare",
+		"ml_drc": "dynamikkompressor",
+
+		"mt_loop": "upprepa en låt\">🔁",
+		"mt_one": "stoppa uppspelningen efter en låt\">1️⃣",
+		"mt_shuf": "blanda låtarna i varje mapp\">🔀",
+		"mt_aplay": "spela automatiskt om det finns en låt-ID i länkar du har klickat på för att öppna sidan$N$Nom detta är avstängt kommer sidans adress inte att bli uppdaterad med en låt-ID om du spelar musik, för att förhindra automatisk uppspelning om dessa inställningar går förlorade men webbadressen återstår\">a▶",
+		"mt_preload": "påbörja nedladdning av nästa låt i förväg för gapfri uppspelning\">ladda",
+		"mt_prescan": "hoppa till nästa mapp i förväg så att webbläsaren$Nförblir glad och inte avbryter uppspelningen\">nav",
+		"mt_fullpre": "försök att ladda ner hela låten i förväg;$N✅ aktivera på <b>opålitliga</b> uppkopplingar,$N❌ <b>avaktivera</b> kanske på långsamma uppkopplingar\">full",
+		"mt_fau": "förhindra att uppspelningen avstannar på telefoner om nästa låt inte laddas tillräckligt snabbt i förväg (kan ge upphov till buggiga musiktaggar)\">☕️",
+		"mt_waves": "vågformsreglage:$Nvisa ljudstyrkan i uppspelningsreglaget\">~s",
+		"mt_npclip": "visa knappar för att kopiera låtinfo till urklippet\">/np",
+		"mt_m3u_c": "visa knappar för att kopiera de valda$Nlåtarna som en m3u8-spellista\">📻",
+		"mt_octl": "systemintegration (mediaknappar / skärmdisplay)\">os-ctl",
+		"mt_oseek": "tillåt fram- och bakåtspolning via systemintegrationen$N$Nobs.: på vissa enheter (iPhone)$Nersätter detta knappen för nästa låt\">spola",
+		"mt_oscv": "visa skivomslag i skärmdisplayen\">omslag",
+		"mt_follow": "skrolla vyn till den spelande låten\">🎯",
+		"mt_compact": "kompakt kontrollpanel\">⟎",
+		"mt_uncache": "rensa cachen &nbsp;(prova detta om din webbläsare har cachat$Nen trasig kopia av en låt och den vägrar spela upp den)\">rensa",
+		"mt_mloop": "upprepa den öppna mappen\">🔁 upprepa",
+		"mt_mnext": "ladda nästa mapp och fortsätt\">📂 nästa",
+		"mt_mstop": "stoppa uppspelningen\">⏸ stopp",
+		"mt_cflac": "konvertera flac / wav till {0}\">flac",
+		"mt_caac": "konvertera aac / m4a till {0}\">aac",
+		"mt_coth": "konvertera allt annat (förutom mp3) till {0}\">annat",
+		"mt_c2opus": "bäst val för pc, laptop, android\">opus",
+		"mt_c2owa": "opus-weba, för iOS 17.5 och senare\">owa",
+		"mt_c2caf": "opus-caf, för iOS 11 till 17\">caf",
+		"mt_c2mp3": "använd detta på mycket gamla enheter\">mp3",
+		"mt_c2flac": "bäst ljudkvalitet, men enorma nedladdningar\">flac",
+		"mt_c2wav": "okomprimerad uppspelning (ännu större)\">wav",
+		"mt_c2ok": "snyggt, bra val",
+		"mt_c2nd": "det är inte det rekommenderade formatet för din enhet, men det är lungt",
+		"mt_c2ng": "din enhet verkar inte stödja det här formatet, men vi provar ändå",
+		"mt_xowa": "det finns buggar i iOS som hindrar uppspelning i bakgrunden med detta format; vänligen använd caf eller mp3 istället",
+		"mt_tint": "nivå på bakgrundsfärg (0-100) på uppspelningsreglaget;$Ngör buffring mindre distraherande",
+		"mt_eq": "aktiverar utjämning och förstärkning;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standard 100%-volym (omodifierad)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standard stereo (omodifierad)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% vänster-höger crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = tar bort sång :^)$N$Nnär utjämningen är aktiverad blir gaplösa album verkligen gaplösa, så låt den stå påslagen med alla värden satta till 0 (förutom width = 1) om du bryr dig om det",
+		"mt_drc": "aktiverar dynamikkompressorn (volymtillplattning / brickwaller); aktiverar även utjämnaren för att balansera röran, så sätt alla fält i utjämnaren förutom 'width' till 0 om du inte vill ha den$N$Nsänker all volym över THRESHOLD dB; för varje RATIO dB över THRESHOLD blir det 1 dB av output, så standardvärdena tresh = -24 och ratio = 12 innebär att volymen aldrig bör bli högre än -22 dB och det är säkert att höja utjämnarens boost till 0.8, eller t.o.m. 1.8 med ATK 0 och ett högt RLS-värde t.ex. 90 (fungerar endast i firefox; RLS är låst till högst 1 i andra webbläsare)$N$N(se wikipedia för en bättre förklaring)",
+
+		"mb_play": "play",
+		"mm_hashplay": "spela upp den här ljudfilen?",
+		"mm_m3u": "tryck <code>Enter/OK</code> för att spela\ntryck <code>ESC/Avbryt</code> to Edit",
+		"mp_breq": "firefox 82+ eller chrome 73+ eller iOS 15+ krävs",
+		"mm_bload": "laddar...",
+		"mm_bconv": "konverterar till {0}, vänligen vänta...",
+		"mm_opusen": "din webbläsare kan inte spela upp aac- eller m4a-filer;\nkonvertering till opus är nu påslaget",
+		"mm_playerr": "uppspelning misslyckades: ",
+		"mm_eabrt": "Uppspelningen avbröts",
+		"mm_enet": "Din uppkoppling är skum",
+		"mm_edec": "Filen är korrumperad??",
+		"mm_esupp": "Din webbläsare förstår inte detta format",
+		"mm_eunk": "Okänt Fel",
+		"mm_e404": "Kunde inte spela upp ljudfil; fel 404: Filen hittades inte.",
+		"mm_e403": "Kunde inte spela upp ljudfil; fel 403: Åtkomst nekad.\n\nProva att ladda om sidan med F5, du kanske blev utloggad",
+		"mm_e500": "Kunde inte spela upp ljudfil; fel 500: Kolla serverloggen.",
+		"mm_e5xx": "Kunde inte spela upp ljudfil; serverfel ",
+		"mm_nof": "hittade inga fler låtar i närheten",
+		"mm_prescan": "Letar efter fler låtar...",
+		"mm_scank": "Hittade nästa låt:",
+		"mm_uncache": "cachen rensad; alla låtar kommer att laddas ner igen vid uppspelning",
+		"mm_hnf": "den låten finns inte längre",
+
+		"im_hnf": "den bilden finns inte längre",
+
+		"f_empty": 'mappen är tom',
+		"f_chide": 'detta kommer att dölja kolumnen «{0}»\n\ndu kan visa kolumner igen i inställningarna',
+		"f_bigtxt": "den här filen är {0} MiB stor -- vill du verkligen visa den som text?",
+		"f_bigtxt2": "visa endast slutet på filen? detta aktiverar även övervakning, vilket visar nya rader i filen i realtid",
+		"fbd_more": '<div id="blazy"><code>{0}</code> av <code>{1}</code> filer visas; <a href="#" id="bd_more">visa {2}</a> eller <a href="#" id="bd_all">visa alla</a></div>',
+		"fbd_all": '<div id="blazy"><code>{0}</code> av <code>{1}</code> filer visas; <a href="#" id="bd_all">visa alla</a></div>',
+		"f_anota": "endast {0} av {1} objekt valdes;\nför att välja hela mappen, skrolla först till botten av vyn",
+
+		"f_dls": 'fillänkarna i den öppna mappen har\nbytts till nedladdningslänkar',
+
+		"f_partial": "För att säkert ladda ner en fil som för tillfället laddas upp, vänligen klicka på filen som har samma filnamn men utan <code>.PARTIAL</code>-filändelsen. Vänligen tryck Avbryt eller Escape för att göra detta.\n\nOm du bortser från denna varning och trycker OK eller Enter kommer den tillfälliga <code>.PARTIAL</code>-filen istället att laddas ner, vilket är nästan garanterat att ge dig korrumperad data.",
+
+		"ft_paste": "klistra in {0} objekt$NSnabbtangent: ctrl-V",
+		"fr_eperm": 'kan ej byta namn:\ndu har inte flytträttighet i denna mapp',
+		"fd_eperm": 'kan ej radera:\ndu har inte raderingsrättighet i denna mapp',
+		"fc_eperm": 'kan ej klippa:\ndu har inte flytträttighet i denna mapp',
+		"fp_eperm": 'kan ej klistra in:\ndu har inte skrivrättighet i denna mapp',
+		"fr_emore": "välj minst en fil att byta namn på",
+		"fd_emore": "välj minst en fil att radera",
+		"fc_emore": "välj minst en fil att klippa",
+		"fcp_emore": "välj minst en fil att kopiera till urklippet",
+
+		"fs_sc": "dela den öppna mappen",
+		"fs_ss": "dela de urvalda filerna",
+		"fs_just1d": "du kan inte välja mer än en mapp\neller blanda filer och mappar i samma urval",
+		"fs_abrt": "❌ avbryt",
+		"fs_rand": "🎲 slump.namn",
+		"fs_go": "✅ skapa utdelning",
+		"fs_name": "namn",
+		"fs_src": "källa",
+		"fs_pwd": "lösen",
+		"fs_exp": "utgång",
+		"fs_tmin": "min",
+		"fs_thrs": "timmar",
+		"fs_tdays": "dagar",
+		"fs_never": "oändlig",
+		"fs_pname": "valfritt länknamn; slumpas fram om detta står tomt",
+		"fs_tsrc": "filen eller mappen att dela",
+		"fs_ppwd": "valfritt lösenord",
+		"fs_w8": "skapar utdelning...",
+		"fs_ok": "tryck <code>Enter/OK</code> för att kopiera länken till urklipp\ntryck <code>ESC/Avbryt</code> för att stänga",
+
+		"frt_dec": "kan laga vissa typer av trasiga filnamn\">avkoda-url",
+		"frt_rst": "återställ modifierade filnamn till de ursprungliga\">↺ återställ",
+		"frt_abrt": "avbryt och stäng denna panel\">❌ avbryt",
+		"frb_apply": "BYT NAMN",
+		"fr_adv": "batch-, metadata- och mönsteromskrivning\">avancerat",
+		"fr_case": "skiftlägeskänsligt reguljärt uttryck\">skift",
+		"fr_win": "windows-säkra namn; ersätt <code>&lt;&gt;:&quot;\\|?*</code> med japanska fullbreddtecken\">win",
+		"fr_slash": "ersätt <code>/</code> med ett tecken som inte skapar nya mappar\">ingen /",
+		"fr_re": "reguljärt sökuttryck att tillämpa på ursprungliga filnamn; grupper kan hänvisas till i formatfältet nedan via &lt;code&gt;(1)&lt;/code&gt; och &lt;code&gt;(2)&lt;/code&gt; osv.",
+		"fr_fmt": "inspirerat av foobar2000:$N&lt;code&gt;(title)&lt;/code&gt; ersätts av låttitel,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; skippar [detta] om artisten är tom$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; fyller i spårnumret till 2 siffror",
+		"fr_pdel": "ta bort",
+		"fr_pnew": "spara som",
+		"fr_pname": "ge ett nytt namn på din inställning",
+		"fr_aborted": "avbrutet",
+		"fr_lold": "gammalt namn",
+		"fr_lnew": "nytt namn",
+		"fr_tags": "taggar för de valda filerna (skrivskyddat, endast som referens):",
+		"fr_busy": "byter namn på {0} objekt...\n\n{1}",
+		"fr_efail": "namnbyte misslyckades:\n",
+		"fr_nchg": "{0} av de nya namnen ändrades p g a <code>win</code> och/eller <code>ingen /</code>\n\nÄr det okej att fortsätta med de nya namnen?",
+
+		"fd_ok": "radering lyckades",
+		"fd_err": "radering misslyckades:\n",
+		"fd_none": "inget raderades; kanske blockerat av serverkonfigurationen (xbd)?",
+		"fd_busy": "raderar {0} objekt...\n\n{1}",
+		"fd_warn1": "RADERA dessa {0} objekt?",
+		"fd_warn2": "<b>Sista chansen!</b> Det finns inget sätt att ångra detta. Radera?",
+
+		"fc_ok": "klippte {0} objekt",
+		"fc_warn": 'klippte {0} objekt, men:\n\nendast <b>denna</b> webbläsarflik kan klistra in dem\n(eftersom urvalet är så enormt stort)',
+
+		"fcc_ok": "kopierade {0} objekt till urklippet",
+		"fcc_warn": 'kopierade {0} objekt till urklippet, men:\n\nendast <b>denna</b> webbläsarflik kan klistra in dem\n(eftersom urvalet är så enormt stort)',
+
+		"fp_apply": "använd dessa namn",
+		"fp_ecut": "klipp eller kopiera filer / mappar först för att klistra / flytta dem\n\nobs.: du kan klippa och klistra mellan webbläsarflikar",
+		"fp_ename": "{0} objekt kan ej flyttas hit eftersom filnamnen redan är tagna. Ge dem nya namn nedan för att fortsätta, eller lämna fältet tomt för att skippa:",
+		"fcp_ename": "{0} objekt kan ej kopieras hit eftersom filnamnen redan är tagna. Ge dem nya namn nedan för att fortsätta, eller lämna fältet tomt för att skippa:",
+		"fp_emore": "det finns fortfarande filnamnskrockar att fixa",
+		"fp_ok": "flytt lyckades",
+		"fcp_ok": "kopiering lyckades",
+		"fp_busy": "flyttar {0} objekt...\n\n{1}",
+		"fcp_busy": "kopierar {0} objekt...\n\n{1}",
+		"fp_abrt": "avbryter...",
+		"fp_err": "flytt misslyckades:\n",
+		"fcp_err": "kopiering misslyckades:\n",
+		"fp_confirm": "flytta dessa {0} objekt hit?",
+		"fcp_confirm": "kopiera dessa {0} objekt hit?",
+		"fp_etab": 'lyckades ej läsa urklippet från en annan webbläsarflik',
+		"fp_name": "laddar upp en fil från din enhet. Ge den ett namn:",
+		"fp_both_m": '<h6>välj vad som ska klistras in</h6><code>Enter</code> = Flytta {0} objekt från «{1}»\n<code>ESC</code> = Ladda upp {2} filer från din enhet',
+		"fcp_both_m": '<h6>välj vad som ska klistras in</h6><code>Enter</code> = Kopiera {0} objekt från «{1}»\n<code>ESC</code> = Ladda upp {2} filer från din enhet',
+		"fp_both_b": '<a href="#" id="modal-ok">Flytta</a><a href="#" id="modal-ng">Ladda upp</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Kopiera</a><a href="#" id="modal-ng">Ladda upp</a>',
+
+		"mk_noname": "skriv ett namn i fältet till vänster först :p",
+
+		"tv_load": "Laddar textfil:\n\n{0}\n\n{1}% ({2} av {3} MiB laddat)",
+		"tv_xe1": "kunde ej ladda textfil:\n\nfel ",
+		"tv_xe2": "404, filen hittades inte",
+		"tv_lst": "lista av textfiler i",
+		"tvt_close": "återvänd till mapp$NSnabbtangent: M (eller Esc)\">❌ stäng",
+		"tvt_dl": "ladda ner denna fil$NSnabbtangent: Y\">💾 ladda ner",
+		"tvt_prev": "visa föregående fil$NSnabbtangent: i\">⬆ föreg.",
+		"tvt_next": "visa nästa fil$NSnabbtangent: K\">⬇ nästa",
+		"tvt_sel": "välj fil &nbsp; ( för klipp / kopiera / radera / ... )$NSnabbtangent: S\">välj",
+		"tvt_edit": "öppna fil i textredigerare$NSnabbtangent: E\">✏️ redigera",
+		"tvt_tail": "övervaka filen; visa nya rader i realtid\">📡 övervaka",
+		"tvt_wrap": "automatisk radbrytning\">↵",
+		"tvt_atail": "lås vyn till sidans botten\">⚓",
+		"tvt_ctail": "avkoda terminalfärger (ansi-escapesekvenser)\">🌈",
+		"tvt_ntail": "gräns för scrollback (hur många byte ska behållas laddade)",
+
+		"m3u_add1": "låt tillagd till m3u-spellista",
+		"m3u_addn": "{0} låtar tillagda till m3u-spellista",
+		"m3u_clip": "m3u-spellista kopierad till urklippet\n\ndu bör skapa en ny textfil som heter någonting.m3u och klistra in spellistan i det dokumentet; detta gör den uppspelbar",
+
+		"gt_vau": "visa inte videor, spela endast ljudet\">🎧",
+		"gt_msel": "urval av filer; ctrl-klicka en fil för standardbeteende$N$N&lt;em&gt;när detta är aktiverat: dubbelklicka en fil / mapp för att öppna den&lt;/em&gt;$N$NSnabbtangent: S\">urval",
+		"gt_crop": "centrera och beskär miniatyrbilder\">beskär",
+		"gt_3x": "högupplösta miniatyrbilder\">3x",
+		"gt_zoom": "zoom",
+		"gt_chop": "klipp",
+		"gt_sort": "sortera efter",
+		"gt_name": "namn",
+		"gt_sz": "storlek",
+		"gt_ts": "datum",
+		"gt_ext": "typ",
+		"gt_c1": "förkorta filnamn (visa mindre)",
+		"gt_c2": "förläng filnamn (visa mer)",
+
+		"sm_w8": "söker...",
+		"sm_prev": "sökresultaten nedan är från en tidigare sökning:\n  ",
+		"sl_close": "stäng sökresultaten",
+		"sl_hits": "visar {0} träffar",
+		"sl_moar": "ladda fler",
+
+		"s_sz": "storlek",
+		"s_dt": "datum",
+		"s_rd": "sökväg",
+		"s_fn": "namn",
+		"s_ta": "taggar",
+		"s_ua": "uppl.",
+		"s_ad": "avanc.",
+		"s_s1": "minimum MiB",
+		"s_s2": "maximum MiB",
+		"s_d1": "min. iso8601",
+		"s_d2": "max. iso8601",
+		"s_u1": "uppladdad efter",
+		"s_u2": "och/eller före",
+		"s_r1": "sökvägen innehåller &nbsp; (blankstegsseparerat)",
+		"s_f1": "filnamnet innehåller &nbsp; (invertera med -intedetta)",
+		"s_t1": "taggar innehåller &nbsp; (^=start, slut=$)",
+		"s_a1": "specifika metadataegenskaper",
+
+		"md_eshow": "kan ej visa ",
+		"md_off": "[📜<em>läsmig</em>] avstängt i [⚙️] -- dokumentet är dolt",
+
+		"badreply": "Kunde ej tolka svaret från servern",
+
+		"xhr403": "403: Åtkomst nekad\n\nProva att ladda om sidan med F5, du kanske blev utloggad",
+		"xhr0": "okänt (tappade förmodligen kontakt med servern, eller så är den nere)",
+		"cf_ok": "ledsen -- DD" + wah + "oS-skyddet har aktiverats\n\nsaker bör fungera igen om 30 sekunder\n\nom inget händer, ladda om sidan med F5",
+		"tl_xe1": "kunde inte visa undermappar:\n\nfel ",
+		"tl_xe2": "404: Mappen hittades inte",
+		"fl_xe1": "kunde inte visa filer i mapp:\n\nfel ",
+		"fl_xe2": "404: Mappen hittades inte",
+		"fd_xe1": "kunde inte skapa mapp:\n\nfel ",
+		"fd_xe2": "404: Överordnad mapp hittades inte",
+		"fsm_xe1": "kunde inte skicka meddelande:\n\ndel ",
+		"fsm_xe2": "404: Överordnad mapp hittades inte",
+		"fu_xe1": "kunde inte ladda unpost-listan från servern:\n\nfel ",
+		"fu_xe2": "404: Filen hittades inte??",
+
+		"fz_tar": "okomprimerad tar-fil i gnu-format (linux / mac)",
+		"fz_pax": "okomprimerad tar-fil i pax-format (långsammare)",
+		"fz_targz": "gnu-tar komprimerad med gzip-nivå 3$N$Ndetta är vanligtvis mycket långsamt,$Nanvänd okomprimerad tar istället",
+		"fz_tarxz": "gnu-tar komprimerad med xz-nivå 1$N$Ndetta är vanligtvis mycket långsamt,$Nanvänd okomprimerad tar istället",
+		"fz_zip8": "zip-fil med utf8-filnman (kan vara skum i windows 7 och äldre)",
+		"fz_zipd": "zip-fil med standard cp437-filnamn, för riktigt gammal mjukvara",
+		"fz_zipc": "cp437 med crc32 uträknad i förväg,$Nför MS-DOS PKZIP v2.04g (oktober 1993)$N(tar längre tid att behandla innan nedladdningen kan påbörjas)",
+
+		"un_m1": "du kan radera dina senaste uppladdningar (eller avbryta pågående sådana) nedan",
+		"un_upd": "uppdatera",
+		"un_m4": "eller, dela filerna som syns nedan:",
+		"un_ulist": "visa",
+		"un_ucopy": "kopiera",
+		"un_flt": "filter:&nbsp; sökvägen måste innehålla",
+		"un_fclr": "rensa filtret",
+		"un_derr": 'unpost-radering misslyckades:\n',
+		"un_f5": 'något gick sönder, prova att uppdatera eller tryck på F5',
+		"un_uf5": "ledsen men du måste uppdatera sidan (t.ex. genom att trycka på F5 eller CTRL-R) innan du kan avbryta den här uppladdningen",
+		"un_nou": '<b>varning:</b> servern är för upptagen för att visa pågående uppladdningar; klicka på "uppdatera" om en stund',
+		"un_noc": '<b>varning:</b> serverkonfigurationen tillåter inte unpost:ning av uppladdade filer',
+		"un_max": "visar de första 2000 filerna (använd filtret)",
+		"un_avail": "{0} av de senaste uppladdningarna kan raderas<br />{1} pågående uppladdningar kan avbrytas",
+		"un_m2": "sorterat efter uppladdningstid; senast uppladdad först:",
+		"un_no1": "tjosan! inga uppladdningar är tillräckligt nya",
+		"un_no2": "tjosan! inga uppladdningar som matchar filtret är tillräckligt nya",
+		"un_next": "radera de {0} nästkommande filerna",
+		"un_abrt": "avbryt",
+		"un_del": "radera",
+		"un_m3": "laddar dina senaste uppladdningar...",
+		"un_busy": "raderar {0} filer...",
+		"un_clip": "{0} länkar kopierade till urklippet",
+
+		"u_https1": "du bör",
+		"u_https2": "byta till https",
+		"u_https3": "för bättre prestanda",
+		"u_ancient": 'din webbläsare är imponerande uråldrig -- du kanske borde <a href="#" onclick="goto(\'bup\')">använda bup istället</a>',
+		"u_nowork": "firefox 53+ eller chrome 57+ eller iOS 11+ krävs",
+		"tail_2old": "firefox 105+ eller chrome 71+ eller iOS 14.5+ krävs",
+		"u_nodrop": 'din webbläsare är för gammal för dra-och-släpp-uppladdning',
+		"u_notdir": "det där är ingen mapp!\n\ndin webbläsare är för gammal,\nprova dra-och-släpp istället",
+		"u_uri": "släpp bilder från andra webbläsarfönster på den stora\nuppladdningsknappen för att ladda upp dem",
+		"u_enpot": 'byt till <a href="#">potatisgränssnittet</a> (kan förbättra uppladdningshastigheten)',
+		"u_depot": 'byt till <a href="#">det snygga gränssnittet</a> (kan försämra uppladdningshastigheten)',
+		"u_gotpot": 'byter till potatisgränssnittet för förbättrad uppladdningshastighet,\n\nbyt gärna tillbaka om du vill!',
+		"u_pott": "<p>filer: &nbsp; <b>{0}</b> färdiga, &nbsp; <b>{1}</b> misslyckade, &nbsp; <b>{2}</b> pågående, &nbsp; <b>{3}</b> köade</p>",
+		"u_ever": "detta är den enkla uppladdaren; up2k kräver minst<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
+		"u_su2k": 'detta är den enkla uppladdaren; <a href="#" id="u2yea">up2k</a> är bättre',
+		"u_uput": 'optimera hastigheten (skippa checksumman)',
+		"u_ewrite": 'du har inte skrivrättighet i denna mapp',
+		"u_eread": 'du har inte läsrättighet i denna mapp',
+		"u_enoi": 'serverkonfigurationen har inte slagit på sökning',
+		"u_enoow": "du kan inte skriva över här; raderingsrättighet krävs",
+		"u_badf": 'Dessa {0} filer (av totalt {1}) skippades, möjligtvis p.g.a. filsystemsrättigheter:\n\n',
+		"u_blankf": 'Dessa {0} filer (av totalt {1}) är tomma; ladda upp dem ändå?\n\n',
+		"u_applef": 'Dessa {0} filer (av totalt {1}) är förmodligen oönskade;\nTryck <code>OK/Enter</code> för att SKIPPA de följande filerna,\nTryck <code>Avbryt/ESC</code> för att INKLUDERA och LADDA UPP dem:\n\n',
+		"u_just1": '\nDet kanske fungerar om du endast väljer en fil',
+		"u_ff_many": "om du använder <b>Linux / MacOS / Android,</b> så <em>kan</em> denna mängd filer <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\">krascha Firefox!</a>\nom detta händer, vänligen försök igen (eller använd Chrome).",
+		"u_up_life": "Denna uppladdning kommer att raderas från servern om\n{0} efter att den har blivit uppladdad",
+		"u_asku": 'ladda upp dessa {0} filer till <code>{1}</code>',
+		"u_unpt": "du kan ångra / radera denna uppladdning med 🧯 uppe till vänster",
+		"u_bigtab": 'försöker att visa {0} filer\n\ndetta kan krascha din webbläsare, är du säker?',
+		"u_scan": 'Scannar filer...',
+		"u_dirstuck": 'katalogskannern fastnade när den försökte komma åt de följande {0} objekten; dessa kommer att skippas:',
+		"u_etadone": 'Klar ({0}, {1} filer)',
+		"u_etaprep": '(förbereder uppladdning)',
+		"u_hashdone": 'hashning klar',
+		"u_hashing": 'hashar',
+		"u_hs": 'skakar hand...',
+		"u_started": "filerna laddas nu upp; se [🚀]",
+		"u_dupdefer": "duplikat; kommer att behandlas efter alla andra filer",
+		"u_actx": "klicka här för att undvika prestandaförlust<br />när du byter till andra fönster/flikar",
+		"u_fixed": "Okej!&nbsp; Fixat 👍",
+		"u_cuerr": "misslyckades att ladda upp chunk {0} av {1};\nförmodligen harmlöst, fortsätter\n\nfil: {2}",
+		"u_cuerr2": "servern avvisade uppladdningen (chunk {0} av {1});\nprovar igen senare\n\nfil: {2}\n\nfel ",
+		"u_ehstmp": "provar igen; see nedåt till höger",
+		"u_ehsfin": "servern avvisade förfrågan att färdigställa uppladdningen; provar igen...",
+		"u_ehssrch": "servern avvisade förfrågan att söka; provar igen...",
+		"u_ehsinit": "servern avvisade förfrågan att påbörja uppladdningen; provar igen...",
+		"u_eneths": "nätverksfel vid handskakning; provar igen...",
+		"u_enethd": "nätverksfel när destinationens existens testades; provar igen...",
+		"u_cbusy": "väntar på att servern ska lita på oss igen efter nätverksfel...",
+		"u_ehsdf": "servern fick slut på diskutrymme!\n\nprovar igen, ifall någon rensar upp\ntillräckligt med utrymme för att fortsätta",
+		"u_emtleak1": "det verkar som att din webbläsare kanske har en minnesläcka;\nvänligen",
+		"u_emtleak2": ' <a href="{0}">byt till https (rekommenderat)</a> eller ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'prova följande:\n<ul><li>tryck <code>F5</code> för att uppdatera sidan</li><li>avaktivera sedan &nbsp;<code>mt</code>&nbsp;-växeln i &nbsp;<code>⚙️-inställningarna</code></li><li>och prova att ladda upp igen</li></ul>Uppladdningar kommer att vara lite långsammare, men aja.\nBeklagar problemet!\n\nPS: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">har en buggfix</a> för detta',
+		"u_emtleakf": 'prova följande:\n<ul><li>tryck <code>F5</code> för att uppdatera sidan</li><li>aktivera sedan <code>🥔</code> (potatis) i uppladdningsgränssnittet<li>och prova att ladda upp igen</li></ul>\nPS: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">kommer förhoppningsvis få en buggfix</a> vid något tillfälle',
+		"u_s404": "hittades ej på servern",
+		"u_expl": "förklara",
+		"u_maxconn": "de flesta webbläsare begränsar detta till 6, men firefox låter dig höja gränsen med <code>connections-per-server</code> i <code>about:config</code>",
+		"u_tu": '<p class="warn">VARNING: turbo är aktiverat, <span>&nbsp;det är möjligt att klienten inte upptäcker och återupptar ofärdiga uppladdningar; se tipset för turbo-växeln</span></p>',
+		"u_ts": '<p class="warn">VARNING: turbo är aktiverat, <span>&nbsp;sökresultat kan vara felaktiga; se tipset för turbo-växeln</span></p>',
+		"u_turbo_c": "serverkonfigurationen har avaktiverat turbo",
+		"u_turbo_g": "avaktiverar turbo eftersom du inte har rättigheten\natt se mappars innehåll i den här volymen",
+		"u_life_cfg": 'radera automatiskt efter <input id="lifem" p="60" /> min (eller <input id="lifeh" p="3600" /> timmar)',
+		"u_life_est": 'uppladdningen kommer att raderas vid <span id="lifew" tt="local time">---</span>',
+		"u_life_max": 'denna mapp tvingar en\nhögsta livstid på {0}',
+		"u_unp_ok": 'unpost är tillåten för {0}',
+		"u_unp_ng": 'unpost är INTE tillåten',
+		"ue_ro": 'du har endast läsrättighet till denna mapp\n\n',
+		"ue_nl": 'du är inte inloggad',
+		"ue_la": 'du är inloggad som "{0}"',
+		"ue_sr": 'du är i filsökläge\n\nbyt till uppladdningsläge genom att klicka på förstoringsglaset 🔎 (bredvid den stora SÖK-knappen), och försök ladda upp igen\n\nledsen',
+		"ue_ta": 'prova att ladda upp igen nu, det bör fungera',
+		"ue_ab": "denna fil laddas redan upp till en annan mapp, och den uppladdningen måste färdigställas innan filen kan laddas upp någon annanstans.\n\nDu kan avbryta och glömma bort den uppladdningen med 🧯 uppe till vänster",
+		"ur_1uo": "Okej: Filen laddades upp med framgång",
+		"ur_auo": "Okej: Alla {0} filer laddades upp med framgång",
+		"ur_1so": "Okej: Filen fanns på servern",
+		"ur_aso": "Okej: Alla {0} filer fanns på servern",
+		"ur_1un": "Uppladdningen misslyckades, ledsen",
+		"ur_aun": "Alla {0} uppladdningar misslyckades, ledsen",
+		"ur_1sn": "Filen hittades INTE på servern",
+		"ur_asn": "De {0} filerna hittades INTE på servern",
+		"ur_um": "Klar;\n{0} uppladdningar gick okej,\n{1} uppladdningar misslyckades, ledsen",
+		"ur_sm": "Klar;\n{0} filer hittades på servern,\n{1} filer hittades INTE på servern",
+
+		"lang_set": "uppdatera för att ändringen ska ta effekt?",
+	},
+	"tur": {
+		"tt": "Türkçe",
+
+		"cols": {
+			"c": "işlem butonları",
+			"dur": "süre",
+			"q": "kalite / bitrate",
+			"Ac": "ses kodlaması",
+			"Vc": "video kodlaması",
+			"Fmt": "format / yapı",
+			"Ahash": "ses denetim toplamı",
+			"Vhash": "video denetim toplamı",
+			"Res": "çözünürlük",
+			"T": "dosya türü",
+			"aq": "ses kalitesi / bitrate",
+			"vq": "video kalitesi / bitrate",
+			"pixfmt": "subsampling / pixel yapısı",
+			"resw": "yatay çözünürlük",
+			"resh": "dikey çözünürlük",
+			"chs": "ses kanalları",
+			"hz": "örnekleme hızı"
+		},
+
+		"hks": [
+			[
+				"diğer",
+				["ESC", "kapat"],
+
+				"dosya yönetimi",
+				["G", "liste / ızgara görünümü arasında geçiş yap"],
+				["T", "küçük resimler / simgeler arasında geçiş yap"],
+				["⇧ A/D", "küçük resim boyutu"],
+				["ctrl-K", "seçileni sil"],
+				["ctrl-X", "seçimi panoya kes"],
+				["ctrl-C", "seçimi panoya kopyala"],
+				["ctrl-V", "buraya yapıştır (taşı/kopyala)"],
+				["Y", "seçileni indir"],
+				["F2", "seçileni yeniden adlandır"],
+
+				"dosya yönetimi seçimleri",
+				["boşluk", "seçimi değiştir"],
+				["↑/↓", "seçim imlecini hareket ettir"],
+				["ctrl ↑/↓", "imleci ve görünümü hareket ettir"],
+				["⇧ ↑/↓", "önceki/sonraki dosyayı seç"],
+				["ctrl-A", "tüm dosyaları / klasörleri seç"],
+			], [
+				"navigasyon",
+				["B", "içerik haritası / navigasyon paneli arasında geçiş yap"],
+				["I/K", "önceki/sonraki klasör"],
+				["M", "üst klasör (veya mevcut olanı daralt)"],
+				["V", "navigasyon panelinde klasörler / metin dosyaları arasında geçiş yap"],
+				["A/D", "navigasyon paneli boyutu"],
+			], [
+				"ses oynatıcı",
+				["J/L", "önceki/sonraki şarkı"],
+				["U/O", "10sn geri/ileri atla"],
+				["0..9", "%0..%90 atla"],
+				["P", "oynat/duraklat (aynı zamanda oynatıcıyı aç)"],
+				["S", "şarkıyı seç"],
+				["Y", "şarkıyı indir"],
+			], [
+				"resim görüntüleyici",
+				["J/L, ←/→", "önceki/sonraki resim"],
+				["Home/End", "ilk/son resim"],
+				["F", "tam ekran"],
+				["R", "sağa döndür"],
+				["⇧ R", "sola döndür"],
+				["S", "resmi seç"],
+				["Y", "resmi indir"],
+			], [
+				"video oynatıcı",
+				["U/O", "10sn geri/ileri atla"],
+				["P/K/Space", "oynat/duraklat"],
+				["C", "sıradakinden devam et"],
+				["V", "döngü"],
+				["M", "sessiz"],
+				["[ ve ]", "döngü aralığını ayarla"],
+			], [
+				"metin dosyası görüntüleyici",
+				["I/K", "önceki/sonraki dosya"],
+				["M", "metin dosyasını kapat"],
+				["E", "metin dosyasını düzenle"],
+				["S", "dosyayı seç (kes/kopyala/yeniden adlandır)"],
+			]
+		],
+
+		"m_ok": "Tamam",
+		"m_ng": "İptal",
+
+		"enable": "Etkinleştir",
+		"danger": "TEHLİKE",
+		"clipped": "panoya kopyalandı",
+
+		"ht_s1": "saniye",
+		"ht_s2": "saniye",
+		"ht_m1": "dakika",
+		"ht_m2": "dakika",
+		"ht_h1": "saat",
+		"ht_h2": "saat",
+		"ht_d1": "gün",
+		"ht_d2": "gün",
+		"ht_and": " ve ",
+
+		"goh": "kontrol paneli",
+		"gop": 'önceki kardeş">önceki',
+		"gou": 'üst klasör">üst',
+		"gon": 'sonraki klasör">sonraki',
+		"logout": "Çıkış ",
+		"login": "Giriş",
+		"access": " erişim",
+		"ot_close": "alt menüyü kapat",
+		"ot_search": "dosyaları özniteliklere, yol / ad, müzik etiketlerine veya bunların herhangi bir kombinasyonuna göre arayın$N$N&lt;code&gt;foo bar&lt;/code&gt; = hem «foo» hem de «bar» içermelidir,$N&lt;code&gt;foo -bar&lt;/code&gt; = «foo» içermeli ancak «bar» içermemelidir,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = «yana» ile başlamalı ve bir «opus» dosyası olmalıdır$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = tam olarak «try unite» içermelidir$N$N tarih formatı iso-8601'dir, gibi$N&lt;code&gt;2009-12-31&lt;/code&gt; veya &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+		"ot_unpost": "unpost: son yüklemelerinizi silin veya tamamlanmamış olanları iptal edin",
+		"ot_bup": "bup: temel yükleyici, hatta netscape 4.0'ı destekler",
+		"ot_mkdir": "mkdir: yeni bir dizin oluştur",
+		"ot_md": "new-md: yeni bir markdown belgesi oluştur",
+		"ot_msg": "msg: sunucu günlüğüne bir mesaj gönder",
+		"ot_mp": "medya oynatıcı seçenekleri",
+		"ot_cfg": "konfigürasyon seçenekleri",
+		"ot_u2i": 'up2k: dosyaları yükle (yazma erişiminiz varsa) veya sunucuda bir yerde var olup olmadıklarını görmek için arama moduna geçiş yap$N$Nyüklemeler devam ettirilebilir, çok iş parçacıklı ve dosya zaman damgaları korunur, ancak [🎈]&nbsp; (temel yükleyici) ile karşılaştırıldığında daha fazla CPU kullanır<br /><br />yükleme sırasında, bu simge bir ilerleme göstergesi haline gelir!',
+		"ot_u2w": 'up2k: devam desteği ile dosyaları yükle (tarayıcınızı kapatın ve daha sonra aynı dosyaları bırakın)$N$Nçok iş parçacıklı ve dosya zaman damgaları korunur, ancak [🎈]&nbsp; (temel yükleyici) ile karşılaştırıldığında daha fazla CPU kullanır<br /><br />yükleme sırasında, bu simge bir ilerleme göstergesi haline gelir!',
+		"ot_noie": 'Lütfen Chrome / Firefox / Edge kullanın',
+
+		"ab_mkdir": "dizin oluştur",
+		"ab_mkdoc": "yeni markdown belgesi",
+		"ab_msg": "sunucu günlüğüne mesaj gönder",
+
+		"ay_path": "klasörlere atla",
+		"ay_files": "dosyalara atla",
+
+		"wt_ren": "seçilenleri yeniden adlandır$NKısa yol: F2",
+		"wt_del": "Seçilen ögeleri sil$Kısa yol: ctrl-K",
+		"wt_cut": "seçilen ögeleri kes &lt;small&gt;&lt;/small&gt;$NKısa yol: ctrl-X",
+		"wt_cpy": "seçilen ögeleri panoya kopyala$N$NKısa yol: ctrl-C",
+		"wt_pst": "daha önce kesilmiş / kopyalanmış bir seçimi yapıştır$NKısa yol: ctrl-V",
+		"wt_selall": "tüm dosyaları seç$NKısa yol: ctrl-A (dosya odaklandığında)",
+		"wt_selinv": "seçimi tersine çevir",
+		"wt_zip1": "seçilenleri sıkıştırılmış bir arşiv olarak indir",
+		"wt_selzip": "seçimi arşiv olarak indir",
+		"wt_seldl": "seçimi ayrı dosyalar olarak indir$NHotkey: Y",
+		"wt_npirc": "irc biçiminde parça bilgilerini kopyala",
+		"wt_nptxt": "düz metin parça bilgilerini kopyala",
+		"wt_m3ua": "m3u çalma listesine ekle (daha sonra <code>📻kopyala</code>ya tıklayın)",
+		"wt_m3uc": "m3u çalma listesini panoya kopyala",
+		"wt_grid": "ızgara / liste görünümünü değiştir$NHotkey: G",
+		"wt_prev": "önceki parça$NHotkey: J",
+		"wt_play": "oynat / duraklat$NHotkey: P",
+		"wt_next": "sonraki parça$NHotkey: L",
+
+		"ul_par": "paralel yüklemeler:",
+		"ut_rand": "dosya adlarını rastgeleleştir",
+		"ut_u2ts": "kendi dosyalarınızdan sunucuya$Nzaman damgasını kopyala\">📅",
+		"ut_ow": "sunucudaki mevcut dosyaları üzerine yazmak mı?$N🛡️: asla (yerine yeni bir dosya adı oluşturur)$N🕒: sunucu dosyası sizinkinden daha eskiyse üzerine yaz$N♻️: dosyalar farklıysa her zaman üzerine yaz",
+		"ut_mt": "yükleme yaparken diğer dosyaların hash'lenmesini durdur$N$kötü bir CPU veya HDD'ye sahipseniz kullanabilirsiniz.",
+		"ut_ask": 'yüklemeye başlamadan önce doğrulama mesajı göster">💭',
+		"ut_pot": "arayüzü daha az karmaşık hale getirerek$Nyükleme hızını yavaş cihazlarda artır",
+		"ut_srch": "gerçekten yükleme yapma, bunun yerine dosyaların $N sunucuda var olup olmadığını kontrol et (okuma izniniz olan tüm klasörleri tarar)",
+		"ut_par": "0'a ayarlayarak yüklemeleri durdur$N$Nbağlantınız yavaşsa değeri artırın$N$NLAN'daysanız veya sunucu HDD'si darboğaz yapıyorsa 1'de tutun",
+		"ul_btn": "dosyaları / klasörleri <br>buraya sürükleyin (veya bana tıklayın)",
+		"ul_btnu": "Y Ü K L E",
+		"ul_btns": "A R A",
+
+		"ul_hash": "hash",
+		"ul_send": "gönder",
+		"ul_done": "tamamlandı",
+		"ul_idle1": "henüz bekleyen yükleme yok",
+		"ut_etah": "ortalama &lt;em&gt;hash&lt;/em&gt; hızı ve bitişe kadar tahmini süre",
+		"ut_etau": "ortalama &lt;em&gt;yükleme&lt;/em&gt; hızı ve bitişe kadar tahmini süre",
+		"ut_etat": "ortalama &lt;em&gt;toplam&lt;/em&gt; hızı ve bitişe kadar tahmini süre",
+
+		"uct_ok": "başarıyla tamamlandı",
+		"uct_ng": "başarısız: başarısız / reddedildi / bulunamadı",
+		"uct_done": "hem başarılı hem de başarısız",
+		"uct_bz": "hash'liyor veya yüklüyor",
+		"uct_q": "beklemede, gönderiliyor",
+
+		"utl_name": "dosya adı",
+		"utl_ulist": "liste",
+		"utl_ucopy": "kopyala",
+		"utl_links": "bağlantılar",
+		"utl_stat": "durum",
+		"utl_prog": "ilerleme",
+
+		// kısa tutun:
+		"utl_404": "404",
+		"utl_err": "HATA",
+		"utl_oserr": "OS-hatası",
+		"utl_found": "bulundu",
+		"utl_defer": "ertele",
+		"utl_yolo": "YOLO",
+		"utl_done": "tamamlandı",
+
+		"ul_flagblk": "dosyalar sıraya alındı</b><br>ancak başka bir tarayıcı sekmesinde meşgul bir up2k var,<br>bu nedenle önce onun bitmesini bekliyor",
+		"ul_btnlk": "sunucu yapılandırması bu anahtarı bu duruma kilitledi",
+
+		"udt_up": "Yükle",
+		"udt_srch": "Ara",
+		"udt_drop": "buraya bırakın",
+
+		"u_nav_m": '<h6>Pekâlâ, bakalım neyin  varmnış?</h6><code>Enter</code> = Dosyalar (bir veya birden fazla)\n<code>ESC</code> = Bir klasör (alt klasörler dahil)',
+		"u_nav_b": '<a href="#" id="modal-ok">Dosyalar</a><a href="#" id="modal-ng">Tek klasör</a>',
+		
+		"cl_opts": "aç / kapat",
+		"cl_themes": "tema",
+		"cl_langs": "dil",
+		"cl_ziptype": "klasör indirme",
+		"cl_uopts": "up2k aç / kapat",
+		"cl_favico": "favicon",
+		"cl_bigdir": "big dirs",
+		"cl_hsort": "#sort",
+		"cl_keytype": "anahtar notasyonu",
+		"cl_hiddenc": "gizli sütunlar",
+		"cl_hidec": "gizle",
+		"cl_reset": "sıfırla",
+		"cl_hpick": "aşağıdaki tabloda gizlemek için sütun başlıklarına dokunun",
+		"cl_hcancel": "sütun gizleme iptal edildi",
+
+		"ct_grid": '田 ızgara',
+		"ct_ttips": '◔ ◡ ◔">ℹ️ ipuçları',
+		"ct_thumb": 'ızgara görünümünde, simgeler ve küçük resimler arasında geçiş yapın$NKısayol: T">🖼️ küçük resimler',
+		"ct_csel": 'ızgara görünümünde dosya seçimi için CTRL ve SHIFT tuşlarını kullanın">seç',
+		"ct_ihop": 'resim görüntüleyici kapatıldığında, en son görüntülenen dosyaya kaydırın">g⮯',
+		"ct_dots": 'gizli dosyaları göster (sunucu izin veriyorsa)">nokta dosyaları',
+		"ct_qdel": 'dosyaları silerken yalnız bir kez onay isteyin">qdel',
+		"ct_dir1st": 'sıralamada klasörleri dosyalardan önceye koy">ilk 📁',
+		"ct_nsort": 'doğal sıralama (başında sayı bulunan isimler için)">dsort',
+		"ct_utc": 'tüm zaman damgalarını UTC diliminde göster">UTC',
+		"ct_readme": 'README.md\'yi klasör listelemelerinde göster">📜 readme',
+		"ct_idxh": 'index.html\'i klasör listelemeleri yerine göster">htm',
+		"ct_sbars": 'kaydırma çubuklarını göster">⟊',
+
+		"cut_umod": "eğer bir dosya sunucuda mevcutsa sunucudaki dosyanın son-değiştirilme zaman damgasını yereldekiyle değiştir (yazma+silme izinlerini gerektirir)\">re📅",
+
+		"cut_turbo": "yolo butonu, bunu muhtemelen etkinleştirmek itemezsiniz:$N$Nyalnızca aynı anda çok fazla sayıda dosya yüklerken harhangi bir sebepten yüklemeyi durdurup anında yeniden başlatmanız gerekirse kullanın$N$Nbu, hash fonksiyonunu basit bir <em> ile değiştirir&quot;sunucudaki boyutu da aynı mı?&quot;</em> dosya içerikleri farklıysa yükleme devam ETMEYECEKTİR!$N$Nyükleme tamamlandığında bu ayarı kapatın ve sonra aynı dosyaları yeniden &quot;yüklemeyi&quot; deneyin ki sunucu bu dosyaları doğrulayabilsin\">turbo",
+
+		"cut_datechk": "turbo modu açıksa hiçbir etkisi yoktur$N$Nyolo faktörünü az bir miktar düşürür; sunucudaki dosya zaman damgalarının sizinkiyle eşleşip eşleşmediğini kontrol eder$N$Nteorik olarak tamamlanmamış / bozuk yüklemelerin çoğunu yakalaması gerekir ancak turbo devre dışı bırakıldıktan sonra yapılan doğrulama geçişinin yerini tutamaz\">date-chk",
+
+		"cut_u2sz": "her yükleme parçasının boyutu (MiB cinsinden); büyük değerler Atlantik boyunca daha iyi iletilir. Çok güvenilmez bağlantılarda düşük değerler deneyin",
+
+		"cut_flag": "aynı anda sadece bir sekmenin yükleme yapabilmesini sağlayın $N -- diğer sekmelerde de bu ayar açık olmalıdır $N -- sadece aynı alan adı altındaki sekmeleri etkiler",
+
+		"cut_az": "dosyaları en küçüğünden başlamak yerine alfabetik sırayla yükleyin$N$Nalefabetik sıralama, sunucuda bir şeylerin yanlış gidip gitmediğini gözlemlemenizi daha kolay hale getirebilir ancak fiber / LAN üzerinde yüklemeyi biraz yavaşlatır",
+
+		"cut_nag": "yükleme tamamlandığında işletim sistemi bildirimi$N(sadece tarayıcı veya serkme aktif değilse)",
+		"cut_sfx": "yükleme tamamlandığında sesli bildirim$N(sadece tarayıcı veya serkme aktif değilse)",
+
+		"cut_mt": "dosya hash'lemesini hızlandırmak için çoklu izlekleri kullan$N$Nbu ayar web işlerini kullanır ve daha fazla$Nmore RAM (fazladan 512 MiB'a kadar) kullanır$N$https bağlantısını %30, http'yi ise 4.5 kat hızlandırır\">mt",
+
+		"cut_wasm": "tarayıcının varsayılan hash fonksiyonu yerine WASM'ı kullan; Chrome tabanlı tarayıcılarda performansla birlikte CPU kullanımını artırır, ayrıca Chrome'un birçok eski sürümünde bu ayar etkinleştiğinde tarayıcının tüm RAM'i yemesine ve çökmesine sebep olan hatalar bulunur\">wasm",
+
+		"cft_text": "favicon yazısı (devre dışı bırakmak için boş bırakıp yenileyin)",
+		"cft_fg": "ön plan rengi",
+		"cft_bg": "arka plan rengi",
+
+		"cdt_lim": "bir klasörde gösterilecek maksimum dosya sayısı",
+		"cdt_ask": "aşağı kaydırırken,$Ndaha fazla dosya yüklemek yerine,$Nne yapılacağını sor",
+		"cdt_hsort": "medya-URL'lerinde dahil edilecek sıralama kurallarının sayısı (&lt;code&gt;,sorthref&lt;/code&gt;). Bunu 0 olarak ayarlamak, tıklanırken medya bağlantılarına dahil edilen sıralama kurallarını da yok sayacaktır",
+
+		"tt_entree": "navigasyon panosunu göster (yan dizin panosu)$NHotkey: B",
+		"tt_detree": "içerik haritasını göster$Kısayol: B",
+		"tt_visdir": "seçili klasöre kaydır",
+		"tt_ftree": "klasör ağacını / metin dosyalarını aç/kapat$Kısayol: V",
+		"tt_pdock": "üstteki bir pencerede üst klasörleri göster",
+		"tt_dynt": "ağaç genişledikçe otomatik büyüt",
+		"tt_wrap": "kelime sarma",
+		"tt_hover": "fare ile üzerine gelindiğinde taşan satırları göster$N( fare imleci sol kenarda değilse kaydırmayı bozar )",
+
+		"ml_pmode": "klasör sonunda...",
+		"ml_btns": "komutlar",
+		"ml_tcode": "dönüştür",
+		"ml_tcode2": "dönüştür",
+		"ml_tint": "tonlama",
+		"ml_eq": "ses eşitleyici",
+		"ml_drc": "dinamik aralık sıkıştırıcı",
+
+		"mt_loop": "bir şarkıyı döngüye al / tekrar et\">🔁",
+		"mt_one": "bir şarkıdan sonra dur\">1️⃣",
+		"mt_shuf": "klasörlerdeki şarkıları karıştır\">🔀",
+		"mt_aplay": "sunucuya erişmek için kullandığın bağlantıda geçerli bir şarkı varsa otomatik oynat$N$Nbunu etkisiz kılmak aynı zamanda müzik oynatıldığında sayfa URL'nin değişmesini de engeller\">a▶",
+		"mt_preload": "aralıksız oynatma için sıradaki şarkıyı önceden yüklemeye başla\">ön yükleme",
+		"mt_prescan": "son şarkı bitmeden önce bir sonraki klasöre git$Nweb tarayıcısını mutlu tutar$Nbu nedenle oynatmayı durdurmaz\">nav",
+		"mt_fullpre": "tüm şarkıyı ön yüklemeye çalış;$N✅ <b>güvenilmez</b> bağlantılarda etkinleştir,$N❌ <b>yavaş</b> bağlantılarda devre dışı bırak\">full",
+		"mt_fau": "telefonlarda, bir sonraki şarkı yeterince hızlı ön yüklenmezse müziğin durmasını önle (etiketlerin bozuk görünmesine neden olabilir)\">☕️",
+		"mt_waves": "dalga formu kaydırıcı:$Nses genliğini kaydırıcıda göster\">~s",
+		"mt_npclip": "şu anda çalan şarkıyı kopyalamak için düğmeleri göster\">/np",
+		"mt_m3u_c": "seçilen şarkıları m3u8 çalma listesi girişleri olarak kopyalamak için düğmeleri göster\">📻",
+		"mt_octl": "os entegrasyonu (medya kısayolları / osd)\">os-ctl",
+		"mt_oseek": "OS entegrasyonuyla şarkı ilerletmeye izin ver$N$Nnot: bazı cihazlarda (iPhone'lar)$Nbu, sıradaki şarkı düğmesini değiştirir\">ilerletme",
+		"mt_oscv": "ekranda albüm kapaklarını göster\">görsel",
+		"mt_follow": "oynatılan müzik ibaresini görünümde tut\">🎯",
+		"mt_compact": "kompakt kontroller\">⟎",
+		"mt_uncache": "önbelleği temizle &nbsp;(bunu, tarayıcınızın bozuk bir şarkı kopyasını önbelleğe alması nedeniyle çalmayı reddettiğinde deneyin)\">önbelleği temizle",
+		"mt_mloop": "açık klasörü döngüye al\">🔁 döngü",
+		"mt_mnext": "bir sonraki klasörü yükle ve devam et\">📂 sonraki",
+		"mt_mstop": "oynatmayı durdur\">⏸ durdur",
+		"mt_cflac": "flac / wav'ı {0}'a dönüştür\">flac",
+		"mt_caac": "aac / m4a'yı {0}'a dönüştür\">aac",
+		"mt_coth": "diğer tüm formatları (mp3 hariç) {0}'a dönüştür\">oth",
+		"mt_c2opus": "masaüstü, dizüstü bilgisayarlar, android için en iyi seçim\">opus",
+		"mt_c2owa": "opus-weba, iOS 17.5 ve üzeri için\">owa",
+		"mt_c2caf": "opus-caf, iOS 11 ile 17 arasında için\">caf",
+		"mt_c2mp3": "çok eski cihazlarda bunu kullanın\">mp3",
+		"mt_c2flac": "en iyi ses kalitesi, ancak büyük indirmeler\">flac",
+		"mt_c2wav": "sıkıştırılmamış oynatma (daha da büyük)\">wav",
+		"mt_c2ok": "güzel, iyi seçim",
+		"mt_c2nd": "bu, cihazınız için önerilen çıkış formatı değil, ama sorun değil",
+		"mt_c2ng": "cihazınız bu çıkış formatını desteklemiyor gibi görünüyor, ama yine de deneyelim",
+		"mt_xowa": "iOS'ta bu formatta arka plan oynatımını engelleyen hatalar var; lütfen bunun yerine caf veya mp3 kullanın",
+		"mt_tint": "seekbar'da arka plan seviyesi (0-100)$ön belleğin daha az dikkat dağıtıcı olmasını sağlar",
+		"mt_eq": "ekolayzer ve kazanç kontrolünü aktifleştirir;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standart %100 ses (varsayılan)$N$Ngenişlik &lt;code&gt;1 &nbsp;&lt;/code&gt; = standart çift kanal (varsayılan)$Ngenişlik &lt;code&gt;0.5&lt;/code&gt; = %50 sol-sağ crossfeed$Ngenişlik &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nartış &lt;code&gt;-0.8&lt;/code&gt; &amp; artış &lt;code&gt;10&lt;/code&gt; = vokal kaldırma :^)$N$Nekolayzeri aktifleştirmek, aralıksız albümleri gerçekten aralıksız yapar, bu yüzden tüm değerleri 0'da bırakın (width = 1 hariç) tabii bunu umursuyorsnaız",
+		"mt_drc": "dinamik aralık sıkıştırıcıyı (ses düzleştiriciyi) aktifleştirir; spagettiyi dengelemek için aynı zamanda EQ'yu da açar, bunun olmasını istemiyorsanız EQ'daki 'genişlik' hariç tüm alanları 0 yapın$N$Nsınır dB'inin üstündeki tüm sesleri kısar; sınırı geçen her 1 dB için ancak 1 dB ses verilir, yani varsayılan eşik -24 ve oran 12 değerleri sesin -22 dB'den yükseğe çıkmayacağını ve EQ artışının 0,8'e, hatta ATK 0 ve hayvan gibi RLS (örneğin 90, bu sadece Firefox'ta çalışır; diğer tarayıcılarda RLS en fazla 1'dir) gibi değerlerle 1.,8'e kadar güvenle çıkabileceğini gösteriyor$N$N(git vikipediye bak, orada daha iyi açıklanıyor)",
+
+		"mb_play": "oynat",
+		"mm_hashplay": "bu ses dosyası oynatılsın mı?",
+		"mm_m3u": "Oynatmak için <code>Enter/Tamam</code> tuşuna basın\nDüzenlemek için <code>ESC/İptal</code> tuşuna basın",
+		"mp_breq": "firefox 82+ veya chrome 73+ veya iOS 15+ gerektirir",
+		"mm_bload": "şu anda yükleniyor...",
+		"mm_bconv": "{0} formatına dönüştürülüyor, lütfen bekleyin...",
+		"mm_opusen": "tarayıcınız aac / m4a dosyalarını oynatamıyor;\nopus'a dönüştürme etkinleştirildi",
+		"mm_playerr": "oynatma hatası: ",
+		"mm_eabrt": "Oynatma denemesi iptal edildi",
+		"mm_enet": "İnternet bağlantınızda bir bokluk var",
+		"mm_edec": "Bu dosya muhtemelen bozuk!",
+		"mm_esupp": "Tarayıcınız salak, bu ses formatını anlamıyor",
+		"mm_eunk": "Bilinmeyen Hata",
+		"mm_e404": "Ses oynatılamadı; hata 404: Dosya bulunamadı.",
+		"mm_e403": "Ses oynatılamadı; hata 403: Erişim reddedildi.\n\nYeniden yüklemek için F5 tuşuna basın, oturumunuz kapanmış olabilir.",
+		"mm_e500": "Ses oynatılamadı; hata 500: Sunucu günlüklerini kontrol edin.",
+		"mm_e5xx": "Ses oynatılamadı; sunucu hatası ",
+		"mm_nof": "yakınlarda başka ses dosyası bulunamadı",
+		"mm_prescan": "Sonraki şarkı aranıyor...",
+		"mm_scank": "Sonraki şarkı bulundu:",
+		"mm_uncache": "önbellek temizlendi; tüm şarkılar bir sonraki çalınmada yeniden indirilecek",
+		"mm_hnf": "bu şarkı artık mevcut değil",
+
+		"im_hnf": "bu resim artık mevcut değil",
+
+		"f_empty": 'bu klasör boş',
+		"f_chide": 'bu, «{0}» sütununu gizleyecektir\n\nsütunları ayarlar sekmesinden yeniden açabilirsiniz',
+		"f_bigtxt": "bu dosya {0} MiB boyutunda -- Cidden saf yazı olarak mı görüntülemek istiyo'n?",
+		"f_bigtxt2": "dosyanın sadece sonunu görüntülemek ister misin? bu, takip etme/sonlandırma işlemini de etkinleştirecek ve gerçek zamanlı olarak yeni eklenen metin satırlarını gösterecektir.",
+		"fbd_more": '<div id="blazy"><code>{1}</code> dosyadan <code>{0}</code> tanesi gösteriliyor; <a href="#" id="bd_more">{2}</a> tanesini ya da <a href="#" id="bd_all">tümünü göster</a></div>',
+		"fbd_all": '<div id="blazy"><code>{1}</code> dosyadan <code>{0}</code> tanesi gösteriliyor; <a href="#" id="bd_all">tümünü göster</a></div>',
+		"f_anota": "{1} dosyadan sadece {0} tanesi seçildi;\nTüm klasörü seçmek için önce en alta kaydırın.",
+
+		"f_dls": 'bu klasördeki dosya linkleri\nindirme linklerine dönüştürüldü',
+
+		"f_partial": "Mevcutta yüklenen bir dosyayı güvenli bir şekilde indirmek için lütfen aynı adlı ama <code>.PARTIAL</code> uzantısına sahip olmayan dosyaya tıklayın. Lütfen bunu yapmak için İPTAL veya Esc tuşuna basın.\n\nTamam / Enter tuşuna basmak, bu uyarıyı yok sayacak ve bunun yerine <code>.PARTIAL</code> geçici dosyasını indirmeye devam edecektir ki bu da elinize bozuk veriler sunacaktır.",
+
+		"ft_paste": "{0} ögeyi yapıştır$Kısayol: ctrl-V",
+		"fr_eperm": 'yeniden adlandırılamıyor:\nbu klasörü “taşıma” izniniz yok',
+		"fd_eperm": 'silinemiyor:\nbu klasörde “silme” izniniz yok',
+		"fc_eperm": 'kesilemiyor:\nbu klasörde “taşıma“ izniniz yok',
+		"fp_eperm": 'yapıştırılamıyor:\nbu klasörde “yazma“ izniniz yok',
+		"fr_emore": "yeniden adlandırmak için en az bir öge seçin",
+		"fd_emore": "silmek için en az bir öge seçin",
+		"fc_emore": "kesmek için en az bir öge seçin",
+		"fcp_emore": "panoya kopyalamak için en az bir öge seçin",
+
+		"fs_sc": "bulunduğunuz klasörü paylaşın",
+		"fs_ss": "seçilen dosyaları paylaşın",
+		"fs_just1d": "birden fazla klasör seçemezsiniz\nveya bir seçimde dosyaları ve klasörleri karıştıramazsınız",
+		"fs_abrt": "❌ iptal",
+		"fs_rand": "🎲 rastgele.ad",
+		"fs_go": "✅ paylaşımı oluştur",
+		"fs_name": "isim",
+		"fs_src": "kaynak",
+		"fs_pwd": "şifre",
+		"fs_exp": "son kullanma",
+		"fs_tmin": "dakika",
+		"fs_thrs": "saat",
+		"fs_tdays": "gün",
+		"fs_never": "sonsuz",
+		"fs_pname": "isteğe bağlı bağlantı adı; boşsa rastgele olacaktır",
+		"fs_tsrc": "paylaşılacak dosya veya klasör",
+		"fs_ppwd": "isteğe bağlı şifre",
+		"fs_w8": "paylaşım oluşturuluyor...",
+		"fs_ok": "panoya kopyalamak için <code>Enter/Tamam</code> tuşuna basın\nkapatmak için <code>ESC/İptal</code> tuşuna basın",
+
+		"frt_dec": "bazı bozuk dosya adlarını düzeltebilir\">url-decode",
+		"frt_rst": "değiştirilen dosya adlarını orijinal haline döndür\">↺ sıfırla",
+		"frt_abrt": "iptal et ve bu pencereyi kapat\">❌ iptal",
+		"frb_apply": "YENİ ADI UYGULA",
+		"fr_adv": "toplu / meta veri / desen yeniden adlandırma\">gelişmiş",
+		"fr_case": "büyük/küçük harf duyarlı regex\">büyük/küçük harf",
+		"fr_win": "windows'a uygun adlar; <code>&lt;&gt;:&quot;\\|?*</code> karakterlerini Japonca tam genişlik karakterleriyle değiştir\">win",
+		"fr_slash": "<code>/</code> karakterini yeni klasörlerin oluşturulmasına neden olmayan bir karakterle değiştir\">/ yok",
+		"fr_re": "orijinal dosya adlarına uygulanacak regex arama deseni; yakalama grupları aşağıdaki format alanında &lt;code&gt;(1)&lt;/code&gt; ve &lt;code&gt;(2)&lt;/code&gt; gibi belirtilebilir",
+		"fr_fmt": "foobar2000'den esinlenilmiştir:$N&lt;code&gt;(title)&lt;/code&gt; şarkı başlığıyla değiştirilir,$N&lt;code&gt;[(artist) - ](title)&lt;/code&gt; sanatçı boşsa [bu] kısmı atlar$N&lt;code&gt;$lpad((tn),2,0)&lt;/code&gt; parça numarasını 2 basamağa doldurur",
+		"fr_pdel": "sil",
+		"fr_pnew": "farklı kaydet",
+		"fr_pname": "yeni ayarınızı adlandırın",
+		"fr_aborted": "iptal edildi",
+		"fr_lold": "eski ad",
+		"fr_lnew": "yeni ad",
+		"fr_tags": "seçilen dosyalar için etiketler (salt okunur, sadece referans için):",
+		"fr_busy": "{0} öğe yeniden adlandırılıyor...\n\n{1}",
+		"fr_efail": "yeniden adlandırma başarısız:\n",
+		"fr_nchg": "{0} yeni adlardan bazıları <code>win</code> ve/veya <code>/ yok</code> nedeniyle değiştirildi\n\nBu değiştirilmiş yeni adlarla devam etmek için Tamam'a basın.",
+
+		"fd_ok": "silme tamam",
+		"fd_err": "silme başarısız:\n",
+		"fd_none": "hiçbir şey silinmedi; belki sunucu yapılandırması (xbd) tarafından engellenmiştir?",
+		"fd_busy": "{0} öğe siliniyor...\n\n{1}",
+		"fd_warn1": "Bu {0} öge silinsin mi?",
+		"fd_warn2": "<b>Son şans!</b> Geri alma imkanın yok. Silinsin mi?",
+
+		"fc_ok": "{0} öge kesildi",
+		"fc_warn": '{0} öge kesildi\n\namma velakin: sadece <b>bu</b> tarayıcı penceresine yapıştırılabilirler\n(çünkü seçiminin boyutu hayvan gibi)',
+
+		"fcc_ok": "{0} öge panoya kopyalandı",
+		"fcc_warn": '{0} öge panoya kopyalandı\n\namma velakin: sadece <b>bu</b> tarayıcı penceresine yapıştırılabilirler\n(çünkü seçiminin boyutu hayvan gibi)',
+
+		"fp_apply": "bu adları kullan",
+		"fp_ecut": "önce bazı dosyaları / klasörleri kes veya kopyala, sonra yapıştır / taşı\n\nnot: farklı tarayıcı sekmeleri arasında kes / yapıştır yapabilirsiniz",
+		"fp_ename": "{0} öğe buraya taşınamaz çünkü adlar zaten alınmış. Devam etmek için aşağıda yeni adlar verin veya atlamak için adları boş bırakın:",
+		"fcp_ename": "{0} öğe buraya kopyalanamaz çünkü adlar zaten alınmış. Devam etmek için aşağıda yeni adlar verin veya atlamak için adları boş bırakın:",
+		"fp_emore": "hâlâ düzeltilmesi gereken bazı dosya adı çakışmaları var",
+		"fp_ok": "taşıma tamam",
+		"fcp_ok": "kopyalama tamam",
+		"fp_busy": "{0} öğe taşınıyor...\n\n{1}",
+		"fcp_busy": "{0} öğe kopyalanıyor...\n\n{1}",
+		"fp_abrt": "İptal ediliyor...",
+		"fp_err": "taşıma başarısız:\n",
+		"fcp_err": "kopyalama başarısız:\n",
+		"fp_confirm": "bu {0} öğeyi buraya taşımak istiyor musunuz?",
+		"fcp_confirm": "bu {0} öğeyi buraya kopyalamak istiyor musunuz?",
+		"fp_etab": 'diğer tarayıcı sekmesinden pano okunamadı',
+		"fp_name": "cihazınızdan bir dosya yüklüyorsunuz. Bir ad verin:",
+		"fp_both_m": '<h6>yapıştırılacak şeyi seçin</h6><code>Enter</code> = «{1}» içinden {0} dosyayı taşı\n<code>ESC</code> = cihazınızdan {2} dosyayı yükle',
+		"fcp_both_m": '<h6>yapıştırılacak şeyi seçin</h6><code>Enter</code> = «{1}» içinden {0} dosyayı kopyala\n<code>ESC</code> = cihazınızdan {2} dosyayı yükle',
+		"fp_both_b": '<a href="#" id="modal-ok">Taşı</a><a href="#" id="modal-ng">Yükle</a>',
+		"fcp_both_b": '<a href="#" id="modal-ok">Kopyala</a><a href="#" id="modal-ng">Yükle</a>',
+
+		"mk_noname": "bunu yapmadan önce soldaki boşluğa bir şeyler yazsana :p",
+
+		"tv_load": "Metin belgesi yükleniyor:\n\n{0}\n\n{1}% ({2} of {3} MiB yüklendi)",
+		"tv_xe1": "metin dosyası yüklenemedi:\n\nhata ",
+		"tv_xe2": "404, dosya bulunamadı",
+		"tv_lst": "metin dosyalarının listesi",
+		"tvt_close": "klasör görünümüne dön$NKısayol: M (veya Esc)\">❌ kapat",
+		"tvt_dl": "bu dosyayı indir$NKısayol: Y\">💾 indir",
+		"tvt_prev": "önceki belgeyi göster$NKısayol: i\">⬆ önceki",
+		"tvt_next": "sonraki belgeyi göster$NKısayol: K\">⬇ sonraki",
+		"tvt_sel": "dosyayı seç$NKısayol: S\">seç",
+		"tvt_edit": "dosyayı metin düzenleyicisinde aç$NKısayol: E\">✏️ düzenle",
+		"tvt_tail": "dosyalardaki değişiklikleri izle; yeni satırları gerçek zamanlı göster\">📡 takip",
+		"tvt_wrap": "kelime sarma\">↵",
+		"tvt_atail": "sayfanın altına sabitle\">⚓",
+		"tvt_ctail": "terminal renklerini çöz (ansi kaçış kodları)\">🌈",
+		"tvt_ntail": "önbellek limiti (kaç byte yüklenmiş metin tutulacağı)",
+
+		"m3u_add1": "şarkı m3u çalma listesine eklendi",
+		"m3u_addn": "{0} şarkı m3u çalma listesine eklendi",
+		"m3u_clip": "m3u çalma listesi şimdi panoya kopyalandı\n\nyeni bir metin dosyası oluşturmalı ve adını dosya.m3u koymalısınız ve çalma listesini o belgeye yapıştırmalısınız; bu sayede oynatılabilir hale gelecektir",
+
+		"gt_vau": "videoları gösterme, sadece sesi oynat\">🎧",
+		"gt_msel": "dosya seçimlerini etkinleştir; bir dosyayı geçersiz kılmak için ctrl-tıkla$N$N&lt;em&gt;etkin olduğunda: bir dosyayı / klasörü açmak için çift tıkla&lt;/em&gt;$N$NKısayol: S\">çoklu seçim",
+		"gt_crop": "küçültülmüş önizlemeleri ortala\">kırp",
+		"gt_3x": "yüksek çözünürlüklü önizlemeler\">3x",
+		"gt_zoom": "yakınlaştır",
+		"gt_chop": "kes",
+		"gt_sort": "sırala",
+		"gt_name": "isim",
+		"gt_sz": "boyut",
+		"gt_ts": "tarih",
+		"gt_ext": "tip",
+		"gt_c1": "dosya adlarını daha fazla kısalt (daha az göster)",
+		"gt_c2": "dosya adlarını daha az kısalt (daha fazla göster)",
+
+		"sm_w8": "aranıyor...",
+		"sm_prev": "aşağıdaki arama sonuçları önceki bir sorgudan alınmıştır:\n  ",
+		"sl_close": "arama sonuçlarını kapat",
+		"sl_hits": "gösterilen {0} sonuç",
+		"sl_moar": "daha fazla yükle",
+
+		"s_sz": "boyut",
+		"s_dt": "tarih",
+		"s_rd": "yol",
+		"s_fn": "isim",
+		"s_ta": "etiketler",
+		"s_ua": "yükleme@",
+		"s_ad": "gel.",
+		"s_s1": "en az MiB",
+		"s_s2": "en fazla MiB",
+		"s_d1": "en az iso8601",
+		"s_d2": "en fazla. iso8601",
+		"s_u1": "yüklendi",
+		"s_u2": "veya önce",
+		"s_r1": "dosya yolu &nbsp içerir; (boşlukla ayrılmış)",
+		"s_f1": "isim &nbsp içerir; (-nope kullan)",
+		"s_t1": "etiketler &nbsp içerir; (^=baş, son=$)",
+		"s_a1": "özel metadata özellikleri",
+
+		"md_eshow": "görüntülenemiyor:  ",
+		"md_off": "[📜<em>beni-oku</em>], [⚙️] içinde kapalıdır -- belge gizli",
+
+		"badreply": "Sunucudan gelen yanıt çözümlenemedi",
+
+		"xhr403": "403: Erişim reddedildi\n\nF5'e basmayı deneyin, oturumunuz kapanmış olabilir",
+		"xhr0": "bilinmiyor (muhtemelen sunucuya bağlantı kaybedildi veya sunucu çevrimdışı)",
+		"cf_ok": "pardon yahu -- DD" + wah + "oS koruması şey etti\n\n30 saniyeye düzelmiş olurum\n\nbi' halt olmazsa f5'e basarak sayfayı yenile",
+		"tl_xe1": "alt klasörler listelenemiyor:\n\nhata ",
+		"tl_xe2": "404: klasör bulunamadı",
+		"fl_xe1": "dosyalar listelenemiyor:\n\nhata ",
+		"fl_xe2": "404: klasör bulunamadı",
+		"fd_xe1": "alt klasör oluşturulamadı:\n\nhata ",
+		"fd_xe2": "404: Üst klasör bulunamadı",
+		"fsm_xe1": "mesaj gönderilemedi:\n\nhata ",
+		"fsm_xe2": "404: Üst klasör bulunamadı",
+		"fu_xe1": "sunucudan unpost(?) listesini yüklemek başarısız oldu:\n\nhata ",
+		"fu_xe2": "404: Dosya bulunamadı!!",
+
+		"fz_tar": "sıkıştırılmamış gnu-tar dosyası (linux / mac)",
+		"fz_pax": "sıkıştırılmamış pax-format tar (daha yavaş)",
+		"fz_targz": "gnu-tar ile gzip seviye 3 sıkıştırma$N$Nbu genellikle çok yavaştır, bu yüzden$Nsıkıştırılmamış tar kullanın",
+		"fz_tarxz": "gnu-tar ile xz seviye 1 sıkıştırma$N$Nbu genellikle çok yavaştır, bu yüzden$Nsıkıştırılmamış tar kullanın",
+		"fz_zip8": "utf8 dosya adları ile zip (windows 7 ve daha eski sürümlerde sorunlu olabilir)",
+		"fz_zipd": "gerçekten eski yazılımlar için geleneksel cp437 dosya adları ile zip",
+		"fz_zipc": "erken hesaplanan crc32 ile cp437,$NMS-DOS PKZIP v2.04g (ekim 1993) için$N(indirmenin başlamasından önce işlenmesi daha uzun sürer)",
+
+		"un_m1": "aşağıdan son yüklemelerinizi (veya tamamlanmamış olanları) silebilirsiniz",
+		"un_upd": "yenile",
+		"un_m4": "veya aşağıda görünen dosyaları paylaşın:",
+		"un_ulist": "göster",
+		"un_ucopy": "kopyala",
+		"un_flt": "isteğe bağlı filtre:&nbsp; URL şunu içermelidir:",
+		"un_fclr": "filtreyi temizle",
+		"un_derr": 'unpost-delete failed:\n',
+		"un_f5": 'bir şeyler bozuldu, lütfen yenilemeyi deneyin veya F5 tuşuna basın',
+		"un_uf5": "üzgünüm ama bu yükleme iptal edilmeden önce sayfayı yenilemeniz gerekiyor (F5 veya CTRL-R tuşlarına basarak)",
+		"un_nou": '<b>uyarı:</b> sunucu tamamlanmamış yüklemeleri göstermek için çok meşgul; birazdan "yenile" bağlantısına tıklayın',
+		"un_noc": '<b>uyarı:</b> tamamen yüklenmiş dosyaların unpost edilmesi sunucu yapılandırmasında etkinleştirilmemiştir/izin verilmemiştir',
+		"un_max": "ilk 2000 dosya gösteriliyor (filtreyi kullan)",
+		"un_avail": "son yüklemelerin {0} tanesi silinebilir<br />tamamlanmayanların {1} tanesi iptal edilebilir",
+		"un_m2": "yükleme zamanına göre sıralandı; en son önce:",
+		"un_no1": "Hayda! yeterince güncel yükleme yok",
+		"un_no2": "Hayda! o filtreye uyan yeterince güncel yükleme yok",
+		"un_next": "aşağıdaki {0} dosyayı sil",
+		"un_abrt": "iptal",
+		"un_del": "sil",
+		"un_m3": "son yüklemelerinizi hazırlanıyor...",
+		"un_busy": "{0} dosya siliniyor...",
+		"un_clip": "{0} bağlantı panoya kopyalandı",
+
+		"u_https1": "daha iyi performans",
+		"u_https2": "için https'i",
+		"u_https3": "kullanın",
+		"u_ancient": 'tarayıcınız resmen fosilleşmiş -- belki de <a href="#" onclick="goto(\'bup\')">bup kullanmalısınız</a>',
+		"u_nowork": "firefox 53+ veya chrome 57+ veya iOS 11+ gerekiyor",
+		"tail_2old": "firefox 105+ veya chrome 71+ veya iOS 14.5+ gerekiyor",
+		"u_nodrop": 'tarayıcınız sürükleyip bırakmak için çok eski',
+		"u_notdir": "bu bir klasör değil!\n\ntarayıcınız çok eski,\nlütfen bunun yerine sürükleyip bırakmayı deneyin",
+		"u_uri": "başka tarayıcı pencerelerinden sürükle-bırak ile yükleme yapmak için,\nlütfen büyük yükleme düğmesinin üstüne bırakın",
+		"u_enpot": '<a href="#">Patates arayüze</a> geçiş yap (yükleme hızını artırabilir)',
+		"u_depot": '<a href="#">Havalı arayüze</a> geçiş yap (yükleme hızını azaltabilir)',
+		"u_gotpot": 'yükleme hızını artırmak için patates arayüzüne geçiliyor,\n\nkatılmıyorsanız geri dönmekte özgürsünüz!',
+		"u_pott": "<p>dosyalar: &nbsp; <b>{0}</b> tamamlandı, &nbsp; <b>{1}</b> başarısız, &nbsp; <b>{2}</b> meşgul, &nbsp; <b>{3}</b> sırada bekliyor</p>",
+		"u_ever": "bu temel yükleyici; up2k en az<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1 gerektirir",
+		"u_su2k": 'bu temel yükleyici; <a href="#" id="u2yea">up2k</a> daha iyidir',
+		"u_uput": 'hız için optimize et (kontrol toplamını atla)',
+		"u_ewrite": 'bu klasöre yazma izniniz yok',
+		"u_eread": 'bu klasörü okuma izniniz yok',
+		"u_enoi": 'dosya arama sunucu yapılandırmasında etkin değil',
+		"u_enoow": "üstüne yazma burada çalışmayacak; Silme izni gerekiyor",
+		"u_badf": 'Bu {0} dosya (toplam {1} arasında) atlandı, muhtemelen dosya sistemi izinleri nedeniyle:\n\n',
+		"u_blankf": 'Bu {0} dosya (toplam {1} arasında) boş / boş; yine de yüklemek ister misiniz?\n\n',
+		"u_applef": 'Bu {0} dosya (toplam {1} arasında) muhtemelen istenmiyor;\nAşağıdaki dosyaları ATLAMAK için <code>TAMAM/Enter</code> tuşuna basın,\nyüklemek için <code>İptal/ESC</code> tuşuna basın\n\n',
+		"u_just1": '\nBelki sadece bir dosya seçerseniz daha iyi çalışır',
+		"u_ff_many": "eğer <b>Linux / MacOS / Android</b> kullanıyorsanız bu kadar çok dosya yüklemenin <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>Firefox'u</em> çökertme ihtimali var!</a>\nEğer çökerse lütfen tekrar deneyin (veya Chrome kullanın).",
+		"u_up_life": "Bu yükleme, tamamlandıktan {0} süre sonra sunucudan silinecek\n",
+		"u_asku": 'bu {0} dosya <code>{1}</code> içerisine yükleniyor',
+		"u_unpt": "bu yüklemeyi sol üstteki 🧯 ile geri alabilir / silebilirsiniz",
+		"u_bigtab": '{0} dosya görüntülenmek üzere\n\nBu kadar fazlası tarayıcınızı çökertebilir, emin misiniz?',
+		"u_scan": 'Dsyalar tarıyor...',
+		"u_dirstuck": 'dizin yineleyicisi aşağıdaki {0} öğeye erişmeye çalışırken takıldı; atlanacak:',
+		"u_etadone": 'Tamamlandı ({0}, {1} dosya)',
+		"u_etaprep": '(yüklemeye hazırlanıyor)',
+		"u_hashdone": 'hash\'leme tamamlandı',
+		"u_hashing": 'hash\'leniyor',
+		"u_hs": 'el sıkılıyor...',
+		"u_started": "dosyalar şu anda yükleniyor; [🚀]'i gör",
+		"u_dupdefer": "başka bir dosyanın kopyası; diğer tüm dosyalardan sonra işlenecek",
+		"u_actx": "diğer pencereler/sekmeler arasında geçiş yaparken <br /> performansın düşmemesi için bu yazıya tıklayın",
+		"u_fixed": "Timam!&nbsp; Hallettim 👍",
+		"u_cuerr": "parça {0} / {1} yüklenemedi;\nmuhtemelen zararsız, devam ediliyor\n\ndosya: {2}",
+		"u_cuerr2": "sunucu yüklemeyi reddetti (parça {0} / {1});\nsonra tekrar denenecek\n\ndosya: {2}\n\nhata ",
+		"u_ehstmp": "tekrar denenecek; sağ alt köşeye mak",
+		"u_ehsfin": "sunucu yüklemeyi tamamlama isteğini reddetti; tekrar deniyor...",
+		"u_ehssrch": "sunucu arama yapma isteğini reddetti; tekrar deniyor...",
+		"u_ehsinit": "sunucu yüklemeyi başlatma isteğini reddetti; tekrar deniyor...",
+		"u_eneths": "yükleme el sıkışması sırasında ağ hatası; tekrar deniyor...",
+		"u_enethd": "hedef varlığını test ederken ağ hatası; tekrar deniyor...",
+		"u_cbusy": "ağ kesintisinden sonra sunucunun bize tekrar güvenmesini bekliyoruz...",
+		"u_ehsdf": "sunucuda disk alanı kalmadı!\n\ndevam edebilmek için birinin\nyeterli alan açmasını bekleyeceğiz",
+		"u_emtleak1": "görünüşe göre web tarayıcınızda bir bellek sızıntısı var;\nlütfen",
+		"u_emtleak2": ' <a href="{0}">https\'ye geçin (önerilir)</a> veya ',
+		"u_emtleak3": ' ',
+		"u_emtleakc": 'sırayla şunları deneyin:\n<ul><li>sayfayı yenilemek için <code>F5</code>\'e basın</li><li>sonra &nbsp;<code>mt</code>&nbsp; düğmesini &nbsp;<code>⚙️ ayarlar</code> menüsünde devre dışı bırakın</li><li>ve o yüklemeyi tekrar deneyin</li></ul>Yüklemeler biraz daha yavaş olacaktır, ama salla gitsin.\nSorun için özür dileriz!\n\nDipnot: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">için bir hata düzeltmesi</a>',
+		"u_emtleakf": 'şunları deneyin:\n<ul><li>sayfayı yenilemek için <code>F5</code>\'e basın</li><li>sonra yükleme arayüzünde <code>🥔</code> (patates) seçeneğini etkinleştirin<li>ve yüklemeyi tekrar deneyin</li></ul>\nDipnot: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">için muhtemel bir hata düzeltmesi</a>',
+		"u_s404": "sunucuda bulunamadı",
+		"u_expl": "açıklama",
+		"u_maxconn": "çoğu tarayıcı bunu 6 ile sınırlar, ancak firefox bunu <code>about:config</code> içinde <code>connections-per-server</code> ile artırmanıza izin verir",
+		"u_tu": '<p class="warn">UYARI: turbo etkin, <span>&nbsp;istemci tamamlanmamış yüklemeleri algılayamayabilir ve devam ettiremeyebilir; turbo düğmesinden ipuçlarına bakabilirsiniz</span></p>',
+		"u_ts": '<p class="warn">UYARI: turbo etkin, <span>&nbsp;arama sonuçları yanlış olabilir; turbo düğmesi ipuçlarına bakın</span></p>',
+		"u_turbo_c": "turbo sunucu yapılandırmasında devre dışı bırakıldı",
+		"u_turbo_g": "turbo devre dışı bırakılıyor çünkü bu alanda\ndizin listeleme ayrıcalıklarınız yok",
+		"u_life_cfg": 'yüklemeleri <input id="lifem" p="60" /> dk (veya <input id="lifeh" p="3600" /> saat) sonra otomatik olarak sil',
+		"u_life_est": 'yükleme <span id="lifew" tt="local time">---</span> sonra silinecek',
+		"u_life_max": 'bu klasör bir\nmaksimum ömür {0} uygular',
+		"u_unp_ok": 'unpost {0} için izin verildi',
+		"u_unp_ng": 'unpost izin verilmeyecek',
+		"ue_ro": 'bu klasöre erişiminiz Salt Okuma\n\n',
+		"ue_nl": 'şu anda oturum açmamışsınız',
+		"ue_la": 'şu anda "{0}" olarak oturum açmışsınız',
+		"ue_sr": 'şu anda dosya arama modundasınız\n\nbüyüteç simgesine tıklayarak yükleme moduna geçin 🔎 (büyük ARAMA düğmesinin yanındaki) ve tekrar yüklemeyi deneyin\n\nyeter be',
+		"ue_ta": 'tekrar yüklemeyi deneyin, artık çalışsana be',
+		"ue_ab": "bu dosya zaten başka bir klasöre yükleniyor ve o yükleme tamamlanmadan dosya başka bir yere yüklenemez.\n\nİlk yüklemeyi iptal edip unutmak için sol üstteki 🧯 simgesini kullanabilirsiniz.",
+		"ur_1uo": "OK: Dosya başarıyla yüklendi",
+		"ur_auo": "OK: {0} dosyanın tamamı başarıyla yüklendi",
+		"ur_1so": "OK: Dosya sunucuda bulundu",
+		"ur_aso": "OK: {0} dosyanın tamamı sunucuda bulundu",
+		"ur_1un": "Yükleme başarısız oldu, üzgünüm",
+		"ur_aun": "{0} yüklemenin tamamı başarısız oldu, üzgünüm",
+		"ur_1sn": "Dosya sunucuda bulunamadı",
+		"ur_asn": "{0} dosyas sunucuda bulunamadı",
+		"ur_um": "Tamamlandı;\n{0} yükleme başarılı,\n{1} yükleme başarısız oldu, üzgünüm",
+		"ur_sm": "Tamamlandı;\n{0} dosya sunucuda bulundu,\n{1} dosya sunucuda bulunamadı",
+
+		"lang_set": "Değişikliklerin etki göstermesi için sayfa yenilensin mi?",
+	},
 	"ukr": {
 		"tt": "Українська",
 
@@ -4502,6 +12111,7 @@ var Ls = {
 		"gou": 'батьківська папка">вгору',
 		"gon": 'наступна папка">далі',
 		"logout": "Вийти ",
+		"login": "увійти", //m
 		"access": " доступ",
 		"ot_close": "закрити підменю",
 		"ot_search": "пошук файлів за атрибутами, шляхом / іменем, музичними тегами, або будь-якою комбінацією$N$N&lt;code&gt;foo bar&lt;/code&gt; = має містити «foo» і «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = має містити «foo», але не «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = починатися з «yana» і бути файлом «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = містити точно «try unite»$N$Nформат дати - iso-8601, наприклад$N&lt;code&gt;2009-12-31&lt;/code&gt; або &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
@@ -4552,7 +12162,7 @@ var Ls = {
 		"ut_srch": "не завантажувати, а перевірити, чи файли вже $N існують на сервері (сканує всі папки, які ви можете читати)",
 		"ut_par": "призупинити завантаження, встановивши 0$N$Nзбільшіть, якщо ваше з'єднання повільне / висока затримка$N$Nзалишіть 1 в локальній мережі або якщо HDD сервера є вузьким місцем",
 		"ul_btn": "перетягніть файли / папки<br> (або клацніть сюди)",
-		"ul_btnu": "З А В А Н Т А Ж И Т И",
+		"ul_btnu": "ЗАВАНТАЖИТИ",
 		"ul_btns": "П О Ш У К",
 
 		"ul_hash": "хеш",
@@ -4688,13 +12298,15 @@ var Ls = {
 		"mt_mloop": "зациклити відкриту папку\">🔁 loop",
 		"mt_mnext": "завантажити наступну папку і продовжити\">📂 next",
 		"mt_mstop": "зупинити відтворення\">⏸ stop",
-		"mt_cflac": "конвертувати flac / wav в opus\">flac",
-		"mt_caac": "конвертувати aac / m4a в opus\">aac",
-		"mt_coth": "конвертувати всі інші (не mp3) в opus\">oth",
+		"mt_cflac": "конвертувати flac / wav в {0}\">flac",
+		"mt_caac": "конвертувати aac / m4a в {0}\">aac",
+		"mt_coth": "конвертувати всі інші (не mp3) в {0}\">oth",
 		"mt_c2opus": "найкращий вибір для робочих столів, ноутбуків, android\">opus",
 		"mt_c2owa": "opus-weba, для iOS 17.5 і новіших\">owa",
 		"mt_c2caf": "opus-caf, для iOS 11 до 17\">caf",
 		"mt_c2mp3": "використовуйте це на дуже старих пристроях\">mp3",
+		"mt_c2flac": "найкраща якість звуку, але великі завантаження\">flac", //m
+		"mt_c2wav": "відтворення без стиснення (ще більше)\">wav", //m
 		"mt_c2ok": "гарно, хороший вибір",
 		"mt_c2nd": "це не рекомендований вихідний формат для вашого пристрою, але це нормально",
 		"mt_c2ng": "ваш пристрій, здається, не підтримує цей вихідний формат, але давайте все одно спробуємо",
@@ -4705,7 +12317,7 @@ var Ls = {
 
 		"mb_play": "відтворити",
 		"mm_hashplay": "відтворити цей аудіо файл?",
-		"mm_m3u": "натисніть <code>Enter/OK</code> для відтворення\nнатисніть <code>ESC/Cancel</code> для редагування",
+		"mm_m3u": "натисніть <code>Enter/Гаразд</code> для відтворення\nнатисніть <code>ESC/Скасувати</code> для редагування",
 		"mp_breq": "потрібен firefox 82+ або chrome 73+ або iOS 15+",
 		"mm_bload": "зараз завантажується...",
 		"mm_bconv": "конвертується в {0}, будь ласка, зачекайте...",
@@ -4738,7 +12350,7 @@ var Ls = {
 
 		"f_dls": 'посилання на файли в поточній папці були\nзмінені на посилання для завантаження',
 
-		"f_partial": "Щоб безпечно завантажити файл, який зараз завантажується, будь ласка, клацніть на файл, який має таке саме ім'я, але без розширення <code>.PARTIAL</code>. Будь ласка, натисніть CANCEL або Escape, щоб зробити це.\n\nНатиснення OK / Enter проігнорує це попередження і продовжить завантаження <code>.PARTIAL</code> робочого файлу замість цього, що майже напевно дасть вам пошкоджені дані.",
+		"f_partial": "Щоб безпечно завантажити файл, який зараз завантажується, будь ласка, клацніть на файл, який має таке саме ім'я, але без розширення <code>.PARTIAL</code>. Будь ласка, натисніть Скасувати або Escape, щоб зробити це.\n\nНатиснення Гаразд / Enter проігнорує це попередження і продовжить завантаження <code>.PARTIAL</code> робочого файлу замість цього, що майже напевно дасть вам пошкоджені дані.",
 
 		"ft_paste": "вставити {0} елементів$NГаряча клавіша: ctrl-V",
 		"fr_eperm": 'не можу перейменувати:\nу вас немає дозволу “переміщення“ в цій папці',
@@ -4768,7 +12380,7 @@ var Ls = {
 		"fs_tsrc": "файл або папка для спільного доступу",
 		"fs_ppwd": "необов'язковий пароль",
 		"fs_w8": "створення спільного доступу...",
-		"fs_ok": "натисніть <code>Enter/OK</code> для копіювання до буфера\nнатисніть <code>ESC/Cancel</code> для закриття",
+		"fs_ok": "натисніть <code>Enter/Гаразд</code> для копіювання до буфера\nнатисніть <code>ESC/Скасувати</code> для закриття",
 
 		"frt_dec": "може виправити деякі випадки пошкоджених імен файлів\">url-decode",
 		"frt_rst": "скинути змінені імена файлів назад до оригінальних\">↺ reset",
@@ -4813,6 +12425,7 @@ var Ls = {
 		"fcp_ok": "копіювання OK",
 		"fp_busy": "переміщення {0} елементів...\n\n{1}",
 		"fcp_busy": "копіювання {0} елементів...\n\n{1}",
+		"fp_abrt": "переривання...", //m
 		"fp_err": "переміщення невдале:\n",
 		"fcp_err": "копіювання невдале:\n",
 		"fp_confirm": "перемістити ці {0} елементи сюди?",
@@ -4891,7 +12504,7 @@ var Ls = {
 
 		"xhr403": "403: Доступ заборонено\n\nспробуйте натиснути F5, можливо ви вийшли з системи",
 		"xhr0": "невідома (ймовірно втрачено з'єднання з сервером, або сервер офлайн)",
-		"cf_ok": "вибачте за це -- захист від DD" + "oS спрацював\n\nречі повинні відновитися приблизно через 30 сек\n\nякщо нічого не відбувається, натисніть F5 для перезавантаження сторінки",
+		"cf_ok": "вибачте за це -- захист від DD" + wah + "oS спрацював\n\nречі повинні відновитися приблизно через 30 сек\n\nякщо нічого не відбувається, натисніть F5 для перезавантаження сторінки",
 		"tl_xe1": "не вдалося перелічити підпапки:\n\nпомилка ",
 		"tl_xe2": "404: Папка не знайдена",
 		"fl_xe1": "не вдалося перелічити файли в папці:\n\nпомилка ",
@@ -4957,7 +12570,7 @@ var Ls = {
 		"u_enoow": "перезапис не працюватиме тут; потрібен дозвіл на видалення",
 		"u_badf": 'Ці {0} файли (з {1} загальних) були пропущені, можливо, через дозволи файлової системи:\n\n',
 		"u_blankf": 'Ці {0} файли (з {1} загальних) порожні; все одно завантажити їх?\n\n',
-		"u_applef": 'Ці {0} файли (з {1} загальних), ймовірно, небажані;\nНатисніть <code>OK/Enter</code> щоб ПРОПУСТИТИ наступні файли,\nНатисніть <code>Cancel/ESC</code> щоб НЕ виключати, і ЗАВАНТАЖИТИ їх також:\n\n',
+		"u_applef": 'Ці {0} файли (з {1} загальних), ймовірно, небажані;\nНатисніть <code>Гаразд/Enter</code> щоб ПРОПУСТИТИ наступні файли,\nНатисніть <code>Скасувати/ESC</code> щоб НЕ виключати, і ЗАВАНТАЖИТИ їх також:\n\n',
 		"u_just1": '\nМожливо, це спрацює краще, якщо ви виберете лише один файл',
 		"u_ff_many": "якщо ви використовуєте <b>Linux / MacOS / Android,</b> то така кількість файлів <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>може</em> завісити Firefox!</a>\nякщо це станеться, будь ласка, спробуйте знову (або використовуйте Chrome).",
 		"u_up_life": "Це завантаження буде видалено з сервера\n{0} після його завершення",
@@ -5023,7 +12636,7 @@ var Ls = {
 	},
 };
 
-var LANGS = ["eng", "nor", "chi", "deu", "fin", "rus", "spa", "ukr"];
+var LANGS = ["eng", "nor", "chi", "cze", "deu", "epo", "fin", "fra", "grc", "ita", "kor", "nld", "nno", "pol", "por", "rus", "spa", "swe", "tur", "ukr"];
 
 if (window.langmod)
 	langmod();
@@ -5043,7 +12656,7 @@ for (var a = 0; a < LANGS.length; a++) {
 			t2 = Ls[LANGS[i2]];
 
 		for (var k in t1)
-			if (!t2[k]) {
+			if (!t2[k] && !/^ht_.5$/.test(k)) {
 				console.log("E missing TL", LANGS[i2], k);
 				t2[k] = t1[k];
 			}
@@ -5060,7 +12673,7 @@ modal.load();
 ebi('ops').innerHTML = (
 	'<a href="#" id="opa_x" data-dest="" tt="' + L.ot_close + '">--</a>' +
 	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
-	(have_del ? '<a href="#" id="opa_del" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
+	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
 	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
 	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂</a>' +
@@ -5246,14 +12859,29 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
+	'	<h3>' + L.cl_hfsz + '</h3>\n' +
+	'	<div><select id="fszfmt">\n' +
+	'		<option value="0">0 ┃ 1234567</option>\n' +
+	'		<option value="1">1 ┃ 1 234 567</option>\n' +
+	'		<option value="2">2- ┃ 1.18 M</option>\n' +
+	'		<option value="2c">2c ┃ 1.18 M</option>\n' +
+	'		<option value="3">3- ┃ 1.2 M</option>\n' +
+	'		<option value="3c">3c ┃ 1.2 M</option>\n' +
+	'		<option value="4">4- ┃ 1.18 MB</option>\n' +
+	'		<option value="4c">4c ┃ 1.18 MB</option>\n' +
+	'		<option value="5">5- ┃ 1.2 MB</option>\n' +
+	'		<option value="5c">5c ┃ 1.2 MB</option>\n' +
+	'		<option value="fuzzy">fuzzy</option>\n' +
+	'	</select></div>\n' +
+	'</div>\n' +
+	'<div>\n' +
 	'	<h3>' + L.cl_themes + '</h3>\n' +
-	'	<div id="themes">\n' +
+	'	<div><select id="themes"></select></div>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
 	'	<h3>' + L.cl_langs + '</h3>\n' +
-	'	<div id="langs">\n' +
-	'	</div>\n' +
+	'	<div><select id="langs"></select></div>\n' +
 	'</div>\n' +
 	(have_zip ? (
 		'<div><h3>' + L.cl_ziptype + '</h3><div id="arc_fmt"></div></div>\n'
@@ -5300,7 +12928,7 @@ ebi('op_cfg').innerHTML = (
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
-	'<div><h3>' + L.cl_keytype + '</h3><div id="key_notation"></div></div>\n' +
+	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
 	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
@@ -5461,10 +13089,17 @@ var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
 	hash0 = location.hash,
 	sloc0 = '' + location,
 	noih = /[?&]v\b/.exec(sloc0),
+	dbg_kbd = /[?&]dbgkbd\b/.exec(sloc0),
+	abrt_key = "",
+	can_shr = false,
 	rtt = null,
 	ldks = [],
 	dks = {},
 	dk, mp;
+
+
+if (location.pathname.indexOf('//') === 0)
+	hist_replace(location.pathname.replace(/^\/+/, '/'));
 
 
 if (window.og_fn) {
@@ -5548,6 +13183,8 @@ var mpl = (function () {
 			'<a href="#" id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
 			'<a href="#" id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
 			'<a href="#" id="ac2mp3" class="tgl btn" tt="' + L.mt_c2mp3 + '</a>' +
+			'<a href="#" id="ac2flac" class="tgl btn" tt="' + L.mt_c2flac + '</a>' +
+			'<a href="#" id="ac2wav" class="tgl btn" tt="' + L.mt_c2wav + '</a>' +
 			'</div></div>'
 		) : '') +
 
@@ -5672,6 +13309,7 @@ var mpl = (function () {
 		else if (re_au_native.exec(cs))
 			c = false;
 
+		// allow flac->flac (bitstream fixup)
 		if (!c)
 			return url;
 
@@ -5688,8 +13326,9 @@ var mpl = (function () {
 			return;
 		}
 
-		var dv = can_ogg ? 'opus' : can_caf ? 'caf' : 'mp3',
-			fmts = ['opus', 'owa', 'caf', 'mp3'],
+		var dv = can_ogg ? 'opus' :
+				can_caf ? 'caf' : 'mp3',
+			fmts = ['opus', 'owa', 'caf', 'mp3', 'flac', 'wav'],
 			btns = [];
 
 		if (v === dv)
@@ -5699,7 +13338,8 @@ var mpl = (function () {
 
 		if ((v == 'opus' && !can_ogg) ||
 			(v == 'caf' && !can_caf) ||
-			(v == 'owa' && !can_owa))
+			(v == 'owa' && !can_owa) ||
+			(v == 'flac' && !can_flac))
 			toast.warn(15, L.mt_c2ng);
 
 		if (v == 'owa' && IPHONE)
@@ -5714,6 +13354,8 @@ var mpl = (function () {
 		}
 		if (!IPHONE)
 			btns[1].style.display = btns[2].style.display = 'none';
+		btns[4].style.display = have_c2flac ? '' : 'none';
+		btns[5].style.display = have_c2wav ? '' : 'none';
 
 		if (v)
 			swrite('acode2', v);
@@ -5725,6 +13367,9 @@ var mpl = (function () {
 			clmod(btns[a], 'on', fmts[a] == v)
 
 		r.ac2 = v;
+		ebi('ac_flac').setAttribute('tt', L.mt_cflac.split('"')[0].format(v));
+		ebi('ac_aac').setAttribute('tt', L.mt_caac.split('"')[0].format(v));
+		ebi('ac_oth').setAttribute('tt', L.mt_coth.split('"')[0].format(v));
 	};
 
 	r.pp = function () {
@@ -5837,11 +13482,13 @@ var mpl = (function () {
 var za,
 	can_ogg = true,
 	can_owa = false,
+	can_flac = false,
 	can_caf = APPLE && !/ OS ([1-9]|1[01])_/.test(UA);
 try {
 	za = new Audio();
 	can_ogg = za.canPlayType('audio/ogg; codecs=opus') === 'probably';
 	can_owa = za.canPlayType('audio/webm; codecs=opus') === 'probably';
+	can_flac = za.canPlayType('audio/flac') === 'probably';
 	can_caf = za.canPlayType('audio/x-caf') && can_caf; //'maybe'
 }
 catch (ex) { }
@@ -5855,6 +13502,7 @@ mpl.init_ac2();
 
 var re_m3u = /\.(m3u8?)$/i;
 var re_au_native = (can_ogg || have_acode) ? /\.(aac|flac|m4a|mp3|oga|ogg|opus|wav)$/i : /\.(aac|flac|m4a|mp3|wav)$/i,
+	re_au_vid = /\.(3gp|asf|avi|flv|m4v|mkv|mov|mp4|mpeg|mpeg2|mpegts|mpg|mpg2|nut|ogm|ogv|rm|ts|vob|webm|wmv)$/i,
 	re_au_all = /\.(aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|itgz|itxz|itz|m4a|mdgz|mdxz|mdz|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|oga|ogg|okt|opus|ra|s3m|s3gz|s3xz|s3z|tak|tta|ulaw|wav|wma|wv|xm|xmgz|xmxz|xmz|xpk|3gp|asf|avi|flv|m4v|mkv|mov|mp4|mpeg|mpeg2|mpegts|mpg|mpg2|nut|ogm|ogv|rm|ts|vob|webm|wmv)$/i;
 
 
@@ -5883,10 +13531,11 @@ function MPlayer() {
 			fn = url.split('?')[0];
 
 		if (re_audio.exec(fn)) {
-			var tid = link.getAttribute('id');
+			var tid = link.getAttribute('id'),
+				txt = re_au_vid.exec(fn) ? '(🎧)' : L.mb_play;
 			r.order.push(tid);
 			r.tracks[tid] = url;
-			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">' + L.mb_play + '</a></td>';
+			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">' + txt + '</a></td>';
 			ebi('a' + tid).onclick = ev_play;
 			clmod(trs[a], 'au', 1);
 		}
@@ -6623,6 +14272,10 @@ function song_skip(n, dirskip) {
 }
 function next_song(e) {
 	ev(e);
+	if (QS('.dumb_loader_thing')) {
+		treectl.ls_cb = next_song;
+		return;
+	}
 	if (mp.order.length) {
 		var dirskip = mpl.traversals;
 		mpl.traversals = 0;
@@ -6656,6 +14309,10 @@ function prev_song(e) {
 	if (mp.au && !mp.au.paused && mp.au.currentTime > 3)
 		return seek_au_sec(0);
 
+	if (QS('.dumb_loader_thing')) {
+		treectl.ls_cb = function () { song_skip(-1); };
+		return;
+	}
 	return song_skip(-1);
 }
 function dl_song() {
@@ -7705,9 +15362,11 @@ function eval_hash() {
 			d.onclick = function (e) {
 				ev(e);
 				if (a)
-					QS(treectl.hidden ? '#path a:nth-last-child(2)' : '#treeul a.hl').focus();
+					d = QS(treectl.hidden ? '#path a:nth-last-child(2)' : '#treeul a.hl');
 				else
-					QS(thegrid.en ? '#ggrid a' : '#files tbody tr[tabindex]').focus();
+					d = QS(thegrid.en ? '#ggrid a' : '#files tbody tr[tabindex]');
+				if (d)
+					d.focus();
 			};
 		})(a);
 
@@ -7975,6 +15634,16 @@ function fmt_ren(re, md, fmt) {
 }
 
 
+function fs_abrt() {
+	toast.inf(30, L.fp_abrt);
+	fileman.sn++;
+	fileman.f.length = 0;
+	var xhr = new XHR();
+	xhr.open('POST', '/?fs_abrt=' + abrt_key, true);
+	xhr.send();
+}
+
+
 var fileman = (function () {
 	var bren = ebi('fren'),
 		bdel = ebi('fdel'),
@@ -7985,6 +15654,8 @@ var fileman = (function () {
 		t_paste,
 		r = {};
 
+	r.f = [];
+	r.sn = 1;
 	r.clip = null;
 	try {
 		r.bus = new BroadcastChannel("fileman_bus");
@@ -8010,7 +15681,7 @@ var fileman = (function () {
 			hdel = !(have_del && has(perms, 'delete')),
 			hcut = !(have_mv && has(perms, 'move')),
 			hpst = !(have_mv && has(perms, 'write')),
-			hshr = !(have_shr && acct != '*' && (has(perms, 'read') || has(perms, 'write')));
+			hshr = !can_shr;
 
 		if (!(enren || endel || encut || enpst))
 			hren = hdel = hcut = hpst = true;
@@ -8171,7 +15842,7 @@ var fileman = (function () {
 
 		exm.onkeydown = exh.onkeydown = exd.onkeydown =
 		sh_k.onkeydown = sh_pw.onkeydown = function (e) {
-			var kc = (e.code || e.key) + '';
+			var kc = (e.key || e.code) + '';
 			if (kc.endsWith('Enter'))
 				sh_apply.click();
 		};
@@ -8269,8 +15940,11 @@ var fileman = (function () {
 			return toast.err(3, L.fr_eperm);
 
 		var f = [],
+			sn = ++r.sn,
 			base = vsplit(sel[0].vp)[0],
 			mkeys;
+
+		r.f = f;
 
 		for (var a = 0; a < sel.length; a++) {
 			var vp = sel[a].vp;
@@ -8378,7 +16052,7 @@ var fileman = (function () {
 				(function (a) {
 					f[a].inew.onkeydown = function (e) {
 						rn_ok(a, true);
-						var kc = (e.code || e.key) + '';
+						var kc = (e.key || e.code) + '';
 						if (kc.endsWith('Enter'))
 							return rn_apply();
 					};
@@ -8476,7 +16150,7 @@ var fileman = (function () {
 		spresets();
 
 		ire.onkeydown = ifmt.onkeydown = function (e) {
-			var k = (e.code || e.key) + '';
+			var k = (e.key || e.code) + '';
 
 			if (k == 'Escape' || k == 'Esc')
 				return rn_cancel();
@@ -8551,7 +16225,9 @@ var fileman = (function () {
 				return rn_cancel();
 			}
 
-			toast.show('inf r', 0, esc(L.fr_busy.format(f.length, f[0].ofn)));
+			var msg = esc(L.fr_busy.format(f.length, f[0].ofn));
+			msg += '\n<a id="fs_abrt" class="btn" href="#" onclick="fs_abrt()">' + L.fs_abrt + '</a>';
+			toast.show('inf r', 0, msg);
 			var dst = base + uricom_enc(f[0].inew.value, false);
 
 			function rename_cb() {
@@ -8560,13 +16236,17 @@ var fileman = (function () {
 					toast.err(9, L.fr_efail + msg);
 					return;
 				}
+				if (r.sn != sn)
+					return modal.confirm('WARNING: the rename was aborted');
 
 				f.shift().inew.value = '( OK )';
 				return rn_apply_loop();
 			}
 
+			abrt_key = randstr(9);
+
 			var xhr = new XHR();
-			xhr.open('POST', f[0].src + '?move=' + dst, true);
+			xhr.open('POST', f[0].src + '?move=' + dst + '&akey=' + abrt_key, true);
 			xhr.onload = xhr.onerror = rename_cb;
 			xhr.send();
 		}
@@ -8574,6 +16254,7 @@ var fileman = (function () {
 
 	r.delete = function (e) {
 		var sel = msel.getsel(),
+			sn = ++r.sn,
 			vps = [];
 
 		for (var a = 0; a < sel.length; a++)
@@ -8610,6 +16291,9 @@ var fileman = (function () {
 				toast.err(9, L.fd_err + msg);
 				return;
 			}
+			if (r.sn != sn)
+				return modal.confirm('WARNING: the delete was aborted');
+
 			if (this.responseText.indexOf('deleted 0 files (and 0') + 1) {
 				toast.err(9, L.fd_none);
 				return deleter('xbd');
@@ -8822,11 +16506,14 @@ var fileman = (function () {
 				'<div><table id="rn_f" class="m">',
 				'<tr><td>' + L.fr_lnew + '</td><td>' + L.fr_lold + '</td></tr>',
 			],
+			sn = ++r.sn,
 			ui = false,
 			f = [],
 			indir = [],
 			srcdir = vsplit(r.clip[0])[0],
 			links = QSA('#files tbody td:nth-child(2) a');
+
+		r.f = f;
 
 		for (var a = 0, aa = links.length; a < aa; a++)
 			indir.push(uricom_dec(vsplit(noq_href(links[a]))[1]));
@@ -8859,13 +16546,17 @@ var fileman = (function () {
 			if (!t.dst)
 				return paster();
 
-			toast.show('inf r', 0, esc((r.ccp ? L.fcp_busy : L.fp_busy).format(f.length + 1, uricom_dec(t.src))));
+			var msg = esc((r.ccp ? L.fcp_busy : L.fp_busy).format(f.length + 1, uricom_dec(t.src)));
+			msg += '\n<a id="fs_abrt" class="btn" href="#" onclick="fs_abrt()">' + L.fs_abrt + '</a>';
+			toast.show('inf r', 0, msg);
 
 			var xhr = new XHR(),
 				act = r.ccp ? '?copy=' : '?move=',
 				dst = get_evpath() + uricom_enc(t.dst);
 
-			xhr.open('POST', t.src + act + dst, true);
+			abrt_key = randstr(9);
+
+			xhr.open('POST', t.src + act + dst + '&akey=' + abrt_key, true);
 			xhr.onload = xhr.onerror = paste_cb;
 			xhr.send();
 		}
@@ -8875,6 +16566,9 @@ var fileman = (function () {
 				toast.err(9, (r.ccp ? L.fcp_err : L.fp_err) + msg);
 				return;
 			}
+			if (r.sn != sn)
+				return modal.confirm('WARNING: the paste was aborted');
+
 			paster();
 		}
 		function okgo() {
@@ -8938,7 +16632,7 @@ var fileman = (function () {
 			(function (a) {
 				var inew = ebi('rn_new_' + a);
 				inew.onkeydown = function (e) {
-					if (((e.code || e.key) + '').endsWith('Enter'))
+					if (((e.key || e.code) + '').endsWith('Enter'))
 						return rn_apply();
 				};
 				inew.oninput = function (e) {
@@ -9371,7 +17065,8 @@ var showfile = (function () {
 	};
 
 	r.mktree = function () {
-		var crumbs = linksplit(get_evpath()).join('<span>/</span>'),
+		var top = get_evpath().slice(SR.length),
+			crumbs = linksplit(top).join('<span>/</span>'),
 			html = ['<li class="bn">' + L.tv_lst + '<br />' + crumbs + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
@@ -9995,7 +17690,10 @@ function tree_scrolltoo(q) {
 }
 
 
-function tree_neigh(n) {
+function tree_neigh(n, ratelimit) {
+	if (ratelimit && QS('.dumb_loader_thing') && Date.now() - treectl.busied < 5)
+		return;
+
 	var links = QSA(showfile.active() || treectl.texts ? '#docul li>a' : '#treeul li>a+a');
 	if (!links.length) {
 		treectl.dir_cb = function () {
@@ -10113,6 +17811,13 @@ function fselfunw(e, ae, d, rem) {
 	}
 	selfun();
 }
+var konmai = 0, konmak = (function() {
+	var u = "arrowup",
+		d = "arrowdown",
+		l = "arrowleft",
+		r = "arrowright";
+	return [u, u, d, d, l, r, l, r, "b", "a", "enter"];
+})();
 var ahotkeys = function (e) {
 	if (e.altKey || e.isComposing)
 		return;
@@ -10120,9 +17825,37 @@ var ahotkeys = function (e) {
 	if (QS('#bbox-overlay.visible') || modal.busy)
 		return;
 
-	var k = (e.code || e.key) + '', pos = -1, n,
+	var k = (e.key || e.code) + '', pos = -1, n,
 		ae = document.activeElement,
 		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
+
+	if (k.startsWith('Key'))
+		k = k.slice(3);
+	else if (k.startsWith('Digit'))
+		k = k.slice(5);
+
+	var kl = k.toLowerCase();
+
+	if (dbg_kbd)
+		console.log('KBD', k, kl, e.key, e.code, e.keyCode, e.which);
+
+	if (konmai < 0)
+		noop();
+	else if (konmak[konmai] != kl)
+		konmai = konmai && kl == konmak[0] ? (konmai<3?konmai:1):0;
+	else if (++konmai >= konmak.length) {
+		konmai = -1;
+		document.documentElement.scrollTop = 0;
+		settheme.go(6);
+		start_actx();
+		sfx_nice();
+		toast.inf(9, 'omega clearance granted', null, 'top');
+		setTimeout(function() {
+			apply_perms(treectl.lsc);
+			fileman.render();
+		}, 573);
+		return ev(e);
+	}
 
 	if (k == 'Escape' || k == 'Esc') {
 		ae && ae.blur();
@@ -10171,7 +17904,7 @@ var ahotkeys = function (e) {
 			fselfunw(e, ae, d, rem);
 			return ev(e);
 		}
-		if (k == 'Space' || k == 'Spacebar') {
+		if (k == 'Space' || k == 'Spacebar' || k == ' ') {
 			clmod(ae, 'sel', 't');
 			msel.origin_tr(ae);
 			msel.selui();
@@ -10179,7 +17912,7 @@ var ahotkeys = function (e) {
 		}
 	}
 	if (in_ftab || !aet || (ae && ae.closest('#ggrid'))) {
-		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
+		if ((kl == 'a') && ctrl(e)) {
 			var ntot = treectl.lsc.files.length + treectl.lsc.dirs.length,
 				sel = msel.getsel(),
 				all = msel.getall();
@@ -10195,7 +17928,7 @@ var ahotkeys = function (e) {
 	}
 
 	if (ae && ae.closest('pre')) {
-		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
+		if ((kl == 'a') && ctrl(e)) {
 			var sel = document.getSelection(),
 				ran = document.createRange();
 
@@ -10212,107 +17945,105 @@ var ahotkeys = function (e) {
 	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre')
 		return;
 
-	if (e.key == '?')
+	if (k == '?')
 		return hkhelp();
 
 	if (!e.shiftKey && ctrl(e)) {
 		var sel = window.getSelection && window.getSelection() || {};
 		sel = sel && !sel.isCollapsed && sel.direction != 'none';
 
-		if (k == 'KeyX' || k == 'x')
+		if (kl == 'x')
 			return fileman.cut(e);
 
-		if ((k == 'KeyC' || k == 'c') && !sel)
+		if (kl == 'c' && !sel)
 			return fileman.cpy(e);
 
-		if (k == 'KeyV' || k == 'v')
+		if (kl == 'v')
 			return fileman.d_paste(e);
 
-		if (k == 'KeyK' || k == 'k')
+		if (kl == 'k')
 			return fileman.delete(e);
 
 		return;
 	}
 
-	if (e.shiftKey && k != 'KeyA' && k != 'KeyD' && k != 'A' && k != 'D')
+	if (e.shiftKey && kl != 'a' && kl != 'd')
 		return;
 
-	if (k.indexOf('Digit') === 0)
-		pos = parseInt(k.slice(-1)) * 0.1;
+	if (/^[0-9]$/.test(k))
+		pos = parseInt(k) * 0.1;
 
 	if (pos !== -1)
 		return seek_au_mul(pos) || true;
 
-	if (k == 'KeyJ' || k == 'j')
+	if (kl == 'j')
 		return prev_song() || true;
 
-	if (k == 'KeyL' || k == 'l')
+	if (kl == 'l')
 		return next_song() || true;
 
-	if (k == 'KeyP' || k == 'p')
+	if (kl == 'p')
 		return playpause() || true;
 
-	n = (k == 'KeyU' || k == 'u') ? -10 :
-		(k == 'KeyO' || k == 'o') ? 10 : 0;
+	n = kl == 'u' ? -10 : kl == 'o' ? 10 : 0;
 	if (n !== 0)
 		return seek_au_rel(n) || true;
 
-	if (k == 'KeyY')
+	if (kl == 'y')
 		return msel.getsel().length ? ebi('seldl').click() :
 			showfile.active() ? ebi('dldoc').click() :
 				dl_song();
 
-	n = (k == 'KeyI' || k == 'i') ? -1 :
-		(k == 'KeyK' || k == 'k') ? 1 : 0;
+	n = kl == 'i' ? -1 : kl == 'k' ? 1 : 0;
 	if (n !== 0)
-		return tree_neigh(n);
+		return tree_neigh(n, 1);
 
-	if (k == 'KeyM' || k == 'm')
+	if (kl == 'm')
 		return tree_up();
 
-	if (k == 'KeyB' || k == 'b')
+	if (kl == 'b')
 		return treectl.hidden ? treectl.entree() : treectl.detree();
 
-	if (k == 'KeyG' || k == 'g')
+	if (kl == 'g')
 		return ebi('griden').click();
 
-	if (k == 'KeyT' || k == 't')
+	if (kl == 't')
 		return ebi('thumbs').click();
 
-	if (k == 'KeyV' || k == 'v')
+	if (kl == 'v')
 		return ebi('filetree').click();
 
 	if (k == 'F2')
 		return fileman.rename();
 
 	if (!treectl.hidden && (!e.shiftKey || !thegrid.en)) {
-		if (k == 'KeyA' || k == 'a')
+		if (kl == 'a')
 			return QS('#twig').click();
 
-		if (k == 'KeyD' || k == 'd')
+		if (kl == 'd')
 			return QS('#twobytwo').click();
 	}
 
 	if (showfile.active()) {
-		if (k == 'KeyS' || k == 's')
+		if (kl == 's')
 			showfile.tglsel();
-		if ((k == 'KeyE' || k == 'e') && ebi('editdoc').style.display != 'none')
+		if (kl == 'e' && ebi('editdoc').style.display != 'none')
 			ebi('editdoc').click();
 	}
 
 	if (mp && mp.au && !mp.au.paused) {
-		if (k == 'KeyS')
+		if (kl == 's')
 			return sel_song();
 	}
 
 	if (thegrid.en) {
-		if (k == 'KeyS' || k == 's')
+		if (kl == 's')
 			return ebi('gridsel').click();
 
-		if (k == 'KeyA' || k == 'a')
+		if (kl == 'a')
 			return QSA('#ghead a[z]')[0].click();
 
-		if (k == 'KeyD' || k == 'd')
+		if (kl == 'd')
 			return QSA('#ghead a[z]')[1].click();
 	}
 };
@@ -10587,7 +18318,8 @@ var search_ui = (function () {
 		for (var a = 0; a < res.hits.length; a++) {
 			var r = res.hits[a],
 				ts = parseInt(r.ts),
-				sz = esc(r.sz + ''),
+				sz = parseInt(r.sz),
+				hsz = filesizefun(sz),
 				rp = esc(uricom_dec(r.rp + '')),
 				ext = rp.lastIndexOf('.') > 0 ? rp.split('.').pop().split('?')[0] : '%',
 				id = 'f-' + ('00000000' + crc32(rp)).slice(-8);
@@ -10600,7 +18332,8 @@ var search_ui = (function () {
 				ext = '%';
 
 			var links = linksplit(r.rp + '', id).join('<span>/</span>'),
-				nodes = ['<tr><td>-</td><td><div>' + links + '</div>', sz];
+				nodes = ['<tr><td>-</td><td><div>' + links +
+					'</div></td><td sortv="' + sz + '">' + hsz];
 
 			for (var b = 0; b < tagord.length; b++) {
 				var k = esc(tagord[b]),
@@ -10671,7 +18404,7 @@ function ev_load_m3u(e) {
 		function () { load_m3u(url); },
 		function () {
 			if (has(perms, 'write') && has(perms, 'delete'))
-				window.location = url + '?edit';
+				location = url + '?edit';
 			else
 				showfile.show(url);
 		}
@@ -11070,7 +18803,7 @@ var treectl = (function () {
 		xhr.top = top;
 		xhr.dst = dst;
 		xhr.rst = rst;
-		xhr.ts = Date.now();
+		xhr.ts = r.busied = Date.now();
 		xhr.open('GET', addq(dst, 'tree=' + top + (r.dots ? '&dots' : '') + k), true);
 		xhr.onload = xhr.onerror = r.recvtree;
 		xhr.send();
@@ -11109,13 +18842,22 @@ var treectl = (function () {
 		}
 		ebi('treeul').setAttribute('ts', ts);
 
+		if (SR && !top0) {
+			var x = SR.slice(1).split('/');
+			while (x[0]) {
+				res = res['k' + x.shift()];
+				if (!res)
+					throw 'invalid --rp-loc (or bug?)';
+			}
+		}
+
 		var top = (top0 == '.' ? dst : top0).split('?')[0],
 			name = uricom_dec(top.split('/').slice(-2)[0]),
 			rtop = top.replace(/^\/+/, ""),
-			html = parsetree(res, rtop);
+			html = parsetree(res, rtop.slice(SR.length));
 
 		if (!top0) {
-			html = '<li><a href="#">-</a><a href="/">[root]</a>\n<ul>' + html;
+			html = '<li><a href="#">-</a><a href="' + SR + '/">[root]</a>\n<ul>' + html;
 			if (rst || !ebi('treeul').getElementsByTagName('li').length)
 				ebi('treeul').innerHTML = html + '</ul></li>';
 		}
@@ -11258,10 +19000,6 @@ var treectl = (function () {
 			return;
 		}
 		var href = this.getAttribute('href');
-		if (R && !href.startsWith(SR)) {
-			location = href;
-			return;
-		}
 		r.reqls(href, true);
 		r.dir_cb = tree_scrollto;
 		thegrid.setvis(true);
@@ -11270,7 +19008,7 @@ var treectl = (function () {
 
 	r.reqls = function (url, hpush, back, hydrate) {
 		if (IE && !history.pushState)
-			return window.location = url;
+			return location = url;
 
 		var xhr = new XHR(),
 			m = /[?&](k=[^&#]+)/.exec(url),
@@ -11284,8 +19022,9 @@ var treectl = (function () {
 		xhr.back = back
 		xhr.hpush = hpush;
 		xhr.hydrate = hydrate;
-		xhr.ts = Date.now();
+		xhr.ts = r.busied = Date.now();
 		xhr.open('GET', xhr.top + '?ls' + uq, true);
+		xhr.setRequestHeader('Fnugg', '' + xhr.ts);
 		xhr.onload = xhr.onerror = recvls;
 		xhr.send();
 
@@ -11333,6 +19072,7 @@ var treectl = (function () {
 		try {
 			var res = JSON.parse(this.responseText);
 			Object.assign(res, res.cfg);
+			res.cfg.k;
 		}
 		catch (ex) {
 			if (r.ls_cb) {
@@ -11350,6 +19090,9 @@ var treectl = (function () {
 
 		if (r.chk_index_html(this.top, res))
 			return;
+
+		if (this.ts != res.fnugg && res.fnugg != 'nei' && sread('no_fnugg') !== '1')
+			toast.warn(60, "WARNING: A proxy/CDN between your webbrowser and the server is misbehaving, and caching responses it shouldn't. As a result, you are now seeing stale directory listings. There will be many issues.\n\nIf you need to ignore this and stop these messages, you can set the global-option 'no-fnugg' on the server, or click <code>π</code> and run this: <code>STG.no_fnugg=1</code>");
 
 		for (var a = 0; a < res.files.length; a++)
 			if (res.files[a].tags === undefined)
@@ -11432,7 +19175,7 @@ var treectl = (function () {
 			fun();
 		}
 
-		if (window.have_shr && QS('#op_unpost.act') && (cdir.startsWith(SR + have_shr) || get_evpath().startsWith(SR + have_shr)))
+		if (can_shr && QS('#op_unpost.act') && (cdir.startsWith(SR + have_shr) || get_evpath().startsWith(SR + have_shr)))
 			goto('unpost');
 	}
 
@@ -11516,7 +19259,8 @@ var treectl = (function () {
 
 			var cl = /\.PARTIAL$/.exec(fname) ? ' class="fade"' : '',
 				ln = ['<tr' + cl + '><td>' + tn.lead + '</td><td><a href="' +
-					top + tn.href + '" id="' + id + '">' + hname + '</a>', tn.sz];
+					top + tn.href + '" id="' + id + '">' + hname +
+					'</a></td><td sortv="' + tn.sz + '">' + filesizefun(tn.sz)];
 
 			for (var b = 0; b < res.taglist.length; b++) {
 				var k = esc(res.taglist[b]),
@@ -11601,6 +19345,7 @@ var treectl = (function () {
 			return r.reqls(get_evpath(), false, undefined, true);
 		}
 		ls0.unlist = unlist0;
+		ls0.u2ts = u2ts;
 
 		var top = get_evpath();
 		if (r.chk_index_html(top, ls0))
@@ -11725,7 +19470,7 @@ var treectl = (function () {
 				url = '/' + (top ? top + uek : uek) + '/',
 				sym = res[kk] ? '-' : '+',
 				link = '<a href="#">' + sym + '</a><a href="' +
-					url + kdk + '">' + hek + '</a>';
+					SR + url + kdk + '">' + hek + '</a>';
 
 			if (res[kk]) {
 				var subtree = parsetree(res[kk], url.slice(1));
@@ -11836,6 +19581,19 @@ var wfp_debounce = (function () {
 function apply_perms(res) {
 	perms = res.perms || [];
 
+	var axs = [],
+		aclass = '>',
+		chk = ['read', 'write', 'move', 'delete', 'get', 'admin'];
+
+	if (konmai < 0) {
+		acct = 'Ted Faro';
+		srvinf = 'FAS Nexus</span> // <span>57.3 EiB free of 127 EiB';
+		res.shr_who = 'auth';
+		perms = res.perms = chk;
+		have_up2k_idx = have_tags_idx = 1;
+		have_mv = have_del = true;
+	}
+
 	var a = QS('#ops a[data-dest="up2k"]');
 	if (have_up2k_idx) {
 		a.removeAttribute('data-perm');
@@ -11850,10 +19608,6 @@ function apply_perms(res) {
 	a.style.display = '';
 	tt.att(QS('#ops'));
 
-	var axs = [],
-		aclass = '>',
-		chk = ['read', 'write', 'move', 'delete', 'get', 'admin'];
-
 	for (var a = 0; a < chk.length; a++)
 		if (has(perms, chk[a]))
 			axs.push(chk[a].slice(0, 1).toUpperCase() + chk[a].slice(1));
@@ -11864,10 +19618,14 @@ function apply_perms(res) {
 		axs += '-Only';
 	}
 
+	var dst = "?h";
+	if (idp_login && acct == "*")
+		dst = idp_login.replace(/\{dst\}/g, get_evpath());
+
 	ebi('acc_info').innerHTML = '<span id="srv_info2"><span>' + srvinf +
 		'</span></span><span' + aclass + axs + L.access + '</span>' + (acct != '*' ?
-			'<form id="flogout" method="post" enctype="multipart/form-data"><input type="hidden" name="act" value="logout" /><input id="blogout" type="submit" value="' + (window.is_idp ? '' : L.logout) + acct + '"></form>' :
-			'<a href="?h">Login</a>');
+			'<form id="flogout" method="post" enctype="multipart/form-data"><input type="hidden" name="act" value="logout" /><input id="blogout" type="submit" value="' + L.logout + acct + '"></form>' :
+			'<a href="' + dst + '">' + L.login + '</a>');
 
 	var o = QSA('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++) {
@@ -11897,6 +19655,11 @@ function apply_perms(res) {
 		have_read = has(perms, "read"),
 		de = document.documentElement,
 		tds = QSA('#u2conf td');
+
+	shr_who = res.shr_who || shr_who;
+	can_shr = acct != '*' && (have_read || have_write) && (
+		(shr_who == 'a' && has(perms, 'admin')) ||
+		(shr_who == 'auth'));
 
 	clmod(de, "read", have_read);
 	clmod(de, "write", have_write);
@@ -12190,25 +19953,21 @@ var mukey = (function () {
 		defnot = 'rekobo_alnum';
 
 	var map = {},
-		html = [];
+		html = [],
+		cb = ebi('key_notation');
 
 	for (var k in maps) {
 		if (!maps.hasOwnProperty(k))
 			continue;
 
-		html.push(
-			'<span><input type="radio" name="keytype" value="' + k + '" id="key_' + k + '">' +
-			'<label for="key_' + k + '">' + k + '</label></span>');
-
+		html.push('<option value="{0}">{0}</option>'.format(k));
 		for (var a = 0; a < 24; a++)
 			maps[k][a] = maps[k][a].trim();
 	}
-	ebi('key_notation').innerHTML = html.join('\n');
+	cb.innerHTML = html.join('');
 
-	function set_key_notation(e) {
-		ev(e);
-		var notation = this.getAttribute('value');
-		load_notation(notation);
+	function set_key_notation() {
+		load_notation(cb.value);
 		try_render();
 	}
 
@@ -12265,13 +20024,9 @@ var mukey = (function () {
 	if (!maps[notation])
 		notation = defnot;
 
-	ebi('key_' + notation).checked = true;
+	cb.value = notation;
+	cb.onchange = set_key_notation;
 	load_notation(notation);
-
-	var o = QSA('#key_notation input');
-	for (var a = 0; a < o.length; a++) {
-		o[a].onchange = set_key_notation;
-	}
 
 	return {
 		"render": try_render
@@ -12311,17 +20066,17 @@ var settheme = (function () {
 		showfile.setstyle();
 		bchrome();
 
-		var html = [], itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con'];
+		var html = [],
+			cb = ebi('themes'),
+			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
+			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
 
 		for (var a = 0; a < themes; a++)
-			html.push('<a href="#" class="btn tgl' + (a == itheme ? ' on' : '') +
-				'" tt="' + (names[a] || 'custom') + '">' + a + '</a>');
+			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));
 
 		ebi('themes').innerHTML = html.join('');
-		var btns = QSA('#themes a');
-		for (var a = 0; a < themes; a++)
-			btns[a].onclick = r.go;
+		cb.value = itheme;
+		cb.onchange = r.onsel;
 
 		if (chldr) {
 			var x = r.ldr[itheme] || [tre];
@@ -12330,12 +20085,13 @@ var settheme = (function () {
 		}
 
 		bcfg_set('light', light);
-		tt.att(ebi('themes'));
 	}
 
-	r.go = function (e) {
-		var i = e;
-		try { ev(e); i = e.target.textContent; } catch (ex) { }
+	r.onsel = function () {
+		r.go(parseInt(ebi('themes').value));
+	};
+
+	r.go = function (i) {
 		light = i % 2 == 1;
 		var c = ax[Math.floor(i / 2)],
 			l = light ? 'y' : 'z';
@@ -12343,36 +20099,60 @@ var settheme = (function () {
 		themen = c + l;
 		swrite('cpp_thm', theme);
 		freshen();
-	}
+	};
 
 	freshen();
 	return r;
 })();
 
 
+var setfszf = (function () {
+	function freshen() {
+		var cb = ebi('fszfmt'),
+			fmt = sread("fszfmt", humansize_fmts) || window.dfszf;
+		if (!has(humansize_fmts, fmt))
+			fmt = '1';
+		window.filesizefun = window['humansize_' + fmt];
+		cb.onchange = onch;
+		if (cb.value != fmt)
+			cb.value = fmt;
+	}
+	function onch(e) {
+		ev(e);
+		setfmt(ebi('fszfmt').value)
+	}
+	function setfmt(fmt) {
+		swrite("fszfmt", fmt);
+		freshen();
+		treectl.gentab(get_evpath(), treectl.lsc);
+	}
+	freshen();
+	return setfmt;
+})();
+
+
 (function () {
 	function freshen() {
 		lang = sread("cpp_lang", LANGS) || lang;
-		var k, html = [];
+		var k, cb = ebi('langs'), html = [];
 		for (var a = 0; a < LANGS.length; a++) {
 			k = LANGS[a];
-			html.push('<a href="#" class="btn tgl' + (k == lang ? ' on' : '') +
-				'" tt="' + Ls[k].tt + '">' + k + '</a>');
+			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(k, Ls[k].tt));
 		}
-		ebi('langs').innerHTML = html.join('');
-		var btns = QSA('#langs a');
-		for (var a = 0, aa = btns.length; a < aa; a++)
-			btns[a].onclick = setlang;
+		cb.innerHTML = html.join('');
+		cb.onchange = setlang;
+		cb.value = lang;
 	}
 
 	function setlang(e) {
 		ev(e);
 		var t = L.lang_set;
-		L = Ls[this.textContent];
-		swrite("cpp_lang", this.textContent);
+		lang = ebi('langs').value;
+		L = Ls[lang];
+		swrite("cpp_lang", lang);
 		freshen();
 		modal.confirm(L.lang_set + "\n\n" + t, location.reload.bind(location), null);
-	};
+	}
 
 	freshen();
 })();
@@ -12921,7 +20701,7 @@ function show_md(md, name, div, url, depth) {
 
 	var marked_opts = {
 		headerPrefix: 'md-',
-		breaks: true,
+		breaks: !md_no_br,
 		gfm: true
 	};
 	var ext = md_plug.pre;
@@ -13508,14 +21288,6 @@ function reload_browser() {
 		o.textContent = uricom_dec(parts[a]) || '/';
 		ebi('path').appendChild(mknod('i'));
 		ebi('path').appendChild(o);
-	}
-
-	var oo = QSA('#files>tbody>tr>td:nth-child(3)');
-	for (var a = 0, aa = oo.length; a < aa; a++) {
-		var sz = oo[a].textContent.replace(/ +/g, ""),
-			hsz = sz.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-
-		oo[a].textContent = hsz;
 	}
 
 	reload_mp();

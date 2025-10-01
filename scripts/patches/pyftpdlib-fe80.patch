@@ -1,0 +1,37 @@
+accept connections from IPv6 link-local addresses
+
+diff -NarU1 a/pyftpdlib/handlers.py b/pyftpdlib2/handlers.py
+--- a/pyftpdlib/handlers.py	2024-06-23 14:03:38
++++ b/pyftpdlib/handlers.py	2025-08-22 21:59:40
+@@ -451,3 +451,4 @@
+ 
+-        local_ip = self.cmd_channel.socket.getsockname()[0]
++        sockname = list(self.cmd_channel.socket.getsockname())
++        local_ip = sockname[0]
+         if local_ip in self.cmd_channel.masquerade_address_map:
+@@ -459,3 +460,5 @@
+ 
+-        if self.cmd_channel.server.socket.family != socket.AF_INET:
++        if local_ip.startswith('fe') and local_ip[2:3] in "89ab":
++            af = socket.AF_INET6  # link-local
++        elif self.cmd_channel.server.socket.family != socket.AF_INET:
+             # dual stack IPv4/IPv6 support
+@@ -472,3 +475,4 @@
+             # free unprivileged random port.
+-            self.bind((local_ip, 0))
++            sockname[1] = 0
++            self.bind(tuple(sockname))
+         else:
+@@ -478,4 +482,5 @@
+                 self.set_reuse_addr()
++                sockname[1] = port
+                 try:
+-                    self.bind((local_ip, port))
++                    self.bind(tuple(sockname))
+                 except PermissionError:
+@@ -495,3 +500,4 @@
+                         else:
+-                            self.bind((local_ip, 0))
++                            sockname[1] = 0
++                            self.bind(tuple(sockname))
+                             self.cmd_channel.log(

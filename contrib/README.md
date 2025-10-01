@@ -7,6 +7,12 @@
 * works on windows, linux and macos
 * assumes `copyparty-sfx.py` was renamed to `copyparty.py` in the same folder as `copyparty.bat`
 
+### [`setup-ashell.sh`](setup-ashell.sh)
+* run copyparty on an iPhone/iPad using [a-Shell](https://holzschu.github.io/a-Shell_iOS/)
+* not very useful due to limitations in iOS:
+  * not able to share all of your phone's storage
+  * cannot run in the background
+
 ### [`index.html`](index.html)
 * drop-in redirect from an httpd to copyparty
 * assumes the webserver and copyparty is running on the same server/IP

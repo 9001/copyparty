@@ -430,6 +430,15 @@ html.y textarea:focus {
 .mdo code {
 	font-size: .96em;
 }
+html.z .mdo a>code,
+html.y .mdo a>code {
+	color: inherit;
+	background: inherit;
+	background: rgba(0, 0, 0, 0.2);
+	padding-top: 0;
+	padding-bottom: 0;
+	border: none;
+}
 .mdo h1,
 .mdo h2 {
 	line-height: 1.5em;

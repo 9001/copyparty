@@ -130,7 +130,8 @@ write markdown (most html is 🙆 too)
 
 var SR = "{{ r }}",
 	last_modified = {{ lastmod }},
-	have_emp = {{ "true" if have_emp else "false" }},
+	have_emp = {{ have_emp }},
+	md_no_br = {{ md_no_br }},
 	dfavico = "{{ favico }}";
 
 var md_opt = {

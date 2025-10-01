@@ -160,10 +160,12 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 
 | method | params | result |
 |--|--|--|
+| GET | `?dl` | download file (don't show in-browser) |
 | GET | `?ls` | list files/folders at URL as JSON |
 | GET | `?ls&dots` | list files/folders at URL as JSON, including dotfiles |
 | GET | `?ls=t` | list files/folders at URL as plaintext |
 | GET | `?ls=v` | list files/folders at URL, terminal-formatted |
+| GET | `?opds` | list files/folders at URL as opds feed, for e-readers |
 | GET | `?lt` | in listings, use symlink timestamps rather than targets |
 | GET | `?b` | list files/folders at URL as simplified HTML |
 | GET | `?tree=.` | list one level of subdirectories inside URL |
@@ -244,6 +246,7 @@ upload modifiers:
 | `Accept: json` | `want=json` | return upload info as json; same as `?j` |
 | `Rand: 4` | `rand=4` | generate random filename with 4 characters |
 | `Life: 30` | `life=30` | delete file after 30 seconds |
+| `Replace: 1` | `replace` | overwrite file if exists |
 | `CK: no` | `ck` | disable serverside checksum (maybe faster) |
 | `CK: md5` | `ck=md5` | return md5 checksum instead of sha512 |
 | `CK: sha1` | `ck=sha1` | return sha1 checksum |
@@ -252,7 +255,9 @@ upload modifiers:
 | `CK: b2s` | `ck=b2s` | return blake2s checksum |
 
 * `life` only has an effect if the volume has a lifetime, and the volume lifetime must be greater than the file's
-
+* `replace` upload-modifier:
+  * the header `replace: 1` works for both PUT and multipart-post
+  * the url-param `replace` only works for multipart-post
 * server behavior of `msg` can be reconfigured with `--urlform`
 
 ## admin
@@ -328,9 +333,8 @@ if you don't need all the features, you can repack the sfx and save a bunch of s
 
 the features you can opt to drop are
 * `cm`/easymde, the "fancy" markdown editor, saves ~89k
-* `hl`, prism, the syntax hilighter, saves ~41k
+* `hl`, prism, the syntax highlighter, saves ~41k
 * `fnt`, source-code-pro, the monospace font, saves ~9k
-* `dd`, the custom mouse cursor for the media player tray tab, saves ~2k
 
 for the `re`pack to work, first run one of the sfx'es once to unpack it
 
@@ -355,11 +359,19 @@ pip install mutagen  # audio metadata
 pip install pyftpdlib  # ftp server
 pip install partftpy  # tftp server
 pip install impacket  # smb server -- disable Windows Defender if you REALLY need this on windows
-pip install Pillow pyheif-pillow-opener  # thumbnails
+pip install Pillow pillow-heif  # thumbnails
 pip install pyvips  # faster thumbnails
-pip install psutil  # better cleanup of stuck metadata parsers on windows 
+pip install psutil  # better cleanup of stuck metadata parsers on windows
 pip install black==21.12b0 click==8.0.2 bandit pylint flake8 isort mypy  # vscode tooling
 ```
+
+* on archlinux you can do this:
+  * `sudo pacman -Sy --needed python-{pip,isort,jinja,argon2-cffi,pyzmq,mutagen,pyftpdlib,pillow}`
+  * then, as user: `python3 -m pip install --user --break-system-packages -U strip_hints black==21.12b0 click==8.0.2`
+  * for building docker images: `sudo pacman -Sy --needed qemu-user-static{,-binfmt} podman{,-docker} jq`
+
+* and if you want to run the python 2.7 tests:
+  * `git clone https://github.com/pyenv/pyenv .pyenv ; cd .pyenv/bin ; env PYTHON_CONFIGURE_OPTS='--enable-optimizations' PYTHON_CFLAGS='-march=native -mtune=native -std=c17' ./pyenv install 2.7.18 -v ; ln -s $HOME/.pyenv/versions/2.7.18/bin/python2 $HOME/bin/`
 
 
 ## just the sfx

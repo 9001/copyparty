@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.11"
-S_BUILD_DT = "2025-05-18"
+S_VERSION = "2.13"
+S_BUILD_DT = "2025-09-05"
 
 """
 u2c.py: upload to copyparty
@@ -10,7 +10,7 @@ u2c.py: upload to copyparty
 https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py
 
 - dependencies: no
-- supports python 2.6, 2.7, and 3.3 through 3.12
+- supports python 2.6, 2.7, and 3.3 through 3.14
 - if something breaks just try again and it'll autoresume
 """
 
@@ -52,7 +52,7 @@ if PY2:
 
     sys.dont_write_bytecode = True
     bytes = str
-    files_decoder = lambda s: unicode(s, 'utf8')
+    files_decoder = lambda s: unicode(s, "utf8")
 else:
     from urllib.parse import quote_from_bytes as quote
     from urllib.parse import unquote_to_bytes as unquote
@@ -590,9 +590,10 @@ def undns(url):
 
 def _scd(err, top):
     """non-recursive listing of directory contents, along with stat() info"""
+    top_ = os.path.join(top, b"")
     with os.scandir(top) as dh:
         for fh in dh:
-            abspath = os.path.join(top, fh.name)
+            abspath = top_ + fh.name
             try:
                 yield [abspath, fh.stat()]
             except Exception as ex:
@@ -601,8 +602,9 @@ def _scd(err, top):
 
 def _lsd(err, top):
     """non-recursive listing of directory contents, along with stat() info"""
+    top_ = os.path.join(top, b"")
     for name in os.listdir(top):
-        abspath = os.path.join(top, name)
+        abspath = top_ + name
         try:
             yield [abspath, os.stat(abspath)]
         except Exception as ex:
@@ -677,7 +679,7 @@ def walkdirs(err, tops, excl):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
             d, n = top.rsplit(sep, 1)
-            yield d, n, os.stat(top)
+            yield d or b"/", n, os.stat(top)
 
 
 # mostly from copyparty/util.py
@@ -1527,10 +1529,10 @@ def main():
 
     # fmt: off
     ap = app = argparse.ArgumentParser(formatter_class=APF, description="copyparty up2k uploader / filesearch tool  " + ver, epilog="""
-NOTE:
-source file/folder selection uses rsync syntax, meaning that:
+NOTE: source file/folder selection uses rsync syntax, meaning that:
   "foo" uploads the entire folder to URL/foo/
   "foo/" uploads the CONTENTS of the folder into URL/
+NOTE: if server has --usernames enabled, then password is "username:password"
 """)
 
     ap.add_argument("url", type=unicode, help="server url, including destination folder")

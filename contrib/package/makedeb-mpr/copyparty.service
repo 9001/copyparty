@@ -26,7 +26,7 @@ Environment=XDG_CONFIG_HOME=/home/cpp/.config
 ExecStartPre=+/bin/bash -c 'mkdir -p /run/tmpfiles.d/ && echo "x /tmp/pe-copyparty*" > /run/tmpfiles.d/copyparty.conf'
 
 # run copyparty
-ExecStart=/usr/bin/python3 /usr/bin/copyparty -c /etc/copyparty.d/init
+ExecStart=/usr/bin/python3 /usr/local/bin/copyparty -c /etc/copyparty.d/init
 
 [Install]
 WantedBy=multi-user.target

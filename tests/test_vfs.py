@@ -57,8 +57,10 @@ class TestVFS(unittest.TestCase):
         t2 = list(sorted(lst))
         self.assertEqual(t1, t2)
 
-    def test(self):
-        td = os.path.join(self.td, "vfs")
+    def wipe_vfs(self, td):
+        os.chdir("..")
+        if os.path.exists(td):
+            shutil.rmtree(td)
         os.mkdir(td)
         os.chdir(td)
 
@@ -72,7 +74,12 @@ class TestVFS(unittest.TestCase):
                         with open(fn, "w") as f:
                             f.write(fn)
 
+    def test(self):
+        td = os.path.join(self.td, "vfs")
+        self.wipe_vfs(td)
+
         # defaults
+        self.wipe_vfs(td)
         vfs = AuthSrv(Cfg(), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
@@ -81,6 +88,7 @@ class TestVFS(unittest.TestCase):
         self.assertAxs(vfs.axs.uwrite, ["*"])
 
         # single read-only rootfs (relative path)
+        self.wipe_vfs(td)
         vfs = AuthSrv(Cfg(v=["a/ab/::r"]), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
@@ -89,6 +97,7 @@ class TestVFS(unittest.TestCase):
         self.assertAxs(vfs.axs.uwrite, [])
 
         # single read-only rootfs (absolute path)
+        self.wipe_vfs(td)
         vfs = AuthSrv(Cfg(v=[td + "//a/ac/../aa//::r"]), self.log).vfs
         self.assertEqual(vfs.nodes, {})
         self.assertEqual(vfs.vpath, "")
@@ -97,6 +106,7 @@ class TestVFS(unittest.TestCase):
         self.assertAxs(vfs.axs.uwrite, [])
 
         # read-only rootfs with write-only subdirectory (read-write for k)
+        self.wipe_vfs(td)
         vfs = AuthSrv(
             Cfg(a=["k:k"], v=[".::r:rw,k", "a/ac/acb:a/ac/acb:w:rw,k"]),
             self.log,
@@ -161,6 +171,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(list(virt), [])
 
         # admin-only rootfs with all-read-only subfolder
+        self.wipe_vfs(td)
         vfs = AuthSrv(
             Cfg(a=["k:k"], v=[".::rw,k", "a:a:r"]),
             self.log,
@@ -185,6 +196,7 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(vfs.can_access("/a", "k"), perm_ro)
 
         # breadth-first construction
+        self.wipe_vfs(td)
         vfs = AuthSrv(
             Cfg(
                 v=[
@@ -207,6 +219,7 @@ class TestVFS(unittest.TestCase):
         self.undot(vfs, "./.././foo/..", "")
 
         # shadowing
+        self.wipe_vfs(td)
         vfs = AuthSrv(Cfg(v=[".::r", "b:a/ac:r"]), self.log).vfs
 
         fsp, r1, v1 = self.ls(vfs, "", "*")
@@ -244,6 +257,7 @@ class TestVFS(unittest.TestCase):
                 ).encode("utf-8")
             )
 
+        self.wipe_vfs(td)
         au = AuthSrv(Cfg(c=[cfg_path]), self.log)
         self.assertEqual(au.acct["a"], "123")
         self.assertEqual(au.acct["asd"], "fgh:jkl")

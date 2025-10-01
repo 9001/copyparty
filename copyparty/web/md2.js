@@ -1,6 +1,10 @@
 "use strict";
 
 
+var sloc0 = '' + location,
+    dbg_kbd = /[?&]dbgkbd\b/.exec(sloc0);
+
+
 // server state
 var server_md = dom_src.value;
 
@@ -255,7 +259,7 @@ function Modpoll() {
         }
 
         console.log('modpoll...');
-        var url = (document.location + '').split('?')[0] + '?_=' + Date.now();
+        var url = (location + '').split('?')[0] + '?_=' + Date.now();
         var xhr = new XHR();
         xhr.open('GET', url, true);
         xhr.responseType = 'text';
@@ -346,7 +350,7 @@ function save(e) {
         fd.append("lastmod", (force ? -1 : last_modified));
         fd.append("body", txt);
 
-        var url = (document.location + '').split('?')[0];
+        var url = (location + '').split('?')[0];
         var xhr = new XHR();
         xhr.open('POST', url, true);
         xhr.responseType = 'text';
@@ -404,7 +408,7 @@ function save_cb() {
 
 function run_savechk(lastmod, txt, btn, ntry) {
     // download the saved doc from the server and compare
-    var url = (document.location + '').split('?')[0] + '?_=' + Date.now();
+    var url = (location + '').split('?')[0] + '?_=' + Date.now();
     var xhr = new XHR();
     xhr.open('GET', url, true);
     xhr.responseType = 'text';
@@ -697,8 +701,14 @@ function reLastIndexOf(txt, ptn, end) {
 // table formatter
 function fmt_table(e) {
     if (e) e.preventDefault();
-    //dom_tbox.className = '';
-
+    try {
+        fmt_table2();
+    }
+    catch (ex) {
+        return toast.err(7, 'table-format (CTRL-K) failed:\n' + ex);
+    }
+}
+function fmt_table2() {
     var txt = dom_src.value,
         ofs = dom_src.selectionStart,
         //o0 = txt.lastIndexOf('\n\n', ofs),
@@ -930,23 +940,30 @@ var set_lno = (function () {
 
 // hotkeys / toolbar
 (function () {
-    var keydown = function (ev) {
-        if (!ev && window.event) {
-            ev = window.event;
+    var keydown = function (e) {
+        if (!e && window.event) {
+            e = window.event;
             if (dev_fbw == 1) {
                 toast.warn(10, 'hello from fallback code ;_;\ncheck console trace');
                 console.error('using window.event');
             }
         }
-        var kc = ev.code || ev.keyCode || ev.which,
+        var k = (e.key || e.code) + '',
             editing = document.activeElement == dom_src;
 
-        //console.log(ev.key, ev.code, ev.keyCode, ev.which);
-        if (ctrl(ev) && (ev.code == "KeyS" || kc == 83)) {
+        if (k.startsWith('Key'))
+            k = k.slice(3);
+
+        var kl = k.toLowerCase();
+
+        if (dbg_kbd)
+            console.log('KBD', k, kl, e.key, e.code, e.keyCode, e.which);
+
+        if (ctrl(e) && kl == "s") {
             save();
             return false;
         }
-        if (ev.code == "Escape" || kc == 27) {
+        if (k == "Escape" || k == "Esc") {
             var d = ebi('helpclose');
             if (d)
                 d.click();
@@ -954,46 +971,44 @@ var set_lno = (function () {
         if (editing)
             set_lno();
 
-        if (ctrl(ev)) {
-            if (ev.code == "KeyE") {
+        if (ctrl(e)) {
+            if (kl == "e") {
                 dom_nsbs.click();
                 return false;
             }
             if (!editing)
                 return true;
 
-            if (ev.code == "KeyH" || kc == 72) {
-                md_header(ev.shiftKey);
+            if (kl == "h") {
+                md_header(e.shiftKey);
                 return false;
             }
-            if (ev.code == "KeyZ" || kc == 90) {
-                if (ev.shiftKey)
+            if (kl == "z") {
+                if (e.shiftKey)
                     action_stack.redo();
                 else
                     action_stack.undo();
 
                 return false;
             }
-            if (ev.code == "KeyY" || kc == 89) {
+            if (kl == "y") {
                 action_stack.redo();
                 return false;
             }
-            if (ev.code == "KeyK") {
+            if (kl == "k") {
                 fmt_table();
                 return false;
             }
-            if (ev.code == "KeyU") {
+            if (kl == "u") {
                 iter_uni();
                 return false;
             }
-            var up = ev.code == "ArrowUp" || kc == 38;
-            var dn = ev.code == "ArrowDown" || kc == 40;
-            if (up || dn) {
-                md_p_jump(dn);
+            if (k == "ArrowUp" || k == "ArrowDown") {
+                md_p_jump(k == "ArrowDown");
                 return false;
             }
-            if (ev.code == "KeyX" || ev.code == "KeyC") {
-                md_cut(ev.code == "KeyX");
+            if (kl == "x" || kl == "c") {
+                md_cut(kl == "x");
                 return true; //sic
             }
         }
@@ -1001,18 +1016,18 @@ var set_lno = (function () {
             if (!editing)
                 return true;
 
-            if (ev.code == "Tab" || kc == 9) {
-                md_indent(ev.shiftKey);
+            if (k == "Tab") {
+                md_indent(e.shiftKey);
                 return false;
             }
-            if (ev.code == "Home" || kc == 36) {
-                md_home(ev.shiftKey);
+            if (k == "Home") {
+                md_home(e.shiftKey);
                 return false;
             }
-            if (!ev.shiftKey && ((ev.code + '').endsWith("Enter") || kc == 13)) {
+            if (!e.shiftKey && k.endsWith("Enter")) {
                 return md_newline();
             }
-            if (!ev.shiftKey && kc == 8) {
+            if (!e.shiftKey && k == "Backspace") {
                 return md_backspace();
             }
         }
@@ -1036,7 +1051,9 @@ ebi('help').onclick = function (e) {
     var dom = ebi('helpbox');
     var dtxt = dom.getElementsByTagName('textarea');
     if (dtxt.length > 0) {
-        convert_markdown(dtxt[0].value, dom);
+        var txt = dtxt[0].value;
+        if (!convert_markdown(txt, dom))
+            dom.innerText = txt.split('## markdown')[0];
         dom.innerHTML = '<a href="#" id="helpclose">close</a>' + dom.innerHTML;
     }
 

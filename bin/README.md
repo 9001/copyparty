@@ -1,7 +1,7 @@
 # [`u2c.py`](u2c.py)
 * command-line up2k client [(webm)](https://ocv.me/stuff/u2cli.webm)
 * file uploads, file-search, autoresume of aborted/broken uploads
-* sync local folder to server
+* [sync local folder to server](https://github.com/9001/copyparty/#folder-sync)
 * generally faster than browsers
 * if something breaks just restart it
 

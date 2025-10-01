@@ -50,7 +50,7 @@ catch (ex) {
     }
     catch (ex) {
         console.log('up2k init failed:', ex);
-        toast.err(10, 'could not initialze up2k\n\n' + basenames(ex));
+        toast.err(10, 'could not initialize up2k\n\n' + basenames(ex));
     }
 }
 treectl.onscroll();
@@ -732,7 +732,7 @@ function Donut(uc, st) {
         tstrober = setInterval(strobe, 300);
 
         if (uc.upsfx && actx && actx.state != 'suspended')
-            sfx();
+            sfx_nice();
 
         // firefox may forget that filedrops are user-gestures so it can skip this:
         if (uc.upnag && Notification && Notification.permission == 'granted')
@@ -745,8 +745,10 @@ function Donut(uc, st) {
         if (!txt)
             clearInterval(tstrober);
     }
+}
 
-    function sfx() {
+function sfx_nice() {
+    if (true) {
         var osc = actx.createOscillator(),
             gain = actx.createGain(),
             gg = gain.gain,
@@ -964,6 +966,7 @@ function up2k_init(subtle) {
             "t": 0
         },
         "car": 0,
+        "nre": 0,
         "slow_io": null,
         "oserr": false,
         "modn": 0,
@@ -1572,7 +1575,7 @@ function up2k_init(subtle) {
 
     function linklist() {
         var ret = [],
-            base = document.location.origin.replace(/\/$/, '');
+            base = location.origin.replace(/\/$/, '');
 
         for (var a = 0; a < st.files.length; a++) {
             var t = st.files[a],
@@ -1595,7 +1598,7 @@ function up2k_init(subtle) {
         ev(e);
         var txt = linklist();
         cliptxt(txt + '\n', function () {
-            toast.inf(5, un_clip.format(txt.split('\n').length));
+            toast.inf(5, L.un_clip.format(txt.split('\n').length));
         });
     };
 
@@ -1783,8 +1786,7 @@ function up2k_init(subtle) {
     }
 
     var tasker = (function () {
-        var running = false,
-            was_busy = false;
+        var running = false;
 
         var defer = function () {
             running = false;
@@ -1801,7 +1803,17 @@ function up2k_init(subtle) {
             while (true) {
                 var now = Date.now(),
                     blocktime = now - r.tact,
-                    is_busy = st.car < st.files.length;
+                    was_busy = !!st.is_busy,
+                    is_busy = !!(  // gzip take the wheel
+                        st.car < st.files.length ||
+                        st.busy.hash.length ||
+                        st.todo.hash.length ||
+                        st.busy.handshake.length ||
+                        st.todo.handshake.length ||
+                        st.busy.upload.length ||
+                        st.todo.upload.length ||
+                        st.busy.head.length ||
+                        st.todo.head.length);
 
                 if (blocktime > 2500)
                     console.log('main thread blocked for ' + blocktime);
@@ -1809,7 +1821,16 @@ function up2k_init(subtle) {
                 r.tact = now;
 
                 if (was_busy && !is_busy) {
-                    for (var a = 0; a < st.files.length; a++) {
+                    var nre = 0, nf = 0;
+                    for (var a = 0; a < st.files.length; a++)
+                        if (st.files[a].want_recheck)
+                            nre++;
+                    console.log('nre', nre, 'st', st.nre);
+                    if (st.nre != nre) {
+                        st.nre = nre;
+                        nf = st.files.length;
+                    }
+                    for (var a = 0; a < nf; a++) {
                         var t = st.files[a];
                         if (t.want_recheck) {
                             t.rechecks++;
@@ -1817,7 +1838,7 @@ function up2k_init(subtle) {
                             push_t(st.todo.handshake, t);
                         }
                     }
-                    is_busy = st.todo.handshake.length;
+                    is_busy = !!st.todo.handshake.length;
                     try {
                         if (!is_busy && !uc.fsearch && !msel.getsel().length && (!mp.au || mp.au.paused))
                             treectl.goto();
@@ -1826,7 +1847,7 @@ function up2k_init(subtle) {
                 }
 
                 if (was_busy != is_busy) {
-                    st.is_busy = was_busy = is_busy;
+                    st.is_busy = is_busy;
 
                     window[(is_busy ? "add" : "remove") +
                         "EventListener"]("beforeunload", warn_uploader_busy);
@@ -1947,7 +1968,7 @@ function up2k_init(subtle) {
 
         for (var a = 0; a < st.files.length; a++) {
             var t = st.files[a];
-            if (t.want_recheck && !t.rechecks)
+            if (t.want_recheck && t.rechecks < 999)
                 return;
         }
 
@@ -2693,8 +2714,9 @@ function up2k_init(subtle) {
                     if (ofs !== -1) {
                         err = err.slice(0, ofs + 1) + linksplit(err.slice(ofs + 2).trimEnd()).join(' / ');
                     }
-                    if (!t.rechecks && (err_pend || err_srcb)) {
+                    if (!t.rechecks)
                         t.rechecks = 0;
+                    if (t.rechecks < 999 && (err_pend || err_srcb)) {
                         t.want_recheck = true;
                         if (st.busy.upload.length || st.busy.handshake.length || st.bytes.uploaded) {
                             err = L.u_dupdefer;
@@ -2811,7 +2833,7 @@ function up2k_init(subtle) {
         if (!t.t_uploading)
             t.t_uploading = Date.now();
 
-        pvis.seth(t.n, 1, "🚀 send");
+        pvis.seth(t.n, 1, "🚀 " + L.ul_send);
 
         var chunksize = get_chunksize(t.size),
             car = pcar * chunksize,
@@ -3017,10 +3039,12 @@ function up2k_init(subtle) {
         if (anymod(e))
             return;
 
-        if (e.code == 'ArrowUp')
+        var k = e.key || e.code;
+
+        if (k == 'ArrowUp')
             bumpthread(1);
 
-        if (e.code == 'ArrowDown')
+        if (k == 'ArrowDown')
             bumpthread(-1);
     }
 
@@ -3083,7 +3107,8 @@ function up2k_init(subtle) {
     ebi('u2szg').addEventListener('blur', read_u2sz);
     ebi('u2szg').onkeydown = function (e) {
         if (anymod(e)) return;
-        var n = e.code == 'ArrowUp' ? 1 : e.code == 'ArrowDown' ? -1 : 0;
+        var k = e.key || e.code,
+            n = k == 'ArrowUp' ? 1 : k == 'ArrowDown' ? -1 : 0;
         if (!n) return;
         this.value = parseInt(this.value) + n;
         read_u2sz();
@@ -3160,7 +3185,8 @@ function up2k_init(subtle) {
 
     function kd_life(e) {
         var el = e.target,
-            d = e.code == 'ArrowUp' ? 1 : e.code == 'ArrowDown' ? -1 : 0;
+            k = e.key || e.code,
+            d = k == 'ArrowUp' ? 1 : k == 'ArrowDown' ? -1 : 0;
 
         if (anymod(e) || !d)
             return;
@@ -3401,6 +3427,8 @@ if (QS('#op_up2k.act'))
     goto_up2k();
 
 apply_perms({ "perms": perms, "frand": frand, "u2ts": u2ts });
+if (ls0)
+    fileman.render();
 
 
 (function () {

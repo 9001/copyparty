@@ -1,15 +1,14 @@
-# based on https://github.com/authelia/authelia/blob/39763aaed24c4abdecd884b47357a052b235942d/examples/compose/lite/authelia/configuration.yml
-
 # Authelia configuration
 
-# This secret can also be set using the env variables AUTHELIA_JWT_SECRET_FILE
-jwt_secret: a_very_important_secret
+identity_validation:
+  reset_password:
+    jwt_secret: 'a_very_important_secret_so_please_change_this'
 
 server:
   address: 'tcp://:9091'
 
 log:
-  level: info  # debug
+  level: info
 
 totp:
   issuer: authelia.com
@@ -21,29 +20,26 @@ authentication_backend:
 access_control:
   default_policy: deny
   rules:
-    # Rules applied to everyone
-    - domain: traefik.example.com
-      policy: one_factor
+    - domain: auth.example.com
+      policy: bypass  # Allow access to the login UI
     - domain: fs.example.com
       policy: one_factor
 
 session:
-  # This secret can also be set using the env variables AUTHELIA_SESSION_SECRET_FILE
   secret: unsecure_session_secret
-
   cookies:
     - name: authelia_session
-      domain: example.com  # Should match whatever your root protected domain is
+      domain: example.com  # this should match whatever your root protected domain is
       default_redirection_url: https://fs.example.com
       authelia_url: https://authelia.example.com/
       expiration: 3600  # 1 hour
       inactivity: 300  # 5 minutes
 
   redis:
-    host: redis
+    host: valkey
     port: 6379
-    # This secret can also be set using the env variables AUTHELIA_SESSION_REDIS_PASSWORD_FILE
-    # password: authelia
+    password: your_secure_password_here
+
 
 regulation:
   max_retries: 3
@@ -58,9 +54,7 @@ storage:
 notifier:
   disable_startup_check: true
   smtp:
-    username: test
-    # This secret can also be set using the env variables AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE
-    password: password
-    host: mail.example.com
-    port: 25
-    sender: admin@example.com
+    address: 'smtp://127.0.0.1:25'
+    username: 'test'
+    password: 'password'
+    sender: "Authelia <admin@example.com>"

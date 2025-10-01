@@ -102,6 +102,7 @@ def tc1(vflags):
         "-p4321",
         "-e2dsa",
         "-e2tsr",
+        "--wram",
         "--ban-403=no",
         "--dbd=yolo",
         "--no-mutagen",

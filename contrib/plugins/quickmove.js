@@ -101,10 +101,10 @@
 
     function our_hotkey_handler(e) {
         // bail if either ALT, CTRL, or SHIFT is pressed
-        if (e.altKey || e.shiftKey || e.isComposing || ctrl(e))
+        if (anymod(e))
             return main_hotkey_handler(e);  // let copyparty handle this keystroke
 
-        var key_name = (e.code || e.key) + '',
+        var keycode = (e.key || e.code) + '',
     		ae = document.activeElement,
 		    aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
 
@@ -114,7 +114,7 @@
         if (aet && !/^(a|button|tr|td|div|pre)$/.test(aet))
             return main_hotkey_handler(e);  // let copyparty handle this keystroke
 
-        if (key_name == 'KeyW') {
+        if (keycode == 'w' || keycode == 'KeyW') {
             // okay, this one's for us... do the thing
             action_to_perform();
             return ev(e);

@@ -7,7 +7,7 @@ import subprocess as sp
 
 # to convert the copyparty --help to html, run this in xfce4-terminal @ 140x43:
 _ = r""""
-echo; for a in '' -bind -accounts -flags -handlers -hooks -urlform -exp -ls -dbd -chmod -pwhash -zm; do
+echo; for a in '' -bind -accounts -auth -auth-ord -flags -handlers -hooks -idp -urlform -exp -ls -dbd -chmod -pwhash -zm; do
 ./copyparty-sfx.py --help$a 2>/dev/null; printf '\n\n\n%0139d\n\n\n'; done  # xfce4-terminal @ 140x43
 """
 # click [edit] => [select all]

@@ -50,7 +50,9 @@ let
 
   configStr = ''
     ${mkSection "global" cfg.settings}
+    ${cfg.globalExtraConfig}
     ${mkSection "accounts" (accountsWithPlaceholders cfg.accounts)}
+    ${mkSection "groups" cfg.groups}
     ${concatStringsSep "\n" (mapAttrsToList mkVolume cfg.volumes)}
   '';
 
@@ -131,6 +133,12 @@ in
       '';
     };
 
+    globalExtraConfig = mkOption {
+      type = types.str;
+      default = "";
+      description = "Appended to the end of the [global] section verbatim. This is useful for flags which are used in a repeating manner (e.g. ipu: 255.255.255.1=user) which can't be repeated in the settings = {} attribute set.";
+    };
+
     accounts = mkOption {
       type = types.attrsOf (
         types.submodule (
@@ -156,6 +164,19 @@ in
       example = literalExpression ''
         {
           ed.passwordFile = "/run/keys/copyparty/ed";
+        };
+      '';
+    };
+
+    groups = mkOption {
+      type = types.attrsOf (types.listOf types.str);
+      description = ''
+        A set of copyparty groups to create and the users that should be part of each group.
+      '';
+      default = { };
+      example = literalExpression ''
+        {
+          group_name = [ "user1" "user2" ];
         };
       '';
     };
@@ -373,3 +394,4 @@ in
     }
   );
 }
+

@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "Run copyparty",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "copyparty",
             "console": "integratedTerminal",
@@ -11,30 +11,46 @@
             "justMyCode": false,
             "env": {
                 "PYDEVD_DISABLE_FILE_VALIDATION": "1",
-                "PYTHONWARNINGS": "always", //error
+                "PYTHONWARNINGS": "always"  //error
             },
             "args": [
-                //"-nw",
-                "-ed",
-                "-emp",
+                //"-nw",  // no-write; for testing uploads without writing to disk
+                //"-q",  // quiet; speedboost when console output is not needed
+
+                // # increase debugger performance:
+                //"no-htp",
+                //"hash-mt=0",
+                //"mtag-mt=1",
+                //"th-mt=1",
+
+                // # listen for FTP and TFTP
+                "--ftp=3921",
+                "--ftp-pr=12000-12099",
+                "--tftp=3969",
+
+                // # listen on all IPv6, all IPv4, and unix-socket
+                "-i::,unix:777:a.sock",
+
+                // # misc
+                "--dedup",
                 "-e2dsa",
                 "-e2ts",
-                "-mtp=.bpm=f,bin/mtag/audio-bpm.py",
+                "--rss",
+                "--shr=/shr",
+                "--stats",
+                "-z",
+
+                // # users + volumes
                 "-aed:wark",
-                "-vsrv::r:rw,ed:c,dupe",
-                "-vdist:dist:r"
+                "-vdist:dist:r",
+                "-vsrv::r:rw,ed",
+                "-vsrv/junk:junk:r:A,ed",
+                "--ver"
             ]
         },
         {
-            "name": "No debug",
-            "preLaunchTask": "no_dbg",
-            "type": "python",
-            //"request": "attach", "port": 42069
-            // fork: nc -l 42069 </dev/null
-        },
-        {
             "name": "Run active unit test",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "module": "unittest",
             "console": "integratedTerminal",
@@ -51,6 +67,6 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false
-        },
+        }
     ]
 }
