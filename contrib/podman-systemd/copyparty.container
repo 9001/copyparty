@@ -1,6 +1,6 @@
 [Container]
 # It's recommended to replace :latest with a specific version
-# for example: docker.io/copyparty/ac:1.18.9
+# for example: docker.io/copyparty/ac:1.19.15
 Image=docker.io/copyparty/ac:latest
 ContainerName=copyparty
 
