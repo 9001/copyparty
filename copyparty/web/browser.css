@@ -2140,6 +2140,7 @@ html.noscroll .sbar::-webkit-scrollbar {
 	width: 100%;
 	height: 100%;
 	text-align: center;
+	flex: none;
 }
 .full-image figure {
 	display: inline;
@@ -2203,6 +2204,7 @@ html.y #bbox-overlay figcaption a {
 	margin-right: -1px;
 }
 #bbox-slider {
+	display: flex;
 	position: fixed;
 	left: 0;
 	top: 0;
@@ -2333,6 +2335,9 @@ html.y #bbox-overlay figcaption a {
 @keyframes bounce {
 	0%, 100% {transform: scale(0)}
 	50% {transform: scale(1)}
+}
+.no-transition {
+	transition: none !important;
 }
 
 

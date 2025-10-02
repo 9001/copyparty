@@ -22,8 +22,9 @@ window.baguetteBox = (function () {
             afterHide: null,
             duringHide: null,
             onChange: null,
+            readDirRtl: false,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnVmode, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnVmode, btnReadDir, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -73,10 +74,10 @@ window.baguetteBox = (function () {
         var touchEvent = e.touches[0] || e.changedTouches[0];
         if (touchEvent.pageX - touch.startX > 40) {
             touchFlag = true;
-            showPreviousImage();
+            showLeftImage();
         } else if (touchEvent.pageX - touch.startX < -40) {
             touchFlag = true;
-            showNextImage();
+            showRightImage();
         } else if (touch.startY - touchEvent.pageY > 100) {
             hideOverlay();
         }
@@ -114,9 +115,9 @@ window.baguetteBox = (function () {
         scrollTimer = Date.now();
 
         if (d > 0)
-            showNextImage();
+            showNextImageIgnoreReadDir();
         else
-            showPreviousImage();
+            showPreviousImageIgnoreReadDir();
     };
 
     var trapFocusInsideOverlay = function (e) {
@@ -212,6 +213,7 @@ window.baguetteBox = (function () {
                 '<div id="bbox-btns">' +
                 '<button id="bbox-help" type="button">?</button>' +
                 '<button id="bbox-anim" type="button" tt="a">-</button>' +
+                '<button id="bbox-readdir" type="button" tt="a">ltr</button>' +
                 '<button id="bbox-rotl" type="button">↶</button>' +
                 '<button id="bbox-rotr" type="button">↷</button>' +
                 '<button id="bbox-tsel" type="button">sel</button>' +
@@ -229,6 +231,7 @@ window.baguetteBox = (function () {
         btnNext = ebi('bbox-next');
         btnHelp = ebi('bbox-help');
         btnAnim = ebi('bbox-anim');
+        btnReadDir = ebi('bbox-readdir')
         btnRotL = ebi('bbox-rotl');
         btnRotR = ebi('bbox-rotr');
         btnSel = ebi('bbox-tsel');
@@ -301,9 +304,9 @@ window.baguetteBox = (function () {
         else if (e.shiftKey && kl != "r")
             return;
         else if (k == "ArrowLeft" || k == "Left" || kl == "j")
-            showPreviousImage();
+            showLeftImage();
         else if (k == "ArrowRight" || k == "Right" || kl == "l")
-            showNextImage();
+            showRightImage();
         else if (k == "Escape" || k == "Esc")
             hideOverlay();
         else if (k == "Home")
@@ -349,6 +352,26 @@ window.baguetteBox = (function () {
         swrite('ganim', anims[i]);
         options = {};
         setOptions(o);
+        if (tt.en)
+            tt.show.call(this);
+    }
+
+    function toggleReadDir() {
+        var o = options;
+        var next;
+        if (options.readDirRtl) {
+            next = "ltr"
+        } else {
+            next = "rtl"
+        }
+        swrite('greaddir', next);
+        slider.className = "no-transition";
+        options = {};
+        setOptions(o);
+        updateOffset(true);
+        window.getComputedStyle(slider).opacity; // force a restyle
+        slider.className = "";
+
         if (tt.en)
             tt.show.call(this);
     }
@@ -492,12 +515,13 @@ window.baguetteBox = (function () {
         bind(document, 'fullscreenchange', onFSC);
         bind(overlay, 'click', overlayClickHandler);
         bind(overlay, 'wheel', overlayWheelHandler);
-        bind(btnPrev, 'click', showPreviousImage);
-        bind(btnNext, 'click', showNextImage);
+        bind(btnPrev, 'click', showLeftImage);
+        bind(btnNext, 'click', showRightImage);
         bind(btnClose, 'click', hideOverlay);
         bind(btnVmode, 'click', tglVmode);
         bind(btnHelp, 'click', halp);
         bind(btnAnim, 'click', anim);
+        bind(btnReadDir, 'click', toggleReadDir);
         bind(btnRotL, 'click', rotl);
         bind(btnRotR, 'click', rotr);
         bind(btnSel, 'click', tglsel);
@@ -515,12 +539,13 @@ window.baguetteBox = (function () {
         unbind(document, 'fullscreenchange', onFSC);
         unbind(overlay, 'click', overlayClickHandler);
         unbind(overlay, 'wheel', overlayWheelHandler);
-        unbind(btnPrev, 'click', showPreviousImage);
-        unbind(btnNext, 'click', showNextImage);
+        unbind(btnPrev, 'click', showLeftImage);
+        unbind(btnNext, 'click', showRightImage);
         unbind(btnClose, 'click', hideOverlay);
         unbind(btnVmode, 'click', tglVmode);
         unbind(btnHelp, 'click', halp);
         unbind(btnAnim, 'click', anim);
+        unbind(btnReadDir, 'click', toggleReadDir);
         unbind(btnRotL, 'click', rotl);
         unbind(btnRotR, 'click', rotr);
         unbind(btnSel, 'click', tglsel);
@@ -570,6 +595,21 @@ window.baguetteBox = (function () {
         var an = options.animation = sread('ganim', anims) || anims[ANIM ? 0 : 2];
         btnAnim.textContent = ['⇄', '⮺', '⚡'][anims.indexOf(an)];
         btnAnim.setAttribute('tt', 'animation: ' + an);
+
+        options.readDirRtl = sread('greaddir') === "rtl";
+        var msg;
+        if (options.readDirRtl) {
+            btnReadDir.innerText = "rtl";
+            msg = "browse from right to left";
+            slider.style.flexDirection = "row-reverse";
+        } else {
+            btnReadDir.innerText = "ltr";
+            msg = "browse from left to right";
+            slider.style.flexDirection = "row";
+        }
+        btnReadDir.setAttribute("tt", msg);
+        btnReadDir.setAttribute("aria-label", msg);
+
 
         slider.style.transition = (options.animation === 'fadeIn' ? 'opacity .3s ease' :
             options.animation === 'slideIn' ? '' : 'none');
@@ -815,12 +855,24 @@ window.baguetteBox = (function () {
         show_buttons(this.paused ? 1 : 0);
     }
 
-    function showNextImage(e) {
+    function showRightImage(e) {
+        ev(e);
+        var dir = options.readDirRtl ? -1 : 1;
+        return show(currentIndex + dir);
+    }
+
+    function showLeftImage(e) {
+        ev(e);
+        var dir = options.readDirRtl ? 1 : -1;
+        return show(currentIndex + dir);
+    }
+
+    function showNextImageIgnoreReadDir(e) {
         ev(e);
         return show(currentIndex + 1);
     }
 
-    function showPreviousImage(e) {
+    function showPreviousImageIgnoreReadDir(e) {
         ev(e);
         return show(currentIndex - 1);
     }
@@ -848,10 +900,10 @@ window.baguetteBox = (function () {
         }
 
         if (index < 0)
-            return bounceAnimation('left');
+            return bounceAnimation(options.readDirRtl ? 'right' : 'left');
 
         if (index >= imagesElements.length)
-            return bounceAnimation('right');
+            return bounceAnimation(options.readDirRtl ? 'left' : 'right');
 
         try {
             vid().pause();
@@ -1005,7 +1057,7 @@ window.baguetteBox = (function () {
 
     function vidEnd() {
         if (this == vid() && vnext)
-            showNextImage();
+            showNextImageIgnoreReadDir();
     }
 
     function setloop(side) {
@@ -1066,11 +1118,12 @@ window.baguetteBox = (function () {
         return false;
     }
 
-    function updateOffset() {
-        var offset = -currentIndex * 100 + '%',
+    function updateOffset(noTransition) {
+        var dir = options.readDirRtl ? 1 : -1;
+        var offset = dir * currentIndex * 100 + '%',
             xform = slider.style.perspective !== undefined;
 
-        if (options.animation === 'fadeIn') {
+        if (options.animation === 'fadeIn' && !noTransition) {
             slider.style.opacity = 0;
             setTimeout(function () {
                 xform ?
@@ -1116,10 +1169,10 @@ window.baguetteBox = (function () {
                 fx = x / (rc.right - rc.left);
 
             if (fx < 0.3)
-                return showPreviousImage();
+                return showLeftImage();
 
             if (fx > 0.7)
-                return showNextImage();
+                return showRightImage();
 
             show_buttons('t');
 
@@ -1175,8 +1228,8 @@ window.baguetteBox = (function () {
     return {
         run: run,
         show: show,
-        showNext: showNextImage,
-        showPrevious: showPreviousImage,
+        showNext: showRightImage,
+        showPrevious: showLeftImage,
         relseek: relseek,
         urltime: urltime,
         playpause: playpause,
