@@ -74,6 +74,7 @@ web/deps/prism.css
 web/deps/prism.js
 web/deps/prismd.css
 web/deps/scp.woff2
+web/deps/w95font.woff2
 web/deps/sha512.ac.js
 web/deps/sha512.hw.js
 web/idp.html
