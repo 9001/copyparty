@@ -1155,6 +1155,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--urlform", metavar="MODE", type=u, default="print,xm", help="how to handle url-form POSTs; see \033[33m--help-urlform\033[0m")
     ap2.add_argument("--wintitle", metavar="TXT", type=u, default="cpp @ $pub", help="server terminal title, for example [\033[32m$ip-10.1.2.\033[0m] or [\033[32m$ip-]")
     ap2.add_argument("--name", metavar="TXT", type=u, default=srvname, help="server name (displayed topleft in browser and in mDNS)")
+    ap2.add_argument("--name-url", metavar="TXT", type=u, help="URL for server name hyperlink (displayed topleft in browser)")
     ap2.add_argument("--mime", metavar="EXT=MIME", type=u, action="append", help="\033[34mREPEATABLE:\033[0m map file \033[33mEXT\033[0mension to \033[33mMIME\033[0mtype, for example [\033[32mjpg=image/jpeg\033[0m]")
     ap2.add_argument("--mimes", action="store_true", help="list default mimetype mapping and exit")
     ap2.add_argument("--rmagic", action="store_true", help="do expensive analysis to improve accuracy of returned mimetypes; will make file-downloads, rss, and webdav slower (volflag=rmagic)")
