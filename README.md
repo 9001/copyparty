@@ -2466,6 +2466,10 @@ copyparty on NixOS is configured via `services.copyparty` options, for example:
 ```nix
 services.copyparty = {
   enable = true;
+  # the user to run the service as
+  user = "copyparty"; 
+  # the group to run the service as
+  group = "copyparty"; 
   # directly maps to values in the [global] section of the copyparty config.
   # see `copyparty --help` for available options
   settings = {
@@ -2488,6 +2492,12 @@ services.copyparty = {
     };
     # or do both in one go
     k.passwordFile = "/run/keys/copyparty/k_password";
+  };
+
+  # create a group
+  groups = {
+    # users "ed" and "k" are part of the group g1
+    g1 = [ "ed" "k" ];
   };
 
   # create a volume

@@ -370,12 +370,16 @@ in
         ) cfg.volumes
       );
 
-      users.groups.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") { };
-      users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
-        description = "Service user for copyparty";
-        group = "copyparty";
-        home = externalStateDir;
-        isSystemUser = true;
+      users.groups = lib.mkIf (cfg.group == "copyparty") {
+        copyparty = { };
+      };
+      users.users = lib.mkIf (cfg.user == "copyparty") {
+        copyparty = {
+          description = "Service user for copyparty";
+          group = cfg.group;
+          home = externalStateDir;
+          isSystemUser = true;
+        };
       };
       environment.systemPackages = lib.mkIf cfg.mkHashWrapper [
         (pkgs.writeShellScriptBin "copyparty-hash" ''
@@ -394,4 +398,3 @@ in
     }
   );
 }
-
