@@ -1516,6 +1516,7 @@ def add_optouts(ap):
     ap2.add_argument("--no-pipe", action="store_true", help="disable race-the-beam (lockstep download of files which are currently being uploaded) (volflag=nopipe)")
     ap2.add_argument("--no-tail", action="store_true", help="disable streaming a growing files with ?tail (volflag=notail)")
     ap2.add_argument("--no-db-ip", action="store_true", help="do not write uploader-IP into the database; will also disable unpost, you may want \033[32m--forget-ip\033[0m instead (volflag=no_db_ip)")
+    ap2.add_argument("--no-zls", action="store_true", help="disable browsing the contents of zip/cbz files, does not affect thumbnails")
 
 
 def add_safety(ap):

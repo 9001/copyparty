@@ -17565,7 +17565,9 @@ var thegrid = (function () {
 					esc(uricom_dec(h.split('/').pop())) + '</a>';
 			},
 			onChange: function (i) {
-				sethash('g' + r.bbox[i].imageElement.getAttribute('ref') + getsort());
+                if (r.bbox[i]) {
+                    sethash('g' + r.bbox[i].imageElement.getAttribute('ref') + getsort());
+                }
 			}
 		});
 		r.bbox = br[0][0];

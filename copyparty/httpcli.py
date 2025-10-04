@@ -1519,6 +1519,74 @@ class HttpCli(object):
         self.log("rss: %d hits, %d bytes" % (len(hits), len(bret)))
         return True
 
+    def tx_zls(self, abspath) -> bool:
+        if self.do_log:
+            self.log("zls %s @%s" % (self.req, self.uname))
+        if self.args.no_zls:
+            raise Pebkac(405, "zip browsing is disabled in server config")
+
+        import zipfile
+
+        try:
+            with zipfile.ZipFile(abspath, "r") as zf:
+                filelist = [f.filename for f in zf.infolist()]
+                ret = json.dumps(filelist).encode("utf-8", "replace")
+                self.reply(ret, mime="application/json")
+                return True
+        except (zipfile.BadZipfile, RuntimeError):
+            raise Pebkac(404, "requested file is not a valid zip file")
+
+    def tx_zget(self, abspath) -> bool:
+        maxsz = 1024 * 1024 * 64
+
+        inner_path = self.uparam.get("zget")
+        if not inner_path:
+            raise Pebkac(405, "inner path is required")
+        if self.do_log:
+            self.log(
+                "zget %s \033[35m%s\033[0m @%s" % (self.req, inner_path, self.uname)
+            )
+        if self.args.no_zls:
+            raise Pebkac(405, "zip browsing is disabled in server config")
+
+        import zipfile
+
+        try:
+            with zipfile.ZipFile(abspath, "r") as zf:
+                zi = zf.getinfo(inner_path)
+                with zf.open(zi, "r") as fi:
+                    self.send_headers(length=zi.file_size, mime=guess_mime(inner_path))
+
+                    remains = sendfile_py(
+                        self.log, 0, zi.file_size,
+                                fi,
+                                self.s,
+                                self.args.s_wr_sz,
+                                self.args.s_wr_slp,
+                                not self.args.no_poll,
+                                {},
+                                "",
+                                )
+                    # fd, ret = tempfile.mkstemp("." + inner_path.rsplit(".", 1)[0])
+                    # fsz = 0
+                    # with os.fdopen(fd, "wb") as fo:
+                    #
+                    #     while True:
+                    #         buf = fi.read(32768)
+                    #         if not buf:
+                    #             break
+                    #
+                    #         fsz += len(buf)
+                    #         if fsz > maxsz:
+                    #             raise Exception("zipbomb defused")
+                    #
+                    #         fo.write(buf)
+        except KeyError:
+            raise Pebkac(404, "no such file in archive")
+        except (zipfile.BadZipfile, RuntimeError):
+            raise Pebkac(404, "requested file is not a valid zip file")
+
+
     def handle_propfind(self) -> bool:
         if self.do_log:
             self.log("PFIND %s @%s" % (self.req, self.uname))
@@ -6478,6 +6546,11 @@ class HttpCli(object):
             ):
                 return self.tx_md(vn, abspath)
 
+            if "zls" in self.uparam:
+                return self.tx_zls(abspath)
+            if "zget" in self.uparam:
+                return self.tx_zget(abspath)
+
             if not add_og or not og_fn:
                 return self.tx_file(
                     abspath, None if st.st_size or "nopipe" in vn.flags else vn.realpath
@@ -6576,6 +6649,7 @@ class HttpCli(object):
             "taglist": [],
             "have_tags_idx": int(e2t),
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
+            "have_zls": int(not self.args.no_zls),
             "sb_lg": vn.js_ls["sb_lg"],
             "url_suf": url_suf,
             "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),

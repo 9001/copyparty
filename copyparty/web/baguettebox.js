@@ -34,6 +34,8 @@ window.baguetteBox = (function () {
         scrollTimer = 0,
         re_i = /^[^?]+\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp)(\?|$)/i,
         re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i,
+        re_cbz = /^[^?]+\.(cbz)(\?|$)/i,
+        cbz_pics = ["png", "jpg", "jpeg", "gif", "bmp", "tga", "tif", "tiff", "webp", "avif"],
         anims = ['slideIn', 'fadeIn', 'none'],
         data = {},  // all galleries
         imagesElements = [],
@@ -147,6 +149,8 @@ window.baguetteBox = (function () {
                 tagsNodeList = [galleryElement];
             else
                 tagsNodeList = galleryElement.getElementsByTagName('a');
+            if (have_zls)
+                bindCbzClickListeners(tagsNodeList, userOptions);
 
             tagsNodeList = [].filter.call(tagsNodeList, function (element) {
                 if (element.className.indexOf(userOptions && userOptions.ignoreClass) === -1)
@@ -176,6 +180,62 @@ window.baguetteBox = (function () {
         });
 
         return [selectorData.galleries, options];
+    }
+
+    function bindCbzClickListeners(tagsNodeList, userOptions) {
+        var cbzNodes = [].filter.call(tagsNodeList, function (element) {
+            return re_cbz.test(element.href);
+        });
+        if (!tagsNodeList.length) {
+            return;
+        }
+
+        [].forEach.call(cbzNodes, function (cbzElement, index) {
+            var gallery = [];
+            var eventHandler = function (e) {
+                if (ctrl(e) || e && e.shiftKey)
+                    return true;
+
+                e.preventDefault ? e.preventDefault() : e.returnValue = false;
+                fillCbzGallery(gallery, cbzElement, eventHandler).then(() => {
+                    console.log("starting prepare")
+                    prepareOverlay(gallery, userOptions);
+                    console.log("prepare done, starting show")
+                    showOverlay(0);
+                });
+            }
+
+            bind(cbzElement, "click", eventHandler);
+        })
+    }
+
+    function fillCbzGallery(gallery, cbzElement, eventHandler) {
+        var href = cbzElement.href
+        var zlsHref = href + (href.indexOf("?") === -1 ? "?" : "&") + "zls";
+        console.log("pre-fetch")
+        return fetch(zlsHref).then(response => response.json())
+            .then((fileList) => {
+                console.log("fetched")
+                var imagesList = fileList.filter((name) =>
+                    name.indexOf(".") !== -1
+                    && cbz_pics.indexOf(name.split(".").pop()) !== -1
+                ).sort();
+
+               imagesList.forEach((imageName) => {
+                    var imageHref = href
+                        + (href.indexOf("?") === -1 ? "?" : "&")
+                        + "zget="
+                        + encodeURIComponent(imageName);
+
+                    var galleryItem = {
+                        href: imageHref,
+                        imageElement: cbzElement,
+                        eventHandler: eventHandler,
+                    };
+                    gallery.push(galleryItem);
+               });
+                console.log(gallery);
+            });
     }
 
     function clearCachedData() {
@@ -786,7 +846,7 @@ window.baguetteBox = (function () {
             imageContainer.removeChild(imageContainer.firstChild);
 
         var imageElement = galleryItem.imageElement,
-            imageSrc = imageElement.href,
+            imageSrc = galleryItem.href || imageElement.href,
             is_vid = re_v.test(imageSrc),
             thumbnailElement = imageElement.querySelector('img, video'),
             imageCaption = typeof options.captions === 'function' ?
