@@ -424,7 +424,7 @@ def _add_mimes() -> None:
 application json wasm xml pdf rtf zip jar fits wasm
 image webp jpeg png gif bmp jxl jp2 jxs jxr tiff bpg heic heif avif
 audio aac ogg wav flac ape amr
-video webm mp4 mpeg
+video webm mp4 mkv mpeg
 font woff woff2 otf ttf
 """.splitlines():
         k, vs = ln.split(" ", 1)
@@ -444,7 +444,7 @@ image arw=x-sony-arw cr2=x-canon-cr2 crw=x-canon-crw dcr=x-kodak-dcr dng=x-adobe
 image k25=x-kodak-k25 kdc=x-kodak-kdc mrw=x-minolta-mrw nef=x-nikon-nef orf=x-olympus-orf
 image pef=x-pentax-pef raf=x-fuji-raf raw=x-panasonic-raw sr2=x-sony-sr2 srf=x-sony-srf x3f=x-sigma-x3f
 audio caf=x-caf mp3=mpeg m4a=mp4 mid=midi mpc=musepack aif=aiff au=basic qcp=qcelp
-video mkv=x-matroska mov=quicktime avi=x-msvideo m4v=x-m4v ts=mp2t
+video mkv=mp4 mov=quicktime avi=x-msvideo m4v=x-m4v ts=mp2t
 video asf=x-ms-asf flv=x-flv 3gp=3gpp 3g2=3gpp2 rmvb=vnd.rn-realmedia-vbr
 font ttc=collection
 """.splitlines():
