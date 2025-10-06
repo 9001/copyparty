@@ -3,6 +3,8 @@ final: prev: {
     ffmpeg = final.ffmpeg-full;
   };
 
+  codemirror = final.callPackage ./deps/codemirror { };
+
   python3 = prev.python3.override {
     packageOverrides = pyFinal: pyPrev: {
       partftpy = pyFinal.callPackage ./partftpy { };
