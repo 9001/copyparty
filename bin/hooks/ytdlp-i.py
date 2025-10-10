@@ -84,7 +84,7 @@ def helper(ka: dict[str, Any]) -> dict[str, str]:
 
     path = ka["ap"]
 
-    name = url.split("?")[0].split("/")[-1]
+    name = url.split("?")[0].split("/")[-1] if '?' in url else "file"
     tfn = "ytdlp_hook: DOWNLOADING " + name
     logger(f"{tfn}\n", 2)
     open(tfn, "wb").close()
