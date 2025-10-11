@@ -3022,6 +3022,7 @@ class AuthSrv(object):
                 "have_shr": self.args.shr,
                 "shr_who": vf["shr_who"],
                 "have_zip": not self.args.no_zip,
+                "have_zls": not self.args.no_zls,
                 "have_mv": not self.args.no_mv,
                 "have_del": not self.args.no_del,
                 "have_unpost": int(self.args.unpost),

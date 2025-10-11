@@ -6629,6 +6629,7 @@ class HttpCli(object):
             "acct": self.uname,
             "perms": perms,
         }
+        # also see `js_htm` in authsrv.py
         j2a = {
             "cgv1": vn.js_htm,
             "cgv": cgv,
@@ -6638,7 +6639,6 @@ class HttpCli(object):
             "taglist": [],
             "have_tags_idx": int(e2t),
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
-            "have_zls": int(not self.args.no_zls),
             "sb_lg": vn.js_ls["sb_lg"],
             "url_suf": url_suf,
             "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
