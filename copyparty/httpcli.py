@@ -1560,20 +1560,21 @@ class HttpCli(object):
                     self.send_headers(length=zi.file_size, mime=guess_mime(inner_path))
 
                     sendfile_py(
-                        self.log, 0, zi.file_size,
-                                fi,
-                                self.s,
-                                self.args.s_wr_sz,
-                                self.args.s_wr_slp,
-                                not self.args.no_poll,
-                                {},
-                                "",
-                                )
+                        self.log,
+                        0,
+                        zi.file_size,
+                        fi,
+                        self.s,
+                        self.args.s_wr_sz,
+                        self.args.s_wr_slp,
+                        not self.args.no_poll,
+                        {},
+                        "",
+                    )
         except KeyError:
             raise Pebkac(404, "no such file in archive")
         except (zipfile.BadZipfile, RuntimeError):
             raise Pebkac(404, "requested file is not a valid zip file")
-
 
     def handle_propfind(self) -> bool:
         if self.do_log:
