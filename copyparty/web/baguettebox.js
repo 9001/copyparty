@@ -171,7 +171,7 @@ window.baguetteBox = (function () {
                 };
                 var imageItem = {
                     eventHandler: imageElementClickHandler,
-                    imageElement: imageElement
+                    imageElement: imageElement,
                 };
                 bind(imageElement, 'click', imageElementClickHandler);
                 gallery.push(imageItem);
@@ -210,6 +210,9 @@ window.baguetteBox = (function () {
     }
 
     function fillCbzGallery(gallery, cbzElement, eventHandler) {
+        if (gallery.length !== 0) {
+            return Promise.resolve();
+        }
         var href = cbzElement.href
         var zlsHref = href + (href.indexOf("?") === -1 ? "?" : "&") + "zls";
         console.log("pre-fetch")
@@ -221,7 +224,7 @@ window.baguetteBox = (function () {
                     && cbz_pics.indexOf(name.split(".").pop()) !== -1
                 ).sort();
 
-               imagesList.forEach((imageName) => {
+               imagesList.forEach((imageName, index) => {
                     var imageHref = href
                         + (href.indexOf("?") === -1 ? "?" : "&")
                         + "zget="
@@ -718,7 +721,7 @@ window.baguetteBox = (function () {
         }, 50);
 
         if (options.onChange && !url_ts)
-            options.onChange(currentIndex, imagesElements.length);
+            options.onChange.call(currentGallery, currentIndex, imagesElements.length);
 
         url_ts = null;
         documentLastFocus = document.activeElement;
@@ -850,7 +853,7 @@ window.baguetteBox = (function () {
             is_vid = re_v.test(imageSrc),
             thumbnailElement = imageElement.querySelector('img, video'),
             imageCaption = typeof options.captions === 'function' ?
-                options.captions.call(currentGallery, imageElement) :
+                options.captions.call(currentGallery, imageElement, index) :
                 imageElement.getAttribute('data-caption') || imageElement.title;
 
         imageSrc = addq(imageSrc, 'cache');
@@ -990,7 +993,7 @@ window.baguetteBox = (function () {
         unfig(index);
 
         if (options.onChange)
-            options.onChange(currentIndex, imagesElements.length);
+            options.onChange.call(currentGallery, currentIndex, imagesElements.length);
 
         return true;
     }
