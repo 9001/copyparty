@@ -202,6 +202,21 @@ window.baguetteBox = (function () {
                     prepareOverlay(gallery, userOptions);
                     console.log("prepare done, starting show")
                     showOverlay(0);
+                    }
+                ).catch((reason) => {
+                    console.error("cbz-ded", reason);
+                    var t;
+                    try {
+                        t = uricom_dec(cbzElement.href.split('/').pop());
+                    } catch (ex) {
+                    }
+
+                    var msg = "Could not browse " + (t ? t : 'archive');
+                    try {
+                        msg += "\n\n" + reason.message;
+
+                    } catch (ex) {}
+                    toast.err(20, msg, 'cbz-ded');
                 });
             }
 
@@ -213,16 +228,26 @@ window.baguetteBox = (function () {
         if (gallery.length !== 0) {
             return Promise.resolve();
         }
-        var href = cbzElement.href
+        var href = cbzElement.href;
         var zlsHref = href + (href.indexOf("?") === -1 ? "?" : "&") + "zls";
-        console.log("pre-fetch")
-        return fetch(zlsHref).then(response => response.json())
+        return fetch(zlsHref)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Archive is invalid");
+                }
+            })
             .then((fileList) => {
                 console.log("fetched")
                 var imagesList = fileList.filter((name) =>
                     name.indexOf(".") !== -1
                     && cbz_pics.indexOf(name.split(".").pop()) !== -1
                 ).sort();
+
+                if (imagesList.length === 0) {
+                    throw new Error("Archive does not contain any images");
+                }
 
                imagesList.forEach((imageName, index) => {
                     var imageHref = href
@@ -237,7 +262,6 @@ window.baguetteBox = (function () {
                     };
                     gallery.push(galleryItem);
                });
-                console.log(gallery);
             });
     }
 
