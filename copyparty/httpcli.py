@@ -1554,10 +1554,12 @@ class HttpCli(object):
         try:
             with zipfile.ZipFile(abspath, "r") as zf:
                 zi = zf.getinfo(inner_path)
+                if zi.file_size >= maxsz:
+                    raise Pebkac(404, "zip bomb defused")
                 with zf.open(zi, "r") as fi:
                     self.send_headers(length=zi.file_size, mime=guess_mime(inner_path))
 
-                    remains = sendfile_py(
+                    sendfile_py(
                         self.log, 0, zi.file_size,
                                 fi,
                                 self.s,
@@ -1567,20 +1569,6 @@ class HttpCli(object):
                                 {},
                                 "",
                                 )
-                    # fd, ret = tempfile.mkstemp("." + inner_path.rsplit(".", 1)[0])
-                    # fsz = 0
-                    # with os.fdopen(fd, "wb") as fo:
-                    #
-                    #     while True:
-                    #         buf = fi.read(32768)
-                    #         if not buf:
-                    #             break
-                    #
-                    #         fsz += len(buf)
-                    #         if fsz > maxsz:
-                    #             raise Exception("zipbomb defused")
-                    #
-                    #         fo.write(buf)
         except KeyError:
             raise Pebkac(404, "no such file in archive")
         except (zipfile.BadZipfile, RuntimeError):
