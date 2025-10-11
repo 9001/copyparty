@@ -197,11 +197,11 @@ window.baguetteBox = (function () {
                     return true;
 
                 e.preventDefault ? e.preventDefault() : e.returnValue = false;
-                fillCbzGallery(gallery, cbzElement, eventHandler).then(() => {
-                    prepareOverlay(gallery, userOptions);
-                    showOverlay(0);
+                fillCbzGallery(gallery, cbzElement, eventHandler).then(function () {
+                        prepareOverlay(gallery, userOptions);
+                        showOverlay(0);
                     }
-                ).catch((reason) => {
+                ).catch(function (reason) {
                     console.error("cbz-ded", reason);
                     var t;
                     try {
@@ -227,24 +227,25 @@ window.baguetteBox = (function () {
         var href = cbzElement.href;
         var zlsHref = href + (href.indexOf("?") === -1 ? "?" : "&") + "zls";
         return fetch(zlsHref)
-            .then(response => {
+            .then(function (response) {
                 if (response.ok) {
                     return response.json();
                 } else {
                     throw new Error("Archive is invalid");
                 }
             })
-            .then((fileList) => {
-                var imagesList = fileList.filter((name) =>
-                    name.indexOf(".") !== -1
-                    && cbz_pics.indexOf(name.split(".").pop()) !== -1
+            .then(function (fileList) {
+                var imagesList = fileList.filter(function (name) {
+                        return name.indexOf(".") !== -1
+                            && cbz_pics.indexOf(name.split(".").pop()) !== -1;
+                    }
                 ).sort();
 
                 if (imagesList.length === 0) {
                     throw new Error("Archive does not contain any images");
                 }
 
-               imagesList.forEach((imageName, index) => {
+                imagesList.forEach(function (imageName, index) {
                     var imageHref = href
                         + (href.indexOf("?") === -1 ? "?" : "&")
                         + "zget="
@@ -256,7 +257,7 @@ window.baguetteBox = (function () {
                         eventHandler: eventHandler,
                     };
                     gallery.push(galleryItem);
-               });
+                });
             });
     }
 
