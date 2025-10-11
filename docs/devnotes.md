@@ -200,7 +200,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?th=opus` | convert audio file to 128kbps opus |
 | GET | `?th=caf` | ...in the iOS-proprietary container |
 | GET | `?zls` | get listing of filepaths in zip file at URL |
-| GET  | `?zget=path` | get specific file from inside a zip file at URL |
+| GET | `?zget=path` | get specific file from inside a zip file at URL |
 
 | method | body | result |
 |--|--|--|
