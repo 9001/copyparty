@@ -249,7 +249,8 @@ class FtpFs(AbstractedFS):
                 need_unlink = False
                 td = 0
 
-        if w and need_unlink:
+        # Don't unlink file for append mode
+        if w and need_unlink and "a" not in mode:
             if td >= -1 and td <= self.args.ftp_wt:
                 # within permitted timeframe; unlink and accept
                 do_it = True
