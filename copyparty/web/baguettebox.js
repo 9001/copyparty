@@ -198,9 +198,7 @@ window.baguetteBox = (function () {
 
                 e.preventDefault ? e.preventDefault() : e.returnValue = false;
                 fillCbzGallery(gallery, cbzElement, eventHandler).then(() => {
-                    console.log("starting prepare")
                     prepareOverlay(gallery, userOptions);
-                    console.log("prepare done, starting show")
                     showOverlay(0);
                     }
                 ).catch((reason) => {
@@ -208,14 +206,12 @@ window.baguetteBox = (function () {
                     var t;
                     try {
                         t = uricom_dec(cbzElement.href.split('/').pop());
-                    } catch (ex) {
-                    }
+                    } catch (ex) { }
 
                     var msg = "Could not browse " + (t ? t : 'archive');
                     try {
                         msg += "\n\n" + reason.message;
-
-                    } catch (ex) {}
+                    } catch (ex) { }
                     toast.err(20, msg, 'cbz-ded');
                 });
             }
@@ -239,7 +235,6 @@ window.baguetteBox = (function () {
                 }
             })
             .then((fileList) => {
-                console.log("fetched")
                 var imagesList = fileList.filter((name) =>
                     name.indexOf(".") !== -1
                     && cbz_pics.indexOf(name.split(".").pop()) !== -1
