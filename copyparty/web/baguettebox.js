@@ -235,11 +235,12 @@ window.baguetteBox = (function () {
                 }
             })
             .then(function (fileList) {
-                var imagesList = fileList.filter(function (name) {
-                        return name.indexOf(".") !== -1
-                            && cbz_pics.indexOf(name.split(".").pop()) !== -1;
-                    }
-                ).sort();
+                var imagesList = fileList.map(function (file) {
+                    return file["fn"];
+                }).filter(function (file) {
+                    return file.indexOf(".") !== -1
+                        && cbz_pics.indexOf(file.split(".").pop()) !== -1;
+                }).sort();
 
                 if (imagesList.length === 0) {
                     throw new Error("Archive does not contain any images");

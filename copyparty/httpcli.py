@@ -1529,7 +1529,7 @@ class HttpCli(object):
 
         try:
             with zipfile.ZipFile(abspath, "r") as zf:
-                filelist = [f.filename for f in zf.infolist()]
+                filelist = [{"fn": f.filename} for f in zf.infolist()]
                 ret = json.dumps(filelist).encode("utf-8", "replace")
                 self.reply(ret, mime="application/json")
                 return True
