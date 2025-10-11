@@ -104,7 +104,11 @@ def utime(
 
 
 def utime_c(
-    log: Union["NamedLogger", Any], p: str, ts: int, follow_symlinks: bool = True, throw: bool = False
+    log: Union["NamedLogger", Any],
+    p: str,
+    ts: int,
+    follow_symlinks: bool = True,
+    throw: bool = False,
 ) -> Optional[int]:
     clamp = 0
     ov = ts
