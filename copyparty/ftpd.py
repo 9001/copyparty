@@ -249,7 +249,6 @@ class FtpFs(AbstractedFS):
                 need_unlink = False
                 td = 0
 
-        # Don't unlink file for append mode
         if w and need_unlink:
             if td >= -1 and td <= self.args.ftp_wt:
                 # within permitted timeframe; allow overwrite or resume
@@ -269,6 +268,7 @@ class FtpFs(AbstractedFS):
             if not do_it:
                 raise FSE("File already exists")
 
+            # Don't unlink file for append mode
             elif "a" not in mode:
                 wunlink(self.log, ap, VF_CAREFUL)
 
