@@ -3886,6 +3886,7 @@ def _runhook(
     ip: str,
     at: float,
     txt: str,
+    other: dict
 ) -> dict[str, Any]:
     ret = {"rc": 0}
     areq, chk, imp, fork, sin, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
@@ -3910,6 +3911,7 @@ def _runhook(
             "src": src,
             "txt": txt,
         }
+        ja.update(other)
         if imp:
             ja["log"] = log
             mod = loadpy(acmd[0], False)
@@ -3980,6 +3982,7 @@ def runhook(
     ip: str,
     at: float,
     txt: str,
+    other: dict,
 ) -> dict[str, Any]:
     assert broker or up2k  # !rm
     args = (broker or up2k).args  # type: ignore
@@ -3989,7 +3992,7 @@ def runhook(
     for cmd in cmds:
         try:
             hr = _runhook(
-                log, verbose, src, cmd, ap, vp, host, uname, perms, mt, sz, ip, at, txt
+                log, verbose, src, cmd, ap, vp, host, uname, perms, mt, sz, ip, at, txt, other
             )
             if verbose and log:
                 log("hook(%s) %r => \033[32m%s" % (src, cmd, hr), 6)

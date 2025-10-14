@@ -8622,8 +8622,12 @@ var msel = (function () {
 		xhr.setRequestHeader('Content-Type', ct);
 		if (xhr.overrideMimeType)
 			xhr.overrideMimeType('Content-Type', ct);
+        let selected = msel.getsel()
+        for (let i=0;i<selected.length;i++) {
+            selected[i] = selected[i].vp;
+        }
 
-		xhr.send('msg=' + uricom_enc(xhr.msg));
+		xhr.send('msg=' + uricom_enc(xhr.msg) + "&sel=" + selected.join("&sel="));
 		return false;
 	};
 

@@ -2146,8 +2146,18 @@ class HttpCli(object):
                     try:
                         zb = unquote(buf.replace(b"+", b" "))
                         plain = zb.decode("utf-8", "replace")
-                        if buf.startswith(b"msg="):
-                            plain = plain[4:]
+                        _msg_data = plain.split("&")
+                        msg_data = {}
+                        for i in _msg_data:
+                            d = i.split("=")
+                            if d[0] in msg_data.keys():
+                                if type(msg_data[d[0]]) is list:
+                                    msg_data[d[0]].append("=".join(d[1:]))
+                                else:
+                                    msg_data[d[0]] = [msg_data[d[0]], "=".join(d[1:])]
+                            else:
+                                msg_data[d[0]] = "=".join(d[1:])
+                        if "msg" in msg_data.keys():
                             xm = self.vn.flags.get("xm")
                             if xm:
                                 xm_rsp = runhook(
@@ -2165,7 +2175,8 @@ class HttpCli(object):
                                     len(buf),
                                     self.ip,
                                     time.time(),
-                                    plain,
+                                    msg_data["msg"],
+                                    {"sel": [self.vn.canonical(i) for i in msg_data.get("sel", [])]}
                                 )
 
                         t = "urlform_dec %d @ %r\n  %r\n"
