@@ -3886,7 +3886,7 @@ def _runhook(
     ip: str,
     at: float,
     txt: str,
-    other: dict
+    other: dict = {},
 ) -> dict[str, Any]:
     ret = {"rc": 0}
     areq, chk, imp, fork, sin, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
@@ -3982,7 +3982,7 @@ def runhook(
     ip: str,
     at: float,
     txt: str,
-    other: dict,
+    other: dict = {},
 ) -> dict[str, Any]:
     assert broker or up2k  # !rm
     args = (broker or up2k).args  # type: ignore
