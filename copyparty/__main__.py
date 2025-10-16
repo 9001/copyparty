@@ -672,12 +672,12 @@ def get_sects():
 
             send the password in the '\033[36mPW\033[0m' http-header:
               \033[36mPW: \033[35mhunter2\033[0m
-            or if you have \033[33m--accounts\033[0m enabled,
+            or if you have \033[33m--usernames\033[0m enabled,
               \033[36mPW: \033[35med:hunter2\033[0m
 
             send the password in the URL itself:
               \033[36mhttp://127.0.0.1:3923/\033[35m?pw=hunter2\033[0m
-            or if you have \033[33m--accounts\033[0m enabled,
+            or if you have \033[33m--usernames\033[0m enabled,
               \033[36mhttp://127.0.0.1:3923/\033[35m?pw=ed:hunter2\033[0m
 
             use basic-authentication:
