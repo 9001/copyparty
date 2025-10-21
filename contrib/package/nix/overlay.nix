@@ -6,6 +6,7 @@ final: prev: {
   # Dependencies
   codemirror = final.callPackage ./deps/codemirror { };
   marked = final.callPackage ./deps/marked { };
+  easy-mde = final.callPackage ./deps/easy-mde { };
 
   python3 = prev.python3.override {
     packageOverrides = pyFinal: pyPrev: {
