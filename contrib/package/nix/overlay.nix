@@ -7,6 +7,7 @@ final: prev: {
   codemirror = final.callPackage ./deps/codemirror { };
   marked = final.callPackage ./deps/marked { };
   easy-mde = final.callPackage ./deps/easy-mde { };
+  busy-mp3 = final.callPackage ./deps/busy-mp3 { };
 
   python3 = prev.python3.override {
     packageOverrides = pyFinal: pyPrev: {
