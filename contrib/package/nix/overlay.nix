@@ -9,6 +9,7 @@ final: prev: {
   easy-mde = final.callPackage ./deps/easy-mde { };
   busy-mp3 = final.callPackage ./deps/busy-mp3 { };
   copyparty-fonts = final.callPackage ./deps/copyparty-fonts { };
+  asmcrypto = final.callPackage ./deps/asmcrypto { };
 
   python3 = prev.python3.override {
     packageOverrides = pyFinal: pyPrev: {
