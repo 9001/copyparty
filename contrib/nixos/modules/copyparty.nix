@@ -364,7 +364,17 @@ in
               #: in front of things means it wont change it if the directory already exists.
               group = ":${cfg.group}";
               user = ":${cfg.user}";
-              mode = ":755";
+              mode = ":${
+                # Use volume permissions if set
+                if (value.flags ? chmod_d) then
+                  value.flags.chmod_d
+                # Else, use global permission if set
+                else if (cfg.settings ? chmod-d) then
+                  cfg.settings.chmod-d
+                # Else, use the default permission
+                else
+                  "755"
+              }";
             };
           }
         ) cfg.volumes
