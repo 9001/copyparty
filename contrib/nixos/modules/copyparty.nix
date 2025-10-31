@@ -48,6 +48,8 @@ let
 
   accountsWithPlaceholders = mapAttrs (name: attrs: passwordPlaceholder name);
 
+  volumesWithoutVariables = filterAttrs (k: v: !(hasInfix "\${" v.path)) cfg.volumes;
+
   configStr = ''
     ${mkSection "global" cfg.settings}
     ${cfg.globalExtraConfig}
@@ -325,7 +327,7 @@ in
           BindPaths =
             (if cfg.settings ? hist then [ cfg.settings.hist ] else [ ])
             ++ [ externalStateDir ]
-            ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
+            ++ (mapAttrsToList (k: v: v.path) volumesWithoutVariables);
           # ProtectSystem = "strict";
           # Note that unlike what 'ro' implies,
           # this actually makes it impossible to read anything in the root FS,
@@ -367,7 +369,7 @@ in
               mode = ":755";
             };
           }
-        ) cfg.volumes
+        ) volumesWithoutVariables
       );
 
       users.groups = lib.mkIf (cfg.group == "copyparty") {
