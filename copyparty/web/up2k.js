@@ -1065,8 +1065,11 @@ function up2k_init(subtle) {
                         if (toast.txt == L.u_uri)
                             toast.hide();
                     }
-                    else
+                    else {
+                        if (!QS('#op_up2k.act'))
+                            goto('up2k');
                         return toast.inf(10, L.u_uri) || true;
+                    }
                 }
 
             if (!ok)
