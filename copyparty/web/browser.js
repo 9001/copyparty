@@ -7194,6 +7194,7 @@ var treectl = (function () {
 
 		var lg0 = res.logues ? res.logues[0] || "" : "",
 			lg1 = res.logues ? res.logues[1] || "" : "",
+			sb_lg = res.sb_lg || "",
 			mds = res.readmes && treectl.ireadme,
 			md0 = mds ? res.readmes[0] || "" : "",
 			md1 = mds ? res.readmes[1] || "" : "",
