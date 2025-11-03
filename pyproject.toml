@@ -166,7 +166,8 @@ no_implicit_reexport = false
 
 [tool.codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file
-skip = '.git*,*.svg,*.lock,*.css,*.min.*'
+skip = '.git*,*.svg,*.lock,*.css,*.min.*,tl,pyproject.toml,*.patch'
 check-hidden = true
-# ignore-regex = ''
-# ignore-words-list = ''
+# ignore camelcase
+ignore-regex = '\b[a-z]+[A-Z][A-Za-z0-9]*\b'
+ignore-words-list = 'caf,cips,ans,ded,wark,warks,halp,ser,oen,datas,slin,nd,te,pres,ths,wast,clen,fo'
