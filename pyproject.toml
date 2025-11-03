@@ -163,3 +163,10 @@ follow_imports = "silent"
 
 [[tool.mypy.overrides]]
 no_implicit_reexport = false
+
+[tool.codespell]
+# Ref: https://github.com/codespell-project/codespell#using-a-config-file
+skip = '.git*,*.svg,*.lock,*.css,*.min.*'
+check-hidden = true
+# ignore-regex = ''
+# ignore-words-list = ''
