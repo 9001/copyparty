@@ -79,7 +79,7 @@ smoketest() {
 # two-for-one:
 # 1) smoketest copyparty even starts
 # 2) build any bytecode we missed
-# this tends to race other builders (alle gode ting er tre)
+# this tends to race other builders (alle gode ting er tre)  # codespell:ignore
 cd /z
 python3 -m copyparty \
   --ign-ebind -p$((1024+RANDOM)),$((1024+RANDOM)),$((1024+RANDOM)) \
