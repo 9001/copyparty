@@ -2081,7 +2081,7 @@ class HttpCli(object):
             oh["Dav"] = "1, 2"
             oh["Ms-Author-Via"] = "DAV"
 
-        # winxp-webdav doesnt know what 204 is
+        # winxp-webdav does not know what 204 is
         self.send_headers(0, 200)
         return True
 

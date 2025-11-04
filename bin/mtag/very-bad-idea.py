@@ -166,7 +166,7 @@ def open_url(txt):
     # nope,
     # close any error messages:
     sp.call(["xdotool", "search", "--name", "Error", "windowclose"])
-    # sp.call(["xdotool", "key", "ctrl+alt+d"])  # doesnt work at all
+    # sp.call(["xdotool", "key", "ctrl+alt+d"])  # does not work at all
     # sp.call(["xdotool", "keydown", "--delay", "100", "ctrl+alt+d"])
     # sp.call(["xdotool", "keyup", "ctrl+alt+d"])
     sp.call(["xdg-open", txt])

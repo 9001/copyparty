@@ -320,7 +320,7 @@ def parse_ffprobe(
                     if v2 is None or zf > v2:
                         ret[rk] = zf
                 except:
-                    # sqlite doesnt care but the code below does
+                    # sqlite does not care but the code below does
                     if v1 not in ["N/A"]:
                         ret[rk] = v1
             else:

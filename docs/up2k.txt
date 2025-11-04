@@ -17,7 +17,7 @@ server creates session id and replies with the same json:
 		secretsalt, name, size, *hash
 	]))[:32].replace('+','-').replace('/','_')
 
-cilent uploads each chunk:
+client uploads each chunk:
 POST application/octet-stream
 X-Up2k-Hash: fUGShzwcSAmw5IbQ3y_2TUrI8a89LYQO-kW0o0rRcU0
 X-Up2k-Wark: CVNt9EYhgTFHU3xiK6gL-0ciJFopshvo

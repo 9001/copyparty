@@ -3699,7 +3699,7 @@ don't get excited! nothing new and revolutionary, but `xvol` and `xdev` changed 
 
 ## bugfixes
 * more sqlite query-planner twiddling
-  * deleting files is MUCH faster now, and uploads / bootup might be a bit better too
+  * deleting files is MUCH faster now, and uploads / boot-up might be a bit better too
 * webdav optimizations / compliance
   * should make some webdav clients run faster than before
   * in very related news, the webdav-client in [rclone](https://github.com/rclone/rclone/) v1.63 ([currently beta](https://beta.rclone.org/?filter=latest)) will be ***FAST!***
@@ -4420,7 +4420,7 @@ after two exciting releases, time for something boring
 
 ## new features
 *but wait, there's more!*   not only do you get the [multithreaded file hashing](https://github.com/9001/copyparty/releases/tag/v1.3.11) but also --
-* faster bootup and volume reindexing when `-e2ds` (file indexing) is enabled
+* faster boot-up and volume reindexing when `-e2ds` (file indexing) is enabled
   * `3x` faster is probably the average on most instances; more files per folder = faster
   * `9x` faster on a 36 TiB zfs music/media nas with `-e2ts` (metadata indexing), dropping from 46sec to 5sec
   * and `34x` on another zfs box, 63sec -> 1.8sec
@@ -7184,7 +7184,7 @@ nothing really important happened since [v0.11.6](https://github.com/9001/copypa
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
-# 2021-0608-0741  `v0.11.10`  dont leave me hangin
+# 2021-0608-0741  `v0.11.10`  dont leave me hanging
 
 * drop-in upgrade, no additional steps since [v0.11.1](https://github.com/9001/copyparty/releases/tag/v0.11.1)
 * nothing really important since [v0.11.6](https://github.com/9001/copyparty/releases/tag/v0.11.6)

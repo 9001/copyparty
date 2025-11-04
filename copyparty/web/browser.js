@@ -2236,7 +2236,7 @@ var vbar = (function () {
 
 		setTimeout(function () {
 			if (IPHONE && mp.au && mul < 0.9 && mp.au.volume == 1)
-				toast.inf(6, 'volume doesnt work because <a href="https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11" target="_blank">apple says no</a>');
+				toast.inf(6, 'volume does not work because <a href="https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11" target="_blank">apple says no</a>');
 		}, 1);
 	}
 	can.onmousedown = function (e) {

@@ -271,7 +271,7 @@ brew install python@2
 pip install virtualenv
 
 # fix firefox phantom breakpoints,
-# suggestions from bugtracker, doesnt work (debugger is not attachable)
+# suggestions from bugtracker, does not work (debugger is not attachable)
 devtools settings >> advanced >> enable browser chrome debugging + enable remote debugging
 burger > developer >> browser toolbox  (ctrl-alt-shift-i)
 iframe btn topright >> chrome://devtools/content/debugger/index.html
