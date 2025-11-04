@@ -42,7 +42,7 @@
 				<thead><tr><th>%</th><th>speed</th><th>eta</th><th>idle</th><th>dir</th><th>file</th></tr></thead>
 				<tbody>
 					{%- for u in ups %}
-					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
+					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ r }}/{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
 					{%- endfor %}
 				</tbody>
 			</table>
@@ -54,7 +54,7 @@
 				<thead><tr><th>%</th><th>sent</th><th>speed</th><th>eta</th><th>idle</th><th></th><th>dir</th><th>file</th></tr></thead>
 				<tbody>
 					{%- for u in dls %}
-					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td>{{ u[4] }}</td><td>{{ u[5] }}</td><td><a href="{{ u[6] }}">{{ u[7]|e }}</a></td><td>{{ u[8] }}</td></tr>
+					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td>{{ u[4] }}</td><td>{{ u[5] }}</td><td><a href="{{ r }}/{{ u[6] }}">{{ u[7]|e }}</a></td><td>{{ u[8] }}</td></tr>
 					{%- endfor %}
 				</tbody>
 			</table>
