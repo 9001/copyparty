@@ -24,8 +24,8 @@ Note that you can select the owner and group of this volume by changing the `uid
 To install and start copyparty with Podman and systemd as the root user, run the following:
 
 ```shell
-sudo mkdir -pv /etc/systemd/container/ /etc/copyparty/
-sudo cp -v copyparty.container /etc/systemd/containers/
+sudo mkdir -pv /etc/containers/systemd/ /etc/copyparty/
+sudo cp -v copyparty.container /etc/containers/systemd/
 sudo cp -v copyparty.conf /etc/copyparty/
 sudo systemctl daemon-reload
 sudo systemctl start copyparty
