@@ -58,7 +58,7 @@ def set_pagesize(db_path):
 
         # https://www.sqlite.org/pragma.html#pragma_page_size
         #  `- disable wal; set pagesize; vacuum
-        #      (copyparty will reenable wal if necessary)
+        #      (copyparty will re-enable wal if necessary)
 
         with sqlite3.connect(db_path) as db:
             db.execute("pragma journal_mode=delete")

@@ -119,7 +119,7 @@ def gen_hdr(
         # infozip-macos: 0100 0000 a481 (spec-ver 1e03) file:644
         # infozip-macos: 0100 0100 0080 (spec-ver 1e03) file:000
         #     win10-zip: 0000 2000 0000 (spec-ver xx00) FILE_ATTRIBUTE_ARCHIVE
-        ret += b"\x00\x00\x00\x00\xa4\x81"  # unx
+        ret += b"\x00\x00\x00\x00\xa4\x81"  # unix
         # ret += b"\x00\x00\x20\x00\x00\x00"  # fat
 
         # 4b local-header-ofs
