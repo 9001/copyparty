@@ -322,7 +322,7 @@ small collection of user feedback
 
 project goals / philosophy
 
-* inverse linux philosophy -- do all the things, and do an *okay* job
+* inverse Unix philosophy -- do all the things, and do an *okay* job
   * quick drop-in service to get a lot of features in a pinch
   * some of [the alternatives](./docs/versus.md) might be a better fit for you
 * run anywhere, support everything
