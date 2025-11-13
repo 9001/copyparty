@@ -11,6 +11,7 @@ final: prev: {
   copyparty-fonts = final.callPackage ./deps/copyparty-fonts { };
   asmcrypto = final.callPackage ./deps/asmcrypto { };
   hash-wasm = final.callPackage ./deps/hash-wasm { };
+  prism = final.callPackage ./deps/prism { };
 
   python3 = prev.python3.override {
     packageOverrides = pyFinal: pyPrev: {
