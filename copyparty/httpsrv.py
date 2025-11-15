@@ -383,8 +383,8 @@ class HttpSrv(object):
                 if nloris < nconn / 2:
                     continue
 
-                t = "slowloris (idle-conn): {} banned for {} min"
-                self.log(self.name, t.format(ip, self.args.loris, nclose), 1)
+                t = "slow%s (idle-conn): %s banned for %d min"  # slowloris
+                self.log(self.name, t % ("loris", ip, self.args.loris), 1)
                 self.bans[ip] = int(time.time() + self.args.loris * 60)
 
             if self.args.log_conn:

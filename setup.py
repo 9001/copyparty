@@ -131,6 +131,7 @@ args = {
         "copyparty.stolen.dnslib",
         "copyparty.stolen.ifaddr",
         "copyparty.web",
+        "copyparty.web.tl",
         "copyparty.web.a",
         "copyparty.web.deps",
     ],

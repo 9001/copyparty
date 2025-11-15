@@ -68,3 +68,8 @@ instead of affecting all volumes, you can set the options for just one volume li
 * `:c,mtp=key=f,audio-key.py`
 * `:c,mtp=.bpm=f,audio-bpm.py`
 * `:c,mtp=ahash,vhash=f,media-hash.py`
+
+
+# tips & tricks
+
+* to delete tags for all files below `blog*` and rescan that, `sqlite3 .hist/up2k.db "delete from mt where w in (select substr(w,1,16) from up where rd like 'blog%')";`

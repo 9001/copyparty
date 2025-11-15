@@ -64,7 +64,7 @@
                 <li>old version of rclone? replace all <code>=</code> with <code>&nbsp;</code> (space)</li>
             </ul>
 
-            <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="{{ r }}/.cpr/a/webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
+            <p>if you want to use the native WebDAV client in windows instead (slow and buggy), first run <a href="{{ r }}/.cpr/a/webdav-cfg.txt?dl=webdav-cfg.bat">webdav-cfg.bat</a> to remove the 47 MiB filesize limit (also fixes latency and password login), then connect:</p>
             <pre>
                 {%- if un %}
                 net use <b>w:</b> http{{ s }}://{{ ep }}/{{ rvp }}{% if accs %} <b>{{ pw }}</b> /user:{{ b_un }}{% endif %}

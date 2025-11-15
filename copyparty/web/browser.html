@@ -137,7 +137,6 @@
 			lang = "{{ lang }}",
 			dfavico = "{{ favico }}",
 			have_tags_idx = {{ have_tags_idx }},
-			sb_lg = "{{ sb_lg }}",
 			logues = {{ logues|tojson if sb_lg else "[]" }},
 			ls0 = {{ ls0|tojson }};
 
@@ -145,6 +144,9 @@
 		document.documentElement.className = (STG && STG.cpp_thm) || dtheme;
 	</script>
 	<script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+	{%- if lang != "eng" %}
+	<script src="{{ r }}/.cpr/tl/{{ lang }}.js?_={{ ts }}"></script>
+	{%- endif %}
 	<script src="{{ r }}/.cpr/baguettebox.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/browser.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/up2k.js?_={{ ts }}"></script>

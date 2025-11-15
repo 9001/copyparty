@@ -1,3 +1,24 @@
+# hide ui-elements
+
+useful for simplifying the UI in a write-only folder for uploads, or to embed copyparty into another website in an `<iframe>` or similar
+
+| url-param | volflag | what it hides |
+| --------- | ------- | ------------- |
+| [nombar](https://a.ocv.me/pub/demo/?nombar) | ui_nombar | the menu-bar at the top |
+| [noacci](https://a.ocv.me/pub/demo/?noacci) | ui_noacci | permissions-list and logout-button |
+| [nosrvi](https://a.ocv.me/pub/demo/?nosrvi) | ui_nosrvi | server-info (name, disk usage) |
+| [notree](https://a.ocv.me/pub/demo/?notree) | ui_notree | the navpane sidebar |
+| [nonav](https://a.ocv.me/pub/demo/?nonav)   | ui_nonav  | `notree` + breadcrumbs |
+| [nocpla](https://a.ocv.me/pub/demo/?nocpla) | ui_nocpla | link to controlpanel |
+| [nolbar](https://a.ocv.me/pub/demo/?nolbar) | ui_nolbar | `nocpla` + "prev/up/next" |
+| [noctxb](https://a.ocv.me/pub/demo/?noctxb) | ui_noctxb | tray-toggle / context-buttons |
+| [norepl](https://a.ocv.me/pub/demo/?norepl) | ui_norepl | the `π` repl button |
+
+can be combined; https://a.ocv.me/pub/demo/?nombar&noacci&nosrvi&nonav&nolbar&noctxb&norepl
+
+all options can be overruled with url-param `fullui`; https://a.ocv.me/pub/demo/?fullui
+
+
 # custom fonts
 
 to change the fonts in the web-UI,  first save the following text (the default font-config) to a new css file, for example named `customfonts.css` in your webroot:
@@ -69,23 +90,13 @@ there is also `--html-head-s` and volflag `html_head_s` to add a plain static bi
 
 # translations
 
-add your own translations by using the english or norwegian one from `browser.js` as a template
+add your own translations by using [tl.js](https://github.com/9001/copyparty/blob/hovudstraum/scripts/tl.js) as a base, and add a new file in [copyparty/web/tl](https://github.com/9001/copyparty/tree/hovudstraum/copyparty/web/tl) when you're happy with it
 
 > ⚠ Please do not contribute translations to [RTL (Right-to-Left) languages](https://en.wikipedia.org/wiki/Right-to-left_script) for now; the javascript is [not ready](https://github.com/9001/copyparty/blob/hovudstraum/docs/rice/rtl.patch) to deal with it
 
-the easy way is to open up and modify `browser.js` in your own installation; depending on how you installed copyparty it might be named `browser.js.gz` instead, in which case just decompress it, restart copyparty, and start editing it anyways
-
 you will be delighted to see inline html in the translation strings; to help prevent syntax errors, there is [a very jank linux script](https://github.com/9001/copyparty/blob/hovudstraum/scripts/tlcheck.sh) which is slightly better than nothing -- just beware the false-positives, so even if it complains it's not necessarily wrong/bad
 
-if you're running `copyparty-sfx.py` then you'll find it at `/tmp/pe-copyparty.1000/copyparty/web` (on linux) or `%TEMP%\pe-copyparty\copyparty\web` (on windows)
-* make sure to keep backups of your work religiously! since that location is volatile af
-
-
-## translations (docker-friendly)
-
-if editing `browser.js` is inconvenient in your setup, for example if you're running in docker, then you can instead do this:
-* if you have python, go to the `scripts` folder and run `./tl.py fra Français` to generate a `tl.js` which is perfect for translating to French, using the three-letter language code `fra`
-  * if you do not have python, you can also just grab `tl.js` from the scripts folder, but I'll probably forget to keep that up to date... and then you'll have to find/replace all `"eng"` and `Ls.eng` to your three-letter language code
+to see your translation taking shape in the copyparty ui as you work on it:
 * put your `tl.js` inside a folder that is being shared by your copyparty, preferably the webroot
 * run copyparty with the argument `--html-head='<script src="/tl.js"></script>'`
   * if you placed `tl.js` in the webroot then you're all good, but if you put it somewhere else then change `/tl.js` accordingly
@@ -97,6 +108,4 @@ if editing `browser.js` is inconvenient in your setup, for example if you're run
 
 you can now edit `tl.js` and press CTRL-SHIFT-R in the browser to see your changes take effect as you go
 
-if you want to contribute your translation back to the project (please do!) then you'll want to...
-* grab all of the text inside your `var tl_cpanel = {` and add it to the translations inside `copyparty/web/splash.js` in the repo
-* and the text inside your `var tl_browser = {` and add that to the translations inside `copyparty/web/browser.js` in the repo
+if you want to contribute your translation back to the project (please do!) then grab most of the text inside your `tl.js` , starting from the line that starts with `Ls.` and put it into a new file inside [the translations folder](https://github.com/9001/copyparty/tree/hovudstraum/copyparty/web/tl)

@@ -48,6 +48,8 @@ let
 
   accountsWithPlaceholders = mapAttrs (name: attrs: passwordPlaceholder name);
 
+  volumesWithoutVariables = filterAttrs (k: v: !(hasInfix "\${" v.path)) cfg.volumes;
+
   configStr = ''
     ${mkSection "global" cfg.settings}
     ${cfg.globalExtraConfig}
@@ -325,7 +327,7 @@ in
           BindPaths =
             (if cfg.settings ? hist then [ cfg.settings.hist ] else [ ])
             ++ [ externalStateDir ]
-            ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
+            ++ (mapAttrsToList (k: v: v.path) volumesWithoutVariables);
           # ProtectSystem = "strict";
           # Note that unlike what 'ro' implies,
           # this actually makes it impossible to read anything in the root FS,
@@ -364,10 +366,20 @@ in
               #: in front of things means it wont change it if the directory already exists.
               group = ":${cfg.group}";
               user = ":${cfg.user}";
-              mode = ":755";
+              mode = ":${
+                # Use volume permissions if set
+                if (value.flags ? chmod_d) then
+                  value.flags.chmod_d
+                # Else, use global permission if set
+                else if (cfg.settings ? chmod-d) then
+                  cfg.settings.chmod-d
+                # Else, use the default permission
+                else
+                  "755"
+              }";
             };
           }
-        ) cfg.volumes
+        ) volumesWithoutVariables
       );
 
       users.groups = lib.mkIf (cfg.group == "copyparty") {

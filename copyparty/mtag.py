@@ -168,12 +168,12 @@ def au_unpk(
             znil = [x for x in znil if "cover" in x[0]] or znil
             znil = [x for x in znil if CBZ_01.search(x[0])] or znil
             t = "cbz: %d files, %d hits" % (nf, len(znil))
+            if not znil:
+                raise Exception("no images inside cbz")
             using = sorted(znil)[0][1].filename
             if znil:
                 t += ", using " + using
             log(t)
-            if not znil:
-                raise Exception("no images inside cbz")
             fi = zf.open(using)
 
         elif pk == "epub":

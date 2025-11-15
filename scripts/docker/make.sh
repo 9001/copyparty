@@ -48,7 +48,7 @@ done
 
 filt=
 [ $clean  ] && filt='/<none>/{print$$3}'
-[ $hclean ] && filt='/localhost\/copyparty-|^<none>.*localhost\/alpine-/{print$3}'
+[ $hclean ] && filt='/localhost\/(copyparty|alpine)-/{print$3}'
 [ $purge  ] && filt='NR>1{print$3}'
 [ $filt ] && {
     [ $purge ] && {
@@ -84,6 +84,11 @@ filt=
         mkdir -p ../../dist
         wget https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py -O $fp
     }
+
+    # enable arm32 crossbuild from aarch64 (macbook or whatever)
+    [ $(uname -m) = aarch64 ] && [ ! -e /proc/sys/fs/binfmt_misc/qemu-arm ] &&
+        echo ":qemu-arm:M:0:\x7f\x45\x4c\x46\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/bin/qemu-arm-static:F" |
+        sudo tee >/dev/null /proc/sys/fs/binfmt_misc/register
 
     # kill abandoned builders
     ps aux | awk '/bin\/qemu-[^-]+-static/{print$2}' | xargs -r kill -9

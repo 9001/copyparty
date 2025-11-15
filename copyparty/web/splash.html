@@ -211,6 +211,9 @@ document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme
 
 </script>
 <script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+{%- if lang != "eng" %}
+<script src="{{ r }}/.cpr/tl/{{ lang }}.js?_={{ ts }}"></script>
+{%- endif %}
 <script src="{{ r }}/.cpr/splash.js?_={{ ts }}"></script>
 {%- if js %}
 <script src="{{ js }}_={{ ts }}"></script>

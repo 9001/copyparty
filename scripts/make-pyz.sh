@@ -41,8 +41,10 @@ rm -rf pyz
 mkdir -p pyz
 cd pyz
 
-cp -pR ../sfx/{copyparty,partftpy} .
-cp -pR ../sfx/{ftp,j2}/* .
+cp -pR ../sfx/copyparty .
+cp -pR ../sfx/j2/* .
+[ -e ../sfx/partftpy ] && cp -pR ../sfx/partftpy .
+[ -e ../sfx/ftp ] && cp -pR ../sfx/ftp/* .
 
 true && {
 	rm -rf copyparty/web/mde.* copyparty/web/deps/easymde*

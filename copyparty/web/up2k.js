@@ -1999,6 +1999,18 @@ function up2k_init(subtle) {
 
         if (pvis.act == 'bz')
             pvis.changecard('bz');
+
+        var n = st.files.length - 1,
+            f = n >= 0 && st.files[n];
+        if (f && !f.srch) {
+            var xhr = new XHR(),
+                ct = 'application/x-www-form-urlencoded;charset=UTF-8';
+            xhr.open('POST', f.purl, true);
+            xhr.setRequestHeader('Content-Type', ct);
+            if (xhr.overrideMimeType)
+                xhr.overrideMimeType('Content-Type', ct);
+            xhr.send('msg=upload-queue-empty;' + uricom_enc(f.name));
+        }
     }
 
     function chill(t) {
@@ -2671,8 +2683,6 @@ function up2k_init(subtle) {
                         f2f(spd1, 2), !isNum(spd2) ? '--' : f2f(spd2, 2)));
 
                     pvis.move(t.n, 'ok');
-                    if (!pvis.ctr.bz && !pvis.ctr.q)
-                        uptoast();
                 }
                 else {
                     if (t.t_uploaded)

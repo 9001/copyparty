@@ -1,4 +1,133 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-1025-1918  `v1.19.19`  copyparty.eu マークII
+
+## 🩹 bugfixes
+
+* fix building the archlinux package e3524d85
+  * otherwise identical to [v1.19.18](https://github.com/9001/copyparty/releases/tag/v1.19.18)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-1025-1434  `v1.19.18`  copyparty.eu
+
+## 🧪 new features
+
+* #949 when all uploads have finished, the client (both the browser and u2c) sends a message to the server saying it's done db87ea5c
+* #941 [copyparty-en.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty-en.pyz), yet another copyparty variant, with enterprise-friendly tweaks:
+  * does not include the smb-server, so antivirus doesn't think it's malware 7f5810f1
+  * english-only, because antivirus apparently hates certain translations too 7f5810f1
+  * renamed the webdav-config `.bat` to `.txt` because clearly only one of those are "dangerous" b624a387
+* show volumes with permssion `h` in the navpane fff7291d 
+* #937 global-option `--notooltips` to default-disable tooltips a325353b
+
+## 🩹 bugfixes
+
+* #948 fix the u2c `--dr` option when the server is running on windows d3dd3456
+* fix crash on startup when using volflags `unlistc*` and the parent folder is not a volume cdd5e78a
+* `og` / opengraph / discord-embed fixes:
+  * using the `h` permission could result in unexpected 404 c9e45c12
+  * a single-file volume could make filenames in its parent volume unintentionally visible 36ab77e0
+    * this would only happen when combined with `--og`
+* fix some harmless warnings from single-file volumes b1efc006
+* fix filesize-colors in selected rows 1c17b63b
+
+## 🔧 other changes
+
+* releases can now also be downloaded from https://copyparty.eu/ 547a7ab1
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-1017-2313  `v1.19.17`  read:cbz + re:ftp
+
+## 🧪 new features
+
+* #916 view cbz manga/comics in the browser (thx @Scotsguy!) 8ef6dda7
+* #845 users/groups can be subtracted from a broader access grant b4fda5f1
+  * for example `*,-@acct` hides a volume from everyone who's logged in
+* [reflink dedup](https://github.com/9001/copyparty/#file-deduplication) is now available in most python versions, not just 3.14 and newer f2caab61
+  * much better and safer than symlink/hardlink-based dedup, but only works with a few filesystems
+* #905 option to magnify images/videos to fill the screen 66dc8b5c
+* #921 #685 `xm` hooks can see the selected files (thx @carson-coder!) 6c024dbf 33644488
+* #927 textfiles can now be viewed with the `?doc=` suffix with just the `g` permission dbb78705
+* #742 new volflag `nodupem` to prevent dupes from being moved into a volume; the stronger alternative to `nodupe` which only prevents uploads f55d8341
+* audioplayer: show embedded coverart as fallback for cover.jpg in OS widgets 9746b4e2
+* #928 option to [hide certain ui-elements](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice#hide-ui-elements), either with volflags or url-params 98da5cc5
+* #911 users can now avoid autoban according to permissions 6f02812a
+* verbosity and permssion options for `?stack` 677fd8ee
+  * default is now admin-only; previously it was "admin or read+write"
+
+## 🩹 bugfixes
+
+* #914 ftp-server: resuming interrupted uploads (thx @Audionut!) 33b0cd5a
+* race-the-beam didn't work in non-toplevel shares d9cd7ec3
+
+## 🔧 other changes
+
+* #904 new example hook [wget-i.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget-i.py); import-safe fork of [wget.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/wget.py) dbd8f837
+* hide the search-ui while viewing a share because searching in shares is not possible cca1f9b2
+* config-parser now prevents invalid values for the lifetime volflag 5d96862c
+* translations are now [separate files](https://github.com/9001/copyparty/tree/hovudstraum/copyparty/web/tl) instead of all chilling inside browser.js d099e5e8 d6433b78 a7840beb a7cdc5de 98086948 a85ad201 c2e03bf6 b9d7ede3 5a29df6b 52446bb5 bb166c98 0fa862e1 6de6aa4b 748aaa95 07ace416 b61b910e 28b93238 14bd4cf5 50109f76 3b009d97 f5425a88 5232ce6a 02ba9ea7 ff01723c d099e5e8
+
+## 🌠 fun facts
+
+* looks like i'll be in Japan november 7～26 and then at CCC for newyears!
+  * wait, I never made stickers... orz
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-1005-2259  `v1.19.16`  FULLBURST
+
+## 🧪 new features
+
+* [hooks](https://github.com/9001/copyparty#event-hooks) got some nice upgrades
+  * add flag `I` to run in-process for a **140x** speed boost 41ed559f
+    * bring your own safeguards (if an `I` hook has a bug then it can deadlock copyparty)
+    * (this is where the releasetitle came from btw)
+  * add flag `s` to send info on stdin instead of argv 4542ad3c
+  * new hook: [reject uploads into ramdisks](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-ramdisk.py) (granular alternative to `wram`) efd19af7
+    * will be default-enabled in the [bootable copyparty flashdrive image](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/)
+* show media-tags inside shares 50276c0c
+* #881 manga-mode (RTL) for the image viewer (thx @Scotsguy!) dacc64dd 
+* #872 combining `chpw` and IdP-auth is now supported 3f597102
+* #854 auto-incrementing counters for batch-rename d05a88d2 76e9f23a
+* #882 change to volume-specific favicon on navigation 2ce32e4f
+* #884 option to turn the servername into a link (thx @Morganamilo!) 38cc8098 9b7f933b
+* rss: add option to not embed pw into feed 73ec2d29
+* cbz and epub files can become folder-thumbnails eb173be4
+
+## 🩹 bugfixes
+
+* web-ui: only show generic http errors if nothing better is available 0453b7ac
+* #860 epub-thumbnailer errors are less noisy now 4177c1d9
+* the `ui-filesz` option can have a trailing hyphen now 2248705e
+* hide "create share" button while inside a share c5f12296
+
+## 🔧 other changes
+
+* #460 example config for running the podman images as a systemd service (thx @danloveg!) 7fc379ab
+* #886 nixos: option to specify unix-user/group to run as (thx @2Kaleb!) 31f1b535
+* #895 mention the `?v` suffix to open mediafiles in the mediaplayer f8e19815
+* ignore 403s from `/favicon.png` (samsung-android)
+* docker: shrink the `min` image from 45 to 33 MiB a8f53d5e
+* #887 add missing entries in `--licenses` 805a7054
+* #887 various vendored python libraries can now be ripped out and replaced with system-libs:
+  * `ifaddr` 656f0a6c
+  * `dnslib` 39bd4e5b
+  * `qrcodegen` 08ebb0b4
+  * `surrogateescape` aace711e
+
+## 🌠 fun facts
+
+* today's genre is Techcore (a subgenre of J-core (a subgenre of UKHC))
+  * [FULLBURST](https://www.youtube.com/watch?v=mYqFHZdbawE) by ぱらどっと is an excellent example
+  * omake: [speedrun through 18 other genres](https://www.youtube.com/watch?v=_YnwnxSE2UA) (pick your favorite)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0929-2310  `v1.19.15`  merry christmas
 
 ## 🧪 new features

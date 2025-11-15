@@ -94,7 +94,10 @@ copyparty = [
     "web/*.css",
     "web/*.html",
     "web/*.xml",
-    "web/a/*.bat",
+    "web/tl/*.js",
+    "web/tl/*.gz",
+    "web/a/*.txt",
+    "web/a/*.gz",
     "web/deps/*.gz",
     "web/deps/*.woff*",
 ]

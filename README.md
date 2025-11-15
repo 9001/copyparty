@@ -21,6 +21,7 @@ made in Norway 🇳🇴
 
 * top
     * [quickstart](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
+        * [mirrors](#mirrors) - other places to download copyparty from
         * [at home](#at-home) - make it accessible over the internet
         * [on servers](#on-servers) - you may also want these, especially on servers
     * [features](#features) - also see [comparison to similar software](./docs/versus.md)
@@ -157,7 +158,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 
 * or install through [pypi](https://pypi.org/project/copyparty/): `python3 -m pip install --user -U copyparty`
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
-* or install [on arch](#arch-package) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
+* or install [on arch](#arch-package) / [homebrew](#homebrew-formulae) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
 * or if you are on android, [install copyparty in termux](#install-on-android)
 * or maybe an iPhone or iPad? [install in a-Shell on iOS](#install-on-iOS)
 * or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
@@ -193,6 +194,18 @@ some recommended options:
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
   * see [accounts and volumes](#accounts-and-volumes) (or `--help-accounts`) for the syntax and other permissions
+
+
+### mirrors
+
+other places to download copyparty from  (non-github links):
+
+* https://copyparty.eu/ (hetzner, finland, official mirror):
+  * https://copyparty.eu/py = https://copyparty.eu/copyparty-sfx.py = the sfx
+  * https://copyparty.eu/en = https://copyparty.eu/copyparty-en.py = the english-only sfx
+  * https://copyparty.eu/pyz = https://copyparty.eu/copyparty.pyz = the zipapp
+  * https://copyparty.eu/enz = https://copyparty.eu/copyparty-en.pyz = the enterprise pyz
+  * https://copyparty.eu/cli = online cli helptext
 
 
 ### at home
@@ -522,6 +535,9 @@ examples:
   * replacing the `g` permission with `wG` would let anonymous users upload files, receiving a working direct link in return
 
 if you want to grant access to all users who are logged in, the group `acct` will always contain all known users, so for example `-v /mnt/music:music:r,@acct`
+
+* to do the opposite, granting access to everyone who is NOT logged in. `*,-@acct` does the trick, for example `-v /srv/welcome:welcome:r,*,-@acct`
+* single users can also be subtracted from a group: `@admins,-james`
 
 anyone trying to bruteforce a password gets banned according to `--ban-pw`; default is 24h ban for 9 failed attempts in 1 hour
 
@@ -1493,7 +1509,12 @@ tweaking the ui
   * to sort in music order (album, track, artist, title) with filename as fallback, you could `--sort tags/Circle,tags/.tn,tags/Artist,tags/Title,href`
   * to sort by upload date, first enable showing the upload date in the listing with `-e2d -mte +.up_at` and then `--sort tags/.up_at`
 
-see [./docs/rice](./docs/rice) for more, including how to add stuff (css/`<meta>`/...) to the html `<head>` tag, or to add your own translation
+see [./docs/rice](./docs/rice) for more, including:
+* how to [hide ui-elements](./docs/rice/README.md#hide-ui-elements)
+* [custom fonts](./docs/rice/README.md#custom-fonts)
+* [custom loading-spinner](./docs/rice/README.md#boring-loader-spinner)
+* adding stuff (css/`<meta>`/...) [to the html `<head>` tag](./docs/rice/README.md#head)
+* [adding your own translation](./docs/rice/README.md#translations)
 
 
 ## opengraph
@@ -2961,7 +2982,9 @@ enable sending [zeromq messages](#zeromq) from event-hooks: `pyzmq`
 
 enable [smb](#smb-server) support (**not** recommended): `impacket==0.12.0`
 
-`pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
+`pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram
+* to install `pyvips` on Linux: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
+* to install `pyvips` on windows: `pip install --user -U "pyvips[binary]"`
 
 to install FFmpeg on Windows, grab [a recent build](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z) -- you need `ffmpeg.exe` and `ffprobe.exe` from inside the `bin` folder; copy them into `C:\Windows\System32` or any other folder that's in your `%PATH%`
 
@@ -3058,7 +3081,8 @@ another emergency alternative, [copyparty.pyz](https://github.com/9001/copyparty
 run it by doubleclicking it, or try typing `python copyparty.pyz` in your terminal/console/commandline/telex if that fails
 
 it is a python [zipapp](https://docs.python.org/3/library/zipapp.html) meaning it doesn't have to unpack its own python code anywhere to run, so if the filesystem is busted it has a better chance of getting somewhere
-* but note that it currently still needs to extract the web-resources somewhere (they'll land in the default TEMP-folder of your OS)
+
+> there is also [copyparty-en.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty-en.pyz), english-only and without smb support (enterprise-friendly)
 
 
 # install on android

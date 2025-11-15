@@ -17,10 +17,27 @@ help() { exec cat <<'EOF'
 # `re` does a repack of an sfx which you already executed once
 #   (grabs files from the sfx-created tempdir), overrides `clean`
 #
-# `gz` creates a gzip-compressed python sfx instead of bzip2
-#
 # `lang` limits which languages/translations to include,
 #   for example `lang eng` or `lang eng|nor`
+#
+# _____________________________________________________________________
+# compression tweaks:
+#
+# `gz` creates a gzip-compressed python sfx instead of bzip2
+#   (improves compat with minimal and/or ancient pythons)
+#
+# `gzz 50` uses zopfli to create a gzip-compressed python sfx
+#   (better compression than regular gz without affecting compat)
+#
+# `xz` creates an xz-compressed python sfx instead of bzip2
+#   (tiny bit smaller, but needs modern python to run)
+#
+# `nopk` disables js/css compression; builds faster, and
+#   the sfx becomes smaller, but reduces runtime performance
+#
+# `udep` unpacks compressed js/css (use with `nopk` and `xz`);
+#   even smaller sfx, much worse RAM/network waste at runtime
+#   (only useful for jokes such as putting the sfx on a floppy)
 #
 # _____________________________________________________________________
 # core features:
@@ -106,11 +123,14 @@ pybin=$(command -v python3 || command -v python) || {
 
 langs=
 use_gz=
+use_xz=
 zopf=2000
+udep=
 while [ ! -z "$1" ]; do
 	case $1 in
 		clean)  clean=1  ; ;;
 		re)     repack=1 ; ;;
+		xz)     use_xz=1 ; ;;
 		gz)     use_gz=1 ; ;;
 		gzz)    shift;use_gzz=$1;use_gz=1; ;;
 		no-ftp) no_ftp=1 ; ;;
@@ -124,6 +144,8 @@ while [ ! -z "$1" ]; do
 		dl-wd)  dl_wd=1  ; ;;
 		ign-wd) ign_wd=1 ; ;;
 		fast)   zopf=    ; ;;
+		nopk)   zopf=no  ; ;;
+		udep)   udep=1   ; ;;
 		lang)   shift;langs="$1"; ;;
 		*)      help     ; ;;
 	esac
@@ -423,14 +445,27 @@ iawk '/^class _Base/{s=1}!s' ftp/pyftpdlib/authorizers.py
 iawk '/^ {0,4}[a-zA-Z]/{s=0}/^ {4}def (serve_forever|_loop)/{s=1}!s' ftp/pyftpdlib/servers.py
 rm -f ftp/pyftpdlib/{__main__,prefork}.py
 
-[ $no_ftp ] &&
+unhelp() {
+	iawk '!/add_argument\("--'$1'/{print;next}
+		/ent\("--'$1'"/{print gensub(/(help=")[^"]+/,"\\1not available in this build","1");next}
+		{sub(/help=.*/,"help=argparse.SUPPRESS)")}1' copyparty/__main__.py
+}
+
+[ $no_ftp ] && {
+	unhelp ftp
 	rm -rf copyparty/ftpd.py ftp
+}
 
-[ $no_tfp ] &&
+[ $no_tfp ] && {
+	unhelp tftp
 	rm -rf copyparty/tftpd.py partftpy
+}
 
-[ $no_smb ] &&
+[ $no_smb ] && {
+	unhelp smb
 	rm -f copyparty/smbd.py
+	ised 's/^( {8}elif )record\.name.*"impacket".*/\10:/' copyparty/util.py
+}
 
 [ $no_zm ] &&
 	rm -rf copyparty/mdns.py copyparty/stolen/dnslib
@@ -459,10 +494,12 @@ rm -f ftp/pyftpdlib/{__main__,prefork}.py
 		langs="eng|$langs"
 		aerr "ERROR: removing english is not supported; will do this instead: $langs"
 	}
-	for f in copyparty/web/{browser.js,splash.js}; do
-		gzip -d "$f.gz" || true
-		iawk '/^\}/{l=0} !l; /^var Ls =/{l=1;next} !l{next} o; /^\t["}]/{o=0} /^\t"'"$langs"'"/{o=1;print}' $f
-	done
+	f=copyparty/web/browser.js
+	gzip -d "$f.gz" || true
+	iawk '/^\]/{s=0} !s; /^var LANGN /{s=1;next} !s{next} /"'"$langs"'"/' $f
+	ls -1 copyparty/web/tl/* >t
+	grep -vE "/($langs)\." <t | xargs -- rm
+	rm t
 }
 
 [ ! $repack ] && {
@@ -529,6 +566,7 @@ done
 
 gzres() {
 	local pk=
+	[ "$zopf" = no ] && return
 	[ $zopf ] && command -v zopfli && pk="zopfli --i$zopf"
 	[ $zopf ] && command -v pigz && pk="pigz -11 -I $zopf"
 	[ -z "$pk" ] && pk='gzip'
@@ -546,62 +584,41 @@ gzres() {
 		$pk "$f" &
 	done < <(
 		find -printf '%s %p\n' |
-		grep -E '\.(js|css)$' |
+		grep -E '\.(js|css)$|/web/a/[^_].*\.(py|txt)$' |
 		grep -vF /deps/ |
 		sort -nr
 	)
 	wait
 	echo
 }
+gzres
 
-
-zdir="$tmpdir/cpp-mksfx"
-[ -e "$zdir/$stamp" ] || rm -rf "$zdir"
-mkdir -p "$zdir"
-echo a > "$zdir/$stamp"
-nf=$(ls -1 "$zdir"/arc.* 2>/dev/null | wc -l)
-[ $nf -ge 2 ] && [ ! $repack ] && use_zdir=1 || use_zdir=
-
-[ $use_zdir ] || {
-	echo "$nf alts += 1"
-	gzres
-	[ $repack ] ||
-		tar -cf "$zdir/arc.$(date +%s)" copyparty/web/*.gz
-}
-[ $use_zdir ] && {
-	arcs=("$zdir"/arc.*)
-	n=$(( $RANDOM % ${#arcs[@]} ))
-	arc="${arcs[n]}"
-	echo "using $arc"
-	tar -xf "$arc"
-	for f in copyparty/web/*.gz; do
-		rm "${f%.*}"
-	done
-}
-
+[ $udep ] &&
+    find -iname '*.gz' | while IFS= read -r x; do gzip -d "$x"; done
 
 echo gen tarlist
 for d in copyparty partftpy magic j2 py2 py37 ftp; do find $d -type f || true; done |  # strip_hints
 sed -r 's/(.*)\.(.*)/\2 \1/' | LC_ALL=C sort |
 sed -r 's/([^ ]*) (.*)/\2.\1/' | grep -vE '/list1?$' > list1
-(grep -vE '\.gz$' list1; grep -E '\.gz$' list1) >list
+(grep -vE '\.gz$' list1; grep -E '\.gz$' list1) >list || true
 
 echo creating tar
 tar -cf tar "${targs[@]}" --numeric-owner -T list
 
-pc="bzip2 -"; pe=bz2
+pc="bzip2 -"; pe=bz2; pl=$(echo {2..9})
 [ $use_gz ] && pc="gzip -" && pe=gz
-[ $use_gzz ] && pc="pigz -11 -I$use_gzz" && pe=gz
+[ $use_gzz ] && pc="pigz -11 -I$use_gzz" && pe=gz && pl=0
+[ $use_xz ] && pc="xz -zeT0 -" && pe=xz
 
 echo compressing tar
-for n in {2..9}; do cp tar t.$n; nice -n20 $pc$n t.$n & done; wait
+for n in $pl; do cp tar t.$n; nice -n20 $pc$n t.$n & done; wait
 minf=$(for f in t.*.$pe; do
 	s1=$(wc -c <$f)
 	s2=$(tr -d '\r\n\0' <$f | wc -c)
 	echo "$(( s2+(s1-s2)*3 )) $f"
 done | sort -n | awk '{print$2;exit}')
 mv -v $minf tar.bz2
-rm t.* || true
+rm t.* 2>/dev/null || true
 exts=()
 
 
@@ -613,13 +630,17 @@ suf=
 	sed -r 's/"r:bz2"/"r:gz"/' <$py >$py.t
 	py=$py.t
 }
+[ $use_xz ] && {
+	sed -r 's/"r:bz2"/"r:xz"/' <$py >$py.t
+	py=$py.t
+}
 
 "$pybin" $py --sfx-make tar.bz2 $ver $ts
 mv sfx.out $sfx_out$suf.py
 
 exts+=($suf.py)
-[ $use_gz ] &&
-	rm $py
+[ $use_gz ] && rm $py
+[ $use_xz ] && rm $py
 
 
 chmod 755 $sfx_out*

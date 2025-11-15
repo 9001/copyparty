@@ -28,6 +28,11 @@ function cb() {
     location = '?shares';
 }
 
+ebi('xpnd').onclick = function (e) {
+	ev(e);
+	clmod(ebi('wrap'), 'terse', 't');
+};
+
 function qr(e) {
     ev(e);
     var href = this.href,

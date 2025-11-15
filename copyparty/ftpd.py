@@ -198,7 +198,7 @@ class FtpFs(AbstractedFS):
                 if not avfs:
                     raise FSE(t.format(vpath), 1)
 
-                cr, cw, cm, cd, _, _, _, _ = avfs.can_access("", self.h.uname)
+                cr, cw, cm, cd, _, _, _, _, _ = avfs.uaxs[self.h.uname]
                 if r and not cr or w and not cw or m and not cm or d and not cd:
                     raise FSE(t.format(vpath), 1)
 
@@ -250,8 +250,9 @@ class FtpFs(AbstractedFS):
                 td = 0
 
         if w and need_unlink:
+            assert td  # type: ignore  # !rm
             if td >= -1 and td <= self.args.ftp_wt:
-                # within permitted timeframe; unlink and accept
+                # within permitted timeframe; allow overwrite or resume
                 do_it = True
             elif self.args.no_del or self.args.ftp_no_ow:
                 # file too old, or overwrite not allowed; reject
@@ -268,7 +269,9 @@ class FtpFs(AbstractedFS):
             if not do_it:
                 raise FSE("File already exists")
 
-            wunlink(self.log, ap, VF_CAREFUL)
+            # Don't unlink file for append mode
+            elif "a" not in mode:
+                wunlink(self.log, ap, VF_CAREFUL)
 
         ret = open(fsenc(ap), mode, self.args.iobuf)
         if w and "fperms" in vfs.flags:
@@ -509,7 +512,7 @@ class FtpHandler(FTPHandler):
                 0,
                 self.cli_ip,
                 time.time(),
-                "",
+                None,
             )
             t = hr.get("rejectmsg") or ""
             if t or not hr:

@@ -649,8 +649,11 @@ def get_sects():
             if no accounts or volumes are configured,
             current folder will be read/write for everyone
 
-            the group @acct will always have every user with an account
-            (the name of that group can be changed with --grp-all)
+            the group \033[33m@acct\033[0m will always have every user with an account
+            (the name of that group can be changed with \033[32m--grp-all\033[0m)
+
+            to hide a volume from authenticated users, specify \033[33m*,-@acct\033[0m
+            to subtract \033[33m@acct\033[0m from \033[33m*\033[0m (can subtract users from groups too)
 
             consider the config file for more flexible account/volume management,
             including dynamic reload at runtime (and being more readable w)
@@ -672,12 +675,12 @@ def get_sects():
 
             send the password in the '\033[36mPW\033[0m' http-header:
               \033[36mPW: \033[35mhunter2\033[0m
-            or if you have \033[33m--accounts\033[0m enabled,
+            or if you have \033[33m--usernames\033[0m enabled,
               \033[36mPW: \033[35med:hunter2\033[0m
 
             send the password in the URL itself:
               \033[36mhttp://127.0.0.1:3923/\033[35m?pw=hunter2\033[0m
-            or if you have \033[33m--accounts\033[0m enabled,
+            or if you have \033[33m--usernames\033[0m enabled,
               \033[36mhttp://127.0.0.1:3923/\033[35m?pw=ed:hunter2\033[0m
 
             use basic-authentication:
@@ -1174,6 +1177,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--rmagic", action="store_true", help="do expensive analysis to improve accuracy of returned mimetypes; will make file-downloads, rss, and webdav slower (volflag=rmagic)")
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
+    ap2.add_argument("--versionb", action="store_true", help="show version and exit")
 
 
 def add_qr(ap, tty):
@@ -1241,6 +1245,7 @@ def add_upload(ap):
     ap2.add_argument("--hardlink-only", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made (volflag=hardlinkonly)")
     ap2.add_argument("--reflink", action="store_true", help="enable reflink-based dedup; will fallback on full copies when that is impossible (non-CoW filesystem) (volflag=reflink)")
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
+    ap2.add_argument("--no-dupe-m", action="store_true", help="also reject dupes when moving a file into another volume (volflag=nodupem)")
     ap2.add_argument("--no-clone", action="store_true", help="do not use existing data on disk to satisfy dupe uploads; reduces server HDD reads in exchange for much more network load (volflag=noclone)")
     ap2.add_argument("--no-snap", action="store_true", help="disable snapshots -- forget unfinished uploads on shutdown; don't create .hist/up2k.snap files -- abandoned/interrupted uploads must be cleaned up manually")
     ap2.add_argument("--snap-wri", metavar="SEC", type=int, default=300, help="write upload state to ./hist/up2k.snap every \033[33mSEC\033[0m seconds; allows resuming incomplete uploads after a server crash")
@@ -1528,6 +1533,7 @@ def add_optouts(ap):
     ap2.add_argument("--no-pipe", action="store_true", help="disable race-the-beam (lockstep download of files which are currently being uploaded) (volflag=nopipe)")
     ap2.add_argument("--no-tail", action="store_true", help="disable streaming a growing files with ?tail (volflag=notail)")
     ap2.add_argument("--no-db-ip", action="store_true", help="do not write uploader-IP into the database; will also disable unpost, you may want \033[32m--forget-ip\033[0m instead (volflag=no_db_ip)")
+    ap2.add_argument("--no-zls", action="store_true", help="disable browsing the contents of zip/cbz files, does not affect thumbnails")
 
 
 def add_safety(ap):
@@ -1546,6 +1552,7 @@ def add_safety(ap):
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore \033[33m--no-robots\033[0m")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything (volflag=norobots)")
     ap2.add_argument("--logout", metavar="H", type=float, default=8086.0, help="logout clients after \033[33mH\033[0m hours of inactivity; [\033[32m0.0028\033[0m]=10sec, [\033[32m0.1\033[0m]=6min, [\033[32m24\033[0m]=day, [\033[32m168\033[0m]=week, [\033[32m720\033[0m]=month, [\033[32m8760\033[0m]=year)")
+    ap2.add_argument("--dont-ban", metavar="TXT", type=u, default="no", help="anyone at this accesslevel or above will not get banned: [\033[32mav\033[0m]=admin-in-volume, [\033[32maa\033[0m]=has-admin-anywhere, [\033[32mrw\033[0m]=read-write, [\033[32mauth\033[0m]=authenticated, [\033[32many\033[0m]=disable-all-bans, [\033[32mno\033[0m]=anyone-can-get-banned")
     ap2.add_argument("--ban-pw", metavar="N,W,B", type=u, default="9,60,1440", help="more than \033[33mN\033[0m wrong passwords in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; disable with [\033[32mno\033[0m]")
     ap2.add_argument("--ban-pwc", metavar="N,W,B", type=u, default="5,60,1440", help="more than \033[33mN\033[0m password-changes in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; disable with [\033[32mno\033[0m]")
     ap2.add_argument("--ban-404", metavar="N,W,B", type=u, default="50,60,1440", help="hitting more than \033[33mN\033[0m 404's in \033[33mW\033[0m minutes = ban for \033[33mB\033[0m minutes; only affects users who cannot see directory listings because their access is either g/G/h")
@@ -1610,12 +1617,14 @@ def add_admin(ap):
     ap2 = ap.add_argument_group("admin panel options")
     ap2.add_argument("--no-reload", action="store_true", help="disable ?reload=cfg (reload users/volumes/volflags from config file)")
     ap2.add_argument("--no-rescan", action="store_true", help="disable ?scan (volume reindexing)")
-    ap2.add_argument("--no-stack", action="store_true", help="disable ?stack (list all stacks)")
+    ap2.add_argument("--no-stack", action="store_true", help="disable ?stack (list all stacks); same as --stack-who=no")
     ap2.add_argument("--no-ups-page", action="store_true", help="disable ?ru (list of recent uploads)")
     ap2.add_argument("--no-up-list", action="store_true", help="don't show list of incoming files in controlpanel")
     ap2.add_argument("--dl-list", metavar="LVL", type=int, default=2, help="who can see active downloads in the controlpanel? [\033[32m0\033[0m]=nobody, [\033[32m1\033[0m]=admins, [\033[32m2\033[0m]=everyone")
     ap2.add_argument("--ups-who", metavar="LVL", type=int, default=2, help="who can see recent uploads on the ?ru page? [\033[32m0\033[0m]=nobody, [\033[32m1\033[0m]=admins, [\033[32m2\033[0m]=everyone (volflag=ups_who)")
     ap2.add_argument("--ups-when", action="store_true", help="let everyone see upload timestamps on the ?ru page, not just admins")
+    ap2.add_argument("--stack-who", metavar="LVL", type=u, default="a", help="who can see the ?stack page (list of threads)? [\033[32mno\033[0m]=nobody, [\033[32ma\033[0m]=admins, [\033[32mrw\033[0m]=read+write, [\033[32mall\033[0m]=everyone")
+    ap2.add_argument("--stack-v", action="store_true", help="verbose ?stack")
 
 
 def add_thumbnail(ap):
@@ -1787,6 +1796,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--ufavico", metavar="TXT", type=u, default="", help="URL to .ico/png/gif/svg file; \033[33m--favico\033[0m takes precedence unless disabled (volflag=ufavico)")
     ap2.add_argument("--ext-th", metavar="E=VP", type=u, action="append", help="\033[34mREPEATABLE:\033[0m use thumbnail-image \033[33mVP\033[0m for file-extension \033[33mE\033[0m, example: [\033[32mexe=/.res/exe.png\033[0m] (volflag=ext_th)")
     ap2.add_argument("--mpmc", type=u, default="", help=argparse.SUPPRESS)
+    ap2.add_argument("--notooltips", action="store_true", help="tooltips disabled as default")
     ap2.add_argument("--spinner", metavar="TXT", type=u, default="🌲", help="\033[33memoji\033[0m or \033[33memoji,css\033[0m Example: [\033[32m🥖,padding:0\033[0m]")
     ap2.add_argument("--css-browser", metavar="L", type=u, default="", help="URL to additional CSS to include in the filebrowser html")
     ap2.add_argument("--js-browser", metavar="L", type=u, default="", help="URL to additional JS to include in the filebrowser html")
@@ -1813,6 +1823,15 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--lg-sba", metavar="TXT", type=u, default="", help="the value of the iframe 'allow' attribute for prologue/epilogue docs (volflag=lg_sba); see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy#iframes")
     ap2.add_argument("--no-sb-md", action="store_true", help="don't sandbox README/PREADME.md documents (volflags: no_sb_md | sb_md)")
     ap2.add_argument("--no-sb-lg", action="store_true", help="don't sandbox prologue/epilogue docs (volflags: no_sb_lg | sb_lg); enables non-js support")
+    ap2.add_argument("--ui-nombar", action="store_true", help="hide top-menu in the UI (volflag=ui_nombar)")
+    ap2.add_argument("--ui-noacci", action="store_true", help="hide account-info in the UI (volflag=ui_noacci)")
+    ap2.add_argument("--ui-nosrvi", action="store_true", help="hide server-info in the UI (volflag=ui_nosrvi)")
+    ap2.add_argument("--ui-nonav", action="store_true", help="hide navpane+breadcrumbs (volflag=ui_nonav)")
+    ap2.add_argument("--ui-notree", action="store_true", help="hide navpane in the UI (volflag=ui_nonav)")
+    ap2.add_argument("--ui-nocpla", action="store_true", help="hide cpanel-link in the UI (volflag=ui_nocpla)")
+    ap2.add_argument("--ui-nolbar", action="store_true", help="hide link-bar in the UI (volflag=ui_nolbar)")
+    ap2.add_argument("--ui-noctxb", action="store_true", help="hide context-buttons in the UI (volflag=ui_noctxb)")
+    ap2.add_argument("--ui-norepl", action="store_true", help="hide repl-button in the UI (volflag=ui_norepl)")
     ap2.add_argument("--have-unlistc", action="store_true", help=argparse.SUPPRESS)
 
 
@@ -1940,14 +1959,18 @@ def run_argparse(
 
 
 def main(argv: Optional[list[str]] = None) -> None:
+    if argv is None:
+        argv = sys.argv
+
+    if "--versionb" in argv:
+        print(S_VERSION)
+        sys.exit(0)
+
     time.strptime("19970815", "%Y%m%d")  # python#7980
     if WINDOWS:
         os.system("rem")  # enables colors
 
     init_E(E)
-
-    if argv is None:
-        argv = sys.argv
 
     f = '\033[36mcopyparty v{} "\033[35m{}\033[36m" ({})\n{}\033[0;36m\n   sqlite {} | jinja {} | pyftpd {} | tftp {}\n\033[0m'
     f = f.format(
@@ -2075,7 +2098,7 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     # propagate implications
     for k1, k2 in IMPLICATIONS:
-        if getattr(al, k1):
+        if getattr(al, k1, None):
             setattr(al, k2, True)
 
     # propagate unplications

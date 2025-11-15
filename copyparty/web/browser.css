@@ -1036,6 +1036,7 @@ html.dz #flogout {
 	box-shadow: 0 .1em 1.2em var(--g-play-sh);
 }
 #files tbody tr.sel td,
+#files tbody tr.sel span,
 #ggrid>a.sel,
 #ggrid>a[tt].sel {
 	color: var(--g-sel-fg);
@@ -2164,6 +2165,12 @@ html.noscroll .sbar::-webkit-scrollbar {
 	margin-bottom: 1.4em;
 	vertical-align: middle;
 	transition: transform .23s, left .23s, top .23s, width .23s, height .23s;
+}
+#bbox-overlay.fill .full-image img,
+#bbox-overlay.fill .full-image video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 html.bb_fsc .full-image img,
 html.bb_fsc .full-image video {

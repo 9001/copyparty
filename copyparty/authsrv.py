@@ -398,6 +398,9 @@ class VFS(object):
         self.vpath = vpath  # absolute path in the virtual filesystem
         self.vpath0 = vpath0  # original vpath (before idp expansion)
         self.axs = axs
+        self.uaxs: dict[
+            str, tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool]
+        ] = {}
         self.flags = flags  # config options
         self.root = self
         self.dev = 0  # st_dev
@@ -555,29 +558,19 @@ class VFS(object):
 
     def can_access(
         self, vpath: str, uname: str
-    ) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
-        """can Read,Write,Move,Delete,Get,Upget,Admin,Dot"""
+    ) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool]:
+        """can Read,Write,Move,Delete,Get,Upget,Html,Admin,Dot"""
+        # NOTE: only used by get_perms, which is only used by hooks; the lowest of fruits
         if vpath:
             vn, _ = self._find(undot(vpath))
         else:
             vn = self
 
-        c = vn.axs
-        return (
-            uname in c.uread,
-            uname in c.uwrite,
-            uname in c.umove,
-            uname in c.udel,
-            uname in c.uget,
-            uname in c.upget,
-            uname in c.uadmin,
-            uname in c.udot,
-        )
-        # skip uhtml because it's rarely needed
+        return vn.uaxs[uname]
 
     def get_perms(self, vpath: str, uname: str) -> str:
         zbl = self.can_access(vpath, uname)
-        ret = "".join(ch for ch, ok in zip("rwmdgGa.", zbl) if ok)
+        ret = "".join(ch for ch, ok in zip("rwmdgGha.", zbl) if ok)
         if "rwmd" in ret and "a." in ret:
             ret += "A"
         return ret
@@ -772,19 +765,16 @@ class VFS(object):
                     virt_vis[name] = vn2
                     continue
 
-                ok = False
-                zx = vn2.axs
-                axs = [zx.uread, zx.uwrite, zx.umove, zx.udel, zx.uget]
+                u_has = vn2.uaxs.get(uname) or [False] * 9
                 for pset in permsets:
                     ok = True
-                    for req, lst in zip(pset, axs):
-                        if req and uname not in lst:
+                    for req, zb in zip(pset, u_has):
+                        if req and not zb:
                             ok = False
+                            break
                     if ok:
+                        virt_vis[name] = vn2
                         break
-
-                if ok:
-                    virt_vis[name] = vn2
 
         if ".hist" in abspath:
             p = abspath.replace("\\", "/") if WINDOWS else abspath
@@ -1972,9 +1962,18 @@ class AuthSrv(object):
             axs_key = "u" + perm
             for vp, vol in vfs.all_vols.items():
                 zx = getattr(vol.axs, axs_key)
-                if "*" in zx:
+                if "*" in zx and "-@acct" not in zx:
                     for usr in unames:
                         zx.add(usr)
+                for zs in list(zx):
+                    if zs.startswith("-"):
+                        zx.discard(zs)
+                        zs = zs[1:]
+                        zx.discard(zs)
+                        if zs.startswith("@"):
+                            zs = zs[1:]
+                            for zs in grps.get(zs) or []:
+                                zx.discard(zs)
 
             # aread,... = dict[uname, list[volnames] or []]
             umap: dict[str, list[str]] = {x: [] for x in unames}
@@ -1985,6 +1984,23 @@ class AuthSrv(object):
                         umap[usr].append(vp)
                 umap[usr].sort()
             setattr(vfs, "a" + perm, umap)
+
+        for vol in vfs.all_nodes.values():
+            za = vol.axs
+            vol.uaxs = {
+                un: (
+                    un in za.uread,
+                    un in za.uwrite,
+                    un in za.umove,
+                    un in za.udel,
+                    un in za.uget,
+                    un in za.upget,
+                    un in za.uhtml,
+                    un in za.uadmin,
+                    un in za.udot,
+                )
+                for un in unames
+            }
 
         all_users = {}
         missing_users = {}
@@ -2319,6 +2335,10 @@ class AuthSrv(object):
         free_umask = False
         have_reflink = False
         for vol in vfs.all_nodes.values():
+            if os.path.isfile(vol.realpath):
+                vol.flags["is_file"] = True
+                vol.flags["d2d"] = True
+
             if (self.args.e2ds and vol.axs.uwrite) or self.args.e2dsa:
                 vol.flags["e2ds"] = True
 
@@ -2588,6 +2608,15 @@ class AuthSrv(object):
                     for x in drop:
                         vol.flags.pop(x)
 
+            zi = vol.flags.get("lifetime") or 0
+            zi2 = time.time() // (86400 * 365)
+            zi3 = zi2 * 86400 * 365
+            if zi < 0 or zi > zi3:
+                t = "the lifetime of volume [/%s] (%d) exceeds max value (%d years; %d)"
+                t = t % (vol.vpath, zi, zi2, zi3)
+                self.log(t, 1)
+                raise Exception(t)
+
             # verify tags mentioned by -mt[mp] are used by -mte
             local_mtp = {}
             local_only_mtp = {}
@@ -2624,7 +2653,14 @@ class AuthSrv(object):
                     errors = True
 
         for vol in vfs.all_nodes.values():
-            if not vol.realpath or os.path.isfile(vol.realpath):
+            if not vol.flags.get("is_file"):
+                continue
+            zs = "og opds xlink"
+            for zs in zs.split():
+                vol.flags.pop(zs, None)
+
+        for vol in vfs.all_nodes.values():
+            if not vol.realpath or vol.flags.get("is_file"):
                 continue
             ccs = vol.flags["casechk"][:1].lower()
             if ccs in ("y", "n"):
@@ -2754,9 +2790,13 @@ class AuthSrv(object):
                 ["uadmin", "uadmin"],
             ]:
                 u = list(sorted(getattr(zv.axs, attr)))
-                u = ["*"] if "*" in u else u
-                u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
-                u = u if u else "\033[36m--none--\033[0m"
+                if u == ["*"] and acct:
+                    u = ["\033[35monly-anonymous\033[0m"]
+                elif "*" in u:
+                    u = ["\033[35meverybody\033[0m"]
+                if not u:
+                    u = ["\033[36m--none--\033[0m"]
+                u = ", ".join(u)
                 t += "\n|  {}:  {}".format(txt, u)
 
             if "e2d" in zv.flags:
@@ -2868,8 +2908,6 @@ class AuthSrv(object):
 
         if have_reflink:
             t = "WARNING: Reflink-based dedup was requested, but %s. This will not work; files will be full copies instead."
-            if sys.version_info < (3, 14):
-                self.log(t % "your python version is not new enough", 1)
             if not sys.platform.startswith("linux"):
                 self.log(t % "your OS is not Linux", 1)
 
@@ -3013,6 +3051,7 @@ class AuthSrv(object):
                 "lifetime": vf.get("lifetime") or 0,
                 "unlist": vf.get("unlist") or "",
                 "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
+                "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
             }
             if "ufavico_h" in vf:
                 vn.js_ls["ufavico"] = vf["ufavico_h"]
@@ -3027,13 +3066,15 @@ class AuthSrv(object):
                 "have_shr": self.args.shr,
                 "shr_who": vf["shr_who"],
                 "have_zip": not self.args.no_zip,
+                "have_zls": not self.args.no_zls,
                 "have_mv": not self.args.no_mv,
                 "have_del": not self.args.no_del,
                 "have_unpost": int(self.args.unpost),
                 "have_emp": int(self.args.emp),
                 "md_no_br": int(vf.get("md_no_br") or 0),
                 "ext_th": vf.get("ext_th_d") or {},
-                "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
+                "sb_lg": vn.js_ls["sb_lg"],
+                "sb_md": vn.js_ls["sb_md"],
                 "sba_md": vf.get("md_sba") or "",
                 "sba_lg": vf.get("lg_sba") or "",
                 "txt_ext": self.args.textfiles.replace(",", " "),
@@ -3063,6 +3104,14 @@ class AuthSrv(object):
                 "lifetime": vn.js_ls["lifetime"],
                 "u2sort": self.args.u2sort,
             }
+            zs = "ui_noacci ui_nocpla ui_noctxb ui_nolbar ui_nombar ui_nonav ui_notree ui_norepl ui_nosrvi"
+            for zs in zs.split():
+                if vf.get(zs):
+                    js_htm[zs] = 1
+            zs = "notooltips"
+            for zs in zs.split():
+                if getattr(self.args, zs, False):
+                    js_htm[zs] = 1
             vn.js_htm = json_hesc(json.dumps(js_htm))
 
         vols = list(vfs.all_nodes.values())
@@ -3411,7 +3460,7 @@ class AuthSrv(object):
                 raise Exception("volume not found: " + zs)
 
         self.log(str({"users": users, "vols": vols, "flags": flags}))
-        t = "/{}: read({}) write({}) move({}) del({}) dots({}) get({}) upGet({}) uadmin({})"
+        t = "/{}: read({}) write({}) move({}) del({}) dots({}) get({}) upGet({}) html({}) uadmin({})"
         for k, zv in self.vfs.all_vols.items():
             vc = zv.axs
             vs = [

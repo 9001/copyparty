@@ -30,7 +30,7 @@ try:
 except:
     pass
 
-from .__init__ import ANYWIN, RES, TYPE_CHECKING, EnvParams, unicode
+from .__init__ import ANYWIN, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
@@ -165,6 +165,12 @@ RE_MDV = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[Mm][Dd])$")
 
 UPARAM_CC_OK = set("doc move tree".split())
 
+PERMS_rwh = [
+    [True, False],
+    [False, True],
+    [False, False, False, False, False, False, True],
+]
+
 
 class HttpCli(object):
     """
@@ -229,6 +235,7 @@ class HttpCli(object):
         self.can_delete = False
         self.can_get = False
         self.can_upget = False
+        self.can_html = False
         self.can_admin = False
         self.can_dot = False
         self.out_headerlist: list[tuple[str, str]] = []
@@ -275,7 +282,7 @@ class HttpCli(object):
         tpl = self.conn.hsrv.j2[name]
         ka["r"] = self.args.SR if self.is_vproxied else ""
         ka["ts"] = self.conn.hsrv.cachebuster()
-        ka["lang"] = self.args.lang
+        ka["lang"] = self.cookies.get("cplng") or self.args.lang
         ka["favico"] = self.args.favico
         ka["s_doctitle"] = self.args.doctitle
         ka["tcolor"] = self.vn.flags["tcolor"]
@@ -737,18 +744,21 @@ class HttpCli(object):
         if "bcasechk" in vn.flags and not vn.casechk(rem, True):
             return self.tx_404() and False
 
-        (
-            self.can_read,
-            self.can_write,
-            self.can_move,
-            self.can_delete,
-            self.can_get,
-            self.can_upget,
-            self.can_admin,
-            self.can_dot,
-        ) = (
-            avn.can_access("", self.uname) if avn else [False] * 8
-        )
+        try:
+            (
+                self.can_read,
+                self.can_write,
+                self.can_move,
+                self.can_delete,
+                self.can_get,
+                self.can_upget,
+                self.can_html,
+                self.can_admin,
+                self.can_dot,
+            ) = avn.uaxs[self.uname]
+        except:
+            pass  # default is all-false
+
         self.avn = avn
         self.vn = vn  # note: do not dbv due to walk/zipgen
         self.rem = rem
@@ -862,6 +872,16 @@ class HttpCli(object):
             return self.conn.iphash.s(self.ip)
 
     def cbonk(self, g: Garda, v: str, reason: str, descr: str) -> bool:
+        cond = self.args.dont_ban
+        if (
+            cond == "any"
+            or (cond == "auth" and self.uname != "*")
+            or (cond == "aa" and self.avol)
+            or (cond == "av" and self.can_admin)
+            or (cond == "rw" and self.can_read and self.can_write)
+        ):
+            return False
+
         self.conn.hsrv.nsus += 1
         if not g.lim:
             return False
@@ -886,7 +906,7 @@ class HttpCli(object):
             0,
             self.ip,
             time.time(),
-            reason,
+            [reason, reason],
         ):
             self.log("client banned: %s" % (descr,), 1)
             self.conn.hsrv.bans[ip] = bonk
@@ -1265,6 +1285,20 @@ class HttpCli(object):
                 else:
                     return self.tx_res(res_path)
 
+            if res_path in RESM:
+                ap = self.E.mod_ + RESM[res_path]
+                if (
+                    "txt" not in self.uparam
+                    and "mime" not in self.uparam
+                    and not self.ouparam.get("dl")
+                ):
+                    # return mimetype matching request extension
+                    self.ouparam["dl"] = res_path.split("/")[-1]
+                if bos.path.exists(ap) or bos.path.exists(ap + ".gz"):
+                    return self.tx_file(ap)
+                else:
+                    return self.tx_res(res_path)
+
             self.tx_404()
             return False
 
@@ -1519,6 +1553,64 @@ class HttpCli(object):
         bret = "".join(ret).encode("utf-8", "replace")
         self.reply(bret, 200, "text/xml; charset=utf-8")
         self.log("rss: %d hits, %d bytes" % (len(hits), len(bret)))
+        return True
+
+    def tx_zls(self, abspath) -> bool:
+        if self.do_log:
+            self.log("zls %s @%s" % (self.req, self.uname))
+        if self.args.no_zls:
+            raise Pebkac(405, "zip browsing is disabled in server config")
+
+        import zipfile
+
+        try:
+            with zipfile.ZipFile(abspath, "r") as zf:
+                filelist = [{"fn": f.filename} for f in zf.infolist()]
+                ret = json.dumps(filelist).encode("utf-8", "replace")
+                self.reply(ret, mime="application/json")
+                return True
+        except (zipfile.BadZipfile, RuntimeError):
+            raise Pebkac(404, "requested file is not a valid zip file")
+
+    def tx_zget(self, abspath) -> bool:
+        maxsz = 1024 * 1024 * 64
+
+        inner_path = self.uparam.get("zget")
+        if not inner_path:
+            raise Pebkac(405, "inner path is required")
+        if self.do_log:
+            self.log(
+                "zget %s \033[35m%s\033[0m @%s" % (self.req, inner_path, self.uname)
+            )
+        if self.args.no_zls:
+            raise Pebkac(405, "zip browsing is disabled in server config")
+
+        import zipfile
+
+        try:
+            with zipfile.ZipFile(abspath, "r") as zf:
+                zi = zf.getinfo(inner_path)
+                if zi.file_size >= maxsz:
+                    raise Pebkac(404, "zip bomb defused")
+                with zf.open(zi, "r") as fi:
+                    self.send_headers(length=zi.file_size, mime=guess_mime(inner_path))
+
+                    sendfile_py(
+                        self.log,
+                        0,
+                        zi.file_size,
+                        fi,
+                        self.s,
+                        self.args.s_wr_sz,
+                        self.args.s_wr_slp,
+                        not self.args.no_poll,
+                        {},
+                        "",
+                    )
+        except KeyError:
+            raise Pebkac(404, "no such file in archive")
+        except (zipfile.BadZipfile, RuntimeError):
+            raise Pebkac(404, "requested file is not a valid zip file")
         return True
 
     def handle_propfind(self) -> bool:
@@ -2087,7 +2179,7 @@ class HttpCli(object):
                     t = "urlform_raw %d @ %r\n  %r\n"
                     self.log(t % (len(orig), "/" + self.vpath, orig))
                     try:
-                        zb = unquote(buf.replace(b"+", b" "))
+                        zb = unquote(buf.replace(b"+", b" ").replace(b"&", b"\n"))
                         plain = zb.decode("utf-8", "replace")
                         if buf.startswith(b"msg="):
                             plain = plain[4:]
@@ -2108,7 +2200,7 @@ class HttpCli(object):
                                     len(buf),
                                     self.ip,
                                     time.time(),
-                                    plain,
+                                    [plain, orig],
                                 )
 
                         t = "urlform_dec %d @ %r\n  %r\n"
@@ -2269,7 +2361,7 @@ class HttpCli(object):
                 remains,
                 self.ip,
                 at,
-                "",
+                None,
             )
             t = hr.get("rejectmsg") or ""
             if t or not hr:
@@ -2404,7 +2496,7 @@ class HttpCli(object):
                 post_sz,
                 self.ip,
                 at,
-                "",
+                None,
             )
             t = hr.get("rejectmsg") or ""
             if t or not hr:
@@ -3242,7 +3334,7 @@ class HttpCli(object):
                     0,
                     self.ip,
                     time.time(),
-                    "",
+                    None,
                 )
                 t = hr.get("rejectmsg") or ""
                 if t or not hr:
@@ -3414,7 +3506,7 @@ class HttpCli(object):
                         0,
                         self.ip,
                         at,
-                        "",
+                        None,
                     )
                     t = hr.get("rejectmsg") or ""
                     if t or not hr:
@@ -3521,7 +3613,7 @@ class HttpCli(object):
                             sz,
                             self.ip,
                             at,
-                            "",
+                            None,
                         )
                         t = hr.get("rejectmsg") or ""
                         if t or not hr:
@@ -3834,7 +3926,7 @@ class HttpCli(object):
                 0,
                 self.ip,
                 time.time(),
-                "",
+                None,
             )
             t = hr.get("rejectmsg") or ""
             if t or not hr:
@@ -3882,7 +3974,7 @@ class HttpCli(object):
                 sz,
                 self.ip,
                 new_lastmod,
-                "",
+                None,
             )
             t = hr.get("rejectmsg") or ""
             if t or not hr:
@@ -4111,8 +4203,11 @@ class HttpCli(object):
         # force download
 
         if "dl" in self.ouparam:
-            cdis = gen_content_disposition(os.path.basename(req_path))
-            self.out_headers["Content-Disposition"] = cdis
+            cdis = self.ouparam["dl"] or req_path
+            zs = gen_content_disposition(os.path.basename(cdis))
+            self.out_headers["Content-Disposition"] = zs
+        else:
+            cdis = req_path
 
         #
         # if-modified
@@ -4178,7 +4273,7 @@ class HttpCli(object):
         elif "mime" in self.uparam:
             mime = str(self.uparam.get("mime"))
         else:
-            mime = guess_mime(req_path)
+            mime = guess_mime(cdis)
 
         logmsg += unicode(status) + logtail
 
@@ -4286,8 +4381,11 @@ class HttpCli(object):
         # force download
 
         if "dl" in self.ouparam:
-            cdis = gen_content_disposition(os.path.basename(req_path))
-            self.out_headers["Content-Disposition"] = cdis
+            cdis = self.ouparam["dl"] or req_path
+            zs = gen_content_disposition(os.path.basename(cdis))
+            self.out_headers["Content-Disposition"] = zs
+        else:
+            cdis = req_path
 
         #
         # if-modified
@@ -4415,7 +4513,7 @@ class HttpCli(object):
         elif "rmagic" in self.vn.flags:
             mime = guess_mime(req_path, fs_path)
         else:
-            mime = guess_mime(req_path)
+            mime = guess_mime(cdis)
 
         if "nohtml" in self.vn.flags and "html" in mime:
             mime = "text/plain; charset=utf-8"
@@ -5020,7 +5118,7 @@ class HttpCli(object):
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, crlf=True),
             "lastmod": int(ts_md * 1000),
-            "lang": self.args.lang,
+            "lang": self.cookies.get("cplng") or self.args.lang,
             "favico": self.args.favico,
             "have_emp": int(self.args.emp),
             "md_no_br": int(vn.flags.get("md_no_br") or 0),
@@ -5193,7 +5291,7 @@ class HttpCli(object):
             dls.append((perc, hsent, spd, eta, idle, usr, erd, rds, fn))
 
         if self.args.have_unlistc:
-            allvols = self.asrv.vfs.all_vols
+            allvols = self.asrv.vfs.all_nodes
             rvol = [x for x in rvol if "unlistcr" not in allvols[x[1:-1]].flags]
             wvol = [x for x in wvol if "unlistcw" not in allvols[x[1:-1]].flags]
 
@@ -5406,13 +5504,20 @@ class HttpCli(object):
         return self.redirect("", "?h", x.get(), "return to", False)
 
     def tx_stack(self) -> bool:
-        if not self.avol and not [x for x in self.wvol if x in self.rvol]:
+        zs = self.args.stack_who
+        if zs == "all" or (
+            (zs == "a" and self.avol)
+            or (zs == "rw" and [x for x in self.wvol if x in self.rvol])
+        ):
+            pass
+        else:
             raise Pebkac(403, "'stack' not allowed for user " + self.uname)
 
-        if self.args.no_stack:
-            raise Pebkac(403, "the stackdump feature is disabled in server config")
-
-        ret = "<pre>{}\n{}".format(time.time(), html_escape(alltrace()))
+        ret = html_escape(alltrace(self.args.stack_v))
+        if self.args.stack_v:
+            ret = "<pre>%s\n%s" % (time.time(), ret)
+        else:
+            ret = "<pre>%s" % (ret,)
         self.reply(ret.encode("utf-8"))
         return True
 
@@ -5465,7 +5570,7 @@ class HttpCli(object):
                 rem,
                 self.uname,
                 not self.args.no_scandir,
-                [[True, False], [False, True]],
+                PERMS_rwh,
             )
             dots = self.uname in vn.axs.udot
             dk_sz = vn.flags.get("dk")
@@ -5497,7 +5602,13 @@ class HttpCli(object):
         for x in vfs_virt:
             if x != excl:
                 try:
-                    dvn, drem = vfs.get(vjoin(top, x), self.uname, True, False)
+                    dvn, drem = vfs.get(vjoin(top, x), self.uname, False, False)
+                    if (
+                        self.uname not in dvn.axs.uread
+                        and self.uname not in dvn.axs.uwrite
+                        and self.uname not in dvn.axs.uhtml
+                    ):
+                        raise Exception()
                     bos.stat(dvn.canonical(drem, False))
                 except:
                     x += "\n"
@@ -5902,6 +6013,15 @@ class HttpCli(object):
 
         if self.uname != self.args.shr_adm:
             rows = [x for x in rows if x[5] == self.uname]
+
+        q = "select vp from sf where k=? limit 99"
+        for r in rows:
+            if not r[4]:
+                r[4] = "---"
+            else:
+                zstl = cur.execute(q, (r[0],)).fetchall()
+                zsl = [html_escape(zst[0]) for zst in zstl]
+                r[4] = "<br />".join(zsl)
 
         html = self.j2s(
             "shares", this=self, shr=self.args.shr, rows=rows, now=int(time.time())
@@ -6423,8 +6543,7 @@ class HttpCli(object):
             return self.tx_svg("upload\nonly")
 
         if not self.can_read and self.can_get and self.avn:
-            axs = self.avn.axs
-            if self.uname not in axs.uhtml:
+            if not self.can_html:
                 pass
             elif is_dir:
                 for fn in ("index.htm", "index.html"):
@@ -6445,6 +6564,7 @@ class HttpCli(object):
 
                     fk_pass = True
                     is_dir = False
+                    add_og = False
                     rem = vjoin(rem, fn)
                     vrem = vjoin(vrem, fn)
                     abspath = ap2
@@ -6480,14 +6600,23 @@ class HttpCli(object):
             ):
                 return self.tx_md(vn, abspath)
 
+            if "zls" in self.uparam:
+                return self.tx_zls(abspath)
+            if "zget" in self.uparam:
+                return self.tx_zget(abspath)
+
             if not add_og or not og_fn:
-                return self.tx_file(
-                    abspath, None if st.st_size or "nopipe" in vn.flags else vn.realpath
-                )
+                if st.st_size or "nopipe" in vn.flags:
+                    return self.tx_file(abspath, None)
+                else:
+                    return self.tx_file(abspath, vn.get_dbv("")[0].realpath)
 
         elif is_dir and not self.can_read:
             if use_dirkey:
                 is_dk = True
+            elif self.can_get and "doc" in self.uparam:
+                zs = vjoin(self.vpath, self.uparam["doc"]) + "?v"
+                return self.redirect(zs, flavor="redirecting to", use302=True)
             elif not self.can_write:
                 return self.tx_404(True)
 
@@ -6569,6 +6698,7 @@ class HttpCli(object):
             "acct": self.uname,
             "perms": perms,
         }
+        # also see `js_htm` in authsrv.py
         j2a = {
             "cgv1": vn.js_htm,
             "cgv": cgv,
@@ -6628,7 +6758,7 @@ class HttpCli(object):
             rem,
             self.uname,
             not self.args.no_scandir,
-            [[True, False], [False, True]],
+            PERMS_rwh,
             lstat="lt" in self.uparam,
             throw=True,
         )

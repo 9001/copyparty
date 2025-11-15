@@ -262,7 +262,7 @@ class SMB(object):
                     0,
                     "1.7.6.2",
                     time.time(),
-                    "",
+                    None,
                 )
                 t = hr.get("rejectmsg") or ""
                 if t or not hr:

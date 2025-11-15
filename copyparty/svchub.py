@@ -291,6 +291,9 @@ class SvcHub(object):
         ch = "abcdefghijklmnopqrstuvwx"[int(args.theme / 2)]
         args.theme = "{0}{1} {0} {1}".format(ch, bri)
 
+        if args.no_stack:
+            args.stack_who = "no"
+
         if args.nid:
             args.du_who = "no"
         args.du_iwho = n_du_who(args.du_who)

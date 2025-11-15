@@ -38,6 +38,8 @@ def run():
 
 
 def main():
+    if "--versionb" in sys.argv:
+        return print(VER)
     pktime = time.strftime("%Y-%m-%d, %H:%M:%S", time.gmtime(STAMP))
     msg()
     msg("build-time:", pktime, "UTC,", STAMP)

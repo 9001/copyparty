@@ -1,13 +1,15 @@
 #!/bin/bash
 set -e
 
-# usage: ./scripts/tlcheck.sh eng chi copyparty/web/browser.js 
+[ -f "$1" ] && [ -f "$2" ] && [ $# = 2 ] || {
+    echo usage: ./scripts/tlcheck.sh scripts/tl.js copyparty/web/tl/nor.js 
+    exit 1
+}
 
-awk <"$3" -v lang1=\"$1\": -v lang2=\"$2\": '
-    /^\t\}/{fa=0;fb=0}
+cat "$1" "$2" | awk '
+    /^\}/{fa=0;fb=0}
+    /^Ls\./{if(nln++){fb=1}else{fa=1}}
     !/":/{next}
-    $0~lang1{fa=1}
-    $0~lang2{fb=1}
     fa{a[ia++]=$0}
     fb{b[ib++]=$0}
     END{for (i=0;i<ia;i++) printf "%s\n%s\n\n",a[i],b[i]}

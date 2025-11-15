@@ -379,7 +379,7 @@ class Tftpd(object):
                     0,
                     "8.3.8.7",
                     time.time(),
-                    "",
+                    None,
                 )
                 t = hr.get("rejectmsg") or ""
                 if t or not hr:

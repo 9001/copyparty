@@ -14,8 +14,9 @@
 </head>
 
 <body>
-	<div id="wrap">
+	<div id="wrap" class="terse">
 		<a href="{{ r }}/?shares">refresh</a>
+		<a id="xpnd" href="#">files</a>
 		<a href="{{ r }}/?h">control-panel</a>
 
         <span>axs = perms (read,write,move,delet)</span>
@@ -46,7 +47,7 @@
             <td>{{ "yes" if pw else "--" }}</td>
             <td><a href="{{ r }}/{{ vp|e }}">/{{ vp|e }}</a></td>
             <td>{{ pr }}</td>
-            <td>{{ st }}</td>
+            <td><div>{{ st }}</div></td>
             <td>{{ un|e }}</td>
             <td>{{ t0 }}</td>
             <td>{{ t1 }}</td>

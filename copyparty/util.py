@@ -129,8 +129,10 @@ try:
     import fcntl
 
     HAVE_FCNTL = True
+    HAVE_FICLONE = hasattr(fcntl, "FICLONE")
 except:
     HAVE_FCNTL = False
+    HAVE_FICLONE = False
 
 try:
     import ctypes
@@ -356,6 +358,8 @@ IMPLICATIONS = [
     ["hardlink_only", "hardlink"],
     ["hardlink", "dedup"],
     ["tftpvv", "tftpv"],
+    ["nodupem", "nodupe"],
+    ["no_dupe_m", "no_dupe"],
     ["smbw", "smb"],
     ["smb1", "smb"],
     ["smbvvv", "smbvv"],
@@ -1498,20 +1502,24 @@ def trace(*args: Any, **kwargs: Any) -> None:
     nuprint(msg)
 
 
-def alltrace() -> str:
+def alltrace(verbose: bool = True) -> str:
     threads: dict[str, types.FrameType] = {}
     names = dict([(t.ident, t.name) for t in threading.enumerate()])
     for tid, stack in sys._current_frames().items():
-        name = "%s (%x)" % (names.get(tid), tid)
+        if verbose:
+            name = "%s (%x)" % (names.get(tid), tid)
+        else:
+            name = str(names.get(tid))
         threads[name] = stack
 
     rret: list[str] = []
     bret: list[str] = []
+    np = -3 if verbose else -2
     for name, stack in sorted(threads.items()):
         ret = ["\n\n# %s" % (name,)]
         pad = None
         for fn, lno, name, line in traceback.extract_stack(stack):
-            fn = os.sep.join(fn.split(os.sep)[-3:])
+            fn = os.sep.join(fn.split(os.sep)[np:])
             ret.append('File: "%s", line %d, in %s' % (fn, lno, name))
             if line:
                 ret.append("  " + str(line.strip()))
@@ -3883,7 +3891,7 @@ def _runhook(
     sz: int,
     ip: str,
     at: float,
-    txt: str,
+    txt: Optional[list[str]],
 ) -> dict[str, Any]:
     ret = {"rc": 0}
     areq, chk, imp, fork, sin, jtxt, wait, sp_ka, acmd = _parsehook(log, cmd)
@@ -3906,15 +3914,17 @@ def _runhook(
             "user": uname,
             "perms": perms,
             "src": src,
-            "txt": txt,
         }
+        if txt:
+            ja["txt"] = txt[0]
+            ja["body"] = txt[1]
         if imp:
             ja["log"] = log
             mod = loadpy(acmd[0], False)
             return mod.main(ja)
         arg = json.dumps(ja)
     else:
-        arg = txt or ap
+        arg = txt[0] if txt else ap
 
     if acmd[0].startswith("zmq:"):
         zi, zs = _zmq_hook(log, verbose, src, acmd[0][4:].lower(), arg, wait, sp_ka)
@@ -3977,7 +3987,7 @@ def runhook(
     sz: int,
     ip: str,
     at: float,
-    txt: str,
+    txt: Optional[list[str]],
 ) -> dict[str, Any]:
     assert broker or up2k  # !rm
     args = (broker or up2k).args  # type: ignore

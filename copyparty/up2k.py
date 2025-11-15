@@ -10,6 +10,7 @@ import re
 import shutil
 import stat
 import subprocess as sp
+import sys
 import tempfile
 import threading
 import time
@@ -27,6 +28,7 @@ from .mtag import MParser, MTag
 from .util import (
     E_FS_CRIT,
     E_FS_MEH,
+    HAVE_FICLONE,
     HAVE_SQLITE3,
     SYMTIME,
     VF_CAREFUL,
@@ -87,6 +89,10 @@ if True:  # pylint: disable=using-constant-test
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
+
+USE_FICLONE = HAVE_FICLONE and sys.version_info < (3, 14)
+if USE_FICLONE:
+    import fcntl
 
 zsg = "avif,avifs,bmp,gif,heic,heics,heif,heifs,ico,j2p,j2k,jp2,jpeg,jpg,jpx,png,tga,tif,tiff,webp"
 ICV_EXTS = set(zsg.split(","))
@@ -3298,7 +3304,7 @@ class Up2k(object):
                                 job["size"],
                                 job["addr"],
                                 job["at"],
-                                "",
+                                None,
                             )
                             t = hr.get("rejectmsg") or ""
                             if t or not hr:
@@ -3530,10 +3536,25 @@ class Up2k(object):
 
         linked = False
         try:
-            if "reflink" in flags:
-                raise Exception("reflink")
+            if rm and bos.path.exists(dst):
+                wunlink(self.log, dst, flags)
+
             if not is_mv and not flags.get("dedup"):
                 raise Exception("dedup is disabled in config")
+
+            if "reflink" in flags:
+                if not USE_FICLONE:
+                    raise Exception("reflink")  # python 3.14 or newer; no need
+                try:
+                    with open(fsenc(src), "rb") as fi, open(fsenc(dst), "wb") as fo:
+                        fcntl.ioctl(fo.fileno(), fcntl.FICLONE, fi.fileno())
+                except:
+                    if bos.path.exists(dst):
+                        wunlink(self.log, dst, flags)
+                    raise
+                if lmod:
+                    bos.utime_c(self.log, dst, int(lmod), False)
+                return
 
             lsrc = src
             ldst = dst
@@ -3560,9 +3581,6 @@ class Up2k(object):
             if WINDOWS:
                 lsrc = lsrc.replace("/", "\\")
                 ldst = ldst.replace("/", "\\")
-
-            if rm and bos.path.exists(dst):
-                wunlink(self.log, dst, flags)
 
             try:
                 if "hardlink" in flags:
@@ -3982,7 +4000,7 @@ class Up2k(object):
                 sz,
                 ip,
                 at or time.time(),
-                "",
+                None,
             )
             t = hr.get("rejectmsg") or ""
             if t or not hr:
@@ -4218,7 +4236,7 @@ class Up2k(object):
                         st.st_size,
                         ip,
                         time.time(),
-                        "",
+                        None,
                     ):
                         t = "delete blocked by xbd server config: %r"
                         self.log(t % (abspath,), 1)
@@ -4258,7 +4276,7 @@ class Up2k(object):
                         st.st_size,
                         ip,
                         time.time(),
-                        "",
+                        None,
                     )
 
         if is_dir:
@@ -4386,7 +4404,7 @@ class Up2k(object):
                 fsize,
                 ip,
                 time.time(),
-                "",
+                None,
             ):
                 t = "copy blocked by xbr server config: %r" % (svp,)
                 self.log(t, 1)
@@ -4487,7 +4505,7 @@ class Up2k(object):
                 fsize,
                 ip,
                 time.time(),
-                "",
+                None,
             )
 
         return "k"
@@ -4638,7 +4656,7 @@ class Up2k(object):
                 fsize,
                 ip,
                 time.time(),
-                "",
+                None,
             ):
                 t = "move blocked by xbr server config: %r" % (svp,)
                 self.log(t, 1)
@@ -4678,7 +4696,7 @@ class Up2k(object):
                     fsize,
                     ip,
                     time.time(),
-                    "",
+                    None,
                 )
 
             return "k"
@@ -4690,6 +4708,12 @@ class Up2k(object):
         if w:
             assert c1  # !rm
             if c2 and c2 != c1:
+                if "nodupem" in dvn.flags:
+                    q = "select w from up where substr(w,1,16) = ?"
+                    for (w2,) in c2.execute(q, (w[:16],)):
+                        if w == w2:
+                            t = "file exists in target volume, and dupes are forbidden in config"
+                            raise Pebkac(400, t)
                 self._copy_tags(c1, c2, w)
 
             xlink = bool(svn.flags.get("xlink"))
@@ -4798,7 +4822,7 @@ class Up2k(object):
                 fsize,
                 ip,
                 time.time(),
-                "",
+                None,
             )
 
         return "k"
@@ -5136,7 +5160,7 @@ class Up2k(object):
                 job["size"],
                 job["addr"],
                 job["t0"],
-                "",
+                None,
             )
             t = hr.get("rejectmsg") or ""
             if t or not hr:

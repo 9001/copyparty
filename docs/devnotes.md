@@ -200,6 +200,8 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?th` | get image/video at URL as thumbnail |
 | GET | `?th=opus` | convert audio file to 128kbps opus |
 | GET | `?th=caf` | ...in the iOS-proprietary container |
+| GET | `?zls` | get listing of filepaths in zip file at URL |
+| GET | `?zget=path` | get specific file from inside a zip file at URL |
 
 | method | body | result |
 |--|--|--|
@@ -413,6 +415,7 @@ if you are unable to use `build`, you can use the old setuptools approach instea
 ```bash
 python3 setup.py install --user setuptools wheel jinja2
 python3 setup.py build
+python3 setup.py bdist_wheel
 # you now have a wheel which you can install. or extract and repackage:
 python3 setup.py install --skip-build --prefix=/usr --root=$HOME/pe/copyparty
 ```

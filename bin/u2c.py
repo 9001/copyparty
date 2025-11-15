@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.13"
-S_BUILD_DT = "2025-09-05"
+S_VERSION = "2.15"
+S_BUILD_DT = "2025-10-25"
 
 """
 u2c.py: upload to copyparty
@@ -232,6 +232,7 @@ class HCli(object):
 
 MJ = "application/json"
 MO = "application/octet-stream"
+MM = "application/x-www-form-urlencoded"
 CLEN = "Content-Length"
 
 web = None  # type: HCli
@@ -979,6 +980,7 @@ class Ctl(object):
         self.nfiles, self.nbytes = self.stats
         self.filegen = walkdirs([], ar.files, ar.x)
         self.recheck = []  # type: list[File]
+        self.last_file = None
 
         if ar.safe:
             self._safe()
@@ -1014,6 +1016,11 @@ class Ctl(object):
             self.mth = MTHash(ar.J) if ar.J > 1 else None
 
             self._fancy()
+
+        file = self.last_file
+        if self.up_br and file:
+            zs = quotep(file.name.encode("utf-8", WTF8))
+            web.req("POST", file.url, {}, b"msg=upload-queue-empty;" + zs, MM)
 
         self.ok = not self.errs
 
@@ -1225,9 +1232,7 @@ class Ctl(object):
                             while req:
                                 print("DELETING ~%s#%s" % (srd, len(req)))
                                 body = json.dumps(req).encode("utf-8")
-                                sc, txt = web.req(
-                                    "POST", self.ar.url + "?delete", {}, body, MJ
-                                )
+                                sc, txt = web.req("POST", "/?delete", {}, body, MJ)
                                 if sc == 413 and "json 2big" in txt:
                                     print(" (delete request too big; slicing...)")
                                     req = req[: len(req) // 2]
@@ -1455,6 +1460,7 @@ class Ctl(object):
 
             file = fsl.file
             cids = fsl.cids
+            self.last_file = file
 
             with self.mutex:
                 if not self.uploader_busy:
