@@ -26,5 +26,7 @@ runCommand "copyparty-fonts"
       --replace-fail "/z/icon.list" "/build/icon.list" \
       --replace-fail "/z/scp.woff2" "${scp}"
     bash nix-mini-fa.sh
+    mv $out/no-pk/* $out
+    rmdir $out/no-pk
   ''
 
