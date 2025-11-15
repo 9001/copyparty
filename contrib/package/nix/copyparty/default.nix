@@ -2,6 +2,9 @@
   lib,
   buildPythonApplication,
   fetchurl,
+  runCommand,
+  compressDrvWeb,
+  pigz,
   util-linux,
   python,
   setuptools,
@@ -19,6 +22,16 @@
   magic,
   partftpy,
   fusepy, # for partyfuse
+
+  # deps in /copyparty/web/deps
+  marked,
+  easy-mde,
+  busy-mp3,
+  copyparty-fonts,
+  asmcrypto,
+  hash-wasm,
+  prism,
+  fusepy-copyparty,
 
   # use argon2id-hashed passwords in config files (sha2 is always available)
   withHashedPasswords ? true,
@@ -72,6 +85,26 @@
 let
   pinData = lib.importJSON ./pin.json;
   runtimeDeps = ([ util-linux ] ++ extraPackages ++ lib.optional withMediaProcessing ffmpeg);
+
+  sitePackages = drv: "${drv.outPath}/lib/python${lib.versions.majorMinor python.version}/site-packages";
+  nodeModules = drv: "${drv.outPath}/lib/node_modules";
+  webDeps = runCommand "copyparty-webdeps" {
+    nativeBuildInputs = [ util-linux ];
+  } ''
+    mkdir $out
+    cp --verbose -r --target-directory $out \
+      ${copyparty-fonts}/*  ${prism}/* \
+      ${sitePackages fusepy-copyparty}/fuse.py \
+      ${nodeModules easy-mde}/easymde/dist/* \
+      ${nodeModules marked}/marked/marked.min.js
+    cp ${busy-mp3} $out/busy.mp3.gz
+    cp ${hash-wasm}/sha512.umd.min.js $out/sha512.hw.js
+    cp ${nodeModules asmcrypto}/@openpgp/asmcrypto.js/asmcrypto.all.es5.js $out/sha512.ac.js
+    rename -v ".min" "" $out/*
+  '';
+  smolWebDeps = compressDrvWeb webDeps {
+    compressors.gz = "${lib.getExe pigz} -11 -I 2048 --force {}";
+  };
 in
 buildPythonApplication {
   pname = "copyparty";
@@ -103,6 +136,14 @@ buildPythonApplication {
   build-system = [
     setuptools
   ];
+  # Build webdeps when building from source
+  preBuild = lib.optionalString (true) ''
+    # TODO: remove this when we build this from source.
+    # This is just so that we can try this without building from source
+    rm -r copyparty/web/deps/* && touch copyparty/web/deps/__init__.py
+
+    cp -vr ${smolWebDeps}/* copyparty/web/deps/
+  '';
   meta = {
     description = "Turn almost any device into a file server";
     longDescription = ''
