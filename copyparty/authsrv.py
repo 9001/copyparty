@@ -1718,6 +1718,33 @@ class AuthSrv(object):
         flags[name] = vals
         self._e("volflag [{}] += {}  ({})".format(name, vals, desc))
 
+    def _parse_password(self, password: str) -> str:
+        """
+        Parses a config file password into a real password
+        """
+        SPECIAL_PASSWORD_CHARACTER = "@"
+        ESCAPE_CHARACTER = "\\"
+
+        if password.startswith(ESCAPE_CHARACTER):
+            return password[1:]
+
+        if not password.startswith(SPECIAL_PASSWORD_CHARACTER):
+            return password
+
+        FILE_URL_TYPE = "file:"
+        ENV_URL_TYPE = "env:"
+
+        password_url = password[1:]
+        if password_url.startswith(FILE_URL_TYPE):
+            with open(password_url[len(FILE_URL_TYPE):], "r") as password_file:
+                return password_file.read()
+        elif password_url.startswith(ENV_URL_TYPE):
+            return os.environ[password_url[len(ENV_URL_TYPE):]]
+        else:
+            self.log("Password URL did not begin with a valid URL type.")
+            raise Exception(BAD_CFG)
+
+
     def reload(self, verbosity: int = 9) -> None:
         """
         construct a flat list of mountpoints and usernames
@@ -2039,10 +2066,11 @@ class AuthSrv(object):
 
         zsl = []
         for usr in list(acct)[:]:
-            zs = acct[usr].strip()
             if not zs:
                 zs = ub64enc(os.urandom(48)).decode("ascii")
                 zsl.append(usr)
+            else:
+                zs = self._parse_password(acct[usr].strip())
             acct[usr] = zs
         if zsl:
             self.log("generated random passwords for users %r" % (zsl,), 6)
