@@ -33,7 +33,27 @@ PY37 = sys.version_info > (3, 7)
 WINDOWS = sys.platform in ["win32", "msys"]
 sys.dont_write_bytecode = True
 me = os.path.abspath(os.path.realpath(__file__))
+_watcher_started = False
+unpackLocation = None
 
+
+def _watch_me():
+    msg("watcher started")
+    lastUnpackTimestamp = os.path.getmtime(me)
+    while True:
+        try:
+            mt = os.path.getmtime(me)
+            if mt > lastUnpackTimestamp:
+                msg("archive changed, re-unpacking")
+                try:
+                    unpack(True)
+                except Exception:
+                    traceback.print_exc()
+                lastUnpackTimestamp = mt
+        except Exception:
+            traceback.print_exc()
+
+        time.sleep(1.0)
 
 def eprint(*a, **ka):
     ka["file"] = sys.stderr
@@ -248,8 +268,9 @@ def hashfile(fn):
     return h.hexdigest()[:24]
 
 
-def unpack():
+def unpack(repack=False):
     """unpacks the tar yielded by `data`"""
+    global unpackLocation
     name = "pe-copyparty"
     try:
         name += "." + str(os.geteuid())
@@ -268,26 +289,33 @@ def unpack():
         if not ofe(mine):
             break
 
+    if repack:
+        mine = unpackLocation
+    else:
+        unpackLocation = mine
+        os.mkdir(mine)
+
     tar = opj(mine, "tar")
 
     try:
-        if tag in os.listdir(final) and ofe(san):
+        if repack == False and tag in os.listdir(final) and ofe(san):
             msg("found early")
             return final
     except:
         pass
 
     sz = 0
-    os.mkdir(mine)
     with open(tar, "wb") as f:
         for buf in get_payload():
             sz += len(buf)
             f.write(buf)
 
-    ck = hashfile(tar)
-    if ck != CKSUM:
-        t = "\n\nexpected %s (%d byte)\nobtained %s (%d byte)\nsfx corrupt"
-        raise Exception(t % (CKSUM, SIZE, ck, sz))
+    # If we are repacking with a listener hashfiles will probably not match
+    if repack == False:
+        ck = hashfile(tar)
+        if ck != CKSUM:
+            t = "\n\nexpected %s (%d byte)\nobtained %s (%d byte)\nsfx corrupt"
+            raise Exception(t % (CKSUM, SIZE, ck, sz))
 
     with tarfile.open(tar, "r:bz2") as tf:
         # this is safe against traversal
@@ -307,7 +335,7 @@ def unpack():
         f.write(b"h\n")
 
     try:
-        if tag in os.listdir(final) and ofe(san):
+        if repack == False and tag in os.listdir(final) and ofe(san):
             msg("found late")
             return final
     except:
@@ -339,6 +367,7 @@ def unpack():
         except:
             msg("reloc fail,", mine)
 
+    msg("unpacked to", mine)
     return mine
 
 
@@ -391,6 +420,15 @@ def run(tmp, j2, ftp):
 
     ld = (("", ""), (j2, "j2"), (ftp, "ftp"), (not PY2, "py2"), (PY37, "py37"))
     ld = [os.path.join(tmp, b) for a, b in ld if not a]
+
+    global _watcher_started
+    if any(arg == "--dev" for arg in sys.argv) and not _watcher_started:
+        sys.argv.remove('--dev')
+        import threading
+        _watcher_started = True
+        t = threading.Thread(target=_watch_me)
+        t.daemon = True
+        t.start()
 
     # skip 1
     # enable this to dynamically remove type hints at startup,

@@ -397,6 +397,12 @@ build the sfx using any of the following examples:
 ./scripts/make-sfx.sh gz no-cm  # gzip-compressed + no fancy markdown editor
 ```
 
+from there, you can run with:
+
+```sh
+./dist/copyparty-sfx.py         # regular way, probably what the user will do
+./dist/copyparty-sfx.py --dev   # with a file watcher for auto-reloading JS/HTML changes
+```
 
 ## build from release tarball
 
