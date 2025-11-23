@@ -2330,3 +2330,26 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
 
     return fun(0, prefix + xhr.status + ": " + errtxt, tag);
 }
+
+/**
+ * Lazy load a script from the server
+ * @param {string} scriptName name of the script you want to load
+ * @param {function|undefined} callback callback to run when the script is loaded
+ */
+function lazyLoad(scriptName, callback) {
+	const scripts = Array.from(QSA('script'));
+	if (scripts.some(s => s.src.endsWith(scriptName))) {
+		callback && callback();
+		return;
+	}
+
+    var s = document.createElement('script');
+    s.src = '/.cpr/' + scriptName;
+    s.onload = function () {
+        callback && callback();
+    };
+    s.onerror = function (e) {
+        console.log('failed loading ' + scriptName, e);
+    };
+    document.head.appendChild(s);
+}

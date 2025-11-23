@@ -90,6 +90,48 @@ if (1)
 			]
 		],
 
+		"hotkeys": {
+			"ESC": "close various things",
+			"ENTER": "open selected file",
+			"HELP": "open help",
+			"PREV_SONG": "prev song",
+			"NEXT_SONG": "next song",
+			"TREE_PREV": "go to the previous dir",
+			"TREE_NEXT": "go to the next dir",
+			"PLAY_PAUSE": "play/pause",
+			"DOWNLOAD": "download selected files",
+			"CUT": "cut selected file(s)",
+			"COPY": "copy selected file(s)",
+			"PASTE": "paste (move/copy) here",
+			"DELETE": "delete selected file(s)",
+			"RENAME": "rename selected file(s)",
+			"TOGGLE_BREADCRUMBS": "toggle breadcrumbs / navpane",
+			"TOGGLE_GRID": "toggle grid / list view",
+			"TOGGLE_THUMBNAILS": "toggle thumbnails / icons",
+			"TOGGLE_FOLDER_TREE": "toggle folders / textfiles in navpane",
+			"FAST_FORWARD": "skip 10sec forward",
+			"REWIND": "skip 10sec back",
+			"NAVPANE_SHRINK": "shrink navpane",
+			"NAVPANE_GROW": "grow navpane",
+			"NAVPANE_SHRINK_DESC": "While in grid mode with nav panel visible",
+			"NAVPANE_GROW_DESC": "While in grid mode with nav panel visible",
+			"SELECT_SONG": "Select playing song",
+			"SELECT_SONG_DESC": "While audio is playing",
+			"SELECT_FILE": "Select file",
+			"SELECT_FILE_DESC": "While in file list",
+			"EDIT_FILE": "Edit file",
+			"EDIT_FILE_DESC": "While in file list",
+			"TOGGLE_GRID_MULTISELECT": "Toggle grid multi select",
+			"TOGGLE_GRID_MULTISELECT_DESC": "While in grid mode",
+			"GRID_SHRINK_THUMBNAILS": "Shrink thumbnails",
+			"GRID_SHRINK_THUMBNAILS_DESC": "While in grid mode",
+			"GRID_GROW_THUMBNAILS": "Grow thumbnails",
+			"GRID_GROW_THUMBNAILS_DESC": "While in grid mode",
+		},
+		"hotkey_binding": "Hotkey keybindings",
+		"hotkey_action": "Hotkey action",
+		"hotkey_context": "Context",
+
 		"m_ok": "OK",
 		"m_ng": "Cancel",
 
@@ -712,6 +754,7 @@ ebi('ops').innerHTML = (
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" id="opa_auc" data-dest="player" tt="' + L.ot_mp + '">🎺</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
+	'<a href="#" id="opa_hotkey" data-dest="hotkey" tt="Hotkeys">⚙️</a>' +
 	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<div id="opdesc"></div>'
 );
@@ -963,6 +1006,16 @@ ebi('op_cfg').innerHTML = (
 	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
+//DDD kbd
+lazyLoad('keybindings.js', function () {
+	const rows = [];
+	Object.entries(currentKeybindings).forEach(([key, value]) => {
+		rows.push(`<tr><td>${key}</td><td>${value.tr}</td><td>${value.desc || ''}</td></tr>`);
+	});
+	const table = '<table><thead><tr><th>' + L.hotkey_binding + '</th><th>' + L.hotkey_action + '</th><th>' + L.hotkey_context + '</th></tr></thead><tbody>' + rows.join('') + '</tbody></table>';
+    ebi('op_hotkey').innerHTML = '<div id="hotkey-root">' + table + '</div>';
+});
+
 
 // navpane
 ebi('tree').innerHTML = (
@@ -1003,6 +1056,7 @@ QS('#op_msg input[type="submit"]').value = L.ab_msg;
 
 function opclick(e) {
 	var dest = this.getAttribute('data-dest');
+	console.log('Clicked on the top thing with dest', dest);
 	if (QS('#op_' + dest + '.act'))
 		dest = '';
 
@@ -5880,24 +5934,25 @@ var ahotkeys = function (e) {
 	if (QS('#bbox-overlay.visible') || modal.busy)
 		return;
 
-	var k = (e.key || e.code) + '', pos = -1, n,
-		ae = document.activeElement,
-		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
 
-	if (k.startsWith('Key'))
-		k = k.slice(3);
-	else if (k.startsWith('Digit'))
-		k = k.slice(5);
+	var kkey = (e.key || e.code) + '', pos = -1, n,
+		activeElement = document.activeElement,
+		activeNode = activeElement && activeElement != document.body ? activeElement.nodeName.toLowerCase() : '';
 
-	var kl = k.toLowerCase();
+	if (kkey.startsWith('Key'))
+		kkey = kkey.slice(3);
+	else if (kkey.startsWith('Digit'))
+		kkey = kkey.slice(5);
+
+	var keyLower = kkey.toLowerCase();
 
 	if (dbg_kbd)
-		console.log('KBD', k, kl, e.key, e.code, e.keyCode, e.which);
+		console.log('KBD', kkey, keyLower, e.key, e.code, e.keyCode, e.which);
 
 	if (konmai < 0)
 		noop();
-	else if (konmak[konmai] != kl)
-		konmai = konmai && kl == konmak[0] ? (konmai<3?konmai:1):0;
+	else if (konmak[konmai] != keyLower)
+		konmai = konmai && keyLower == konmak[0] ? (konmai<3?konmai:1):0;
 	else if (++konmai >= konmak.length) {
 		konmai = -1;
 		document.documentElement.scrollTop = 0;
@@ -5912,62 +5967,46 @@ var ahotkeys = function (e) {
 		return ev(e);
 	}
 
-	if (k == 'Escape' || k == 'Esc') {
-		ae && ae.blur();
-		tt.hide();
+	var in_ftab = (activeNode == 'tr' || activeNode == 'td') && activeElement.closest('#files');
 
-		if (ebi('hkhelp'))
-			return qsr('#hkhelp');
+	//QQQ
+	const action = getHotkeyEvent(e, {
+		activeElement,
+		activeNode,
+		in_ftab,
+		treectl,
+		gridMode: thegrid.en,
+		mp,
+		showfile
+	});
 
-		if (toast.visible)
-			return toast.hide();
+	if (!action) return;
 
-		if (ebi('rn_cancel'))
-			return ebi('rn_cancel').click();
-
-		if (ebi('sh_abrt'))
-			return ebi('sh_abrt').click();
-
-		if (QS('.opview.act'))
-			return QS('#ops>a').click();
-
-		if (widget.is_open)
-			return widget.close();
-
-		if (showfile.active())
-			return thegrid.setvis(true);
-
-		if (!treectl.hidden)
-			return treectl.detree();
-
-		if (QS('#unsearch'))
-			return QS('#unsearch').click();
-
-		if (thegrid.en)
-			return ebi('griden').click();
+	if (action === HOTKEY_ACTIONS.ESCAPE) {
+		return escape();
 	}
 
-	var in_ftab = (aet == 'tr' || aet == 'td') && ae.closest('#files');
+	//TODO Ftab in context. can listen for these
 	if (in_ftab) {
 		var d = '', rem = 0;
-		if (aet == 'td') ae = ae.closest('tr'); //ie11
-		if (k == 'ArrowUp' || k == 'Up') d = 'previous';
-		if (k == 'ArrowDown' || k == 'Down') d = 'next';
-		if (k == 'PageUp') { d = 'previous'; rem = 0.6; }
-		if (k == 'PageDown') { d = 'next'; rem = 0.6; }
+		if (activeNode == 'td') activeElement = activeElement.closest('tr'); //ie11
+		if (kkey == 'ArrowUp' || kkey == 'Up') d = 'previous';
+		if (kkey == 'ArrowDown' || kkey == 'Down') d = 'next';
+		if (kkey == 'PageUp') { d = 'previous'; rem = 0.6; }
+		if (kkey == 'PageDown') { d = 'next'; rem = 0.6; }
 		if (d) {
-			fselfunw(e, ae, d, rem);
+			fselfunw(e, activeElement, d, rem);
 			return ev(e);
 		}
-		if (k == 'Space' || k == 'Spacebar' || k == ' ') {
-			clmod(ae, 'sel', 't');
-			msel.origin_tr(ae);
+		if (kkey == 'Space' || kkey == 'Spacebar' || kkey == ' ') {
+			clmod(activeElement, 'sel', 't');
+			msel.origin_tr(activeElement);
 			msel.selui();
 			return ev(e);
 		}
 	}
-	if (in_ftab || !aet || (ae && ae.closest('#ggrid'))) {
-		if ((kl == 'a') && ctrl(e)) {
+	if (in_ftab || !activeNode || (activeElement && activeElement.closest('#ggrid'))) {
+		if ((keyLower == 'a') && ctrl(e)) {
 			var ntot = treectl.lsc.files.length + treectl.lsc.dirs.length,
 				sel = msel.getsel(),
 				all = msel.getall();
@@ -5982,124 +6021,111 @@ var ahotkeys = function (e) {
 		}
 	}
 
-	if (ae && ae.closest('pre')) {
-		if ((kl == 'a') && ctrl(e)) {
-			var sel = document.getSelection(),
-				ran = document.createRange();
+	//TODO does not work
+	if (action === HOTKEY_ACTIONS.SELECT_ALL) {
+		var sel = document.getSelection(),
+			ran = document.createRange();
 
-			sel.removeAllRanges();
-			ran.selectNode(ae.closest('pre'));
-			sel.addRange(ran);
-			return ev(e);
-		}
+		sel.removeAllRanges();
+		ran.selectNode(activeElement.closest('pre'));
+		sel.addRange(ran);
+		return ev(e);
 	}
 
-	if (k.endsWith('Enter') && ae && (ae.onclick || ae.hasAttribute('tabIndex')))
-		return ev(e) && ae.click() || true;
+	if (action === HOTKEY_ACTIONS.ENTER && activeElement && (activeElement.onclick || activeElement.hasAttribute('tabIndex')))
+		return ev(e) && activeElement.click() || true;
 
-	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre')
-		return;
-
-	if (k == '?')
+	if (action === HOTKEY_ACTIONS.HELP)
 		return hkhelp();
 
-	if (!e.shiftKey && ctrl(e)) {
-		var sel = window.getSelection && window.getSelection() || {};
-		sel = sel && !sel.isCollapsed && sel.direction != 'none';
-
-		if (kl == 'x')
-			return fileman.cut(e);
-
-		if (kl == 'c' && !sel)
-			return fileman.cpy(e);
-
-		if (kl == 'v')
-			return fileman.d_paste(e);
-
-		if (kl == 'k')
-			return fileman.delete(e);
-
-		return;
+	if (action === HOTKEY_ACTIONS.CUT) {
+		return fileman.cut(e);
+	}
+	if (action === HOTKEY_ACTIONS.COPY) {
+		return fileman.cpy(e);
+	}
+	if (action === HOTKEY_ACTIONS.PASTE) {
+		return fileman.d_paste(e);
+	}
+	if (action === HOTKEY_ACTIONS.DELETE) {
+		return fileman.delete(e);
 	}
 
-	if (e.shiftKey && kl != 'a' && kl != 'd')
-		return;
+	if (action === HOTKEY_ACTIONS.PREV_SONG) {
+		return prev_song() || true;
+	}
+	if (action === HOTKEY_ACTIONS.NEXT_SONG) {
+		return next_song() || true;
+	}
+	if (action === HOTKEY_ACTIONS.TREE_PREV) {
+		return tree_neigh(-1, 1) || true;
+	}
+	if (action === HOTKEY_ACTIONS.TREE_NEXT) {
+		return tree_neigh(1, 1) || true;
+	}
 
-	if (/^[0-9]$/.test(k))
-		pos = parseInt(k) * 0.1;
+	if (action === HOTKEY_ACTIONS.PLAY_PAUSE)
+		return playpause() || true;
+
+	//TODO uncovered use case
+	if (/^[0-9]$/.test(kkey))
+		pos = parseInt(kkey) * 0.1;
 
 	if (pos !== -1)
 		return seek_au_mul(pos) || true;
 
-	if (kl == 'j')
-		return prev_song() || true;
+	if (action === HOTKEY_ACTIONS.FAST_FORWARD)
+		return seek_au_rel(10) || true;
+	if (action === HOTKEY_ACTIONS.REWIND)
+		return seek_au_rel(-10) || true;
 
-	if (kl == 'l')
-		return next_song() || true;
-
-	if (kl == 'p')
-		return playpause() || true;
-
-	n = kl == 'u' ? -10 : kl == 'o' ? 10 : 0;
-	if (n !== 0)
-		return seek_au_rel(n) || true;
-
-	if (kl == 'y')
+	if (action === HOTKEY_ACTIONS.DOWNLOAD)
 		return msel.getsel().length ? ebi('seldl').click() :
 			showfile.active() ? ebi('dldoc').click() :
 				dl_song();
 
-	n = kl == 'i' ? -1 : kl == 'k' ? 1 : 0;
-	if (n !== 0)
-		return tree_neigh(n, 1);
-
-	if (kl == 'm')
+	if (action === HOTKEY_ACTIONS.TREE_UP)
 		return tree_up();
 
-	if (kl == 'b')
+	if (action === HOTKEY_ACTIONS.TOGGLE_BREADCRUMBS)
 		return treectl.hidden ? treectl.entree() : treectl.detree();
 
-	if (kl == 'g')
+	if (action === HOTKEY_ACTIONS.TOGGLE_GRID)
 		return ebi('griden').click();
 
-	if (kl == 't')
+	if (action === HOTKEY_ACTIONS.TOGGLE_THUMBNAILS)
 		return ebi('thumbs').click();
 
-	if (kl == 'v')
+	if (action === HOTKEY_ACTIONS.TOGGLE_FOLDER_TREE)
 		return ebi('filetree').click();
 
-	if (k == 'F2')
+	if (action === HOTKEY_ACTIONS.RENAME)
 		return fileman.rename();
 
-	if (!treectl.hidden && (!e.shiftKey || !thegrid.en)) {
-		if (kl == 'a')
-			return QS('#twig').click();
+	if (action === HOTKEY_ACTIONS.NAVPANE_SHRINK)
+		return QS('#twig').click();
+	if (action === HOTKEY_ACTIONS.NAVPANE_GROW)
+		return QS('#twobytwo').click();
+	
+	if (action === HOTKEY_ACTIONS.SELECT_FILE)
+		showfile.tglsel();
+	if (action === HOTKEY_ACTIONS.EDIT_FILE && ebi('editdoc').style.display != 'none')
+		ebi('editdoc').click();
 
-		if (kl == 'd')
-			return QS('#twobytwo').click();
+	if (action === HOTKEY_ACTIONS.SELECT_SONG) {
+		return sel_song();
 	}
 
-	if (showfile.active()) {
-		if (kl == 's')
-			showfile.tglsel();
-		if (kl == 'e' && ebi('editdoc').style.display != 'none')
-			ebi('editdoc').click();
+	if (action === HOTKEY_ACTIONS.TOGGLE_GRID_MULTISELECT) {
+		return ebi('gridsel').click();
 	}
 
-	if (mp && mp.au && !mp.au.paused) {
-		if (kl == 's')
-			return sel_song();
+	if (action === HOTKEY_ACTIONS.GRID_SHRINK_THUMBNAILS) {
+		return QSA('#ghead a[z]')[0].click();
 	}
-
-	if (thegrid.en) {
-		if (kl == 's')
-			return ebi('gridsel').click();
-
-		if (kl == 'a')
-			return QSA('#ghead a[z]')[0].click();
-
-		if (kl == 'd')
-			return QSA('#ghead a[z]')[1].click();
+	
+	if (action === HOTKEY_ACTIONS.GRID_GROW_THUMBNAILS) {
+		return QSA('#ghead a[z]')[1].click();
 	}
 };
 
@@ -9380,6 +9406,42 @@ function reload_browser() {
 	thegrid.setdirty();
 	msel.render();
 }
+
+function escape() {
+	window.activeElement && window.activeElement.blur();
+	tt.hide();
+
+	if (ebi('hkhelp'))
+		return qsr('#hkhelp');
+
+	if (toast.visible)
+		return toast.hide();
+
+	if (ebi('rn_cancel'))
+		return ebi('rn_cancel').click();
+
+	if (ebi('sh_abrt'))
+		return ebi('sh_abrt').click();
+
+	if (QS('.opview.act'))
+		return QS('#ops>a').click();
+
+	if (widget.is_open)
+		return widget.close();
+
+	if (showfile.active())
+		return thegrid.setvis(true);
+
+	if (!treectl.hidden)
+		return treectl.detree();
+
+	if (QS('#unsearch'))
+		return QS('#unsearch').click();
+
+	if (thegrid.en)
+		return ebi('griden').click();
+}
+
 treectl.hydrate();
 
 if (!fullui && (window.ui_nombar || /[?&]nombar\b/.exec(sloc0))) ebi('ops').style.display = 'none';
