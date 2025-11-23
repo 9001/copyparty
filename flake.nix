@@ -39,6 +39,19 @@
           withSMB = true;
         };
 
+        # Make sure that the nix dependencies don't drift away
+        checks.nix-deps-updated = pkgs.runCommandLocal "nix-deps-updated-check" { } ''
+          hash="6e3a014f303f86992e75446c3ce3aaf704fc838b850ba3688c9a1f5d358bc9f4"
+          dockerfilePath="${self.outPath}/scripts/deps-docker/Dockerfile"
+
+          echo "If you can see this, the dependencies dockerfile updated."
+          echo "Please update the nix packages (if necessary) and the hash on this check"
+          echo $hash $dockerfilePath | sha256sum --check --status
+
+          # Need to make an empty folder so that Nix doesn't complain
+          mkdir $out
+        '';
+
         packages = {
           inherit (pkgs)
             copyparty
