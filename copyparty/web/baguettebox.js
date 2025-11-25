@@ -24,7 +24,7 @@ window.baguetteBox = (function () {
             onChange: null,
             readDirRtl: false,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnVmode, btnReadDir, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnVmode, btnReadDir, btnSpeed, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -42,6 +42,7 @@ window.baguetteBox = (function () {
         documentLastFocus = null,
         isFullscreen = false,
         vmute = false,
+        vspeed = sread('vspeed') || 1.0,
         vloop = sread('vmode') == 'L',
         vnext = sread('vmode') == 'C',
         loopA = null,
@@ -304,6 +305,7 @@ window.baguetteBox = (function () {
                 '<button id="bbox-full" type="button" tt="full-screen">⛶</button>' +
                 '<button id="bbzoom" type="button" tt="zoom/stretch">z</button>' +
                 '<button id="bbox-vmode" type="button" tt="a"></button>' +
+                '<button id="bbox-vspeed" type="button" tt="playback speed">1x</button>' +
                 '<button id="bbox-close" type="button" aria-label="Close">X</button>' +
                 '</div></div>'
             );
@@ -323,6 +325,7 @@ window.baguetteBox = (function () {
         btnFull = ebi('bbox-full');
         btnZoom = ebi('bbzoom');
         btnVmode = ebi('bbox-vmode');
+        btnSpeed = ebi('bbox-vspeed');
         btnClose = ebi('bbox-close');
 
         bcfg_bind(options, 'bbzoom', 'bbzoom', false, setzoom);
@@ -509,6 +512,29 @@ window.baguetteBox = (function () {
             tt.show.call(this);
     }
 
+    function setVspeed() {
+        var v = vid();
+        ebi('bbox-vspeed').style.display = v ? '' : 'none';
+        if (!v)
+            return;
+
+        v.playbackRate = vspeed;
+        btnSpeed.textContent = vspeed + "x";
+        swrite('vspeed', vspeed);
+    }
+
+    function cycleVspeed() {
+        var newSpeed = vspeed + 0.25;
+        if (newSpeed > 2.0) {
+            newSpeed = 0.25;
+        }
+        vspeed = newSpeed;
+
+        setVspeed();
+        if (tt.en)
+            tt.show.call(this);
+    }
+
     function findfile() {
         var thumb = currentGallery[currentIndex].imageElement,
             name = vsplit(thumb.href)[1].split('?')[0],
@@ -614,6 +640,7 @@ window.baguetteBox = (function () {
         bind(overlay, 'wheel', overlayWheelHandler);
         bind(btnPrev, 'click', showLeftImage);
         bind(btnNext, 'click', showRightImage);
+        bind(btnSpeed, 'click', cycleVspeed);
         bind(btnClose, 'click', hideOverlay);
         bind(btnVmode, 'click', tglVmode);
         bind(btnHelp, 'click', halp);
@@ -638,6 +665,7 @@ window.baguetteBox = (function () {
         unbind(overlay, 'wheel', overlayWheelHandler);
         unbind(btnPrev, 'click', showLeftImage);
         unbind(btnNext, 'click', showRightImage);
+        unbind(btnSpeed, 'click', cycleVspeed);
         unbind(btnClose, 'click', hideOverlay);
         unbind(btnVmode, 'click', tglVmode);
         unbind(btnHelp, 'click', halp);
@@ -1254,6 +1282,7 @@ window.baguetteBox = (function () {
         selbg();
         mp_ctl();
         setVmode();
+        setVspeed();
 
         var el = vidimg();
         if (el.getAttribute('rot'))
