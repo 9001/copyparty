@@ -1545,12 +1545,13 @@ class HttpCli(object):
                 ap = os.path.join(self.vn.realpath, i["rp"])
 
             iurl = html_escape("%s%s" % (baseurl, i["rp"]), True, True)
-            title = unquotep(i["rp"].split("?")[0].split("/")[-1])
-            title = html_escape(title, True, True)
+            fn_title = unquotep(i["rp"].split("?")[0].split("/")[-1])
+            fn_title = html_escape(fn_title, True, True)
             tag_t = str(i["tags"].get("title") or "")
             tag_a = str(i["tags"].get("artist") or "")
+            title = html_escape(tag_t, True, True) if tag_t else fn_title
             desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
-            desc = html_escape(desc, True, True) if desc else title
+            desc = html_escape(desc, True, True) if desc else fn_title
             mime = html_escape(guess_mime(title, ap))
             lmod = formatdate(max(0, i["ts"]))
             zsa = (iurl, iurl, title, desc, lmod, iurl, mime, i["sz"])
