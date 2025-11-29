@@ -1547,13 +1547,21 @@ class HttpCli(object):
             iurl = html_escape("%s%s" % (baseurl, i["rp"]), True, True)
             fn_title = unquotep(i["rp"].split("?")[0].split("/")[-1])
             fn_title = html_escape(fn_title, True, True)
+            self.log("tags: %s" % (i["tags"],), 7)
             tag_t = str(i["tags"].get("title") or "")
+            tag_track = str(i["tags"].get(".tn") or "")
+
             tag_a = str(i["tags"].get("artist") or "")
             title = html_escape(tag_t, True, True) if tag_t else fn_title
-            desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
+            if tag_track:
+                desc = "%s - %s - %s" % (tag_a,tag_track, tag_t) if tag_t and tag_a and tag_track else (tag_t or tag_a)
+            else:
+                desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
             desc = html_escape(desc, True, True) if desc else fn_title
             mime = html_escape(guess_mime(title, ap))
             lmod = formatdate(max(0, i["ts"]))
+            tag_date = i["tags"].get("date")
+
             zsa = (iurl, iurl, title, desc, lmod, iurl, mime, i["sz"])
             zs = (
                 """\
