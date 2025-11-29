@@ -1540,27 +1540,48 @@ class HttpCli(object):
         ap = ""
         use_magic = "rmagic" in self.vn.flags
 
+        # Get format templates from config or URL params
+        title_fmt = self.uparam.get("title_fmt", self.args.rss_title)
+        desc_fmt = self.uparam.get("desc_fmt", self.args.rss_desc)
+
         for i in hits:
             if use_magic:
                 ap = os.path.join(self.vn.realpath, i["rp"])
 
             iurl = html_escape("%s%s" % (baseurl, i["rp"]), True, True)
             fn_title = unquotep(i["rp"].split("?")[0].split("/")[-1])
-            fn_title = html_escape(fn_title, True, True)
-            self.log("tags: %s" % (i["tags"],), 7)
-            tag_t = str(i["tags"].get("title") or "")
-            tag_track = str(i["tags"].get(".tn") or "")
-
-            tag_a = str(i["tags"].get("artist") or "")
-            title = html_escape(tag_t, True, True) if tag_t else fn_title
-            if tag_track:
-                desc = "%s - %s - %s" % (tag_a,tag_track, tag_t) if tag_t and tag_a and tag_track else (tag_t or tag_a)
-            else:
-                desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
-            desc = html_escape(desc, True, True) if desc else fn_title
-            mime = html_escape(guess_mime(title, ap))
+            fn_title_esc = html_escape(fn_title, True, True)
+            
+            # Build tag dictionary for substitution
+            tag_dict = {
+                "filename": fn_title,
+                "title": str(i["tags"].get("title") or ""),
+                "artist": str(i["tags"].get("artist") or ""),
+                "album": str(i["tags"].get("album") or ""),
+                ".tn": str(i["tags"].get(".tn") or ""),
+                "date": str(i["tags"].get("date") or ""),
+            }
+            
+            # Format title using template
+            title = title_fmt
+            for tag_name, tag_value in tag_dict.items():
+                title = title.replace("{" + tag_name + "}", tag_value)
+            # If title is empty or only contains empty placeholders, use filename
+            if not title.strip() or title == title_fmt:
+                title = fn_title
+            title = html_escape(title, True, True)
+            
+            # Format description using template
+            desc = desc_fmt
+            for tag_name, tag_value in tag_dict.items():
+                desc = desc.replace("{" + tag_name + "}", tag_value)
+            # If desc is empty or only contains empty placeholders, use filename
+            if not desc.strip() or desc == desc_fmt:
+                desc = fn_title
+            desc = html_escape(desc, True, True)
+            
+            mime = html_escape(guess_mime(fn_title, ap))
             lmod = formatdate(max(0, i["ts"]))
-            tag_date = i["tags"].get("date")
 
             zsa = (iurl, iurl, title, desc, lmod, iurl, mime, i["sz"])
             zs = (
