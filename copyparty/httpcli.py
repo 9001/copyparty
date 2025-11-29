@@ -1541,8 +1541,8 @@ class HttpCli(object):
         use_magic = "rmagic" in self.vn.flags
 
         # Get format templates from config or URL params
-        title_fmt = self.uparam.get("title_fmt", self.args.rss_title)
-        desc_fmt = self.uparam.get("desc_fmt", self.args.rss_desc)
+        title_fmt = self.uparam.get("rss-title-format", self.args.rss_title_format)
+        desc_fmt = self.uparam.get("rss-desc-format", self.args.rss_desc_format)
 
         for i in hits:
             if use_magic:

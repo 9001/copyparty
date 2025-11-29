@@ -1067,6 +1067,12 @@ url parameters:
   * `n` = filename
   * `a` = filesize
   * uppercase = reverse-sort; `M` = oldest file first
+* `rss-title-format={title}` format for RSS item titles, using tags or metadata (can also be set globally with `--rss-title-format`)
+  * available placeholders: `{title}`, `{artist}`, `{album}`, `{.tn}`, `{date}`, `{filename}`
+  * default: `{filename}`
+* `rss-desc-format={artist} - {title}` format for RSS item descriptions, using tags or metadata  (can also be set globally with `--rss-desc-format`)
+  * available placeholders: `{title}`, `{artist}`, `{album}`, `{.tn}`, `{date}`, `{filename}`
+  * default: `{filename}`
 
 
 ## opds feeds

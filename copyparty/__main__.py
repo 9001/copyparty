@@ -1695,8 +1695,8 @@ def add_rss(ap):
     ap2.add_argument("--rss-nf", metavar="HITS", type=int, default=250, help="default number of files to return (url-param 'nf')")
     ap2.add_argument("--rss-fext", metavar="E,E", type=u, default="", help="default list of file extensions to include (url-param 'fext'); blank=all")
     ap2.add_argument("--rss-sort", metavar="ORD", type=u, default="m", help="default sort order (url-param 'sort'); [\033[32mm\033[0m]=last-modified [\033[32mu\033[0m]=upload-time [\033[32mn\033[0m]=filename [\033[32ms\033[0m]=filesize; Uppercase=oldest-first. Note that upload-time is 0 for non-uploaded files")
-    ap2.add_argument("--rss-title", metavar="FMT", type=u, default="{filename}", help="format for RSS item title; available tags: {title}, {artist}, {album}, {.tn}, {date}, {filename}; default is '{title}' (falls back to filename if tag missing)")
-    ap2.add_argument("--rss-desc", metavar="FMT", type=u, default="{filename}", help="format for RSS item description; available tags: {title}, {artist}, {album}, {.tn}, {date}, {filename}; default is '{artist} - {title}' (falls back to filename if all tags missing)")
+    ap2.add_argument("--rss-title-format", metavar="FMT", type=u, default="{filename}", help="format for RSS item title; available tags: {title}, {artist}, {album}, {.tn}, {date}, {filename}; default is '{title}' (falls back to filename if tag missing)")
+    ap2.add_argument("--rss-desc-format", metavar="FMT", type=u, default="{filename}", help="format for RSS item description; available tags: {title}, {artist}, {album}, {.tn}, {date}, {filename}; default is '{artist} - {title}' (falls back to filename if all tags missing)")
 
 
 def add_db_general(ap, hcores):
