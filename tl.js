@@ -25,6 +25,15 @@ function langmod() {
 // copy the text below into a new file in the translations folder;
 // https://github.com/9001/copyparty/tree/hovudstraum/copyparty/web/tl
 
+/*
+
+TLNotes:
+- navpane: thanh điều hướng
+- breadcrumb: đường dẫn
+
+
+*/
+
 
 Ls.vie = {
 	"tt": "Tiếng Việt",
@@ -138,7 +147,7 @@ Ls.vie = {
 	"access": "quyền truy cập",
 	"ot_close": "đóng menu con",
 
-	"ot_search": "tìm kiếm các tệp theo thuộc tính, đường dẫn / tên, thẻ nhạc hoặc bất kỳ sự kết hợp nào của chúng$N$N&lt;code&gt;foo bar&lt;/code&gt; = phải chứa cả «foo» và «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = phải chứa «foo» nhưng không chứa «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = bắt đầu bằng «yana» và là tệp «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = chứa chính xác «try unite»$N$Nđịnh dạng ngày là iso-8601, như$N&lt;code&gt;2009-12-31&lt;/code&gt; hoặc &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
+	"ot_search": "tìm kiếm các tệp theo thuộc tính, đường dẫn / tên, tag nhạc hoặc bất kỳ sự kết hợp nào của chúng$N$N&lt;code&gt;foo bar&lt;/code&gt; = phải chứa cả «foo» và «bar»,$N&lt;code&gt;foo -bar&lt;/code&gt; = phải chứa «foo» nhưng không chứa «bar»,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = bắt đầu bằng «yana» và là tệp «opus»$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = chứa chính xác «try unite»$N$Nđịnh dạng ngày là iso-8601, như$N&lt;code&gt;2009-12-31&lt;/code&gt; hoặc &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
 
 
 	"ot_unpost": "unpost: xoá các tệp đã tải lên gần đây hoặc huỷ những tệp đang tải dở",
@@ -171,7 +180,7 @@ Ls.vie = {
 	"wt_seldl": "tải lựa chọn dưới dạng các tệp riêng biệt$NPhím tắt: Y",
 	"wt_npirc": "sao chép thông tin bản nhạc theo định dạng irc",
 	"wt_nptxt": "sao chép thông tin bản nhạc dưới dạng văn bản thuần túy",
-	"wt_m3ua": "thêm vào danh sách phát m3u (bấm <code>📻sao chép</code> sau)",
+	"wt_m3ua": "thêm vào danh sách phát m3u (bấm <code>📻copy</code> sau)",
 	"wt_m3uc": "sao chép danh sách phát m3u vào bảng nhớ tạm",
 	"wt_grid": "chuyển đổi chế độ xem danh sách / lưới $NPhím tắt: G",
 	"wt_prev": "bài trước$NPhím tắt: J",
@@ -266,87 +275,94 @@ Ls.vie = {
 	"ct_idxh": 'hiển thị index.html thay cho danh sách thư mục">htm',
 	"ct_sbars": 'hiển thị thanh cuộn">⟊',
 
-	// 
-	"cut_umod": "if a file already exists on the server, update the server's last-modified timestamp to match your local file (requires write+delete permissions)\">re📅",
+	// tuỳ chọn up2k
+	"cut_umod": "nếu tệp đã tồn tại trên máy chủ, cập nhật dấu thời gian chỉnh sửa cuối của máy chủ cho khớp với tệp cục bộ của bạn (yêu cầu quyền ghi và xóa)\">re📅",
 
-	"cut_turbo": "the yolo button, you probably DO NOT want to enable this:$N$Nuse this if you were uploading a huge amount of files and had to restart for some reason, and want to continue the upload ASAP$N$Nthis replaces the hash-check with a simple <em>&quot;does this have the same filesize on the server?&quot;</em> so if the file contents are different it will NOT be uploaded$N$Nyou should turn this off when the upload is done, and then &quot;upload&quot; the same files again to let the client verify them\">turbo",
+	"cut_turbo": "nút YOLO, bạn gần như KHÔNG nên bật tuỳ chọn này:$N$Ndùng khi bạn đang tải lên một lượng tệp rất lớn và phải khởi động lại vì lý do nào đó, và muốn tiếp tục tải càng sớm sàng tốt$N$Ntuỳ chọn này thay thế kiểm tra băm bằng kiểm tra <em>&quot;kích thước tệp ở trên máy chủ có giống nhau không&quot;</em> nên nếu nội dung tệp khác nhau thì sẽ KHÔNG được tải lên$N$Nbạn nên tắt tuỳ chọn này sau khi tải lên xong, và &quot;tải lên&quot; lại các tệp đó để xác minh\">turbo",
 
-	"cut_datechk": "has no effect unless the turbo button is enabled$N$Nreduces the yolo factor by a tiny amount; checks whether the file timestamps on the server matches yours$N$Nshould <em>theoretically</em> catch most unfinished / corrupted uploads, but is not a substitute for doing a verification pass with turbo disabled afterwards\">date-chk",
+	"cut_datechk": "không có tác dụng trừ khi nút turbo được bật$N$Ngiảm mức độ yolo một chút; kiểm tra xem dấu thời gian tệp trên máy chủ có khớp với của bạn không$N$Nnên <em>về lý thuyết</em> có thể phát hiện phần lớn tệp chưa xong hoặc bị lỗi, nhưng không thể thay thế cho việc chạy xác minh sau khi tắt turbo\">date-chk",
 
-	"cut_u2sz": "size (in MiB) of each upload chunk; big values fly better across the atlantic. Try low values on very unreliable connections",
+	"cut_u2sz": "kích thước (tính theo MiB) của mỗi khối tải lên; dùng kích thước khối lớn khi truyền ở khoảng cách lục địa. Hãy thử giá trị nhỏ hơn với kết nối không ổn định",
 
-	"cut_flag": "ensure only one tab is uploading at a time $N -- other tabs must have this enabled too $N -- only affects tabs on the same domain",
+	"cut_flag": "đảm bảo chỉ một tab được tải lên tại một thời điểm $N -- tab khác cũng cần bật tùy chọn này $N -- tác dụng trong các tab cùng tên miền",
 
-	"cut_az": "upload files in alphabetical order, rather than smallest-file-first$N$Nalphabetical order can make it easier to eyeball if something went wrong on the server, but it makes uploading slightly slower on fiber / LAN",
+	"cut_az": "tải tệp theo thứ tự bảng chữ cái thay vì tệp nhỏ trước$N$Ntải lên theo thứ tự bảng chữ cái giúp dễ quan sát nếu có vấn đề trên máy chủ, nhưng làm tốc độ tải chậm hơn trên mạng cáp quang hoặc LAN",
 
-	"cut_nag": "OS notification when upload completes$N(only if the browser or tab is not active)",
-	"cut_sfx": "audible alert when upload completes$N(only if the browser or tab is not active)",
+	"cut_nag": "thông báo của hệ điều hành khi tải lên hoàn tất$N(chỉ khi trình duyệt hoặc tab không hoạt động)",
+	"cut_sfx": "âm báo khi tải lên hoàn tất$N(chỉ khi trình duyệt hoặc tab không hoạt động)",
 
-	"cut_mt": "use multithreading to accelerate file hashing$N$Nthis uses web-workers and requires$Nmore RAM (up to 512 MiB extra)$N$Nmakes https 30% faster, http 4.5x faster\">mt",
+	"cut_mt": "dùng đa luồng để tăng tốc băm tệp$N$dùng web workers và cần $nhiều RAM hơn (tối đa thêm 512 MiB)$N$làm cho https nhanh hơn 30%, http nhanh hơn 4.5 lần\">mt",
 
-	"cut_wasm": "use wasm instead of the browser's built-in hasher; improves speed on chrome-based browsers but increases CPU load, and many older versions of chrome have bugs which makes the browser consume all RAM and crash if this is enabled\">wasm",
+	"cut_wasm": "dùng wasm thay vì bộ băm tích hợp của trình duyệt; nhanh hơn trên trình duyệt chromium nhưng làm tăng tải CPU, và nhiều bản chrome cũ có lỗi khiến trình duyệt dùng hết RAM và treo nếu bật tuỳ chọn này\">wasm",
 
-	"cft_text": "favicon text (blank and refresh to disable)",
-	"cft_fg": "foreground color",
-	"cft_bg": "background color",
+	// favicon
+	"cft_text": "chuỗi favicon (để trống và làm mới trang để tắt)",
+	"cft_fg": "màu chữ",
+	"cft_bg": "màu nền",
 
-	"cdt_lim": "max number of files to show in a folder",
-	"cdt_ask": "when scrolling to the bottom,$Ninstead of loading more files,$Nask what to do",
-	"cdt_hsort": "how many sorting rules (&lt;code&gt;,sorthref&lt;/code&gt;) to include in media-URLs. Setting this to 0 will also ignore sorting-rules included in media links when clicking them",
+	// big dirs
+	"cdt_lim": "số tệp tối đa hiển thị trong thư mục",
+	"cdt_ask": "khi cuộn xuống cuối,$Nthay vì tải thêm tệp,$Nhỏi người dùng muốn làm gì",
+	"cdt_hsort": "số lượng luật sắp xếp(&lt;code&gt;,sorthref&lt;/code&gt;) được đưa vào URL media. Đặt bằng 0 cũng sẽ bỏ qua các quy tắc sắp xếp trong liên kết media khi nhấp vào chúng",
 
-	"tt_entree": "show navpane (directory tree sidebar)$NPhím tắt: B",
-	"tt_detree": "show breadcrumbs$NPhím tắt: B",
-	"tt_visdir": "scroll to selected folder",
-	"tt_ftree": "toggle folder-tree / textfiles$NPhím tắt: V",
-	"tt_pdock": "show parent folders in a docked pane at the top",
-	"tt_dynt": "autogrow as tree expands",
-	"tt_wrap": "word wrap",
-	"tt_hover": "reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )",
+	"tt_entree": "hiển thị thanh điều hướng (cây thư mục)$NPhím tắt: B",
+	"tt_detree": "hiển thị đường dẫn$NPhím tắt: B",
+	"tt_visdir": "cuộn đến thư mục đã chọn",
+	"tt_ftree": "chuyển đổi cây thư mục / tệp văn bản$NPhím tắt: V",
+	"tt_pdock": "hiển thị thư mục cha trong thanh ghim trên cùng",
+	"tt_dynt": "tự mở rộng khi cây mở rộng",
+	"tt_wrap": "ngắt dòng",
+	"tt_hover": "hiện thị dòng tràn khi rê chuột$N( không cuộn được nếu $N&nbsp; con trỏ chuột nằm ngoài cột trái )",
 
-	"ml_pmode": "at end of folder...",
-	"ml_btns": "cmds",
-	"ml_tcode": "transcode",
-	"ml_tcode2": "transcode to",
-	"ml_tint": "tint",
-	"ml_eq": "audio equalizer",
-	"ml_drc": "dynamic range compressor",
+	"ml_pmode": "ở cuối thư mục...",
+	"ml_btns": "lệnh",
+	"ml_tcode": "mã hoá lại",
+	// chắc là phần nhạc
+	"ml_tcode2": "mã hoá lại thành",
+	"ml_tint": "tô màu",
+	"ml_eq": "bộ cân bằng âm thanh",
+	"ml_drc": "bộ nén dải động",
 
-	"mt_loop": "loop/repeat one song\">🔁",
-	"mt_one": "stop after one song\">1️⃣",
-	"mt_shuf": "shuffle the songs in each folder\">🔀",
-	"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
-	"mt_preload": "start loading the next song near the end for gapless playback\">preload",
-	"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
-	"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
-	"mt_fau": "on phones, prevent music from stopping if the next song doesn't preload fast enough (can make tags display glitchy)\">☕️",
-	"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
-	"mt_npclip": "show buttons for bảng nhớ tạming the currently playing song\">/np",
-	"mt_m3u_c": "show buttons for bảng nhớ tạming the$Nselected songs as m3u8 playlist entries\">📻",
-	"mt_octl": "os integration (media Phím tắts / osd)\">os-ctl",
-	"mt_oseek": "allow seeking through os integration$N$Nnote: on some devices (iPhones),$Nthis replaces the next-song button\">seek",
-	"mt_oscv": "show album cover in osd\">art",
-	"mt_follow": "keep the playing track scrolled into view\">🎯",
-	"mt_compact": "compact controls\">⟎",
-	"mt_uncache": "clear cache &nbsp;(try this if your browser cached$Na broken copy of a song so it refuses to play)\">uncache",
-	"mt_mloop": "loop the open folder\">🔁 loop",
-	"mt_mnext": "load the next folder and continue\">📂 next",
-	"mt_mstop": "stop playback\">⏸ stop",
-	"mt_cflac": "convert flac / wav to {0}\">flac",
-	"mt_caac": "convert aac / m4a to {0}\">aac",
-	"mt_coth": "convert all others (not mp3) to {0}\">oth",
-	"mt_c2opus": "best choice for desktops, laptops, android\">opus",
-	"mt_c2owa": "opus-weba, for iOS 17.5 and newer\">owa",
-	"mt_c2caf": "opus-caf, for iOS 11 through 17\">caf",
-	"mt_c2mp3": "use this on very old devices\">mp3",
-	"mt_c2flac": "best sound quality, but huge downloads\">flac",
-	"mt_c2wav": "uncompressed playback (even bigger)\">wav",
-	"mt_c2ok": "nice, good choice",
-	"mt_c2nd": "that's not the recommended output format for your device, but that's fine",
-	"mt_c2ng": "your device does not seem to support this output format, but let's try anyways",
-	"mt_xowa": "there are bugs in iOS preventing background playback using this format; please use caf or mp3 instead",
-	"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
-	"mt_eq": "enables the equalizer and gain control;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standard 100% volume (unmodified)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standard stereo (unmodified)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% left-right crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = vocal removal :^)$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero (except width = 1) if you care about that",
-	"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of tresh -24 and ratio 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90 (only works in firefox; RLS is max 1 in other browsers)$N$N(see wikipedia, they explain it much better)",
+	// nhạc
+
+	"mt_loop": "lặp lại một bài\">🔁",
+	"mt_one": "dừng sau một bài\">1️⃣",
+	"mt_shuf": "trộn các bài trong thư mụcr\">🔀",
+	"mt_aplay": "tự động phát nếu có ID bài trong link bạn nhấp để truy cập máy chủ$N$Ntắt tuỳ chọn sẽ ngăn URL của trang cập nhật theo ID bài khi phát nhạc, tránh tự động phát nếu cài đặt mất nhưng URL còn\">a▶",
+	"mt_preload": "bắt đầu tải bài hát tiếp theo khi gần hết bài để phát liền mạch\">preload",
+	"mt_prescan": "chuyển đến thư mục tiếp theo trước khi bài cuối cùng $Nkết thúc, giúp giữ trình duyệt hoạt động $N và không dừng phát nhạc\">nav",
+	"mt_fullpre": "cố gắng tải trước toàn bộ bài;$N✅ bật với kết nối <b>không ổn định</b>,$N❌ tắt <b>với kết nối chậm</b>\">full",
+	"mt_fau": "trên điện thoại, ngăn nhạc dừng nếu bài tiếp theo tải chậm (có thể gây lỗi hiển thị tag nhạc)\">☕️",
+	"mt_waves": "thanh tiến trình bài hát dạng sóng:$Nhiển thị biên độ âm thanh trong thanh tiến trình\">~s",
+	"mt_npclip": "hiển thị nút để sao chép bài đang phát\">/np",
+	"mt_m3u_c": "hiển thị nút để sao chép $Nnhững bài đã chọn dưới dạng danh sách phát m3u8\">📻",
+	"mt_octl": "tích hợp hệ điều hành (phím tắt media / OSD)\">os-ctl",
+	"mt_oseek": "cho phép tìm kiếm qua tích hợp hệ điều hành$N$Nlưu ý: trên một số thiết bị (iphone), $Nthao tác này sẽ thay thế nút bài hát tiếp theo\">seek",
+	"mt_oscv": "hiển thị bài album trên OSD\">art",
+	"mt_follow": "giữ bài đang phát trong tầm nhìn\">🎯",
+	"mt_compact": "giao diện điều khiển thu gọn\">⟎",
+	"mt_uncache": "xoá bộ nhớ tạm &nbsp;(thử nếu trình duyệt lưu trữ tạm $Nmột bản nhạc bị lỗi và không thể phát)\">uncache",
+	"mt_mloop": "lặp trong thư mục đang mở\">🔁 loop",
+	"mt_mnext": "tải thư mục tiếp theo và tiếp tục\">📂 next",
+	"mt_mstop": "dừng phát\">⏸ stop",
+	"mt_cflac": "chuyển flac / wav sang {0}\">flac",
+	"mt_caac": "chuyển aac / m4a sang {0}\">aac",
+	"mt_coth": "chuyển mọi loại khác (trừ mp3) thành {0}\">oth",
+	"mt_c2opus": "lựa chọn tốt nhất cho máy tính, laptop, android\">opus",
+	"mt_c2owa": "opus-weba, cho iOS 17.5 trở lên\">owa",
+	"mt_c2caf": "opus-caf, cho iOS 11 đến 17\">caf",
+	"mt_c2mp3": "dùng trên thiết bị cũ\">mp3",
+	"mt_c2flac": "chất lượng âm thanh tốt nhất, nhưng tệp tải xuống lớn\">flac",
+	"mt_c2wav": "phát không nén (tệp còn lớn hơn nữa)\">wav",
+	"mt_c2ok": "lựa chọn hợp lý",
+	"mt_c2nd": "không phải định dạng khuyến nghị cho thiết bị, nhưng hãy thử nếu bạn muốn",
+	"mt_c2ng": "thiết bị dường như không hỗ trợ định dạng này, nhưng hãy thử nếu bạn muốn",
+	"mt_xowa": "có một vài lỗi trên iOS ngăn phát nền với định dạng này; vui lòng dùng caf hoặc mp3",
+	"mt_tint": "mức nền (0-100) trên thanh tiến trình",
+	
+	"mt_eq": "bật bộ cân bằng âm thanh và bộ tăng ích;$N$Nboost &lt;code&gt;0 &nbsp;&lt;/code&gt; = âm lượng chuẩn 100% (không chỉnh)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = stereo chuẩn (không chỉnh)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% pha trái-phải$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = loại bỏ lời hát :^)$N$Nbật EQ giúp cho album được phát liền mạch không ngắt quãng, nên giữ các giá trị bằng 0 (trừ width = 1) nếu bạn không muốn thay đổi âm thanh gốc",
+
+	"mt_drc": "bật bộ nén dải động (làm phẳng âm lượng / brickwaller); cũng bật EQ để cân bằng, nên đặt tất cả EQ trừ 'width' = 0 nếu không muốn$N$Ngiảm âm thanh trên THRESHOLD dB; với mỗi RATIO dB vượt THRESHOLD thì có 1 dB đầu ra, ví dụ tresh -24 và ratio 12 => âm lượng không vượt -22 dB, có thể tăng EQ boost lên 0.8 hoặc 1.8 với ATK 0 và RLS lớn 90 (chỉ Firefox; RLS max 1 trên browser khác)$N$NXem Wikipedia để hiểu chi tiết hơn",
 
 	"mb_play": "play",
 	"mm_hashplay": "play this audio file?",
