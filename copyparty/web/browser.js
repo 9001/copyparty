@@ -2449,7 +2449,7 @@ function mpause(e) {
 				return true;
 
 			dist *= -1;
-			mp.setvol(mp.vol + dist / 500);
+			mp.setvol(Math.round((mp.vol + dist / 500) * 100) / 100 );
 			vbar.draw();
 			ev(e);
 		};
