@@ -2271,11 +2271,17 @@ function up2k_init(subtle) {
             busy = {},
             nbusy = 0,
             init = 0,
+            ninit = 0,
             hashtab = {},
             mem = (MOBILE ? 128 : 256) * 1024 * 1024;
 
         if (!hws_ok)
-            init = setTimeout(function() {
+            init = setInterval(function() {
+                if (ninit < hws_ok) {
+                    ninit = hws_ok;
+                    return toast.inf(10, 'initializing webworkers ({0}/{1})'.format(hws_ok, hws.length), "iwwt");
+                }
+                clearInterval(init);
                 hws_ng = true;
                 toast.warn(30, 'webworkers failed to start\n\nwill be a bit slower due to\nhashing on main-thread');
                 apop(st.busy.hash, t);
@@ -2325,12 +2331,17 @@ function up2k_init(subtle) {
         }
 
         function onmsg(d) {
+            if (hws_ng)
+                return;
+
             d = d.data;
             var k = d[0];
 
             if (k == "pong")
                 if (++hws_ok == hws.length) {
-                    clearTimeout(init);
+                    clearInterval(init);
+                    if (toast.tag == 'iwwt')
+                        toast.hide();
                     go_next();
                 }
 

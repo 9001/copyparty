@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+command -v gfind >/dev/null &&
+command -v gsed  >/dev/null &&
+command -v gsort >/dev/null && {
+    sed()  { gsed "$@"; }
+}
+
 [ -e make-sfx.sh ] || cd scripts
 [ -e make-sfx.sh ] && [ -e deps-docker ] || {
     echo cd into the scripts folder first

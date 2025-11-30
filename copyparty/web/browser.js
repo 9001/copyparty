@@ -2449,7 +2449,7 @@ function mpause(e) {
 				return true;
 
 			dist *= -1;
-			mp.setvol(mp.vol + dist / 500);
+			mp.setvol(Math.round((mp.vol + dist / 500) * 100) / 100 );
 			vbar.draw();
 			ev(e);
 		};
@@ -3019,9 +3019,6 @@ function play(tid, is_ev, seek) {
 	}
 
 	if (tn >= mp.order.length) {
-		if (mpl.pb_mode == 'stop')
-			return;
-
 		if (mpl.pb_mode == 'loop' || ebi('unsearch')) {
 			tn = 0;
 		}
@@ -3029,6 +3026,7 @@ function play(tid, is_ev, seek) {
 			treectl.ls_cb = next_song;
 			return tree_neigh(1);
 		}
+		else return;
 	}
 
 	if (tn < 0) {
@@ -3039,6 +3037,7 @@ function play(tid, is_ev, seek) {
 			treectl.ls_cb = last_song;
 			return tree_neigh(-1);
 		}
+		else return;
 	}
 
 	tid = mp.order[tn];

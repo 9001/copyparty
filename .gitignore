@@ -43,6 +43,7 @@ scripts/docker/*.err
 
 # nix build output link
 result
+result-*
 
 # IDEA config
 .idea/

@@ -2924,6 +2924,11 @@ if [cfssl](https://github.com/cloudflare/cfssl/releases/latest) is installed, co
 * this will be a self-signed certificate so you must install your `ca.pem` into all your browsers/devices
 * if you want to avoid the hassle of distributing certs manually, please consider using a reverse proxy
 
+to install cfssl on windows:
+* [download](https://github.com/cloudflare/cfssl/releases/latest) `cfssl_windows_amd64.exe`, `cfssljson_windows_amd64.exe`, `cfssl-certinfo_windows_amd64.exe`
+* rename them to `cfssl.exe`, `cfssljson.exe`, `cfssl-certinfo.exe`
+* put them in PATH, for example inside `c:\windows\system32`
+
 
 # recovering from crashes
 

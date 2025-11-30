@@ -47,6 +47,9 @@ while you're in the /inc folder (or any folder below there)
 def main():
     inf = json.loads(sys.argv[1])
     url = inf["txt"]
+    if url.startswith("upload-queue-empty;"):
+        return
+
     if "://" not in url:
         url = "https://" + url
 

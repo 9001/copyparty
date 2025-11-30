@@ -62,6 +62,9 @@ def do_stuff(inf):
     log = inf["log"]
 
     url = inf["txt"]
+    if url.startswith("upload-queue-empty;"):
+        return
+
     if "://" not in url:
         url = "https://" + url
 

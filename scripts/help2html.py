@@ -37,7 +37,12 @@ def cnv(src):
     hostname = str(socket.gethostname()).split(".")[0]
 
     yield '<!DOCTYPE html>'
-    yield '<html style="background:#222;color:#fff"><body>'
+    yield '<html><body><style>'
+    yield 'html{background:#222;color:#fff;line-height:1.25em}'
+    yield 'h3{margin:0;padding:0}'
+    yield 'a{color:#fc5;text-decoration:none;scroll-margin-top:3em}'
+    yield 'a:active,a:target{background:#fc5;color:#000;box-shadow:0 0 0 .12em #fc5}'
+    yield '</style>'
     skip_sfx = False
     in_sfx = 0
     in_salt = 0
@@ -104,6 +109,15 @@ def cnv(src):
             ln = re.sub(r">[0-9]{1,2}\.[0-9]<", ">dynamic<", ln)
             if t != ln:
                 in_th_ram_max = 0
+        m = re.search(r"^# (.* help page)(.*)", ln)
+        if m:
+            zs1, zs2 = m.groups()
+            zs3 = zs1.replace(" ", "-")
+            ln = '<h3># <a id="%s" href="#%s">%s</a>%s</h3></a>' % (zs3, zs3, zs1, zs2)
+        m = re.search(r"^  (-{1,2})([^ ,]+)(.*)", ln)
+        if m:
+            zs1, zs2, zs3 = m.groups()
+            ln = '  <a href="#g-%s" id="g-%s">%s%s</a>%s' % (zs2, zs2, zs1, zs2, zs3)
 
         ln = ln.replace(">/home/ed/", ">~/")
         if ln.startswith("0" * 20):

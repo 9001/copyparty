@@ -34,7 +34,10 @@ MOUNT_BASE = b"/run/media/egon/"
 
 def main():
     try:
-        label = sys.argv[1].split(":usb-eject:")[1].split(":")[0]
+        msg = sys.argv[1]
+        if msg.startswith("upload-queue-empty;"):
+            return
+        label = msg.split(":usb-eject:")[1].split(":")[0]
         mp = MOUNT_BASE + unquote(label)
         # print("ejecting [%s]... " % (mp,), end="")
         mp = os.path.abspath(os.path.realpath(mp))
