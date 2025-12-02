@@ -123,6 +123,7 @@ web/ui.css
 web/up2k.js
 web/util.js
 web/w.hash.js
+web/keybindings.js
 """
 RES = set(zs.strip().split("\n"))
 RESM = {
