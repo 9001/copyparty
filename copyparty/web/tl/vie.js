@@ -154,7 +154,7 @@ Ls.vie = {
 	"ut_rand": "ngẫu nhiên hoá tên tệp",
 	"ut_u2ts": "sao chép dấu thời gian chỉnh sửa cuối$Ntừ hệ thống tệp của bạn lên máy chủ\">📅",
 	"ut_ow": "ghi đè các tệp đã có trên máy chủ?$N🛡️: không bao giờ (sẽ tạo tên tệp mới)$N🕒: ghi đè nếu tệp trên máy chủ cũ hơn$N♻️: luôn ghi đè nếu hai tệp khác nhau",
-	"ut_mt": "tiếp tục băm các tệp khác trong khi tải lên$N$NCó thể tắt nếu CPU hoặc HDD của bạn bị nghẽn",
+	"ut_mt": "tiếp tục hash các tệp khác trong khi tải lên$N$NCó thể tắt nếu CPU hoặc HDD của bạn bị nghẽn",
 	"ut_ask": 'yêu cầu xác nhận trước khi bắt đầu tải lên">💭',
 	"ut_pot": "cải thiện tốc độ tải lên trên các thiết bị chậm$Nbằng cách đơn giản hoá giao diện người dùng",
 	"ut_srch": "không tải lên, chỉ kiểm tra xem tệp$Nđã tồn tại trên máy chủ hay chưa (sẽ quét toàn bộ thư mục bạn có quyền đọc)",
@@ -163,18 +163,18 @@ Ls.vie = {
 	"ul_btnu": "T Ả I  L Ê N",
 	"ul_btns": "T Ì M  K I Ế M",
 
-	"ul_hash": "băm",
+	"ul_hash": "hash",
 	"ul_send": "gửi",
 	"ul_done": "hoàn tất",
 	"ul_idle1": "chưa có mục nào trong hàng chờ tải lên",
-	"ut_etah": "tốc độ &lt;em&gt;băm&lt;/em&gt; trung bình và thời gian dự kiến để hoàn tất",
+	"ut_etah": "tốc độ &lt;em&gt;hash&lt;/em&gt; trung bình và thời gian dự kiến để hoàn tất",
 	"ut_etau": "tốc độ &lt;em&gt;tải lên&lt;/em&gt; trung bình và thời gian dự kiến để hoàn tất",
 	"ut_etat": "tốc độ &lt;em&gt;tổng&lt;/em&gt; trung bình và thời gian dự kiến để hoàn tất",
 
 	"uct_ok": "hoàn tất thành công",
 	"uct_ng": "không hợp lệ: lỗi / bị từ chối / không tìm thấy",
 	"uct_done": "đã xử lý: gồm cả thành công và không hợp lệ",
-	"uct_bz": "đang băm hoặc tải lên",
+	"uct_bz": "đang hash hoặc tải lên",
 	"uct_q": "nhàn rỗi, đang chờ",
 
 	"utl_name": "tên tệp",
@@ -241,7 +241,7 @@ Ls.vie = {
 	// tuỳ chọn up2k
 	"cut_umod": "nếu tệp đã tồn tại trên máy chủ, cập nhật dấu thời gian chỉnh sửa cuối của máy chủ cho khớp với tệp cục bộ của bạn (yêu cầu quyền ghi và xóa)\">re📅",
 
-	"cut_turbo": "nút YOLO, bạn gần như KHÔNG nên bật tuỳ chọn này:$N$Ndùng khi bạn đang tải lên một lượng tệp rất lớn và phải khởi động lại vì lý do nào đó, và muốn tiếp tục tải càng sớm sàng tốt$N$Ntuỳ chọn này thay thế kiểm tra băm bằng kiểm tra <em>&quot;kích thước tệp ở trên máy chủ có giống nhau không&quot;</em> nên nếu nội dung tệp khác nhau thì sẽ KHÔNG được tải lên$N$Nbạn nên tắt tuỳ chọn này sau khi tải lên xong, và &quot;tải lên&quot; lại các tệp đó để xác minh\">turbo",
+	"cut_turbo": "nút YOLO, bạn gần như KHÔNG nên bật tuỳ chọn này:$N$Ndùng khi bạn đang tải lên một lượng tệp rất lớn và phải khởi động lại vì lý do nào đó, và muốn tiếp tục tải càng sớm sàng tốt$N$Ntuỳ chọn này thay thế kiểm tra hash bằng kiểm tra <em>&quot;kích thước tệp ở trên máy chủ có giống nhau không&quot;</em> nên nếu nội dung tệp khác nhau thì sẽ KHÔNG được tải lên$N$Nbạn nên tắt tuỳ chọn này sau khi tải lên xong, và &quot;tải lên&quot; lại các tệp đó để xác minh\">turbo",
 
 	"cut_datechk": "không có tác dụng trừ khi nút turbo được bật$N$Ngiảm mức độ yolo một chút; kiểm tra xem dấu thời gian tệp trên máy chủ có khớp với của bạn không$N$Nnên <em>về lý thuyết</em> có thể phát hiện phần lớn tệp chưa xong hoặc bị lỗi, nhưng không thể thay thế cho việc chạy xác minh sau khi tắt turbo\">date-chk",
 
@@ -254,9 +254,9 @@ Ls.vie = {
 	"cut_nag": "thông báo của hệ điều hành khi tải lên hoàn tất$N(chỉ khi trình duyệt hoặc tab không hoạt động)",
 	"cut_sfx": "âm báo khi tải lên hoàn tất$N(chỉ khi trình duyệt hoặc tab không hoạt động)",
 
-	"cut_mt": "dùng đa luồng để tăng tốc băm tệp$N$dùng web workers và cần $nhiều RAM hơn (tối đa thêm 512 MiB)$N$làm cho https nhanh hơn 30%, http nhanh hơn 4.5 lần\">mt",
+	"cut_mt": "dùng đa luồng để tăng tốc hash tệp$N$dùng web workers và cần $nhiều RAM hơn (tối đa thêm 512 MiB)$N$làm cho https nhanh hơn 30%, http nhanh hơn 4.5 lần\">mt",
 
-	"cut_wasm": "dùng wasm thay vì bộ băm tích hợp của trình duyệt; nhanh hơn trên trình duyệt chromium nhưng làm tăng tải CPU, và nhiều bản chrome cũ có lỗi khiến trình duyệt dùng hết RAM và treo nếu bật tuỳ chọn này\">wasm",
+	"cut_wasm": "dùng wasm thay vì bộ hash tích hợp của trình duyệt; nhanh hơn trên trình duyệt chromium nhưng làm tăng tải CPU, và nhiều bản chrome cũ có lỗi khiến trình duyệt dùng hết RAM và treo nếu bật tuỳ chọn này\">wasm",
 
 	// favicon
 	"cft_text": "chuỗi favicon (để trống và làm mới trang để tắt)",
@@ -335,7 +335,7 @@ Ls.vie = {
 	"mm_bconv": "đang chuyển đổi sang {0}, vui lòng chờ...",
 	"mm_opusen": "trình duyệt không hỗ trợ tệp aac / m4a;\nchuyển sang định dạng opus hiện đã được bật",
 	"mm_playerr": "phát lỗi: ",
-	"mm_eabrt": "Việt phát nhạc đã bị huỷ",
+	"mm_eabrt": "Việc phát nhạc đã bị huỷ",
 	"mm_enet": "Kết nối Internet không ổn định",
 	"mm_edec": "Tệp này dường như đã bị hỏng??",
 	"mm_esupp": "Trình duyệt của bạn không nhận dạng được định dạng tệp này.",
@@ -692,7 +692,7 @@ Ls.vie = {
 		"cc1": "thứ khác:",
 		"h1": "vô hiệu hoá k304",  // TLNote: "j1" explains what k304 is
 		"i1": "bật k304",
-		"j1": "bật k304 sẽ ngắt kết nối client của bạn trên mỗi HTTP 304, điều này có thể ngăn một số proxy bị lỗi bị kẹt (đột ngột không tải được trang), <em>nhưng</em> nó cũng sẽ làm mọi thứ chậm hơn nói chung",
+		"j1": "bật k304 sẽ ngắt kết nối client của bạn trên mỗi HTTP 304, tùy chọn này có thể ngăn một số proxy bị lỗi kẹt (đột ngột không tải được trang), <em>nhưng</em> nó cũng sẽ làm mọi thứ chậm hơn",
 		"k1": "đặt lại cài đặt client",
 		"l1": "đăng nhập để có thêm:",
 		"m1": "chào mừng trở lại,",
@@ -716,7 +716,7 @@ Ls.vie = {
 		"aa1": "tệp đến",
 		"ab1": "vô hiệu hóa no304",
 		"ac1": "bật no304",
-		"ad1": "bật no304 sẽ vô hiệu hóa tất cả bộ nhớ đệm; hãy thử điều này nếu k304 không đủ. Điều này sẽ lãng phí một lượng lớn lưu lượng mạng!",
+		"ad1": "bật no304 sẽ vô hiệu hóa tất cả bộ nhớ đệm; hãy thử tùy chọn này nếu k304 không đủ. Tùy chọn này sẽ làm lãng phí một lượng lớn lưu lượng mạng!",
 		"ae1": "tải xuống đang hoạt động:",
 		"af1": "hiển thị các tệp đã tải lên gần đây",
 	}
