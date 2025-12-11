@@ -3173,9 +3173,6 @@ class HttpCli(object):
             uhash = ""
         self.parser.drop()
 
-        if not pwd:
-            raise Pebkac(422, "password cannot be blank")
-
         if un:
             pwd = "%s:%s" % (un, pwd)
 
@@ -3212,6 +3209,10 @@ class HttpCli(object):
         return True
 
     def get_pwd_cookie(self, pwd: str) -> tuple[bool, str]:
+        if not pwd:
+            self.cbonk(self.conn.hsrv.gpwd, pwd, "pw", "empty passwords")
+            return False, "password cannot be blank"
+
         uname = self.asrv.sesa.get(pwd)
         if not uname:
             hpwd = self.asrv.ah.hash(pwd)

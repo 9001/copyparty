@@ -4175,12 +4175,7 @@ def wrap(txt: str, maxlen: int, maxlen2: int) -> list[str]:
 
 
 def termsize() -> tuple[int, int]:
-    try:
-        w, h = os.get_terminal_size()
-        return w, h
-    except:
-        pass
-
+    # from hashwalk
     env = os.environ
 
     def ioctl_GWINSZ(fd: int) -> Optional[tuple[int, int]]:
