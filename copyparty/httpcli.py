@@ -151,6 +151,7 @@ NO_CACHE = {"Cache-Control": "no-cache"}
 ALL_COOKIES = "k304 no304 js idxh dots cppwd cppws".split()
 
 BADXFF = " due to dangerous misconfiguration (the http-header specified by --xff-hdr was received from an untrusted reverse-proxy)"
+BADXFF2 = ". Some copyparty features are now disabled as a safety measure."
 
 H_CONN_KEEPALIVE = "Connection: Keep-Alive"
 H_CONN_CLOSE = "Connection: Close"
@@ -221,12 +222,11 @@ class HttpCli(object):
         self.log_func = conn.log_func  # mypy404
         self.log_src = conn.log_src  # mypy404
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
-        self.tls: bool = hasattr(self.s, "cipher")
+        self.tls = self.is_https = hasattr(self.s, "cipher")
         self.is_vproxied = bool(self.args.R)
 
         # placeholders; assigned by run()
         self.keepalive = False
-        self.is_https = False
         self.in_hdr_recv = True
         self.headers: dict[str, str] = {}
         self.mode = " "  # http verb
@@ -390,9 +390,6 @@ class HttpCli(object):
         self.keepalive = "close" not in zs and (
             self.http_ver != "HTTP/1.0" or zs == "keep-alive"
         )
-        self.is_https = (
-            self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls
-        )
         self.host = self.headers.get("host") or ""
         if not self.host:
             if self.s.family == socket.AF_UNIX:
@@ -417,7 +414,7 @@ class HttpCli(object):
                     self.bad_xff = True
                     if self.args.rproxy != 9999999:
                         t = "global-option --rproxy %d could not be used (out-of-bounds) for the received header [%s]"
-                        self.log(t % (self.args.rproxy, zso), c=3)
+                        self.log(t % (self.args.rproxy, zso) + BADXFF2, c=3)
                     else:
                         zsl = [
                             "  rproxy: %d   if this client's IP-address is [%s]"
@@ -436,6 +433,7 @@ class HttpCli(object):
                         t += '  Note: if you are behind cloudflare, then this default header is not a good choice; please first make sure your local reverse-proxy (if any) does not allow non-cloudflare IPs from providing cf-* headers, and then add this additional global setting: "--xff-hdr=cf-connecting-ip"'
                     else:
                         t += '  Note: depending on your reverse-proxy, and/or WAF, and/or other intermediates, you may want to read the true client IP from another header by also specifying "--xff-hdr=SomeOtherHeader"'
+                    t += BADXFF2
 
                     if "." in pip:
                         zs = ".".join(pip.split(".")[:2]) + ".0.0/16"
@@ -448,7 +446,19 @@ class HttpCli(object):
                 else:
                     self.ip = cli_ip
                     self.log_src = self.conn.set_rproxy(self.ip)
-                    self.host = self.headers.get("x-forwarded-host") or self.host
+                    self.host = self.headers.get(self.args.xf_host, self.host)
+                    try:
+                        self.is_https = len(self.headers[self.args.xf_proto]) == 5
+                    except:
+                        self.bad_xff = True
+                        self.host = "example.com"
+                        t = 'got proxied request without header "%s" (global-option "xf-proto"). This header must contain either "http" or "https". Either fix your reverse-proxy config to include this header, or change the copyparty global-option "xf-proto" to another header-name to read this value from'
+                        self.log(t % (self.args.xf_proto,) + BADXFF2, 3)
+
+                    # the semantics of trusted_xff and bad_xff are different;
+                    # trusted_xff is whether the connection came from a trusted reverseproxy,
+                    # regardless of whether the client ip detection is correctly configured
+                    # (the primary safeguard for idp is --idp-h-key)
                     trusted_xff = True
 
         m = RE_HOST.search(self.host)
@@ -623,7 +633,7 @@ class HttpCli(object):
         if relchk(self.vpath) and (self.vpath != "*" or self.mode != "OPTIONS"):
             self.log("illegal relpath; req(%r) => %r" % (self.req, "/" + self.vpath))
             self.cbonk(self.conn.hsrv.gmal, self.req, "bad_vp", "invalid relpaths")
-            return self.tx_404() and self.keepalive
+            return self.tx_404() and False
 
         zso = self.headers.get("authorization")
         bauth = ""
@@ -955,7 +965,7 @@ class HttpCli(object):
             return False
 
         self.log("banned for {:.0f} sec".format(rt), 6)
-        self.terse_reply(b"thank you for playing (see serverlog and readme)", 403)
+        self.terse_reply(self.args.banmsg_b, 403)
         return True
 
     def permit_caching(self) -> None:
@@ -1138,7 +1148,10 @@ class HttpCli(object):
         ]
 
         if body:
-            lines.append("Content-Length: " + unicode(len(body)))
+            lines.append(
+                "Content-Type: text/html; charset=utf-8\r\nContent-Length: "
+                + unicode(len(body))
+            )
 
         lines.append("\r\n")
         self.s.sendall("\r\n".join(lines).encode("utf-8") + body)
@@ -5718,17 +5731,18 @@ class HttpCli(object):
             and (self.uname in vol.axs.uread or self.uname in vol.axs.upget)
         }
 
-        bad_xff = hasattr(self, "bad_xff")
-        if bad_xff:
+        if hasattr(self, "bad_xff"):
             allvols = []
             t = "will not return list of recent uploads" + BADXFF
             self.log(t, 1)
             if self.avol:
                 raise Pebkac(500, t)
 
-        x = self.conn.hsrv.broker.ask(
-            "up2k.get_unfinished_by_user", self.uname, "" if bad_xff else self.ip
-        )
+            x = self.conn.hsrv.broker.ask("up2k.get_unfinished_by_user", self.uname, "")
+        else:
+            x = self.conn.hsrv.broker.ask(
+                "up2k.get_unfinished_by_user", self.uname, self.ip
+            )
         zdsa: dict[str, Any] = x.get()
         uret: list[dict[str, Any]] = []
         if "timeout" in zdsa:

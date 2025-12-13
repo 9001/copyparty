@@ -2384,7 +2384,7 @@ class AuthSrv(object):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
-            zs = "forget_ip gid nrand tail_who th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
+            zs = "forget_ip gid nrand tail_who th_qv th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])

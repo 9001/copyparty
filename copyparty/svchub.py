@@ -1102,6 +1102,12 @@ class SvcHub(object):
             else:
                 setattr(al, k, re.compile("^" + vs + "$"))
 
+        if al.banmsg.startswith("@"):
+            with open(al.banmsg[1:], "rb") as f:
+                al.banmsg_b = f.read()
+        else:
+            al.banmsg_b = al.banmsg.encode("utf-8") + b"\n"
+
         if not al.sus_urls:
             al.ban_url = "no"
         elif al.ban_url == "no":

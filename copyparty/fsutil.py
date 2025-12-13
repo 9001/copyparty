@@ -127,6 +127,24 @@ class Fstab(object):
 
         self.log("mtab has changed; reevaluating support for sparse files")
 
+        try:
+            fuses = [mp for mp, fs in dtab.items() if fs == "fuseblk"]
+            if not fuses or MACOS:
+                raise Exception()
+            try:
+                so, _ = chkcmd(["lsblk", "-nrfo", "FSTYPE,MOUNTPOINT"])  # centos6
+            except:
+                so, _ = chkcmd(["lsblk", "-nrfo", "FSTYPE,MOUNTPOINTS"])  # future
+            for ln in so.split("\n"):
+                zsl = ln.split(" ", 1)
+                if len(zsl) != 2:
+                    continue
+                fs, mp = zsl
+                if mp in fuses:
+                    dtab[mp] = fs
+        except:
+            pass
+
         tab1 = list(dtab.items())
         tab1.sort(key=lambda x: (len(x[0]), x[0]))
         path1, fs1 = tab1[0]
