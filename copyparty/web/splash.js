@@ -8,8 +8,8 @@ Ls.eng = {
 		"ta1": "fill in your new password first",
 		"ta2": "repeat to confirm new password:",
 		"ta3": "found a typo; please try again",
-		"nop": "please enter a password",
-		"nou": "please enter a username and password"
+		"nop": "ERROR: Password cannot be blank",
+		"nou": "ERROR: Username and/or password cannot be blank",
 	}
 };
 
@@ -103,12 +103,11 @@ if (/\&re=/.test('' + location))
 	};
 })();
 
-ebi('lf').onsubmit = function(e) {
-	ev(e);
-	e.preventDefault();
-	let uname = ebi('lu');
-	if (ebi('lp').value && (!uname || uname.value))
-		e.target.submit();
-	else
-		ebi('lm').innerHTML = uname ? d.nou : d.nop;
-};
+if (ebi('lf'))
+	ebi('lf').onsubmit = function() {
+		var un = ebi('lu');
+		if (ebi('lp').value && (!un || un.value))
+			return true;
+		ebi('lm').innerHTML = un ? d.nou : d.nop;
+		return false;
+	};
