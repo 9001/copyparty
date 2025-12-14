@@ -8,6 +8,8 @@ Ls.eng = {
 		"ta1": "fill in your new password first",
 		"ta2": "repeat to confirm new password:",
 		"ta3": "found a typo; please try again",
+		"nop": "please enter a password",
+		"nou": "please enter a username and password"
 	}
 };
 
@@ -95,8 +97,18 @@ if (/\&re=/.test('' + location))
 	ebi('x').onclick = function (e) {
 		ev(e);
 		if (!pwi.value)
-			return redo(d.ta1);
+			return ebi('lm').innerHTML = d.ta1;
 
 		modal.prompt(d.ta2, "y", mok, null, stars);
 	};
 })();
+
+ebi('lf').onsubmit = function(e) {
+	ev(e);
+	e.preventDefault();
+	let uname = ebi('lu');
+	if (ebi('lp').value && (!uname || uname.value))
+		e.target.submit();
+	else
+		ebi('lm').innerHTML = uname ? d.nou : d.nop;
+};

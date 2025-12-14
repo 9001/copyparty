@@ -86,7 +86,6 @@ web/md2.js
 web/mde.css
 web/mde.html
 web/mde.js
-web/msg.css
 web/msg.html
 web/opds.xml
 web/rups.css
