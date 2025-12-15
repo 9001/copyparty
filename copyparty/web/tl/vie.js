@@ -195,13 +195,15 @@ Ls.vie = {
 	"utl_yolo": "YOLO",
 	"utl_done": "hoàn tất",
 
-	"udt_up": "Tải lên",
-	"udt_srch": "Tìm kiếm",
-	"udt_drop": "thả vào đây",
+	"ul_flagblk": "tệp đã được thêm vào hàng chờ</b><br>tuy vậy đang có một tiến trình up2k đang chạy ở một tab khác<br>vui lòng đợi cho đến khi tiến trình đó hoàn tất hoặc bị hủy",
+	"ul_btnlk": "cài đặt của máy chủ đã khóa tùy chọn ở trạng thái này",
+
 
 	"udt_up": "Tải lên",
 	"udt_srch": "Tìm kiếm",
 	"udt_drop": "thả vào đây",
+
+
 
 	"u_nav_m": '<h6>chọn phương thức tải lên</h6><code>Enter</code> = Tệp (một hoặc nhiều)\n<code>ESC</code> = Một thư mục (kèm thư mục con)',
 	"u_nav_b": '<a href="#" id="modal-ok">Tệp</a><a href="#" id="modal-ng">Một thư mục</a>',
@@ -228,6 +230,7 @@ Ls.vie = {
 	"ct_ttips": '༼ ◕_◕ ༽">ℹ️ tooltips',
 	"ct_thumb": 'ở chế độ lưới, chuyển biểu tượng hoặc hình thu nhỏ$NPhím tắt: T">🖼️ ảnh thu nhỏ',
 	"ct_csel": 'dùng CTRL và SHIFT để chọn tệp trong chế độ lưới">sel',
+	"ct_dl": 'cưỡng chế tải xuống (không hiện thị trong dòng) khi nhấp vào tệp">dl',
 	"ct_ihop": 'khi đóng trình xem ảnh, cuộn xuống tệp đã xem gần nhất">g⮯',
 	"ct_dots": 'hiển thị tệp ẩn (nếu máy chủ cho phép)">dotfiles',
 	"ct_qdel": 'khi xóa tệp, chỉ hỏi xác nhận một lần">qdel',
@@ -464,6 +467,7 @@ Ls.vie = {
 	"tvt_prev": "hiển thị tài liệu trước đó$NPhím tắt: I\">⬆ prev",
 	"tvt_next": "hiển thị tài liệu kế tiếp$NPhím tắt: K\">⬇ next",
 	"tvt_sel": "chọn tệp &nbsp; (để cắt / sao chép / xóa / ...)$NPhím tắt: S\">sel",
+	"tvt_j": "chuẩn hóa json$NPhím tắt: shift-J\">j",
 	"tvt_edit": "mở tệp trong trình soạn thảo văn bản$NPhím tắt: E\">✏️ edit",
 	"tvt_tail": "theo dõi thay đổi của tệp; hiển thị dòng mới theo thời gian thực\">📡 follow",
 	"tvt_wrap": "ngắt dòng\">↵",
