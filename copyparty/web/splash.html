@@ -111,7 +111,7 @@
 		<div>
 			<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
 				<input type="hidden" id="la" name="act" value="login" />
-				<input type="password" id="lp" name="cppwd" placeholder=" password" oninput="this.setCustomValidity('')" oninvalid="this.setCustomValidity('Password must be between 1 and 64 characters')" "pattern="^.{1,64}$" />
+				<input type="password" id="lp" name="cppwd" placeholder=" password" oninput="this.setCustomValidity('')" oninvalid="this.setCustomValidity('Password must be between 1 and 64 characters')" pattern="^.{1,64}$" />
 				<input type="hidden" name="uhash" id="uhash" value="x" />
 				<input type="submit" id="ls" value="Unlock" />
 				{%- if ahttps %}
