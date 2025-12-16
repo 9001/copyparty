@@ -84,6 +84,8 @@ Ls.epo = {
 			["M", "fermi dosieron"],
 			["E", "redakti dosieron"],
 			["S", "elekti dosieron (por eltondado/kopiado/alinomado)"],
+			["Y", "elŝuti tekstodosieron"], //m
+			["⇧ J", "beligi json"], //m
 		]
 	],
 
@@ -223,6 +225,7 @@ Ls.epo = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ ŝpruchelpiloj',
 	"ct_thumb": 'dum krado-vido, baskuli montradon de simboloj aŭ bildetoj$NFulmoklavo: T">🖼️ bildetoj',
 	"ct_csel": 'uzi STIR kaj MAJ por elekti dosierojn en krado-vido">elekto',
+	"ct_dl": 'devigi elŝuton (ne montri enkadre) kiam dosiero estas alklakita">dl', //m
 	"ct_ihop": 'montri la lastan viditan bildo-dosieron post fermado de bildo-vidilo">g⮯',
 	"ct_dots": 'montri kaŝitajn dosierojn (se servilo permesas)">kaŝitaj',
 	"ct_qdel": 'peti konfirmon nur unufoje antaŭ forigado">rapid-forig.',
@@ -437,7 +440,7 @@ Ls.epo = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopii</a><a href="#" id="modal-ng">Alŝuti</a>',
 
 	"mk_noname": "tajpu nomon en tekstokampo maldekstre antaŭ vi faras ĉi tion :p",
-	"nmd_i1": "vi povas aldoni la deziratan sufikson, ekzemple <code>.txt</code>", //m
+	"nmd_i1": "vi povas aldoni la deziratan sufikson, ekzemple <code>.md</code>", //m
 	"nmd_i2": "vi povas krei nur <code>.md</code>-dosierojn ĉar vi ne havas forigan permeson", //m
 
 	"tv_load": "Ŝargado de teksto-dokumento:\n\n{0}\n\n{1}% ({2} da {3} MiB ŝargita)",
@@ -449,6 +452,7 @@ Ls.epo = {
 	"tvt_prev": "montri malsekvan dokumenton$NFulmoklavo: i\">⬆ malsekva",
 	"tvt_next": "montri sekvan dokumenton$NFulmoklavo: K\">⬇ sekva",
 	"tvt_sel": "elekti dosieron &nbsp; ( por eltondado / kopiado / forigado / ... )$NFulmoklavo: S\">elekti",
+	"tvt_j": "beligi json$NFulmoklavo: shift-J\">j", //m
 	"tvt_edit": "malfermi dosieron en teksto-redaktilo$NFulmoklavo: E\">✏️ redakti",
 	"tvt_tail": "observi ŝanĝojn en dosiero; novaj linioj estos tuje montritaj\">📡 gvati",
 	"tvt_wrap": "linifaldo\">↵",
@@ -674,6 +678,8 @@ Ls.epo = {
 		"ta1": "entajpu novan pasvorton unue",
 		"ta2": "retajpu por konfirmi:",
 		"ta3": "tajpo-eraro; bonvolu provu denove",
+		"nop": "ERARO: Pasvorto ne povas esti malplena", //m
+		"nou": "ERARO: Uzantnomo kaj/aŭ pasvorto ne povas esti malplena", //m
 		"aa1": "aktivaj alŝutoj:",
 		"ab1": "malŝalti no304-on",
 		"ac1": "ŝalti no304-on",

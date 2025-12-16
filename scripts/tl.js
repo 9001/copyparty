@@ -113,6 +113,8 @@ Ls.hmn = {
 			["M", "close textfile"],
 			["E", "edit textfile"],
 			["S", "select file (for cut/copy/rename)"],
+			["Y", "download textfile"],
+			["⇧ J", "beautify json"],
 		]
 	],
 
@@ -252,6 +254,7 @@ Ls.hmn = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 	"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 	"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
+	"ct_dl": 'force download (don\'t display inline) when a file is clicked">dl',
 	"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 	"ct_dots": 'show hidden files (if server permits)">dotfiles',
 	"ct_qdel": 'when deleting files, only ask for confirmation once">qdel',
@@ -478,6 +481,7 @@ Ls.hmn = {
 	"tvt_prev": "show previous document$NHotkey: i\">⬆ prev",
 	"tvt_next": "show next document$NHotkey: K\">⬇ next",
 	"tvt_sel": "select file &nbsp; ( for cut / copy / delete / ... )$NHotkey: S\">sel",
+	"tvt_j": "beautify json$NHotkey: shift-J\">j",
 	"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
 	"tvt_tail": "monitor file for changes; show new lines in real time\">📡 follow",
 	"tvt_wrap": "word-wrap\">↵",
@@ -698,11 +702,14 @@ Ls.hmn = {
 		"ta1": "fill in your new password first",
 		"ta2": "repeat to confirm new password:",
 		"ta3": "found a typo; please try again",
+		"nop": "ERROR: Password cannot be blank",
+		"nou": "ERROR: Username and/or password cannot be blank",
 		"aa1": "incoming files:",
 		"ab1": "disable no304",
 		"ac1": "enable no304",
 		"ad1": "enabling no304 will disable all caching; try this if k304 wasn't enough. This will waste a huge amount of network traffic!",
 		"ae1": "active downloads:",
 		"af1": "show recent uploads",
+		"ag1": "view idp cache",  // TLNote: is a link to a page where IdP users can be managed
 	}
 };

@@ -82,6 +82,7 @@ Ls.nno = {
 			["E", "redigér tekstdokument"],
 			["S", "markér fil (for F2/ctrl-x/...)"],
 			["Y", "last ned tekstfil"],
+			["⇧ J", "formattér json"],
 		]
 	],
 
@@ -221,6 +222,7 @@ Ls.nno = {
 	"ct_ttips": 'vis hjelpetekst ved å holde musa over ting">ℹ️ tips',
 	"ct_thumb": 'vis miniatyrbilder i staden for ikon$NSnarvei: T">🖼️ bilder',
 	"ct_csel": 'bruk tastane CTRL og SHIFT for markering av filer i ikonvising">merk',
+	"ct_dl": 'last ned filer (ikkje vis i nettleseren)">dl',
 	"ct_ihop": 'bla ned åt sist viste bilde når bildevisaren lukkast">g⮯',
 	"ct_dots": 'vis skjulte filer (gitt at serveren tillèt det)">.synlig',
 	"ct_qdel": 'sletteknappen spør berre éin gong om stadfesting">hurtig🗑️',
@@ -435,7 +437,7 @@ Ls.nno = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopiér</a><a href="#" id="modal-ng">Last opp</a>',
 
 	"mk_noname": "skriv inn eit namn i tekstboksa åt venstre først :p",
-	"nmd_i1": "leggja også til filendinga du vil, til dømes <code>.txt</code>", //m
+	"nmd_i1": "leggja også til filendinga du vil, til dømes <code>.md</code>", //m
 	"nmd_i2": "du kan berre laga <code>.md</code>-filer fordi du ikkje har delete-tilgang", //m
 
 	"tv_load": "Lastar inn tekstfil:\n\n{0}\n\n{1}% ({2} av {3} MiB lasta ned)",
@@ -447,6 +449,7 @@ Ls.nno = {
 	"tvt_prev": "vis førre dokument$NSnarvei: i\">⬆ forr.",
 	"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ neste",
 	"tvt_sel": "markér fila &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
+	"tvt_j": "formattér json$NSnarvei: shift-J\">j",
 	"tvt_edit": "redigér fila$NSnarvei: E\">✏️ endre",
 	"tvt_tail": "overvak fila for endringar og vis nye linjer i sanntid\">📡 følg",
 	"tvt_wrap": "tekstbryting\">↵",
@@ -672,6 +675,8 @@ Ls.nno = {
 		"ta1": "du må skrive eit nytt passord først",
 		"ta2": "gjenta for å stadfeste nytt passord:",
 		"ta3": "fant ein skrivefeil; vennligst prøv igjen",
+		"nop": "FEIL: Passord kan ikkje vere tomt",
+		"nou": "FEIL: Brukarnamn og passord må fyllast ut",
 		"aa1": "innkommande:",
 		"ab1": "skru av no304",
 		"ac1": "skru på no304",

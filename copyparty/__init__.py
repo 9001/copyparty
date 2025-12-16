@@ -86,7 +86,6 @@ web/md2.js
 web/mde.css
 web/mde.html
 web/mde.js
-web/msg.css
 web/msg.html
 web/opds.xml
 web/rups.css
@@ -119,6 +118,7 @@ web/tl/spa.js
 web/tl/swe.js
 web/tl/tur.js
 web/tl/ukr.js
+web/tl/vie.js
 web/ui.css
 web/up2k.js
 web/util.js

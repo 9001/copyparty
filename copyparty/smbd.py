@@ -265,7 +265,7 @@ class SMB(object):
                     None,
                 )
                 t = hr.get("rejectmsg") or ""
-                if t or not hr:
+                if t or hr.get("rc") != 0:
                     if not t:
                         t = "blocked by xbu server config: %r" % (vpath,)
                     yeet(t)

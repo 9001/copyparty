@@ -84,6 +84,8 @@ Ls.pol = {
 			["M", "zamknij plik"],
 			["E", "edytuj plik"],
 			["S", "wybierz plik (do wycięcia/skopiowania/zmiany nazwy)"],
+			["Y", "pobierz plik tekstowy"], //m
+			["⇧ J", "upiększ json"], //m
 		]
 	],
 
@@ -226,6 +228,7 @@ Ls.pol = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ podpowiedzi',
 	"ct_thumb": 'w widoku siatki, przełącz ikony i miniaturki$NSkrót: T">🖼️ miniaturki',
 	"ct_csel": 'użyj CTRL i SHIFT do wybierania plików w widoku siatki">wybierz',
+	"ct_dl": 'wymuś pobieranie (nie wyświetlaj inline) po kliknięciu pliku">dl', //m
 	"ct_ihop": 'przejdź do ostatniego pliku po zamknięciu przeglądarki obrazów">g⮯',
 	"ct_dots": 'pokaż ukryte pliki (jeśli pozwala serwer)">ukryte',
 	"ct_qdel": 'pytaj o potwierdzenie przy usuwaniu tylko raz">pyt. us.',
@@ -440,7 +443,7 @@ Ls.pol = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopiuj</a><a href="#" id="modal-ng">Prześlij</a>',
 
 	"mk_noname": "wpisz nazwę do pola po lewej zanim to zrobisz :p",
-	"nmd_i1": "możesz też dodać wybrane rozszerzenie, np. <code>.txt</code>", //m
+	"nmd_i1": "możesz też dodać wybrane rozszerzenie, np. <code>.md</code>", //m
 	"nmd_i2": "możesz tworzyć tylko pliki <code>.md</code>, ponieważ nie masz uprawnień do usuwania", //m
 
 	"tv_load": "Wczytywanie pliku tekstowego:\n\n{0}\n\n{1}% (wczytano {2} z {3} MiB)",
@@ -452,6 +455,7 @@ Ls.pol = {
 	"tvt_prev": "pokaż poprzedni dokument$NSkrót: i\">⬆ poprzedni",
 	"tvt_next": "pokaż następny dokument$NSkrót: K\">⬇ następny",
 	"tvt_sel": "wybierz plik &nbsp; ( do wycięcia / skopiowania / usunięcia / itp. )$NSkrót: S\">wyb",
+	"tvt_j": "upiększ json$NSkrót: shift-J\">j", //m
 	"tvt_edit": "otwórz plik w edytorze tekstu$NSkrót: E\">✏️ edytuj",
 	"tvt_tail": "śledź zmiany w pliku; pokazuj nowe linie w czasie rzeczywistym\">📡 śledź",
 	"tvt_wrap": "zawijaj tekst\">↵",
@@ -677,6 +681,8 @@ Ls.pol = {
 		"ta1": "najpierw wprowadź nowe hasło",
 		"ta2": "powtórz hasło dla potwierdzenia:",
 		"ta3": "znaleziono literówkę, spróbuj ponownie",
+		"nop": "BŁĄD: Hasło nie może być puste", //m
+		"nou": "BŁĄD: Nazwa użytkownika i/lub hasło nie może być puste", //m
 		"aa1": "pliki przychodzące:",
 		"ab1": "wyłącz no304",
 		"ac1": "włącz no304",

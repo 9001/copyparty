@@ -3,7 +3,7 @@ WORKDIR /z
 ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
         ver_hashwasm=4.12.0 \
         ver_marked=4.3.0 \
-        ver_dompf=3.2.7 \
+        ver_dompf=3.3.1 \
         ver_mde=2.18.0 \
         ver_codemirror=5.65.18 \
         ver_fontawesome=5.13.0 \

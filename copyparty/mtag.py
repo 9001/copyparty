@@ -523,7 +523,7 @@ class MTag(object):
             ],
             ".tn": ["tracknumber", "trck", "trkn", "track"],
             "genre": ["genre", "tcon", "\u00a9gen"],
-            "date": [
+            "tdate": [
                 "original-release-date",
                 "release-date",
                 "date",

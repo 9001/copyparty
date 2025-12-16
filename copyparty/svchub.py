@@ -79,6 +79,7 @@ from .util import (
     start_stackmon,
     termsize,
     ub64enc,
+    umktrans,
 )
 
 if HAVE_SQLITE3:
@@ -1087,7 +1088,7 @@ class SvcHub(object):
             vsa = [x.lower() for x in vsa if x]
             setattr(al, k + "_set", set(vsa))
 
-        zs = "dav_ua1 sus_urls nonsus_urls ua_nodoc ua_nozip"
+        zs = "dav_ua1 sus_urls nonsus_urls ua_nodav ua_nodoc ua_nozip"
         for k in zs.split(" "):
             vs = getattr(al, k)
             if not vs or vs == "no":
@@ -1101,6 +1102,12 @@ class SvcHub(object):
                 setattr(al, k, None)
             else:
                 setattr(al, k, re.compile("^" + vs + "$"))
+
+        if al.banmsg.startswith("@"):
+            with open(al.banmsg[1:], "rb") as f:
+                al.banmsg_b = f.read()
+        else:
+            al.banmsg_b = al.banmsg.encode("utf-8") + b"\n"
 
         if not al.sus_urls:
             al.ban_url = "no"
@@ -1125,8 +1132,19 @@ class SvcHub(object):
             except:
                 raise Exception("invalid --idp-hm-usr [%s]" % (zs0,))
 
-        al.ftp_ipa_nm = build_netmap(al.ftp_ipa or al.ipa, True)
-        al.tftp_ipa_nm = build_netmap(al.tftp_ipa or al.ipa, True)
+        zs1 = ""
+        zs2 = ""
+        zs = al.idp_chsub
+        while zs:
+            if zs[:1] != "|":
+                raise Exception("invalid --idp-chsub; expected another | but got " + zs)
+            zs1 += zs[1:2]
+            zs2 += zs[2:3]
+            zs = zs[3:]
+        al.idp_chsub_tr = umktrans(zs1, zs2)
+
+        al.ftp_ipa_nm = build_netmap(al.ftp_ipa or al.ipa or al.ipar, True)
+        al.tftp_ipa_nm = build_netmap(al.tftp_ipa or al.ipa or al.ipar, True)
 
         mte = ODict.fromkeys(DEF_MTE.split(","), True)
         al.mte = odfusion(mte, al.mte)
@@ -1552,6 +1570,9 @@ class SvcHub(object):
         with self.log_mutex:
             dt = datetime.now(self.tz)
             if dt.day != self.cday or dt.month != self.cmon:
+                if self.args.log_date:
+                    zs = dt.strftime(self.args.log_date)
+                    self.log_efmt = "%s %s" % (zs, self.log_efmt.split(" ")[-1])
                 zs = "{}\n" if self.no_ansi else "\033[36m{}\033[0m\n"
                 zs = zs.format(dt.strftime("%Y-%m-%d"))
                 print(zs, end="")

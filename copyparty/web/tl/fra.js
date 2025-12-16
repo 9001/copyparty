@@ -84,6 +84,8 @@ Ls.fra = {
 			["M", "fermer le fichier texte"],
 			["E", "modifier le fichier texte"],
 			["S", "sélectioner le fichier (pour le couper/copier/renommer)"],
+			["Y", "télécharger le fichier texte"], //m
+			["⇧ J", "embellir json"], //m
 		]
 	],
 
@@ -223,6 +225,7 @@ Ls.fra = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ infobulles',
 	"ct_thumb": 'vue en grille, activer les icônes ou les miniatures$NHotkey: T">🖼️ minia',
 	"ct_csel": 'utiliser CTRL et MAJ pour selectioner des fichiers en vue en grille">sel',
+	"ct_dl": 'forcer le téléchargement (ne pas afficher en ligne) lorsqu’un fichier est cliqué">dl', //m
 	"ct_ihop": 'quand le visionneuse d\'image est fermé, faire defiller vers le bas jusqu\'au dernier fichier">g⮯',
 	"ct_dots": 'voir les fichiers caché (si le serveur le permet)">dotfiles',
 	"ct_qdel": 'ne demander qu\'une confirmation lors de la suppression de fichiers>qdel',
@@ -437,7 +440,7 @@ Ls.fra = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Copier</a><a href="#" id="modal-ng">Téléverser</a>',
 
 	"mk_noname": "entrez un nom dans le champ de texte à gauche avant de faire ça :p",
-	"nmd_i1": "ajoutez aussi l’extension souhaitée, par exemple <code>.txt</code>", //m
+	"nmd_i1": "ajoutez aussi l’extension souhaitée, par exemple <code>.md</code>", //m
 	"nmd_i2": "vous ne pouvez créer que des fichiers <code>.md</code> car vous n’avez pas la permission d’effacer", //m
 
 	"tv_load": "Chargement du document texte:\n\n{0}\n\n{1}% ({2} de {3} MiB chargés)",
@@ -449,6 +452,7 @@ Ls.fra = {
 	"tvt_prev": "montrer le document précédent$NHotkey: i\">⬆ précédent",
 	"tvt_next": "montrer le document suivant$NHotkey: K\">⬇ suivant",
 	"tvt_sel": "sélectionner le fichier &nbsp; ( pour couper / copier / supprimer / … )$NHotkey: S\">sel",
+	"tvt_j": "embellir json$NHotkey: shift-J\">j", //m
 	"tvt_edit": "ouvrir le fichier dans l'éditeur de texte$NHotkey: E\">✏️ modifier",
 	"tvt_tail": "surveiller le fichier pour les changements; montrer les nouvelles lignes en temps réel\">📡 suivre",
 	"tvt_wrap": "retour à la ligne\">↵",
@@ -674,11 +678,14 @@ Ls.fra = {
 		"ta1": "entrez d'abord votre nouveau mot de passe",
 		"ta2": "répétez pour confirmer le nouveau mot de passe :",
 		"ta3": "une faute de frappe a été détectée ; veuillez réessayer.",
+		"nop": "ERREUR : Le mot de passe ne peut pas être vide", //m
+		"nou": "ERREUR : Le nom d’utilisateur et/ou le mot de passe ne peut pas être vide", //m
 		"aa1": "fichiers entrants :",
 		"ab1": "désactiver no304",
 		"ac1": "activer no304",
 		"ad1": "l'activation de no304 désactivera toute mise en cache ; essayez ceci si k304 n'était pas suffisant. Cela va générer un trafic réseau considérable !",
 		"ae1": "téléchargements actifs :",
 		"af1": "afficher les derniers téléchargements",
+		"ag1": "afficher les utilisateurs IdP connus", //m
 	}
 };

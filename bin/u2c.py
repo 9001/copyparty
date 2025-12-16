@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.15"
-S_BUILD_DT = "2025-10-25"
+S_VERSION = "2.17"
+S_BUILD_DT = "2025-12-16"
 
 """
 u2c.py: upload to copyparty
@@ -165,8 +165,8 @@ class HCli(object):
             elif self.verify is True:
                 self.ctx = None
             else:
-                self.ctx = ssl.SSLContext(ssl.PROTOCOL_TLS)
-                self.ctx.load_verify_locations(self.verify)
+                self.ctx = ssl.create_default_context(cafile=self.verify)
+                self.ctx.check_hostname = ar.teh
 
         self.base_hdrs = {
             "Accept": "*/*",
@@ -492,6 +492,12 @@ print = safe_print if VT100 else flushing_print
 
 
 def termsize():
+    try:
+        w, h = os.get_terminal_size()
+        return w, h
+    except:
+        pass
+
     env = os.environ
 
     def ioctl_GWINSZ(fd):
@@ -1587,6 +1593,7 @@ NOTE: if server has --usernames enabled, then password is "username:password"
 
     ap = app.add_argument_group("tls")
     ap.add_argument("-te", metavar="PATH", help="path to ca.pem or cert.pem to expect/verify")
+    ap.add_argument("-teh", action="store_true", help="require correct hostname in -te cert")
     ap.add_argument("-td", action="store_true", help="disable certificate check")
     # fmt: on
 

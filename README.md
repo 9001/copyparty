@@ -118,6 +118,7 @@ made in Norway 🇳🇴
     * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
     * [nixos module](#nixos-module)
 * [browser support](#browser-support) - TLDR: yes
+* [server hall of fame](#server-hall-of-fame) - unexpected things that run copyparty
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
     * [folder sync](#folder-sync) - sync folders to/from copyparty
     * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
@@ -193,7 +194,7 @@ some recommended options:
 * `-e2ts` enables audio metadata indexing (needs either FFprobe or Mutagen)
 * `-v /mnt/music:/music:r:rw,foo -a foo:bar` shares `/mnt/music` as `/music`, `r`eadable by anyone, and read-write for user `foo`, password `bar`
   * replace `:r:rw,foo` with `:r,foo` to only make the folder readable by `foo` and nobody else
-  * see [accounts and volumes](#accounts-and-volumes) (or `--help-accounts`) for the syntax and other permissions
+  * see [accounts and volumes](#accounts-and-volumes) (or [`--help-accounts`](https://copyparty.eu/cli/#accounts-help-page)) for the syntax and other permissions
 
 
 ### mirrors
@@ -450,6 +451,12 @@ upgrade notes
 * CopyParty?
   * nope! the name is either copyparty (all-lowercase) or Copyparty -- it's [one word](https://en.wiktionary.org/wiki/copyparty) after all :>
 
+* what is a volflag?
+  * per-volume configuration; many (not all) global-options can be set as volflags, and most (not all) volflags can be set as global-options; [complete list of volflags](https://copyparty.eu/cli/#flags-help-page)
+
+* what is a volume?
+  * a mapping from a URL (`/music/`) to a folder on your server's local filesystem (`C:\Users\ed\Music`) which can then be accessed through copyparty, depending on the permissions and options you set on it -- see [accounts and volumes](#accounts-and-volumes)
+
 * can I change the 🌲 spinning pine-tree loading animation?
   * [yeah...](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice#boring-loader-spinner) :-(
 
@@ -497,7 +504,7 @@ per-folder, per-user permissions  - if your setup is getting complex, consider m
 * much easier to manage, and you can modify the config at runtime with `systemctl reload copyparty` or more conveniently using the `[reload cfg]` button in the control-panel (if the user has `a`/admin in any volume)
   * changes to the `[global]` config section requires a restart to take effect
 
-a quick summary can be seen using `--help-accounts`
+a quick summary can be seen using [`--help-accounts`](https://copyparty.eu/cli/#accounts-help-page)
 
 configuring accounts/volumes with arguments:
 * `-a usr:pwd` adds account `usr` with password `pwd`
@@ -1262,7 +1269,7 @@ see [./srv/expand/](./srv/expand/) for usage and examples
 
   * and `PREADME.md` / `preadme.md` is shown above directory listings unless `--no-readme` or `.prologue.html`
 
-* `README.md` and `*logue.html` can contain placeholder values which are replaced server-side before embedding into directory listings; see `--help-exp`
+* `README.md` and `*logue.html` can contain placeholder values which are replaced server-side before embedding into directory listings; see [`--help-exp`](https://copyparty.eu/cli/#exp-help-page)
 
 
 ## searching
@@ -1292,10 +1299,9 @@ using arguments or config files, or a mix of both:
   * or click the `[reload cfg]` button in the control-panel if the user has `a`/admin in any volume
   * changes to the `[global]` config section requires a restart to take effect
 
-**NB:** as humongous as this readme is, there is also a lot of undocumented features. Run copyparty with `--help` to see all available global options; all of those can be used in the `[global]` section of config files, and everything listed in `--help-flags` can be used in volumes as volflags.
+**NB:** as humongous as this readme is, there is also a lot of undocumented features. Run copyparty with [`--help`](https://copyparty.eu/cli/) (or click that link) to see all available global options; all of those can be used in the `[global]` section of config files, and everything listed in [`--help-flags`](https://copyparty.eu/cli/#flags-help-page) can be used in volumes as volflags (per-volume configuration).
 * if running in docker/podman, try this: `docker run --rm -it copyparty/ac --help`
-* or see this: https://ocv.me/copyparty/helptext.html
-* or if you prefer plaintext, https://ocv.me/copyparty/helptext.txt
+* or if you prefer plaintext, https://copyparty.eu/helptext.txt
 
 
 ## zeroconf
@@ -1782,6 +1788,8 @@ notes:
 * `:c,magic` enables filetype detection for nameless uploads, same as `--magic`
   * needs https://pypi.org/project/python-magic/ `python3 -m pip install --user -U python-magic`
   * on windows grab this instead `python3 -m pip install --user -U python-magic-bin`
+* `cachectl` changes how webbrowser will cache responses (the `Cache-Control` response-header); default is `no-cache` which will prevent repeated downloading of the same file unless necessary (browser will ask copyparty if the file has changed)
+  * adding `?cache` to a link will override this with "fully cache this for 69 seconds"; `?cache=321` is 321 seconds, and `?cache=i` is 7 days
 
 
 ## database location
@@ -1888,7 +1896,7 @@ trigger a program on uploads, renames etc ([examples](./bin/hooks/))
 
 you can set hooks before and/or after an event happens, and currently you can hook uploads, moves/renames, and deletes
 
-there's a bunch of flags and stuff, see `--help-hooks`
+there's a bunch of flags and stuff, see [`--help-hooks`](https://copyparty.eu/cli/#hooks-help-page)
 
 if you want to write your own hooks, see [devnotes](./docs/devnotes.md#event-hooks)
 
@@ -2411,6 +2419,8 @@ it comes with a [systemd service](./contrib/systemd/copyparty@.service) as well 
 
 after installing, start either the system service or the user service and navigate to http://127.0.0.1:3923 for further instructions (unless you already edited the config files, in which case you are good to go, probably)
 
+> to start the systemd service, either do `systemctl start --user copyparty` to start it as your own user, or `systemctl start copyparty@bob` to use unix-user `bob`
+
 
 ## fedora package
 
@@ -2623,6 +2633,15 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 <p align="center"><img src="https://github.com/user-attachments/assets/88deab3d-6cad-4017-8841-2f041472b853" /></p>
 
 
+# server hall of fame
+
+unexpected things that run copyparty:
+
+* an old [allwinner](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/aallwinner.jpg) android tv-box (ziptie-strapped to an HDD) running a firmware which flips the CPU into Big-Endian mode early during boot
+  * copyparty is [certified BE ready](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/be-ready.png)
+* a [wristwatch](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/clockyparty.jpg)
+
+
 # client examples
 
 interact with copyparty using non-browser clients
@@ -2810,7 +2829,7 @@ some notes on hardening
   * cors doesn't work right otherwise
 * if you allow anonymous uploads or otherwise don't trust the contents of a volume, you can prevent XSS with volflag `nohtml`
   * this returns html documents as plaintext, and also disables markdown rendering
-* when running behind a reverse-proxy, listen on a unix-socket for tighter access control (and more performance); see [reverse-proxy](#reverse-proxy) or `--help-bind`
+* when running behind a reverse-proxy, listen on a unix-socket for tighter access control (and more performance); see [reverse-proxy](#reverse-proxy) or [`--help-bind`](https://copyparty.eu/cli/#bind-help-page)
 
 safety profiles:
 
@@ -2898,7 +2917,7 @@ dirkeys are generated based on another salt (`--dk-salt`) + filesystem-path and 
 
 ## password hashing
 
-you can hash passwords  before putting them into config files / providing them as arguments; see `--help-pwhash` for all the details
+you can hash passwords  before putting them into config files / providing them as arguments; see [`--help-pwhash`](https://copyparty.eu/cli/#pwhash-help-page) for all the details
 
 `--ah-alg argon2` enables it, and if you have any plaintext passwords then it'll print the hashed versions on startup so you can replace them
 

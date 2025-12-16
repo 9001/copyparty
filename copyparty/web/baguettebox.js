@@ -61,6 +61,15 @@ window.baguetteBox = (function () {
             hideOverlay();
     };
 
+    var vtouch = function (e) {
+        var v = vid(),
+            bv = v.getBoundingClientRect(),
+            tp = e.changedTouches[0];
+
+        if (bv.bottom - tp.clientY < 90)
+            touchFlag = true;
+    };
+
     var touchstartHandler = function (e) {
         touch.count = e.touches.length;
         if (touch.count > 1)
@@ -850,6 +859,7 @@ window.baguetteBox = (function () {
             if (v == keep)
                 continue;
 
+            unbind(v, 'touchstart', vtouch, nonPassiveEvent);
             unbind(v, 'error', lerr);
             v.src = '';
             v.load();
@@ -1278,6 +1288,7 @@ window.baguetteBox = (function () {
                     setloop();
                 }
             }
+            bind(v, 'touchstart', vtouch, nonPassiveEvent);
         }
         selbg();
         mp_ctl();

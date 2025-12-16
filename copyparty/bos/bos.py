@@ -40,7 +40,7 @@ def makedirs(name: str, vf: dict[str, Any] = MKD_755, exist_ok: bool = True) -> 
     todo = []
     bname = fsenc(name)
     while bname:
-        if os.path.isdir(bname):
+        if os.path.isdir(bname) or bname in todo:
             break
         todo.append(bname)
         bname = os.path.dirname(bname)

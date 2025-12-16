@@ -1148,7 +1148,7 @@ class Up2k(object):
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
-        zs = "bcasechk du_iwho ext_th_d html_head html_head_d html_head_s put_name2 mv_re_r mv_re_t rm_re_r rm_re_t srch_re_dots srch_re_nodot zipmax zipmaxn_v zipmaxs_v"
+        zs = "bcasechk du_iwho emb_lgs emb_mds ext_th_d html_head html_head_d html_head_s put_name2 mv_re_r mv_re_t rm_re_r rm_re_t srch_re_dots srch_re_nodot zipmax zipmaxn_v zipmaxs_v"
         fx = set(zs.split())
         fd = vf_bmap()
         fd.update(vf_cmap())
@@ -3307,7 +3307,7 @@ class Up2k(object):
                                 None,
                             )
                             t = hr.get("rejectmsg") or ""
-                            if t or not hr:
+                            if t or hr.get("rc") != 0:
                                 if not t:
                                     t = "upload blocked by xbu server config: %r"
                                     t = t % (vp,)
@@ -4003,7 +4003,7 @@ class Up2k(object):
                 None,
             )
             t = hr.get("rejectmsg") or ""
-            if t or not hr:
+            if t or hr.get("rc") != 0:
                 if not t:
                     t = "upload blocked by xau server config: %r"
                     t = t % (djoin(vtop, rd, fn),)
@@ -4221,7 +4221,7 @@ class Up2k(object):
                     _ = dbv.get(volpath, uname, *permsets[0])
 
                 if xbd:
-                    if not runhook(
+                    hr = runhook(
                         self.log,
                         None,
                         self,
@@ -4237,9 +4237,12 @@ class Up2k(object):
                         ip,
                         time.time(),
                         None,
-                    ):
-                        t = "delete blocked by xbd server config: %r"
-                        self.log(t % (abspath,), 1)
+                    )
+                    t = hr.get("rejectmsg") or ""
+                    if t or hr.get("rc") != 0:
+                        if not t:
+                            t = "delete blocked by xbd server config: %r" % (abspath,)
+                        self.log(t, 1)
                         continue
 
                 n_files += 1
@@ -4389,7 +4392,7 @@ class Up2k(object):
         xbc = svn.flags.get("xbc")
         xac = dvn.flags.get("xac")
         if xbc:
-            if not runhook(
+            hr = runhook(
                 self.log,
                 None,
                 self,
@@ -4405,8 +4408,11 @@ class Up2k(object):
                 ip,
                 time.time(),
                 None,
-            ):
-                t = "copy blocked by xbr server config: %r" % (svp,)
+            )
+            t = hr.get("rejectmsg") or ""
+            if t or hr.get("rc") != 0:
+                if not t:
+                    t = "copy blocked by xbr server config: %r" % (svp,)
                 self.log(t, 1)
                 raise Pebkac(405, t)
 
@@ -4641,7 +4647,7 @@ class Up2k(object):
         xbr = svn.flags.get("xbr")
         xar = dvn.flags.get("xar")
         if xbr:
-            if not runhook(
+            hr = runhook(
                 self.log,
                 None,
                 self,
@@ -4657,8 +4663,11 @@ class Up2k(object):
                 ip,
                 time.time(),
                 None,
-            ):
-                t = "move blocked by xbr server config: %r" % (svp,)
+            )
+            t = hr.get("rejectmsg") or ""
+            if t or hr.get("rc") != 0:
+                if not t:
+                    t = "move blocked by xbr server config: %r" % (svp,)
                 self.log(t, 1)
                 raise Pebkac(405, t)
 
@@ -5163,7 +5172,7 @@ class Up2k(object):
                 None,
             )
             t = hr.get("rejectmsg") or ""
-            if t or not hr:
+            if t or hr.get("rc") != 0:
                 if not t:
                     t = "upload blocked by xbu server config: %r" % (vp_chk,)
                 self.log(t, 1)

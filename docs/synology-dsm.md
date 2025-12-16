@@ -40,6 +40,7 @@ open the Package Center and install `Text Editor` (by Synology Inc.) to create a
   rss, daw, ver    # some other nice-to-have features
   #dedup            # you may want this, or maybe not
   hist: /cfg/hist  # don't pollute the shared-folder
+  unlist: ^@eaDir  # hide the synology "@eaDir" folders
   name: synology   # shows in the browser, can be anything
 
 [accounts]
@@ -49,10 +50,6 @@ open the Package Center and install `Text Editor` (by Synology Inc.) to create a
   /w         # the "/w" docker-volume (the shared-folder)
   accs:
     A: ed    # give Admin to username ed
-
-# hide the synology system files by creating a hidden volume
-[/@eaDir]
-  /w/@eaDir
 ```
 
 if you ever change the copyparty config file, then [restart the container](https://ocv.me/copyparty/doc/pics/dsm71-02.png) to make the changes take effect

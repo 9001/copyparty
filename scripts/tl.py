@@ -105,12 +105,15 @@ Ls.{lang3} = {{
 		"ta1": "fill in your new password first",
 		"ta2": "repeat to confirm new password:",
 		"ta3": "found a typo; please try again",
+		"nop": "ERROR: Password cannot be blank",
+		"nou": "ERROR: Username and/or password cannot be blank",
 		"aa1": "incoming files:",
 		"ab1": "disable no304",
 		"ac1": "enable no304",
 		"ad1": "enabling no304 will disable all caching; try this if k304 wasn't enough. This will waste a huge amount of network traffic!",
 		"ae1": "active downloads:",
 		"af1": "show recent uploads",
+		"ag1": "view idp cache",  // TLNote: is a link to a page where IdP users can be managed
 	}}
 }};
 """

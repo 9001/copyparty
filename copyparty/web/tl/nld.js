@@ -84,6 +84,8 @@ Ls.nld = {
 			["M", "sluit tekst bestand"],
 			["E", "bewerk tekst bestand"],
 			["S", "selecteer bestand (voor knip/kopie/hernoem)"],
+			["Y", "tekst bestand downloaden"], //m
+			["⇧ J", "json verfraaien"], //m
 		]
 	],
 
@@ -223,6 +225,7 @@ Ls.nld = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 	"ct_thumb": 'In grid-overzicht, wissel tussen iconen of thumbnails$NHotkey: T">🖼️ thumbs',
 	"ct_csel": 'Gebruik CTRL en SHIFT voor de bestand selectie in grid-overzicht>sel',
+	"ct_dl": 'download afdwingen (niet inline weergeven) wanneer op een bestand wordt geklikt">dl', //m
 	"ct_ihop": 'Als je afbeeldingviewer afsluit, scroll omlaag naar de laatst bekeken bestand">g⮯',
 	"ct_dots": 'Laat verborgen bestanden zien (als de server dat toestaat)">dotfiles',
 	"ct_qdel": 'Waneeer je een bestand verwijderd, vraag eenmalig om bevestiging">qdel',
@@ -437,7 +440,7 @@ Ls.nld = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopieer</a><a href="#" id="modal-ng">Upload</a>',
 
 	"mk_noname": "Voer een naam in het tekstveld aan de linkerkant voordat je verder gaat :p",
-	"nmd_i1": "Voeg ook de gewenste extensie toe, bijvoorbeeld <code>.txt</code>", //m
+	"nmd_i1": "Voeg ook de gewenste extensie toe, bijvoorbeeld <code>.md</code>", //m
 	"nmd_i2": "Je kunt alleen <code>.md</code>-bestanden maken omdat je geen verwijderrechten hebt", //m
 
 	"tv_load": "Tekstdocument laden:\n\n{0}\n\n{1}% ({2} van de {3} MiB geladen)",
@@ -449,6 +452,7 @@ Ls.nld = {
 	"tvt_prev": "Vorig document tonen$NHotkey: i\">⬆ prev",
 	"tvt_next": "Volgende document tonen$NHotkey: K\">⬇ next",
 	"tvt_sel": "Selecteer bestand &nbsp; ( voor knip / verplaats / verwijder / ... )$NHotkey: S\">sel",
+	"tvt_j": "json verfraaien$NHotkey: shift-J\">j", //m
 	"tvt_edit": "Bestand openen in teksteditor$NHotkey: E\">✏️ bewerk",
 	"tvt_tail": "Bestand controleren op wijzigingen; nieuwe regels in realtime weergeven\">📡 volgen",
 	"tvt_wrap": "Automatische terugloop\">↵",
@@ -674,6 +678,8 @@ Ls.nld = {
 		"ta1": "Je moet eerst een nieuw wachtwoord invoeren",
 		"ta2": "Herhaal om nieuw wachtwoord te bevestigen:",
 		"ta3": "Typefout gevonden; probeer het opnieuw",
+		"nop": "FOUT: Wachtwoord mag niet leeg zijn", //m
+		"nou": "FOUT: Gebruikersnaam en/of wachtwoord mag niet leeg zijn", //m
 		"aa1": "Inkomend:",
 		"ab1": "Schakel nr. 304 uit",
 		"ac1": "Schakel nr. 304 in",

@@ -8,6 +8,8 @@ Ls.eng = {
 		"ta1": "fill in your new password first",
 		"ta2": "repeat to confirm new password:",
 		"ta3": "found a typo; please try again",
+		"nop": "ERROR: Password cannot be blank",
+		"nou": "ERROR: Username and/or password cannot be blank",
 	}
 };
 
@@ -15,6 +17,10 @@ if (window.langmod)
 	langmod();
 
 var d = (Ls[lang] || Ls.eng).splash;
+if (Ls.eng && d !== Ls.eng.splash)
+	for (var k in Ls.eng.splash)
+		if (d[k] === undefined)
+			d[k] = Ls.eng.splash[k];
 
 d.wb = d.w;
 
@@ -95,8 +101,23 @@ if (/\&re=/.test('' + location))
 	ebi('x').onclick = function (e) {
 		ev(e);
 		if (!pwi.value)
-			return redo(d.ta1);
+			return ebi('lm').innerHTML = d.ta1;
 
 		modal.prompt(d.ta2, "y", mok, null, stars);
 	};
 })();
+
+if (ebi('lf'))
+	ebi('lf').onsubmit = function() {
+		var un = ebi('lu');
+		if (ebi('lp').value && (!un || un.value))
+			return true;
+		ebi('lm').innerHTML = un ? d.nou : d.nop;
+		return false;
+	};
+
+if (ebi('lp'))
+	ebi('lp').oninput = function() {
+		ebi('lm').innerHTML = this.value.length <= 64 ?
+			'' : 'ERROR: Password too long (max=64)';
+	};

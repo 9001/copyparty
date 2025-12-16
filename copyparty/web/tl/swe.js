@@ -84,6 +84,8 @@ Ls.swe = {
 			["M", "stäng textfil"],
 			["E", "redigera textfil"],
 			["S", "välj fil"],
+			["Y", "ladda ner textfil"], //m
+			["⇧ J", "försköna json"], //m
 		]
 	],
 
@@ -223,6 +225,7 @@ Ls.swe = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tips',
 	"ct_thumb": 'växla mellan miniatyrer och ikoner i rutnätsvyn$NSnabbtangent: T">🖼️ miniatyrer',
 	"ct_csel": 'använd CTRL och SKIFT för urval av filer i rutnätsvyn">val',
+	"ct_dl": 'tvinga nedladdning (visa inte inline) när en fil klickas">dl', //m
 	"ct_ihop": 'skrolla till den senast visade filen när bildvisaren stängs">g⮯',
 	"ct_dots": 'visa dolda filer (om servern tillåter detta)">dolda',
 	"ct_qdel": 'bekräfta endast en gång när filer raderas">srad',
@@ -437,7 +440,7 @@ Ls.swe = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopiera</a><a href="#" id="modal-ng">Ladda upp</a>',
 
 	"mk_noname": "skriv ett namn i fältet till vänster först :p",
-	"nmd_i1": "lägg också till filändelsen du vill ha, till exempel <code>.txt</code>", //m
+	"nmd_i1": "lägg också till filändelsen du vill ha, till exempel <code>.md</code>", //m
 	"nmd_i2": "du kan bara skapa <code>.md</code>-filer eftersom du inte har borttagningsbehörighet", //m
 
 	"tv_load": "Laddar textfil:\n\n{0}\n\n{1}% ({2} av {3} MiB laddat)",
@@ -449,6 +452,7 @@ Ls.swe = {
 	"tvt_prev": "visa föregående fil$NSnabbtangent: i\">⬆ föreg.",
 	"tvt_next": "visa nästa fil$NSnabbtangent: K\">⬇ nästa",
 	"tvt_sel": "välj fil &nbsp; ( för klipp / kopiera / radera / ... )$NSnabbtangent: S\">välj",
+	"tvt_j": "försköna json$NSnabbtangent: shift-J\">j", //m
 	"tvt_edit": "öppna fil i textredigerare$NSnabbtangent: E\">✏️ redigera",
 	"tvt_tail": "övervaka filen; visa nya rader i realtid\">📡 övervaka",
 	"tvt_wrap": "automatisk radbrytning\">↵",
@@ -674,6 +678,8 @@ Ls.swe = {
 		"ta1": "fyll i ditt nya lösenord",
 		"ta2": "upprepa det nya lösenordet:",
 		"ta3": "det blev fel; vänligen försök igen",
+		"nop": "FEL: Lösenordet får inte vara tomt", //m
+		"nou": "FEL: Användarnamn och/eller lösenord får inte vara tomt", //m
 		"aa1": "inkommande filer:",
 		"ab1": "avaktivera no304",
 		"ac1": "aktivera no304",

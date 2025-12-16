@@ -9,10 +9,13 @@
 	width: calc(100% - 56em);
 }
 #mw {
-	left: max(0em, calc(100% - 55em));
 	overflow-y: auto;
 	position: fixed;
 	bottom: 0;
+	left: 0;
+}
+@media (min-width: 55em) {
+	#mw {left:calc(100% - 55em)}
 }
 
 

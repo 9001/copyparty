@@ -49,6 +49,9 @@ from .util import (
     HAVE_SQLITE3,
     HTTPCODE,
     UTC,
+    VPTL_MAC,
+    VPTL_OS,
+    VPTL_WIN,
     Garda,
     MultipartParser,
     ODict,
@@ -146,18 +149,15 @@ _ = (argparse, threading)
 
 USED4SEC = {"usedforsecurity": False} if sys.version_info > (3, 9) else {}
 
-NO_CACHE = {"Cache-Control": "no-cache"}
-
 ALL_COOKIES = "k304 no304 js idxh dots cppwd cppws".split()
 
 BADXFF = " due to dangerous misconfiguration (the http-header specified by --xff-hdr was received from an untrusted reverse-proxy)"
+BADXFF2 = ". Some copyparty features are now disabled as a safety measure.\n\n\n"
+BADXFP = ', or change the copyparty global-option "xf-proto" to another header-name to read this value from. Alternatively, if your reverseproxy is not able to provide a header similar to "X-Forwarded-Proto", then you must tell copyparty which protocol to assume by setting global-option --xf-proto-fb to either http or https'
+BADXFFB = "<b>NOTE: serverlog has a message regarding your reverse-proxy config</b>"
 
 H_CONN_KEEPALIVE = "Connection: Keep-Alive"
 H_CONN_CLOSE = "Connection: Close"
-
-LOGUES = [[0, ".prologue.html"], [1, ".epilogue.html"]]
-
-READMES = [[0, ["preadme.md", "PREADME.md"]], [1, ["readme.md", "README.md"]]]
 
 RSS_SORT = {"m": "mt", "u": "at", "n": "fn", "s": "sz"}
 
@@ -166,12 +166,14 @@ A_FILE = os.stat_result(
 )
 
 RE_CC = re.compile(r"[\x00-\x1f]")  # search always faster
+RE_USAFE = re.compile(r'[\x00-\x1f<>"]')  # search always faster
 RE_HSAFE = re.compile(r"[\x00-\x1f<>\"'&]")  # search always much faster
 RE_HOST = re.compile(r"[^][0-9a-zA-Z.:_-]")  # search faster <=17ch
 RE_MHOST = re.compile(r"^[][0-9a-zA-Z.:_-]+$")  # match faster >=18ch
 RE_K = re.compile(r"[^0-9a-zA-Z_-]")  # search faster <=17ch
 RE_HR = re.compile(r"[<>\"'&]")
 RE_MDV = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[Mm][Dd])$")
+RE_RSS_KW = re.compile(r"(\{[^} ]+\})")
 
 UPARAM_CC_OK = set("doc move tree".split())
 
@@ -221,12 +223,11 @@ class HttpCli(object):
         self.log_func = conn.log_func  # mypy404
         self.log_src = conn.log_src  # mypy404
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
-        self.tls: bool = hasattr(self.s, "cipher")
+        self.tls = self.is_https = hasattr(self.s, "cipher")
         self.is_vproxied = bool(self.args.R)
 
         # placeholders; assigned by run()
         self.keepalive = False
-        self.is_https = False
         self.in_hdr_recv = True
         self.headers: dict[str, str] = {}
         self.mode = " "  # http verb
@@ -247,8 +248,8 @@ class HttpCli(object):
         self.dl_id = ""
         self.gctx = " "  # additional context for garda
         self.trailing_slash = True
-        self.uname = " "
-        self.pw = " "
+        self.uname = "*"
+        self.pw = ""
         self.rvol = self.wvol = self.avol = empty_stringlist
         self.do_log = True
         self.can_read = False
@@ -390,9 +391,6 @@ class HttpCli(object):
         self.keepalive = "close" not in zs and (
             self.http_ver != "HTTP/1.0" or zs == "keep-alive"
         )
-        self.is_https = (
-            self.headers.get("x-forwarded-proto", "").lower() == "https" or self.tls
-        )
         self.host = self.headers.get("host") or ""
         if not self.host:
             if self.s.family == socket.AF_UNIX:
@@ -417,7 +415,7 @@ class HttpCli(object):
                     self.bad_xff = True
                     if self.args.rproxy != 9999999:
                         t = "global-option --rproxy %d could not be used (out-of-bounds) for the received header [%s]"
-                        self.log(t % (self.args.rproxy, zso), c=3)
+                        self.log(t % (self.args.rproxy, zso) + BADXFF2, c=3)
                     else:
                         zsl = [
                             "  rproxy: %d   if this client's IP-address is [%s]"
@@ -426,7 +424,24 @@ class HttpCli(object):
                         ]
                         t = 'could not determine the client\'s IP-address because the global-option --rproxy has not been configured, so the request-header [%s] specified by global-option --xff-hdr cannot be used safely! The raw header value was [%s]. Please see the "reverse-proxy" section in the readme. The best approach is to configure your reverse-proxy to give copyparty the exact IP-address to assume (perhaps in another header), but you may also try the following:'
                         t = t % (self.args.xff_hdr, zso)
-                        self.log("%s\n\n%s\n" % (t, "\n".join(zsl)), 3)
+                        t = "%s\n\n%s\n" % (t, "\n".join(zsl))
+
+                        zs = self.headers.get(self.args.xf_proto)
+                        t2 = "\nFurthermore, the following request-headers are also relevant, and you should check that the values below are sensible:\n\n  request-header [%s] (configured with global-option --xf-proto) has the value [%s]; this should be the protocol that the webbrowser is using, so either 'http' or 'https'"
+                        t += t2 % (self.args.xf_proto, zs or "NOT-PROVIDED")
+                        if not zs:
+                            t += ". Because the header is not provided by the reverse-proxy, you must either fix the reverseproxy config"
+                            t += BADXFP
+                        zs = self.headers.get(self.args.xf_host)
+                        t2 = "\n\n  request-header [%s] (configured with global-option --xf-host) has the value [%s]; this should be the website domain or external IP-address which the webbrowser is accessing"
+                        t += t2 % (self.args.xf_host, zs or "NOT-PROVIDED")
+                        if not zs:
+                            zs = self.headers.get("host")
+                            t2 = ". Because the header is not provided by the reverse-proxy, copyparty is using the standard [Host] header which has the value [%s]"
+                            t += t2 % (zs or "NOT-PROVIDED")
+                            if zs:
+                                t += ". If that is the address that visitors are supposed to use to access your server -- or, in other words, it is not some internal address you wish to keep secret -- then the current choice of using the [Host] header is fine (usually the case)"
+                        self.log(t + "\n\n\n", 3)
 
                 pip = self.conn.addr[0]
                 xffs = self.conn.xff_nm
@@ -436,6 +451,7 @@ class HttpCli(object):
                         t += '  Note: if you are behind cloudflare, then this default header is not a good choice; please first make sure your local reverse-proxy (if any) does not allow non-cloudflare IPs from providing cf-* headers, and then add this additional global setting: "--xff-hdr=cf-connecting-ip"'
                     else:
                         t += '  Note: depending on your reverse-proxy, and/or WAF, and/or other intermediates, you may want to read the true client IP from another header by also specifying "--xff-hdr=SomeOtherHeader"'
+                    t += BADXFF2
 
                     if "." in pip:
                         zs = ".".join(pip.split(".")[:2]) + ".0.0/16"
@@ -448,7 +464,22 @@ class HttpCli(object):
                 else:
                     self.ip = cli_ip
                     self.log_src = self.conn.set_rproxy(self.ip)
-                    self.host = self.headers.get("x-forwarded-host") or self.host
+                    self.host = self.headers.get(self.args.xf_host, self.host)
+                    try:
+                        self.is_https = len(self.headers[self.args.xf_proto]) == 5
+                    except:
+                        if self.args.xf_proto_fb:
+                            self.is_https = len(self.args.xf_proto_fb) == 5
+                        else:
+                            self.bad_xff = True
+                            self.host = "example.com"
+                            t = 'got proxied request without header "%s" (global-option "xf-proto"). This header must contain either "http" or "https". Either fix your reverse-proxy config to include this header%s%s'
+                            self.log(t % (self.args.xf_proto, BADXFP, BADXFF2), 3)
+
+                    # the semantics of trusted_xff and bad_xff are different;
+                    # trusted_xff is whether the connection came from a trusted reverseproxy,
+                    # regardless of whether the client ip detection is correctly configured
+                    # (the primary safeguard for idp is --idp-h-key)
                     trusted_xff = True
 
         m = RE_HOST.search(self.host)
@@ -461,6 +492,11 @@ class HttpCli(object):
             return False
 
         if self.is_banned():
+            return False
+
+        if self.conn.ipar_nm and not self.conn.ipar_nm.map(self.ip):
+            self.log("client rejected (--ipar)", 3)
+            self.terse_reply(b"", 500)
             return False
 
         if self.conn.aclose:
@@ -505,8 +541,7 @@ class HttpCli(object):
                 self.loud_reply(t, status=400)
                 return False
 
-        ptn_cc = RE_CC
-        m = ptn_cc.search(self.req)
+        m = RE_USAFE.search(self.req)
         if m:
             zs = self.req
             t = "malicious user; Cc in req0 %r => %r"
@@ -528,6 +563,7 @@ class HttpCli(object):
             vpath = undot(vpath)
 
             re_k = RE_K
+            ptn_cc = RE_CC
             k_safe = UPARAM_CC_OK
             for k in arglist.split("&"):
                 if "=" in k:
@@ -610,20 +646,21 @@ class HttpCli(object):
             self.loud_reply("u wot m8", status=400)
             return False
 
+        if VPTL_OS:
+            vpath = vpath.translate(VPTL_OS)
+
         self.uparam = uparam
         self.cookies = cookies
         self.vpath = vpath
-        self.vpaths = (
-            self.vpath + "/" if self.trailing_slash and self.vpath else self.vpath
-        )
+        self.vpaths = vpath + "/" if self.trailing_slash and vpath else vpath
 
         if "qr" in uparam:
             return self.tx_qr()
 
-        if relchk(self.vpath) and (self.vpath != "*" or self.mode != "OPTIONS"):
+        if "\x00" in vpath or (ANYWIN and ("\n" in vpath or "\r" in vpath)):
             self.log("illegal relpath; req(%r) => %r" % (self.req, "/" + self.vpath))
             self.cbonk(self.conn.hsrv.gmal, self.req, "bad_vp", "invalid relpaths")
-            return self.tx_404() and self.keepalive
+            return self.tx_404() and False
 
         zso = self.headers.get("authorization")
         bauth = ""
@@ -676,6 +713,9 @@ class HttpCli(object):
                     if self.args.idp_h_grp
                     else ""
                 )
+                if self.args.idp_chsub:
+                    idp_usr = idp_usr.translate(self.args.idp_chsub_tr)
+                    idp_grp = idp_grp.translate(self.args.idp_chsub_tr)
 
                 if not trusted_xff:
                     pip = self.conn.addr[0]
@@ -913,29 +953,31 @@ class HttpCli(object):
             return False
 
         xban = self.vn.flags.get("xban")
-        if not xban or not runhook(
-            self.log,
-            self.conn.hsrv.broker,
-            None,
-            "xban",
-            xban,
-            self.vn.canonical(self.rem),
-            self.vpath,
-            self.host,
-            self.uname,
-            "",
-            time.time(),
-            0,
-            self.ip,
-            time.time(),
-            [reason, reason],
-        ):
-            self.log("client banned: %s" % (descr,), 1)
-            self.conn.hsrv.bans[ip] = bonk
-            self.conn.hsrv.nban += 1
-            return True
+        if xban:
+            hr = runhook(
+                self.log,
+                self.conn.hsrv.broker,
+                None,
+                "xban",
+                xban,
+                self.vn.canonical(self.rem),
+                self.vpath,
+                self.host,
+                self.uname,
+                "",
+                time.time(),
+                0,
+                self.ip,
+                time.time(),
+                [reason, reason],
+            )
+            if hr.get("rv") == 0:
+                return False
 
-        return False
+        self.log("client banned: %s" % (descr,), 1)
+        self.conn.hsrv.bans[ip] = bonk
+        self.conn.hsrv.nban += 1
+        return True
 
     def is_banned(self) -> bool:
         if not self.conn.bans:
@@ -953,13 +995,13 @@ class HttpCli(object):
             return False
 
         self.log("banned for {:.0f} sec".format(rt), 6)
-        self.terse_reply(b"thank you for playing (see serverlog and readme)", 403)
+        self.terse_reply(self.args.banmsg_b, 403)
         return True
 
     def permit_caching(self) -> None:
         cache = self.uparam.get("cache")
         if cache is None:
-            self.out_headers.update(NO_CACHE)
+            self.out_headers["Cache-Control"] = self.vn.flags["cachectl"]
             return
 
         n = 69 if not cache else 604869 if cache == "i" else int(cache)
@@ -1136,7 +1178,10 @@ class HttpCli(object):
         ]
 
         if body:
-            lines.append("Content-Length: " + unicode(len(body)))
+            lines.append(
+                "Content-Type: text/html; charset=utf-8\r\nContent-Length: "
+                + unicode(len(body))
+            )
 
         lines.append("\r\n")
         self.s.sendall("\r\n".join(lines).encode("utf-8") + body)
@@ -1540,18 +1585,31 @@ class HttpCli(object):
         ap = ""
         use_magic = "rmagic" in self.vn.flags
 
+        tpl_t = self.uparam.get("fmt_t") or self.vn.flags["rss_fmt_t"]
+        tpl_d = self.uparam.get("fmt_d") or self.vn.flags["rss_fmt_d"]
+        kw_t = [[x, x[1:-1]] for x in RE_RSS_KW.findall(tpl_t)]
+        kw_d = [[x, x[1:-1]] for x in RE_RSS_KW.findall(tpl_d)]
+
         for i in hits:
             if use_magic:
                 ap = os.path.join(self.vn.realpath, i["rp"])
 
+            tags = i["tags"]
             iurl = html_escape("%s%s" % (baseurl, i["rp"]), True, True)
-            title = unquotep(i["rp"].split("?")[0].split("/")[-1])
-            title = html_escape(title, True, True)
-            tag_t = str(i["tags"].get("title") or "")
-            tag_a = str(i["tags"].get("artist") or "")
-            desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
-            desc = html_escape(desc, True, True) if desc else title
-            mime = html_escape(guess_mime(title, ap))
+            fname = tags["fname"] = unquotep(i["rp"].split("?")[0].split("/")[-1])
+            title = tpl_t
+            desc = tpl_d
+            for zs1, zs2 in kw_t:
+                title = title.replace(zs1, str(tags.get(zs2, "")))
+            for zs1, zs2 in kw_d:
+                desc = desc.replace(zs1, str(tags.get(zs2, "")))
+            title = html_escape(title.strip(), True, True)
+            if desc.strip(" -,"):
+                desc = html_escape(desc.strip(), True, True)
+            else:
+                desc = title
+
+            mime = html_escape(guess_mime(fname, ap))
             lmod = formatdate(max(0, i["ts"]))
             zsa = (iurl, iurl, title, desc, lmod, iurl, mime, i["sz"])
             zs = (
@@ -2386,7 +2444,7 @@ class HttpCli(object):
                 None,
             )
             t = hr.get("rejectmsg") or ""
-            if t or not hr:
+            if t or hr.get("rc") != 0:
                 if not t:
                     t = "upload blocked by xbu server config: %r" % (vp,)
                 self.log(t, 1)
@@ -2521,7 +2579,7 @@ class HttpCli(object):
                 None,
             )
             t = hr.get("rejectmsg") or ""
-            if t or not hr:
+            if t or hr.get("rc") != 0:
                 if not t:
                     t = "upload blocked by xau server config: %r" % (vp,)
                 self.log(t, 1)
@@ -2792,6 +2850,11 @@ class HttpCli(object):
             raise Pebkac(400, "your client is old; press CTRL-SHIFT-R and try again")
 
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
+        fsnt = vfs.flags["fsnt"]
+        if fsnt != "lin":
+            tl = VPTL_WIN if fsnt == "win" else VPTL_MAC
+            rem = rem.translate(tl)
+            name = name.translate(tl)
         dbv, vrem = vfs.get_dbv(rem)
 
         name = sanitize_fn(name, "")
@@ -3359,7 +3422,7 @@ class HttpCli(object):
                     None,
                 )
                 t = hr.get("rejectmsg") or ""
-                if t or not hr:
+                if t or hr.get("rc") != 0:
                     if not t:
                         t = "new-md blocked by " + hn + " server config: %r"
                         t = t % (vjoin(vfs.vpath, rem),)
@@ -3530,7 +3593,7 @@ class HttpCli(object):
                         None,
                     )
                     t = hr.get("rejectmsg") or ""
-                    if t or not hr:
+                    if t or hr.get("rc") != 0:
                         if not t:
                             t = "upload blocked by xbu server config: %r"
                             t = t % (vjoin(upload_vpath, fname),)
@@ -3637,7 +3700,7 @@ class HttpCli(object):
                             None,
                         )
                         t = hr.get("rejectmsg") or ""
-                        if t or not hr:
+                        if t or hr.get("rc") != 0:
                             if not t:
                                 t = "upload blocked by xau server config: %r"
                                 t = t % (vjoin(upload_vpath, fname),)
@@ -3950,7 +4013,7 @@ class HttpCli(object):
                 None,
             )
             t = hr.get("rejectmsg") or ""
-            if t or not hr:
+            if t or hr.get("rc") != 0:
                 if not t:
                     t = "save blocked by xbu server config"
                 self.log(t, 1)
@@ -3998,7 +4061,7 @@ class HttpCli(object):
                 None,
             )
             t = hr.get("rejectmsg") or ""
-            if t or not hr:
+            if t or hr.get("rc") != 0:
                 if not t:
                     t = "save blocked by xau server config"
                 self.log(t, 1)
@@ -4108,40 +4171,36 @@ class HttpCli(object):
         self, vn: VFS, abspath: str, lnames: Optional[dict[str, str]]
     ) -> tuple[list[str], list[str]]:
         logues = ["", ""]
-        if not self.args.no_logues:
-            for n, fn in LOGUES:
-                if lnames is not None and fn not in lnames:
-                    continue
+        for n, fns1, fns2 in [] if self.args.no_logues else vn.flags["emb_lgs"]:
+            for fn in fns1 if lnames is None else fns2:
+                if lnames is not None:
+                    fn = lnames.get(fn)
+                    if not fn:
+                        continue
                 fn = "%s/%s" % (abspath, fn)
-                if bos.path.isfile(fn):
-                    logues[n] = read_utf8(self.log, fsenc(fn), False)
-                    if "exp" in vn.flags:
-                        logues[n] = self._expand(
-                            logues[n], vn.flags.get("exp_lg") or []
-                        )
+                if not bos.path.isfile(fn):
+                    continue
+                logues[n] = read_utf8(self.log, fsenc(fn), False)
+                if "exp" in vn.flags:
+                    logues[n] = self._expand(logues[n], vn.flags.get("exp_lg") or [])
+                break
 
         readmes = ["", ""]
-        for n, fns in [] if self.args.no_readme else READMES:
+        for n, fns1, fns2 in [] if self.args.no_readme else vn.flags["emb_mds"]:
             if logues[n]:
                 continue
-            elif lnames is None:
-                pass
-            elif fns[0] in lnames:
-                fns = [lnames[fns[0]]]
-            else:
-                fns = []
-
-            txt = ""
-            for fn in fns:
+            for fn in fns1 if lnames is None else fns2:
+                if lnames is not None:
+                    fn = lnames.get(fn.lower())
+                    if not fn:
+                        continue
                 fn = "%s/%s" % (abspath, fn)
-                if bos.path.isfile(fn):
-                    txt = read_utf8(self.log, fsenc(fn), False)
-                    break
-
-            if txt and "exp" in vn.flags:
-                txt = self._expand(txt, vn.flags.get("exp_md") or [])
-
-            readmes[n] = txt
+                if not bos.path.isfile(fn):
+                    continue
+                readmes[n] = read_utf8(self.log, fsenc(fn), False)
+                if "exp" in vn.flags:
+                    readmes[n] = self._expand(readmes[n], vn.flags.get("exp_md") or [])
+                break
 
         return logues, readmes
 
@@ -5128,7 +5187,7 @@ class HttpCli(object):
         file_ts = int(max(ts_md, self.E.t0))
         file_lastmod, do_send, _ = self._chk_lastmod(file_ts)
         self.out_headers["Last-Modified"] = file_lastmod
-        self.out_headers.update(NO_CACHE)
+        self.out_headers["Cache-Control"] = "no-cache"
         status = 200 if do_send else 304
 
         arg_base = "?"
@@ -5267,10 +5326,11 @@ class HttpCli(object):
                     fdone = max(0.001, 1 - rem)
                     td = max(0.1, now - t0)
                     rd, fn = vsplit(vp.replace(os.sep, "/"))
-                    if not rd:
-                        rd = "/"
-                    erd = quotep(rd)
-                    rds = rd.replace("/", " / ")
+                    if rd:
+                        rds = rd.replace("/", " / ")
+                        erd = "/%s/" % (quotep(rd),)
+                    else:
+                        erd = rds = "/"
                     spd = humansize(sz * fdone / td, True) + "/s"
                     eta = s2hms((td / fdone) - td, True) if rem < 1 else "--"
                     idle = s2hms(now - poke, True)
@@ -5297,10 +5357,11 @@ class HttpCli(object):
         for t0, t1, sent, sz, vp, dl_id, uname in dl_list:
             td = max(0.1, now - t0)
             rd, fn = vsplit(vp)
-            if not rd:
-                rd = "/"
-            erd = quotep(rd)
-            rds = rd.replace("/", " / ")
+            if rd:
+                rds = rd.replace("/", " / ")
+                erd = "/%s/" % (quotep(rd),)
+            else:
+                erd = rds = "/"
             spd = humansize(sent / td, True) + "/s"
             hsent = humansize(sent, True)
             idle = s2hms(now - t1, True)
@@ -5394,6 +5455,7 @@ class HttpCli(object):
             no304=self.no304(),
             k304vis=self.args.k304 > 0,
             no304vis=self.args.no304 > 0,
+            msg=BADXFFB if hasattr(self, "bad_xff") else "",
             ver=S_VERSION if show_ver else "",
             chpw=self.args.chpw and self.uname != "*",
             ahttps="" if self.is_https else "https://" + self.host + self.req,
@@ -5404,7 +5466,7 @@ class HttpCli(object):
     def setck(self) -> bool:
         k, v = self.uparam["setck"].split("=", 1)
         t = 0 if v in ("", "x") else 86400 * 299
-        ck = gencookie(k, v, self.args.R, self.args.cookie_lax, False, t)
+        ck = gencookie(k, v, self.args.R, True, False, t)
         self.out_headerlist.append(("Set-Cookie", ck))
         if "cc" in self.ouparam:
             self.redirect("", "?h#cc")
@@ -5416,7 +5478,7 @@ class HttpCli(object):
         for k in ALL_COOKIES:
             if k not in self.cookies:
                 continue
-            cookie = gencookie(k, "x", self.args.R, self.args.cookie_lax, False)
+            cookie = gencookie(k, "x", self.args.R, True, False)
             self.out_headerlist.append(("Set-Cookie", cookie))
 
         self.redirect("", "?h#cc")
@@ -5450,8 +5512,9 @@ class HttpCli(object):
             rc == 403
             and self.uname == "*"
             and "sec-fetch-site" not in self.headers
+            and self.cookies.get("js") != "y"
             and (
-                not self.ua.startswith("Mozilla/")
+                not self.args.ua_nodav.search(self.ua)
                 or (self.args.dav_ua1 and self.args.dav_ua1.search(self.ua))
             )
         ):
@@ -5713,17 +5776,18 @@ class HttpCli(object):
             and (self.uname in vol.axs.uread or self.uname in vol.axs.upget)
         }
 
-        bad_xff = hasattr(self, "bad_xff")
-        if bad_xff:
+        if hasattr(self, "bad_xff"):
             allvols = []
             t = "will not return list of recent uploads" + BADXFF
             self.log(t, 1)
             if self.avol:
                 raise Pebkac(500, t)
 
-        x = self.conn.hsrv.broker.ask(
-            "up2k.get_unfinished_by_user", self.uname, "" if bad_xff else self.ip
-        )
+            x = self.conn.hsrv.broker.ask("up2k.get_unfinished_by_user", self.uname, "")
+        else:
+            x = self.conn.hsrv.broker.ask(
+                "up2k.get_unfinished_by_user", self.uname, self.ip
+            )
         zdsa: dict[str, Any] = x.get()
         uret: list[dict[str, Any]] = []
         if "timeout" in zdsa:
@@ -6226,6 +6290,9 @@ class HttpCli(object):
         if unpost and hasattr(self, "bad_xff"):
             self.log("unpost was denied" + BADXFF, 1)
             raise Pebkac(403, "the delete feature is disabled in server config")
+
+        if not unpost and self.vn.shr_src:
+            raise Pebkac(403, "files in shares can only be deleted with unpost")
 
         if not req:
             req = [self.vpath]

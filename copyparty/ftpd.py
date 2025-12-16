@@ -515,7 +515,7 @@ class FtpHandler(FTPHandler):
                 None,
             )
             t = hr.get("rejectmsg") or ""
-            if t or not hr:
+            if t or hr.get("rc") != 0:
                 if not t:
                     t = "Upload blocked by xbu server config: %r" % (vp,)
                 self.respond("550 %s" % (t,), logging.info)

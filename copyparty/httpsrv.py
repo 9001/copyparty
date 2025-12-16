@@ -201,6 +201,7 @@ class HttpSrv(object):
             self.ipr = None
 
         self.ipa_nm = build_netmap(self.args.ipa)
+        self.ipar_nm = build_netmap(self.args.ipar)
         self.xff_nm = build_netmap(self.args.xff_src)
         self.xff_lan = build_netmap("lan")
 

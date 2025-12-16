@@ -87,6 +87,8 @@ if (1)
 				["M", "close textfile"],
 				["E", "edit textfile"],
 				["S", "select file (for cut/copy/rename)"],
+				["Y", "download textfile"],
+				["⇧ J", "beautify json"],
 			]
 		],
 
@@ -226,6 +228,7 @@ if (1)
 		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
+		"ct_dl": 'force download (don\'t display inline) when a file is clicked">dl',
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
 		"ct_qdel": 'when deleting files, only ask for confirmation once">qdel',
@@ -452,6 +455,7 @@ if (1)
 		"tvt_prev": "show previous document$NHotkey: i\">⬆ prev",
 		"tvt_next": "show next document$NHotkey: K\">⬇ next",
 		"tvt_sel": "select file &nbsp; ( for cut / copy / delete / ... )$NHotkey: S\">sel",
+		"tvt_j": "beautify json$NHotkey: shift-J\">j",
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
 		"tvt_tail": "monitor file for changes; show new lines in real time\">📡 follow",
 		"tvt_wrap": "word-wrap\">↵",
@@ -660,6 +664,7 @@ var LANGN = [
 	["swe", "Svenska"],
 	["tur", "Türkçe"],
 	["ukr", "Українська"],
+	["vie", "Tiếng Việt"],
 ];
 
 if (window.langmod)
@@ -878,6 +883,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '</a>\n' +
 	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '</a>\n' +
+	'		<a id="dlni" class="tgl btn" href="#" tt="' + L.ct_dl + '</a>\n' +
 	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '</a>\n' +
 	'		<a id="qdel" class="tgl btn" href="#" tt="' + L.ct_qdel + '</a>\n' +
@@ -1134,6 +1140,20 @@ var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
 	dk, mp;
 
 
+var x = '';
+if (!fullui) {
+	if (window.ui_nombar || /[?&]nombar\b/.exec(sloc0)) x += '#ops,';
+	if (window.ui_noacci || /[?&]noacci\b/.exec(sloc0)) x += '#acc_info,';
+	if (window.ui_nosrvi || /[?&]nosrvi\b/.exec(sloc0)) x += '#srv_info,#srv_info2,';
+	if (window.ui_nocpla || /[?&]nocpla\b/.exec(sloc0)) x += '#goh,';
+	if (window.ui_nolbar || /[?&]nolbar\b/.exec(sloc0)) x += '#wfp,';
+	if (window.ui_noctxb || /[?&]noctxb\b/.exec(sloc0)) x += '#wtoggle,';
+	if (window.ui_norepl || /[?&]norepl\b/.exec(sloc0)) x += '#repl,';
+}
+if (x)
+	document.head.appendChild(mknod('style', '', x.slice(0, -1) + '{display:none!important}'));
+
+
 if (location.pathname.indexOf('//') === 0)
 	hist_replace(location.pathname.replace(/^\/+/, '/'));
 
@@ -1237,6 +1257,7 @@ var mpl = (function () {
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 		'traversals': 0,
 		'm3ut': '#EXTM3U\n',
+		'np': [{'file': 'nothing'}, ['file']],
 	};
 	bcfg_bind(r, 'one', 'au_one', false, function (v) {
 		if (mp.au)
@@ -1433,7 +1454,7 @@ var mpl = (function () {
 		if (!r.os_ctl || !mp.au)
 			return;
 
-		var np = get_np()[0],
+		var np = mpl.np[0],
 			fns = np.file.split(' - '),
 			artist = (np.circle && np.circle != np.artist ? np.circle + ' // ' : '') + (np.artist || (fns.length > 1 ? fns[0] : '')),
 			title = np.title || fns.pop(),
@@ -1779,12 +1800,6 @@ function ft2dict(tr, skip) {
 }
 
 
-function get_np() {
-	var tr = QS('#files tr.play');
-	return ft2dict(tr, { 'up_ip': 1 });
-};
-
-
 // toggle player widget
 var widget = (function () {
 	var r = {},
@@ -1842,9 +1857,8 @@ var widget = (function () {
 			ck = irc ? '06' : '',
 			cv = irc ? '07' : '',
 			m = ck + 'np: ',
-			npr = get_np(),
-			npk = npr[1],
-			np = npr[0];
+			npk = mpl.np[1],
+			np = mpl.np[0];
 
 		for (var a = 0; a < npk.length; a++)
 			m += (npk[a] == 'file' ? '' : npk[a]).replace(/^\./, '') + '(' + cv + np[npk[a]] + ck + ') // ';
@@ -2543,6 +2557,9 @@ var mpui = (function () {
 						if (mpl.prescan_evp == evp)
 							throw "evp match";
 
+						if (treectl.trunc)
+							return treectl.showmore(99999, repreload);
+
 						if (mpl.traversals++ > 4) {
 							mpl.prescan_evp = null;
 							toast.inf(10, L.mm_nof);
@@ -3019,6 +3036,9 @@ function play(tid, is_ev, seek) {
 	}
 
 	if (tn >= mp.order.length) {
+		if (treectl.trunc)
+			return treectl.showmore(99999, next_song);
+
 		if (mpl.pb_mode == 'loop' || ebi('unsearch')) {
 			tn = 0;
 		}
@@ -3092,9 +3112,12 @@ function play(tid, is_ev, seek) {
 	for (var a = 0, aa = trs.length; a < aa; a++)
 		clmod(trs[a], 'play');
 
-	var oid = 'a' + tid;
-	clmod(ebi(oid), 'act', 1);
-	clmod(ebi(oid).closest('tr'), 'play', 1);
+	var oid = 'a' + tid,
+		t_a = ebi(oid),
+		t_tr = t_a.closest('tr');
+
+	clmod(t_a, 'act', 1);
+	clmod(t_tr, 'play', 1);
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
 	clmod(ebi('wtoggle'), 'm3u', mpl.m3uen);
 	if (thegrid)
@@ -3116,12 +3139,12 @@ function play(tid, is_ev, seek) {
 		}
 
 		if (!seek && !ebi('unsearch')) {
-			var o = ebi(oid);
-			o.setAttribute('id', 'thx_js');
+			t_a.setAttribute('id', 'thx_js');
 			if (mpl.aplay)
 				sethash(oid + getsort());
-			o.setAttribute('id', oid);
+			t_a.setAttribute('id', oid);
 		}
+		mpl.np = ft2dict(t_tr, { 'up_ip': 1 });
 
 		pbar.unwave();
 		if (mpl.waves)
@@ -3136,7 +3159,7 @@ function play(tid, is_ev, seek) {
 	catch (ex) {
 		toast.err(0, esc(L.mm_playerr + basenames(ex)));
 	}
-	clmod(ebi(oid), 'act');
+	clmod(t_a, 'act');
 	mpl.t_eplay = setTimeout(next_song, 5000);
 }
 
@@ -3825,7 +3848,7 @@ var fileman = (function () {
 			'<tr><td>perms</td><td class="sh_axs">',
 		];
 		for (var a = 0; a < perms.length; a++)
-			if (!has(['admin', 'move'], perms[a]))
+			if (!has(['admin', 'move', 'delete'], perms[a]))
 				html.push('<a href="#" class="tgl btn">' + perms[a] + '</a>');
 
 		if (has(perms, 'write'))
@@ -4771,6 +4794,7 @@ var showfile = (function () {
 		'.log': 'ans',
 		'.m': 'matlab',
 		'.moon': 'moonscript',
+		'.nfo': 'ans',
 		'.patch': 'diff',
 		'.ps1': 'powershell',
 		'.psm1': 'powershell',
@@ -4778,6 +4802,7 @@ var showfile = (function () {
 		'.rs': 'rust',
 		'.sh': 'bash',
 		'.service': 'systemd',
+		'.txt': 'ans',
 		'.vb': 'vbnet',
 		'.v': 'verilog',
 		'.vert': 'glsl',
@@ -4791,7 +4816,8 @@ var showfile = (function () {
 	var x = txt_ext + ' ans c cfg conf cpp cs css diff glsl go html ini java js json jsx kt kts latex less lisp lua makefile md nim py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml zig';
 	x = x.split(/ +/g);
 	for (var a = 0; a < x.length; a++)
-		r.map["." + x[a]] = x[a];
+		if (!r.map["." + x[a]])
+			r.map["." + x[a]] = x[a];
 
 	r.sname = function (srch) {
 		return srch.split(/[?&]doc=/)[1].split('&')[0];
@@ -5121,6 +5147,33 @@ var showfile = (function () {
 		return out.join('');
 	};
 
+	r.ppj = function (e) {
+		ebi(e);
+		try {
+			r.ppj2();
+		}
+		catch (ex) {
+			toast.err(10, '' + ex);
+		}
+	};
+	r.ppj2 = function () {
+		var btn = ebi('dldoc'),
+			el = ebi('doc'),
+			t = el.textContent.trim(),
+			jo = JSON.parse(t),
+			jt = JSON.stringify(jo, null, t.indexOf('\n') + 1 ? 0 : 2);
+		el.textContent = jt;
+		el.innerHTML = '<code>' + el.innerHTML + '</code>';
+		try {
+			el = QS('#doc>code');
+			el.className = 'language-json';
+			Prism.highlightElement(el);
+		}
+		catch (ex) { }
+        btn.setAttribute('download', ebi('docname').innerHTML);
+        btn.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jt));
+	};
+
 	r.mktree = function () {
 		var top = get_evpath().slice(SR.length),
 			crumbs = linksplit(top).join('<span>/</span>'),
@@ -5187,6 +5240,7 @@ var showfile = (function () {
 		'<a href="#" class="btn" id="prevdoc" tt="' + L.tvt_prev + '</a>\n' +
 		'<a href="#" class="btn" id="nextdoc" tt="' + L.tvt_next + '</a>\n' +
 		'<a href="#" class="btn" id="seldoc" tt="' + L.tvt_sel + '</a>\n' +
+		'<a href="#" class="btn" id="ppjdoc" tt="' + L.tvt_j + '</a>\n' +
 		'<a href="#" class="btn" id="editdoc" tt="' + L.tvt_edit + '</a>\n' +
 		'<a href="#" class="btn tgl" id="taildoc" tt="' + L.tvt_tail + '</a>\n' +
 		'<div id="tailbtns">\n' +
@@ -5206,6 +5260,7 @@ var showfile = (function () {
 	ebi('prevdoc').onclick = function () { tree_neigh(-1); };
 	ebi('nextdoc').onclick = function () { tree_neigh(1); };
 	ebi('seldoc').onclick = r.tglsel;
+	ebi('ppjdoc').onclick = r.ppj;
 	bcfg_bind(r, 'wrap', 'wrapdoc', true, r.tglwrap);
 	bcfg_bind(r, 'taildoc', 'taildoc', false, r.tgltail);
 	bcfg_bind(r, 'tail2end', 'tail2end', true);
@@ -5880,6 +5935,7 @@ var ahotkeys = function (e) {
 		return;
 
 	var k = (e.key || e.code) + '', pos = -1, n,
+		sh = e.shiftKey,
 		ae = document.activeElement,
 		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
 
@@ -6002,7 +6058,7 @@ var ahotkeys = function (e) {
 	if (k == '?')
 		return hkhelp();
 
-	if (!e.shiftKey && ctrl(e)) {
+	if (!sh && ctrl(e)) {
 		var sel = window.getSelection && window.getSelection() || {};
 		sel = sel && !sel.isCollapsed && sel.direction != 'none';
 
@@ -6021,7 +6077,16 @@ var ahotkeys = function (e) {
 		return;
 	}
 
-	if (e.shiftKey && kl != 'a' && kl != 'd')
+	if (showfile.active()) {
+		if (!sh && kl == 's')
+			return showfile.tglsel() || true;
+		if (!sh && kl == 'e' && ebi('editdoc').style.display != 'none')
+			return ebi('editdoc').click() || true;
+		if (sh && kl == 'j')
+			return showfile.ppj(e) || true;
+	}
+
+	if (sh && kl != 'a' && kl != 'd')
 		return;
 
 	if (/^[0-9]$/.test(k))
@@ -6070,19 +6135,12 @@ var ahotkeys = function (e) {
 	if (k == 'F2')
 		return fileman.rename();
 
-	if (!treectl.hidden && (!e.shiftKey || !thegrid.en)) {
+	if (!treectl.hidden && (!sh || !thegrid.en)) {
 		if (kl == 'a')
 			return QS('#twig').click();
 
 		if (kl == 'd')
 			return QS('#twobytwo').click();
-	}
-
-	if (showfile.active()) {
-		if (kl == 's')
-			showfile.tglsel();
-		if (kl == 'e' && ebi('editdoc').style.display != 'none')
-			ebi('editdoc').click();
 	}
 
 	if (mp && mp.au && !mp.au.paused) {
@@ -6600,6 +6658,9 @@ var treectl = (function () {
 		mentered = null,
 		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
+	if (/[?&]dlni\b/.exec(sloc0))
+		swrite('dlni', /[?&]dlni=0\b/.exec(sloc0) ? 0 : 1);
+
 	var resort = function () {
 		ENATSORT = NATSORT && clgot(ebi('nsort'), 'on');
 		treectl.gentab(get_evpath(), treectl.lsc);
@@ -6608,6 +6669,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
 	bcfg_bind(r, 'csel', 'csel', dgsel);
+	bcfg_bind(r, 'dlni', 'dlni', dlni, resort);
 	bcfg_bind(r, 'dots', 'dotfiles', see_dots, function (v) {
 		r.goto();
 		setck('dots=' + (v ? 'y' : ''));
@@ -7157,6 +7219,14 @@ var treectl = (function () {
 		dth3x = res.dth3x;
 		dk = res.dk;
 
+		dlni = res.dlni;
+		if (!sread('dlni'))
+			clmod(ebi('dlni'), 'on', treectl.dlni = dlni);
+
+		dgrid = res.dgrid;
+		if (!sread('griden'))
+			clmod(ebi('griden'), 'on', thegrid.en = dgrid);
+
 		srvinf = res.srvinf;
 		if (rtt !== null)
 			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
@@ -7343,6 +7413,11 @@ var treectl = (function () {
 		html.push('</tbody>');
 		html = html.join('\n');
 		set_files_html(html);
+		if (r.dlni) {
+			var o = QSA('#files a[id]');
+			for (var a = 0, aa = o.length; a < aa; a++)
+				o[a].setAttribute('download', '');
+		}
 		if (r.trunc) {
 			r.setlazy(plain);
 			if (!r.ask) {
@@ -7463,7 +7538,7 @@ var treectl = (function () {
 		catch (ex) { }
 	};
 
-	r.showmore = function (n) {
+	r.showmore = function (n, cb) {
 		window.removeEventListener('scroll', r.tscroll);
 		console.log('nvis {0} -> {1}'.format(r.nvis, n));
 		r.nvis = n;
@@ -7473,6 +7548,8 @@ var treectl = (function () {
 		setTimeout(function () {
 			r.gentab(get_evpath(), r.lsc);
 			ebi('wrap').style.opacity = CLOSEST ? 'unset' : 1;
+			if (cb)
+				cb();
 		}, 1);
 	};
 
@@ -8169,7 +8246,12 @@ var settheme = (function () {
 		freshen();
 	};
 
-	freshen();
+	var m = /[?&]theme=([0-9]+)/.exec(sloc0);
+	if (m)
+		r.go(parseInt(m[1]));
+	else
+		freshen();
+
 	return r;
 })();
 
@@ -9380,14 +9462,3 @@ function reload_browser() {
 	msel.render();
 }
 treectl.hydrate();
-
-if (!fullui && (window.ui_nombar || /[?&]nombar\b/.exec(sloc0))) ebi('ops').style.display = 'none';
-if (!fullui && (window.ui_noacci || /[?&]noacci\b/.exec(sloc0))) ebi('acc_info').style.display = 'none';
-if (!fullui && (window.ui_nosrvi || /[?&]nosrvi\b/.exec(sloc0))) ebi('srv_info').style.display = 'none';
-if (!fullui && (window.ui_nocpla || /[?&]nocpla\b/.exec(sloc0))) ebi('goh').style.display = 'none';
-if (!fullui && (window.ui_nolbar || /[?&]nolbar\b/.exec(sloc0))) ebi('wfp').style.display = 'none';
-if (!fullui && (window.ui_noctxb || /[?&]noctxb\b/.exec(sloc0))) ebi('wtoggle').style.display = 'none';
-if (!fullui && (window.ui_norepl || /[?&]norepl\b/.exec(sloc0))) ebi('repl').style.display = 'none';
-
-var m = /[?&]theme=([0-9]+)/.exec(sloc0);
-if (m) settheme.go(parseInt(m[1]));

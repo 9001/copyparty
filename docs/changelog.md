@@ -1,4 +1,85 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-1202-2047  `v1.19.21`  tadaimback
+
+## 🧪 new features
+
+* [hooks](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks#readme) now behave more usefully/predictably; 889bd324
+  * hooks returning `0` will run the next hook (if any), and let the initiating action proceed if no other hooks object
+  * hooks returning `100` will stop processing successive hooks, but return success, letting the initiating action proceed
+  * hooks returning anything else will stop processing successive hooks (like the documentation always said) and also fail the initiating action (if hook is checked)
+  * zmq hooks can now respond with json, doing relocations and all that stuff
+* new mtag plugin, [geotag.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/geotag.py): read image geotags with exiftool ([demo](https://a.ocv.me/pub/blog/j8/11/)) 1c15c0d5 ac085b81
+* #972 markdown-links are rewritten to open in the markdown-viewer 278a0d85
+* #794 add json beautifier / minifier
+  * ...in the textfile-editor fd8c5bfc
+  * ...in the textfile-viewer 89cab5b5
+* #1058 ui-option and server-config to force download instead of showing files inline a9174e5d
+* option `stats-u` to grant access to prometheus-metrics based on username, not just permissions b427d780
+
+## 🩹 bugfixes
+
+* #1003 u2c.py (commandline uploader) did not install correctly on archlinux and/or pypi 9385daea
+* #1035 uploader could fail to initialize if: 98701b78
+  * the `mt` button (webworkers) was enabled in the settings tab
+  * **and** the network was severely strained during intial page load 
+* possible deadlock on shutdown if thumbnailer queue was hella busy fb9f0441
+* #971 windows: fix deadlock on startup if trying to use a nonexistant driveletter as a volume 945b2276
+* #1022 js-panic if audio playback is set to stay-in-folder a28503e8
+* links to ongoing file transfers in the controlpanel could 404 (thx @Habetdin!) 77f74ddb f4d67ff0
+* video scrubbing on iOS dba7c5d4
+* #1054 audio volume slider could skip one percent (thx @shermanhlc!) ca6d3a5c
+* detect invalid config:
+  * #959 panic if `ipu` user doesn't exist 79e10786
+  * panic if share config overlaps with a volume cedfc444
+* #943
+
+## 🔧 other changes
+
+* the "new-markdown" feature was repurposed into "new-file", accepting any file extension 7d62335c
+* #1023 the option to grant delete-access when creating a share was removed due to never having been implemented in the backend 04ac7fbd
+* #1012 rephrased the controlpanel login-text when logged in to avoid confusion 7a291403
+* add hints that the serverlog is a good place to look in some situations c424a55d
+* all thumbnail types and combinations can now be pregenerated a359b89e
+* #1030 add debug if cfssl is misbehaving ec00dc18
+* #871 `grid` volflag is applied during navigation if user has not set a preference a9378a8e
+* cosmetic:
+  * show column number in markdown editor b9aacba1
+  * reduced grid margins in theme2 e469bc94
+  * reduced redirect delay after logging in f7e7b03f
+  * controlpanel greeting in some fail-early responses acde21d4
+  * update hooks to ignore the new upload-queue-empty message 3f4b79ff
+* docs:
+  * #1032 fix typo in example docker idp config (thx @tuetenk0pp!) 867237d0
+  * warn that using/changing `-j` is usually a bad idea cad15fbf
+  * add hotlink anchors to https://copyparty.eu/cli/ 7f9c139e 
+* nixos:
+  * #868 option to install from git-head (thx @shelvacu!) c7345308
+  * #962 support idp volumes (thx @nicomem!) 904c984b
+  * #963 use configured chmod-d when creating volumes (thx @nicomem!) 3242145e
+* copyparty.exe: update to python 3.13.10, pillow 12.0 cdffde78
+
+## 🌠 fun facts
+
+* copyparty has been observed running [on a wristwatch](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/clockyparty.jpg) and on an [android tv-box](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/aallwinner.jpg) running in big-endian mode, so copyparty is [BE-certified](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/be-ready.png)
+* also... **it's december!** [you know what that means](https://a.ocv.me/pub/demo/music/.bonus/#af-55d4554d) :^)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-1102-0109  `v1.19.20`  november
+
+## 🧪 new features
+
+* #961 the `/?shares` listing now shows the list of filenames for each share 2cc53ea15181f750b4367e6cd20dfebd0bcb3bee
+
+## 🩹 bugfixes
+
+* #967 per-volume md/lg sandbox rules are now applied during navigation db60951d9fa5b17c8190e8b3ab4ceb422a9d2701
+  * if a volume has `no-sb-lg` or `no-sb-md` set then it'll apply when navigating into that volume, and vice-versa
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-1025-1918  `v1.19.19`  copyparty.eu マークII
 
 ## 🩹 bugfixes

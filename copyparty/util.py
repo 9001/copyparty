@@ -294,6 +294,23 @@ RE_MEMTOTAL = re.compile("^MemTotal:.* kB")
 RE_MEMAVAIL = re.compile("^MemAvailable:.* kB")
 
 
+if PY2:
+
+    def umktrans(s1, s2):
+        return {ord(c1): ord(c2) for c1, c2 in zip(s1, s2)}
+
+else:
+    umktrans = str.maketrans
+
+FNTL_WIN = umktrans('<>:|?*"\\/', "＜＞：｜？＊＂＼／")
+VPTL_WIN = umktrans('<>:|?*"\\', "＜＞：｜？＊＂＼")
+APTL_WIN = umktrans('<>:|?*"/', "＜＞：｜？＊＂／")
+FNTL_MAC = VPTL_MAC = APTL_MAC = umktrans(":", "：")
+FNTL_OS = FNTL_WIN if ANYWIN else FNTL_MAC if MACOS else None
+VPTL_OS = VPTL_WIN if ANYWIN else VPTL_MAC if MACOS else None
+APTL_OS = APTL_WIN if ANYWIN else APTL_MAC if MACOS else None
+
+
 BOS_SEP = ("%s" % (os.sep,)).encode("ascii")
 
 
@@ -470,9 +487,9 @@ MAGIC_MAP = {"jpeg": "jpg"}
 
 DEF_EXP = "self.ip self.ua self.uname self.host cfg.name cfg.logout vf.scan vf.thsize hdr.cf-ipcountry srv.itime srv.htime"
 
-DEF_MTE = ".files,circle,album,.tn,artist,title,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash"
+DEF_MTE = ".files,circle,album,.tn,artist,title,tdate,.bpm,key,.dur,.q,.vq,.aq,vc,ac,fmt,res,.fps,ahash,vhash"
 
-DEF_MTH = ".vq,.aq,vc,ac,fmt,res,.fps"
+DEF_MTH = "tdate,.vq,.aq,vc,ac,fmt,res,.fps"
 
 
 REKOBO_KEY = {
@@ -684,7 +701,7 @@ except Exception as ex:
     ub64dec = base64.urlsafe_b64decode  # type: ignore
     b64enc = base64.b64encode  # type: ignore
     b64dec = base64.b64decode  # type: ignore
-    if not PY36:
+    if PY36:
         print("using fallback base64 codec due to %r" % (ex,))
 
 
@@ -2232,32 +2249,22 @@ def sanitize_fn(fn: str, ok: str) -> str:
     if "/" not in ok:
         fn = fn.replace("\\", "/").split("/")[-1]
 
-    if ANYWIN:
-        remap = [
-            ["<", "＜"],
-            [">", "＞"],
-            [":", "："],
-            ['"', "＂"],
-            ["/", "／"],
-            ["\\", "＼"],
-            ["|", "｜"],
-            ["?", "？"],
-            ["*", "＊"],
-        ]
-        for a, b in [x for x in remap if x[0] not in ok]:
-            fn = fn.replace(a, b)
+    if APTL_OS:
+        fn = fn.translate(APTL_OS)
+        if ANYWIN:
+            bad = ["con", "prn", "aux", "nul"]
+            for n in range(1, 10):
+                bad += ("com%s lpt%s" % (n, n)).split(" ")
 
-        bad = ["con", "prn", "aux", "nul"]
-        for n in range(1, 10):
-            bad += ("com%s lpt%s" % (n, n)).split(" ")
-
-        if fn.lower().split(".")[0] in bad:
-            fn = "_" + fn
+            if fn.lower().split(".")[0] in bad:
+                fn = "_" + fn
 
     return fn.strip()
 
 
 def sanitize_vpath(vp: str, ok: str) -> str:
+    if not FNTL_OS:
+        return vp
     parts = vp.replace(os.sep, "/").split("/")
     ret = [sanitize_fn(x, ok) for x in parts]
     return "/".join(ret)
@@ -3930,7 +3937,13 @@ def _runhook(
         zi, zs = _zmq_hook(log, verbose, src, acmd[0][4:].lower(), arg, wait, sp_ka)
         if zi:
             raise Exception("zmq says %d" % (zi,))
-        return {"rc": 0, "stdout": zs}
+        try:
+            ret = json.loads(zs)
+            if "rc" not in ret:
+                ret["rc"] = 0
+            return ret
+        except:
+            return {"rc": 0, "stdout": zs}
 
     if sin:
         sp_ka["sin"] = (arg + "\n").encode("utf-8", "replace")
@@ -3949,20 +3962,23 @@ def _runhook(
         rc, v, err = runcmd(bcmd, **sp_ka)  # type: ignore
         if chk and rc:
             ret["rc"] = rc
-            retchk(rc, bcmd, err, log, 5)
+            zi = 0 if rc == 100 else rc
+            retchk(zi, bcmd, err, log, 5)
         else:
             try:
                 ret = json.loads(v)
             except:
-                ret = {}
+                pass
 
             try:
                 if "stdout" not in ret:
                     ret["stdout"] = v
+                if "stderr" not in ret:
+                    ret["stderr"] = err
                 if "rc" not in ret:
                     ret["rc"] = rc
             except:
-                ret = {"rc": rc, "stdout": v}
+                ret = {"rc": rc, "stdout": v, "stderr": err}
 
     if wait:
         wait -= time.time() - t0
@@ -3994,6 +4010,7 @@ def runhook(
     verbose = args.hook_v
     vp = vp.replace("\\", "/")
     ret = {"rc": 0}
+    stop = False
     for cmd in cmds:
         try:
             hr = _runhook(
@@ -4001,8 +4018,6 @@ def runhook(
             )
             if verbose and log:
                 log("hook(%s) %r => \033[32m%s" % (src, cmd, hr), 6)
-            if not hr:
-                return {}
             for k, v in hr.items():
                 if k in ("idx", "del") and v:
                     if broker:
@@ -4013,17 +4028,20 @@ def runhook(
                 elif k == "reloc" and v:
                     # idk, just take the last one ig
                     ret["reloc"] = v
+                elif k == "rc" and v:
+                    stop = True
+                    ret[k] = 0 if v == 100 else v
                 elif k in ret:
-                    if k == "rc" and v:
-                        ret[k] = v
-                    elif k == "stdout" and v and not ret[k]:
+                    if k == "stdout" and v and not ret[k]:
                         ret[k] = v
                 else:
                     ret[k] = v
         except Exception as ex:
             (log or print)("hook: %r, %s" % (ex, ex))
             if ",c," in "," + cmd:
-                return {}
+                return {"rc": 1}
+            break
+        if stop:
             break
 
     return ret
@@ -4164,7 +4182,12 @@ def wrap(txt: str, maxlen: int, maxlen2: int) -> list[str]:
 
 
 def termsize() -> tuple[int, int]:
-    # from hashwalk
+    try:
+        w, h = os.get_terminal_size()
+        return w, h
+    except:
+        pass
+
     env = os.environ
 
     def ioctl_GWINSZ(fd: int) -> Optional[tuple[int, int]]:

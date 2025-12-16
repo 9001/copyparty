@@ -4,6 +4,11 @@ these programs either take zero arguments, or a filepath (the affected file), or
 
 run copyparty with `--help-hooks` for usage details / hook type explanations (xm/xbu/xau/xiu/xbc/xac/xbr/xar/xbd/xad/xban)
 
+in particular, if a hook is loaded into copyparty with the hook-flag `c` ("check") then its exit-code controls the action that launched the hook:
+* exit-code `0` = allow the action, and/or continue running the next hook
+* exit-code `100` = allow the action, and stop running any remaining consecutive hooks
+* anything else = reject/prevent the original action, and don't run the remaining hooks
+
 > **note:** in addition to event hooks (the stuff described here), copyparty has another api to run your programs/scripts while providing way more information such as audio tags / video codecs / etc and optionally daisychaining data between scripts in a processing pipeline; if that's what you want then see [mtp plugins](../mtag/) instead
 
 

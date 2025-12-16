@@ -62,6 +62,7 @@ class HttpConn(object):
         self.ipu_iu: Optional[dict[str, str]] = hsrv.ipu_iu
         self.ipu_nm: Optional[NetMap] = hsrv.ipu_nm
         self.ipa_nm: Optional[NetMap] = hsrv.ipa_nm
+        self.ipar_nm: Optional[NetMap] = hsrv.ipar_nm
         self.xff_nm: Optional[NetMap] = hsrv.xff_nm
         self.xff_lan: NetMap = hsrv.xff_lan  # type: ignore
         self.iphash: HMaccas = hsrv.broker.iphash

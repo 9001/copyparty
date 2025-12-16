@@ -83,7 +83,9 @@ Ls.spa = {
 			["I/K", "anterior/siguiente archivo"],
 			["M", "cerrar archivo"],
 			["E", "editar archivo"],
-			["S", "seleccionar archivo (para cortar/copiar/renombrar)"]
+			["S", "seleccionar archivo (para cortar/copiar/renombrar)"],
+			["Y", "descargar archivo de texto"], //m
+			["⇧ J", "embellecer json"], //m
 		]
 	],
 
@@ -222,6 +224,7 @@ Ls.spa = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 	"ct_thumb": 'en vista de cuadrícula, alternar iconos o miniaturas$NAtajo: T">🖼️ miniaturas',
 	"ct_csel": 'usa CTRL y SHIFT para seleccionar archivos en la vista de cuadrícula">sel',
+	"ct_dl": 'forzar descarga (no mostrar en línea) al hacer clic en un archivo">dl', //m
 	"ct_ihop": 'al cerrar el visor de imágenes, desplazarse hasta el último archivo visto">g⮯',
 	"ct_dots": 'mostrar archivos ocultos (si el servidor lo permite)">archivos ocultos',
 	"ct_qdel": 'al eliminar archivos, pedir confirmación solo una vez">elim. rápida',
@@ -436,7 +439,7 @@ Ls.spa = {
 	"fcp_both_b": "<a href=\"#\" id=\"modal-ok\">Copiar</a><a href=\"#\" id=\"modal-ng\">Subir</a>",
 
 	"mk_noname": "escribe un nombre en el campo de texto de la izquierda antes de hacer eso :p",
-	"nmd_i1": "también puedes añadir la extensión que quieras, por ejemplo <code>.txt</code>", //m
+	"nmd_i1": "también puedes añadir la extensión que quieras, por ejemplo <code>.md</code>", //m
 	"nmd_i2": "solo puedes crear archivos <code>.md</code> porque no tienes permiso para borrar", //m
 
 	"tv_load": "Cargando documento de texto:\n\n{0}\n\n{1}% ({2} de {3} MiB cargados)",
@@ -448,6 +451,7 @@ Ls.spa = {
 	"tvt_prev": "mostrar documento anterior$NAtajo: i\">⬆ ant",
 	"tvt_next": "mostrar siguiente documento$NAtajo: K\">⬇ sig",
 	"tvt_sel": "seleccionar archivo &nbsp; ( para cortar / copiar / eliminar / ... )$NAtajo: S\">sel",
+	"tvt_j": "embellecer json$NAtajo: shift-J\">j", //m
 	"tvt_edit": "abrir archivo en editor de texto$NAtajo: E\">✏️ editar",
 	"tvt_tail": "monitorizar cambios en el archivo; mostrar nuevas líneas en tiempo real\">📡 seguir",
 	"tvt_wrap": "ajuste de línea\">↵",
@@ -673,6 +677,8 @@ Ls.spa = {
 		"ta1": "primero escribe tu nueva contraseña",
 		"ta2": "repite para confirmar la nueva contraseña:",
 		"ta3": "hay un error; por favor, inténtalo de nuevo",
+		"nop": "ERROR: La contraseña no puede estar vacía", //m
+		"nou": "ERROR: El nombre de usuario y/o la contraseña no pueden estar vacíos", //m
 		"aa1": "archivos entrantes:",
 		"ab1": "desactivar no304",
 		"ac1": "activar no304",

@@ -84,6 +84,8 @@ Ls.cze = {
 			["M", "zavřít textový soubor"],
 			["E", "upravit textový soubor"],
 			["S", "vybrat soubor (pro vyjmutí/kopírování/přejmenování)"],
+			["Y", "stáhnout textový soubor"], //m
+			["⇧ J", "zkrášlit json"], //m
 		]
 	],
 
@@ -227,6 +229,7 @@ Ls.cze = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ nápovědy',
 	"ct_thumb": 'v zobrazení mřížky přepnout ikony nebo náhledy$NKlávesová zkratka: T">🖼️ náhledy',
 	"ct_csel": 'použít CTRL a SHIFT pro výběr souborů v zobrazení mřížky">výběr',
+	"ct_dl": 'vynutit stažení (nezobrazovat inline) při kliknutí na soubor">dl', //m
 	"ct_ihop": 'když se zavře prohlížeč obrázků, posunout dolů k naposledy zobrazenému souboru">g⮯',
 	"ct_dots": 'zobrazit skryté soubory (pokud to server povoluje)">dotfiles',
 	"ct_qdel": 'při mazání souborů požádat o potvrzení jen jednou">rychlé mazání',
@@ -441,7 +444,7 @@ Ls.cze = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopírovat</a><a href="#" id="modal-ng">Nahrát</a>',
 
 	"mk_noname": "napište název do textového pole vlevo předtím než to uděláte :p",
-	"nmd_i1": "můžeš také přidat příponu souboru, například <code>.txt</code>", //m
+	"nmd_i1": "můžeš také přidat příponu souboru, například <code>.md</code>", //m
 	"nmd_i2": "můžeš vytvářet pouze <code>.md</code> soubory, protože nemáš oprávnění mazat", //m
 
 	"tv_load": "Načítání textového dokumentu:\n\n{0}\n\n{1}% ({2} z {3} MiB načteno)",
@@ -453,6 +456,7 @@ Ls.cze = {
 	"tvt_prev": "zobrazit předchozí dokument$NKlávesová zkratka: i\">⬆ předchozí",
 	"tvt_next": "zobrazit následující dokument$NKlávesová zkratka: K\">⬇ další",
 	"tvt_sel": "vybrat soubor &nbsp; ( pro vyjmutí / kopírování / mazání / ... )$NKlávesová zkratka: S\">výběr",
+	"tvt_j": "zkrášlit json$NKlávesová zkratka: shift-J\">j", //m
 	"tvt_edit": "otevřít soubor v textovém editoru$NKlávesová zkratka: E\">✏️ upravit",
 	"tvt_tail": "sledovat soubor pro změny; zobrazit nové řádky v reálném čase\">📡 sledovat",
 	"tvt_wrap": "zalamování slov\">↵",
@@ -678,11 +682,14 @@ Ls.cze = {
 		"ta1": "nejprve vyplňte své nové heslo",
 		"ta2": "zopakujte pro potvrzení nového hesla:",
 		"ta3": "nalezen překlep; zkuste to prosím znovu",
+		"nop": "CHYBA: Heslo nesmí být prázdné", //m
+		"nou": "CHYBA: Uživatelské jméno a/nebo heslo nesmí být prázdné", //m
 		"aa1": "příchozí soubory:",
 		"ab1": "deaktivovat no304",
 		"ac1": "povolit no304",
 		"ad1": "povolení no304 deaktivuje veškeré mezipaměti; zkuste to, pokud k304 nestačilo. To ovšem zapříčíní obrovské množství síťového provozu!",
 		"ae1": "aktivní stahování:",
 		"af1": "zobrazit nedávné nahrávání",
+		"ag1": "zobrazit známé uživatele IdP", //m
 	}
 };

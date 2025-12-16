@@ -3147,9 +3147,6 @@ html.bz .ghead {
 html.b #files td {
 	padding: .5em .7em;
 }
-html.b #ggrid>a {
-	margin: .8em;
-}
 html.b .btn {
 	top: -.1em;
 }
@@ -3294,8 +3291,8 @@ html.d #treepar {
 	}
 
 	html.b #ggrid {
-		padding: 0 2em 2em 0;
-		gap: .5em 3em;
+		padding: 0 0 2em 0;
+		gap: 1em 1.5em;
 	}
 
 	#ggrid > a {

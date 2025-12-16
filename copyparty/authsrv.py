@@ -1054,6 +1054,7 @@ class AuthSrv(object):
         self.is_lxc = args.c == ["/z/initcfg"]
 
         self._vf0b = {
+            "cachectl": self.args.cachectl,
             "tcolor": self.args.tcolor,
             "du_iwho": self.args.du_iwho,
             "shr_who": self.args.shr_who if self.args.shr else "no",
@@ -1812,7 +1813,7 @@ class AuthSrv(object):
         derive_args(self.args)
         self.setup_auth_ord()
 
-        if self.args.ipu:
+        if self.args.ipu and not self.args.have_idp_hdrs:
             # syntax (CIDR=UNAME) is verified in load_ipu
             zsl = [x.split("=", 1)[1] for x in self.args.ipu]
             zsl = [x for x in zsl if x not in acct]
@@ -2384,7 +2385,7 @@ class AuthSrv(object):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
-            zs = "forget_ip gid nrand tail_who th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
+            zs = "forget_ip gid nrand tail_who th_qv th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
@@ -2524,6 +2525,18 @@ class AuthSrv(object):
                 t = "WARNING: volume [/%s]: invalid value specified for ext-th: %s"
                 self.log(t % (vol.vpath, etv), 3)
 
+            zsl1 = [x for x in vol.flags["preadmes"].split(",") if x]
+            zsl2 = [x for x in vol.flags["readmes"].split(",") if x]
+            zsl3 = list(set([x.lower() for x in zsl1]))
+            zsl4 = list(set([x.lower() for x in zsl2]))
+            vol.flags["emb_mds"] = [[0, zsl1, zsl3], [1, zsl2, zsl4]]
+
+            zsl1 = [x for x in vol.flags["prologues"].split(",") if x]
+            zsl2 = [x for x in vol.flags["epilogues"].split(",") if x]
+            zsl3 = list(set([x.lower() for x in zsl1]))
+            zsl4 = list(set([x.lower() for x in zsl2]))
+            vol.flags["emb_lgs"] = [[0, zsl1, zsl3], [1, zsl2, zsl4]]
+
             zs = str(vol.flags.get("html_head") or "")
             if zs and zs[:1] in "%@":
                 vol.flags["html_head_d"] = zs
@@ -2604,18 +2617,16 @@ class AuthSrv(object):
                     vol.flags[k] = int(vol.flags[k])
 
             if "e2d" not in vol.flags:
-                if "lifetime" in vol.flags:
-                    t = 'removing lifetime config from volume "/{}" because e2d is disabled'
-                    self.log(t.format(vol.vpath), 1)
-                    del vol.flags["lifetime"]
+                zs = "lifetime rss"
+                drop = [x for x in zs.split() if x in vol.flags]
 
-                needs_e2d = [x for x in hooks if x in ("xau", "xiu")]
-                drop = [x for x in needs_e2d if vol.flags.get(x)]
-                if drop:
-                    t = 'removing [{}] from volume "/{}" because e2d is disabled'
-                    self.log(t.format(", ".join(drop), vol.vpath), 1)
-                    for x in drop:
-                        vol.flags.pop(x)
+                zs = "xau xiu"
+                drop += [x for x in zs.split() if vol.flags.get(x)]
+
+                for k in drop:
+                    t = 'cannot enable [%s] for volume "/%s" because this requires one of the following: e2d / e2ds / e2dsa  (either as volflag or global-option)'
+                    self.log(t % (k, vol.vpath), 1)
+                    vol.flags.pop(k)
 
             zi = vol.flags.get("lifetime") or 0
             zi2 = time.time() // (86400 * 365)
@@ -3049,6 +3060,8 @@ class AuthSrv(object):
             vn.js_ls = {
                 "idx": "e2d" in vf,
                 "itag": "e2t" in vf,
+                "dlni": "dlni" in vf,
+                "dgrid": "grid" in vf,
                 "dnsort": "nsort" in vf,
                 "dhsortn": vf["hsortn"],
                 "dsort": vf["sort"],
@@ -3091,7 +3104,8 @@ class AuthSrv(object):
                 "unlist0": vf.get("unlist") or "",
                 "see_dots": self.args.see_dots,
                 "dqdel": self.args.qdel,
-                "dgrid": "grid" in vf,
+                "dlni": vn.js_ls["dlni"],
+                "dgrid": vn.js_ls["dgrid"],
                 "dgsel": "gsel" in vf,
                 "dnsort": "nsort" in vf,
                 "dhsortn": vf["hsortn"],
@@ -3131,7 +3145,10 @@ class AuthSrv(object):
                     self.log("BUG: /%s not in all_nodes" % (vol.vpath,), 1)
                     vols.append(vol)
             if shr in vfs.all_nodes:
-                self.log("BUG: %s found in all_nodes" % (shr,), 1)
+                t = "invalid config: a volume is overlapping with the --shr global-option (/%s)"
+                t = t % (shr,)
+                self.log(t, 1)
+                raise Exception(t)
 
         for vol in vols:
             dbv = vol.get_dbv("")[0]
@@ -3290,7 +3307,7 @@ class AuthSrv(object):
                 pwdb = {}
             else:
                 jtxt = read_utf8(self.log, ap, True)
-                pwdb = json.loads(jtxt)
+                pwdb = json.loads(jtxt) if jtxt.strip() else {}
 
             pwdb = [x for x in pwdb if x[0] != uname]
             pwdb.append((uname, self.defpw[uname], hpw))
@@ -3314,7 +3331,7 @@ class AuthSrv(object):
             return
 
         jtxt = read_utf8(self.log, ap, True)
-        pwdb = json.loads(jtxt)
+        pwdb = json.loads(jtxt) if jtxt.strip() else {}
 
         useen = set()
         urst = set()

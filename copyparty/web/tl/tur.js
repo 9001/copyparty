@@ -84,6 +84,8 @@ Ls.tur = {
 			["M", "metin dosyasını kapat"],
 			["E", "metin dosyasını düzenle"],
 			["S", "dosyayı seç (kes/kopyala/yeniden adlandır)"],
+			["Y", "metin dosyasını indir"], //m
+			["⇧ J", "json güzelleştir"], //m
 		]
 	],
 
@@ -223,6 +225,7 @@ Ls.tur = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ ipuçları',
 	"ct_thumb": 'ızgara görünümünde, simgeler ve küçük resimler arasında geçiş yapın$NKısayol: T">🖼️ küçük resimler',
 	"ct_csel": 'ızgara görünümünde dosya seçimi için CTRL ve SHIFT tuşlarını kullanın">seç',
+	"ct_dl": 'dosyaya tıklandığında indirmeyi zorla (satır içinde görüntüleme)">dl', //m
 	"ct_ihop": 'resim görüntüleyici kapatıldığında, en son görüntülenen dosyaya kaydırın">g⮯',
 	"ct_dots": 'gizli dosyaları göster (sunucu izin veriyorsa)">nokta dosyaları',
 	"ct_qdel": 'dosyaları silerken yalnız bir kez onay isteyin">qdel',
@@ -437,7 +440,7 @@ Ls.tur = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopyala</a><a href="#" id="modal-ng">Yükle</a>',
 
 	"mk_noname": "bunu yapmadan önce soldaki boşluğa bir şeyler yazsana :p",
-	"nmd_i1": "ayrıca istediğin dosya uzantısını ekleyebilirsin, örneğin <code>.txt</code>", //m
+	"nmd_i1": "ayrıca istediğin dosya uzantısını ekleyebilirsin, örneğin <code>.md</code>", //m
 	"nmd_i2": "silme iznin olmadığı için yalnızca <code>.md</code> dosyaları oluşturabilirsin", //m
 
 	"tv_load": "Metin belgesi yükleniyor:\n\n{0}\n\n{1}% ({2} of {3} MiB yüklendi)",
@@ -449,6 +452,7 @@ Ls.tur = {
 	"tvt_prev": "önceki belgeyi göster$NKısayol: i\">⬆ önceki",
 	"tvt_next": "sonraki belgeyi göster$NKısayol: K\">⬇ sonraki",
 	"tvt_sel": "dosyayı seç$NKısayol: S\">seç",
+	"tvt_j": "json güzelleştir$NKısayol: shift-J\">j", //m
 	"tvt_edit": "dosyayı metin düzenleyicisinde aç$NKısayol: E\">✏️ düzenle",
 	"tvt_tail": "dosyalardaki değişiklikleri izle; yeni satırları gerçek zamanlı göster\">📡 takip",
 	"tvt_wrap": "kelime sarma\">↵",
@@ -669,11 +673,14 @@ Ls.tur = {
 		"ta1": "ilk önce yeni şifreyi doldur",
 		"ta2": "yeni şifreyi onaylamak için tekrar girin:",
 		"ta3": "bir yazım hatası bulundu; lütfen tekrar deneyin",
+		"nop": "HATA: Parola boş olamaz", //m
+		"nou": "HATA: Kullanıcı adı ve/veya parola boş olamaz", //m
 		"aa1": "gelen dosyalar:",
 		"ab1": "no304'ü devre dışı bırak",
 		"ac1": "no304'ü etkinleştir",
 		"ad1": "no304'ü etkinleştirmek, tüm önbelleği devre dışı bırakır; bunu k304 yeterli olmadıysa deneyin. Bu, büyük miktarda ağ trafiği israf edecektir!",
 		"ae1": "aktif indirmeler:",
 		"af1": "son yüklemeleri göster",
+		"ag1": "bilinen IdP kullanıcılarını göster", //m
 	}
 };
