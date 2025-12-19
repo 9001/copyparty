@@ -900,19 +900,19 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag);
     bcfg_bind(uc, 'upsfx', 'upsfx', false, set_upsfx);
 
-    uc.ow = parseInt(sread('u2ow', ['0', '1', '2']) || u2ow);
-    uc.owt = ['🛡️', '🕒', '♻️'];
+    uc.ow = parseInt(sread('u2ow', ['0', '1', '2', '3']) || u2ow);
+    uc.owt = ['🛡️', '🕒', '♻️', '⏭️'];
     function set_ow() {
         QS('label[for="u2ow"]').innerHTML = uc.owt[uc.ow];
         ebi('u2ow').checked  = true; //cosmetic
     }
     ebi('u2ow').onclick = function (e) {
         ev(e);
-        if (++uc.ow > 2)
+        if (++uc.ow > 3)
             uc.ow = 0;
         swrite('u2ow', uc.ow);
         set_ow();
-        if (uc.ow && !has(perms, 'delete'))
+        if (uc.ow && uc.ow !== 3 &&  !has(perms, 'delete'))
             toast.warn(10, L.u_enoow, 'noow');
         else if (toast.tag == 'noow')
             toast.hide();
@@ -2727,9 +2727,10 @@ function up2k_init(subtle) {
                 var err_pend = rsp.indexOf('partial upload exists at a different') + 1,
                     err_srcb = rsp.indexOf('source file busy; please try again') + 1,
                     err_plug = rsp.indexOf('upload blocked by x') + 1,
-                    err_dupe = rsp.indexOf('upload rejected, file already exists') + 1;
+                    err_dupe = rsp.indexOf('upload rejected, file already exists') + 1,
+                    err_exists = rsp.indexOf('upload rejected, a file with that name already exists') + 1;
 
-                if (err_pend || err_srcb || err_plug || err_dupe) {
+                if (err_pend || err_srcb || err_plug || err_dupe || err_exists) {
                     err = rsp;
                     ofs = err.indexOf('\n/');
                     if (ofs !== -1) {
@@ -2793,6 +2794,8 @@ function up2k_init(subtle) {
                 req.replace = 'mt';
             if (uc.ow == 2)
                 req.replace = true;
+            if (uc.ow == 3)
+                req.replace = 'skip';
         }
 
         xhr.open('POST', t.purl, true);

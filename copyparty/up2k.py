@@ -3468,7 +3468,15 @@ class Up2k(object):
         fp = djoin(fdir, fname)
 
         ow = job.get("replace") and bos.path.exists(fp)
-        if ow and "mt" in str(job["replace"]).lower():
+        if ow:
+            replace_arg = str(job["replace"]).lower()
+
+        if ow and "skip" in replace_arg:
+            self.log("skipping upload, filename already exists: %r" % fp)
+            err = "upload rejected, a file with that name already exists"
+            raise Pebkac(409, err)
+
+        if ow and "mt" in replace_arg:
             mts = bos.stat(fp).st_mtime
             mtc = job["lmod"]
             if mtc < mts:

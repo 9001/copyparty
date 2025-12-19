@@ -2875,7 +2875,7 @@ class HttpCli(object):
         body["addr"] = self.ip
         body["vcfg"] = dbv.flags
 
-        if not self.can_delete:
+        if not self.can_delete and not body.get("replace") == "skip":
             body.pop("replace", None)
 
         if rem:
