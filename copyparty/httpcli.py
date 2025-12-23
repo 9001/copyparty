@@ -117,7 +117,6 @@ from .util import (
     undot,
     unescape_cookie,
     unquotep,
-    unhumanize,
     vjoin,
     vol_san,
     vroots,
@@ -1832,18 +1831,16 @@ class HttpCli(object):
             or (zi == 4 and self.can_write and self.can_read)
             or (zi == 3 and self.can_admin)
         ):
-            vmaxb_value = unhumanize(vn.flags.get("vmaxb") or "0")
-            if vmaxb_value:
-                try:
-                    bused, _ = self.conn.hsrv.broker.ask("up2k.get_volsizes", [vn.realpath]).get()[0]
-                    bfree = max(0, vmaxb_value - bused)
-                    btot = vmaxb_value
-                except:
-                    bfree, btot, _ = get_df(vn.realpath, False)
-            else:
-                bfree, btot, _ = get_df(vn.realpath, False)
-            
+            bfree, btot, _ = get_df(vn.realpath, False)
             if btot:
+                if "vmaxb" in vn.flags:
+                    try:
+                        zi, _ = self.conn.hsrv.broker.ask(
+                            "up2k.get_volsizes", [vn.realpath]
+                        ).get()[0]
+                        bfree = min(bfree, max(0, vn.lim.vbmax - zi))
+                    except:
+                        pass
                 df = {
                     "quota-available-bytes": str(bfree),
                     "quota-used-bytes": str(btot - bfree),
