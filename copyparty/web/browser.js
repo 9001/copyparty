@@ -646,7 +646,7 @@ if (1)
 		"rc_opn": "Open",
 		"rc_ply": "Play",
 		"rc_pla": "Play as audio",
-		"rc_txt": "Open in text editor",
+		"rc_txt": "Open in file viewer",
 		"rc_md": "Open in markdown editor",
 		"rc_dl": "Download",
 		"rc_zip": "Download as archive",
@@ -9472,7 +9472,7 @@ let rcm = (function () {
 	function mktemp(is_dir) {
 		let row = mknod('tr', 'temp', 
 			'<td>-new-</td>' +
-			'<td columnspan="2"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : "File") + ' Name"></td>'
+			'<td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : "File") + ' Name"></td>'
 		);
 		QS("#files tbody").appendChild(row);
 
@@ -9487,8 +9487,10 @@ let rcm = (function () {
 			let req = new XHR();
 			req.open("POST", get_evpath());
 			req.onload = req.onerror = function() {
-				if (req.status != 201)
-					return toast.err(3, "something broke :(");
+				if (req.status == 405 || req.status == 500)
+					return toast.err(3, "a " + (is_dir ? "folder" : "file") + " with that name alredy exists.");
+				if (req.status < 200 || req.status > 399)
+					return toast.err(3, "couldn't create " + (is_dir ? "folder" : "file") + ": <br><code>" + esc(req.responseText) + '</code>');
 				toast.ok(3, "OK :)");
 				reload_browser();
 			};
@@ -9503,8 +9505,10 @@ let rcm = (function () {
 		input.onkeydown = function(e) {
 			if (e.key == "Enter")
 				sendit(input.value);
-			if (e.key == "Enter" || e.key == "Escape")
+			if (e.key == "Enter" || e.key == "Escape") {
 				row.remove();
+				ev(e)
+			}
 		};
 		input.focus();
 	}

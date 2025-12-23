@@ -4159,6 +4159,7 @@ html.e #detree {
 }
 
 #tempname {
+	width: 100%;
 	color: var(--fg);
 	background: var(--txt-bg);
 	border: none;
