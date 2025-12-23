@@ -4121,3 +4121,46 @@ html.e #doc {
 html.e #detree {
   padding: 0px;
 }
+
+#rcm {
+	position: absolute;
+	display: none;
+	background: var(--bg);
+	border: 1px solid var(--bg-u3);
+	outline: none;
+	border-radius: .3rem;
+	box-shadow: 0 0 .3rem var(--bg-d3);
+	z-index: 3;
+}
+
+#rcm > * {
+	display: block;
+}
+
+#rcm > a {
+	padding: .2rem .3rem;
+}
+
+#rcm > .hide {
+	display: none;
+}
+
+#rcm > a:hover {
+	background: var(--bg-d2);
+}
+
+#rcm > .sep {
+	margin: 0 .2rem;
+	border-bottom: 1px solid var(--a-gray);
+}
+
+#tempname {
+	color: var(--fg);
+	background: var(--txt-bg);
+	border: none;
+	box-shadow: 0 0 2px var(--txt-sh);
+	border-bottom: 1px solid #999;
+	border-color: var(--a);
+	border-radius: .2em;
+	padding: .2em .3em;
+}

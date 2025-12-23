@@ -223,6 +223,7 @@ if (1)
 		"cl_reset": "reset",
 		"cl_hpick": "tap on column headers to hide in the table below",
 		"cl_hcancel": "column hiding aborted",
+		"cl_rcm": "right-click menu",
 
 		"ct_grid": '田 the grid',
 		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
@@ -265,6 +266,8 @@ if (1)
 		"cdt_lim": "max number of files to show in a folder",
 		"cdt_ask": "when scrolling to the bottom,$Ninstead of loading more files,$Nask what to do",
 		"cdt_hsort": "how many sorting rules (&lt;code&gt;,sorthref&lt;/code&gt;) to include in media-URLs. Setting this to 0 will also ignore sorting-rules included in media links when clicking them",
+		"cdt_ren": "enable custom right-click menu",
+		"cdt_rno": "enable normal menu when double right-clicking",
 
 		"tt_entree": "show navpane (directory tree sidebar)$NHotkey: B",
 		"tt_detree": "show breadcrumbs$NHotkey: B",
@@ -640,6 +643,22 @@ if (1)
 		"ur_um": "Finished;\n{0} uploads OK,\n{1} uploads failed, sorry",
 		"ur_sm": "Finished;\n{0} files found on server,\n{1} files NOT found on server",
 
+		"rc_opn": "Open",
+		"rc_ply": "Play",
+		"rc_pla": "Play as audio",
+		"rc_txt": "Open in text editor",
+		"rc_md": "Open in markdown editor",
+		"rc_dl": "Download",
+		"rc_zip": "Download as archive",
+		"rc_del": "Delete",
+		"rc_cut": "Cut",
+		"rc_cpy": "Copy",
+		"rc_pst": "Paste",
+		"rc_nfo": "New folder",
+		"rc_nfi": "New file",
+		"rc_sal": "Select all",
+		"rc_sin": "Invert selection",
+
 		"lang_set": "refresh to make the change take effect?",
 };
 
@@ -966,6 +985,13 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
+	'<div>' +
+	'	<h3>' + L.cl_rcm + '</h3>' +
+	'	<div>' +
+	'		<a id="ren" class="tgl btn" href="#" tt="' + L.cdt_ren + '">enable</a>' +
+	'		<a id="rno" class="tgl btn" href="#" tt="' + L.cdt_rno + '">double-click</a>' +
+	'	</div>' +
+	'</div>' +
 	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
@@ -995,6 +1021,34 @@ QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
 QS('#op_new_md input[type="submit"]').value = L.ab_mkdoc;
 QS('#op_msg input[type="submit"]').value = L.ab_msg;
 
+// right-click menu
+ebi('rcm').innerHTML = (
+	'<a href="#" id="ropn">' + L.rc_opn + '</a>' +
+	'<a href="#" id="rply">' + L.rc_ply + '</a>' +
+	'<a href="#" id="rpla">' + L.rc_pla + '</a>' +
+	'<a href="#" id="rtxt">' + L.rc_txt + '</a>' +
+	'<a href="#" id="rmd">' + L.rc_md + '</a>' +
+	'<div id="rs1" class="sep"></div>' +
+	'<a href="#" id="rdl">' + L.rc_dl + '</a>' +
+	(have_zip ?
+		'<a href="#" id="rzip">' + L.rc_zip + '</a>'
+	: '') +
+	'<div id="rs2" class="sep"></div>' +
+	(has(perms, "move") ?
+		'<a href="#" id="rdel">' + L.rc_del + '</a>' +
+		'<a href="#" id="rcut">' + L.rc_cut + '</a>'
+	: '') +
+	'<a href="#" id="rcpy">' + L.rc_cpy + '</a>' +
+	(has(perms, "write") ?
+		'<a href="#" id="rpst">' + L.rc_pst + '</a>' +
+		'<div id="rs3" class="sep"></div>' + 
+		'<a href="#" id="rnfo">' + L.rc_nfo + '</a>' +
+		'<a href="#" id="rnfi">' + L.rc_nfi + '</a>'
+	: '') +
+	'<div id="rs4" class="sep"></div>' +
+	'<a href="#" id="rsal">' + L.rc_sal + '</a>' +
+	'<a href="#" id="rsin">' + L.rc_sin + '</a>'
+);
 
 (function () {
 	var ops = QSA('#ops>a');
@@ -9391,6 +9445,198 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 		return ev(e);
 	}
 };
+
+
+
+let rcm = (function () {
+	if (MOBILE)
+		return {enabled: false}
+
+	let r = {
+		enabled: true,
+		double: true
+	};
+	bcfg_bind(r, 'enabled', 'ren', true);
+	bcfg_bind(r, 'double', 'rno', true);
+
+	let menu = ebi('rcm');
+	let selFile = {
+		elem: null,
+		type: null,
+		path: null,
+		id: null,
+		relpath: null,
+		no_dsel: false
+	};
+
+	function mktemp(is_dir) {
+		let row = mknod('tr', 'temp', 
+			'<td>-new-</td>' +
+			'<td columnspan="2"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : "File") + ' Name"></td>'
+		);
+		QS("#files tbody").appendChild(row);
+
+		function sendit(name) {
+			name = ('' + name).trim();
+			if (!name)
+				return;
+			let data = new FormData();
+			data.set("act", is_dir ? "mkdir" : "new_md");
+			data.set("name", name);
+
+			let req = new XHR();
+			req.open("POST", get_evpath());
+			req.onload = req.onerror = function() {
+				if (req.status != 201)
+					return toast.err(3, "something broke :(");
+				toast.ok(3, "OK :)");
+				reload_browser();
+			};
+			req.send(data);
+		}
+
+		let input = ebi("tempname");
+		input.onblur = function() {
+			sendit(input.value);
+			row.remove();
+		};
+		input.onkeydown = function(e) {
+			if (e.key == "Enter")
+				sendit(input.value);
+			if (e.key == "Enter" || e.key == "Escape")
+				row.remove();
+		};
+		input.focus();
+	}
+
+	let opts = QSA('#rcm a');
+	for (let i = 0; i < opts.length; i++) {
+		let fn = function() {};
+		switch(opts[i].id.slice(1)) {
+			case 'opn':
+				fn = function() {
+					let a = mknod('a');
+					a.href = selFile.path;
+					a.target = selFile.type == "dir" ? '' : '_blank';
+					a.click();
+				};
+				break;
+			case 'ply':
+				fn = function() {selFile.type == 'gf' ? thegrid.imshow(selFile.relpath) : play('f-' + selFile.id)};
+				break;
+			case 'pla':
+				fn = function() {play('f-' + selFile.id)};
+				break;
+			case 'txt':
+				fn = function() {location = '?doc=' + selFile.relpath};
+				break;
+			case 'md':
+				fn = function() {location = selFile.path + '?v'};
+				break;
+			case 'dl':
+				fn = function() {ebi('seldl').click()};
+				break;
+			case 'zip':
+				fn = function() {ebi('selzip').click()};
+				break;
+			case 'cut':
+				fn = function() {fileman.cut()};
+				break;
+			case 'cpy':
+				fn = function() {fileman.cpy()};
+				break;
+			case 'pst':
+				fn = function() {fileman.paste(); fileman.clip = []};
+				break;
+			case 'nfo':
+				fn = function() {mktemp(true)};
+				break;
+			case 'nfi':
+				fn = function() {mktemp()};
+				break;
+			case 'sal':
+				fn = function() {msel.evsel(null, true); selFile.no_dsel = true};
+				break;
+			case 'sin':
+				fn = function() {msel.evsel(null, 't')};
+				break;
+		}
+		opts[i].onclick = function(e) {
+			ev(e);
+			fn();
+			hide(true);
+		};
+	}
+	
+	function show(x, y, target) {
+		selFile.elem = selFile.type = selFile.path = selFile.id = selFile.relpath = null;
+		selFile.no_dsel = false;
+		if (target) {
+			let file = target.closest("#files tbody tr");
+			if (file) {
+				selFile.no_dsel = clgot(file, "sel");
+				clmod(file, "sel", true);
+				selFile.elem = file;
+
+				selFile.path = basenames(file.children[1].firstChild.href).split('?')[0];
+				selFile.relpath = selFile.path.split('/').slice(-1)[0];
+				if (file.children[3].innerHTML == "---")
+					selFile.type = "dir";
+				else {
+					let lead = file.firstChild.firstChild;
+					selFile.id = lead.id.split('-')[1];
+					selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
+				}
+			}
+		}
+		msel.selui();
+
+		let has_sel = msel.getsel().length;
+		let has_clip = fileman.clip.length;
+
+		clmod(ebi('ropn'), 'hide', !selFile.path);
+		clmod(ebi('rply'), 'hide', selFile.type != 'gf' && selFile.type != 'af');
+		clmod(ebi('rpla'), 'hide', selFile.type != 'gf');
+		clmod(ebi('rtxt'), 'hide', !selFile.id);
+		clmod(ebi('rs1'), 'hide', !selFile.path);
+		clmod(ebi('rmd'), 'hide', !selFile.id || selFile.path.slice(-3) != '.md');
+		clmod(ebi('rdl'), 'hide', !has_sel);
+		clmod(ebi('rzip'), 'hide', !has_sel);
+		clmod(ebi('rs2'), 'hide', !has_sel);
+		clmod(ebi('rcut'), 'hide', !has_sel);
+		clmod(ebi('rdel'), 'hide', !has_sel);
+		clmod(ebi('rcpy'), 'hide', !has_sel);
+		clmod(ebi('rpst'), 'hide', !has_clip);
+		clmod(ebi('rs3'), 'hide', !has_sel || !has_clip);
+
+		menu.style.left = x + 'px';
+		menu.style.top = y + 'px';
+		menu.style.display = 'block';
+		menu.focus();
+	}
+
+	function hide(force) {
+		if (!menu.style.display || (!force && menu.contains(document.activeElement)))
+			return;
+		if (selFile.elem && !selFile.no_dsel)
+			clmod(selFile.elem, "sel", false);
+		selFile.elem = selFile.type = selFile.path = selFile.id = selFile.relpath = null;
+		selFile.no_dsel = false;
+		menu.style.display = '';
+	}
+
+	ebi('wrap').oncontextmenu = function(e) {
+		hide(true);
+		if (thegrid.en || !r.enabled || (r.double && e.detail > 1))
+			return true;
+		ev(e);
+		show(e.x, e.y, e.target);
+		return false;
+	};
+	menu.onblur = function() {setTimeout(hide)};
+
+	return r;
+})();
 
 
 function reload_mp() {
