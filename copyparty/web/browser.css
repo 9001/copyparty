@@ -2166,6 +2166,10 @@ html.noscroll .sbar::-webkit-scrollbar {
 	vertical-align: middle;
 	transition: transform .23s, left .23s, top .23s, width .23s, height .23s;
 }
+.full-image img.asap,
+.full-image video.asap {
+	transition: none;
+}
 #bbox-overlay.fill .full-image img,
 #bbox-overlay.fill .full-image video {
     width: 100%;

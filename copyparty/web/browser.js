@@ -158,7 +158,7 @@ if (1)
 		"ul_par": "parallel uploads:",
 		"ut_rand": "randomize filenames",
 		"ut_u2ts": "copy the last-modified timestamp$Nfrom your filesystem to the server\">📅",
-		"ut_ow": "overwrite existing files on the server?$N🛡️: never (will generate a new filename instead)$N🕒: overwrite if server-file is older than yours$N♻️: always overwrite if the files are different",
+		"ut_ow": "overwrite existing files on the server?$N🛡️: never (will generate a new filename instead)$N🕒: overwrite if server-file is older than yours$N♻️: always overwrite if the files are different$N⏭️: skip uploading if the server-file exists, regardless of contents",
 		"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
 		"ut_ask": 'ask for confirmation before upload starts">💭',
 		"ut_pot": "improve upload speed on slow devices$Nby making the UI less complex",

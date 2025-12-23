@@ -174,7 +174,7 @@ class FtpFs(AbstractedFS):
                 t = "Unsupported characters in [{}]"
                 raise FSE(t.format(vpath), 1)
 
-            fn = sanitize_fn(fn or "", "")
+            fn = sanitize_fn(fn or "")
             vpath = vjoin(rd, fn)
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
             if (

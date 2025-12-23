@@ -2245,28 +2245,30 @@ def undot(path: str) -> str:
     return "/".join(ret)
 
 
-def sanitize_fn(fn: str, ok: str) -> str:
-    if "/" not in ok:
-        fn = fn.replace("\\", "/").split("/")[-1]
-
+def sanitize_fn(fn: str) -> str:
+    fn = fn.replace("\\", "/").split("/")[-1]
     if APTL_OS:
-        fn = fn.translate(APTL_OS)
-        if ANYWIN:
-            bad = ["con", "prn", "aux", "nul"]
-            for n in range(1, 10):
-                bad += ("com%s lpt%s" % (n, n)).split(" ")
-
-            if fn.lower().split(".")[0] in bad:
-                fn = "_" + fn
-
+        fn = sanitize_to(fn, APTL_OS)
     return fn.strip()
 
 
-def sanitize_vpath(vp: str, ok: str) -> str:
+def sanitize_to(fn: str, tl: dict[int, int]) -> str:
+    fn = fn.translate(tl)
+    if ANYWIN:
+        bad = ["con", "prn", "aux", "nul"]
+        for n in range(1, 10):
+            bad += ("com%s lpt%s" % (n, n)).split(" ")
+
+        if fn.lower().split(".")[0] in bad:
+            fn = "_" + fn
+    return fn
+
+
+def sanitize_vpath(vp: str) -> str:
     if not FNTL_OS:
         return vp
     parts = vp.replace(os.sep, "/").split("/")
-    ret = [sanitize_fn(x, ok) for x in parts]
+    ret = [sanitize_to(x, APTL_OS) for x in parts]
     return "/".join(ret)
 
 

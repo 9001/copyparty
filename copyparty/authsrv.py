@@ -93,6 +93,13 @@ LEELOO_DALLAS = "leeloo_dallas"
 ## thanks for coming to my ted talk
 
 
+UP_MTE_MAP = {  # db-order
+    "w": "substr(w,1,16)",
+    "up_ip": "ip",
+    ".up_at": "at",
+    "up_by": "un",
+}
+
 SEE_LOG = "see log for details"
 SEESLOG = " (see serverlog for details)"
 SSEELOG = " ({})".format(SEE_LOG)
@@ -1058,6 +1065,7 @@ class AuthSrv(object):
             "tcolor": self.args.tcolor,
             "du_iwho": self.args.du_iwho,
             "shr_who": self.args.shr_who if self.args.shr else "no",
+            "ls_q_m": ("", ""),
         }
         self._vf0 = self._vf0b.copy()
         self._vf0["d2d"] = True
@@ -2671,6 +2679,12 @@ class AuthSrv(object):
                     t = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volflags)'
                     self.log(t.format(vol.vpath, mtp), 1)
                     errors = True
+
+            mte = vol.flags.get("mte") or {}
+            up_m = [x for x in UP_MTE_MAP if x in mte]
+            up_q = [UP_MTE_MAP[x] for x in up_m]
+            zs = "select %s from up where rd=? and fn=?" % (", ".join(up_q),)
+            vol.flags["ls_q_m"] = (zs if up_m else "", up_m)
 
         for vol in vfs.all_nodes.values():
             if not vol.flags.get("is_file"):

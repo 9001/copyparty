@@ -1014,7 +1014,9 @@ window.baguetteBox = (function () {
         if (index >= imagesElements.length)
             return bounceAnimation(options.readDirRtl ? 'left' : 'right');
 
+        var orot;
         try {
+            orot = vidimg().getAttribute('rot');
             vid().pause();
         }
         catch (ex) { }
@@ -1032,6 +1034,9 @@ window.baguetteBox = (function () {
         else if (toast.tag == 'bb-ded')
             toast.hide();
 
+        if (orot && im.getAttribute('rot') === null)
+            rotn(orot / 90, 1);
+
         if (options.animation == 'none')
             unvid(vid());
         else
@@ -1048,7 +1053,7 @@ window.baguetteBox = (function () {
     }
 
     var prev_cw = 0, prev_ch = 0, unrot_timer = null;
-    function rotn(n) {
+    function rotn(n, asap) {
         var el = vidimg(),
             orot = parseInt(el.getAttribute('rot') || 0),
             frot = orot + (n || 0) * 90;
@@ -1063,6 +1068,8 @@ window.baguetteBox = (function () {
         if (!n && prev_cw === cw && prev_ch === ch)
             return;  // reflow noop
 
+        clmod(el, 'asap', asap);
+
         prev_cw = cw;
         prev_ch = ch;
         var rot = frot,
@@ -1072,8 +1079,13 @@ window.baguetteBox = (function () {
             dl = el.closest('div').querySelector('figcaption a'),
             vw = cw,
             vh = ch - dl.offsetHeight + magic,
-            pmag = Math.min(1, Math.min(vw / ih, vh / iw)),
-            wmag = Math.min(1, Math.min(vw / iw, vh / ih));
+            pmag = Math.min(vw / ih, vh / iw),
+            wmag = Math.min(vw / iw, vh / ih);
+
+        if (!options.bbzoom) {
+            pmag = Math.min(1, pmag);
+            wmag = Math.min(1, wmag);
+        }
 
         while (rot < 0) rot += 360;
         while (rot >= 360) rot -= 360;
@@ -1117,7 +1129,7 @@ window.baguetteBox = (function () {
             return;
 
         clmod(el, 'nt', 1);
-        el.removeAttribute('rot');
+        el.setAttribute('rot', 0);
         el.removeAttribute("style");
         rot = el.offsetHeight;
         clmod(el, 'nt');
