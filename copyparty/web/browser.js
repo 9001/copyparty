@@ -9622,8 +9622,8 @@ var rcm = (function () {
 		clmod(ebi('rpst'), 'hide', !has_clip);
 		clmod(ebi('rs3'), 'hide', !has_sel || !has_clip);
 
-		menu.style.left = x + 1 + 'px';
-		menu.style.top = y + 1 + 'px';
+		menu.style.left = x + 5 + 'px';
+		menu.style.top = y + 5 + 'px';
 		menu.style.display = 'block';
 		menu.focus();
 	}
@@ -9638,14 +9638,17 @@ var rcm = (function () {
 		menu.style.display = '';
 	}
 
+	var lrcTime = null;
 	ebi('wrap').oncontextmenu = function(e) {
 		hide(true);
-		console.log(e.detail)
-		if (thegrid.en || !r.enabled || (r.double && e.detail > 1))
+		if (thegrid.en || !r.enabled || (r.double && lrcTime && e.timeStamp - lrcTime < 500)) {
 			return true;
-		ev(e);
-		show(e.x, e.y, e.target);
-		return false;
+		} else {
+			lrcTime = e.timeStamp;
+			ev(e);
+			show(e.clientX, e.clientY, e.target);
+			return false;
+		}
 	};
 	menu.onblur = function() {setTimeout(hide)};
 
