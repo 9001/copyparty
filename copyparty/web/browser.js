@@ -985,13 +985,13 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	'<div>' +
+	(!MOBILE ? '<div>' +
 	'	<h3>' + L.cl_rcm + '</h3>' +
 	'	<div>' +
 	'		<a id="ren" class="tgl btn" href="#" tt="' + L.cdt_ren + '">enable</a>' +
 	'		<a id="rno" class="tgl btn" href="#" tt="' + L.cdt_rno + '">double-click</a>' +
 	'	</div>' +
-	'</div>' +
+	'</div>' : '') +
 	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
@@ -9448,19 +9448,19 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 
 
-let rcm = (function () {
+var rcm = (function () {
 	if (MOBILE)
 		return {enabled: false}
 
-	let r = {
+	var r = {
 		enabled: true,
 		double: true
 	};
 	bcfg_bind(r, 'enabled', 'ren', true);
 	bcfg_bind(r, 'double', 'rno', true);
 
-	let menu = ebi('rcm');
-	let selFile = {
+	var menu = ebi('rcm');
+	var selFile = {
 		elem: null,
 		type: null,
 		path: null,
@@ -9470,7 +9470,7 @@ let rcm = (function () {
 	};
 
 	function mktemp(is_dir) {
-		let row = mknod('tr', 'temp', 
+		var row = mknod('tr', 'temp', 
 			'<td>-new-</td>' +
 			'<td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : "File") + ' Name"></td>'
 		);
@@ -9480,94 +9480,104 @@ let rcm = (function () {
 			name = ('' + name).trim();
 			if (!name)
 				return;
-			let data = new FormData();
+			var data = new FormData();
 			data.set("act", is_dir ? "mkdir" : "new_md");
 			data.set("name", name);
 
-			let req = new XHR();
+			var req = new XHR();
 			req.open("POST", get_evpath());
 			req.onload = req.onerror = function() {
 				if (req.status == 405 || req.status == 500)
-					return toast.err(3, "a " + (is_dir ? "folder" : "file") + " with that name alredy exists.");
+					return toast.err(3, "a " + (is_dir ? "folder" : "file") + " with that name already exists.");
 				if (req.status < 200 || req.status > 399)
 					return toast.err(3, "couldn't create " + (is_dir ? "folder" : "file") + ": <br><code>" + esc(req.responseText) + '</code>');
 				toast.ok(3, "OK :)");
-				reload_browser();
+				
+				setTimeout(function() {location.reload()}, 100);
 			};
 			req.send(data);
 		}
 
-		let input = ebi("tempname");
+		var input = ebi("tempname");
 		input.onblur = function() {
 			sendit(input.value);
+			// Chrome blurs elements when calling remove for some reason
+			input.onblur = null;
 			row.remove();
 		};
 		input.onkeydown = function(e) {
 			if (e.key == "Enter")
 				sendit(input.value);
 			if (e.key == "Enter" || e.key == "Escape") {
+				input.onblur = null;
 				row.remove();
-				ev(e)
+				ev(e);
 			}
 		};
 		input.focus();
 	}
 
-	let opts = QSA('#rcm a');
-	for (let i = 0; i < opts.length; i++) {
-		let fn = function() {};
-		switch(opts[i].id.slice(1)) {
-			case 'opn':
-				fn = function() {
-					let a = mknod('a');
+	var opts = QSA('#rcm a');
+	for (var i = 0; i < opts.length; i++) {
+		opts[i].onclick = function(e) {
+			ev(e);
+			switch(e.target.id.slice(1)) {
+				case 'opn':
+					var a = mknod('a');
 					a.href = selFile.path;
 					a.target = selFile.type == "dir" ? '' : '_blank';
 					a.click();
-				};
-				break;
-			case 'ply':
-				fn = function() {selFile.type == 'gf' ? thegrid.imshow(selFile.relpath) : play('f-' + selFile.id)};
-				break;
-			case 'pla':
-				fn = function() {play('f-' + selFile.id)};
-				break;
-			case 'txt':
-				fn = function() {location = '?doc=' + selFile.relpath};
-				break;
-			case 'md':
-				fn = function() {location = selFile.path + '?v'};
-				break;
-			case 'dl':
-				fn = function() {ebi('seldl').click()};
-				break;
-			case 'zip':
-				fn = function() {ebi('selzip').click()};
-				break;
-			case 'cut':
-				fn = function() {fileman.cut()};
-				break;
-			case 'cpy':
-				fn = function() {fileman.cpy()};
-				break;
-			case 'pst':
-				fn = function() {fileman.paste(); fileman.clip = []};
-				break;
-			case 'nfo':
-				fn = function() {mktemp(true)};
-				break;
-			case 'nfi':
-				fn = function() {mktemp()};
-				break;
-			case 'sal':
-				fn = function() {msel.evsel(null, true); selFile.no_dsel = true};
-				break;
-			case 'sin':
-				fn = function() {msel.evsel(null, 't')};
-				break;
-		}
-		opts[i].onclick = function(e) {
-			ev(e);
-			fn();
+					break;
+				case 'ply':
+					if (selFile.type == 'gf')
+						thegrid.imshow(selFile.relpath);
+					else
+						play('f-' + selFile.id);
+					break;
+				case 'pla':
+					play('f-' + selFile.id);
+					break;
+				case 'txt':
+					location = '?doc=' + selFile.relpath;
+					break;
+				case 'md':
+					location = selFile.path + '?v';
+					break;
+				case 'dl':
+					ebi('seldl').click();
+					break;
+				case 'zip':
+					ebi('selzip').click();
+					break;
+				case 'del':
+					fileman.delete();
+					break;
+				case 'cut':
+					fileman.cut();
+					break;
+				case 'cpy':
+					fileman.cpy();
+					break;
+				case 'pst':
+					fileman.paste();
+					fileman.clip = [];
+					break;
+				case 'nfo':
+					mktemp(true);
+					break;
+				case 'nfi':
+					mktemp();
+					break;
+				case 'sal':
+					msel.evsel(null, true);
+					selFile.no_dsel = true;
+					break;
+				case 'sin':
+					msel.evsel(null, 't');
+					break;
+				default:
+					console.warn('Invalid rcm option "' + e.target.id + '"');
+			}
 			hide(true);
 		};
 	}
@@ -9576,7 +9586,7 @@ let rcm = (function () {
 		selFile.elem = selFile.type = selFile.path = selFile.id = selFile.relpath = null;
 		selFile.no_dsel = false;
 		if (target) {
-			let file = target.closest("#files tbody tr");
+			var file = target.closest("#files tbody tr");
 			if (file) {
 				selFile.no_dsel = clgot(file, "sel");
 				clmod(file, "sel", true);
@@ -9587,7 +9597,7 @@ let rcm = (function () {
 				if (file.children[3].innerHTML == "---")
 					selFile.type = "dir";
 				else {
-					let lead = file.firstChild.firstChild;
+					var lead = file.firstChild.firstChild;
 					selFile.id = lead.id.split('-')[1];
 					selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
 				}
@@ -9595,8 +9605,8 @@ let rcm = (function () {
 		}
 		msel.selui();
 
-		let has_sel = msel.getsel().length;
-		let has_clip = fileman.clip.length;
+		var has_sel = msel.getsel().length;
+		var has_clip = fileman.clip.length;
 
 		clmod(ebi('ropn'), 'hide', !selFile.path);
 		clmod(ebi('rply'), 'hide', selFile.type != 'gf' && selFile.type != 'af');
