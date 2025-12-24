@@ -266,8 +266,7 @@ if (1)
 		"cdt_lim": "max number of files to show in a folder",
 		"cdt_ask": "when scrolling to the bottom,$Ninstead of loading more files,$Nask what to do",
 		"cdt_hsort": "how many sorting rules (&lt;code&gt;,sorthref&lt;/code&gt;) to include in media-URLs. Setting this to 0 will also ignore sorting-rules included in media links when clicking them",
-		"cdt_ren": "enable custom right-click menu",
-		"cdt_rno": "enable normal menu when double right-clicking",
+		"cdt_ren": "enable custom right-click menu, you can still access the regular menu by pressing the shift key and right-clicking",
 
 		"tt_entree": "show navpane (directory tree sidebar)$NHotkey: B",
 		"tt_detree": "show breadcrumbs$NHotkey: B",
@@ -985,13 +984,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	(!MOBILE ? '<div>' +
-	'	<h3>' + L.cl_rcm + '</h3>' +
-	'	<div>' +
-	'		<a id="ren" class="tgl btn" href="#" tt="' + L.cdt_ren + '">enable</a>' +
-	'		<a id="rno" class="tgl btn" href="#" tt="' + L.cdt_rno + '">double-click</a>' +
-	'	</div>' +
-	'</div>' : '') +
+	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="ren" class="tgl btn" href="#" tt="' + L.cdt_ren + '">enable</a></div></div>' : '') +
 	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
@@ -9453,11 +9446,9 @@ var rcm = (function () {
 		return {enabled: false}
 
 	var r = {
-		enabled: true,
-		double: true
+		enabled: true
 	};
 	bcfg_bind(r, 'enabled', 'ren', true);
-	bcfg_bind(r, 'double', 'rno', true);
 
 	var menu = ebi('rcm');
 	var selFile = {
@@ -9638,13 +9629,11 @@ var rcm = (function () {
 		menu.style.display = '';
 	}
 
-	var lrcTime = null;
 	ebi('wrap').oncontextmenu = function(e) {
 		hide(true);
-		if (thegrid.en || !r.enabled || (r.double && lrcTime && e.timeStamp - lrcTime < 500)) {
+		if (thegrid.en || !r.enabled || e.shiftKey)
 			return true;
-		} else {
-			lrcTime = e.timeStamp;
+		else {
 			ev(e);
 			show(e.clientX, e.clientY, e.target);
 			return false;
