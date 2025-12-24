@@ -9491,9 +9491,8 @@ var rcm = (function () {
 					return toast.err(3, "a " + (is_dir ? "folder" : "file") + " with that name already exists.");
 				if (req.status < 200 || req.status > 399)
 					return toast.err(3, "couldn't create " + (is_dir ? "folder" : "file") + ": <br><code>" + esc(req.responseText) + '</code>');
-				toast.ok(3, "OK :)");
 				
-				setTimeout(function() {location.reload()}, 100);
+				location.reload();
 			};
 			req.send(data);
 		}
@@ -9623,8 +9622,8 @@ var rcm = (function () {
 		clmod(ebi('rpst'), 'hide', !has_clip);
 		clmod(ebi('rs3'), 'hide', !has_sel || !has_clip);
 
-		menu.style.left = x + 'px';
-		menu.style.top = y + 'px';
+		menu.style.left = x + 1 + 'px';
+		menu.style.top = y + 1 + 'px';
 		menu.style.display = 'block';
 		menu.focus();
 	}
@@ -9641,6 +9640,7 @@ var rcm = (function () {
 
 	ebi('wrap').oncontextmenu = function(e) {
 		hide(true);
+		console.log(e.detail)
 		if (thegrid.en || !r.enabled || (r.double && e.detail > 1))
 			return true;
 		ev(e);
