@@ -9631,7 +9631,7 @@ var rcm = (function () {
 
 	ebi('wrap').oncontextmenu = function(e) {
 		hide(true);
-		if (thegrid.en || !r.enabled || e.shiftKey)
+		if (thegrid.en || !r.enabled || e.shiftKey || menu.style.display)
 			return true;
 		else {
 			ev(e);
