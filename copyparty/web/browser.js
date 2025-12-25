@@ -9630,9 +9630,10 @@ var rcm = (function () {
 	}
 
 	ebi('wrap').oncontextmenu = function(e) {
-		hide(true);
-		if (thegrid.en || !r.enabled || e.shiftKey || menu.style.display)
+		if (thegrid.en || !r.enabled || e.shiftKey || menu.style.display) {
+			hide(true);
 			return true;
+		}
 		else {
 			ev(e);
 			show(e.clientX, e.clientY, e.target);
