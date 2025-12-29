@@ -195,10 +195,9 @@ class HCli(object):
 
         hdrs.update(self.base_hdrs)
         if self.ar.a:
-            if self.ar.ba:
-                hdrs["Authorization"] = "Basic " + base64.b64encode(self.ar.a.encode("utf-8")).decode("utf-8")
-            else:
-                hdrs["PW"] = self.ar.a
+            hdrs["PW"] = self.ar.a
+        if self.ar.ba:
+            hdrs["Authorization"] = self.ar.ba
         if ctype:
             hdrs["Content-Type"] = ctype
         if meth == "POST" and CLEN not in hdrs:
@@ -1553,8 +1552,8 @@ NOTE: if server has --usernames enabled, then password is "username:password"
     ap.add_argument("url", type=unicode, help="server url, including destination folder")
     ap.add_argument("files", type=files_decoder, nargs="+", help="files and/or folders to process")
     ap.add_argument("-v", action="store_true", help="verbose")
-    ap.add_argument("-a", metavar="PASSWD", help="password or $filepath")
-    ap.add_argument("--ba", action="store_true", help="use basic auth instead of PW header")
+    ap.add_argument("-a", metavar="PASSWD", default="", help="password (or $filepath) for copyparty (is sent in header 'PW')")
+    ap.add_argument("--ba", metavar="PASSWD", default="", help="password (or $filepath) for basic-auth (usually not necessary)")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("-x", type=unicode, metavar="REGEX", action="append", help="skip file if filesystem-abspath matches REGEX (option can be repeated), example: '.*/\\.hist/.*'")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
@@ -1693,11 +1692,15 @@ NOTE: if server has --usernames enabled, then password is "username:password"
             print("\n\n   %s\n\n" % (t,))
             raise
 
-    if ar.a and ar.a.startswith("$"):
-        fn = ar.a[1:]
-        print("reading password from file [{0}]".format(fn))
-        with open(fn, "rb") as f:
-            ar.a = f.read().decode("utf-8").strip()
+    for k in ("a", "ba"):
+        zs = getattr(ar, k)
+        if zs.startswith("$"):
+            print("reading password from file [%s]" % (zs[1:],))
+            with open(zs[1:], "rb") as f:
+                setattr(ar, k, f.read().decode("utf-8").strip())
+
+    if ar.ba:
+        ar.ba = "Basic " + base64.b64encode(ar.ba.encode("utf-8")).decode("utf-8")
 
     for n in range(ar.rh):
         try:
