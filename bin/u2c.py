@@ -195,7 +195,10 @@ class HCli(object):
 
         hdrs.update(self.base_hdrs)
         if self.ar.a:
-            hdrs["PW"] = self.ar.a
+            if self.ar.ba:
+                hdrs["Authorization"] = "Basic " + base64.b64encode(self.ar.a.encode("utf-8")).decode("utf-8")
+            else:
+                hdrs["PW"] = self.ar.a
         if ctype:
             hdrs["Content-Type"] = ctype
         if meth == "POST" and CLEN not in hdrs:
@@ -857,7 +860,7 @@ def handshake(ar, file, search):
                 return [], False
             elif sc == 409 or "<pre>upload rejected, file already exists" in txt:
                 return [], False
-            elif sc == 403:
+            elif sc == 403 or sc == 401:
                 print("\nERROR: login required, or wrong password:\n%s" % (txt,))
                 raise BadAuth()
 
@@ -1551,6 +1554,7 @@ NOTE: if server has --usernames enabled, then password is "username:password"
     ap.add_argument("files", type=files_decoder, nargs="+", help="files and/or folders to process")
     ap.add_argument("-v", action="store_true", help="verbose")
     ap.add_argument("-a", metavar="PASSWD", help="password or $filepath")
+    ap.add_argument("--ba", action="store_true", help="use basic auth instead of PW header")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("-x", type=unicode, metavar="REGEX", action="append", help="skip file if filesystem-abspath matches REGEX (option can be repeated), example: '.*/\\.hist/.*'")
     ap.add_argument("--ok", action="store_true", help="continue even if some local files are inaccessible")
