@@ -5471,7 +5471,7 @@ class HttpCli(object):
             no304vis=self.args.no304 > 0,
             msg=BADXFFB if hasattr(self, "bad_xff") else "",
             ver=S_VERSION if show_ver else "",
-            chpw=self.args.chpw and self.uname != "*",
+            chpw=self.args.chpw and self.uname != "*" and self.uname not in self.args.chpw_no,
             ahttps="" if self.is_https else "https://" + self.host + self.req,
         )
         self.reply(html.encode("utf-8"))
