@@ -646,10 +646,11 @@ if (1)
 		"rc_opn": "open",
 		"rc_ply": "play",
 		"rc_pla": "play as audio",
-		"rc_txt": "open in file viewer",
-		"rc_md": "open in text-editor",
+		"rc_txt": "open in text file viewer",
+		"rc_md": "open in markdown editor",
 		"rc_dl": "download",
 		"rc_zip": "download as archive",
+		"rc_cpl": "copy link",
 		"rc_del": "delete",
 		"rc_cut": "cut",
 		"rc_cpy": "copy",
@@ -1023,6 +1024,7 @@ ebi('rcm').innerHTML = (
 	'<a href="#" id="rtxt">' + L.rc_txt + '</a>' +
 	'<a href="#" id="rmd">' + L.rc_md + '</a>' +
 	'<div id="rs1" class="sep"></div>' +
+	'<a href="#" id="rcpl">' + L.rc_cpl + '</a>' +
 	'<a href="#" id="rdl">' + L.rc_dl + '</a>' +
 	(have_zip ?
 		'<a href="#" id="rzip">' + L.rc_zip + '</a>'
@@ -9534,55 +9536,27 @@ var rcm = (function () {
 					a.target = selFile.type == "dir" ? '' : '_blank';
 					a.click();
 					break;
-				case 'ply':
-					if (selFile.type == 'gf')
-						thegrid.imshow(selFile.relpath);
-					else
-						play('f-' + selFile.id);
-					break;
-				case 'pla':
-					play('f-' + selFile.id);
-					break;
-				case 'txt':
-					location = '?doc=' + selFile.relpath;
-					break;
-				case 'md':
-					location = selFile.path + '?v';
-					break;
-				case 'dl':
-					ebi('seldl').click();
-					break;
-				case 'zip':
-					ebi('selzip').click();
-					break;
-				case 'del':
-					fileman.delete();
-					break;
-				case 'cut':
-					fileman.cut();
-					break;
-				case 'cpy':
-					fileman.cpy();
-					break;
+				case 'ply': selFile.type == 'gf' ? thegrid.imshow(selFile.relpath) : play('f-' + selFile.id); break;
+				case 'pla': play('f-' + selFile.id); break;
+				case 'txt': location = '?doc=' + selFile.relpath; break;
+				case 'md': location = selFile.path + '?v'; break;
+				case 'cpl': cliptxt(location.protocol + '//' + location.host + selFile.path, function() {toast.ok(2, L.clipped)}); break;
+				case 'dl': ebi('seldl').click(); break;
+				case 'zip': ebi('selzip').click(); break;
+				case 'del': fileman.delete(); break;
+				case 'cut': fileman.cut(); break;
+				case 'cpy': fileman.cpy(); break;
 				case 'pst':
 					fileman.paste();
 					fileman.clip = [];
 					break;
-				case 'nfo':
-					mktemp(true);
-					break;
-				case 'nfi':
-					mktemp();
-					break;
+				case 'nfo': mktemp(true); break;
+				case 'nfi': mktemp(); break;
 				case 'sal':
 					msel.evsel(null, true);
 					selFile.no_dsel = true;
 					break;
-				case 'sin':
-					msel.evsel(null, 't');
-					break;
-				default:
-					console.warn('Invalid rcm option "' + e.target.id + '"');
+				case 'sin': msel.evsel(null, 't'); break;
 			}
 			r.hide(true);
 		};
@@ -9620,6 +9594,7 @@ var rcm = (function () {
 		clmod(ebi('rtxt'), 'hide', !selFile.id);
 		clmod(ebi('rs1'), 'hide', !selFile.path);
 		clmod(ebi('rmd'), 'hide', !selFile.id || selFile.path.slice(-3) != '.md');
+		clmod(ebi('rcpl'), 'hide', !has_sel);
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);
 		clmod(ebi('rs2'), 'hide', !has_sel);
