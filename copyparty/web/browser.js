@@ -647,7 +647,7 @@ if (1)
 		"rc_ply": "play",
 		"rc_pla": "play as audio",
 		"rc_txt": "open in text file viewer",
-		"rc_md": "open in markdown editor",
+		"rc_md": "open in text editor",
 		"rc_dl": "download",
 		"rc_zip": "download as archive",
 		"rc_cpl": "copy link",
