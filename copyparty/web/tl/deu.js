@@ -60,7 +60,7 @@ Ls.deu = {
 			["0..9", "zu 0%..90% springen"],
 			["P", "Wiedergabe / Pause"],
 			["S", "aktuell abgespielten Song auswählen"],
-			["Y", "Sing herunterladen"],
+			["Y", "Song herunterladen"],
 		], [
 			"image-viewer",
 			["J/L, ←/→", "vorheriges / nächstes Bild"],
@@ -84,8 +84,8 @@ Ls.deu = {
 			["M", "Textdatei schliessen"],
 			["E", "Textdatei bearbeiten"],
 			["S", "Textdatei auswählen (für Ausschneiden / Kopieren / Umbenennen)"],
-			["Y", "Textdatei herunterladen"], //m
-			["⇧ J", "json verschönern"], //m
+			["Y", "Textdatei herunterladen"],
+			["⇧ J", "json verschönern"],
 		]
 	],
 
@@ -111,15 +111,15 @@ Ls.deu = {
 	"gou": 'zum übergeordneter Ordner springen">hoch',
 	"gon": 'zum nächsten Ordner springen">nächst.',
 	"logout": "Abmelden ",
-	"login": "Anmelden", //m
+	"login": "Anmelden",
 	"access": " Zugriff",
 	"ot_close": "Submenu schliessen",
 	"ot_search": "Dateien nach Attributen, Pfad/Name, Musiktags oder beliebiger Kombination suchen$N$N&lt;code&gt;foo bar&lt;/code&gt; = muss «foo» und «bar» enthalten,$N&lt;code&gt;foo -bar&lt;/code&gt; = muss «foo» aber nicht «bar» enthalten,$N&lt;code&gt;^yana .opus$&lt;/code&gt; = beginnt mit «yana» und ist «opus»-Datei$N&lt;code&gt;&quot;try unite&quot;&lt;/code&gt; = genau «try unite» enthalten$N$NDatumsformat ist iso-8601, z.B.$N&lt;code&gt;2009-12-31&lt;/code&gt; oder &lt;code&gt;2020-09-12 23:30:00&lt;/code&gt;",
 	"ot_unpost": "unpost: lösche deine letzten Uploads oder breche unvollständige ab",
 	"ot_bup": "bup: Basic Uploader, unterstützt sogar Neuheiten wie Netscape 4.0",
-	"ot_mkdir": "mkdir: Neuen Ordner erstellen",
-	"ot_md": "new-file: Neues Textdokument erstellen", //m
-	"ot_msg": "msg: Eine Nachricht an das Server-Log schicken",
+	"ot_mkdir": "mkdir: neuen Ordner erstellen",
+	"ot_md": "new-file: neue Textdatei erstellen",
+	"ot_msg": "msg: eine Nachricht an das Server-Log schicken",
 	"ot_mp": "Media Player-Optionen",
 	"ot_cfg": "Konfigurationsoptionen",
 	"ot_u2i": 'up2k: Dateien hochladen (wenn du Schreibrechte hast) oder in den Suchmodus wechseln, um zu prüfen, ob sie bereits auf dem Server existieren$N$NUploads sind fortsetzbar, multithreaded und behalten Dateizeitstempel, verbrauchen aber mehr CPU als [🎈]&nbsp; (der einfache Uploader)<br /><br />während Uploads wird dieses Symbol zu einem Fortschrittsanzeiger!',
@@ -127,7 +127,7 @@ Ls.deu = {
 	"ot_noie": 'Bitte benutze Chrome / Firefox / Edge',
 
 	"ab_mkdir": "Ordner erstellen",
-	"ab_mkdoc": "Textdatei erstellen", //m
+	"ab_mkdoc": "Textdatei erstellen",
 	"ab_msg": "Nachricht an Server Log senden",
 
 	"ay_path": "zu Ordnern springen",
@@ -155,7 +155,7 @@ Ls.deu = {
 	"ul_par": "Parallele Uploads:",
 	"ut_rand": "Zufällige Dateinamen",
 	"ut_u2ts": "Zuletzt geändert-Zeitstempel von$Ndeinem Dateisystem auf den Server übertragen\">📅",
-	"ut_ow": "Existierende Dateien auf dem Server überschreiben?$N🛡️: Nie (generiert einen neuen Dateinamen)$N🕒: Überschreiben, wenn Server-Datei älter ist als meine$N♻️: Überschreiben, wenn der Dateiinhalt anders ist$N⏭️: Alle vorhandenen Dateien bedingungslos überspringen", //m
+	"ut_ow": "Existierende Dateien auf dem Server überschreiben?$N🛡️: Nie (generiert einen neuen Dateinamen)$N🕒: Überschreiben, wenn Server-Datei älter ist als meine$N♻️: Überschreiben, wenn der Dateiinhalt anders ist$N⏭️: Vorhandene Dateien immer überspringen",
 	"ut_mt": "Andere Dateien während des Uploads hashen$N$Nsolltest du deaktivieren, falls deine CPU oder Festplatte zum Flaschenhals werden könnte",
 	"ut_ask": 'Vor dem Upload nach Bestätigung fragen">💭',
 	"ut_pot": "Verbessert Upload-Geschwindigkeit$Nindem das UI weniger komplex gemacht wird",
@@ -206,7 +206,7 @@ Ls.deu = {
 	"u_nav_b": '<a href="#" id="modal-ok">Dateien</a><a href="#" id="modal-ng">1 Ordner</a>',
 
 	"cl_opts": "Schalter",
-	"cl_hfsz": "Dateigröße", //m
+	"cl_hfsz": "Dateigröße",
 	"cl_themes": "Themes",
 	"cl_langs": "Sprache",
 	"cl_ziptype": "Ordner Download",
@@ -220,19 +220,19 @@ Ls.deu = {
 	"cl_reset": "zurücksetzen",
 	"cl_hpick": "zum Verstecken, tippe auf Spaltenüberschriften in der Tabelle unten",
 	"cl_hcancel": "Spaltenbearbeitung abgebrochen",
-	"cl_rcm": "Rechtsklick-Menü", //m
+	"cl_rcm": "Rechtsklick-Menü",
 
 	"ct_grid": '田 Das Raster&trade;',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ Tooltips',
 	"ct_thumb": 'In Raster-Ansicht, zwischen Icons und Vorschau wechseln$NHotkey: T">🖼️ Vorschaubilder',
 	"ct_csel": 'Benutze STRG und UMSCHALT für Dateiauswahl in Raster-Ansicht">sel',
-	"ct_dl": 'Herunterladen erzwingen (nicht inline anzeigen), wenn eine datei angeklickt wird">dl', //m
+	"ct_dl": 'Beim Klick auf Dateien sie immer herunterladen (nicht einbetten)">dl',
 	"ct_ihop": 'Wenn die Bildanzeige geschlossen ist, scrolle runter zu den zuletzt angesehenen Dateien">g⮯',
-	"ct_dots": 'Verstecke Dateien anzeigen (wenn erlaubt durch Server)">dotfiles',
+	"ct_dots": 'Verstecke Dateien anzeigen (wenn durch den Server erlaubt)">dotfiles',
 	"ct_qdel": 'Nur einmal fragen, wenn mehrere Dateien gelöscht werden">qdel',
 	"ct_dir1st": 'Ordner vor Dateien sortieren">📁 zuerst',
 	"ct_nsort": 'Natürliche Sortierung (für Dateinamen mit führenden Ziffern)">nsort',
-	"ct_utc": 'Verwenden Sie UTC für alle Zeitangaben">UTC', //m
+	"ct_utc": 'Für alle Zeitangaben UTC verwenden">UTC',
 	"ct_readme": 'README.md in Dateiliste anzeigen">📜 readme',
 	"ct_idxh": 'index.html anstelle von Dateiliste anzeigen">htm',
 	"ct_sbars": 'Scrollbars zeigen">⟊',
@@ -263,7 +263,7 @@ Ls.deu = {
 	"cdt_lim": "max. Anz. Dateien, die in einem Ordner gezeigt werden sollen",
 	"cdt_ask": "beim Runterscrollen nach $NAktion fragen statt mehr,$NDateien zu laden",
 	"cdt_hsort": "Menge an Sortierregeln (&lt;code&gt;,sorthref&lt;/code&gt;) in Media-URLs enthalten sein sollen. Ein Wert von 0 sorgt dafür, dass Sortierregeln in Media-URLs ignoriert werden",
-	"cdt_ren": "Benutzerdefiniertes Rechtsklick-Menü aktivieren, das normale Menü ist weiterhin mit Shift + Rechtsklick erreichbar", //m
+	"cdt_ren": "spezielles Rechtsklick-Menü aktivieren, das Browser-Menü ist weiterhin mit Shift + Rechtsklick erreichbar",
 
 	"tt_entree": "Navpane anzeigen (Ordnerbaum Sidebar)$NHotkey: B",
 	"tt_detree": "Breadcrumbs anzeigen$NHotkey: B",
@@ -309,8 +309,8 @@ Ls.deu = {
 	"mt_c2owa": "opus-weba, für iOS 17.5 und neuer\">owa",
 	"mt_c2caf": "opus-caf, für iOS 11 bis 17\">caf",
 	"mt_c2mp3": "benutze dieses Format für ältere Geräte\">mp3",
-	"mt_c2flac": "beste Klangqualität, aber große Downloads\">flac", //m
-	"mt_c2wav": "unkomprimierte Wiedergabe (noch größer)\">wav", //m
+	"mt_c2flac": "beste Klangqualität, aber riesige Downloads\">flac",
+	"mt_c2wav": "unkomprimierte Wiedergabe (noch größer)\">wav",
 	"mt_c2ok": "Gute Wahl, Chef!",
 	"mt_c2nd": "Das ist nicht das empfohlene Ausgabeformat für dein Gerät, aber passt schon",
 	"mt_c2ng": "Dein Gerät scheint dieses Ausgabeformat nicht zu unterstützen, aber lass trotzdem mal probieren",
@@ -421,16 +421,16 @@ Ls.deu = {
 	"fcc_warn": '{0} Elemente in die Zwischenablage kopiert\n\nAber: nur <b>dieses</b> Browsertab kann sie einfügen\n(da deine Auswahl so abartig riesig war)',
 
 	"fp_apply": "Diese Namen verwenden",
-	"fp_skip": "Konflikte überspringen", //m
+	"fp_skip": "Konflikte überspringen",
 	"fp_ecut": "Kopiere erst ein paar Dateien / Ordner, um sie einzufügen\n\nTipp: Ausschneiden und Kopieren funktioniert über Browsertabs hinweg",
-	"fp_ename": "{0} Elemente konnten nicht verschoben werden, weil bereits andere Dateien mit diesen Namen existieren. Gib ihnen unten neue Namen um fortzufahren, oder lass das Feld leer (\"konflikte überspringen\") zum Überspringen:", //m
-	"fcp_ename": "{0} Elemente konnten nicht kopiert werden, weil bereits andere Dateien mit diesen Namen existieren. Gib ihnen unten neue Namen um fortzufahren, oder lass das Feld leer (\"konflikte überspringen\") zum Überspringen:", //m
+	"fp_ename": '{0} Elemente konnten nicht verschoben werden, weil bereits andere Dateien mit diesen Namen existieren. Gib ihnen unten neue Namen um fortzufahren, oder lass das Feld leer um sie zu überspringen ("Konflikte überspringen" macht das automatisch):',
+	"fcp_ename": '{0} Elemente konnten nicht kopiert werden, weil bereits andere Dateien mit diesen Namen existieren. Gib ihnen unten neue Namen um fortzufahren, oder lass das Feld leer um sie zu überspringen ("Konflikte überspringen" macht das automatisch):',
 	"fp_emore": "Es gibt noch ein paar Dateinamen, die geändert werden müssen",
 	"fp_ok": "Verschieben OK",
 	"fcp_ok": "Kopieren OK",
 	"fp_busy": "Verschiebe {0} Elemente...\n\n{1}",
 	"fcp_busy": "Kopiere {0} Elemente...\n\n{1}",
-	"fp_abrt": "Abbrechen...", //m
+	"fp_abrt": "wird abgebrochen...",
 	"fp_err": "Verschieben fehlgeschlagen:\n",
 	"fcp_err": "Kopieren fehlgeschlagen:\n",
 	"fp_confirm": "Diese {0} Elemente hierher verschieben?",
@@ -443,8 +443,8 @@ Ls.deu = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopieren</a><a href="#" id="modal-ng">Hochladen</a>',
 
 	"mk_noname": "Tipp' mal vorher lieber einen Namen in das Textfeld links, bevor du das machst :p",
-	"nmd_i1": "Fügen Sie auch die gewünschte Dateiendung hinzu, z. B. <code>.md</code>", //m
-	"nmd_i2": "Sie können nur <code>.md</code>-Dateien erstellen, da Ihnen die Löschberechtigung fehlt", //m
+	"nmd_i1": "Füge auch die Dateiendung hinzu, z.B. <code>.md</code>",
+	"nmd_i2": "Du kannst nur <code>.md</code>-Dateien erstellen, da dir Lösch-Rechte fehlen",
 
 	"tv_load": "Textdatei wird geladen:\n\n{0}\n\n{1}% ({2} von {3} MiB geladen)",
 	"tv_xe1": "Konnte Textdatei nicht laden:\n\nFehler ",
@@ -455,7 +455,7 @@ Ls.deu = {
 	"tvt_prev": "Vorheriges Dokument zeigen$NHotkey: i\">⬆ vorh.",
 	"tvt_next": "Nächstes Dokument zeigen$NHotkey: K\">⬇ nächst.",
 	"tvt_sel": "Wählt diese Datei aus &nbsp; ( zum Ausschneiden / Kopieren / Löschen / ... )$NHotkey: S\">ausw.",
-	"tvt_j": "json verschönern$NHotkey: shift-J\">j", //m
+	"tvt_j": "json verschönern$NHotkey: shift-J\">j",
 	"tvt_edit": "Datei im Texteditor zum Bearbeiten öffnen$NHotkey: E\">✏️ bearb.",
 	"tvt_tail": "Datei auf Veränderungen überwachen; Neue Zeilen werden in Echtzeit angezeigt\">📡 folgen",
 	"tvt_wrap": "Zeilenumbruch\">↵",
@@ -525,14 +525,14 @@ Ls.deu = {
 	"fu_xe2": "404: Datei nicht gefunden??",
 
 	"fz_tar": "Unkomprimierte GNU TAR-Datei (Linux / Mac)",
-	"fz_pax": "Unkomprimierte pax-format TAR-Datei (etwas langsamer)", //m
+	"fz_pax": "Unkomprimierte pax-Format TAR-Datei (langsamer)",
 	"fz_targz": "GNU-TAR mit gzip Level 3 Kompression$N$Nüblicherweise recht langsam,$Nbenutze stattdessen ein unkomprimiertes TAR",
 	"fz_tarxz": "GNU-TAR mit xz level 1 Kompression$N$Nüblicherweise recht langsam,$Nbenutze stattdessen ein unkomprimiertes TAR",
 	"fz_zip8": "ZIP mit UTF8-Dateinamen (könnte kaputt gehen auf Windows 7 oder älter)",
 	"fz_zipd": "ZIP mit traditionellen CP437-Dateinamen, für richtig alte Software",
-	"fz_zipc": "CP437 mit CRC32 früh berechnet,$Nfür MS-DOS PKZIP v2.04g (Oktober 1993)$N(braucht länger zum Verarbeiten, bevor der Download starten kann)",
+	"fz_zipc": "CP437 mit früh berechnetem CRC32,$Nfür MS-DOS PKZIP v2.04g (Oktober 1993)$N(braucht länger zum Verarbeiten, bevor der Download starten kann)",
 
-	"un_m1": "Unten kannst du deine neusten Uploads löschen (oder Unvollständige abbrechen)",
+	"un_m1": "Unten kannst du deine neusten Uploads löschen (oder unvollständige abbrechen)",
 	"un_upd": "Neu laden",
 	"un_m4": "Oder die unten sichtbaren Dateien teilen:",
 	"un_ulist": "Anzeigen",
@@ -640,21 +640,21 @@ Ls.deu = {
 	"ur_um": "Fertig;\n{0} Uploads OK,\n{1} Uploads fehlgeschlagen, sorry",
 	"ur_sm": "Fertig;\n{0} Uploads gefunden auf dem Server,\n{1} Dateien NICHT gefunden auf dem Server",
 
-	"rc_opn": "Öffnen", //m
-	"rc_ply": "Abspielen", //m
-	"rc_pla": "Als Audio abspielen", //m
-	"rc_txt": "Im Dateibetrachter öffnen", //m
-	"rc_md": "Im Texteditor öffnen", //m
-	"rc_dl": "Herunterladen", //m
-	"rc_zip": "Als Archiv herunterladen", //m
-	"rc_del": "Löschen", //m
-	"rc_cut": "Ausschneiden", //m
-	"rc_cpy": "Kopieren", //m
-	"rc_pst": "Einfügen", //m
-	"rc_nfo": "Neuer Ordner", //m
-	"rc_nfi": "Neue Datei", //m
-	"rc_sal": "Alles auswählen", //m
-	"rc_sin": "Auswahl umkehren", //m
+	"rc_opn": "öffnen",
+	"rc_ply": "abspielen",
+	"rc_pla": "als Audio abspielen",
+	"rc_txt": "als Text öffnen",
+	"rc_md": "im Texteditor öffnen",
+	"rc_dl": "herunterladen",
+	"rc_zip": "als Archiv herunterladen",
+	"rc_del": "löschen",
+	"rc_cut": "ausschneiden",
+	"rc_cpy": "kopieren",
+	"rc_pst": "einfügen",
+	"rc_nfo": "neuer Ordner",
+	"rc_nfi": "neue Datei",
+	"rc_sal": "alles auswählen",
+	"rc_sin": "auswahl umkehren",
 
 	"lang_set": "Neuladen um Änderungen anzuwenden?",
 
@@ -674,11 +674,11 @@ Ls.deu = {
 		"j1": "k304 trennt die Clientverbindung bei jedem HTTP 304, was Bugs mit problematischen Proxies vorbeugen kann (z.B. nicht ladenden Seiten), macht Dinge aber generell langsamer",
 		"k1": "Client-Einstellungen zurücksetzen",
 		"l1": "Melde dich an für mehr:",
-		"ls3": "Anmelden", //m
-		"lu4": "Benutzername", //m
-		"lp4": "Passwort", //m
-		"lo3": "“{0}” überall abmelden", //m
-		"lo2": "Dies beendet die Sitzung in allen Browsern", //m
+		"ls3": "Anmelden",
+		"lu4": "Benutzername",
+		"lp4": "Passwort",
+		"lo3": "“{0}” überall abmelden",
+		"lo2": "Das beendet die Sitzung in allen Browsern",
 		"m1": "Willkommen zurück,",
 		"n1": "404 Nicht gefunden &nbsp;┐( ´ -`)┌",
 		"o1": 'or maybe you don\'t have access -- try a password or <a href="' + SR + '/?h">go home</a>',
@@ -697,8 +697,8 @@ Ls.deu = {
 		"ta1": "Trage zuerst dein Passwort ein",
 		"ta2": "Wiederhole dein Passwort zur Bestätigung:",
 		"ta3": "Da stimmt etwas nicht; probier's nochmal",
-		"nop": "FEHLER: Passwort darf nicht leer sein", //m
-		"nou": "FEHLER: Benutzername und/oder Passwort dürfen nicht leer sein", //m
+		"nop": "FEHLER: Passwort darf nicht leer sein",
+		"nou": "FEHLER: Benutzername und/oder Passwort dürfen nicht leer sein",
 		"aa1": "Eingehende Dateien:",
 		"ab1": "no304 deaktivieren",
 		"ac1": "no304 aktivieren",
