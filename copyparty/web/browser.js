@@ -9594,7 +9594,7 @@ var rcm = (function () {
 		clmod(ebi('rtxt'), 'hide', !selFile.id);
 		clmod(ebi('rs1'), 'hide', !selFile.path);
 		clmod(ebi('rmd'), 'hide', !selFile.id || selFile.path.slice(-3) != '.md');
-		clmod(ebi('rcpl'), 'hide', !has_sel);
+		clmod(ebi('rcpl'), 'hide', !selFile.path);
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);
 		clmod(ebi('rs2'), 'hide', !has_sel);
