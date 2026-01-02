@@ -9600,7 +9600,7 @@ var rcm = (function () {
 
 				selFile.path = basenames(file.children[1].firstChild.href).split('?')[0];
 				selFile.relpath = selFile.path.split('/').slice(-1)[0];
-				if (file.children[3].innerHTML == "---")
+				if (noq_href(file.children[1].firstChild).endsWith("/"))
 					selFile.type = "dir";
 				else {
 					var lead = file.firstChild.firstChild;
