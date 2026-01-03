@@ -9570,24 +9570,43 @@ var rcm = (function () {
 		};
 	}
 
-	function show(x, y, target) {
+	function show(x, y, target, isGrid) {
 		selFile.elem = selFile.type = selFile.path = selFile.id = selFile.relpath = null;
 		selFile.no_dsel = false;
 		if (target) {
-			var file = target.closest("#files tbody tr");
-			if (file) {
-				selFile.no_dsel = clgot(file, "sel");
-				clmod(file, "sel", true);
-				selFile.elem = file;
+			if (isGrid && target.matches && target.matches('#ggrid > a')) {
+				var ref = target.getAttribute('ref');
+				var file = ebi(ref) && ebi(ref).closest('#files tbody tr');
+				if (file) {
+					selFile.no_dsel = clgot(file, "sel");
+					clmod(file, "sel", true);
+					selFile.elem = file;
+					selFile.path = basenames(file.children[1].firstChild.href).split('?')[0];
+					selFile.relpath = selFile.path.split('/').slice(-1)[0];
+					if (noq_href(file.children[1].firstChild).endsWith("/"))
+						selFile.type = "dir";
+					else {
+						var lead = file.firstChild.firstChild;
+						selFile.id = lead.id.split('-')[1];
+						selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
+					}
+				}
+			} else {
+				var file = target.closest("#files tbody tr");
+				if (file) {
+					selFile.no_dsel = clgot(file, "sel");
+					clmod(file, "sel", true);
+					selFile.elem = file;
 
-				selFile.path = basenames(file.children[1].firstChild.href).split('?')[0];
-				selFile.relpath = selFile.path.split('/').slice(-1)[0];
-				if (noq_href(file.children[1].firstChild).endsWith("/"))
-					selFile.type = "dir";
-				else {
-					var lead = file.firstChild.firstChild;
-					selFile.id = lead.id.split('-')[1];
-					selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
+					selFile.path = basenames(file.children[1].firstChild.href).split('?')[0];
+					selFile.relpath = selFile.path.split('/').slice(-1)[0];
+					if (noq_href(file.children[1].firstChild).endsWith("/"))
+						selFile.type = "dir";
+					else {
+						var lead = file.firstChild.firstChild;
+						selFile.id = lead.id.split('-')[1];
+						selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
+					}
 				}
 			}
 		}
@@ -9623,27 +9642,30 @@ var rcm = (function () {
 			return;
 		if (selFile.elem && !selFile.no_dsel)
 			clmod(selFile.elem, "sel", false);
+			msel.selui();
 		selFile.elem = selFile.type = selFile.path = selFile.id = selFile.relpath = null;
 		selFile.no_dsel = false;
 		menu.style.display = '';
 	}
 
 	ebi('wrap').oncontextmenu = function(e) {
-		if (thegrid.en || !r.enabled || e.shiftKey || menu.style.display) {
+		if (!r.enabled || e.shiftKey || menu.style.display) {
 			r.hide(true);
 			return true;
 		}
-		else {
-			ev(e);
-			show(xscroll() + e.clientX, yscroll() + e.clientY, e.target);
+		ev(e);
+		var gridItem = e.target.closest('#ggrid > a');
+		if (thegrid.en && gridItem) {
+			show(xscroll() + e.clientX, yscroll() + e.clientY, gridItem, true);
 			return false;
 		}
+		show(xscroll() + e.clientX, yscroll() + e.clientY, e.target, false);
+		return false;
 	};
 	menu.onblur = function() {setTimeout(r.hide)};
 
 	return r;
 })();
-
 
 function reload_mp() {
 	if (mp && mp.au) {
