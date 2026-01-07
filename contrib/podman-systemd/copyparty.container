@@ -1,0 +1,55 @@
+[Container]
+# It's recommended to replace :latest with a specific version
+# for example: docker.io/copyparty/ac:1.19.15
+Image=docker.io/copyparty/ac:latest
+ContainerName=copyparty
+
+# Uncomment to enable auto-updates
+# AutoUpdate=registry
+
+# Environment variables
+# enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
+Environment=LD_PRELOAD=/usr/lib/libmimalloc-secure.so.NOPE
+# ensures log-messages are not delayed (but can reduce speed a tiny bit)
+Environment=PYTHONUNBUFFERED=1
+
+# Ports
+PublishPort=3923:3923
+
+
+# Volumes (PLEASE LOOK!)
+
+# Rootful setup:
+#   Leave as-is
+# Non-root setup:
+#   Change /etc/copyparty to /home/<USER>/copyparty/config
+Volume=/etc/copyparty:/cfg:z
+
+# Rootful setup:
+#   Change /mnt to the directory you want to share
+# Non-root setup:
+#   Change /mnt to something owned by your user, e.g., /home/<USER>/copyparty/sharing:/w:z
+Volume=/mnt:/w:z
+
+
+# Give the container time to stop in case the thumbnailer is still running.
+# It's allowed to continue finishing up for 10s after the shutdown signal, give it a 5s buffer
+StopTimeout=15
+
+# hide it from logs with "/._" so it matches the default --lf-url filter
+HealthCmd="wget --spider -q 127.0.0.1:3923/?reset=/._"
+HealthInterval=1m
+HealthTimeout=2s
+HealthRetries=5
+HealthStartPeriod=15s
+
+[Unit]
+After=default.target
+
+[Install]
+# Start by default on boot
+WantedBy=default.target
+
+[Service]
+# Give the container time to start in case it needs to pull the image
+TimeoutStartSec=600

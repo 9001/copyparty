@@ -39,3 +39,9 @@ point `--css-browser` to one of these by URL:
 
 * turns copyparty into chromecast just more flexible (and probably way more buggy)
 * usage: put the js somewhere in the webroot and `--js-browser /memes/meadup.js`
+
+
+
+# junk
+
+* [**rave.js**](./rave.js): april-fools joke, [demo (epilepsy warning)](https://cd.ocv.me/b/d2/d21/#af-9b927c42,sorthref), not maintained, very buggy

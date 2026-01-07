@@ -39,7 +39,7 @@ if you wanna have a go at coding it up yourself then maybe mention the idea on d
 
 aside from documentation and ideas, some other things that would be cool to have some help with is:
 
-* **translations** -- the copyparty web-UI has translations for english and norwegian at the top of [browser.js](https://github.com/9001/copyparty/blob/hovudstraum/copyparty/web/browser.js); if you'd like to add a translation for another language then that'd be welcome! and if that language has a grammar that doesn't fit into the way the strings are assembled, then we'll fix that as we go :>
+* **translations** -- the copyparty web-UI has translations in [copyparty/web/tl](https://github.com/9001/copyparty/tree/hovudstraum/copyparty/web/tl); if you'd like to [add a translation](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice#translations) for another language then that'd be welcome! and if that language has a grammar that doesn't fit into the way the strings are assembled, then we'll fix that as we go :>
 
   * but please note that support for [RTL (Right-to-Left) languages](https://en.wikipedia.org/wiki/Right-to-left_script) is currently not planned, since the javascript is a bit too jank for that
 

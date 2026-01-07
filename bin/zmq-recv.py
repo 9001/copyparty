@@ -61,6 +61,8 @@ def rep_server():
         print("copyparty says %r" % (sck.recv_string(),))
         reply = b"thx"
         # reply = b"return 1"  # non-zero to block an upload
+        # reply = b'{"rc":1}'  # or as json, that's fine too
+        # reply = b'{"rejectmsg":"naw dude"}'  # or custom message
         sck.send(reply)
 
 

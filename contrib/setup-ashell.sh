@@ -6,7 +6,7 @@
 #   https://apps.apple.com/us/app/a-shell/id1473805438
 #
 # step 2: copypaste the following command into a-Shell:
-#   curl https://github.com/9001/copyparty/raw/refs/heads/hovudstraum/contrib/setup-ashell.sh
+#   curl -L https://github.com/9001/copyparty/raw/refs/heads/hovudstraum/contrib/setup-ashell.sh | sh
 #
 # step 3: launch copyparty with this command: cpp
 #

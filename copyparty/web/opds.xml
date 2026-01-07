@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    {%- for d in dirs %}
+    <entry>
+        <title>{{ d.name }}</title>
+        <link rel="subsection"
+        href="{{ d.href | e }}"
+        type="application/atom+xml;profile=opds-catalog"/>
+        <updated>{{ d.iso8601 }}</updated>
+    </entry>
+    {%- endfor %}
+    {%- for f in files %}
+    <entry>
+        <title>{{ f.name }}</title>
+        <updated>{{ f.iso8601 }}</updated>
+        <link rel="http://opds-spec.org/acquisition"
+        href="{{ f.href | e }}"
+        type="{{ f.mime }}"/>
+        {%- if f.jpeg_thumb_href != None %}
+        <link rel="http://opds-spec.org/image/thumbnail"
+        href="{{ f.jpeg_thumb_href | e }}"
+        type="image/jpeg"/>
+        {%- endif %}
+        {%- if f.jpeg_thumb_href_hires != None %}
+        <link rel="http://opds-spec.org/image"
+        href="{{ f.jpeg_thumb_href_hires | e }}"
+        type="image/jpeg"/>
+        {%- endif %}
+    </entry>
+    {%- endfor %}
+</feed>

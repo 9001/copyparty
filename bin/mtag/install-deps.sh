@@ -155,6 +155,11 @@ install_keyfinder() {
 		return
 	}
 
+	(cat /etc/alpine-release || echo a) 2>&1 | grep -E '3\.2[3-9]' && {
+		echo "alpine too new; ffmpeg8 is keyfinder-py incompat; giving up"
+		return
+	}
+
 	cd "$td"
 	github_tarball https://api.github.com/repos/mixxxdj/libkeyfinder/releases/latest
 	ls -al
@@ -189,7 +194,7 @@ install_keyfinder() {
 		exit 1
 	}
 
-	x=${-//[^x]/}; set -x; cat /etc/alpine-release
+	x=${-//[^x]/}; set -x; cat /etc/alpine-release || true
 	# rm -rf /Users/ed/Library/Python/3.9/lib/python/site-packages/*keyfinder*
 	CFLAGS="-I$h/pe/keyfinder/include -I/opt/local/include -I/usr/include/ffmpeg" \
 	CXXFLAGS="-I$h/pe/keyfinder/include -I/opt/local/include -I/usr/include/ffmpeg" \

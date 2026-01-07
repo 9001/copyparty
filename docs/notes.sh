@@ -339,3 +339,6 @@ mk && t0="$(date)" && for n in {1..40}; do date -s "$(date '+ 1 day')"; systemd-
 
 # number of megabytes downloaded since some date
 awk </var/log/wjaycore.out '/^..36m2025-05-20/{o=1} !o{next} !/ plain 20[06](,| \[[^,]+\],) +[0-9.]+.\[33m[KM] .* n[0-9]+$/{next} {v=$0;sub(/.* plain 20[06](,| \[[^,]+\],) +/,"",v);sub(/ .*/,"",v);u=v;sub(/.\[.*/,"",v);sub(/.*m/,"",u);$0=u} /[KMG]/{v*=1024} /[MG]/{v*=1024} /G/{v*=1024} {t+=v} END{printf "%d\n",t/(1024*1024)}'
+
+# find format/% mixups
+%[sdfr].*format| % [^,]+\)|\{!?r?\}.*%[sdfr]|%[sdfr].*\{!?r?\}|runhook

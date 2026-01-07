@@ -4,13 +4,19 @@ import os
 import sys
 import tempfile
 import subprocess as sp
-import keyfinder
+
+try:
+    import keyfinder
+
+    PKF = True
+except:
+    PKF = False
 
 from copyparty.util import fsenc
 
 """
 dep: github/mixxxdj/libkeyfinder
-dep: pypi/keyfinder
+dep: pypi/keyfinder  -OR-  EvanPurkhiser/keyfinder-cli
 dep: ffmpeg
 """
 
@@ -35,7 +41,17 @@ def det(tf):
     ])
     # fmt: on
 
-    print(keyfinder.key(tf).camelot())
+    if PKF:
+        print(keyfinder.key(tf).camelot())
+    else:
+        # fmt: off
+        sp.check_call([
+            b"keyfinder-cli",
+            b"-n",
+            b"camelot",
+            fsenc(tf)
+        ])
+        # fmt: on
 
 
 def main():

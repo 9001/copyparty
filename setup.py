@@ -84,7 +84,7 @@ args = {
     "version": about["__version__"],
     "description": (
         "Portable file server with accelerated resumable uploads, "
-        + "deduplication, WebDAV, FTP, TFTP, zeroconf, media indexer, "
+        + "deduplication, WebDAV, SFTP, FTP, TFTP, zeroconf, media indexer, "
         + "video thumbnails, audio transcoding, and write-only folders"
     ),
     "long_description": long_description,
@@ -131,15 +131,17 @@ args = {
         "copyparty.stolen.dnslib",
         "copyparty.stolen.ifaddr",
         "copyparty.web",
+        "copyparty.web.tl",
         "copyparty.web.a",
         "copyparty.web.deps",
     ],
     "install_requires": ["jinja2"],
     "extras_require": {
-        "all": ["argon2-cffi", "partftpy>=0.4.0", "Pillow", "pyftpdlib", "pyopenssl", "pyzmq"],
+        "all": ["argon2-cffi", "paramiko", "partftpy>=0.4.0", "Pillow", "pyftpdlib", "pyopenssl", "pyzmq"],
         "thumbnails": ["Pillow"],
         "thumbnails2": ["pyvips"],
         "audiotags": ["mutagen"],
+        "sftp": ["paramiko"],
         "ftpd": ["pyftpdlib"],
         "ftps": ["pyftpdlib", "pyopenssl"],
         "tftpd": ["partftpy>=0.4.0"],

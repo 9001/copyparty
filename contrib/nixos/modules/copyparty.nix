@@ -48,10 +48,13 @@ let
 
   accountsWithPlaceholders = mapAttrs (name: attrs: passwordPlaceholder name);
 
+  volumesWithoutVariables = filterAttrs (k: v: !(hasInfix "\${" v.path)) cfg.volumes;
+
   configStr = ''
     ${mkSection "global" cfg.settings}
     ${cfg.globalExtraConfig}
     ${mkSection "accounts" (accountsWithPlaceholders cfg.accounts)}
+    ${mkSection "groups" cfg.groups}
     ${concatStringsSep "\n" (mapAttrsToList mkVolume cfg.volumes)}
   '';
 
@@ -163,6 +166,19 @@ in
       example = literalExpression ''
         {
           ed.passwordFile = "/run/keys/copyparty/ed";
+        };
+      '';
+    };
+
+    groups = mkOption {
+      type = types.attrsOf (types.listOf types.str);
+      description = ''
+        A set of copyparty groups to create and the users that should be part of each group.
+      '';
+      default = { };
+      example = literalExpression ''
+        {
+          group_name = [ "user1" "user2" ];
         };
       '';
     };
@@ -311,7 +327,7 @@ in
           BindPaths =
             (if cfg.settings ? hist then [ cfg.settings.hist ] else [ ])
             ++ [ externalStateDir ]
-            ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
+            ++ (mapAttrsToList (k: v: v.path) volumesWithoutVariables);
           # ProtectSystem = "strict";
           # Note that unlike what 'ro' implies,
           # this actually makes it impossible to read anything in the root FS,
@@ -350,18 +366,32 @@ in
               #: in front of things means it wont change it if the directory already exists.
               group = ":${cfg.group}";
               user = ":${cfg.user}";
-              mode = ":755";
+              mode = ":${
+                # Use volume permissions if set
+                if (value.flags ? chmod_d) then
+                  value.flags.chmod_d
+                # Else, use global permission if set
+                else if (cfg.settings ? chmod-d) then
+                  cfg.settings.chmod-d
+                # Else, use the default permission
+                else
+                  "755"
+              }";
             };
           }
-        ) cfg.volumes
+        ) volumesWithoutVariables
       );
 
-      users.groups.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") { };
-      users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
-        description = "Service user for copyparty";
-        group = "copyparty";
-        home = externalStateDir;
-        isSystemUser = true;
+      users.groups = lib.mkIf (cfg.group == "copyparty") {
+        copyparty = { };
+      };
+      users.users = lib.mkIf (cfg.user == "copyparty") {
+        copyparty = {
+          description = "Service user for copyparty";
+          group = cfg.group;
+          home = externalStateDir;
+          isSystemUser = true;
+        };
       };
       environment.systemPackages = lib.mkIf cfg.mkHashWrapper [
         (pkgs.writeShellScriptBin "copyparty-hash" ''
@@ -380,4 +410,3 @@ in
     }
   );
 }
-

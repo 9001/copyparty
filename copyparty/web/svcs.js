@@ -1,3 +1,7 @@
+"use strict";
+
+var J_SVC = 1;
+
 var oa = QSA('pre');
 for (var a = 0; a < oa.length; a++) {
     var html = oa[a].innerHTML,
@@ -104,3 +108,5 @@ ebi('qr').onclick = function () {
     var txt = esc(url) + '<img class="b64" width="100" height="100" src="' + addq(url, 'qr') + '" />';
     modal.alert(txt);
 };
+
+J_SVC = 2;

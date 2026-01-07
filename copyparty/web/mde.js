@@ -1,5 +1,6 @@
 "use strict";
 
+var J_MDE = 1;
 var dom_wrap = ebi('mw');
 var dom_nav = ebi('mn');
 var dom_doc = ebi('m');
@@ -199,3 +200,5 @@ function save_chk() {
 
     toast.ok(2, 'save OK' + (this.ntry ? '\nattempt ' + this.ntry : ''));
 }
+
+J_MDE = 2;

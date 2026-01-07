@@ -439,6 +439,8 @@ def run_s(ld):
 
 
 def main():
+    if "--versionb" in sys.argv:
+        return print(VER)
     sysver = str(sys.version).replace("\n", "\n" + " " * 18)
     pktime = time.strftime("%Y-%m-%d, %H:%M:%S", time.gmtime(STAMP))
     msg()

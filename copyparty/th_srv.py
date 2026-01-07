@@ -14,7 +14,7 @@ import time
 
 from queue import Queue
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
 from .authsrv import VFS
 from .bos import bos
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, au_unpk, ffprobe
@@ -55,6 +55,56 @@ EXTS_AC = set(["opus", "owa", "caf", "mp3", "flac", "wav"])
 EXTS_SPEC_SAFE = set("aif aiff flac mp3 opus wav".split())
 
 PTN_TS = re.compile("^-?[0-9a-f]{8,10}$")
+
+# for n in {1..100}; do rm -rf /home/ed/Pictures/wp/.hist/th/ ; python3 -m copyparty -qv /home/ed/Pictures/wp/::r --th-no-webp --th-qv $n --th-dec pil >/dev/null 2>&1 & p=$!; printf '\033[A\033[J%3d ' $n; while true; do sleep 0.1; curl -s 127.1:3923 >/dev/null && break; done; curl -s '127.1:3923/?tar=j' >/dev/null ; cat /home/ed/Pictures/wp/.hist/th/1n/bs/1nBsjDetfie1iDq3y2D4YzF5/*.* | wc -c; kill $p; wait >/dev/null 2>&1; done
+# filesize-equivalent, not quality (ff looks much shittier)
+FF_JPG_Q = {
+    0: b"30",  # 0
+    1: b"30",  # 5
+    2: b"30",  # 10
+    3: b"30",  # 15
+    4: b"28",  # 20
+    5: b"21",  # 25
+    6: b"17",  # 30
+    7: b"15",  # 35
+    8: b"13",  # 40
+    9: b"12",  # 45
+    10: b"11",  # 50
+    11: b"10",  # 55
+    12: b"9",  # 60
+    13: b"8",  # 65
+    14: b"7",  # 70
+    15: b"6",  # 75
+    16: b"5",  # 80
+    17: b"4",  # 85
+    18: b"3",  # 90
+    19: b"2",  # 95
+    20: b"2",  # 100
+}
+# FF_JPG_Q = {xn: ("%d" % (xn,)).encode("ascii") for xn in range(2, 33)}
+VIPS_JPG_Q = {
+    0: 4,  # 0
+    1: 7,  # 5
+    2: 12,  # 10
+    3: 17,  # 15
+    4: 22,  # 20
+    5: 27,  # 25
+    6: 32,  # 30
+    7: 37,  # 35
+    8: 42,  # 40
+    9: 47,  # 45
+    10: 52,  # 50
+    11: 56,  # 55
+    12: 61,  # 60
+    13: 66,  # 65
+    14: 71,  # 70
+    15: 75,  # 75
+    16: 80,  # 80
+    17: 85,  # 85
+    18: 89,  # 90 (vips explodes past this point)
+    19: 91,  # 95
+    20: 97,  # 100
+}
 
 
 try:
@@ -270,6 +320,9 @@ class ThumbSrv(object):
 
     def shutdown(self) -> None:
         self.stopping = True
+        Daemon(self._fire_sentinels, "thumbstopper")
+
+    def _fire_sentinels(self):
         for _ in range(self.nthr):
             self.q.put(None)
 
@@ -305,6 +358,7 @@ class ThumbSrv(object):
                 if not bos.path.exists(inf_path):
                     with open(inf_path, "wb") as f:
                         f.write(afsenc(os.path.dirname(abspath)))
+                    self.writevolcfg(histpath)
 
                 self.busy[tpath] = [cond]
                 do_conv = True
@@ -348,6 +402,47 @@ class ThumbSrv(object):
             "ffa": self.fmt_ffa,
         }
 
+    def volcfgi(self, vn: VFS) -> str:
+        ret = []
+        zs = "th_dec th_no_webp th_no_jpg"
+        for zs in zs.split(" "):
+            ret.append("%s(%s)\n" % (zs, getattr(self.args, zs)))
+        zs = "th_qv thsize th_spec_p convt"
+        for zs in zs.split(" "):
+            ret.append("%s(%s)\n" % (zs, vn.flags.get(zs)))
+        return "".join(ret)
+
+    def volcfga(self, vn: VFS) -> str:
+        ret = []
+        zs = "q_opus q_mp3"
+        for zs in zs.split(" "):
+            ret.append("%s(%s)\n" % (zs, getattr(self.args, zs)))
+        zs = "aconvt"
+        for zs in zs.split(" "):
+            ret.append("%s(%s)\n" % (zs, vn.flags.get(zs)))
+        return "".join(ret)
+
+    def writevolcfg(self, histpath: str) -> None:
+        try:
+            bos.stat(os.path.join(histpath, "th", "cfg.txt"))
+            bos.stat(os.path.join(histpath, "ac", "cfg.txt"))
+            return
+        except:
+            pass
+        cfgi = cfga = ""
+        for vn in self.asrv.vfs.all_vols.values():
+            if vn.histpath == histpath:
+                cfgi = self.volcfgi(vn)
+                cfga = self.volcfga(vn)
+                break
+        t = "writing thumbnailer-config %d,%d to %s"
+        self.log(t % (len(cfgi), len(cfga), histpath))
+        chmod = bos.MKD_700 if self.args.free_umask else bos.MKD_755
+        for cfg, cat in ((cfgi, "th"), (cfga, "ac")):
+            bos.makedirs(os.path.join(histpath, cat), vf=chmod)
+            with open(os.path.join(histpath, cat, "cfg.txt"), "wb") as f:
+                f.write(cfg.encode("utf-8"))
+
     def wait4ram(self, need: float, ttpath: str) -> None:
         ram = self.args.th_ram_max
         if need > ram * 0.99:
@@ -381,7 +476,7 @@ class ThumbSrv(object):
             else:
                 ap_unpk = abspath
 
-            if not bos.path.exists(tpath):
+            if ap_unpk and not bos.path.exists(tpath):
                 tex = tpath.rsplit(".", 1)[-1]
                 want_mp3 = tex == "mp3"
                 want_opus = tex in ("opus", "owa", "caf")
@@ -424,12 +519,14 @@ class ThumbSrv(object):
             except:
                 pass
 
+            conv_ok = False
             for fun in funs:
                 try:
                     if not png_ok and tpath.endswith(".png"):
                         raise Exception("png only allowed for waveforms")
 
                     fun(ap_unpk, ttpath, fmt, vn)
+                    conv_ok = True
                     break
                 except Exception as ex:
                     msg = "%s could not create thumbnail of %r\n%s"
@@ -451,16 +548,20 @@ class ThumbSrv(object):
                         except:
                             pass
 
-            if abspath != ap_unpk:
+            if abspath != ap_unpk and ap_unpk:
                 wunlink(self.log, ap_unpk, vn.flags)
 
             try:
                 atomic_move(self.log, ttpath, tpath, vn.flags)
             except Exception as ex:
-                if not os.path.exists(tpath):
+                if conv_ok and not os.path.exists(tpath):
                     t = "failed to move  [%s]  to  [%s]:  %r"
                     self.log(t % (ttpath, tpath, ex), 3)
-                pass
+                elif not conv_ok:
+                    try:
+                        open(tpath, "ab").close()
+                    except:
+                        pass
 
             untemp = []
             with self.mutex:
@@ -520,7 +621,7 @@ class ThumbSrv(object):
             im.thumbnail(self.getres(vn, fmt))
 
         fmts = ["RGB", "L"]
-        args = {"quality": 40}
+        args = {"quality": vn.flags["th_qv"]}
 
         if tpath.endswith(".webp"):
             # quality 80 = pillow-default
@@ -564,7 +665,12 @@ class ThumbSrv(object):
                     raise
 
         assert img  # type: ignore  # !rm
-        img.write_to_file(tpath, Q=40)
+        args = {}
+        qv = vn.flags["th_qv"]
+        if tpath.endswith("jpg"):
+            qv = VIPS_JPG_Q[qv // 5]
+            args["optimize_coding"] = True
+        img.write_to_file(tpath, Q=qv, strip=True, **args)
 
     def conv_raw(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.2, tpath)
@@ -598,7 +704,12 @@ class ThumbSrv(object):
                         raise
 
             assert img  # type: ignore  # !rm
-            img.write_to_file(tpath, Q=40)
+            args = {}
+            qv = vn.flags["th_qv"]
+            if tpath.endswith("jpg"):
+                qv = VIPS_JPG_Q[qv // 5]
+                args["optimize_coding"] = True
+            img.write_to_file(tpath, Q=qv, strip=True, **args)
         elif HAVE_PIL:
             if thumb.format == rawpy.ThumbFormat.BITMAP:
                 im = Image.fromarray(thumb.data, "RGB")
@@ -662,12 +773,12 @@ class ThumbSrv(object):
         if tpath.endswith(".jpg"):
             cmd += [
                 b"-q:v",
-                b"6",  # default=??
+                FF_JPG_Q[vn.flags["th_qv"] // 5],  # default=??
             ]
         else:
             cmd += [
                 b"-q:v",
-                b"50",  # default=75
+                unicode(vn.flags["th_qv"]).encode("ascii"),  # default=75
                 b"-compression_level:v",
                 b"6",  # default=4, 0=fast, 6=max
             ]
@@ -682,7 +793,7 @@ class ThumbSrv(object):
             return
 
         c: Union[str, int] = "90"
-        t = "FFmpeg failed (probably a corrupt video file):\n"
+        t = "FFmpeg failed (probably a corrupt file):\n"
         if (
             (not self.args.th_ff_jpg or time.time() - int(self.args.th_ff_jpg) < 60)
             and cmd[-1].lower().endswith(b".webp")
@@ -713,7 +824,7 @@ class ThumbSrv(object):
         if len(lines) > 50:
             lines = lines[:25] + ["[...]"] + lines[-25:]
 
-        txt = "\n".join(["ff: " + str(x) for x in lines])
+        txt = "\n".join(["ff: " + unicode(x) for x in lines])
         if len(txt) > 5000:
             txt = txt[:2500] + "...\nff: [...]\nff: ..." + txt[-2500:]
 
@@ -871,12 +982,12 @@ class ThumbSrv(object):
         if tpath.endswith(".jpg"):
             cmd += [
                 b"-q:v",
-                b"6",  # default=??
+                FF_JPG_Q[vn.flags["th_qv"] // 5],  # default=??
             ]
         else:
             cmd += [
                 b"-q:v",
-                b"50",  # default=75
+                unicode(vn.flags["th_qv"]).encode("ascii"),  # default=75
                 b"-compression_level:v",
                 b"6",  # default=4, 0=fast, 6=max
             ]
@@ -1134,7 +1245,7 @@ class ThumbSrv(object):
         ret = []
         for k, vs in raw_tags.items():
             for v in vs:
-                if len(str(v)) >= 1024:
+                if len(unicode(v)) >= 1024:
                     bv = k.encode("utf-8", "replace")
                     ret += [b"-metadata", bv + b"="]
                     break
@@ -1172,6 +1283,28 @@ class ThumbSrv(object):
             time.sleep(interval)
 
     def clean(self, histpath: str) -> int:
+        cfgi = cfga = ""
+        for vn in self.asrv.vfs.all_vols.values():
+            if vn.histpath == histpath:
+                cfgi = self.volcfgi(vn)
+                cfga = self.volcfga(vn)
+                break
+        for cfg, cat in ((cfgi, "th"), (cfga, "ac")):
+            if not cfg:
+                continue
+            try:
+                with open(os.path.join(histpath, cat, "cfg.txt"), "rb") as f:
+                    oldcfg = f.read().decode("utf-8")
+            except:
+                oldcfg = ""
+            if cfg == oldcfg:
+                continue
+            zs = os.path.join(histpath, cat)
+            if not os.path.exists(zs):
+                continue
+            self.log("thumbnailer-config changed; deleting %s" % (zs,), 3)
+            shutil.rmtree(zs)
+
         ret = 0
         for cat in ["th", "ac"]:
             top = os.path.join(histpath, cat)
@@ -1230,7 +1363,7 @@ class ThumbSrv(object):
                 if len(b64) != 24 or len(ts) != 8 or ext not in exts:
                     raise Exception()
             except:
-                if f != "dir.txt":
+                if f != "dir.txt" and f != "cfg.txt":
                     self.log("foreign file in thumbs dir: [{}]".format(fp), 1)
 
                 continue

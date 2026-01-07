@@ -4,7 +4,7 @@ set -e
 # general housekeeping before a release
 
 self=$(cd -- "$(dirname "$BASH_SOURCE")"; pwd -P)
-ver=$(awk '/^VERSION/{gsub(/[^0-9]/," ");printf "%d.%d.%d\n",$1,$2,$3}' copyparty/__version__.py)
+ver=$(awk '/^VERSION/{gsub(/[^0-9]/," ");printf "%d.%d.%d\n",$1,$2,$3}' $self/../copyparty/__version__.py)
 
 update_arch_pkgbuild() {
     cd "$self/../contrib/package/arch"

@@ -10,12 +10,13 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/shares.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
-{{- html_head }}
+{{ html_head }}
 </head>
 
 <body>
-	<div id="wrap">
+	<div id="wrap" class="terse">
 		<a href="{{ r }}/?shares">refresh</a>
+		<a id="xpnd" href="#">files</a>
 		<a href="{{ r }}/?h">control-panel</a>
 
         <span>axs = perms (read,write,move,delet)</span>
@@ -46,7 +47,7 @@
             <td>{{ "yes" if pw else "--" }}</td>
             <td><a href="{{ r }}/{{ vp|e }}">/{{ vp|e }}</a></td>
             <td>{{ pr }}</td>
-            <td>{{ st }}</td>
+            <td><div>{{ st }}</div></td>
             <td>{{ un|e }}</td>
             <td>{{ t0 }}</td>
             <td>{{ t1 }}</td>
@@ -78,6 +79,11 @@ document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme
 {%- if js %}
 <script src="{{ js }}_={{ ts }}"></script>
 {%- endif %}
+<script>
+    Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+    jsldp("J_UTL","util");
+    jsldp("J_SHR","shares");
+</script>
 </body>
 </html>
 

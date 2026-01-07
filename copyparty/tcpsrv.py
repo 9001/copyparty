@@ -9,7 +9,7 @@ import time
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
 from .cert import gencert
-from .stolen.qrcodegen import QrCode, qr2svg
+from .qrkode import QrCode, qr2png, qr2svg, qr2txt, qrgen
 from .util import (
     E_ACCESS,
     E_ADDR_IN_USE,
@@ -21,6 +21,7 @@ from .util import (
     VF_CAREFUL,
     Netdev,
     atomic_move,
+    get_adapters,
     min_ex,
     sunpack,
     termsize,
@@ -59,6 +60,7 @@ class TcpSrv(object):
         self.stopping = False
         self.srv: list[socket.socket] = []
         self.bound: list[tuple[str, int]] = []
+        self.seen_eps: list[tuple[str, int]] = []  # also skipped by uds-only
         self.netdevs: dict[str, Netdev] = {}
         self.netlist = ""
         self.nsrv = 0
@@ -299,6 +301,9 @@ class TcpSrv(object):
 
         try:
             if tcp:
+                if self.args.http_no_tcp:
+                    self.seen_eps.append((ip, port))
+                    return
                 srv.bind((ip, port))
             else:
                 if ANYWIN or self.args.rm_sck:
@@ -409,6 +414,7 @@ class TcpSrv(object):
 
         self.srv = srvs
         self.bound = bound
+        self.seen_eps = list(set(self.seen_eps + bound))
         self.nsrv = len(srvs)
         self._distribute_netdevs()
 
@@ -416,6 +422,7 @@ class TcpSrv(object):
         self.hub.broker.say("httpsrv.set_netdevs", self.netdevs)
         self.hub.start_zeroconf()
         gencert(self.log, self.args, self.netdevs)
+        self.hub.restart_sftpd()
         self.hub.restart_ftpd()
         self.hub.restart_tftpd()
 
@@ -451,8 +458,6 @@ class TcpSrv(object):
             self._distribute_netdevs()
 
     def detect_interfaces(self, listen_ips: list[str]) -> dict[str, Netdev]:
-        from .stolen.ifaddr import get_adapters
-
         listen_ips = [x for x in listen_ips if not x.startswith(("unix:", "fd:"))]
 
         nics = get_adapters(True)
@@ -625,7 +630,7 @@ class TcpSrv(object):
 
         pad = self.args.qrp
         zoom = self.args.qrz
-        qrc = QrCode.encode_binary(btxt)
+        qrc = qrgen(btxt)
 
         for zs in self.args.qr_file or []:
             self._qr2file(qrc, zs)
@@ -638,7 +643,7 @@ class TcpSrv(object):
             except:
                 zoom = 1
 
-        qr = qrc.render(zoom, pad)
+        qr = qr2txt(qrc, zoom, pad)
         if self.args.no_ansi:
             return "{}\n{}".format(txt, qr)
 
@@ -679,12 +684,12 @@ class TcpSrv(object):
             if zoom not in (1, 2):
                 raise Exception("invalid zoom for qr.txt; must be 1 or 2")
             with open(ap, "wb") as f:
-                f.write(qrc.render(zoom, pad).encode("utf-8"))
+                f.write(qr2txt(qrc, zoom, pad).encode("utf-8"))
         elif ap.endswith(".svg"):
             with open(ap, "wb") as f:
                 f.write(qr2svg(qrc, pad).encode("utf-8"))
         else:
-            qrc.to_png(zoom, pad, self._h2i(bg), self._h2i(fg), ap)
+            qr2png(qrc, zoom, pad, self._h2i(bg), self._h2i(fg), ap)
 
     def _h2i(self, hs):
         try:

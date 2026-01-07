@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="{{ r }}/.cpr/mde.css?_={{ ts }}">
 	<link rel="stylesheet" href="{{ r }}/.cpr/deps/mini-fa.css?_={{ ts }}">
 	<link rel="stylesheet" href="{{ r }}/.cpr/deps/easymde.css?_={{ ts }}">
-{{- html_head }}
+{{ html_head }}
 </head>
 <body>
 	<div id="mw">
@@ -57,5 +57,10 @@ try { l.light = drk? 0:1; } catch (ex) { }
 	{%- if js %}
 	<script src="{{ js }}_={{ ts }}"></script>
 	{%- endif %}
+	<script>
+		Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+		jsldp("J_UTL","util");
+		jsldp("J_MDE","mde");
+	</script>
 </body></html>
 

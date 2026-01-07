@@ -16,6 +16,8 @@ lics = [
     "MIT License",
     "BSD 2-Clause License",
     "BSD 3-Clause License",
+    "ISC License",
+    "Apache License v2.0",
     "SIL Open Font License v1.1",
 ]
 

@@ -9,7 +9,8 @@ ENV     XDG_CONFIG_HOME=/cfg
 
 RUN     apk --no-cache add !pyc \
             tzdata wget mimalloc2 mimalloc2-insecure \
-            py3-jinja2 py3-argon2-cffi py3-pyzmq py3-openssl py3-pillow \
+            py3-jinja2 py3-argon2-cffi py3-pyzmq \
+            py3-openssl py3-paramiko py3-pillow \
             ffmpeg
 
 COPY    i/dist/copyparty-sfx.py innvikler.sh ./

@@ -2,9 +2,9 @@
 
 
 pkgname=copyparty
-pkgver=1.19.7
+pkgver=1.20.0
 pkgrel=1
-pkgdesc="File server with accelerated resumable uploads, dedup, WebDAV, FTP, TFTP, zeroconf, media indexer, thumbnails++"
+pkgdesc="File server with accelerated resumable uploads, dedup, WebDAV, SFTP, FTP, TFTP, zeroconf, media indexer, thumbnails++"
 arch=("any")
 url="https://github.com/9001/${pkgname}"
 license=('MIT')
@@ -13,6 +13,7 @@ makedepends=("python3-wheel" "python3-setuptools" "python3-build" "python3-insta
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags"
             "golang-cfssl: generate TLS certificates on startup"
             "python3-mutagen: music tags (alternative)"
+            "python3-paramiko: sftp server"
             "python3-pil: thumbnails for images"
             "python3-openssl: ftps functionality"
             "python3-zmq: send zeromq messages from event-hooks"
@@ -20,7 +21,7 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
 )
 source=("https://github.com/9001/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
 backup=("/etc/${pkgname}.d/init" )
-sha256sums=("229476fc111de22a46d56c564d5e615bce6ce222321bcb73b336a3ead03d01f9")
+sha256sums=("a1fd3aab51f30435f07f1d128cf773262ee69a1554c9c32ea1e36d06438eb291")
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}/copyparty/web"

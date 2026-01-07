@@ -9,7 +9,7 @@
 	{%- if edit %}
 	<link rel="stylesheet" href="{{ r }}/.cpr/md2.css?_={{ ts }}">
 	{%- endif %}
-{{- html_head }}
+{{ html_head }}
 </head>
 <body>
 	<div id="mn"></div>
@@ -22,7 +22,8 @@
 			<a id="nsbs" href="#" tt="switch between editor and preview$NHotkey: ctrl-e">editor</a>
 			<div id="toolsbox">
 				<a id="tools" href="#">tools</a>
-				<a id="fmt_table" href="#">prettify table (ctrl-k)</a>
+				<a id="fmt_table" href="#">beautify table (ctrl-k)</a>
+				<a id="fmt_json" href="#">beautify json (ctrl-j)</a>
 				<a id="iter_uni" href="#">non-ascii: iterate (ctrl-u)</a>
 				<a id="mark_uni" href="#">non-ascii: markup</a>
 				<a id="cfg_uni" href="#">non-ascii: whitelist</a>
@@ -160,8 +161,17 @@ try { l.light = drk? 0:1; } catch (ex) { }
 	{%- if edit %}
 	<script src="{{ r }}/.cpr/md2.js?_={{ ts }}"></script>
 	{%- endif %}
+	<script>
+		Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+		jsldp("J_UTL","util");
+		jsldp("J_MD","md");
+		{%- if edit %}
+		jsldp("J_MD2","md2");
+		{%- endif %}
+	</script>
 	{%- if js %}
 	<script src="{{ js }}_={{ ts }}"></script>
 	{%- endif %}
-</body></html>
+</body>
+</html>
 

@@ -1,5 +1,6 @@
 "use strict";
 
+var J_MD = 1;
 var dom_toc = ebi('toc'),
     dom_wrap = ebi('mw'),
     dom_hbar = ebi('mh'),
@@ -238,6 +239,12 @@ function convert_markdown(md_text, dest_dom) {
     for (var a = nodes.length - 1; a >= 0; a--) {
         var href = nodes[a].getAttribute('href');
         var txt = nodes[a].innerHTML;
+
+        if (/\.[Mm][Dd]$/.test(href)) {
+            var o = new URL(href, location.href).origin;
+            if (!o || o == location.origin)
+                nodes[a].href = href + '?v';
+        }
 
         if (!txt)
             nodes[a].textContent = href;
@@ -518,3 +525,5 @@ if (sread('hidenav') == 1)
 
 if (window.tt && tt.init)
     tt.init();
+
+J_MD = 2;

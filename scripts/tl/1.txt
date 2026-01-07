@@ -1,0 +1,15 @@
+var chi = {
+	"ut_ow": "aa", //m
+	"cl_rcm": "aa", //m
+	"cdt_ren": "aa", //m
+	"rc_opn": "aa", //m
+	"rc_ply": "aa", //m
+}
+
+var cze = {
+	"ut_ow": "aa", //m
+	"cl_rcm": "aa", //m
+	"cdt_ren": "aa", //m
+	"rc_opn": "aa", //m
+	"rc_ply": "aa", //m
+}

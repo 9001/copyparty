@@ -10,6 +10,7 @@ gtar=$(command -v gtar || command -v gnutar) || true
 	sed()  { gsed  "$@"; }
 	find() { gfind "$@"; }
 	sort() { gsort "$@"; }
+	nproc() { gnproc; }
 	command -v grealpath >/dev/null &&
 		realpath() { grealpath "$@"; }
 }

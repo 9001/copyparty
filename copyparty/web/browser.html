@@ -9,7 +9,7 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/browser.css?_={{ ts }}">
-{{- html_head }}
+{{ html_head }}
 	{%- if css %}
 	<link rel="stylesheet" media="screen" href="{{ css }}_={{ ts }}">
 	{%- endif %}
@@ -51,8 +51,9 @@
 		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="new_md" />
 			📝<input type="text" name="name" class="i" placeholder="weekend-plans">
-			<input type="submit" value="new markdown doc">
+			<input type="submit" value="new file">
 		</form>
+		<span id="new_mdi"></span>
 	</div>
 
 	<div id="op_msg" class="opview opbox {% if not ls0 %}act{% endif %}">
@@ -128,17 +129,17 @@
 
 	<div id="widget"></div>
 
+	<div id="rcm" tabindex="0"></div>
+
 	<script>
 		var SR = "{{ r }}",
 			CGV1 = {{ cgv1 }},
 			CGV = {{ cgv|tojson }},
 			TS = "{{ ts }}",
 			dtheme = "{{ dtheme }}",
-			srvinf = "{{ srv_info }}",
 			lang = "{{ lang }}",
 			dfavico = "{{ favico }}",
 			have_tags_idx = {{ have_tags_idx }},
-			sb_lg = "{{ sb_lg }}",
 			logues = {{ logues|tojson if sb_lg else "[]" }},
 			ls0 = {{ ls0|tojson }};
 
@@ -146,13 +147,22 @@
 		document.documentElement.className = (STG && STG.cpp_thm) || dtheme;
 	</script>
 	<script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+	{%- if lang != "eng" %}
+	<script src="{{ r }}/.cpr/tl/{{ lang }}.js?_={{ ts }}"></script>
+	{%- endif %}
 	<script src="{{ r }}/.cpr/baguettebox.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/browser.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/up2k.js?_={{ ts }}"></script>
 	{%- if js %}
 	<script src="{{ js }}_={{ ts }}"></script>
 	{%- endif %}
+	<script>
+		Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+		jsldp("J_UTL","util");
+		jsldp("J_BBX","baguettebox");
+		jsldp("J_BRW","browser");
+		jsldp("J_U2K","up2k");
+	</script>
 </body>
-
 </html>
 

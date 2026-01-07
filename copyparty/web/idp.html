@@ -10,7 +10,7 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/shares.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
-{{- html_head }}
+{{ html_head }}
 </head>
 
 <body>
@@ -50,6 +50,10 @@ document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme
 {%- if js %}
 <script src="{{ js }}_={{ ts }}"></script>
 {%- endif %}
+<script>
+    Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+    jsldp("J_UTL","util");
+</script>
 </body>
 </html>
 

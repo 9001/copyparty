@@ -9,7 +9,7 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/splash.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/ui.css?_={{ ts }}">
-{{- html_head }}
+{{ html_head }}
 </head>
 
 <body>
@@ -42,7 +42,7 @@
 				<thead><tr><th>%</th><th>speed</th><th>eta</th><th>idle</th><th>dir</th><th>file</th></tr></thead>
 				<tbody>
 					{%- for u in ups %}
-					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
+					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ r }}{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
 					{%- endfor %}
 				</tbody>
 			</table>
@@ -54,7 +54,7 @@
 				<thead><tr><th>%</th><th>sent</th><th>speed</th><th>eta</th><th>idle</th><th></th><th>dir</th><th>file</th></tr></thead>
 				<tbody>
 					{%- for u in dls %}
-					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td>{{ u[4] }}</td><td>{{ u[5] }}</td><td><a href="{{ u[6] }}">{{ u[7]|e }}</a></td><td>{{ u[8] }}</td></tr>
+					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td>{{ u[4] }}</td><td>{{ u[5] }}</td><td><a href="{{ r }}{{ u[6] }}">{{ u[7]|e }}</a></td><td>{{ u[8] }}</td></tr>
 					{%- endfor %}
 				</tbody>
 			</table>
@@ -117,10 +117,15 @@
 				{%- if ahttps %}
 				<a id="w" href="{{ ahttps }}">switch to https</a>
 				{%- endif %}
+				<div id="lm"></div>
 			</form>
 		</div>
 		{%- else %}
+			{%- if this.uname == '*' %}
 		<h1 id="l">login for more:</h1>
+			{%- else %}
+		<h1 id="l">change account:</h1>
+			{%- endif %}
 		<div>
 			{%- if this.args.idp_login %}
 			<ul><li>
@@ -145,25 +150,38 @@
 				{%- if ahttps %}
 				<a id="w" href="{{ ahttps }}">switch to https</a>
 				{%- endif %}
+				<div id="lm"></div>
 			</form>
 			{%- endif %}
 		</div>
 		{%- endif %}
 
 		<h1 id="cc">other stuff:</h1>
-		<ul>
+		<div class="agr">
 			{%- if ahttps %}
-			<li><a id="wb" href="{{ ahttps }}">switch to https</a></li>
+			<a id="wb" href="{{ ahttps }}">switch to https</a><br />
 			{%- endif %}
 
-			{%- if this.uname in this.args.idp_adm_set %}
-			<li><a id="ag" href="{{ r }}/?idp">view idp cache</a></li>
-			{%- endif %}
+			<a id="af" href="{{ r }}/?ru">show recent uploads</a><br />
 
 			{%- if this.uname != '*' and this.args.shr %}
-			<li><a id="y" href="{{ r }}/?shares">edit shares</a></li>
+			<a id="y" href="{{ r }}/?shares">edit shares</a><br />
 			{%- endif %}
 
+            {%- if this.uname in this.args.idp_adm_set %}
+			<a id="ag" href="{{ r }}/?idp">view idp cache</a><br />
+			{%- endif %}
+
+			<a id="k" href="{{ r }}/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a><br />
+
+			{%- if this.uname != '*' and not in_shr %}
+			<form method="post" enctype="multipart/form-data">
+				<input type="hidden" name="act" value="logout" />
+				<input type="submit" id="lo" value="logout “{{ this.uname|e }}” everywhere" />
+			</form>
+			{%- endif %}
+		</div>
+		<ul>
 			{%- if k304 or k304vis %}
 			{%- if k304 %}
 			<li><a id="h" href="{{ r }}/?cc&setck=k304=n">disable k304</a> (currently enabled)
@@ -180,16 +198,6 @@
 			<li><a id="ac" href="{{ r }}/?cc&setck=no304=y" class="r">enable no304</a> (currently disabled)
 			{%- endif %}
 			<blockquote id="ad">enabling no304 will disable all caching; try this if k304 wasn't enough. This will waste a huge amount of network traffic!</blockquote></li>
-			{%- endif %}
-
-			<li><a id="af" href="{{ r }}/?ru">show recent uploads</a></li>
-			<li><a id="k" href="{{ r }}/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a></li>
-
-			{%- if this.uname != '*' and not in_shr %}
-			<li><form method="post" enctype="multipart/form-data">
-				<input type="hidden" name="act" value="logout" />
-				<input type="submit" id="lo" value="logout “{{ this.uname|e }}” everywhere" />
-			</form></li>
 			{%- endif %}
 		</ul>
 
@@ -209,10 +217,18 @@ document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme
 
 </script>
 <script src="{{ r }}/.cpr/util.js?_={{ ts }}"></script>
+{%- if lang != "eng" %}
+<script src="{{ r }}/.cpr/tl/{{ lang }}.js?_={{ ts }}"></script>
+{%- endif %}
 <script src="{{ r }}/.cpr/splash.js?_={{ ts }}"></script>
 {%- if js %}
 <script src="{{ js }}_={{ ts }}"></script>
 {%- endif %}
+<script>
+	Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+	jsldp("J_UTL","util");
+	jsldp("J_SPL","splash");
+</script>
 </body>
 </html>
 

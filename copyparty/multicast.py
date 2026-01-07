@@ -96,7 +96,10 @@ class MCast(object):
     def create_servers(self) -> list[str]:
         bound: list[str] = []
         netdevs = self.hub.tcpsrv.netdevs
-        ips = [x[0] for x in self.hub.tcpsrv.bound]
+        blist = self.hub.tcpsrv.bound
+        if self.args.http_no_tcp:
+            blist = self.hub.tcpsrv.seen_eps
+        ips = [x[0] for x in blist]
 
         if "::" in ips:
             ips = [x for x in ips if x != "::"] + list(

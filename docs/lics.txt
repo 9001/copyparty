@@ -6,15 +6,15 @@ L: MIT
 
 https://github.com/pallets/jinja/
 C: 2007 Pallets
-L: BSD 3-Clause
+L: BSD-3-Clause
 
 https://github.com/pallets/markupsafe/
 C: 2010 Pallets
-L: BSD 3-Clause
+L: BSD-3-Clause
 
 https://github.com/paulc/dnslib/
 C: 2010-2017 Paul Chakravarti
-L: BSD 2-Clause
+L: BSD-2-Clause
 
 https://github.com/pydron/ifaddr/
 C: 2014 Stefan C. Mueller
@@ -36,6 +36,10 @@ https://github.com/ahupp/python-magic/
 C: 2001-2014 Adam Hupp
 L: MIT
 
+https://github.com/fusepy/fusepy
+C: 2012 Giorgos Verigakis
+L: ISC
+
 --- client-side --- software ---
 
 https://github.com/Daninet/hash-wasm/
@@ -49,6 +53,10 @@ L: MIT
 https://github.com/feimosi/baguetteBox.js/
 C: 2017 Marek Grzybek
 L: MIT
+
+https://github.com/cure53/DOMPurify/
+C: 2025 Cure53 / Mario Heiderich
+L: Apache-2.0 or MPL-2.0
 
 https://github.com/markedjs/marked/
 C: 2018+, MarkedJS
@@ -68,8 +76,8 @@ L: MIT
 
 https://github.com/adobe-fonts/source-code-pro/
 C: 2010-2019 Adobe
-L: SIL OFL 1.1
+L: OFL-1.1
 
 https://github.com/FortAwesome/Font-Awesome/
 C: 2022 Fonticons, Inc.
-L: SIL OFL 1.1
+L: OFL-1.1

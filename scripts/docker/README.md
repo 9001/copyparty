@@ -33,10 +33,11 @@ i'm not very familiar with containers, so let me know if this section could be b
 
 the container has the same default config as the sfx and the pypi module, meaning it will listen on port 3923 and share the "current folder" (`/w` inside the container) as read-write for anyone
 
-the recommended way to configure copyparty inside a container is to mount a folder which has one or more [config files](https://github.com/9001/copyparty/blob/hovudstraum/docs/example.conf) inside; `-v /your/config/folder:/cfg`
+the recommended way to configure copyparty inside a container is to mount a folder which has one or more [config files](https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/basic-docker-compose/copyparty.conf) inside; `-v /your/config/folder:/cfg`
 
 * but you can also provide arguments to the docker command if you prefer that
 * config files must be named `something.conf` to get picked up
+* there are [more extensive config examples](https://github.com/9001/copyparty/blob/hovudstraum/docs/example.conf) but those are not made for docker so the paths are wrong (`/home/ed/Music` should be `/w/something` and so on)
 
 also see [docker-specific recommendations](#docker-specific-recommendations)
 

@@ -15,6 +15,7 @@
     * [general](#general)
 * [event hooks](#event-hooks) - on writing your own [hooks](../README.md#event-hooks)
     * [hook effects](#hook-effects) - hooks can cause intentional side-effects
+    * [hook import](#hook-import) - the `I` flag runs the hook inside copyparty
 * [assumptions](#assumptions)
     * [mdns](#mdns)
 * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
@@ -154,7 +155,11 @@ there is a static salt for all passwords;
 * method `uPOST` = url-encoded post
 * `FILE` = conventional HTTP file upload entry (rfc1867 et al, filename in `Content-Disposition`)
 
-authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
+clients can authenticate in the following ways; the first of these which is not blank will be used:
+* url-param `&pw=foo` -- can be disabled with `--pw-urlp=A` (or renamed, if provided value is lowercase)
+* then, header `PW: foo` -- can be disabled with `--pw-hdr=A` (or renamed, if provided value is lowercase)
+* then, basic-auth -- can be disabled with `--no-bauth`
+* then, depending on protocol, header `Cookie: cppwd=foo` on plaintext http, or header `Cookie: cppws=foo` on https
 
 ## read
 
@@ -165,6 +170,7 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?ls&dots` | list files/folders at URL as JSON, including dotfiles |
 | GET | `?ls=t` | list files/folders at URL as plaintext |
 | GET | `?ls=v` | list files/folders at URL, terminal-formatted |
+| GET | `?opds` | list files/folders at URL as opds feed, for e-readers |
 | GET | `?lt` | in listings, use symlink timestamps rather than targets |
 | GET | `?b` | list files/folders at URL as simplified HTML |
 | GET | `?tree=.` | list one level of subdirectories inside URL |
@@ -198,6 +204,8 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?th` | get image/video at URL as thumbnail |
 | GET | `?th=opus` | convert audio file to 128kbps opus |
 | GET | `?th=caf` | ...in the iOS-proprietary container |
+| GET | `?zls` | get listing of filepaths in zip file at URL |
+| GET | `?zget=path` | get specific file from inside a zip file at URL |
 
 | method | body | result |
 |--|--|--|
@@ -222,11 +230,13 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | PUT | `?ck=md5` | (binary data) | return md5 instead of sha512 |
 | PUT | `?gz` | (binary data) | compress with gzip and write into file at URL |
 | PUT | `?xz` | (binary data) | compress with xz and write into file at URL |
+| PUT | `?apnd` | (binary data) | append to existing file |
 | mPOST | | `f=FILE` | upload `FILE` into the folder at URL |
 | mPOST | `?j` | `f=FILE` | ...and reply with json |
 | mPOST | `?ck` | `f=FILE` | ...and disable checksum gen (faster) |
 | mPOST | `?ck=md5` | `f=FILE` | ...and return md5 instead of sha512 |
 | mPOST | `?replace` | `f=FILE` | ...and overwrite existing files |
+| mPOST | `?apnd` | `f=FILE` | ...and append to existing files |
 | mPOST | `?media` | `f=FILE` | ...and return medialink (not hotlink) |
 | mPOST | | `act=mkdir`, `name=foo` | create directory `foo` at URL |
 | POST | `?delete` | | delete URL recursively |
@@ -245,6 +255,7 @@ upload modifiers:
 | `Accept: json` | `want=json` | return upload info as json; same as `?j` |
 | `Rand: 4` | `rand=4` | generate random filename with 4 characters |
 | `Life: 30` | `life=30` | delete file after 30 seconds |
+| `Replace: 1` | `replace` | overwrite file if exists |
 | `CK: no` | `ck` | disable serverside checksum (maybe faster) |
 | `CK: md5` | `ck=md5` | return md5 checksum instead of sha512 |
 | `CK: sha1` | `ck=sha1` | return sha1 checksum |
@@ -253,7 +264,9 @@ upload modifiers:
 | `CK: b2s` | `ck=b2s` | return blake2s checksum |
 
 * `life` only has an effect if the volume has a lifetime, and the volume lifetime must be greater than the file's
-
+* `replace` upload-modifier:
+  * the header `replace: 1` works for both PUT and multipart-post
+  * the url-param `replace` only works for multipart-post
 * server behavior of `msg` can be reconfigured with `--urlform`
 
 ## admin
@@ -306,6 +319,14 @@ a subset of effect types are available for a subset of hook types,
 to trigger indexing of files `/foo/1.txt` and `/foo/bar/2.txt`, a hook can `print(json.dumps({"idx":{"vp":["/foo/1.txt","/foo/bar/2.txt"]}}))` (and replace "idx" with "del" to delete instead)
 * note: paths starting with `/` are absolute URLs, but you can also do `../3.txt` relative to the destination folder of each uploaded file
 
+## hook import
+
+the `I` flag runs the hook inside copyparty,  which can be very useful and dangerous:
+
+* around 140x faster because it doesn't need to launch a new subprocess
+* the hook can intentionally (or accidentally) mess with copyparty's internals
+  * very easy to crash things if not careful
+
 
 # assumptions
 
@@ -352,14 +373,23 @@ pip install jinja2 strip_hints  # MANDATORY
 pip install argon2-cffi  # password hashing
 pip install pyzmq  # send 0mq from hooks
 pip install mutagen  # audio metadata
+pip install paramiko  # sftp server
 pip install pyftpdlib  # ftp server
 pip install partftpy  # tftp server
 pip install impacket  # smb server -- disable Windows Defender if you REALLY need this on windows
 pip install Pillow pillow-heif  # thumbnails
 pip install pyvips  # faster thumbnails
-pip install psutil  # better cleanup of stuck metadata parsers on windows 
+pip install psutil  # better cleanup of stuck metadata parsers on windows
 pip install black==21.12b0 click==8.0.2 bandit pylint flake8 isort mypy  # vscode tooling
 ```
+
+* on archlinux you can do this:
+  * `sudo pacman -Sy --needed python-{pip,isort,jinja,argon2-cffi,pyzmq,mutagen,paramiko,pyftpdlib,pillow}`
+  * then, as user: `python3 -m pip install --user --break-system-packages -U strip_hints black==21.12b0 click==8.0.2`
+  * for building docker images: `sudo pacman -Sy --needed qemu-user-static{,-binfmt} podman{,-docker} jq`
+
+* and if you want to run the python 2.7 tests:
+  * `git clone https://github.com/pyenv/pyenv .pyenv ; cd .pyenv/bin ; env PYTHON_CONFIGURE_OPTS='--enable-optimizations' PYTHON_CFLAGS='-march=native -mtune=native -std=c17' ./pyenv install 2.7.18 -v ; ln -s $HOME/.pyenv/versions/2.7.18/bin/python2 $HOME/bin/`
 
 
 ## just the sfx
@@ -392,6 +422,7 @@ if you are unable to use `build`, you can use the old setuptools approach instea
 ```bash
 python3 setup.py install --user setuptools wheel jinja2
 python3 setup.py build
+python3 setup.py bdist_wheel
 # you now have a wheel which you can install. or extract and repackage:
 python3 setup.py install --skip-build --prefix=/usr --root=$HOME/pe/copyparty
 ```

@@ -1,6 +1,7 @@
 "use strict";
 
 
+var J_MD2 = 1;
 var sloc0 = '' + location,
     dbg_kbd = /[?&]dbgkbd\b/.exec(sloc0);
 
@@ -334,7 +335,7 @@ window.onbeforeunload = function (e) {
 
 // save handler
 function save(e) {
-    if (e) e.preventDefault();
+    ev(e);
     var save_btn = ebi("save"),
         save_cls = save_btn.className + '';
 
@@ -698,9 +699,42 @@ function reLastIndexOf(txt, ptn, end) {
 }
 
 
+// json formatter
+function fmt_json(e) {
+    ev(e);
+    try {
+        fmt_json2();
+    }
+    catch (ex) {
+        return toast.err(7, 'json-format (CTRL-J) failed\n\n(hint: select the json you want to beautify/minify first)\n\n' + ex);
+    }
+}
+function fmt_json2() {
+    var txt = dom_src.value,
+        o0 = txt.lastIndexOf('\n', dom_src.selectionStart - 1),
+        o1 = txt.indexOf('\n', dom_src.selectionEnd);
+    o0 = o0 + 1 ? o0 + 1 : 0;
+    if (o1 < 0) o1 = txt.length;
+    for (var a = 0; a < 9; a++) {
+        if (has(['\r', '\n', ' '], txt.charAt(o0))) ++o0;
+        if (has(['\r', '\n', ' '], txt.charAt(o1))) --o1;
+    }
+    var jt0 = txt.slice(o0, ++o1),
+        jo = JSON.parse(jt0),
+        jt = JSON.stringify(jo, null, jt0.indexOf('\n') + 1 ? 0 : 2);
+    setsel({
+        "pre": txt.slice(0, o0),
+        "sel": jt,
+        "post": txt.slice(o1),
+        "car": o0,
+        "cdr": o0,
+    });
+}
+
+
 // table formatter
 function fmt_table(e) {
-    if (e) e.preventDefault();
+    ev(e);
     try {
         fmt_table2();
     }
@@ -857,7 +891,7 @@ function fmt_table2() {
 
 // show unicode
 function mark_uni(e) {
-    if (e) e.preventDefault();
+    ev(e);
     dom_tbox.className = '';
 
     var txt = dom_src.value,
@@ -873,7 +907,7 @@ function mark_uni(e) {
 
 // iterate unicode
 function iter_uni(e) {
-    if (e) e.preventDefault();
+    ev(e);
 
     var txt = dom_src.value,
         ofs = dom_src.selectionDirection == "forward" ? dom_src.selectionEnd : dom_src.selectionStart,
@@ -895,7 +929,7 @@ function iter_uni(e) {
 
 // configure whitelist
 function cfg_uni(e) {
-    if (e) e.preventDefault();
+    ev(e);
 
     modal.prompt("unicode whitelist", esc_uni_whitelist, function (reply) {
         esc_uni_whitelist = reply;
@@ -923,7 +957,9 @@ var set_lno = (function () {
             if (i === pi)
                 return;
 
-            var v = 'L' + dom_src.value.slice(0, i).split('\n').length;
+            var lns = dom_src.value.slice(0, i).split('\n'),
+                v = lns.length + ' : ' + lns.pop().length;
+
             if (v != pv)
                 lno.innerHTML = v;
 
@@ -995,6 +1031,10 @@ var set_lno = (function () {
                 action_stack.redo();
                 return false;
             }
+            if (kl == "j") {
+                fmt_json(e.shiftKey);
+                return false;
+            }
             if (kl == "k") {
                 fmt_table();
                 return false;
@@ -1038,14 +1078,14 @@ var set_lno = (function () {
 
 
 ebi('tools').onclick = function (e) {
-    if (e) e.preventDefault();
+    ev(e);
     var is_open = dom_tbox.className != 'open';
     dom_tbox.className = is_open ? 'open' : '';
 };
 
 
 ebi('help').onclick = function (e) {
-    if (e) e.preventDefault();
+    ev(e);
     dom_tbox.className = '';
 
     var dom = ebi('helpbox');
@@ -1065,6 +1105,7 @@ ebi('help').onclick = function (e) {
 
 
 ebi('fmt_table').onclick = fmt_table;
+ebi('fmt_json').onclick = fmt_json;
 ebi('mark_uni').onclick = mark_uni;
 ebi('iter_uni').onclick = iter_uni;
 ebi('cfg_uni').onclick = cfg_uni;
@@ -1190,3 +1231,5 @@ action_stack = (function () {
         _ref: ref
     }
 })();
+
+J_MD2 = 2;

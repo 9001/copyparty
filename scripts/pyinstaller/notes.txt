@@ -14,9 +14,11 @@ qemu-system-x86_64 -m 4096 -enable-kvm --machine q35 -cpu host -smp 4 -usb -devi
 
 ## ============================================================
 ## first-time setup in a stock win7x32sp1 and/or win10x64 vm:
-## 
+##
 
-grab & install from ftp2host:  Git-2.45.2-32-bit.exe
+grab & install from ftp2host:
+  win7:  Git-2.46.2-32-bit.exe
+  win10: Git-*-64-bit.exe
 
 ...and do this on the host so you can grab these notes too:
 unix2dos <~/dev/copyparty/scripts/pyinstaller/notes.txt >~/dev/pyi/notes.txt
@@ -30,17 +32,17 @@ fns=(
   altgraph-0.17.4-py2.py3-none-any.whl
   pefile-2023.2.7-py3-none-any.whl
   pywin32_ctypes-0.2.3-py3-none-any.whl
-  upx-5.0.1-win32.zip
+  upx-5.0.2-win32.zip
 )
 [ $w10 ] && fns+=(
   jinja2-3.1.6-py3-none-any.whl
   MarkupSafe-3.0.2-cp313-cp313-win_amd64.whl
   mutagen-1.47.0-py3-none-any.whl
   packaging-25.0-py3-none-any.whl
-  pillow-11.3.0-cp313-cp313-win_amd64.whl
-  pyinstaller-6.14.1-py3-none-win_amd64.whl
-  pyinstaller_hooks_contrib-2025.5-py3-none-any.whl
-  python-3.13.7-amd64.exe
+  pillow-12.0.0-cp313-cp313-win_amd64.whl
+  pyinstaller-6.15.0-py3-none-win_amd64.whl
+  pyinstaller_hooks_contrib-2025.8-py3-none-any.whl
+  python-3.13.11-amd64.exe
   setuptools-80.9.0-py3-none-any.whl
 )
 [ $w7 ] && fns+=(
@@ -124,13 +126,13 @@ note: if you keep accidentally killing the vm with alt-f4 then remove "-device u
 rm -f win7-x32.qcow2
 qemu-img create -f qcow2 win7-x32.qcow2 64g
 qemu-system-x86_64 -m 4096 -enable-kvm --machine q35 -cpu host -smp 4 -usb -device usb-tablet -net bridge,br=virhost0 -net nic,model=e1000e -drive file=win7-x32.qcow2,discard=unmap,detect-zeroes=unmap \
-  -cdrom ~/iso/win7-X17-59183-english-32bit-professional.iso
+  -cdrom ~/iso/~/iso/en_windows_7_professional_with_sp1_x86_dvd_u_677056.iso
 
 # win10: use virtio hdd and net (viostor+netkvm), but do NOT use qxl graphics (kills mouse cursor)
 rm -f win10-e2021.qcow2
 qemu-img create -f qcow2 win10-e2021.qcow2 64g
 qemu-system-x86_64 -m 4096 -enable-kvm --machine q35 -cpu host -smp 4 -usb -device usb-tablet -net bridge,br=virhost0 -net nic,model=virtio -drive file=win10-e2021.qcow2,if=virtio,discard=unmap \
-  -drive file=$HOME/iso/virtio-win-0.1.248.iso,media=cdrom -cdrom $HOME/iso/en-us_windows_10_enterprise_ltsc_2021_x64_dvd_d289cf96.iso
+  -drive file=$HOME/iso/virtio-win-0.1.285.iso,media=cdrom -cdrom $HOME/iso/en-us_windows_10_enterprise_ltsc_2021_x64_dvd_d289cf96.iso
 
 tweak stuff to your preference, but also do these steps in order:
 * press ctrl-alt-g so you don't accidentally alt-f4 the vm
@@ -148,7 +150,7 @@ tweak stuff to your preference, but also do these steps in order:
 * WIN7-ONLY: connect to ftp, download 4g.nul to desktop, then delete it (poor man's fstrim...)
 
 and finally take snapshots of the VMs by copypasting this stuff into your shell:
-vmsnap() { zstd --long=31 -vT0 -19 <$1 >$1.$2; };
+vmsnap() { zstd --long=31 -vT0 -19 -o $1.$2 $1; };
 vmsnap win7-x32.qcow2 snap1
 vmsnap win10-e2021.qcow2 snap1
 

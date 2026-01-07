@@ -4,6 +4,11 @@ these programs either take zero arguments, or a filepath (the affected file), or
 
 run copyparty with `--help-hooks` for usage details / hook type explanations (xm/xbu/xau/xiu/xbc/xac/xbr/xar/xbd/xad/xban)
 
+in particular, if a hook is loaded into copyparty with the hook-flag `c` ("check") then its exit-code controls the action that launched the hook:
+* exit-code `0` = allow the action, and/or continue running the next hook
+* exit-code `100` = allow the action, and stop running any remaining consecutive hooks
+* anything else = reject/prevent the original action, and don't run the remaining hooks
+
 > **note:** in addition to event hooks (the stuff described here), copyparty has another api to run your programs/scripts while providing way more information such as audio tags / video codecs / etc and optionally daisychaining data between scripts in a processing pipeline; if that's what you want then see [mtp plugins](../mtag/) instead
 
 
@@ -28,10 +33,19 @@ these are `--xiu` hooks; unlike `xbu` and `xau` (which get executed on every sin
 * [reject-extension.py](reject-extension.py) rejects uploads if they match a list of file extensions
 * [reloc-by-ext.py](reloc-by-ext.py) redirects an upload to another destination based on the file extension
   * good example of the `reloc` [hook effect](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#hook-effects)
+* [reject-and-explain.py](reject-and-explain.py) shows a custom error-message when it rejects an upload
+* [reject-ramdisk.py](reject-ramdisk.py) rejects the upload if the destination is a ramdisk
+  * this hook uses the `I` flag which makes it 140x faster, but if the plugin has a bug it may crash copyparty
 
 
 # on message
 * [wget.py](wget.py) lets you download files by POSTing URLs to copyparty
+  * [wget-i.py](wget-i.py) is an import-safe modification of this hook (starts 140x faster, but higher chance of bugs)
 * [qbittorrent-magnet.py](qbittorrent-magnet.py) starts downloading a torrent if you post a magnet url
 * [usb-eject.py](usb-eject.py) adds web-UI buttons to safe-remove usb flashdrives shared through copyparty
 * [msg-log.py](msg-log.py) is a guestbook; logs messages to a doc in the same folder
+
+
+# general concept demos
+* [import-me.py](import-me.py) shows how the `I` flag makes the hook 140x faster (but you need to be Very Careful when writing the plugin)
+  * [wget-i.py](wget-i.py) is an import-safe modification of [wget.py](wget.py)

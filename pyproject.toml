@@ -2,7 +2,7 @@
 name = "copyparty"
 description = """
   Portable file server with accelerated resumable uploads, \
-  deduplication, WebDAV, FTP, zeroconf, media indexer, \
+  deduplication, WebDAV, SFTP, FTP, zeroconf, media indexer, \
   video thumbnails, audio transcoding, and write-only folders"""
 readme = "README.md"
 authors = [{ name = "ed", email = "copyparty@ocv.me" }]
@@ -47,6 +47,7 @@ classifiers = [
 [project.optional-dependencies]
 all = [
     "argon2-cffi",
+    "paramiko",
     "partftpy>=0.4.0",
     "Pillow",
     "pyftpdlib",
@@ -56,6 +57,7 @@ all = [
 thumbnails = ["Pillow"]
 thumbnails2 = ["pyvips"]
 audiotags = ["mutagen"]
+sftp = ["paramiko"]
 ftpd = ["pyftpdlib"]
 ftps = ["pyftpdlib", "pyopenssl"]
 tftpd = ["partftpy>=0.4.0"]
@@ -93,7 +95,11 @@ copyparty = [
     "web/*.js",
     "web/*.css",
     "web/*.html",
-    "web/a/*.bat",
+    "web/*.xml",
+    "web/tl/*.js",
+    "web/tl/*.gz",
+    "web/a/*.txt",
+    "web/a/*.gz",
     "web/deps/*.gz",
     "web/deps/*.woff*",
 ]

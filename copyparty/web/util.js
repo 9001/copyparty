@@ -1,5 +1,7 @@
 "use strict";
 
+var J_UTL = 1;
+
 if (!window.console || !console.log)
     window.console = {
         "log": function (msg) { }
@@ -296,6 +298,10 @@ function ignex(all) {
 window.onerror = vis_exh;
 
 
+if (!window.Ls || !window.langmod)
+    var Ls = {};
+
+
 function noop() { }
 
 
@@ -586,6 +592,19 @@ function yscroll() {
     if (window.pageYOffset) {
         return (window.yscroll = function () {
             return window.pageYOffset;
+        })();
+    }
+    return 0;
+}
+function xscroll() {
+    if (document.documentElement.scrollLeft) {
+        return (window.xscroll = function () {
+            return document.documentElement.scrollLeft;
+        })();
+    }
+    if (window.pageXOffset) {
+        return (window.xscroll = function () {
+            return window.pageXOffset;
         })();
     }
     return 0;
@@ -960,15 +979,95 @@ function f2f(val, nd) {
 }
 
 
+var HSZ_U = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 function humansize(b, terse) {
-    var i = 0, u = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-    while (b >= 1000 && i < u.length - 1) {
-        b /= 1024;
-        i += 1;
-    }
+    var i = 0;
+    while (b >= 1000 && i < 5) { b /= 1024; i += 1; }
     return (f2f(b, b >= 100 ? 0 : b >= 10 ? 1 : 2) +
-        ' ' + (terse ? u[i].charAt(0) : u[i]));
+        ' ' + (terse ? HSZ_U[i].charAt(0) : HSZ_U[i]));
 }
+function humansize_su(b) {
+    var i = 0;
+    while (b >= 1000 && i < 5) { b /= 1024; i += 1; }
+    return [b, HSZ_U[i]];
+}
+function humansize_0(b) {
+    return '' + b;
+}
+function humansize_1(b) {
+    return ('' + b).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+function humansize_2g(b) {
+    var z = humansize_su(b), u = z[1].charAt(0); b = z[0];
+    return [f2f(b, b >= 100 ? 0 : b >= 10 ? 1 : 2) + ' ' + u, u];
+}
+function humansize_3g(b) {
+    var z = humansize_su(b), u = z[1].charAt(0); b = z[0];
+    return [f2f(b, b >= 10 ? 0 : 1) + ' ' + u, u];
+}
+function humansize_4g(b) {
+    var z = humansize_su(b), u = z[1]; b = z[0];
+    return [parseFloat(b.toFixed(b >= 100 ? 0 : b >= 10 ? 1 : 2)) + ' ' + u, u.charAt(0)];
+}
+function humansize_5g(b) {
+    var z = humansize_su(b), u = z[1]; b = z[0];
+    return [parseFloat(b.toFixed(b >= 10 ? 0 : 1)) + ' ' + u, u.charAt(0)];
+}
+function humansize_2(b) {
+    return humansize_2g(b)[0];
+}
+function humansize_3(b) {
+    return humansize_3g(b)[0];
+}
+function humansize_4(b) {
+    return humansize_4g(b)[0];
+}
+function humansize_5(b) {
+    return humansize_5g(b)[0];
+}
+function humansize_2c(b) {
+    var v = humansize_2g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_3c(b) {
+    var v = humansize_3g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_4c(b) {
+    var v = humansize_4g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_5c(b) {
+    var v = humansize_5g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_fuzzy(b) {
+    if (b <= 0) return "yes";
+	if (b <= 80) return "hullkort";
+	if (b <= 368640) return "5¼ DD";
+	if (b <= 1474560) return "save icon";
+	if (b <= 2880000) return "3½ Extended";
+	if (b <= 13107200) return "C90 Tape";
+	if (b <= 21000000) return "Floptical";
+	if (b <= 33554432) return "MPMan F10";
+	if (b <= 50000000) return "creditcardCD";
+	if (b <= 100663296) return "Zipdisk";
+	if (b <= 170000000) return "MD";
+	if (b <= 220200960) return "8cm CD";
+	if (b <= 737280000) return "CD-R";
+	if (b <= 900000000) return "UMD";
+	if (b <= 1300000000) return "GD-ROM";
+	if (b <= 4700000000) return "DVD";
+	if (b <= 9400000000) return "DVD-DL";
+	if (b <= 25025000000) return "BluRei";
+	if (b <= 50050000000) return "BD-DL";
+	return "LTO";
+}
+var humansize_fmts = ['0', '1', '2', '2c', '3', '3c', '4', '4c', '5', '5c', 'fuzzy'];
+window.filesizefun = (function () {
+    var v = sread('fszfmt', humansize_fmts);
+    return window['humansize_' + (v || window.dfszf)] || humansize_1;
+})();
 
 
 function humantime(v) {
@@ -1227,6 +1326,11 @@ function scfg_bind(obj, oname, cname, defval, cb) {
     return v;
 }
 
+function setck(v) {
+    var xhr = new XHR();
+    xhr.open('GET', SR + '/?setck=' + v, true);
+    xhr.send();
+}
 
 window.unix2ui = (function () {
     var v = sread('utctid');
@@ -1398,7 +1502,7 @@ var tt = (function () {
     var r = {
         "tt": mknod("div", 'tt'),
         "th": mknod("div", 'tth'),
-        "en": true,
+        "en": !window.notooltips,
         "el": null,
         "skip": false,
         "lvis": 0
@@ -1759,7 +1863,13 @@ var modal = (function () {
         document.removeEventListener('selectionchange', onselch);
         document.removeEventListener('focus', onfocus);
         document.removeEventListener('keydown', onkey);
-        o.parentNode.removeChild(o);
+        try {
+            o.parentNode.removeChild(o);
+        }
+        catch (ex) {
+            if (r.busy)
+                alert('WARNING: you have a browser-extension which is causing problems');
+        }
         r.busy = false;
         setTimeout(next, 50);
     };
@@ -2181,6 +2291,19 @@ function bchrome() {
 }
 bchrome();
 
+var XC_CMSG = {
+    502: "bad gateway (server offline)",
+    503: "server offline",
+    504: "gateway timeout (server busy)",
+    529: "gateway timeout (server busy)",
+    520: "unknown error from server",
+    521: "server offline",
+    523: "server offline",
+    522: "proxy timeout (server busy)",
+    524: "proxy timeout (server busy)",
+    598: "proxy timeout (server busy)",
+    599: "proxy timeout (server busy)",
+};
 var cf_cha_t = 0;
 function xhrchk(xhr, prefix, e404, lvl, tag) {
     if (xhr.status < 400 && xhr.status >= 200)
@@ -2223,5 +2346,10 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
         document.body.appendChild(fr);
     }
 
+    if (XC_CMSG[xhr.status] && (errtxt.indexOf('<html') + 1))
+        errtxt = XC_CMSG[xhr.status];
+
     return fun(0, prefix + xhr.status + ": " + errtxt, tag);
 }
+
+J_UTL = 2;

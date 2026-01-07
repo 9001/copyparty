@@ -12,13 +12,14 @@ COPY    i/bin/mtag/audio-bpm.py /mtag/
 COPY    i/bin/mtag/audio-key.py /mtag/
 RUN     apk add -U !pyc \
             tzdata wget mimalloc2 mimalloc2-insecure \
-            py3-jinja2 py3-argon2-cffi py3-pyzmq py3-openssl py3-pillow \
+            py3-jinja2 py3-argon2-cffi py3-pyzmq \
+            py3-openssl py3-paramiko py3-pillow \
             py3-pip py3-cffi \
             ffmpeg \
             py3-magic \
             vips-jxl vips-heif vips-poppler vips-magick \
             py3-numpy fftw libsndfile \
-            vamp-sdk vamp-sdk-libs \
+            vamp-sdk vamp-sdk-libs keyfinder-cli \
             libraw py3-numpy cython \
         && apk add -t .bd \
             bash wget gcc g++ make cmake patchelf \

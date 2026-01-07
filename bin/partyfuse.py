@@ -6,8 +6,8 @@ __copyright__ = 2019
 __license__ = "MIT"
 __url__ = "https://github.com/9001/copyparty/"
 
-S_VERSION = "2.1"
-S_BUILD_DT = "2025-09-06"
+S_VERSION = "2.2"
+S_BUILD_DT = "2025-12-16"
 
 """
 mount a copyparty server (local or remote) as a filesystem
@@ -284,8 +284,8 @@ class Gateway(object):
             if ar.td:
                 self.ssl_context = ssl._create_unverified_context()
             elif ar.te:
-                self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
-                self.ssl_context.load_verify_locations(ar.te)
+                self.ssl_context = ssl.create_default_context(cafile=ar.te)
+                self.ssl_context.check_hostname = ar.teh
 
         self.conns = {}
 
@@ -1165,6 +1165,7 @@ NOTE: if server has --usernames enabled, then password is "username:password"
 
     ap2 = ap.add_argument_group("https/TLS")
     ap2.add_argument("-te", metavar="PEMFILE", help="certificate to expect/verify")
+    ap2.add_argument("-teh", action="store_true", help="require correct hostname in -te cert")
     ap2.add_argument("-td", action="store_true", help="disable certificate check")
 
     ap2 = ap.add_argument_group("cache/perf")

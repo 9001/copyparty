@@ -118,6 +118,26 @@ table {
 .btns>a:first-child {
 	margin-left: 0;
 }
+.agr br {
+	display: none;
+}
+#lo,
+.agr a,
+.agr form {
+	margin: 0 .5em 0 0;
+	line-height: 4em;
+}
+.agr form,
+.agr input {
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+#lo,
+.agr input {
+	line-height: 1em;
+	font-weight: normal;
+}
 #msg {
 	margin: 3em 0;
 }

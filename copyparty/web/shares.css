@@ -58,6 +58,7 @@ th {
 #wrap th {
 	padding: .3em .6em;
 	text-align: left;
+	vertical-align: top;
 	white-space: nowrap;
 }
 #wrap td+td+td+td+td+td+td+td {
@@ -71,7 +72,10 @@ th {
 #wrap td:last-child {
 	border-radius: 0 .5em .5em 0;
 }
-
+#wrap.terse td div {
+   	height: 2.3em;
+	overflow-y: hidden;
+}
 
 
 html.z {

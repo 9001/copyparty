@@ -85,19 +85,34 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
 the table headers in the matrixes below are the different softwares, with a quick review of each software in the next section
 
 the softwares,
-* `a` = [copyparty](https://github.com/9001/copyparty)
-* `b` = [hfs2](https://github.com/rejetto/hfs2/) 🔥
-* `c` = [hfs3](https://rejetto.com/hfs/)
-* `d` = [nextcloud](https://github.com/nextcloud/server)
-* `e` = [seafile](https://github.com/haiwen/seafile)
-* `f` = [rclone](https://github.com/rclone/rclone), specifically `rclone serve webdav .`
-* `g` = [dufs](https://github.com/sigoden/dufs)
-* `h` = [chibisafe](https://github.com/chibisafe/chibisafe)
-* `i` = [kodbox](https://github.com/kalcaddle/kodbox)
-* `j` = [filebrowser](https://github.com/filebrowser/filebrowser)
-* `k` = [filegator](https://github.com/filegator/filegator)
-* `l` = [sftpgo](https://github.com/drakkan/sftpgo)
-* `m` = [arozos](https://github.com/tobychui/arozos)
+
+[a]: https://github.com/9001/copyparty "copyparty"
+[b]: https://github.com/rejetto/hfs2/ "hfs2"
+[c]: https://rejetto.com/hfs/ "hfs3"
+[d]: https://github.com/nextcloud/server "nextcloud"
+[e]: https://github.com/haiwen/seafile "seafile"
+[f]: https://github.com/rclone/rclone "rclone"
+[g]: https://github.com/sigoden/dufs "dufs"
+[h]: https://github.com/chibisafe/chibisafe "chibisafe"
+[i]: https://github.com/kalcaddle/kodbox "kodbox"
+[j]: https://github.com/filebrowser/filebrowser "filebrowser"
+[k]: https://github.com/filegator/filegator "filegator"
+[l]: https://github.com/drakkan/sftpgo "sftpgo"
+[m]: https://github.com/tobychui/arozos "arozos"
+
+* `a` = [copyparty][a]
+* `b` = [hfs2][b] 🔥
+* `c` = [hfs3][c]
+* `d` = [nextcloud][d]
+* `e` = [seafile][e]
+* `f` = [rclone][f], specifically `rclone serve webdav .`
+* `g` = [dufs][g]
+* `h` = [chibisafe][h]
+* `i` = [kodbox][i]
+* `j` = [filebrowser][j]
+* `k` = [filegator][k]
+* `l` = [sftpgo][l]
+* `m` = [arozos][m]
 
 some softwares not in the matrixes,
 * [updog](#updog)
@@ -119,19 +134,21 @@ symbol legend,
 
 ## general
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | intuitive UX            |   | ╱ | █ | █ | █ |   | █ | █ | █ | █ | █ | █ | █ |
 | config GUI              |   | █ | █ | █ | █ |   |   | █ | █ | █ |   | █ | █ |
 | good documentation      |   |   | █ | █ | █ | █ | █ |   |   | █ | █ | ╱ | ╱ |
 | runs on iOS             | ╱ |   |   |   |   | ╱ |   |   |   |   |   |   |   |
-| runs on Android         | █ |   | █ |   |   | █ |   |   |   |   |   |   |   |
+| runs on Android         | █ |   | █ |   |   | █ |   |   |   |   |   | █ |   |
 | runs on WinXP           | █ | █ |   |   |   | █ |   |   |   |   |   |   |   |
 | runs on Windows         | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ | █ | █ | ╱ |
 | runs on Linux           | █ | ╱ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | runs on Macos           | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |   |
 | runs on FreeBSD         | █ |   | █ | • | █ | █ | █ | • | █ | █ |   | █ |   |
 | runs on Risc-V          | █ |   |   | █ | █ | █ |   | • |   | █ |   |   |   |
+| runs on SGI IRIX        | █ |   |   | • |   |   |   |   |   |   |   |   |   |
+| runs on aarch64-BE      | █ |   |   | • |   | • |   |   |   | • |   | • |   |
 | portable binary         | █ | █ | █ |   |   | █ | █ |   |   | █ |   | █ | █ |
 | zero setup, just go     | █ | █ | █ |   |   | ╱ | █ |   |   | █ |   | ╱ | █ |
 | android app             | ╱ |   |   | █ | █ |   |   |   |   |   |   |   |   |
@@ -143,10 +160,14 @@ symbol legend,
   * runs on iOS / iPads using [a-Shell](https://holzschu.github.io/a-Shell_iOS/) (pretty good) or [iSH](https://ish.app/) (very slow) but cannot run in the background and is not able to share all of your phone storage (just a separate dedicated folder)
   * [android app](https://f-droid.org/en/packages/me.ocv.partyup/) is for uploading only
   * no iOS app but has [shortcuts](https://github.com/9001/copyparty#ios-shortcuts) for easy uploading
+  * validated on aarch64-BE by [Øl Telecom](http://ol-tele.com/) during eth0:2025; [photo1](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/aallwinner.jpg?cache) and [diploma](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/be-ready.png?cache)
+  * validated on [SGI IRIX](https://en.wikipedia.org/wiki/IRIX) ([an O2](https://en.wikipedia.org/wiki/SGI_O2)) by [Øl Telecom](http://ol-tele.com/) during 39c3; [photo1](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/sgi-o2.jpg?cache) and [screenshot](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/sgi-o2.png?cache)
 * `b`/hfs2 runs on linux through wine
 * `f`/rclone must be started with the command `rclone serve webdav .` or similar
 * `h`/chibisafe has undocumented windows support
-* `i`/sftpgo must be launched with a command
+* `l`/sftpgo:
+  * Must be launched with a command
+  * On Termux, just run `pkg in sftpgo`
 * `m`/arozos has partial windows support
 
 
@@ -154,7 +175,7 @@ symbol legend,
 
 *the thing that copyparty is actually kinda good at*
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | download folder as zip  | █ | █ | █ | █ | ╱ |   | █ |   | █ | █ | ╱ | █ | ╱ |
 | download folder as tar  | █ |   |   |   |   |   |   |   |   |   |   |   |   |
@@ -218,14 +239,14 @@ symbol legend,
 
 ## protocols and client support
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | serve https             | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | serve webdav            | █ |   |   | █ | █ | █ | █ |   | █ |   |   | █ | █ |
 | serve ftp  (tcp)        | █ |   |   |   |   | █ |   |   |   |   |   | █ | █ |
 | serve ftps (tls)        | █ |   |   |   |   | █ |   |   |   |   |   | █ |   |
 | serve tftp (udp)        | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| serve sftp (ssh)        |   |   |   |   |   | █ |   |   |   |   |   | █ | █ |
+| serve sftp (ssh)        | █ |   |   |   |   | █ |   |   |   |   |   | █ | █ |
 | serve smb/cifs          | ╱ |   |   |   |   | █ |   |   |   |   |   |   |   |
 | serve dlna              |   |   |   |   |   | █ |   |   |   |   |   |   |   |
 | listen on unix-socket   | █ |   |   | █ | █ |   | █ | █ | █ | █ | █ | █ |   |
@@ -249,7 +270,7 @@ symbol legend,
 
 ## server configuration
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | config from cmd args    | █ |   | █ |   |   | █ | █ |   |   | █ |   | ╱ | ╱ |
 | config files            | █ | █ | █ | ╱ | ╱ | █ |   | █ |   | █ | • | ╱ | ╱ |
@@ -262,7 +283,7 @@ symbol legend,
 
 * `folder-rproxy` = reverse-proxying without dedicating an entire (sub)domain, using a subfolder instead
 * `l`/sftpgo:
-  * config: users must be added through gui / api calls
+  * config: user can be added by cmd command in [Portable mode](https://docs.sftpgo.com/2.6/cli/#portable-mode); if not in  Portable mode users must be added through gui / api calls
 * `m`/arozos:
   * configuration is primarily through GUI
   * reverse-proxy is not guaranteed to see the correct client IP
@@ -270,7 +291,7 @@ symbol legend,
 
 ## server capabilities
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | accounts                | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | per-account chroot      |   |   |   |   |   |   |   |   |   |   |   | █ |   |
@@ -280,7 +301,7 @@ symbol legend,
 | per-volume permissions  | █ | █ | █ | █ | █ | █ | █ |   | █ | █ | ╱ | █ | █ |
 | per-folder permissions  | ╱ |   | █ | █ | █ |   | █ |   | █ | █ | ╱ | █ | █ |
 | per-file permissions    |   |   | █ | █ | █ |   | █ |   | █ |   |   |   | █ |
-| per-file passwords      | █ |   |   | █ | █ |   | █ |   | █ |   |   |   | █ |
+| per-file passwords      | █ |   |   | █ | █ |   | █ |   | █ |   |   | █ | █ |
 | unmap subfolders        | █ |   | █ |   |   |   | █ |   |   | █ | ╱ | • |   |
 | index.html blocks list  | ╱ |   |   |   |   |   | █ |   |   | • |   |   |   |
 | write-only folders      | █ |   | █ |   | █ |   |   |   |   |   | █ | █ |   |
@@ -337,23 +358,23 @@ symbol legend,
 
 ## client features
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------  | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | single-page app         | █ |   | █ | █ | █ |   |   | █ | █ | █ | █ |   | █ |
 | themes                  | █ | █ | █ | █ |   |   |   |   | █ |   |   |   |   |
 | directory tree nav      | █ | ╱ |   |   | █ |   |   |   | █ |   | ╱ |   |   |
-| multi-column sorting    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| multi-column sorting    | █ |   |   |   |   |   |   |   |   |   |   | █ |   |
 | thumbnails              | █ |   | / | ╱ | ╱ |   |   | █ | █ | ╱ |   |   | █ |
 | ┗ image thumbnails      | █ |   | / | █ | █ |   |   | █ | █ | █ |   |   | █ |
 | ┗ video thumbnails      | █ |   |   | █ | █ |   |   |   | █ |   |   |   | █ |
 | ┗ audio spectrograms    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| audio player            | █ |   | ╱ | █ | █ |   |   |   | █ | ╱ |   |   | █ |
+| audio player            | █ |   | ╱ | █ | █ |   |   |   | █ | ╱ |   | ╱ | █ |
 | ┗ gapless playback      | █ |   |   |   |   |   |   |   | • |   |   |   |   |
 | ┗ audio equalizer       | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | ┗ waveform seekbar      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | ┗ OS integration        | █ |   | █ |   |   |   |   |   |   |   |   |   |   |
 | ┗ transcode to lossy    | █ |   |   |   |   |   |   |   |   |   |   |   |   |
-| video player            | █ |   | █ | █ | █ |   |   |   | █ | █ |   |   | █ |
+| video player            | █ |   | █ | █ | █ |   |   |   | █ | █ |   | ╱ | █ |
 | ┗ video transcoding     |   |   | / |   |   |   |   |   | █ |   |   |   |   |
 | audio BPM detector      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | audio key detector      | █ |   |   |   |   |   |   |   |   |   |   |   |   |
@@ -366,16 +387,16 @@ symbol legend,
 | find local file         | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | undo recent uploads     | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | create directories      | █ |   | █ | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
-| image viewer            | █ |   | █ | █ | █ |   |   |   | █ | █ | █ |   | █ |
+| image viewer            | █ |   | █ | █ | █ |   |   |   | █ | █ | █ | █ | █ |
 | markdown viewer         | █ |   | / |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
-| markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ |   | █ |
+| markdown editor         | █ |   |   |   | █ |   |   |   | █ | ╱ | ╱ | ╱ | █ |
 | readme.md in listing    | █ |   | / | █ |   |   |   |   |   |   |   |   |   |
 | rename files            | █ | █ | █ | █ | █ | ╱ | █ |   | █ | █ | █ | █ | █ |
 | batch rename            | █ |   |   |   |   |   |   |   | █ |   |   |   |   |
 | cut / paste files       | █ | █ | █ | █ | █ |   |   |   | █ |   |   |   | █ |
-| move files              | █ | █ | █ | █ | █ |   | █ |   | █ | █ | █ |   | █ |
+| move files              | █ | █ | █ | █ | █ |   | █ |   | █ | █ | █ | █ | █ |
 | delete files            | █ | █ | █ | █ | █ | ╱ | █ | █ | █ | █ | █ | █ | █ |
-| copy files              |   |   | / |   | █ |   |   |   | █ | █ | █ |   | █ |
+| copy files              |   |   | / |   | █ |   |   |   | █ | █ | █ | █ | █ |
 
 * `single-page app` = multitasking; possible to continue navigating while uploading
 * `audio player » os-integration` = use the [lockscreen](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) or [media hotkeys](https://user-images.githubusercontent.com/241032/215347492-b4250797-6c90-4e09-9a4c-721edf2fb15c.png) to play/pause, prev/next song
@@ -389,11 +410,14 @@ symbol legend,
   * audio playback does not continue into next song
   * plaintext viewer/editor
 * `k`/filegator directory tree is a modal window
+* `l`/sftpgo remarks:
+  * audio/video playback does not continue into next song/video
+  * plaintext viewer/editor
 
 
 ## integration
 
-| feature / software      | a | b | c | d | e | f | g | h | i | j | k | l | m |
+| feature / software      |[a]|[b]|[c]|[d]|[e]|[f]|[g]|[h]|[i]|[j]|[k]|[l]|[m]|
 | ----------------------- | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | OS alert on upload      | ╱ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |   |
 | discord                 | ╱ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |   |
@@ -614,16 +638,13 @@ symbol legend,
   * ⚠️ across the atlantic, copyparty is 2.5x faster
   * 🔵 sftp uploads are resumable
 * ⚠️ web UI is very minimal + a bit slow
-  * ⚠️ no thumbnails / image viewer / audio player
-  * ⚠️ basic file manager (no cut/paste/move)
+  * ⚠️ no thumbnails
 * ⚠️ no filesystem indexing / search
-* ⚠️ doesn't run on phones, tablets
 * ⚠️ no zeroconf (mdns/ssdp)
 * ⚠️ impractical directory URLs
 * ⚠️ AGPL licensed
 * 🔵 uploading small files is fast; `340` files per sec (copyparty does `670`/sec)
-* 🔵 ftp, ftps, webdav
-* ✅ sftp server
+* 🔵 sftp, ftp, ftps, webdav
 * ✅ settings gui
 * ✅ acme (automatic tls certs)
   * 💾 relies on caddy/certbot/acme.sh
@@ -649,7 +670,6 @@ symbol legend,
 * ⚠️ not self-contained (pulls from jsdelivr)
 * ⚠️ has an audio player, but supports less filetypes
 * ⚠️ limited support for configuring real-ip detection
-* ✅ sftp server
 * ✅ settings gui
 * ✅ good-looking gui
 * ✅ an IDE, msoffice viewer, rich host integration, much more

@@ -8,7 +8,7 @@ import time
 from .authsrv import AuthSrv
 from .bos import bos
 from .sutil import StreamArc, errdesc
-from .util import min_ex, sanitize_fn, spack, sunpack, yieldfile, zlib
+from .util import VPTL_WIN, min_ex, sanitize_to, spack, sunpack, yieldfile, zlib
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Generator, Optional
@@ -104,7 +104,7 @@ def gen_hdr(
     ret += spack(b"<LL", vsz, vsz)
 
     # windows support (the "?" replace below too)
-    fn = sanitize_fn(fn, "/")
+    fn = sanitize_to(fn, VPTL_WIN)
     bfn = fn.encode("utf-8" if utf8 else "cp437", "replace").replace(b"?", b"_")
 
     # add ntfs (0x24) and/or unix (0x10) extrafields for utc, add z64 if requested

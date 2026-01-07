@@ -4,7 +4,7 @@
 # https://github.com/nayuki/QR-Code-generator/blob/daa3114/python/qrcodegen.py
 # the original ^ is extremely well commented so refer to that for explanations
 
-# hacks: binary-only, auto-ecc, render, py2-compat
+# hacks: binary-only, auto-ecc, py2-compat
 
 from __future__ import print_function, unicode_literals
 
@@ -172,52 +172,6 @@ class QrCode(object):
         self.mask = msk
         self._apply_mask(msk)  # Apply the final choice of mask
         self._draw_format_bits(msk)  # Overwrite old format bits
-
-    def render(self, zoom=1, pad=4) -> str:
-        tab = self.modules
-        sz = self.size
-        if sz % 2 and zoom == 1:
-            tab.append([False] * sz)
-
-        tab = [[False] * sz] * pad + tab + [[False] * sz] * pad
-        tab = [[False] * pad + x + [False] * pad for x in tab]
-
-        rows: list[str] = []
-        if zoom == 1:
-            for y in range(0, len(tab), 2):
-                row = ""
-                for x in range(len(tab[y])):
-                    v = 2 if tab[y][x] else 0
-                    v += 1 if tab[y + 1][x] else 0
-                    row += " ▄▀█"[v]
-                rows.append(row)
-        else:
-            for tr in tab:
-                row = ""
-                for zb in tr:
-                    row += " █"[int(zb)] * 2
-                rows.append(row)
-
-        return "\n".join(rows)
-
-    def to_png(self, zoom, pad, bg, fg, ap) -> None:
-        from PIL import Image
-
-        tab = self.modules
-        sz = self.size
-        psz = sz + pad * 2
-        if bg:
-            img = Image.new("RGB", (psz, psz), bg)
-        else:
-            img = Image.new("RGBA", (psz, psz), (0, 0, 0, 0))
-            fg = (fg[0], fg[1], fg[2], 255)
-        for y in range(sz):
-            for x in range(sz):
-                if tab[y][x]:
-                    img.putpixel((x + pad, y + pad), fg)
-        if zoom != 1:
-            img = img.resize((sz * zoom, sz * zoom), Image.Resampling.NEAREST)
-        img.save(ap)
 
     def _draw_function_patterns(self) -> None:
         # Draw horizontal and vertical timing patterns
@@ -613,20 +567,3 @@ def _get_bit(x: int, i: int) -> bool:
 
 class DataTooLongError(ValueError):
     pass
-
-
-def qr2svg(qr: QrCode, border: int) -> str:
-    parts: list[str] = []
-    for y in range(qr.size):
-        sy = border + y
-        for x in range(qr.size):
-            if qr.modules[y][x]:
-                parts.append("M%d,%dh1v1h-1z" % (border + x, sy))
-    t = """\
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 {0} {0}" stroke="none">
-<rect width="100%" height="100%" fill="#F7F7F7"/>
-<path d="{1}" fill="#111111"/>
-</svg>
-"""
-    return t.format(qr.size + border * 2, " ".join(parts))

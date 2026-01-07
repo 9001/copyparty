@@ -7,9 +7,9 @@ assignees: '9001'
 
 ---
 
-NOTE:
+<!-- NOTE:
 **please use english, or include an english translation.** aside from that,  
-all of the below are optional, consider them as inspiration, delete and rewrite at will
+all of the below are optional, consider them as inspiration, delete and rewrite at will -->
 
 **is your feature request related to a problem? Please describe.**
 a description of what the problem is, for example, `I'm always frustrated when [...]` or `Why is it not possible to [...]`

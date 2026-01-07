@@ -17,10 +17,10 @@ class Metrics(object):
         self.hsrv = hsrv
 
     def tx(self, cli: "HttpCli") -> bool:
-        if not cli.avol:
+        args = cli.args
+        if not cli.avol and cli.uname.lower() not in args.stats_u_set:
             raise Pebkac(403, "'stats' not allowed for user " + cli.uname)
 
-        args = cli.args
         if not args.stats:
             raise Pebkac(403, "the stats feature is not enabled in server config")
 

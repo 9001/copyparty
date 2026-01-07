@@ -1,3 +1,7 @@
+"use strict";
+
+var J_RUP = 1;
+
 function render() {
     var html = ['<table id="tab"><thead><tr><th>size</th><th>who</th><th>ip</th><th>when</th><th>age</th><th>dir</th><th>file</th></tr></thead><tbody>'];
     var ups = V.ups, now = V.now;
@@ -67,3 +71,5 @@ ebi('filter').onkeydown = function (e) {
     if (('' + e.key).endsWith('Enter'))
         ask();
 };
+
+J_RUP = 2;

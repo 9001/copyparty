@@ -363,24 +363,29 @@ class Tftpd(object):
                 yeet("blocked write; folder not world-deletable: /%s" % (vpath,))
 
             xbu = vfs.flags.get("xbu")
-            if xbu and not runhook(
-                self.nlog,
-                None,
-                self.hub.up2k,
-                "xbu.tftpd",
-                xbu,
-                ap,
-                vpath,
-                "",
-                "",
-                "",
-                0,
-                0,
-                "8.3.8.7",
-                time.time(),
-                "",
-            ):
-                yeet("blocked by xbu server config: %r" % (vpath,))
+            if xbu:
+                hr = runhook(
+                    self.nlog,
+                    None,
+                    self.hub.up2k,
+                    "xbu.tftpd",
+                    xbu,
+                    ap,
+                    vpath,
+                    "",
+                    "",
+                    "",
+                    0,
+                    0,
+                    "8.3.8.7",
+                    time.time(),
+                    None,
+                )
+                t = hr.get("rejectmsg") or ""
+                if t or hr.get("rc") != 0:
+                    if not t:
+                        t = "upload blocked by xbu server config: %r" % (vpath,)
+                    yeet(t)
 
         if not self.args.tftp_nols and bos.path.isdir(ap):
             return self._ls(vpath, "", 0, True)

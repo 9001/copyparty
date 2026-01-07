@@ -1,5 +1,6 @@
 "use strict";
 
+var J_U2K = 1;
 
 (function () {
     var x = sread('nosubtle');
@@ -900,19 +901,19 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag);
     bcfg_bind(uc, 'upsfx', 'upsfx', false, set_upsfx);
 
-    uc.ow = parseInt(sread('u2ow', ['0', '1', '2']) || u2ow);
-    uc.owt = ['🛡️', '🕒', '♻️'];
+    uc.ow = parseInt(sread('u2ow', ['0', '1', '2', '3']) || u2ow);
+    uc.owt = ['🛡️', '🕒', '♻️', '⏭️'];
     function set_ow() {
         QS('label[for="u2ow"]').innerHTML = uc.owt[uc.ow];
         ebi('u2ow').checked  = true; //cosmetic
     }
     ebi('u2ow').onclick = function (e) {
         ev(e);
-        if (++uc.ow > 2)
+        if (++uc.ow > 3)
             uc.ow = 0;
         swrite('u2ow', uc.ow);
         set_ow();
-        if (uc.ow && !has(perms, 'delete'))
+        if (uc.ow && uc.ow !== 3 &&  !has(perms, 'delete'))
             toast.warn(10, L.u_enoow, 'noow');
         else if (toast.tag == 'noow')
             toast.hide();
@@ -1803,7 +1804,7 @@ function up2k_init(subtle) {
             while (true) {
                 var now = Date.now(),
                     blocktime = now - r.tact,
-                    was_busy = st.is_busy,
+                    was_busy = !!st.is_busy,
                     is_busy = !!(  // gzip take the wheel
                         st.car < st.files.length ||
                         st.busy.hash.length ||
@@ -1999,6 +2000,18 @@ function up2k_init(subtle) {
 
         if (pvis.act == 'bz')
             pvis.changecard('bz');
+
+        var n = st.files.length - 1,
+            f = n >= 0 && st.files[n];
+        if (f && !f.srch) {
+            var xhr = new XHR(),
+                ct = 'application/x-www-form-urlencoded;charset=UTF-8';
+            xhr.open('POST', f.purl, true);
+            xhr.setRequestHeader('Content-Type', ct);
+            if (xhr.overrideMimeType)
+                xhr.overrideMimeType('Content-Type', ct);
+            xhr.send('msg=upload-queue-empty;' + uricom_enc(f.name));
+        }
     }
 
     function chill(t) {
@@ -2259,11 +2272,17 @@ function up2k_init(subtle) {
             busy = {},
             nbusy = 0,
             init = 0,
+            ninit = 0,
             hashtab = {},
             mem = (MOBILE ? 128 : 256) * 1024 * 1024;
 
         if (!hws_ok)
-            init = setTimeout(function() {
+            init = setInterval(function() {
+                if (ninit < hws_ok) {
+                    ninit = hws_ok;
+                    return toast.inf(10, 'initializing webworkers ({0}/{1})'.format(hws_ok, hws.length), "iwwt");
+                }
+                clearInterval(init);
                 hws_ng = true;
                 toast.warn(30, 'webworkers failed to start\n\nwill be a bit slower due to\nhashing on main-thread');
                 apop(st.busy.hash, t);
@@ -2313,12 +2332,17 @@ function up2k_init(subtle) {
         }
 
         function onmsg(d) {
+            if (hws_ng)
+                return;
+
             d = d.data;
             var k = d[0];
 
             if (k == "pong")
                 if (++hws_ok == hws.length) {
-                    clearTimeout(init);
+                    clearInterval(init);
+                    if (toast.tag == 'iwwt')
+                        toast.hide();
                     go_next();
                 }
 
@@ -2671,8 +2695,6 @@ function up2k_init(subtle) {
                         f2f(spd1, 2), !isNum(spd2) ? '--' : f2f(spd2, 2)));
 
                     pvis.move(t.n, 'ok');
-                    if (!pvis.ctr.bz && !pvis.ctr.q)
-                        uptoast();
                 }
                 else {
                     if (t.t_uploaded)
@@ -2706,9 +2728,10 @@ function up2k_init(subtle) {
                 var err_pend = rsp.indexOf('partial upload exists at a different') + 1,
                     err_srcb = rsp.indexOf('source file busy; please try again') + 1,
                     err_plug = rsp.indexOf('upload blocked by x') + 1,
-                    err_dupe = rsp.indexOf('upload rejected, file already exists') + 1;
+                    err_dupe = rsp.indexOf('upload rejected, file already exists') + 1,
+                    err_exists = rsp.indexOf('upload rejected, a file with that name already exists') + 1;
 
-                if (err_pend || err_srcb || err_plug || err_dupe) {
+                if (err_pend || err_srcb || err_plug || err_dupe || err_exists) {
                     err = rsp;
                     ofs = err.indexOf('\n/');
                     if (ofs !== -1) {
@@ -2772,6 +2795,8 @@ function up2k_init(subtle) {
                 req.replace = 'mt';
             if (uc.ow == 2)
                 req.replace = true;
+            if (uc.ow == 3)
+                req.replace = 'skip';
         }
 
         xhr.open('POST', t.purl, true);
@@ -3427,6 +3452,8 @@ if (QS('#op_up2k.act'))
     goto_up2k();
 
 apply_perms({ "perms": perms, "frand": frand, "u2ts": u2ts });
+if (ls0)
+    fileman.render();
 
 
 (function () {
@@ -3438,3 +3465,5 @@ apply_perms({ "perms": perms, "frand": frand, "u2ts": u2ts });
         }
         catch (ex) { }
 })();
+
+J_U2K = 2;

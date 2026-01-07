@@ -15,6 +15,7 @@
   pyzmq,
   ffmpeg,
   mutagen,
+  paramiko,
   pyftpdlib,
   magic,
   partftpy,
@@ -44,6 +45,9 @@
   # send ZeroMQ messages from event-hooks
   withZeroMQ ? true,
 
+  # enable SFTP server
+  withSFTP ? false,
+
   # enable FTP server
   withFTP ? true,
 
@@ -67,24 +71,71 @@
   # additional dependencies
   extraPythonPackages ? (_p: [ ]),
 
+  # to build stable + unstable with the same file
+  stable ? true,
+
+  # for commit date, only used when stable = false
+  copypartyFlake ? null,
+
+  nix-gitignore,
 }:
 
 let
   pinData = lib.importJSON ./pin.json;
   runtimeDeps = ([ util-linux ] ++ extraPackages ++ lib.optional withMediaProcessing ffmpeg);
+  inherit (copypartyFlake) lastModifiedDate;
+  # ex: "1970" "01" "01"
+  dateStringsZeroPrefixed = {
+    year = builtins.substring 0 4 lastModifiedDate;
+    month = builtins.substring 4 2 lastModifiedDate;
+    day = builtins.substring 6 2 lastModifiedDate;
+  };
+  # ex: "1970" "1" "1"
+  dateStringsShort = builtins.mapAttrs (_: val: toString (lib.toIntBase10 val)) dateStringsZeroPrefixed;
+  unstableVersion =
+    if copypartyFlake == null then
+      "${pinData.version}-unstable"
+    else
+      with dateStringsZeroPrefixed; "${pinData.version}-unstable-${year}-${month}-${day}"
+  ;
+  version = if stable then pinData.version else unstableVersion;
+  stableSrc = fetchurl {
+    inherit (pinData) url hash;
+  };
+  root = ../../../..;
+  unstableSrc = nix-gitignore.gitignoreSource [] root;
+  src = if stable then stableSrc else unstableSrc;
+  rev = copypartyFlake.shortRev or copypartyFlake.dirtyShortRev or "unknown";
+  unstableCodename = "unstable" + (lib.optionalString (copypartyFlake != null) "-${rev}");
 in
 buildPythonApplication {
   pname = "copyparty";
-  inherit (pinData) version;
-  src = fetchurl {
-    inherit (pinData) url hash;
-  };
+  inherit version src;
+  postPatch = lib.optionalString (!stable) ''
+    old_src="$(mktemp -d)"
+    tar -C "$old_src" -xf ${stableSrc}
+    declare -a folders
+    folders=("$old_src"/*)
+    count_folders="''${#folders[@]}"
+    if [[ $count_folders != 1 ]]; then
+      declare -p folders
+      echo "Expected 1 folder, found $count_folders" >&2
+      exit 1
+    fi
+    old_src_folder="''${folders[0]}"
+    cp -r "$old_src_folder"/copyparty/web/deps copyparty/web/deps
+    sed -i 's/^CODENAME =.*$/CODENAME = "${unstableCodename}"/' copyparty/__version__.py
+    ${lib.optionalString (copypartyFlake != null) (with dateStringsShort; ''
+      sed -i 's/^BUILD_DT =.*$/BUILD_DT = (${year}, ${month}, ${day})/' copyparty/__version__.py
+    '')}
+  '';
   dependencies =
     [
       jinja2
       fusepy
     ]
     ++ lib.optional withSMB impacket
+    ++ lib.optional withSFTP paramiko
     ++ lib.optional withFTP pyftpdlib
     ++ lib.optional withFTPS pyopenssl
     ++ lib.optional withTFTP partftpy
@@ -106,7 +157,7 @@ buildPythonApplication {
   meta = {
     description = "Turn almost any device into a file server";
     longDescription = ''
-      Portable file server with accelerated resumable uploads, dedup, WebDAV,
+      Portable file server with accelerated resumable uploads, dedup, WebDAV, SFTP,
       FTP, TFTP, zeroconf, media indexer, thumbnails++ all in one file, no deps
     '';
     homepage = "https://github.com/9001/copyparty";

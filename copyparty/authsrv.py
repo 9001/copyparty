@@ -13,7 +13,7 @@ import threading
 import time
 from datetime import datetime
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, WINDOWS, E
+from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash
@@ -21,8 +21,10 @@ from .util import (
     DEF_MTE,
     DEF_MTH,
     EXTS,
+    FAVICON_MIMES,
     HAVE_SQLITE3,
     IMPLICATIONS,
+    META_NOBOTS,
     MIMES,
     SQLITE_VER,
     UNPLICATIONS,
@@ -91,6 +93,13 @@ LEELOO_DALLAS = "leeloo_dallas"
 ## thanks for coming to my ted talk
 
 
+UP_MTE_MAP = {  # db-order
+    "w": "substr(w,1,16)",
+    "up_ip": "ip",
+    ".up_at": "at",
+    "up_by": "un",
+}
+
 SEE_LOG = "see log for details"
 SEESLOG = " (see serverlog for details)"
 SSEELOG = " ({})".format(SEE_LOG)
@@ -99,6 +108,8 @@ SBADCFG = " ({})".format(BAD_CFG)
 
 PTN_U_GRP = re.compile(r"\$\{u(%[+-][^}]+)\}")
 PTN_G_GRP = re.compile(r"\$\{g(%[+-][^}]+)\}")
+PTN_U_ANY = re.compile(r"(\${[u][}%])")
+PTN_G_ANY = re.compile(r"(\${[g][}%])")
 PTN_SIGIL = re.compile(r"(\${[ug][}%])")
 
 
@@ -156,6 +167,9 @@ class Lim(object):
         self.vbmax = 0  # volume bytes max
         self.vnmax = 0  # volume max num files
 
+        self.c_vb_v = 0  # cache: volume bytes used (value)
+        self.c_vb_r = 0  # cache: volume bytes used (ref)
+
         self.smin = 0  # filesize min
         self.smax = 0  # filesize max
 
@@ -167,14 +181,19 @@ class Lim(object):
         self.rotn = 0  # rot num files
         self.rotl = 0  # rot depth
         self.rotf = ""  # rot datefmt
+        self.rotf_tz = UTC  # rot timezone
         self.rot_re = re.compile("")  # rotf check
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         if self.log_func:
             self.log_func("up-lim", msg, c)
 
-    def set_rotf(self, fmt: str) -> None:
+    def set_rotf(self, fmt: str, tz: str) -> None:
         self.rotf = fmt
+        if tz != "UTC":
+            from zoneinfo import ZoneInfo
+
+            self.rotf_tz = ZoneInfo(tz)
         r = re.escape(fmt).replace("%Y", "[0-9]{4}").replace("%j", "[0-9]{3}")
         r = re.sub("%[mdHMSWU]", "[0-9]{2}", r)
         self.rot_re = re.compile("(^|/)" + r + "$")
@@ -278,7 +297,7 @@ class Lim(object):
             if self.rot_re.search(path.replace("\\", "/")):
                 return path, ""
 
-            suf = datetime.now(UTC).strftime(self.rotf)
+            suf = datetime.now(self.rotf_tz).strftime(self.rotf)
             if path:
                 path += "/"
 
@@ -389,6 +408,9 @@ class VFS(object):
         self.vpath = vpath  # absolute path in the virtual filesystem
         self.vpath0 = vpath0  # original vpath (before idp expansion)
         self.axs = axs
+        self.uaxs: dict[
+            str, tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool]
+        ] = {}
         self.flags = flags  # config options
         self.root = self
         self.dev = 0  # st_dev
@@ -414,6 +436,7 @@ class VFS(object):
         self.js_htm = ""
         self.all_vols: dict[str, VFS] = {}  # flattened recursive
         self.all_nodes: dict[str, VFS] = {}  # also jumpvols/shares
+        self.all_fvols: dict[str, VFS] = {}  # volumes which are files
 
         if realpath:
             rp = realpath + ("" if realpath.endswith(os.sep) else os.sep)
@@ -424,10 +447,14 @@ class VFS(object):
             self.all_nodes[vpath] = self
             self.all_aps = [(rp, [self])]
             self.all_vps = [(vp, self)]
+            self.canonical = self._canonical
+            self.dcanonical = self._dcanonical
         else:
             self.histpath = self.dbpath = ""
             self.all_aps = []
             self.all_vps = []
+            self.canonical = self._canonical_null
+            self.dcanonical = self._dcanonical_null
 
         self.get_dbv = self._get_dbv
         self.ls = self._ls
@@ -542,29 +569,19 @@ class VFS(object):
 
     def can_access(
         self, vpath: str, uname: str
-    ) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool]:
-        """can Read,Write,Move,Delete,Get,Upget,Admin,Dot"""
+    ) -> tuple[bool, bool, bool, bool, bool, bool, bool, bool, bool]:
+        """can Read,Write,Move,Delete,Get,Upget,Html,Admin,Dot"""
+        # NOTE: only used by get_perms, which is only used by hooks; the lowest of fruits
         if vpath:
             vn, _ = self._find(undot(vpath))
         else:
             vn = self
 
-        c = vn.axs
-        return (
-            uname in c.uread,
-            uname in c.uwrite,
-            uname in c.umove,
-            uname in c.udel,
-            uname in c.uget,
-            uname in c.upget,
-            uname in c.uadmin,
-            uname in c.udot,
-        )
-        # skip uhtml because it's rarely needed
+        return vn.uaxs[uname]
 
     def get_perms(self, vpath: str, uname: str) -> str:
         zbl = self.can_access(vpath, uname)
-        ret = "".join(ch for ch, ok in zip("rwmdgGa.", zbl) if ok)
+        ret = "".join(ch for ch, ok in zip("rwmdgGha.", zbl) if ok)
         if "rwmd" in ret and "a." in ret:
             ret += "A"
         return ret
@@ -624,7 +641,39 @@ class VFS(object):
         vrem = vjoin(self.vpath[len(dbv.vpath) :].lstrip("/"), vrem)
         return dbv, vrem
 
-    def canonical(self, rem: str, resolve: bool = True) -> str:
+    def casechk(self, rem: str, do_stat: bool) -> bool:
+        ap = self.canonical(rem, False)
+        if do_stat and not bos.path.exists(ap):
+            return True  # doesn't exist at all; good to go
+        dp, fn = os.path.split(ap)
+        if not fn:
+            return True  # filesystem root
+        try:
+            fns = os.listdir(dp)
+        except:
+            return True  # maybe chmod 111; assume ok
+        if fn in fns:
+            return True
+        hit = "<?>"
+        lfn = fn.lower()
+        for zs in fns:
+            if lfn == zs.lower():
+                hit = zs
+                break
+        if not hit:
+            return True  # NFC/NFD or something, can't be helped either way
+        if self.log:
+            t = "returning 404 due to underlying case-insensitive filesystem:\n  http-req: %r\n  local-fs: %r"
+            self.log("vfs", t % (fn, hit))
+        return False
+
+    def _canonical_null(self, rem: str, resolve: bool = True) -> str:
+        return ""
+
+    def _dcanonical_null(self, rem: str) -> str:
+        return ""
+
+    def _canonical(self, rem: str, resolve: bool = True) -> str:
         """returns the canonical path (fully-resolved absolute fs path)"""
         ap = self.realpath
         if rem:
@@ -632,7 +681,7 @@ class VFS(object):
 
         return absreal(ap) if resolve else ap
 
-    def dcanonical(self, rem: str) -> str:
+    def _dcanonical(self, rem: str) -> str:
         """resolves until the final component (filename)"""
         ap = self.realpath
         if rem:
@@ -640,6 +689,44 @@ class VFS(object):
 
         ad, fn = os.path.split(ap)
         return os.path.join(absreal(ad), fn)
+
+    def _canonical_shr(self, rem: str, resolve: bool = True) -> str:
+        """returns the canonical path (fully-resolved absolute fs path)"""
+        ap = self.realpath
+        if rem:
+            ap += "/" + rem
+
+        rap = absreal(ap)
+        if self.shr_files:
+            assert self.shr_src  # !rm
+            vn, rem = self.shr_src
+            chk = absreal(os.path.join(vn.realpath, rem))
+            if chk != rap:
+                # not the dir itself; assert file allowed
+                ad, fn = os.path.split(rap)
+                if chk != ad or fn not in self.shr_files:
+                    return "\n\n"
+
+        return rap if resolve else ap
+
+    def _dcanonical_shr(self, rem: str) -> str:
+        """resolves until the final component (filename)"""
+        ap = self.realpath
+        if rem:
+            ap += "/" + rem
+
+        ad, fn = os.path.split(ap)
+        ad = absreal(ad)
+        if self.shr_files:
+            assert self.shr_src  # !rm
+            vn, rem = self.shr_src
+            chk = absreal(os.path.join(vn.realpath, rem))
+            if chk != absreal(ap):
+                # not the dir itself; assert file allowed
+                if ad != chk or fn not in self.shr_files:
+                    return "\n\n"
+
+        return os.path.join(ad, fn)
 
     def _ls_nope(
         self, *a, **ka
@@ -673,8 +760,12 @@ class VFS(object):
         """return user-readable [fsdir,real,virt] items at vpath"""
         virt_vis = {}  # nodes readable by user
         abspath = self.canonical(rem)
-        real = list(statdir(self.log, scandir, lstat, abspath, throw))
-        real.sort()
+        if abspath:
+            real = list(statdir(self.log, scandir, lstat, abspath, throw))
+            real.sort()
+        else:
+            real = []
+
         if not rem:
             # no vfs nodes in the list of real inodes
             real = [x for x in real if x[0] not in self.nodes]
@@ -685,19 +776,16 @@ class VFS(object):
                     virt_vis[name] = vn2
                     continue
 
-                ok = False
-                zx = vn2.axs
-                axs = [zx.uread, zx.uwrite, zx.umove, zx.udel, zx.uget]
+                u_has = vn2.uaxs.get(uname) or [False] * 9
                 for pset in permsets:
                     ok = True
-                    for req, lst in zip(pset, axs):
-                        if req and uname not in lst:
+                    for req, zb in zip(pset, u_has):
+                        if req and not zb:
                             ok = False
+                            break
                     if ok:
+                        virt_vis[name] = vn2
                         break
-
-                if ok:
-                    virt_vis[name] = vn2
 
         if ".hist" in abspath:
             p = abspath.replace("\\", "/") if WINDOWS else abspath
@@ -809,6 +897,7 @@ class VFS(object):
         flt: set[str],
         uname: str,
         dirs: bool,
+        dots: int,
         scandir: bool,
         wrap: bool = True,
     ) -> Generator[dict[str, Any], None, None]:
@@ -817,7 +906,7 @@ class VFS(object):
         # if single folder: the folder itself is the top-level item
         folder = "" if flt or not wrap else (vpath.split("/")[-1].lstrip(".") or "top")
 
-        g = self.walk(folder, vrem, [], uname, [[True, False]], 1, scandir, False)
+        g = self.walk(folder, vrem, [], uname, [[True, False]], dots, scandir, False)
         for _, _, vpath, apath, files, rd, vd in g:
             if flt:
                 files = [x for x in files if x[0] in flt]
@@ -976,6 +1065,16 @@ class AuthSrv(object):
         self.indent = ""
         self.is_lxc = args.c == ["/z/initcfg"]
 
+        self._vf0b = {
+            "cachectl": self.args.cachectl,
+            "tcolor": self.args.tcolor,
+            "du_iwho": self.args.du_iwho,
+            "shr_who": self.args.shr_who if self.args.shr else "no",
+            "ls_q_m": ("", ""),
+        }
+        self._vf0 = self._vf0b.copy()
+        self._vf0["d2d"] = True
+
         # fwd-decl
         self.vfs = VFS(log_func, "", "", "", AXS(), {})
         self.acct: dict[str, str] = {}  # uname->pw
@@ -1014,17 +1113,14 @@ class AuthSrv(object):
         yield prev, True
 
     def vf0(self):
-        return {"d2d": True, "tcolor": self.args.tcolor, "du_iwho": self.args.du_iwho}
+        return self._vf0.copy()
 
     def vf0b(self):
-        return {"tcolor": self.args.tcolor, "du_iwho": self.args.du_iwho}
+        return self._vf0b.copy()
 
     def idp_checkin(
         self, broker: Optional["BrokerCli"], uname: str, gname: str
     ) -> bool:
-        if uname in self.acct:
-            return False
-
         if self.idp_usr_gh.get(uname) == gname:
             return False
 
@@ -1082,6 +1178,16 @@ class AuthSrv(object):
         visited = set()
         src0 = src  # abspath
         dst0 = dst  # vpath
+
+        zsl = []
+        for ptn, sigil in ((PTN_U_ANY, "${u}"), (PTN_G_ANY, "${g}")):
+            if bool(ptn.search(src)) != bool(ptn.search(dst)):
+                zsl.append(sigil)
+        if zsl:
+            t = "ERROR: if %s is mentioned in a volume definition, it must be included in both the filesystem-path [%s] and the volume-url [/%s]"
+            t = "\n".join([t % (x, src, dst) for x in zsl])
+            self.log(t, 1)
+            raise Exception(t)
 
         un_gn = [(un, gn) for un, gns in un_gns.items() for gn in gns]
         if not un_gn:
@@ -1175,8 +1281,8 @@ class AuthSrv(object):
             self.log(t, c=3)
             raise Exception(BAD_CFG)
 
-        if not bos.path.isdir(src):
-            self.log("warning: filesystem-path does not exist: {}".format(src), 3)
+        if not bos.path.exists(src):
+            self.log("warning: filesystem-path did not exist: %r" % (src,), 3)
 
         mount[dst] = (src, dst0)
         daxs[dst] = AXS()
@@ -1362,7 +1468,10 @@ class AuthSrv(object):
                     t = "group [%s] = " % (gn,)
                     t += ", ".join("user [%s]" % (x,) for x in uns)
                     self._l(ln, 5, t)
-                    grps[gn] = uns
+                    if gn in grps:
+                        grps[gn].extend(uns)
+                    else:
+                        grps[gn] = uns
                 except:
                     t = 'lines inside the [groups] section must be "groupname: user1, user2, user..."'
                     raise Exception(t + SBADCFG)
@@ -1494,7 +1603,7 @@ class AuthSrv(object):
                 uns = [x[0] for x in un_gns.items() if grp in x[1]]
                 if grp == "${g}":
                     unames.append(un)
-                elif not uns and not self.args.idp_h_grp:
+                elif not uns and not self.args.idp_h_grp and grp != self.args.grp_all:
                     t = "group [%s] must be defined with --grp argument (or in a [groups] config section)"
                     raise CfgEx(t % (grp,))
 
@@ -1714,9 +1823,17 @@ class AuthSrv(object):
                     self.log("\n{0}\n{1}{0}".format(t, "\n".join(slns)))
                     raise
 
-        self.args.have_idp_hdrs = bool(self.args.idp_h_usr or self.args.idp_hm_usr)
-        self.args.have_ipu_or_ipr = bool(self.args.ipu or self.args.ipr)
+        derive_args(self.args)
         self.setup_auth_ord()
+
+        if self.args.ipu and not self.args.have_idp_hdrs:
+            # syntax (CIDR=UNAME) is verified in load_ipu
+            zsl = [x.split("=", 1)[1] for x in self.args.ipu]
+            zsl = [x for x in zsl if x not in acct]
+            if zsl:
+                t = "ERROR: unknown users in ipu: %s" % (zsl,)
+                self.log(t, 1)
+                raise Exception(t)
 
         self.setup_pwhash(acct)
         defpw = acct.copy()
@@ -1798,7 +1915,7 @@ class AuthSrv(object):
             vol.all_vps.sort(key=lambda x: len(x[0]), reverse=True)
             vol.root = vfs
 
-        zs = "neversymlink"
+        zs = "du_iwho ls_q_m neversymlink"
         k_ign = set(zs.split())
         for vol in vfs.all_vols.values():
             unknown_flags = set()
@@ -1868,9 +1985,18 @@ class AuthSrv(object):
             axs_key = "u" + perm
             for vp, vol in vfs.all_vols.items():
                 zx = getattr(vol.axs, axs_key)
-                if "*" in zx:
+                if "*" in zx and "-@acct" not in zx:
                     for usr in unames:
                         zx.add(usr)
+                for zs in list(zx):
+                    if zs.startswith("-"):
+                        zx.discard(zs)
+                        zs = zs[1:]
+                        zx.discard(zs)
+                        if zs.startswith("@"):
+                            zs = zs[1:]
+                            for zs in grps.get(zs) or []:
+                                zx.discard(zs)
 
             # aread,... = dict[uname, list[volnames] or []]
             umap: dict[str, list[str]] = {x: [] for x in unames}
@@ -1881,6 +2007,23 @@ class AuthSrv(object):
                         umap[usr].append(vp)
                 umap[usr].sort()
             setattr(vfs, "a" + perm, umap)
+
+        for vol in vfs.all_nodes.values():
+            za = vol.axs
+            vol.uaxs = {
+                un: (
+                    un in za.uread,
+                    un in za.uwrite,
+                    un in za.umove,
+                    un in za.udel,
+                    un in za.uget,
+                    un in za.upget,
+                    un in za.uhtml,
+                    un in za.uadmin,
+                    un in za.udot,
+                )
+                for un in unames
+            }
 
         all_users = {}
         missing_users = {}
@@ -1950,6 +2093,8 @@ class AuthSrv(object):
         promote = []
         demote = []
         for vol in vfs.all_vols.values():
+            if not vol.realpath:
+                continue
             hid = self.hid_cache.get(vol.realpath)
             if not hid:
                 zb = hashlib.sha512(afsenc(vol.realpath)).digest()
@@ -1988,6 +2133,8 @@ class AuthSrv(object):
             vol.histpath = absreal(vol.histpath)
 
         for vol in vfs.all_vols.values():
+            if not vol.realpath:
+                continue
             hid = self.hid_cache[vol.realpath]
             vflag = vol.flags.get("dbpath")
             if vflag == "-":
@@ -2116,7 +2263,7 @@ class AuthSrv(object):
             zs = vol.flags.get("rotf")
             if zs:
                 use = True
-                lim.set_rotf(zs)
+                lim.set_rotf(zs, vol.flags.get("rotf_tz") or "UTC")
 
             zs = vol.flags.get("maxn")
             if zs:
@@ -2211,6 +2358,10 @@ class AuthSrv(object):
         free_umask = False
         have_reflink = False
         for vol in vfs.all_nodes.values():
+            if os.path.isfile(vol.realpath):
+                vol.flags["is_file"] = True
+                vol.flags["d2d"] = True
+
             if (self.args.e2ds and vol.axs.uwrite) or self.args.e2dsa:
                 vol.flags["e2ds"] = True
 
@@ -2247,7 +2398,7 @@ class AuthSrv(object):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
-            zs = "forget_ip gid nrand tail_who th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
+            zs = "forget_ip gid nrand tail_who th_qv th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
@@ -2297,6 +2448,9 @@ class AuthSrv(object):
                 vol.lim.gid = vol.flags["gid"]
 
             vol.flags["du_iwho"] = n_du_who(vol.flags["du_who"])
+
+            if not enshare:
+                vol.flags["shr_who"] = self.args.shr_who = "no"
 
             if vol.flags.get("og"):
                 self.args.uqe = True
@@ -2384,6 +2538,57 @@ class AuthSrv(object):
                 t = "WARNING: volume [/%s]: invalid value specified for ext-th: %s"
                 self.log(t % (vol.vpath, etv), 3)
 
+            zsl1 = [x for x in vol.flags["preadmes"].split(",") if x]
+            zsl2 = [x for x in vol.flags["readmes"].split(",") if x]
+            zsl3 = list(set([x.lower() for x in zsl1]))
+            zsl4 = list(set([x.lower() for x in zsl2]))
+            vol.flags["emb_mds"] = [[0, zsl1, zsl3], [1, zsl2, zsl4]]
+
+            zsl1 = [x for x in vol.flags["prologues"].split(",") if x]
+            zsl2 = [x for x in vol.flags["epilogues"].split(",") if x]
+            zsl3 = list(set([x.lower() for x in zsl1]))
+            zsl4 = list(set([x.lower() for x in zsl2]))
+            vol.flags["emb_lgs"] = [[0, zsl1, zsl3], [1, zsl2, zsl4]]
+
+            zs = str(vol.flags.get("html_head") or "")
+            if zs and zs[:1] in "%@":
+                vol.flags["html_head_d"] = zs
+                head_s = str(vol.flags.get("html_head_s") or "")
+            else:
+                zs2 = str(vol.flags.get("html_head_s") or "")
+                if zs2 and zs:
+                    head_s = "%s\n%s\n" % (zs2.strip(), zs.strip())
+                else:
+                    head_s = zs2 or zs
+
+            if head_s and not head_s.endswith("\n"):
+                head_s += "\n"
+
+            if "norobots" in vol.flags:
+                head_s += META_NOBOTS
+
+            ico_url = vol.flags.get("ufavico")
+            if ico_url:
+                ico_h = ""
+                ico_ext = ico_url.split("?")[0].split(".")[-1].lower()
+                if ico_ext in FAVICON_MIMES:
+                    zs = '<link rel="icon" type="%s" href="%s">\n'
+                    ico_h = zs % (FAVICON_MIMES[ico_ext], ico_url)
+                elif ico_ext == "ico":
+                    zs = '<link rel="shortcut icon" href="%s">\n'
+                    ico_h = zs % (ico_url,)
+                if ico_h:
+                    vol.flags["ufavico_h"] = ico_h
+                    head_s += ico_h
+
+            if head_s:
+                vol.flags["html_head_s"] = head_s
+            else:
+                vol.flags.pop("html_head_s", None)
+
+            if not vol.flags.get("html_head_d"):
+                vol.flags.pop("html_head_d", None)
+
             vol.check_landmarks()
 
             # d2d drops all database features for a volume
@@ -2425,18 +2630,25 @@ class AuthSrv(object):
                     vol.flags[k] = int(vol.flags[k])
 
             if "e2d" not in vol.flags:
-                if "lifetime" in vol.flags:
-                    t = 'removing lifetime config from volume "/{}" because e2d is disabled'
-                    self.log(t.format(vol.vpath), 1)
-                    del vol.flags["lifetime"]
+                zs = "lifetime rss"
+                drop = [x for x in zs.split() if x in vol.flags]
 
-                needs_e2d = [x for x in hooks if x in ("xau", "xiu")]
-                drop = [x for x in needs_e2d if vol.flags.get(x)]
-                if drop:
-                    t = 'removing [{}] from volume "/{}" because e2d is disabled'
-                    self.log(t.format(", ".join(drop), vol.vpath), 1)
-                    for x in drop:
-                        vol.flags.pop(x)
+                zs = "xau xiu"
+                drop += [x for x in zs.split() if vol.flags.get(x)]
+
+                for k in drop:
+                    t = 'cannot enable [%s] for volume "/%s" because this requires one of the following: e2d / e2ds / e2dsa  (either as volflag or global-option)'
+                    self.log(t % (k, vol.vpath), 1)
+                    vol.flags.pop(k)
+
+            zi = vol.flags.get("lifetime") or 0
+            zi2 = time.time() // (86400 * 365)
+            zi3 = zi2 * 86400 * 365
+            if zi < 0 or zi > zi3:
+                t = "the lifetime of volume [/%s] (%d) exceeds max value (%d years; %d)"
+                t = t % (vol.vpath, zi, zi2, zi3)
+                self.log(t, 1)
+                raise Exception(t)
 
             # verify tags mentioned by -mt[mp] are used by -mte
             local_mtp = {}
@@ -2472,6 +2684,64 @@ class AuthSrv(object):
                     t = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volflags)'
                     self.log(t.format(vol.vpath, mtp), 1)
                     errors = True
+
+            mte = vol.flags.get("mte") or {}
+            up_m = [x for x in UP_MTE_MAP if x in mte]
+            up_q = [UP_MTE_MAP[x] for x in up_m]
+            zs = "select %s from up where rd=? and fn=?" % (", ".join(up_q),)
+            vol.flags["ls_q_m"] = (zs if up_m else "", up_m)
+
+        vfs.all_fvols = {
+            zs: vol for zs, vol in vfs.all_vols.items() if "is_file" in vol.flags
+        }
+
+        for vol in vfs.all_nodes.values():
+            if not vol.flags.get("is_file"):
+                continue
+            zs = "og opds xlink"
+            for zs in zs.split():
+                vol.flags.pop(zs, None)
+
+        for vol in vfs.all_nodes.values():
+            if not vol.realpath or vol.flags.get("is_file"):
+                continue
+            ccs = vol.flags["casechk"][:1].lower()
+            if ccs in ("y", "n"):
+                if ccs == "y":
+                    vol.flags["bcasechk"] = True
+                continue
+            try:
+                bos.makedirs(vol.realpath, vf=vol.flags)
+                files = os.listdir(vol.realpath)
+                for fn in files:
+                    fn2 = fn.lower()
+                    if fn == fn2:
+                        fn2 = fn.upper()
+                    if fn == fn2 or fn2 in files:
+                        continue
+                    is_ci = os.path.exists(os.path.join(vol.realpath, fn2))
+                    ccs = "y" if is_ci else "n"
+                    break
+                if ccs not in ("y", "n"):
+                    ap = os.path.join(vol.realpath, "casechk")
+                    open(ap, "wb").close()
+                    ccs = "y" if os.path.exists(ap[:-1] + "K") else "n"
+                    os.unlink(ap)
+            except Exception as ex:
+                if ANYWIN:
+                    zs = "Windows"
+                    ccs = "y"
+                elif MACOS:
+                    zs = "Macos"
+                    ccs = "y"
+                else:
+                    zs = "Linux"
+                    ccs = "n"
+                t = "unable to determine if filesystem at %r is case-insensitive due to %r; assuming casechk=%s due to %s"
+                self.log(t % (vol.realpath, ex, ccs, zs), 3)
+            vol.flags["casechk"] = ccs
+            if ccs == "y":
+                vol.flags["bcasechk"] = True
 
         tags = self.args.mtp or []
         tags = [x.split("=")[0] for x in tags]
@@ -2563,9 +2833,13 @@ class AuthSrv(object):
                 ["uadmin", "uadmin"],
             ]:
                 u = list(sorted(getattr(zv.axs, attr)))
-                u = ["*"] if "*" in u else u
-                u = ", ".join("\033[35meverybody\033[0m" if x == "*" else x for x in u)
-                u = u if u else "\033[36m--none--\033[0m"
+                if u == ["*"] and acct:
+                    u = ["\033[35monly-anonymous\033[0m"]
+                elif "*" in u:
+                    u = ["\033[35meverybody\033[0m"]
+                if not u:
+                    u = ["\033[36m--none--\033[0m"]
+                u = ", ".join(u)
                 t += "\n|  {}:  {}".format(txt, u)
 
             if "e2d" in zv.flags:
@@ -2576,7 +2850,11 @@ class AuthSrv(object):
 
             if "dedup" in zv.flags:
                 have_dedup = True
-                if "e2d" not in zv.flags and "hardlink" not in zv.flags:
+                if (
+                    "e2d" not in zv.flags
+                    and "hardlink" not in zv.flags
+                    and "reflink" not in zv.flags
+                ):
                     unsafe_dedup.append("/" + zv.vpath)
 
             t += "\n"
@@ -2673,8 +2951,6 @@ class AuthSrv(object):
 
         if have_reflink:
             t = "WARNING: Reflink-based dedup was requested, but %s. This will not work; files will be full copies instead."
-            if sys.version_info < (3, 14):
-                self.log(t % "your python version is not new enough", 1)
             if not sys.platform.startswith("linux"):
                 self.log(t % "your OS is not Linux", 1)
 
@@ -2694,9 +2970,11 @@ class AuthSrv(object):
             pwds.extend([x.split(":", 1)[1] for x in pwds if ":" in x])
         if pwds:
             if self.ah.on:
-                zs = r"(\[H\] pw:.*|[?&]pw=)([^&]+)"
+                zs = r"(\[H\] %s:.*|[?&]%s=)([^&]+)"
+                zs = zs % (self.args.pw_hdr, self.args.pw_urlp)
             else:
-                zs = r"(\[H\] pw:.*|=)(" + "|".join(pwds) + r")([]&; ]|$)"
+                zs = r"(\[H\] %s:.*|=)(" % (self.args.pw_hdr,)
+                zs += "|".join(pwds) + r")([]&; ]|$)"
 
             self.re_pwd = re.compile(zs)
 
@@ -2740,12 +3018,22 @@ class AuthSrv(object):
 
                     shn.shr_files = set(fns)
                     shn.ls = shn._ls_shr
+                    shn.canonical = shn._canonical_shr
+                    shn.dcanonical = shn._dcanonical_shr
                 else:
                     shn.ls = shn._ls
+                    shn.canonical = shn._canonical
+                    shn.dcanonical = shn._dcanonical
 
                 shn.shr_owner = s_un
                 shn.shr_src = (s_vfs, s_rem)
                 shn.realpath = s_vfs.canonical(s_rem)
+
+                o_vn, _ = shn._get_share_src("")
+                shn.lim = o_vn.lim
+                shn.flags = o_vn.flags.copy()
+                shn.dbpath = o_vn.dbpath
+                shn.histpath = o_vn.histpath
 
                 # root.all_aps doesn't include any shares, so make a copy where the
                 # share appears in all abspaths it can provide (for example for chk_ap)
@@ -2798,17 +3086,23 @@ class AuthSrv(object):
             vn.js_ls = {
                 "idx": "e2d" in vf,
                 "itag": "e2t" in vf,
+                "dlni": "dlni" in vf,
+                "dgrid": "grid" in vf,
                 "dnsort": "nsort" in vf,
                 "dhsortn": vf["hsortn"],
                 "dsort": vf["sort"],
                 "dcrop": vf["crop"],
                 "dth3x": vf["th3x"],
                 "u2ts": vf["u2ts"],
+                "shr_who": vf["shr_who"],
                 "frand": bool(vf.get("rand")),
                 "lifetime": vf.get("lifetime") or 0,
                 "unlist": vf.get("unlist") or "",
                 "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
+                "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
             }
+            if "ufavico_h" in vf:
+                vn.js_ls["ufavico"] = vf["ufavico_h"]
             js_htm = {
                 "SPINNER": self.args.spinner,
                 "s_name": self.args.bname,
@@ -2818,14 +3112,17 @@ class AuthSrv(object):
                 "have_c2flac": self.args.allow_flac,
                 "have_c2wav": self.args.allow_wav,
                 "have_shr": self.args.shr,
+                "shr_who": vf["shr_who"],
                 "have_zip": not self.args.no_zip,
+                "have_zls": not self.args.no_zls,
                 "have_mv": not self.args.no_mv,
                 "have_del": not self.args.no_del,
                 "have_unpost": int(self.args.unpost),
                 "have_emp": int(self.args.emp),
                 "md_no_br": int(vf.get("md_no_br") or 0),
                 "ext_th": vf.get("ext_th_d") or {},
-                "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
+                "sb_lg": vn.js_ls["sb_lg"],
+                "sb_md": vn.js_ls["sb_md"],
                 "sba_md": vf.get("md_sba") or "",
                 "sba_lg": vf.get("lg_sba") or "",
                 "txt_ext": self.args.textfiles.replace(",", " "),
@@ -2833,7 +3130,8 @@ class AuthSrv(object):
                 "unlist0": vf.get("unlist") or "",
                 "see_dots": self.args.see_dots,
                 "dqdel": self.args.qdel,
-                "dgrid": "grid" in vf,
+                "dlni": vn.js_ls["dlni"],
+                "dgrid": vn.js_ls["dgrid"],
                 "dgsel": "gsel" in vf,
                 "dnsort": "nsort" in vf,
                 "dhsortn": vf["hsortn"],
@@ -2843,6 +3141,7 @@ class AuthSrv(object):
                 "dvol": self.args.au_vol,
                 "idxh": int(self.args.ih),
                 "dutc": not self.args.localtime,
+                "dfszf": self.args.ui_filesz.strip("-"),
                 "themes": self.args.themes,
                 "turbolvl": self.args.turbo,
                 "nosubtle": self.args.nosubtle,
@@ -2854,6 +3153,14 @@ class AuthSrv(object):
                 "lifetime": vn.js_ls["lifetime"],
                 "u2sort": self.args.u2sort,
             }
+            zs = "ui_noacci ui_nocpla ui_noctxb ui_nolbar ui_nombar ui_nonav ui_notree ui_norepl ui_nosrvi"
+            for zs in zs.split():
+                if vf.get(zs):
+                    js_htm[zs] = 1
+            zs = "notooltips"
+            for zs in zs.split():
+                if getattr(self.args, zs, False):
+                    js_htm[zs] = 1
             vn.js_htm = json_hesc(json.dumps(js_htm))
 
         vols = list(vfs.all_nodes.values())
@@ -2864,7 +3171,10 @@ class AuthSrv(object):
                     self.log("BUG: /%s not in all_nodes" % (vol.vpath,), 1)
                     vols.append(vol)
             if shr in vfs.all_nodes:
-                self.log("BUG: %s found in all_nodes" % (shr,), 1)
+                t = "invalid config: a volume is overlapping with the --shr global-option (/%s)"
+                t = t % (shr,)
+                self.log(t, 1)
+                raise Exception(t)
 
         for vol in vols:
             dbv = vol.get_dbv("")[0]
@@ -3023,7 +3333,7 @@ class AuthSrv(object):
                 pwdb = {}
             else:
                 jtxt = read_utf8(self.log, ap, True)
-                pwdb = json.loads(jtxt)
+                pwdb = json.loads(jtxt) if jtxt.strip() else {}
 
             pwdb = [x for x in pwdb if x[0] != uname]
             pwdb.append((uname, self.defpw[uname], hpw))
@@ -3047,7 +3357,7 @@ class AuthSrv(object):
             return
 
         jtxt = read_utf8(self.log, ap, True)
-        pwdb = json.loads(jtxt)
+        pwdb = json.loads(jtxt) if jtxt.strip() else {}
 
         useen = set()
         urst = set()
@@ -3202,7 +3512,7 @@ class AuthSrv(object):
                 raise Exception("volume not found: " + zs)
 
         self.log(str({"users": users, "vols": vols, "flags": flags}))
-        t = "/{}: read({}) write({}) move({}) del({}) dots({}) get({}) upGet({}) uadmin({})"
+        t = "/{}: read({}) write({}) move({}) del({}) dots({}) get({}) upGet({}) html({}) uadmin({})"
         for k, zv in self.vfs.all_vols.items():
             vc = zv.axs
             vs = [
@@ -3476,6 +3786,11 @@ class AuthSrv(object):
             ret.append("")
 
         self.log("generated config:\n\n" + "\n".join(ret))
+
+
+def derive_args(args: argparse.Namespace) -> None:
+    args.have_idp_hdrs = bool(args.idp_h_usr or args.idp_hm_usr)
+    args.have_ipu_or_ipr = bool(args.ipu or args.ipr)
 
 
 def n_du_who(s: str) -> int:

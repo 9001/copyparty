@@ -187,6 +187,7 @@ class HttpSrv(object):
             "svcs",
         ]
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
+        self.j2["opds"] = env.get_template("opds.xml")
         self.prism = has_resource(self.E, "web/deps/prism.js.gz")
 
         if self.args.ipu:
@@ -200,6 +201,7 @@ class HttpSrv(object):
             self.ipr = None
 
         self.ipa_nm = build_netmap(self.args.ipa)
+        self.ipar_nm = build_netmap(self.args.ipar)
         self.xff_nm = build_netmap(self.args.xff_src)
         self.xff_lan = build_netmap("lan")
 
@@ -382,8 +384,8 @@ class HttpSrv(object):
                 if nloris < nconn / 2:
                     continue
 
-                t = "slowloris (idle-conn): {} banned for {} min"
-                self.log(self.name, t.format(ip, self.args.loris, nclose), 1)
+                t = "slow%s (idle-conn): %s banned for %d min"  # slowloris
+                self.log(self.name, t % ("loris", ip, self.args.loris), 1)
                 self.bans[ip] = int(time.time() + self.args.loris * 60)
 
             if self.args.log_conn:

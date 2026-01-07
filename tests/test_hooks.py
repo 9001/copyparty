@@ -78,6 +78,41 @@ class TestHooks(tu.TC):
                     h, b = self.curl(url_dl)
                     self.assertEqual(b, "ok %s\n" % (url_up))
 
+    def test2(self):
+        hooktxt = "import sys\nopen('h%d','wb').close()\nsys.exit(%d)\n"
+        for hooktype in ("xbu", "xau"):
+            for upfun in (self.put, self.bup):
+                self.reset()
+                for n in [0, 1, 100]:
+                    with open("h%d.py" % (n,), "wb") as f:
+                        f.write((hooktxt % (n, n)).encode("utf-8"))
+                vcfg = [
+                    "012:012:A:c,H=c,h0.py:c,H=c,h1.py:c,H=c,h100.py",
+                    "021:021:A:c,H=c,h0.py:c,H=c,h100.py:c,H=c,h1.py",
+                    "120:120:A:c,H=c,h1.py:c,H=c,h100.py:c,H=c,h0.py",
+                    "30:30:A:c,H=c,enoent.py:c,H=c,h100.py",  # not-exist
+                ]
+                vcfg = [x.replace("H", hooktype) for x in vcfg]
+                self.args = Cfg(v=vcfg, a=["o:o"], e2d=True)
+                self.asrv = AuthSrv(self.args, self.log)
+                self.cinit()
+                scenarios = (
+                    ("012", False, True, True, False),
+                    ("021", True, True, False, True),
+                    ("120", False, False, True, False),
+                    ("30", False, False, False, False),
+                )
+                for (vp, ok, h0, h1, h2) in scenarios:
+                    for zs in ("h0", "h1", "h100"):
+                        if os.path.exists(zs):
+                            os.unlink(zs)
+                    vp = "%s/f" % (vp,)
+                    h, b = upfun(vp)
+                    self.assertEqual(ok, os.path.exists(vp))
+                    self.assertEqual(h0, os.path.exists("h0"))
+                    self.assertEqual(h1, os.path.exists("h1"))
+                    self.assertEqual(h2, os.path.exists("h100"))
+
     def makehook(self, hs):
         with open("h.py", "wb") as f:
             f.write(hs.encode("utf-8"))
