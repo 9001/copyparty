@@ -269,6 +269,7 @@ if (1)
 		"cdt_ask": "when scrolling to the bottom,$Ninstead of loading more files,$Nask what to do",
 		"cdt_hsort": "how many sorting rules (&lt;code&gt;,sorthref&lt;/code&gt;) to include in media-URLs. Setting this to 0 will also ignore sorting-rules included in media links when clicking them",
 		"cdt_ren": "enable custom right-click menu, you can still access the regular menu by pressing the shift key and right-clicking",
+		"cdt_rdb": "show the regular right-click menu when the custom one is already open and right-clicking again",
 
 		"tt_entree": "show navpane (directory tree sidebar)$NHotkey: B",
 		"tt_detree": "show breadcrumbs$NHotkey: B",
@@ -649,7 +650,7 @@ if (1)
 		"rc_ply": "play",
 		"rc_pla": "play as audio",
 		"rc_txt": "open in textfile viewer",
-		"rc_md": "open in text editor",
+		"rc_md": "open in markdown viewer",
 		"rc_dl": "download",
 		"rc_zip": "download as archive",
 		"rc_cpl": "copy link",
@@ -657,6 +658,7 @@ if (1)
 		"rc_cut": "cut",
 		"rc_cpy": "copy",
 		"rc_pst": "paste",
+		"rc_rnm": "rename",
 		"rc_nfo": "new folder",
 		"rc_nfi": "new file",
 		"rc_sal": "select all",
@@ -988,7 +990,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="ren" class="tgl btn" href="#" tt="' + L.cdt_ren + '">enable</a></div></div>' : '') +
+	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="ren" class="tgl btn" href="#" tt="' + L.cdt_ren + '">enable</a><a id="rdb" class="tgl btn" href="#" tt="' + L.cdt_rdb + '">double</a></div></div>' : '') +
 	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
@@ -1032,13 +1034,12 @@ ebi('rcm').innerHTML = (
 		'<a href="#" id="rzip">' + L.rc_zip + '</a>'
 	: '') +
 	'<div id="rs2" class="sep"></div>' +
-	(has(perms, "move") ?
-		'<a href="#" id="rdel">' + L.rc_del + '</a>' +
-		'<a href="#" id="rcut">' + L.rc_cut + '</a>'
-	: '') +
+	(have_del ? '<a href="#" id="rdel">' + L.rc_del + '</a>' : '') +
+	(have_mv ? '<a href="#" id="rcut">' + L.rc_cut + '</a>' : '') +
 	'<a href="#" id="rcpy">' + L.rc_cpy + '</a>' +
 	(has(perms, "write") ?
 		'<a href="#" id="rpst">' + L.rc_pst + '</a>' +
+		(have_mv ? '<a href="#" id="rrnm">' + L.rc_rnm + '</a>' : '') +
 		'<div id="rs3" class="sep"></div>' +
 		'<a href="#" id="rnfo">' + L.rc_nfo + '</a>' +
 		'<a href="#" id="rnfi">' + L.rc_nfi + '</a>'
@@ -9473,9 +9474,11 @@ var rcm = (function () {
 		return {enabled: false}
 
 	var r = {
-		enabled: true
+		enabled: true,
+		double: false
 	};
 	bcfg_bind(r, 'enabled', 'ren', true);
+	bcfg_bind(r, 'double', 'rdb', false);
 
 	var menu = ebi('rcm');
 	var selFile = {
@@ -9541,13 +9544,13 @@ var rcm = (function () {
 				case 'opn':
 					var a = mknod('a');
 					a.href = selFile.path;
-					a.target = selFile.type == "dir" ? '' : '_blank';
+					a.target = selFile.type == 'dir' ? '' : '_blank';
 					a.click();
 					break;
 				case 'ply': selFile.type == 'gf' ? thegrid.imshow(selFile.relpath) : play('f-' + selFile.id); break;
 				case 'pla': play('f-' + selFile.id); break;
 				case 'txt': location = '?doc=' + selFile.relpath; break;
-				case 'md': location = selFile.path + '?v'; break;
+				case 'md': location = selFile.path + (has(selFile.path, '?') ? '&v' : '?v'); break;
 				case 'cpl': cliptxt(location.protocol + '//' + location.host + selFile.path, function() {toast.ok(2, L.clipped)}); break;
 				case 'dl': ebi('seldl').click(); break;
 				case 'zip': ebi('selzip').click(); break;
@@ -9558,6 +9561,7 @@ var rcm = (function () {
 					fileman.paste();
 					fileman.clip = [];
 					break;
+				case 'rnm': fileman.rename(); break;
 				case 'nfo': mktemp(true); break;
 				case 'nfi': mktemp(); break;
 				case 'sal':
@@ -9584,8 +9588,8 @@ var rcm = (function () {
 				clmod(file, "sel", true);
 				selFile.elem = file;
 
-				selFile.path = basenames(file.children[1].firstChild.href).split('?')[0];
-				selFile.relpath = selFile.path.split('/').slice(-1)[0];
+				selFile.path = basenames(file.children[1].firstChild.href).replace(/(&|\?)v/, '');
+				selFile.relpath = selFile.path.split('/').slice(-1)[0].split("?")[0];
 				if (noq_href(file.children[1].firstChild).endsWith("/"))
 					selFile.type = "dir";
 				else {
@@ -9595,6 +9599,7 @@ var rcm = (function () {
 				}
 			}
 		}
+		console.log(selFile);
 		msel.selui();
 
 		var has_sel = msel.getsel().length;
@@ -9605,7 +9610,7 @@ var rcm = (function () {
 		clmod(ebi('rpla'), 'hide', selFile.type != 'gf');
 		clmod(ebi('rtxt'), 'hide', !selFile.id);
 		clmod(ebi('rs1'), 'hide', !selFile.path);
-		clmod(ebi('rmd'), 'hide', !selFile.id || selFile.path.slice(-3) != '.md');
+		clmod(ebi('rmd'), 'hide', !selFile.id || selFile.relpath.slice(-3) != ".md");
 		clmod(ebi('rcpl'), 'hide', !selFile.path);
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);
@@ -9614,7 +9619,9 @@ var rcm = (function () {
 		clmod(ebi('rdel'), 'hide', !has_sel);
 		clmod(ebi('rcpy'), 'hide', !has_sel);
 		clmod(ebi('rpst'), 'hide', !has_clip);
-		clmod(ebi('rs3'), 'hide', !has_sel || !has_clip);
+		clmod(ebi('rrnm'), 'hide', !has_sel);
+		clmod(ebi('rs3'), 'hide', !has_sel);
+		clmod(ebi('rs4'), 'hide', !has_sel && !has(perms, "write"));
 
 		menu.style.left = x + 5 + 'px';
 		menu.style.top = y + 5 + 'px';
@@ -9622,7 +9629,7 @@ var rcm = (function () {
 		menu.focus();
 	}
 
-	r.hide = function (force) {
+	r.hide = function(force) {
 		if (!menu.style.display || (!force && menu.contains(document.activeElement)))
 			return;
 		if (selFile.elem && !selFile.no_dsel) {
@@ -9635,9 +9642,13 @@ var rcm = (function () {
 	}
 
 	ebi('wrap').oncontextmenu = function(e) {
-		if (!r.enabled || e.shiftKey || menu.style.display) {
-			r.hide(true);
+		r.hide(true);
+		if (!r.enabled || e.shiftKey || (r.double && menu.style.display)) {
 			return true;
+		}
+		if (selFile.elem && !selFile.no_dsel) {
+			clmod(selFile.elem, "sel", false);
+			msel.selui();
 		}
 		ev(e);
 		var gfile = thegrid.en && e.target && e.target.closest('#ggrid > a');
