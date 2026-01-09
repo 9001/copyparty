@@ -641,7 +641,7 @@ class Ftpd(object):
         lgr = logging.getLogger("pyftpdlib")
         lgr.setLevel(logging.DEBUG if self.args.ftpv else logging.INFO)
 
-        ips = self.args.i
+        ips = self.args.ftp_i
         if "::" in ips:
             ips.append("0.0.0.0")
 

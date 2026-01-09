@@ -691,6 +691,7 @@ Ls.vie = {
 	"rc_md": "mở trong trình soạn thảo văn bản", //m
 	"rc_dl": "tải xuống", //m
 	"rc_zip": "tải xuống dưới dạng gói nén", //m
+	"rc_cpl": "sao chép liên kết", //m
 	"rc_del": "xóa", //m
 	"rc_cut": "cắt", //m
 	"rc_cpy": "sao chép", //m

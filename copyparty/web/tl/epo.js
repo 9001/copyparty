@@ -647,6 +647,7 @@ Ls.epo = {
 	"rc_md": "malfermi en tekstredaktilo", //m
 	"rc_dl": "elŝuti", //m
 	"rc_zip": "elŝuti kiel arkivon", //m
+	"rc_cpl": "kopii ligilon", //m
 	"rc_del": "forigi", //m
 	"rc_cut": "eltondi", //m
 	"rc_cpy": "kopii", //m

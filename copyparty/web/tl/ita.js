@@ -647,6 +647,7 @@ Ls.ita = {
 	"rc_md": "apri nell’editor di testo", //m
 	"rc_dl": "scarica", //m
 	"rc_zip": "scarica come archivio", //m
+	"rc_cpl": "copia link", //m
 	"rc_del": "elimina", //m
 	"rc_cut": "taglia", //m
 	"rc_cpy": "copia", //m

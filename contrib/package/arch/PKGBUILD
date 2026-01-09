@@ -3,7 +3,7 @@
 # NOTE: You generally shouldn't use this PKGBUILD on Arch, as it is mainly for testing purposes. Install copyparty using pacman instead.
 
 pkgname=copyparty
-pkgver="1.20.0"
+pkgver="1.20.1"
 pkgrel=1
 pkgdesc="File server with accelerated resumable uploads, dedup, WebDAV, SFTP, FTP, TFTP, zeroconf, media indexer, thumbnails++"
 arch=("any")
@@ -24,7 +24,7 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
 )
 source=("https://github.com/9001/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
 backup=("etc/${pkgname}/copyparty.conf" )
-sha256sums=("a1fd3aab51f30435f07f1d128cf773262ee69a1554c9c32ea1e36d06438eb291")
+sha256sums=("4f513ca9e3d1c11a7bb4e1a8a925dda2449b9565e91f6ef7cbe10367fa4e2935")
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}/copyparty/web"

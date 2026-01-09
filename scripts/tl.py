@@ -87,6 +87,11 @@ Ls.{lang3} = {{
 		"j1": "enabling k304 will disconnect your client on every HTTP 304, which can prevent some buggy proxies from getting stuck (suddenly not loading pages), <em>but</em> it will also make things slower in general",
 		"k1": "reset client settings",
 		"l1": "login for more:",
+		"ls3": "login",
+		"lu4": "username",
+		"lp4": "password",
+		"lo3": "logout “{{0}}” everywhere",
+		"lo2": "ends the session on all browsers",
 		"m1": "welcome back,",  // TLNote: "welcome back, USERNAME"
 		"n1": "404 not found &nbsp;┐( ´ -`)┌",
 		"o1": 'or maybe you don\\'t have access -- try a password or <a href="' + SR + '/?h">go home</a>',

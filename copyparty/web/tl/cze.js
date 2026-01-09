@@ -651,6 +651,7 @@ Ls.cze = {
 	"rc_md": "otevřít v textovém editoru", //m
 	"rc_dl": "stáhnout", //m
 	"rc_zip": "stáhnout jako archiv", //m
+	"rc_cpl": "kopírovat odkaz", //m
 	"rc_del": "smazat", //m
 	"rc_cut": "vyjmout", //m
 	"rc_cpy": "kopírovat", //m

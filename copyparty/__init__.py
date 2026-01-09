@@ -107,6 +107,7 @@ web/tl/fin.js
 web/tl/fra.js
 web/tl/grc.js
 web/tl/ita.js
+web/tl/jpn.js
 web/tl/kor.js
 web/tl/nld.js
 web/tl/nno.js

@@ -644,6 +644,7 @@ Ls.nno = {
 	"rc_md": "opne i tekstredigerar",
 	"rc_dl": "Last ned",
 	"rc_zip": "Last ned som arkiv",
+	"rc_cpl": "kopier lenke",
 	"rc_del": "slett",
 	"rc_cut": "klipp ut",
 	"rc_cpy": "kopier",

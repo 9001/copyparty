@@ -2553,6 +2553,8 @@ class HttpCli(object):
                 or (zs == "dw" and self.can_delete)
             ):
                 pass
+            elif zs == "ndd":
+                raise Pebkac(400, "append is denied here due to non-reflink dedup")
             else:
                 raise Pebkac(400, "you do not have permission to append")
             zs = os.path.join(params["fdir"], fn)

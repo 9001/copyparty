@@ -647,6 +647,7 @@ Ls.fin = {
 	"rc_md": "avaa tekstieditorissa", //m
 	"rc_dl": "Lataa", //m
 	"rc_zip": "Lataa arkistona", //m
+	"rc_cpl": "kopioi linkki", //m
 	"rc_del": "poista", //m
 	"rc_cut": "Leikkaa", //m
 	"rc_cpy": "kopioi", //m

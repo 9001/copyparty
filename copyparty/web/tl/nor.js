@@ -644,6 +644,7 @@ Ls.nor = {
 	"rc_md": "åpne i teksteditor",
 	"rc_dl": "Last ned",
 	"rc_zip": "Last ned som arkiv",
+	"rc_cpl": "kopier lenke",
 	"rc_del": "slett",
 	"rc_cut": "klipp ut",
 	"rc_cpy": "kopier",

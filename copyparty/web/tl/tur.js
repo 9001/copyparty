@@ -647,6 +647,7 @@ Ls.tur = {
 	"rc_md": "metin düzenleyicide aç", //m
 	"rc_dl": "i̇ndir", //m
 	"rc_zip": "arşiv olarak indir", //m
+	"rc_cpl": "bağlantıyı kopyala", //m
 	"rc_del": "sil", //m
 	"rc_cut": "kes", //m
 	"rc_cpy": "kopyala", //m

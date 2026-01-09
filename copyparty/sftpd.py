@@ -286,9 +286,25 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
         self.uname: str = ssh.uname  # type: ignore
         self.args = self.hub.args
         self.asrv: "AuthSrv" = self.hub.asrv
+        self.v = self.args.sftpv
+        self.vv = self.args.sftpvv
 
         if self.uname == LEELOO_DALLAS:
             raise Exception("send her back")
+
+        self.vols = [
+            vp
+            for vp, vn in self.asrv.vfs.all_vols.items()
+            if self.uname in vn.axs.uread
+            or self.uname in vn.axs.uwrite
+            or self.uname in vn.axs.uget
+        ]
+        self.vis = set()
+        for zs in self.vols:
+            self.vis.add(zs)
+            while zs:
+                zs = zs.rsplit("/", 1)[0] if "/" in zs else ""
+                self.vis.add(zs)
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.hub.log("sftp:%s" % (self.ip,), msg, c)
@@ -353,29 +369,35 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             return SFTP_FAILURE
 
     def _list_folder(self, path: str) -> list[SATTR] | int:
+        if self.v:
+            self.log("ls(%s):" % (path,))
+        path = path.strip("/")
         try:
             ap, vn, rem = self.v2a(path, r=True)
         except Pebkac:
             try:
                 self.v2a(path, w=True)
+                self.log("ls(%s): [] (write-only)" % (path,))
                 return []  # display write-only folders as empty
             except:
                 pass
-            if self.asrv.vfs.realpath or path.strip("/"):
+            if path not in self.vis:
+                self.log("ls(%s): EPERM" % (path,))
                 return SFTP_PERMISSION_DENIED
             # list of accessible volumes
             ret = []
             zi = int(time.time())
             vst = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, zi, zi, zi))
-            for vn in self.asrv.vfs.all_vols.values():
-                if "/" in vn.vpath or not vn.vpath:
-                    continue  # only include toplevel-mounted vols
-                try:
-                    self.hub.asrv.vfs.get(vn.vpath, self.uname, True, False)
-                    ret.append(SATTR.from_stat(vst, filename=vn.vpath))
-                except:
-                    pass
+            prefix = path + "/"
+            for vn in self.asrv.vfs.all_nodes.values():
+                if path and not vn.vpath.startswith(prefix):
+                    continue  # vn is parent
+                vname = vn.vpath[len(prefix) :]
+                if "/" in vname or not vname:
+                    continue  # only include vols at current level
+                ret.append(SATTR.from_stat(vst, filename=vn.vpath))
             ret.sort(key=lambda x: x.filename)
+            self.log("ls(%s): vfs-vols; |%d|" % (path, len(ret)))
             return ret
 
         _, vfs_ls, vfs_virt = vn.ls(
@@ -394,6 +416,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
         if self.uname not in vn.axs.udot:
             ret = [x for x in ret if not x.filename.split("/")[-1].startswith(".")]
         ret.sort(key=lambda x: x.filename)
+        self.log("ls(%s): |%d|" % (path, len(ret)))
         return ret
 
     def stat(self, path: str) -> SATTR | int:
@@ -411,17 +434,25 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             return SFTP_FAILURE
 
     def _stat(self, vp: str) -> SATTR | int:
+        vp = vp.strip("/")
         try:
-            ap = self.v2a(vp, r=True)[0]
+            ap, vn, _ = self.v2a(vp)
+            if (
+                self.uname not in vn.axs.uread
+                and self.uname not in vn.axs.uwrite
+                and self.uname not in vn.axs.uget
+            ):
+                self.log("stat(%s): EPERM" % (vp,))
+                return SFTP_PERMISSION_DENIED
             st = bos.stat(ap)
+            self.log("stat(%s): %s" % (vp, st))
         except:
-            if vp.strip("/") or self.asrv.vfs.realpath:
-                try:
-                    self.v2a(vp, w=True)[0]
-                except:
-                    return SFTP_PERMISSION_DENIED
+            if vp not in self.vis:
+                self.log("stat(%s): ENOENT" % (vp,))
+                return SFTP_NO_SUCH_FILE
             zi = int(time.time())
             st = os.stat_result((16877, -1, -1, 1, 1000, 1000, 8, zi, zi, zi))
+            self.log("stat(%s): vfs-vols")
         return SATTR.from_stat(st)
 
     def open(self, path: str, flags: int, attr: SATTR) -> paramiko.SFTPHandle | int:
@@ -457,9 +488,11 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             ap = os.path.join(vn.realpath, rem)
             vf = vn.flags
         except Pebkac as ex:
-            t = "denied open file [%s], iflag=%s, attr=%s, read=%s, write=%s: %s"
-            self.log(t % (vp, iflag, attr, rd, wr, ex))
+            t = "denied open file [%s], iflag=%s, read=%s, write=%s: %s"
+            self.log(t % (vp, iflag, rd, wr, ex))
             return SFTP_PERMISSION_DENIED
+
+        self.log("open(%s, %x, %s)" % (vp, iflag, smode))
 
         if wr:
             try:
@@ -496,6 +529,8 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
                     self.log(t, 3)
                     return SFTP_PERMISSION_DENIED
 
+            self.log("writing to [%s] => [%s]" % (vp, ap))
+
         if wr and need_unlink:  # type: ignore  # !rm
             assert td  # type: ignore  # !rm
             if td >= -1 and td <= self.args.ftp_wt:
@@ -519,13 +554,16 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
 
         chmod = getattr(attr, "st_mode", None)
         if chmod is None:
-            chmod = vf.get("chmod_f", 644)
+            chmod = vf.get("chmod_f", 0o644)
+            self.log("open(%s, %x): client did not chmod" % (vp, iflag))
+        else:
+            self.log("open(%s, %x): client set chmod 0%o" % (vp, iflag, chmod))
 
         try:
             fd = os.open(ap, iflag, chmod)
         except OSError as ex:
-            t = "failed to os.open [%s] -> [%s] with iflag [%s] and chmod [%s]"
-            self.log(t % (vp, ap, iflag, chmod), 3)
+            t = "failed to os.open [%s] -> [%s] with iflag [%s] and chmod [%s]: %r"
+            self.log(t % (vp, ap, iflag, chmod, ex), 3)
             return paramiko.SFTPServer.convert_errno(ex.errno)
 
         if iflag & os.O_CREAT:
@@ -534,8 +572,8 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
         try:
             f = os.fdopen(fd, smode)
         except OSError as ex:
-            t = "failed to os.fdpen [%s] -> [%s] with smode [%s]"
-            self.log(t % (vp, ap, smode), 3)
+            t = "failed to os.fdpen [%s] -> [%s] with smode [%s]: %r"
+            self.log(t % (vp, ap, smode, ex), 3)
             return paramiko.SFTPServer.convert_errno(ex.errno)
 
         ret = SFTP_FH(iflag)
@@ -552,17 +590,37 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             return SFTP_FAILURE
 
     def _remove(self, vp: str) -> int:
+        self.log("rm(%s)" % (vp,))
         if self.args.no_del:
             self.log("The delete feature is disabled in server config")
             return SFTP_PERMISSION_DENIED
         try:
             self.hub.up2k.handle_rm(self.uname, self.ip, [vp], [], False, False)
+            self.log("rm(%s): ok" % (vp,))
             return SFTP_OK
         except Pebkac as ex:
             t = "denied delete [%s]: %s"
             self.log(t % (vp, ex))
+            if str(ex).startswith("file not found"):
+                return SFTP_NO_SUCH_FILE
+            try:
+                # write-only client trying to rm before upload?
+                ap, vn, _ = self.v2a(vp)
+                if (
+                    self.uname not in vn.axs.uread
+                    and self.uname not in vn.axs.uwrite
+                    and self.uname not in vn.axs.uget
+                ):
+                    self.log("rm(%s): EPERM" % (vp,))
+                    return SFTP_PERMISSION_DENIED
+                if not bos.path.exists(ap):
+                    self.log(" `- file didn't exist; returning ENOENT")
+                    return SFTP_NO_SUCH_FILE
+            except:
+                pass
             return SFTP_PERMISSION_DENIED
         except OSError as ex:
+            self.log("failed: rm(%s): %r" % (vp, ex))
             return paramiko.SFTPServer.convert_errno(ex.errno)
 
     def rename(self, oldpath: str, newpath: str) -> int:
@@ -573,6 +631,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             return SFTP_FAILURE
 
     def _rename(self, svp: str, dvp: str) -> int:
+        self.log("mv(%s, %s)" % (svp, dvp))
         if self.args.no_mv:
             self.log("The rename/move feature is disabled in server config")
         svp = svp.strip("/")
@@ -585,6 +644,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             self.log(t % (svp, dvp, ex))
             return SFTP_PERMISSION_DENIED
         except OSError as ex:
+            self.log("mv(%s, %s): %r" % (svp, dvp, ex))
             return paramiko.SFTPServer.convert_errno(ex.errno)
 
     def mkdir(self, path: str, attr: SATTR) -> int:
@@ -595,6 +655,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             return SFTP_FAILURE
 
     def _mkdir(self, vp: str, attr: SATTR) -> int:
+        self.log("mkdir(%s)" % (vp,))
         try:
             vn, rem = self.asrv.vfs.get(vp, self.uname, False, True)
             ap = os.path.join(vn.realpath, rem)
@@ -607,6 +668,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             self.log(t % (vp, ex))
             return SFTP_PERMISSION_DENIED
         except OSError as ex:
+            self.log("mkdir(%s): %r" % (vp, ex))
             return paramiko.SFTPServer.convert_errno(ex.errno)
 
     def rmdir(self, path: str) -> int:
@@ -617,6 +679,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             return SFTP_FAILURE
 
     def _rmdir(self, vp: str) -> int:
+        self.log("rmdir(%s)" % (vp,))
         try:
             vn, rem = self.asrv.vfs.get(vp, self.uname, False, False, will_del=True)
             ap = os.path.join(vn.realpath, rem)
@@ -627,6 +690,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             self.log(t % (vp, ex))
             return SFTP_PERMISSION_DENIED
         except OSError as ex:
+            self.log("rmdir(%s): %r" % (vp, ex))
             return paramiko.SFTPServer.convert_errno(ex.errno)
 
     def chattr(self, path: str, attr: SATTR) -> int:
@@ -637,6 +701,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             return SFTP_FAILURE
 
     def _chattr(self, vp: str, attr: SATTR) -> int:
+        self.log("chattr(%s, %s)" % (vp, attr))
         try:
             vn, rem = self.asrv.vfs.get(vp, self.uname, False, True, will_del=True)
             ap = os.path.join(vn.realpath, rem)
@@ -647,6 +712,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             self.log(t % (vp, ex))
             return SFTP_PERMISSION_DENIED
         except OSError as ex:
+            self.log("chattr(%s): %r" % (vp, ex))
             return paramiko.SFTPServer.convert_errno(ex.errno)
 
     def symlink(self, target_path: str, path: str) -> int:
@@ -668,7 +734,7 @@ class Sftpd(object):
         self.bound: list[str] = []
         self.sessions = {}
 
-        ips = args.i
+        ips = args.sftp_i
         if "::" in ips:
             ips.append("0.0.0.0")
 
@@ -714,7 +780,7 @@ class Sftpd(object):
         for ip in ips:
             self._bind(ip)
 
-        self.log("listening on %s port %s" % (self.srv, args.sftp))
+        self.log("listening @ %s port %s" % (self.bound, args.sftp))
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.hub.log("sftp", msg, c)

@@ -39,7 +39,7 @@ fns=(
   MarkupSafe-3.0.2-cp313-cp313-win_amd64.whl
   mutagen-1.47.0-py3-none-any.whl
   packaging-25.0-py3-none-any.whl
-  pillow-12.0.0-cp313-cp313-win_amd64.whl
+  pillow-12.1.0-cp313-cp313-win_amd64.whl
   pyinstaller-6.15.0-py3-none-win_amd64.whl
   pyinstaller_hooks_contrib-2025.8-py3-none-any.whl
   python-3.13.11-amd64.exe

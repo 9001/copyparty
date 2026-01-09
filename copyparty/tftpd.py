@@ -175,7 +175,7 @@ class Tftpd(object):
             p1, p2 = [int(x) for x in self.args.tftp_pr.split("-")]
             ports = list(range(p1, p2 + 1))
 
-        ips = self.args.i
+        ips = self.args.tftp_i
         if "::" in ips:
             ips.append("0.0.0.0")
 

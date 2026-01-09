@@ -650,6 +650,7 @@ Ls.pol = {
 	"rc_md": "otwórz w edytorze tekstu", //m
 	"rc_dl": "pobierz", //m
 	"rc_zip": "pobierz jako archiwum", //m
+	"rc_cpl": "kopiuj link", //m
 	"rc_del": "usuń", //m
 	"rc_cut": "wytnij", //m
 	"rc_cpy": "kopiuj", //m

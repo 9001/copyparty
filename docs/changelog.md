@@ -1,4 +1,58 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0102-0007  `v1.20.0`  sftp is fine too
+
+## 🧪 new features
+
+* sftp server 4714c2fa ec7ea309
+  * included in [docker-images](https://hub.docker.com/u/copyparty) `im`, `iv`, `ac`, `dj`
+  * not using docker? install the optional dependency [paramiko](https://pypi.org/project/paramiko/)
+* #1135 right-click menu (thx @stackxp and @Scotsguy!) 82c49609 05a44720
+* PUT can now append to existing files 63d8e5a0
+  * new option [apnd-who](https://copyparty.eu/cli/#g-apnd-who) to configure who is allowed to do that
+* #1128 added option to skip uploading a file if the filename is already taken on the server (thx @Scotsguy!) fa32e159
+* #1127 descript.ion now also works for folders 2c26aecd
+* in file listings, `up_by` and `up_ip` (uploader info) can now be displayed for non-admin users by adding them to the [mte](https://copyparty.eu/cli/#g-mte) option 7bfd370b
+* #1120 display the disk-space quota instead of the underlying HDD size (thx @rabid-dev!) 511dc016 e0845b23
+* option to skip dotfiles/dotfolders when using download-as-zip 7d7a1510
+* #1124 button to skip files with a filename collision when copying/moving files 85639ad2
+* #1151 u2c ([commandline uploader](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy)): option to use basic-auth instead of the `PW` header (thx @Le0Developer!) 120fdfb2
+* the name of the `pw` url-param and http-header can be changed f81d80bc
+  * mainly to force basic-auth, but perhaps also for other purposes
+  * changing these will break support for many clients, so you probably want to keep the default
+
+## 🩹 bugfixes
+
+* image-viewer:
+  * images now scale properly when rotated while the zoom feature is enabled c0e167fd
+  * the current image rotation will now be applied to the next image as well 485c60cf c82a3cb2
+* groups announced by an IdP will now also apply for native (copyparty-config) users f08cb25c
+* windows: download-as-zip would flatten everything to a single folder 2d1d295a
+* #1157 [dirkeys](https://github.com/9001/copyparty/#dirkeys) did not work in grid-view d1ddcb19
+* #1123 the [ui-notree](https://copyparty.eu/cli/#g-ui-notree) option to simplify the UI would simplify a bit too much 4c73704c
+* don't add the trailing slash to a volume in the controlpanel when the volume is a file 80a37492
+  * the link couldn't be clicked on Windows CE 4.20 using Internet Explorer 4.01
+
+## 🔧 other changes
+
+* #1158 updated german translation (thx @Scotsguy!) 3bf80c81
+* the `dotfiles` button now also toggles showing [unlisted](https://copyparty.eu/cli/#g-unlist) files e55e5a45
+* `/?h&ls` (the api to list volumes) now includes the user's permissions for each volume 1f6e8116
+* #1142 new option [dav-port](https://copyparty.eu/cli/#g-dav-port) to open a dedicated port for webdav clients 4642d323
+  * workaround for certain clients which pretend to be webbrowsers
+* #1147 workaround for a buggy browser-extension 8551472b
+* detect (and panic) when a webbrowser has failed to load one of the javascript files af3f777e
+  * replaces the confusing errormessage resulting from half of the code missing
+
+## 🌠 fun facts
+
+* it [turns out](https://github.com/9001/copyparty/#server-hall-of-fame) that copyparty runs just fine on [SGI IRIX](https://en.wikipedia.org/wiki/IRIX)! 39c3ccc2
+  * there's a [photo of the server](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/sgi-o2.jpg?cache) and a [screenshot](https://a.ocv.me/pub/g/nerd-stuff/cpp/servers/sgi-o2.png?cache) as proof 😁
+  * the [feature comparison](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md#general) has been updated accordingly
+* this release was mostly coded at 39c3 (see photo above) and the release was [made at revspace](https://a.ocv.me/pub/g/2026/01/PXL_20260102_235328552.jpg)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-1217-0014  `v1.19.23`  bad apple x2
 
 ## 🧪 new features

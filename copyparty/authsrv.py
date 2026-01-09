@@ -2650,6 +2650,13 @@ class AuthSrv(object):
                 self.log(t, 1)
                 raise Exception(t)
 
+            if (
+                "dedup" in vol.flags
+                and "reflink" not in vol.flags
+                and vol.flags["apnd_who"] != "no"
+            ):
+                vol.flags["apnd_who"] = "ndd"
+
             # verify tags mentioned by -mt[mp] are used by -mte
             local_mtp = {}
             local_only_mtp = {}

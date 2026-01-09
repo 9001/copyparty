@@ -1429,6 +1429,7 @@ def add_sftp(ap):
     ap2.add_argument("--sftp", metavar="PORT", type=int, default=0, help="enable SFTP server on \033[33mPORT\033[0m, for example \033[32m3922")
     ap2.add_argument("--sftpv", action="store_true", help="verbose")
     ap2.add_argument("--sftpvv", action="store_true", help="verboser")
+    ap2.add_argument("--sftp-i", metavar="IP", type=u, default="-i", help="IPs to listen on (comma-separated list). Set this to override \033[33m-i\033[0m for this protocol")
     ap2.add_argument("--sftp4", action="store_true", help="only listen on IPv4")
     ap2.add_argument("--sftp-key", metavar="U K", type=u, action="append", help="\033[34mREPEATABLE:\033[0m add ssh-key \033[33mK\033[0m for user \033[33mU\033[0m (username, space, key-type, space, base64); if user has multiple keys, then repeat this option for each key\n └─commandline example: --sftp-key 'david ssh-ed25519 AAAAC3NzaC...'\n └─config-file example: sftp-key: david ssh-ed25519 AAAAC3NzaC...")
     ap2.add_argument("--sftp-key2u", action="append", help=argparse.SUPPRESS)
@@ -1444,6 +1445,7 @@ def add_ftp(ap):
     ap2.add_argument("--ftp", metavar="PORT", type=int, default=0, help="enable FTP server on \033[33mPORT\033[0m, for example \033[32m3921")
     ap2.add_argument("--ftps", metavar="PORT", type=int, default=0, help="enable FTPS server on \033[33mPORT\033[0m, for example \033[32m3990")
     ap2.add_argument("--ftpv", action="store_true", help="verbose")
+    ap2.add_argument("--ftp-i", metavar="IP", type=u, default="-i", help="IPs to listen on (comma-separated list). Set this to override \033[33m-i\033[0m for this protocol")
     ap2.add_argument("--ftp4", action="store_true", help="only listen on IPv4")
     ap2.add_argument("--ftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m (comma-separated); specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m / \033[33m--ipar\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--ftp-no-ow", action="store_true", help="if target file exists, reject upload instead of overwrite")
@@ -1468,6 +1470,7 @@ def add_webdav(ap):
 def add_tftp(ap):
     ap2 = ap.add_argument_group("TFTP options (UDP only)")
     ap2.add_argument("--tftp", metavar="PORT", type=int, default=0, help="enable TFTP server on \033[33mPORT\033[0m, for example \033[32m69 \033[0mor \033[32m3969")
+    ap2.add_argument("--tftp-i", metavar="IP", type=u, default="-i", help="IPs to listen on (comma-separated list). Set this to override \033[33m-i\033[0m for this protocol")
     ap2.add_argument("--tftp4", action="store_true", help="only listen on IPv4")
     ap2.add_argument("--tftpv", action="store_true", help="verbose")
     ap2.add_argument("--tftpvv", action="store_true", help="verboser")
@@ -1481,6 +1484,7 @@ def add_tftp(ap):
 def add_smb(ap):
     ap2 = ap.add_argument_group("SMB/CIFS options")
     ap2.add_argument("--smb", action="store_true", help="enable smb (read-only) -- this requires running copyparty as root on linux and macos unless \033[33m--smb-port\033[0m is set above 1024 and your OS does port-forwarding from 445 to that.\n\033[1;31mWARNING:\033[0m this protocol is DANGEROUS and buggy! Never expose to the internet!")
+    ap2.add_argument("--smb-i", metavar="IP", type=u, default="-i", help="IPs to listen on (comma-separated list). Set this to override \033[33m-i\033[0m for this protocol")
     ap2.add_argument("--smbw", action="store_true", help="enable write support (please dont)")
     ap2.add_argument("--smb1", action="store_true", help="disable SMBv2, only enable SMBv1 (CIFS)")
     ap2.add_argument("--smb-port", metavar="PORT", type=int, default=445, help="port to listen on -- if you change this value, you must NAT from TCP:445 to this port using iptables or similar")
@@ -1491,10 +1495,12 @@ def add_smb(ap):
     ap2.add_argument("--smbvv", action="store_true", help="verboser")
     ap2.add_argument("--smbvvv", action="store_true", help="verbosest")
 
+
 def add_opds(ap):
     ap2 = ap.add_argument_group("OPDS options")
     ap2.add_argument("--opds", action="store_true", help="enable opds -- allows e-book readers to browse and download files (volflag=opds)")
     ap2.add_argument("--opds-exts", metavar="T,T", type=u, default="epub,cbz,pdf", help="file formats to list in OPDS feeds; leave empty to show everything (volflag=opds_exts)")
+
 
 def add_handlers(ap):
     ap2 = ap.add_argument_group("handlers (see --help-handlers)")
@@ -2150,10 +2156,17 @@ def main(argv: Optional[list[str]] = None) -> None:
         if getattr(al, k1):
             setattr(al, k2, False)
 
-    if not HAVE_IPV6 and al.i == "::":
-        al.i = "0.0.0.0"
+    protos = "ftp tftp sftp smb".split()
+    opts = ["%s_i" % (zs,) for zs in protos]
+    for opt in opts:
+        if getattr(al, opt) == "-i":
+            setattr(al, opt, al.i)
+    for opt in ["i"] + opts:
+        zs = getattr(al, opt)
+        if not HAVE_IPV6 and zs == "::":
+            zs = "0.0.0.0"
+        setattr(al, opt, [x.strip() for x in zs.split(",")])
 
-    al.i = [x.strip() for x in al.i.split(",")]
     try:
         if "-" in al.p:
             lo, hi = [int(x) for x in al.p.split("-")]

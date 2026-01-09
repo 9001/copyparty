@@ -89,7 +89,7 @@ class SMB(object):
         smbserver.isInFileJail = self._is_in_file_jail
         self._disarm()
 
-        ip = next((x for x in self.args.i if ":" not in x), None)
+        ip = next((x for x in self.args.smb_i if ":" not in x), None)
         if not ip:
             self.log("smb", "IPv6 not supported for SMB; listening on 0.0.0.0", 3)
             ip = "0.0.0.0"

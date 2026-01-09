@@ -647,6 +647,7 @@ Ls.fra = {
 	"rc_md": "ouvrir dans l’éditeur de texte", //m
 	"rc_dl": "télécharger", //m
 	"rc_zip": "télécharger comme archive", //m
+	"rc_cpl": "copier le lien", //m
 	"rc_del": "supprimer", //m
 	"rc_cut": "couper", //m
 	"rc_cpy": "copier", //m

@@ -647,6 +647,7 @@ Ls.nld = {
 	"rc_md": "Openen in teksteditor", //m
 	"rc_dl": "Downloaden", //m
 	"rc_zip": "Downloaden als archief", //m
+	"rc_cpl": "Link kopiëren", //m
 	"rc_del": "Verwijderen", //m
 	"rc_cut": "Knippen", //m
 	"rc_cpy": "Kopiëren", //m

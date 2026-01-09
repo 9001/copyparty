@@ -647,6 +647,7 @@ Ls.por = {
 	"rc_md": "abrir no editor de texto", //m
 	"rc_dl": "baixar", //m
 	"rc_zip": "baixar como arquivo", //m
+	"rc_cpl": "copiar link", //m
 	"rc_del": "excluir", //m
 	"rc_cut": "recortar", //m
 	"rc_cpy": "copiar", //m

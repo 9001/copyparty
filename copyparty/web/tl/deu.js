@@ -647,6 +647,7 @@ Ls.deu = {
 	"rc_md": "im Texteditor öffnen",
 	"rc_dl": "herunterladen",
 	"rc_zip": "als Archiv herunterladen",
+	"rc_cpl": "Link kopieren", //m
 	"rc_del": "löschen",
 	"rc_cut": "ausschneiden",
 	"rc_cpy": "kopieren",

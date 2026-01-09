@@ -647,6 +647,7 @@ Ls.swe = {
 	"rc_md": "öppna i textredigerare", //m
 	"rc_dl": "Ladda ner", //m
 	"rc_zip": "Ladda ner som arkiv", //m
+	"rc_cpl": "kopiera länk", //m
 	"rc_del": "radera", //m
 	"rc_cut": "klipp ut", //m
 	"rc_cpy": "kopiera", //m

@@ -377,6 +377,7 @@ IMPLICATIONS = [
     ["tftpvv", "tftpv"],
     ["nodupem", "nodupe"],
     ["no_dupe_m", "no_dupe"],
+    ["sftpvv", "sftpv"],
     ["smbw", "smb"],
     ["smb1", "smb"],
     ["smbvvv", "smbvv"],

@@ -646,6 +646,7 @@ Ls.spa = {
 	"rc_md": "abrir en el editor de texto", //m
 	"rc_dl": "descargar", //m
 	"rc_zip": "descargar como archivo", //m
+	"rc_cpl": "copiar enlace", //m
 	"rc_del": "eliminar", //m
 	"rc_cut": "cortar", //m
 	"rc_cpy": "copiar", //m
