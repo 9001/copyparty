@@ -116,7 +116,7 @@ in
         Global settings to apply.
         Directly maps to values in the [global] section of the copyparty config.
         Cannot set "c" or "hist", those are set by this module.
-        See `${getExe cfg.package} --help` for more details.
+        See `copyparty --help` for more details.
       '';
       default = {
         i = "127.0.0.1";
@@ -227,7 +227,7 @@ in
                 type = types.attrs;
                 description = ''
                   Attribute list of volume flags to apply.
-                  See `${getExe cfg.package} --help-flags` for more details.
+                  See `copyparty --help-flags` for more details.
                 '';
                 example = literalExpression ''
                   {
