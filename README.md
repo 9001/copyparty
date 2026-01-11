@@ -8,7 +8,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * 🔌 protocols: [http(s)](#the-browser) // [webdav](#webdav-server) // [sftp](#sftp-server) // [ftp(s)](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
 * 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
-👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
+👉 **[get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
 
 📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
@@ -58,12 +58,13 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
         * [creating a playlist](#creating-a-playlist) - with a standalone mediaplayer or copyparty
         * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
         * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
-    * [textfile viewer](#textfile-viewer) - with realtime streaming of logfiles and such ([demo](https://a.ocv.me/pub/demo/logtail/))
-    * [markdown viewer](#markdown-viewer) - and there are *two* editors
+   * [textfile viewer](#textfile-viewer) - with realtime streaming of logfiles and such ([demo](https://a.ocv.me/pub/demo/logtail/))
+   * [markdown viewer](#markdown-viewer) - and there are *two* editors
         * [markdown vars](#markdown-vars) - dynamic docs with serverside variable expansion
-    * [other tricks](#other-tricks)
-    * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
-* [server config](#server-config) - using arguments or config files, or a mix of both
+   * [other tricks](#other-tricks)
+   * [searching](#searching) - search by size, date, path/name, mp3-tags, ...
+
+### 8. [SERVER CONFIG](#server-config) - using arguments or config files, or a mix of both
     * [zeroconf](#zeroconf) - announce enabled services on the LAN ([pic](https://user-images.githubusercontent.com/241032/215344737-0eae8d98-9496-4256-9aa8-cd2f6971810d.png))
         * [mdns](#mdns) - LAN domain-name and feature announcer
         * [ssdp](#ssdp) - windows-explorer announcer
@@ -72,44 +73,44 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
     * [sftp server](#sftp-server) - goes roughly 700 MiB/s (slower than webdav and ftp)
     * [webdav server](#webdav-server) - with read-write support
         * [connecting to webdav from windows](#connecting-to-webdav-from-windows) - using the GUI
-    * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
-    * [smb server](#smb-server) - unsafe, slow, not recommended for wan
-    * [browser ux](#browser-ux) - tweaking the ui
-    * [opengraph](#opengraph) - discord and social-media embeds
-    * [file deduplication](#file-deduplication) - enable symlink-based upload deduplication
-    * [file indexing](#file-indexing) - enable music search, upload-undo, and better dedup
+   * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
+   * [smb server](#smb-server) - unsafe, slow, not recommended for wan
+   * [browser ux](#browser-ux) - tweaking the ui
+   * [opengraph](#opengraph) - discord and social-media embeds
+   * [file deduplication](#file-deduplication) - enable symlink-based upload deduplication
+   * [file indexing](#file-indexing) - enable music search, upload-undo, and better dedup
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
         * [periodic rescan](#periodic-rescan) - filesystem monitoring
-    * [upload rules](#upload-rules) - set upload rules using volflags
-    * [compress uploads](#compress-uploads) - files can be autocompressed on upload
-    * [chmod and chown](#chmod-and-chown) - per-volume filesystem-permissions and ownership
-    * [other flags](#other-flags)
-    * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
-    * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
-    * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
-    * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
+   * [upload rules](#upload-rules) - set upload rules using volflags
+   * [compress uploads](#compress-uploads) - files can be autocompressed on upload
+   * [`chmod` and `chown`](#chmod-and-chown) - per-volume filesystem-permissions and ownership
+   * [other flags](#other-flags)
+   * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
+   * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
+   * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
+   * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
         * [zeromq](#zeromq) - event-hooks can send zeromq messages
         * [upload events](#upload-events) - the older, more powerful approach ([examples](./bin/mtag/))
-    * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
-    * [ip auth](#ip-auth) - autologin based on IP range (CIDR)
+   * [handlers](#handlers) - redefine behavior with plugins ([examples](./bin/handlers/))
+   * [ip auth](#ip-auth) - autologin based on IP range (CIDR)
         * [restrict to ip](#restrict-to-ip) - limit a user to certain IP ranges (CIDR)
-    * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
+   * [identity providers](#identity-providers) - replace copyparty passwords with oauth and such
         * [generic header auth](#generic-header-auth) - other ways to auth by header
-    * [user-changeable passwords](#user-changeable-passwords) - if permitted, users can change their own passwords
-    * [using the cloud as storage](#using-the-cloud-as-storage) - connecting to an aws s3 bucket and similar
-    * [hiding from google](#hiding-from-google) - tell search engines you don't wanna be indexed
-    * [themes](#themes)
-    * [complete examples](#complete-examples)
-    * [listen on port 80 and 443](#listen-on-port-80-and-443) - become a *real* webserver
-    * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
+   * [user-changeable passwords](#user-changeable-passwords) - if permitted, users can change their own passwords
+   * [using the cloud as storage](#using-the-cloud-as-storage) - connecting to an aws s3 bucket and similar
+   * [hiding from google](#hiding-from-google) - tell search engines you don't wanna be indexed
+   * [themes](#themes)
+   * [complete examples](#complete-examples)
+   * [listen on port 80 and 443](#listen-on-port-80-and-443) - become a *real* webserver
+   * [reverse-proxy](#reverse-proxy) - running copyparty next to other websites
         * [real-ip](#real-ip) - teaching copyparty how to see client IPs
         * [reverse-proxy performance](#reverse-proxy-performance)
-    * [permanent cloudflare tunnel](#permanent-cloudflare-tunnel) - if you have a domain and want to get your copyparty online real quick
-    * [prometheus](#prometheus) - metrics/stats can be enabled
-    * [other extremely specific features](#other-extremely-specific-features) - you'll never find a use for these
+   * [permanent cloudflare tunnel](#permanent-cloudflare-tunnel) - if you have a domain and want to get your copyparty online real quick
+   * [prometheus](#prometheus) - metrics/stats can be enabled
+   * [other extremely specific features](#other-extremely-specific-features) - you'll never find a use for these
         * [custom mimetypes](#custom-mimetypes) - change the association of a file extension
-        * [GDPR compliance](#GDPR-compliance) - imagine using copyparty professionally...
+        * [GDPR compliance](#gdpr-compliance) - imagine using copyparty professionally...
         * [feature chickenbits](#feature-chickenbits) - buggy feature? rip it out
         * [feature beefybits](#feature-beefybits) - force-enable features with known issues on your OS/env
 * [packages](#packages) - the party might be closer than you think
@@ -132,12 +133,14 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
     * [cors](#cors) - cross-site request config
     * [filekeys](#filekeys) - prevent filename bruteforcing
         * [dirkeys](#dirkeys) - share specific folders in a volume
-    * [password hashing](#password-hashing) - you can hash passwords
-    * [https](#https) - both HTTP and HTTPS are accepted
-* [recovering from crashes](#recovering-from-crashes)
-    * [client crashes](#client-crashes)
+   * [password hashing](#password-hashing) - you can hash passwords
+   * [https](#https) - both HTTP and HTTPS are accepted
+
+### 15. [RECOVERING FROM CRASHES](#recovering-from-crashes)
+   * [client crashes](#client-crashes)
         * [firefox wsod](#firefox-wsod) - firefox 87 can crash during uploads
-* [HTTP API](#HTTP-API) - see [devnotes](./docs/devnotes.md#http-api)
+
+### 16. [HTTP API](#HTTP-API) - see [devnotes](./docs/devnotes.md#http-api)
 * [dependencies](#dependencies) - mandatory deps
     * [optional dependencies](#optional-dependencies) - enable bonus features
         * [dependency chickenbits](#dependency-chickenbits) - prevent loading an optional dependency
@@ -152,7 +155,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
 * [devnotes](#devnotes) - for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
 
 
-## quickstart
+# quickstart
 
 just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
 
@@ -162,7 +165,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
 * or install [on arch](#arch-package) / [homebrew](#homebrew-formulae) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
 * or if you are on android, [install copyparty in termux](#install-on-android)
-* or maybe an iPhone or iPad? [install in a-Shell on iOS](#install-on-iOS)
+* or maybe an iPhone or iPad? [install in a-Shell on ios](#install-on-ios)
 * or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
 * or if you have [uv](https://docs.astral.sh/uv/) installed, run `uv tool run copyparty`
 * or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
@@ -348,7 +351,7 @@ general notes:
   * because no browsers currently implement the media-query to do this properly orz
 
 browser-specific:
-* iPhone/iPad: use Firefox to download files
+* iPhone / iPad: use Firefox to download files
 * Android-Chrome: increase "parallel uploads" for higher speed (android bug)
 * Android-Firefox: takes a while to select files (their fix for ☝️)
 * Desktop-Firefox: ~~may use gigabytes of RAM if your files are massive~~ *seems to be OK now*
@@ -406,7 +409,7 @@ same order here too
 * iPhones: music volume goes on a rollercoaster during song changes
   * nothing I can do about it because `AudioContext` is still broken in safari
 
-* iPhones: the preload feature (in the media-player-options tab) can cause a tiny audio glitch 20sec before the end of each song, but disabling it may cause worse iOS bugs to appear instead
+* iPhones: the preload feature (in the media-player-options tab) can cause a tiny audio glitch 20sec before the end of each song, but disabling it may cause worse ios bugs to appear instead
   * just a hunch, but disabling preloading may cause playback to stop entirely, or possibly mess with bluetooth speakers
   * tried to add a tooltip regarding this but looks like apple broke my tooltips
 
@@ -450,7 +453,7 @@ upgrade notes
 "frequently" asked questions
 
 * CopyParty?
-  * nope! the name is either copyparty (all-lowercase) or Copyparty -- it's [one word](https://en.wiktionary.org/wiki/copyparty) after all :>
+  * **nope**! the name is either copyparty (all-lowercase) or Copyparty -- it's [one word](https://en.wiktionary.org/wiki/copyparty) after all :>
 
 * what is a volflag?
   * per-volume configuration; many (not all) global-options can be set as volflags, and most (not all) volflags can be set as global-options; [complete list of volflags](https://copyparty.eu/cli/#flags-help-page)
@@ -1130,7 +1133,7 @@ plays almost every audio format there is  (if the server has FFmpeg installed fo
 the following audio formats are usually always playable, even without FFmpeg: `aac|flac|m4a|mp3|ogg|opus|wav`
 
 some highlights:
-* OS integration; control playback from your phone's lockscreen ([windows](https://user-images.githubusercontent.com/241032/233213022-298a98ba-721a-4cf1-a3d4-f62634bc53d5.png) // [iOS](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) // [android](https://user-images.githubusercontent.com/241032/233212311-a7368590-08c7-4f9f-a1af-48ccf3f36fad.png))
+* OS integration; control playback from your phone's lockscreen ([windows](https://user-images.githubusercontent.com/241032/233213022-298a98ba-721a-4cf1-a3d4-f62634bc53d5.png) // [ios](https://user-images.githubusercontent.com/241032/142711926-0700be6c-3e31-47b3-9928-53722221f722.png) // [android](https://user-images.githubusercontent.com/241032/233212311-a7368590-08c7-4f9f-a1af-48ccf3f36fad.png))
 * shows the audio waveform in the seekbar
 * not perfectly gapless but can get really close (see settings + eq below); good enough to enjoy gapless albums as intended
 * videos can be played as audio, without wasting bandwidth on the video
@@ -1164,8 +1167,8 @@ open the `[🎺]` media-player-settings tab to configure it,
     * `aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|m4a|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|tak|tta|ulaw|wav|wma|wv|xm|xpk`
 * "transcode to":
   * `[opus]` produces an `opus` whenever transcoding is necessary (the best choice on Android and PCs)
-  * `[awo]` is `opus` in a `weba` file, good for iPhones (iOS 17.5 and newer) but Apple is still fixing some state-confusion bugs as of iOS 18.2.1
-  * `[caf]` is `opus` in a `caf` file, good for iPhones (iOS 11 through 17), technically unsupported by Apple but works for the most part
+  * `[awo]` is `opus` in a `weba` file, good for iPhones (ios 17.5 and newer) but Apple is still fixing some state-confusion bugs as of ios 18.2.1
+  * `[caf]` is `opus` in a `caf` file, good for iPhones (ios 11 through 17), technically unsupported by Apple but works for the most part
   * `[mp3]` -- the myth, the legend, the undying master of mediocre sound quality that definitely works everywhere
   * `[flac]` -- lossless but compressed, for LAN and/or fiber playback on electrostatic headphones
   * `[wav]` -- lossless and uncompressed, for LAN and/or fiber playback on electrostatic headphones connected to very old equipment
@@ -1209,7 +1212,7 @@ can also boost the volume in general, or increase/decrease stereo width (like [c
 
 has the convenient side-effect of reducing the pause between songs, so gapless albums play better with the eq enabled (just make it flat)
 
-not available on iPhones / iPads because AudioContext currently breaks background audio playback on iOS (15.7.8)
+not available on iPhones / iPads because AudioContext currently breaks background audio playback on ios (15.7.8)
 
 
 ### fix unreliable playback on android
@@ -2606,9 +2609,9 @@ TLDR: yes
 
 ![copyparty-ie4-fs8](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png)
 
-`ie` = internet-explorer, `ff` = firefox, `c` = chrome, `iOS` = iPhone/iPad, `Andr` = Android
+`ie` = internet-explorer, `ff` = firefox, `c` = chrome, `ios` = iPhone/iPad, `Andr` = Android
 
-| feature         | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
+| feature         | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | ios | Andr |
 | --------------- | --- | ---- | ---- | ---- | ----- | ---- | --- | ---- |
 | browse files    | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | thumbnail view  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
@@ -2629,13 +2632,13 @@ TLDR: yes
 | markdown viewer |  -  | `*2` | `*2` | `*2` |  yep  | yep  | yep | yep  |
 | play mp3/m4a    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | play ogg/opus   |  -  |  -   |  -   |  -   |  yep  | yep  | `*3` | yep |
-| **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | iOS | Andr |
+| **= feature =** | ie6 | ie9  | ie10 | ie11 | ff 52 | c 49 | ios | Andr |
 
 * internet explorer 6 through 8 behave the same
 * firefox 52 and chrome 49 are the final winxp versions
 * `*1` yes, but extremely slow (ie10: `1 MiB/s`, ie11: `270 KiB/s`)
 * `*2` only able to do plaintext documents (no markdown rendering)
-* `*3` iOS 11 and newer, opus only, and requires FFmpeg on the server
+* `*3` ios 11 and newer, opus only, and requires FFmpeg on the server
 
 quick summary of more eccentric web-browsers trying to view a directory index:
 
@@ -2783,7 +2786,7 @@ the app is **NOT** the full copyparty server! just a basic upload client, nothin
 if you want to run the copyparty server on your android device, see [install on android](#install-on-android)
 
 
-# iOS shortcuts
+# ios shortcuts
 
 there is no iPhone app, but  the following shortcuts are almost as good:
 
@@ -2792,7 +2795,7 @@ there is no iPhone app, but  the following shortcuts are almost as good:
   * can download links and rehost the target file on copyparty (see first comment inside the shortcut)
   * pics become lowres if you share from gallery to shortcut, so better to launch the shortcut and pick stuff from there
 
-if you want to run the copyparty server on your iPhone or iPad, see [install on iOS](#install-on-iOS)
+if you want to run the copyparty server on your iPhone or iPad, see [install on ios](#install-on-ios)
 
 
 # performance
@@ -3160,7 +3163,7 @@ if you want thumbnails (photos+videos) and you're okay with spending another 132
 if you are suddenly unable to access storage (permission issues), try forcequitting termux, revoke all of its permissions in android settings, and run the command `termux-setup-storage`
 
 
-# install on iOS
+# install on ios
 
 first install one of the following:
 * [a-Shell mini](https://apps.apple.com/us/app/a-shell-mini/id1543537943) gives you the essential features
