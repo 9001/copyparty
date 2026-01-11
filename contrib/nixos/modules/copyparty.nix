@@ -69,11 +69,8 @@ in
   options.services.copyparty = {
     enable = mkEnableOption "web-based file manager";
 
-    package = mkOption {
-      type = types.package;
-      default = pkgs.copyparty;
-      defaultText = "pkgs.copyparty";
-      description = ''
+    package = mkPackageOption pkgs "copyparty" {
+      extraDescription = ''
         Package of the application to run, exposed for overriding purposes.
       '';
     };
