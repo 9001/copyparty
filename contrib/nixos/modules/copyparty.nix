@@ -79,7 +79,7 @@ in
       type = types.bool;
       default = true;
       description = ''
-        Make a shell script wrapper called 'copyparty-hash' with all options set here,
+        Make a shell script wrapper called {command}`copyparty-hash` with all options set here,
         that launches the hashing cli.
       '';
     };
@@ -114,9 +114,9 @@ in
       type = types.attrs;
       description = ''
         Global settings to apply.
-        Directly maps to values in the [global] section of the copyparty config.
+        Directly maps to values in the `[global]` section of the copyparty config.
         Cannot set "c" or "hist", those are set by this module.
-        See `copyparty --help` for more details.
+        See {command}`copyparty --help` for more details.
       '';
       default = {
         i = "127.0.0.1";
@@ -135,7 +135,7 @@ in
     globalExtraConfig = mkOption {
       type = types.str;
       default = "";
-      description = "Appended to the end of the [global] section verbatim. This is useful for flags which are used in a repeating manner (e.g. ipu: 255.255.255.1=user) which can't be repeated in the settings = {} attribute set.";
+      description = "Appended to the end of the `[global]` section verbatim. This is useful for flags which are used in a repeating manner (e.g. `ipu: 255.255.255.1=user`) which can't be repeated in the settings = {} attribute set.";
     };
 
     accounts = mkOption {
@@ -227,7 +227,7 @@ in
                 type = types.attrs;
                 description = ''
                   Attribute list of volume flags to apply.
-                  See `copyparty --help-flags` for more details.
+                  See {command}`copyparty --help-flags` for more details.
                 '';
                 example = literalExpression ''
                   {
