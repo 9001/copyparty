@@ -198,21 +198,21 @@ in
                   Attribute list of permissions and the users to apply them to.
 
                   The key must be a string containing any combination of allowed permission:
-                    "r" (read):   list folder contents, download files
-                    "w" (write):  upload files; need "r" to see the uploads
-                    "m" (move):   move files and folders; need "w" at destination
-                    "d" (delete): permanently delete files and folders
-                    "g" (get):    download files, but cannot see folder contents
-                    "G" (upget):  "get", but can see filekeys of their own uploads
-                    "h" (html):   "get", but folders return their index.html
-                    "a" (admin):  can see uploader IPs, config-reload
+                  * "r" (read):   list folder contents, download files
+                  * "w" (write):  upload files; need "r" to see the uploads
+                  * "m" (move):   move files and folders; need "w" at destination
+                  * "d" (delete): permanently delete files and folders
+                  * "g" (get):    download files, but cannot see folder contents
+                  * "G" (upget):  "get", but can see filekeys of their own uploads
+                  * "h" (html):   "get", but folders return their index.html
+                  * "a" (admin):  can see uploader IPs, config-reload
 
                   For example: "rwmd"
 
                   The value must be one of:
-                    an account name, defined in `accounts`
-                    a list of account names
-                    "*", which means "any account"
+                  * an account name, defined in `accounts`
+                  * a list of account names
+                  * "*", which means "any account"
                 '';
                 example = literalExpression ''
                   {
