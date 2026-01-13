@@ -9566,7 +9566,7 @@ var rcm = (function () {
 					break;
 				case 'ply': selFile.type == 'gf' ? thegrid.imshow(selFile.relpath) : play('f-' + selFile.id); break;
 				case 'pla': play('f-' + selFile.id); break;
-				case 'txt': location = '?doc=' + selFile.relpath; break;
+				case 'txt': location = selFile.basepath + '?doc=' + selFile.relpath; break;
 				case 'md': location = selFile.path + (has(selFile.path, '?') ? '&v' : '?v'); break;
 				case 'cpl': cliptxt(selFile.url, function() {toast.ok(2, L.clipped)}); break;
 				case 'dl': ebi('seldl').click(); break;
@@ -9604,15 +9604,22 @@ var rcm = (function () {
 				clmod(file, "sel", true);
 				selFile.elem = file;
 
-				selFile.url = file.children[1].firstChild.href;
+				var isSearchView = file.children[1].firstChild.tagName === "DIV";
+
+				selFile.url = isSearchView ? file.children[1].firstChild.lastChild.href : file.children[1].firstChild.href;
 				selFile.path = basenames(selFile.url).replace(/(&|\?)v/, '');
+				selFile.basepath = selFile.path.lastIndexOf("/") === 0 ? "/" : selFile.path.slice(0, selFile.path.lastIndexOf("/"));
 				selFile.relpath = selFile.path.split('/').slice(-1)[0].split("?")[0];
-				if (noq_href(file.children[1].firstChild).endsWith("/"))
+				if (!isSearchView && noq_href(file.children[1].firstChild).endsWith("/"))
 					selFile.type = "dir";
 				else {
 					var lead = file.firstChild.firstChild;
-					selFile.id = lead.id.split('-')[1];
-					selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
+					if (lead.id === undefined)
+						selFile.type = "tf";
+					else {
+						selFile.id = lead.id.split('-')[1];
+						selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
+					}
 				}
 			}
 		}
