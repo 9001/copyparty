@@ -9503,7 +9503,7 @@ var rcm = (function () {
 		dpath: null,
 		url: null,
 		id: null,
-		fname: null,
+		name: null,
 		no_dsel: false
 	};
 	var selFile = jcp(nsFile);
@@ -9601,7 +9601,7 @@ var rcm = (function () {
 				file = ref && ref.closest('#files tbody tr');
 			}
 			var fa = file && file.children[1].querySelector('a[id]');
-			if (fa && !file.matches('.srch_hdr')) {
+			if (fa && fa.id != 'unsearch') {
 				selFile.no_dsel = clgot(file, "sel");
 				clmod(file, "sel", true);
 				selFile.elem = file;
@@ -9635,7 +9635,7 @@ var rcm = (function () {
 		clmod(ebi('rpla'), 'hide', selFile.type != 'gf');
 		clmod(ebi('rtxt'), 'hide', !selFile.id);
 		clmod(ebi('rs1'), 'hide', !selFile.path);
-		clmod(ebi('rmd'), 'hide', selFile.name === undefined || selFile.name.slice(-3) != ".md");
+		clmod(ebi('rmd'), 'hide', !selFile.name || selFile.name.slice(-3) != ".md");
 		clmod(ebi('rcpl'), 'hide', !selFile.path);
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);
@@ -9666,10 +9666,11 @@ var rcm = (function () {
 	}
 
 	ebi('wrap').oncontextmenu = function(e) {
-		r.hide(true);
 		if (!r.enabled || e.shiftKey || (r.double && menu.style.display)) {
+			r.hide(true);
 			return true;
 		}
+		r.hide(true);
 		if (selFile.elem && !selFile.no_dsel) {
 			clmod(selFile.elem, "sel", false);
 			msel.selui();
