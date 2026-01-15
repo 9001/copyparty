@@ -9601,7 +9601,7 @@ var rcm = (function () {
 				file = ref && ref.closest('#files tbody tr');
 			}
 			var fa = file && file.children[1].querySelector('a[id]');
-			if (fa) {
+			if (fa && !file.matches('.srch_hdr')) {
 				selFile.no_dsel = clgot(file, "sel");
 				clmod(file, "sel", true);
 				selFile.elem = file;
@@ -9635,7 +9635,7 @@ var rcm = (function () {
 		clmod(ebi('rpla'), 'hide', selFile.type != 'gf');
 		clmod(ebi('rtxt'), 'hide', !selFile.id);
 		clmod(ebi('rs1'), 'hide', !selFile.path);
-		clmod(ebi('rmd'), 'hide', selFile.name.slice(-3) != ".md");
+		clmod(ebi('rmd'), 'hide', selFile.name === undefined || selFile.name.slice(-3) != ".md");
 		clmod(ebi('rcpl'), 'hide', !selFile.path);
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);
