@@ -231,6 +231,7 @@ if (1)
 		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
+		"ct_dsel": 'use drag selection in grid-view">dsel',
 		"ct_dl": 'force download (don\'t display inline) when a file is clicked">dl',
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
@@ -910,6 +911,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '</a>\n' +
 	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '</a>\n' +
+	'		<a id="dsel" class="tgl btn" href="#" tt="' + L.ct_dsel + '</a>\n' +
 	'		<a id="dlni" class="tgl btn" href="#" tt="' + L.ct_dl + '</a>\n' +
 	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '</a>\n' +
@@ -6745,6 +6747,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
 	bcfg_bind(r, 'csel', 'csel', dgsel);
+	bcfg_bind(r, 'dsel', 'dsel', false);
 	bcfg_bind(r, 'dlni', 'dlni', dlni, resort);
 	bcfg_bind(r, 'dots', 'dotfiles', see_dots, function (v) {
 		r.goto();
@@ -9754,6 +9757,160 @@ function reload_browser() {
 	thegrid.setdirty();
 	msel.render();
 }
+
+(function() {
+    var is_selma = false;
+    var is_drag = false;
+    var startx, starty;
+    var selbox = null;
+    
+    var ttimer = null;
+    var lpdelay = 400; 
+    var mvthresh = 10;
+
+    function is_dsel() {
+        return localStorage.getItem('dsel') === '1';
+    }
+
+    function unbox() {
+        var boxes = QSA('.selbox');
+        boxes.forEach(box => box.remove());
+        selbox = null;
+        is_drag = false;
+        is_selma = false;
+    }
+
+    function getpp(e) {
+        if (e.touches && e.touches.length > 0) {
+            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+    }
+
+    function sel_toggle(el) {
+        clmod(el, 'sel', 't');
+        var eref = el.getAttribute('ref');
+        if (eref) {
+            var ehidden = ebi(eref);
+            if (ehidden) {
+                var tr = ehidden.closest('tr');
+                if (tr) clmod(tr, 'sel', 't');
+            }
+        }
+    }
+
+    function bob(rect1, rect2) {
+        return !(rect1.right < rect2.left || rect1.left > rect2.right ||
+                 rect1.bottom < rect2.top || rect1.top > rect2.bottom);
+    }
+
+    function start_sel(e) {
+        if (!is_dsel()) return;
+        if (!(e.target && e.target.closest('#gfiles'))) return;
+
+        var pos = getpp(e);
+        startx = pos.x;
+        starty = pos.y;
+
+        if (e.type === 'mousedown') {
+            if (e.button !== 0) {
+                unbox();
+                return;
+            }
+            is_selma = true;
+            start_drag(pos);
+        } 
+        else if (e.type === 'touchstart') {
+            ttimer = setTimeout(() => {
+                is_selma = true;
+                start_drag(pos);
+            }, lpdelay);
+        }
+    }
+
+    function start_drag(pos) {
+        is_drag = true;
+        selbox = document.createElement('div');
+        selbox.className = 'selbox';
+        document.body.appendChild(selbox);
+        document.body.style.userSelect = 'none';
+    }
+
+    function move_sel(e) {
+        if (!is_dsel()) return;
+
+        var pos = getpp(e);
+
+        if (ttimer && !is_drag) {
+            var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
+            if (dist > mvthresh) {
+                clearTimeout(ttimer);
+                ttimer = null;
+            }
+        }
+
+        if (!is_drag || !selbox) return;
+        
+        if (e.cancelable) e.preventDefault();
+
+        var width = Math.abs(pos.x - startx);
+        var height = Math.abs(pos.y - starty);
+        var left = Math.min(pos.x, startx);
+        var top = Math.min(pos.y, starty);
+
+        selbox.style.width = `${width}px`;
+        selbox.style.height = `${height}px`;
+        selbox.style.left = `${left}px`;
+        selbox.style.top = `${top}px`;
+    }
+
+    function end_sel(e) {
+        clearTimeout(ttimer);
+        ttimer = null;
+
+        if (!is_drag) return;
+
+        if (selbox) {
+            var sbrect = selbox.getBoundingClientRect();
+            var faf = QSA('#ggrid a');
+
+            faf.forEach(el => {
+                if (bob(sbrect, el.getBoundingClientRect())) {
+                    sel_toggle(el);
+                }
+            });
+
+			msel.selui();
+        }
+        
+        unbox();
+        document.body.style.userSelect = 'auto';
+    }
+
+    function init() {
+		var gspot = ebi('gfiles');
+        gspot.onmousedown = (e) => start_sel(e);
+        gspot.onmousemove = (e) => move_sel(e);
+        gspot.onmouseup = (e) => end_sel(e);
+
+        window.addEventListener('touchstart', start_sel, { passive: true });
+        window.addEventListener('touchmove', move_sel, { passive: false });
+        window.addEventListener('touchend', end_sel, { passive: true });
+
+        window.addEventListener('dragstart', (e) => {
+            if (is_dsel() && (is_selma || is_drag)) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
 treectl.hydrate();
 
 J_BRW = 2;
