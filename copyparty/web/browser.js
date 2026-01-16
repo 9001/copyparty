@@ -9761,27 +9761,29 @@ function reload_browser() {
 (function() {
 	var is_selma = false;
 	var dragging = false;
-	var prevent_click = false;
 
-	var fwrapper = null;
 	var startx, starty;
+	var fwrap = null;
 	var selbox = null;
-	
 	var ttimer = null;
+
 	var lpdelay = 250; 
 	var mvthresh = 10;
 
 	function unbox() {
 		qsr('.selbox');
-
-		if (fwrapper) {
-			ebi("gfiles").style.userSelect = 'auto';
-			fwrapper = null;
+		ebi('gfiles').style.removeProperty('pointer-events')
+		ebi('wrap').style.removeProperty('user-select')
+		
+		if (selbox) {
+			console.log(selbox)
+			window.getSelection().removeAllRanges();
 		}
-
-		selbox = null;
-		dragging = false;
+		
 		is_selma = false;
+		dragging = false;
+		fwrap = null;
+		selbox = null;
 		ttimer = null;
 	}
 
@@ -9807,132 +9809,90 @@ function reload_browser() {
 				 b1.bottom < b2.top || b1.top > b2.bottom);
 	}
 
-	function sel_excl(e, exclist) {
-		for (var id of exclist) {
-			if ((e.target && e.target.closest(id))) {
-				return true
-			}
-		}
-		return false
-	}
-
 	function sel_start(e) {
 		if (e.button !== 0 && e.type !== 'touchstart') return;
 		if (!thegrid.en || !treectl.dsel) return;
-		if (sel_excl(e, ['#widget','#ops','.opview','.doc'])) return;
+		if (e.target.closest('#widget,#ops,.opview,.doc')) return;
 
-		
+		if (e.target.closest('#gfiles'))
+			ebi('gfiles').style.userSelect = "none"
+
 		var pos = getpp(e);
 		startx = pos.x;
 		starty = pos.y;
 		is_selma = true;
 		ttimer = null;
-		prevent_click = false;
-		
-		fwrapper = e.target.closest('#wrap');
-		if (fwrapper) ebi('gfiles').style.userSelect = 'none';
 		
 		if (e.type === 'touchstart') {
-			if (ttimer) clearTimeout(ttimer);
 			ttimer = setTimeout(function() {
 				ttimer = null;
-				start_drag(pos);
+				start_drag();
 			}, lpdelay);
 		}
 	}
 	
-	function start_drag(pos) {
+	function start_drag() {
 		if (dragging) return;
 
 		dragging = true;
 		selbox = document.createElement('div');
 		selbox.className = 'selbox';
 		document.body.appendChild(selbox);
+
+		ebi('gfiles').style.pointerEvents = 'none';
 	}
 	
 	function sel_move(e) {
 		if (!is_selma) return;
 		var pos = getpp(e);
+		var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
 
-		if (e.type === 'touchmove') {
-			if (ttimer !== null) {
-				var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));	
-				if (dist > mvthresh) {
-					clearTimeout(ttimer);
-					ttimer = null;
-					is_selma = false;
-				}
-				return;
-			}
-			if (e.cancelable) e.preventDefault();
-		}
-		if (!dragging && !has_txtsel()) {
-			var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
+		if (e.type === 'touchmove' && ttimer) {
 			if (dist > mvthresh) {
-				if (!fwrapper) return;
-				start_drag(pos);
+				clearTimeout(ttimer);
+				ttimer = null;
+				is_selma = false;
 			}
+			return;
+		}
+		if (!dragging && dist > mvthresh && !window.getSelection().toString()) {
+			if (fwrap = e.target.closest('#wrap')) 
+				fwrap.style.userSelect = 'none';
+			else return;
+			start_drag();
 		}
 
 		if (!dragging || !selbox) return;
 		ev(e);
 
-		var width = Math.abs(pos.x - startx);
-		var height = Math.abs(pos.y - starty);
-		var left = Math.min(pos.x, startx);
-		var top = Math.min(pos.y, starty);
-
-		selbox.style.width = width + 'px';
-		selbox.style.height = height + 'px';
-		selbox.style.left = left + 'px';
-		selbox.style.top = top + 'px';
+		selbox.style.width = Math.abs(pos.x - startx) + 'px';
+		selbox.style.height = Math.abs(pos.y - starty) + 'px';
+		selbox.style.left = Math.min(pos.x, startx) + 'px';
+		selbox.style.top = Math.min(pos.y, starty) + 'px';
 
 		if (IE && window.getSelection)
-		window.getSelection().removeAllRanges();
+			window.getSelection().removeAllRanges();
 	}
 
 	function sel_end(e) {
 		clearTimeout(ttimer);
-		ttimer = null;
-
-		if (dragging) {
-			prevent_click = true;
-			if (selbox) {
-				var sbrect = selbox.getBoundingClientRect();
-				var faf = QSA('#ggrid a');
-				var sadmode = e.shiftKey ? true : e.altKey ? false : "t";
-				for (var a = 0, aa = faf.length; a < aa; a++)
-					if (bob(sbrect, faf[a].getBoundingClientRect()))
-						sel_toggle(faf[a], sadmode);
-				msel.selui();
-			}
+		if (dragging && selbox) {
+			var sbrect = selbox.getBoundingClientRect();
+			var faf = QSA('#ggrid a');
+			var sadmode = e.shiftKey ? true : e.altKey ? false : "t";
+			for (var a = 0, aa = faf.length; a < aa; a++)
+				if (bob(sbrect, faf[a].getBoundingClientRect()))
+					sel_toggle(faf[a], sadmode);
+			msel.selui();
 			ev(e);
 		}
-		
 		unbox();
-		setTimeout(function() {
-			prevent_click = false;
-		}, 50);
-	}
-
-	function has_txtsel() {
-		var txtsel = window.getSelection();
-		return txtsel && txtsel.toString().length > 0;
-	}
-
-	function clickblock(e) {
-		if (prevent_click) {
-			e.stopImmediatePropagation();
-			e.preventDefault();
-		}
 	}
 
 	function dsel_init() {
 		window.addEventListener('mousedown', sel_start);
 		window.addEventListener('mousemove', sel_move);
 		window.addEventListener('mouseup', sel_end);
-
-		window.addEventListener('click', clickblock, true);
 
 		window.addEventListener('touchstart', sel_start, { passive: true });
 		window.addEventListener('touchmove', sel_move, { passive: false });
