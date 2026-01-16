@@ -9790,14 +9790,16 @@ function reload_browser() {
 		return { x: touch.clientX, y: touch.clientY };
 	}
 
-	function sel_toggle(el) {
-		clmod(el, 'sel', 't');
+	function sel_toggle(el, usel) {
+		var m = usel ? true : 't';
+
+		clmod(el, 'sel', m);
 		var eref = el.getAttribute('ref');
 		if (eref) {
 			var ehidden = ebi(eref);
 			if (ehidden) {
 				var tr = ehidden.closest('tr');
-				if (tr) clmod(tr, 'sel', 't');
+				if (tr) clmod(tr, 'sel', m);
 			}
 		}
 	}
@@ -9902,7 +9904,7 @@ function reload_browser() {
 				var faf = QSA('#ggrid a');
 				for (var a = 0, aa = faf.length; a < aa; a++)
 					if (bob(sbrect, faf[a].getBoundingClientRect()))
-						sel_toggle(faf[a]);
+						sel_toggle(faf[a], e.shiftKey);
 				msel.selui();
 			}
 			ev(e);
