@@ -9759,145 +9759,191 @@ function reload_browser() {
 }
 
 (function() {
-    var is_selma = false;
-    var is_drag = false;
-    var startx, starty;
-    var selbox = null;
+	var is_selma = false;
+	var dragging = false;
+	var prevent_click = false;
 
-    var ttimer = null;
-    var lpdelay = 400; 
-    var mvthresh = 10;
+	var fwrapper = null;
+	var startx, starty;
+	var selbox = null;
+	
+	var ttimer = null;
+	var lpdelay = 250; 
+	var mvthresh = 10;
 
-    function unbox() {
-        qsr('.selbox');
-        selbox = null;
-        is_drag = false;
-        is_selma = false;
-    }
+	function unbox() {
+		qsr('.selbox');
 
-    function getpp(e) {
-        if (e.touches && e.touches.length > 0) {
-            return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-        return { x: e.clientX, y: e.clientY };
-    }
+		if (fwrapper) {
+			ebi("gfiles").style.userSelect = 'auto';
+			fwrapper = null;
+		}
 
-    function sel_toggle(el) {
-        clmod(el, 'sel', 't');
-        var eref = el.getAttribute('ref');
-        if (eref) {
-            var ehidden = ebi(eref);
-            if (ehidden) {
-                var tr = ehidden.closest('tr');
-                if (tr) clmod(tr, 'sel', 't');
-            }
-        }
-    }
+		selbox = null;
+		dragging = false;
+		is_selma = false;
+		ttimer = null;
+	}
 
-    function bob(rect1, rect2) {
-        return !(rect1.right < rect2.left || rect1.left > rect2.right ||
-                 rect1.bottom < rect2.top || rect1.top > rect2.bottom);
-    }
+	function getpp(e) {
+		var touch = (e.touches && e.touches[0]) || e;
+		return { x: touch.clientX, y: touch.clientY };
+	}
 
-    function sel_start(e) {
+	function sel_toggle(el) {
+		clmod(el, 'sel', 't');
+		var eref = el.getAttribute('ref');
+		if (eref) {
+			var ehidden = ebi(eref);
+			if (ehidden) {
+				var tr = ehidden.closest('tr');
+				if (tr) clmod(tr, 'sel', 't');
+			}
+		}
+	}
+
+	function bob(b1, b2) {
+		return !(b1.right < b2.left || b1.left > b2.right ||
+				 b1.bottom < b2.top || b1.top > b2.bottom);
+	}
+
+	function sel_excl(e, exclist) {
+		for (var id of exclist) {
+			if ((e.target && e.target.closest(id))) {
+				return true
+			}
+		}
+		return false
+	}
+
+	function sel_start(e) {
+		if (e.button !== 0 && e.type !== 'touchstart') return;
 		if (!thegrid.en || !treectl.dsel) return;
+		if (sel_excl(e, ['#widget','#ops','.opview','.doc'])) return;
 
-        var pos = getpp(e);
-        startx = pos.x;
-        starty = pos.y;
+		
+		var pos = getpp(e);
+		startx = pos.x;
+		starty = pos.y;
+		is_selma = true;
+		ttimer = null;
+		prevent_click = false;
+		
+		fwrapper = e.target.closest('#wrap');
+		if (fwrapper) ebi('gfiles').style.userSelect = 'none';
+		
+		if (e.type === 'touchstart') {
+			if (ttimer) clearTimeout(ttimer);
+			ttimer = setTimeout(function() {
+				ttimer = null;
+				start_drag(pos);
+			}, lpdelay);
+		}
+	}
+	
+	function start_drag(pos) {
+		if (dragging) return;
 
-        if (e.type === 'mousedown') {
-            if (e.button !== 0) {
-                unbox();
-                return;
-            }
-            is_selma = true;
-            start_drag(pos);
-        } 
-        else if (e.type === 'touchstart') {
-            ttimer = setTimeout(function() {
-                is_selma = true;
-                start_drag(pos);
-            }, lpdelay);
-        }
-    }
+		dragging = true;
+		selbox = document.createElement('div');
+		selbox.className = 'selbox';
+		document.body.appendChild(selbox);
+	}
+	
+	function sel_move(e) {
+		if (!is_selma) return;
+		var pos = getpp(e);
 
-    function start_drag(pos) {
-        is_drag = true;
-        selbox = document.createElement('div');
-        selbox.className = 'selbox';
-        document.body.appendChild(selbox);
-        document.body.style.userSelect = 'none';
-    }
+		if (e.type === 'touchmove') {
+			if (ttimer !== null) {
+				var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));	
+				if (dist > mvthresh) {
+					clearTimeout(ttimer);
+					ttimer = null;
+					is_selma = false;
+				}
+				return;
+			}
+			if (e.cancelable) e.preventDefault();
+		}
+		if (!dragging && !has_txtsel()) {
+			var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
+			if (dist > mvthresh) {
+				if (!fwrapper) return;
+				start_drag(pos);
+			}
+		}
 
-    function sel_move(e) {
-        if (!treectl.dsel) return;
+		if (!dragging || !selbox) return;
+		ev(e);
 
-        var pos = getpp(e);
+		var width = Math.abs(pos.x - startx);
+		var height = Math.abs(pos.y - starty);
+		var left = Math.min(pos.x, startx);
+		var top = Math.min(pos.y, starty);
 
-        if (ttimer && !is_drag) {
-            var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
-            if (dist > mvthresh) {
-                clearTimeout(ttimer);
-                ttimer = null;
-            }
-        }
+		selbox.style.width = width + 'px';
+		selbox.style.height = height + 'px';
+		selbox.style.left = left + 'px';
+		selbox.style.top = top + 'px';
 
-        if (!is_drag || !selbox) return;
+		if (IE && window.getSelection)
+		window.getSelection().removeAllRanges();
+	}
 
-        ev(e);
+	function sel_end(e) {
+		clearTimeout(ttimer);
+		ttimer = null;
 
-        var width = Math.abs(pos.x - startx);
-        var height = Math.abs(pos.y - starty);
-        var left = Math.min(pos.x, startx);
-        var top = Math.min(pos.y, starty);
+		if (dragging) {
+			prevent_click = true;
+			if (selbox) {
+				var sbrect = selbox.getBoundingClientRect();
+				var faf = QSA('#ggrid a');
+				for (var a = 0, aa = faf.length; a < aa; a++)
+					if (bob(sbrect, faf[a].getBoundingClientRect()))
+						sel_toggle(faf[a]);
+				msel.selui();
+			}
+			ev(e);
+		}
+		
+		unbox();
+		setTimeout(function() {
+			prevent_click = false;
+		}, 50);
+	}
 
-        selbox.style.width = width + 'px';
-        selbox.style.height = height + 'px';
-        selbox.style.left = left + 'px';
-        selbox.style.top = top + 'px';
+	function has_txtsel() {
+		var txtsel = window.getSelection();
+		return txtsel && txtsel.toString().length > 0;
+	}
 
-        if (IE && window.getSelection)
-            window.getSelection().removeAllRanges();
-    }
+	function clickblock(e) {
+		if (prevent_click) {
+			e.stopImmediatePropagation();
+			e.preventDefault();
+		}
+	}
 
-    function sel_end(e) {
-        clearTimeout(ttimer);
-        ttimer = null;
-
-        if (!is_drag) return;
-
-        if (selbox) {
-            var sbrect = selbox.getBoundingClientRect();
-            var faf = QSA('#ggrid a');
-
-            for (var a = 0, aa = faf.length; a < aa; a++)
-                if (bob(sbrect, faf[a].getBoundingClientRect()))
-                    sel_toggle(faf[a]);
-
-			msel.selui();
-        }
-
-        unbox();
-        document.body.style.userSelect = 'auto';
-    }
-
-    function dsel_init() {
+	function dsel_init() {
 		window.addEventListener('mousedown', sel_start);
 		window.addEventListener('mousemove', sel_move);
 		window.addEventListener('mouseup', sel_end);
 
-        window.addEventListener('touchstart', sel_start, { passive: true });
-        window.addEventListener('touchmove', sel_move, { passive: false });
-        window.addEventListener('touchend', sel_end, { passive: true });
+		window.addEventListener('click', clickblock, true);
 
-        window.addEventListener('dragstart', function(e) {
-            if (treectl.dsel && (is_selma || is_drag)) {
-                e.preventDefault();
-            }
-        });
-    }
+		window.addEventListener('touchstart', sel_start, { passive: true });
+		window.addEventListener('touchmove', sel_move, { passive: false });
+		window.addEventListener('touchend', sel_end, { passive: true });
 
+		window.addEventListener('dragstart', function(e) {
+			if (treectl.dsel && (is_selma || dragging)) {
+				e.preventDefault();
+			}
+		});
+	}
+	
 	dsel_init();
 })();
 
