@@ -9790,9 +9790,7 @@ function reload_browser() {
 		return { x: touch.clientX, y: touch.clientY };
 	}
 
-	function sel_toggle(el, usel) {
-		var m = usel ? true : 't';
-
+	function sel_toggle(el, m) {
 		clmod(el, 'sel', m);
 		var eref = el.getAttribute('ref');
 		if (eref) {
@@ -9902,9 +9900,10 @@ function reload_browser() {
 			if (selbox) {
 				var sbrect = selbox.getBoundingClientRect();
 				var faf = QSA('#ggrid a');
+				var sadmode = e.shiftKey ? true : e.altKey ? false : "t";
 				for (var a = 0, aa = faf.length; a < aa; a++)
 					if (bob(sbrect, faf[a].getBoundingClientRect()))
-						sel_toggle(faf[a], e.shiftKey);
+						sel_toggle(faf[a], sadmode);
 				msel.selui();
 			}
 			ev(e);
