@@ -9768,13 +9768,11 @@ function reload_browser() {
     var lpdelay = 400; 
     var mvthresh = 10;
 
-    function is_dsel() {
-        return localStorage.getItem('dsel') === '1';
-    }
-
     function unbox() {
         var boxes = QSA('.selbox');
-        boxes.forEach(box => box.remove());
+		for (var el of boxes) {
+			el.remove();
+		}
         selbox = null;
         is_drag = false;
         is_selma = false;
@@ -9804,8 +9802,8 @@ function reload_browser() {
                  rect1.bottom < rect2.top || rect1.top > rect2.bottom);
     }
 
-    function start_sel(e) {
-        if (!is_dsel()) return;
+    function sel_start(e) {
+        if (!treectl.dsel) return;
         if (!(e.target && e.target.closest('#gfiles'))) return;
 
         var pos = getpp(e);
@@ -9821,7 +9819,7 @@ function reload_browser() {
             start_drag(pos);
         } 
         else if (e.type === 'touchstart') {
-            ttimer = setTimeout(() => {
+            ttimer = setTimeout(function() {
                 is_selma = true;
                 start_drag(pos);
             }, lpdelay);
@@ -9836,8 +9834,8 @@ function reload_browser() {
         document.body.style.userSelect = 'none';
     }
 
-    function move_sel(e) {
-        if (!is_dsel()) return;
+    function sel_move(e) {
+        if (!treectl.dsel) return;
 
         var pos = getpp(e);
 
@@ -9858,13 +9856,13 @@ function reload_browser() {
         var left = Math.min(pos.x, startx);
         var top = Math.min(pos.y, starty);
 
-        selbox.style.width = `${width}px`;
-        selbox.style.height = `${height}px`;
-        selbox.style.left = `${left}px`;
-        selbox.style.top = `${top}px`;
+        selbox.style.width = width + 'px';
+        selbox.style.height = height + 'px';
+        selbox.style.left = left + 'px';
+        selbox.style.top = top + 'px';
     }
 
-    function end_sel(e) {
+    function sel_end(e) {
         clearTimeout(ttimer);
         ttimer = null;
 
@@ -9874,11 +9872,11 @@ function reload_browser() {
             var sbrect = selbox.getBoundingClientRect();
             var faf = QSA('#ggrid a');
 
-            faf.forEach(el => {
+            for (var el of faf) {
                 if (bob(sbrect, el.getBoundingClientRect())) {
                     sel_toggle(el);
                 }
-            });
+            };
 
 			msel.selui();
         }
@@ -9887,28 +9885,24 @@ function reload_browser() {
         document.body.style.userSelect = 'auto';
     }
 
-    function init() {
+    function dsel_init() {
 		var gspot = ebi('gfiles');
-        gspot.onmousedown = (e) => start_sel(e);
-        gspot.onmousemove = (e) => move_sel(e);
-        gspot.onmouseup = (e) => end_sel(e);
+        gspot.onmousedown = function(e) { sel_start(e) };
+        gspot.onmousemove = function(e) { sel_move(e) };
+        gspot.onmouseup = function(e) { sel_end(e) };
 
-        window.addEventListener('touchstart', start_sel, { passive: true });
-        window.addEventListener('touchmove', move_sel, { passive: false });
-        window.addEventListener('touchend', end_sel, { passive: true });
+        window.addEventListener('touchstart', sel_start, { passive: true });
+        window.addEventListener('touchmove', sel_move, { passive: false });
+        window.addEventListener('touchend', sel_end, { passive: true });
 
-        window.addEventListener('dragstart', (e) => {
-            if (is_dsel() && (is_selma || is_drag)) {
+        window.addEventListener('dragstart', function(e) {
+            if (treectl.dsel && (is_selma || is_drag)) {
                 e.preventDefault();
             }
         });
     }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
+    
+	dsel_init();
 })();
 
 treectl.hydrate();
