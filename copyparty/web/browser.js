@@ -9803,8 +9803,7 @@ function reload_browser() {
     }
 
     function sel_start(e) {
-        if (!treectl.dsel) return;
-        if (!(e.target && e.target.closest('#gfiles'))) return;
+		if (!thegrid.en || !treectl.dsel) return;
 
         var pos = getpp(e);
         startx = pos.x;
@@ -9886,10 +9885,9 @@ function reload_browser() {
     }
 
     function dsel_init() {
-		var gspot = ebi('gfiles');
-        gspot.onmousedown = function(e) { sel_start(e) };
-        gspot.onmousemove = function(e) { sel_move(e) };
-        gspot.onmouseup = function(e) { sel_end(e) };
+		window.addEventListener('mousedown', sel_start);
+		window.addEventListener('mousemove', sel_move);
+		window.addEventListener('mouseup', sel_end);
 
         window.addEventListener('touchstart', sel_start, { passive: true });
         window.addEventListener('touchmove', sel_move, { passive: false });
