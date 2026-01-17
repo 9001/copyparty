@@ -666,6 +666,9 @@ if (1)
 		"rc_nfi": "new file",
 		"rc_sal": "select all",
 		"rc_sin": "invert selection",
+		"rc_rnm": "rename",
+		"rc_shf": "share this folder",
+		"rc_shs": "share selection",
 
 		"lang_set": "refresh to make the change take effect?",
 };
@@ -1051,7 +1054,8 @@ ebi('rcm').innerHTML = (
 	: '') +
 	'<div id="rs4" class="sep"></div>' +
 	'<a href="#" id="rsal">' + L.rc_sal + '</a>' +
-	'<a href="#" id="rsin">' + L.rc_sin + '</a>'
+	'<a href="#" id="rsin">' + L.rc_sin + '</a>' +
+	'<a id="rshr" href="#"></a>'
 );
 
 (function () {
@@ -9590,6 +9594,7 @@ var rcm = (function () {
 					selFile.no_dsel = true;
 					break;
 				case 'sin': msel.evsel(null, 't'); break;
+				case 'shr': fileman.share(); break;
 			}
 			r.hide(true);
 		};
@@ -9627,7 +9632,6 @@ var rcm = (function () {
 				}
 			}
 		}
-		console.log(selFile);
 		msel.selui();
 
 		var has_sel = msel.getsel().length;
@@ -9650,6 +9654,9 @@ var rcm = (function () {
 		clmod(ebi('rrnm'), 'hide', !has_sel);
 		clmod(ebi('rs3'), 'hide', !has_sel);
 		clmod(ebi('rs4'), 'hide', !has_sel && !has(perms, "write"));
+		var shr = ebi('rshr');
+		clmod(shr, 'hide', !can_shr || !get_evpath().indexOf(have_shr));
+		shr.innerHTML = has_sel ? L.rc_shs : L.rc_shf;
 
 		menu.style.left = x + 5 + 'px';
 		menu.style.top = y + 5 + 'px';
