@@ -6,7 +6,7 @@ services:
     container_name: copyparty
     user: "1000:1000"
     ports:
-      - 3923:3923
+      - 3923:3923 # use 127.0.0.1:3923:3923 if you want to listen locally only (ideal if you're using a domain + reverse proxy)
     volumes:
       - ./:/cfg:z
       - /path/to/your/fileshare/top/folder:/w:z
