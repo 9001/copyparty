@@ -5570,6 +5570,7 @@ var thegrid = (function () {
 		var ths = QSA('#ggrid>a');
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
+			if(ths[a].id == 'temp') continue;
 			var tr = ebi(ths[a].getAttribute('ref')).closest('tr'),
 				cl = tr.className || '';
 
