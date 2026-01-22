@@ -9514,11 +9514,25 @@ var rcm = (function () {
 	var selFile = jcp(nsFile);
 
 	function mktemp(is_dir) {
-		var row = mknod('tr', 'temp',
-			'<td>-new-</td>' +
-			'<td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : "File") + ' Name"></td>'
-		);
-		QS("#files tbody").appendChild(row);
+		if(!thegrid.en) {
+			var row = mknod('tr', 'temp',
+				'<td>-new-</td>' +
+				'<td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : "File") + ' Name"></td>'
+			);
+			QS("#files tbody").appendChild(row);
+	    }
+		else{
+			var row = mknod('a', 'temp',
+				'<span class="dir" style="align-self: end;"><input id="tempname" class="dir" type="text" placeholder="' + (is_dir ? 'Folder' : "File") + ' Name"></span>'
+			);
+			// TODO: using some inline theming here. not good?
+			if(is_dir) {
+				row.className = 'dir'; // add folder icon
+			}
+			row.style = "display: flex;"; // lets us align text entry box to the bottom
+			QS("#ggrid").appendChild(row);
+		}
+		
 
 		function sendit(name) {
 			name = ('' + name).trim();
@@ -9552,7 +9566,7 @@ var rcm = (function () {
 				sendit(input.value);
 			if (e.key == "Enter" || e.key == "Escape") {
 				input.onblur = null;
-				row.remove();
+				row.remove(); 
 				ev(e);
 			}
 		};
