@@ -63,6 +63,20 @@ Accept-Encoding: gzip
 fgsfds"""
 
 
+RCLONE_PUT_FLOAT = """PUT /%s HTTP/1.1
+Host: 127.0.0.1:3923
+User-Agent: rclone/v1.67.0
+Content-Length: 6
+Authorization: Basic azp1
+Content-Type: application/octet-stream
+Oc-Checksum: SHA1:f5e3dc3fb27af53cd0005a1184e2df06481199e8
+Referer: http://127.0.0.1:3923/
+X-Oc-Mtime: 1689453578.123
+Accept-Encoding: gzip
+
+fgsfds"""
+
+
 # tcpdump of `rclone delete dav:/a/d1/`  (it does propfind recursively and then this on each file)
 # (note: `rclone rmdirs dav:/a/d1/` does the same thing but just each folder after asserting they're empty)
 RCLONE_DELETE = """DELETE /%s HTTP/1.1
@@ -200,6 +214,11 @@ class TestHttpCli(TC):
         # then it uploads the file
         h, b = self.req(RCLONE_PUT % ("a/fa",))
         self.assertStart("HTTP/1.1 201 Created\r", h)
+
+        # float x-oc-mtime should be accepted
+        h, b = self.req(RCLONE_PUT_FLOAT % ("a/fb",))
+        self.assertStart("HTTP/1.1 201 Created\r", h)
+        self.assertAlmostEqual(os.path.getmtime("a/fb"), 1689453578.123, places=3)
 
         # then it does a propfind to confirm
         h, b = self.req(RCLONE_PROPFIND % ("a/fa",))

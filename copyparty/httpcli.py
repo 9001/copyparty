@@ -2618,7 +2618,7 @@ class HttpCli(object):
         at = mt = time.time() - lifetime
         cli_mt = self.headers.get("x-oc-mtime")
         if cli_mt:
-            bos.utime_c(self.log, path, int(cli_mt), False)
+            bos.utime_c(self.log, path, float(cli_mt), False)
 
         if nameless and "magic" in vfs.flags:
             try:
