@@ -7,7 +7,7 @@ ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
         ver_mde=2.18.0 \
         ver_codemirror=5.65.18 \
         ver_fontawesome=5.13.0 \
-        ver_prism=1.29.0 \
+        ver_prism=1.30.0 \
         ver_zopfli=1.0.3
 
 # versioncheck:
