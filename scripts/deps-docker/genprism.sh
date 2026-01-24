@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+plugins=(
+    line-highlight
+    line-numbers
+    autolinker
+)
+
 langs=(
     markup
     css
@@ -56,8 +62,11 @@ langs=(
 slangs="${langs[*]}"
 slangs="${slangs// /+}"
 
+splugins="${plugins[*]}"
+splugins="${splugins// /+}"
+
 for theme in prism-funky prism ; do
-    u="https://prismjs.com/download.html#themes=$theme&languages=$slangs&plugins=line-highlight+line-numbers+autolinker"
+    u="https://prismjs.com/download.html#themes=$theme&languages=$slangs&plugins=$splugins"
     echo "$u"
     ./genprism.py --dir prism-$1 --js-out prism.js --css-out $theme.css "$u"
 done
