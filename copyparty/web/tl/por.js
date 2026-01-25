@@ -650,7 +650,7 @@ Ls.por = {
 	"rc_txt": "abrir no leitor de texto",
 	"rc_md": "abrir no leitor markdown",
 	"rc_dl": "baixar",
-	"rc_zip": "baixar como zip",
+	"rc_zip": "baixar compactado",
 	"rc_cpl": "copiar link",
 	"rc_del": "excluir",
 	"rc_cut": "recortar",
