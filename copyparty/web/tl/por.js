@@ -84,8 +84,8 @@ Ls.por = {
 			["M", "fechar arquivo de texto"],
 			["E", "editar arquivo de texto"],
 			["S", "selecionar arquivo (para recortar/copiar/renomear)"],
-			["Y", "baixar arquivo de texto"], //m
-			["⇧ J", "embelezar json"], //m
+			["Y", "baixar arquivo de texto"],
+			["⇧ J", "embelezar json"],
 		]
 	],
 
@@ -118,7 +118,7 @@ Ls.por = {
 	"ot_unpost": "despublicar: excluir seus uploads recentes, ou abortar os que não foram concluídos",
 	"ot_bup": "bup: uploader básico, até suporta netscape 4.0",
 	"ot_mkdir": "mkdir: criar um novo diretório",
-	"ot_md": "new-file: criar um novo ficheiro de texto", //m
+	"ot_md": "new-file: criar um novo arquivo de texto",
 	"ot_msg": "msg: enviar uma mensagem para o log do servidor",
 	"ot_mp": "opções do reprodutor de mídia",
 	"ot_cfg": "opções de configuração",
@@ -127,7 +127,7 @@ Ls.por = {
 	"ot_noie": 'Por favor, use Chrome / Firefox / Edge',
 
 	"ab_mkdir": "criar diretório",
-	"ab_mkdoc": "novo ficheiro de texto", //m
+	"ab_mkdoc": "novo arquivo de texto",
 	"ab_msg": "enviar msg para o log do srv",
 
 	"ay_path": "pular para pastas",
@@ -155,7 +155,7 @@ Ls.por = {
 	"ul_par": "uploads paralelos:",
 	"ut_rand": "randomizar nomes de arquivos",
 	"ut_u2ts": "copiar o carimbo de data/hora de última modificação$Ndo seu sistema de arquivos para o servidor\">📅",
-	"ut_ow": "substituir arquivos existentes no servidor?$N🛡️: nunca (irá gerar um novo nome de arquivo em vez disso)$N🕒: substituir se o arquivo no servidor for mais antigo que o seu$N♻️: sempre substituir se os arquivos forem diferentes$N⏭️: ignorar incondicionalmente todos os arquivos existentes", //m
+	"ut_ow": "substituir arquivos existentes no servidor?$N🛡️: nunca (irá gerar um novo nome de arquivo em vez disso)$N🕒: substituir se o arquivo no servidor for mais antigo que o seu$N♻️: sempre substituir se os arquivos forem diferentes$N⏭️: ignorar incondicionalmente todos os arquivos existentes",
 	"ut_mt": "continuar a fazer o hash de outros arquivos enquanto faz upload$N$Ntalvez desativar se sua CPU ou HDD for um gargalo",
 	"ut_ask": 'pedir confirmação antes do upload começar">💭',
 	"ut_pot": "melhorar a velocidade de upload em dispositivos lentos$Ntornando a UI menos complexa",
@@ -206,7 +206,7 @@ Ls.por = {
 	"u_nav_b": '<a href="#" id="modal-ok">Arquivos</a><a href="#" id="modal-ng">Uma pasta</a>',
 
 	"cl_opts": "interruptores",
-	"cl_hfsz": "tamanho do arquivo", //m
+	"cl_hfsz": "tamanho do arquivo", 
 	"cl_themes": "tema",
 	"cl_langs": "idioma",
 	"cl_ziptype": "download de pasta",
@@ -220,14 +220,14 @@ Ls.por = {
 	"cl_reset": "resetar",
 	"cl_hpick": "toque nos cabeçalhos das colunas para ocultá-los na tabela abaixo",
 	"cl_hcancel": "ocultar coluna abortado",
-	"cl_rcm": "menu de clique direito", //m
+	"cl_rcm": "menu de clique direito",
 
 	"ct_grid": '田 a grade',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ dicas de ferramentas',
 	"ct_thumb": 'na visualização de grade, alternar entre ícones ou miniaturas$NHotkey: T">🖼️ miniaturas',
 	"ct_csel": 'usar CTRL e SHIFT para seleção de arquivo na visualização de grade">sel',
-	"ct_dsel": 'usar seleção por arrasto na visualização de grade">arrastar', //m
-	"ct_dl": 'forçar download (não exibir inline) ao clicar em um arquivo">dl', //m
+	"ct_dsel": 'usar seleção por arrasto na visualização de grade">arrastar',
+	"ct_dl": 'forçar download (não exibir na página) ao clicar em um arquivo">dl',
 	"ct_ihop": 'quando o visualizador de imagens for fechado, rolar para o último arquivo visualizado">g⮯',
 	"ct_dots": 'mostrar arquivos ocultos (se o servidor permitir)">dotfiles',
 	"ct_qdel": 'ao excluir arquivos, pedir confirmação apenas uma vez">qdel',
@@ -264,8 +264,8 @@ Ls.por = {
 	"cdt_lim": "número máximo de arquivos para mostrar em uma pasta",
 	"cdt_ask": "ao rolar para o final,$nem vez de carregar mais arquivos,$nperguntar o que fazer",
 	"cdt_hsort": "quantas regras de ordenação (&lt;code&gt;,sorthref&lt;/code&gt;) incluir em URLs de mídia. Definir isso para 0 também ignorará as regras de ordenação incluídas em links de mídia quando você clicar neles",
-	"cdt_ren": "ativar menu de clique direito personalizado, o menu normal permanece acessível com shift + clique direito", //m
-	"cdt_rdb": "mostrar o menu padrão do botão direito quando o personalizado já estiver aberto e houver novo clique", //m
+	"cdt_ren": "ativar menu de clique direito personalizado, o menu normal permanece acessível com shift + clique direito",
+	"cdt_rdb": "mostrar o menu padrão do botão direito quando o menu personalizado já estiver aberto e houver um novo clique",
 
 	"tt_entree": "mostrar painel de navegação (árvore de diretórios)$NHotkey: B",
 	"tt_detree": "mostrar breadcrumbs$NHotkey: B",
@@ -336,7 +336,7 @@ Ls.por = {
 	"mm_eunk": "Erro Desconhecido",
 	"mm_e404": "Não foi possível reproduzir áudio; erro 404: Arquivo não encontrado.",
 	"mm_e403": "Não foi possível reproduzir áudio; erro 403: Acesso negado.\n\nTente pressionar F5 para recarregar, talvez você tenha saído da conta",
-	"mm_e415": "Não foi possível reproduzir áudio; erro 415: Falha na conversão do ficheiro; verifique os logs do servidor.", //m
+	"mm_e415": "Não foi possível reproduzir áudio; erro 415: Falha na conversão do arquivo; verifique os logs do servidor.",
 	"mm_e500": "Não foi possível reproduzir áudio; erro 500: Verifique os logs do servidor.",
 	"mm_e5xx": "Não foi possível reproduzir áudio; erro do servidor ",
 	"mm_nof": "não encontrando mais arquivos de áudio por perto",
@@ -356,7 +356,7 @@ Ls.por = {
 	"f_anota": "apenas {0} dos {1} itens foram selecionados;\npara selecionar a pasta inteira, primeiro role para o final",
 
 	"f_dls": 'os links de arquivo na pasta atual foram\nalterados para links de download',
-	"f_dl_nd": 'a ignorar pasta (use o download zip/tar em vez disso):\n', //m
+	"f_dl_nd": 'pulando pasta (use o download zip/tar em vez disso):\n',
 
 	"f_partial": "Para baixar com segurança um arquivo que está sendo enviado, por favor, clique no arquivo que tem o mesmo nome, mas sem a extensão <code>.PARTIAL</code>. Por favor, pressione CANCELAR ou Escape para fazer isso.\n\nPressionar OK / Enter irá ignorar este aviso e continuar baixando o arquivo temporário <code>.PARTIAL</code>, o que quase certamente lhe dará dados corrompidos.",
 
@@ -425,10 +425,10 @@ Ls.por = {
 	"fcc_warn": 'copiado {0} itens para a área de transferência\n\nmas: apenas <b>esta</b> aba do navegador pode colá-los\n(já que a seleção é tão absolutamente massiva)',
 
 	"fp_apply": "usar estes nomes",
-	"fp_skip": "pular conflitos", //m
+	"fp_skip": "pular conflitos",
 	"fp_ecut": "primeiro recorte ou copie alguns arquivos / pastas para colar / mover\n\nnota: você pode recortar / colar entre abas diferentes do navegador",
-	"fp_ename": "{0} itens não podem ser movidos para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco (\"pular conflitos\") para pular:", //m
-	"fcp_ename": "{0} itens não podem ser copiados para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco (\"pular conflitos\") para pular:", //m
+	"fp_ename": "{0} itens não podem ser movidos para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco (\"pular conflitos\") para pular:",
+	"fcp_ename": "{0} itens não podem ser copiados para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco (\"pular conflitos\") para pular:",
 	"fp_emore": "ainda há algumas colisões de nome de arquivo para consertar",
 	"fp_ok": "movimento OK",
 	"fcp_ok": "cópia OK",
@@ -447,8 +447,8 @@ Ls.por = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Copiar</a><a href="#" id="modal-ng">Enviar</a>',
 
 	"mk_noname": "digite um nome no campo de texto à esquerda antes de fazer isso :p",
-	"nmd_i1": "também pode adicionar a extensão desejada, por exemplo <code>.md</code>", //m
-	"nmd_i2": "só pode criar ficheiros <code>.md</code> porque não tem permissão para apagar", //m
+	"nmd_i1": "também adicione a extensão desejada, por exemplo <code>.md</code>",
+	"nmd_i2": "só pode criar arquivos <code>.md</code> porque não tem permissão para apagar",
 
 	"tv_load": "Carregando documento de texto:\n\n{0}\n\n{1}% ({2} de {3} MiB carregados)",
 	"tv_xe1": "não foi possível carregar o arquivo de texto:\n\nerro ",
@@ -459,7 +459,7 @@ Ls.por = {
 	"tvt_prev": "mostrar documento anterior$NHotkey: i\">⬆ anterior",
 	"tvt_next": "mostrar próximo documento$NHotkey: K\">⬇ próximo",
 	"tvt_sel": "selecionar arquivo &nbsp; ( para recortar / copiar / excluir / ... )$NHotkey: S\">sel",
-	"tvt_j": "embelezar json$NHotkey: shift-J\">j", //m
+	"tvt_j": "embelezar json$NHotkey: shift-J\">j",
 	"tvt_edit": "abrir arquivo no editor de texto$NHotkey: E\">✏️ editar",
 	"tvt_tail": "monitorar arquivo para alterações; mostrar novas linhas em tempo real\">📡 seguir",
 	"tvt_wrap": "quebra de linha\">↵",
@@ -644,25 +644,25 @@ Ls.por = {
 	"ur_um": "Concluído;\n{0} uploads OK,\n{1} uploads falharam, desculpe",
 	"ur_sm": "Concluído;\n{0} arquivos encontrados no servidor,\n{1} arquivos NÃO encontrados no servidor",
 
-	"rc_opn": "abrir", //m
-	"rc_ply": "reproduzir", //m
-	"rc_pla": "reproduzir como áudio", //m
-	"rc_txt": "abrir no visualizador de arquivos", //m
-	"rc_md": "abrir no editor de texto", //m
-	"rc_dl": "baixar", //m
-	"rc_zip": "baixar como arquivo", //m
-	"rc_cpl": "copiar link", //m
-	"rc_del": "excluir", //m
-	"rc_cut": "recortar", //m
-	"rc_cpy": "copiar", //m
-	"rc_pst": "colar", //m
-	"rc_rnm": "renomear", //m
-	"rc_nfo": "nova pasta", //m
-	"rc_nfi": "novo arquivo", //m
-	"rc_sal": "selecionar tudo", //m
-	"rc_sin": "inverter seleção", //m
-	"rc_shf": "compartilhar esta pasta", //m
-	"rc_shs": "compartilhar seleção", //m
+	"rc_opn": "abrir",
+	"rc_ply": "reproduzir",
+	"rc_pla": "reproduzir como áudio",
+	"rc_txt": "abrir no leitor de texto",
+	"rc_md": "abrir no leitor markdown",
+	"rc_dl": "baixar",
+	"rc_zip": "baixar como zip",
+	"rc_cpl": "copiar link",
+	"rc_del": "excluir",
+	"rc_cut": "recortar",
+	"rc_cpy": "copiar",
+	"rc_pst": "colar",
+	"rc_rnm": "renomear",
+	"rc_nfo": "nova pasta",
+	"rc_nfi": "novo arquivo",
+	"rc_sal": "selecionar tudo",
+	"rc_sin": "inverter seleção",
+	"rc_shf": "compartilhar esta pasta",
+	"rc_shs": "compartilhar seleção",
 
 	"lang_set": "atualizar para a mudança ter efeito?",
 
@@ -705,8 +705,8 @@ Ls.por = {
 		"ta1": "primeiro digite sua nova senha",
 		"ta2": "repita para confirmar a nova senha:",
 		"ta3": "há um erro; por favor, tente novamente",
-		"nop": "ERRO: A senha não pode estar em branco", //m
-		"nou": "ERRO: O nome de usuário e/ou a senha não podem estar em branco", //m
+		"nop": "ERRO: A senha não pode estar em branco",
+		"nou": "ERRO: O nome de usuário e/ou a senha não podem estar em branco",
 		"aa1": "arquivos de entrada:",
 		"ab1": "desativar no304",
 		"ac1": "ativar no304",
