@@ -84,8 +84,8 @@ Ls.epo = {
 			["M", "fermi dosieron"],
 			["E", "redakti dosieron"],
 			["S", "elekti dosieron (por eltondado/kopiado/alinomado)"],
-			["Y", "elŝuti tekstodosieron"], //m
-			["⇧ J", "beligi json"], //m
+			["Y", "elŝuti tekstodosieron"],
+			["⇧ J", "beligi JSONon"],
 		]
 	],
 
@@ -118,7 +118,7 @@ Ls.epo = {
 	"ot_unpost": "unpost: forigi viaj plej lastaj alŝutoj, aŭ ĉesigi nefinigitajn",
 	"ot_bup": "bup: fundamenta alŝutilo, funkias eĉ kun netscape 4.0",
 	"ot_mkdir": "mkdir: krei novan dosierujon",
-	"ot_md": "new-file: krei novan tekstodosieron", //m
+	"ot_md": "new-file: krei novan tekstodosieron",
 	"ot_msg": "msg: sendi mesaĝon al servila protokolo",
 	"ot_mp": "agordoj de medialudilo",
 	"ot_cfg": "aliaj agordoj",
@@ -127,7 +127,7 @@ Ls.epo = {
 	"ot_noie": 'Bonvolu uzi retumilojn Chrome / Firefox / Edge',
 
 	"ab_mkdir": "krei dosierujon",
-	"ab_mkdoc": "krei tekstodosieron", //m
+	"ab_mkdoc": "krei tekstodosieron",
 	"ab_msg": "sendi mesaĝon al protokolo",
 
 	"ay_path": "iri al dosierujoj",
@@ -155,7 +155,7 @@ Ls.epo = {
 	"ul_par": "paralelaj alŝutoj:",
 	"ut_rand": "hazardigi dosiernomojn",
 	"ut_u2ts": "kopii la tempon de lasta modifo$Nel via dosiersistemo al la servilo\">📅",
-	"ut_ow": "ĉu anstataŭigi dosierojn ĉe la servilo?$N🛡️: neniam (dosiero estos alŝutita kun nova dosiernomo)$N🕒: anstataŭigi, se servila dosiero estas pli malnova ol via$N♻️: ĉiam anstataŭigi, se dosieroj estas malsamaj$N⏭️: senkondiĉe preterlasi ĉiujn ekzistantajn dosierojn", //m
+	"ut_ow": "ĉu anstataŭigi dosierojn ĉe la servilo?$N🛡️: neniam (dosiero estos alŝutita kun nova dosiernomo)$N🕒: anstataŭigi, se servila dosiero estas pli malnova ol via$N♻️: ĉiam anstataŭigi, se dosieroj estas malsamaj$N⏭️: senkondiĉe preterlasi ĉiujn ekzistantajn dosierojn",
 	"ut_mt": "daŭri kalkuladon de kontrolsumoj por aliaj dosieroj dum alŝutado$N$Nmalŝaltinda, se via procesoro aŭ disko ne estas sufiĉe rapidaj",
 	"ut_ask": 'peti konfirmon antaŭ komenco de alŝutado">💭',
 	"ut_pot": "plirapidigi alŝutadon por malrapidaj komputiloj$Nper malkomplikado de fasado",
@@ -220,13 +220,14 @@ Ls.epo = {
 	"cl_reset": "restarigi",
 	"cl_hpick": "alklaki la kapojn de kolumnoj por kasi en la suban tabelon",
 	"cl_hcancel": "kaŝado de kolumno nuligita",
-	"cl_rcm": "dekstra-klaka menuo", //m
+	"cl_rcm": "dekstra-klaka menuo",
 
 	"ct_grid": '田 krado',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ ŝpruchelpiloj',
 	"ct_thumb": 'dum krado-vido, baskuli montradon de simboloj aŭ bildetoj$NFulmoklavo: T">🖼️ bildetoj',
 	"ct_csel": 'uzi STIR kaj MAJ por elekti dosierojn en krado-vido">elekto',
-	"ct_dl": 'devigi elŝuton (ne montri enkadre) kiam dosiero estas alklakita">dl', //m
+	"ct_dsel": 'uzi tren-elekton en krado-vido">treni',
+	"ct_dl": 'devigi elŝuton (ne montri enkadre), kiam dosiero estas alklakita">dl',
 	"ct_ihop": 'montri la lastan viditan bildo-dosieron post fermado de bildo-vidilo">g⮯',
 	"ct_dots": 'montri kaŝitajn dosierojn (se servilo permesas)">kaŝitaj',
 	"ct_qdel": 'peti konfirmon nur unufoje antaŭ forigado">rapid-forig.',
@@ -263,7 +264,8 @@ Ls.epo = {
 	"cdt_lim": "maks. nombro de dosieroj por montri en dosierujo",
 	"cdt_ask": "je malsupro de paĝo, peti por ago$Nanstataŭ ŝarĝi pli da dosieroj",
 	"cdt_hsort": "kiom da ordigo-reguloj (&lt;code&gt;,sorthref&lt;/code&gt;) inkludi en adreso de la paĝo. Se agordita kiel 0, reguloj, inkluditaj en la adreso, estos ignoritaj",
-	"cdt_ren": "ebligi propran dekstra-klakan menuon, la normala menuo restas alirebla per shift + dekstra klako", //m
+	"cdt_ren": "ebligi propran dekstra-klakan menuon, la normala menuo restas alirebla per MAJ + dekstra klako",
+	"cdt_rdb": "montri la normalan dekstraklakan menuon, kiam la propra jam estas malfermita kaj oni denove dekstre klakas",
 
 	"tt_entree": "montri arbovidan navig-panelon$NFulmoklavo: B",
 	"tt_detree": "montri paĝnivelan navig-panelon$NFulmoklavo: B",
@@ -354,6 +356,7 @@ Ls.epo = {
 	"f_anota": "nur {0} de {1} eroj estis elektita;\nrulumi al la malsupro por elekti la tutan dosierujon",
 
 	"f_dls": 'la ligiloj de dosieroj en ĉi tiu dosierujo estis\nanstataŭigitaj per elŝuto-ligiloj',
+	"f_dl_nd": 'preterlasante dosierujon (uzu zip/tar-elŝuton anstataŭe):\n', //m
 
 	"f_partial": "Por sendifekta elŝuto de nune-alŝutata dosiero, elektu dosieron kun sama nomo, sed sen etendaĵo <code>.PARTIAL</code>. Bonvolu uzi la butonon \"Rezigni\" aŭ klavon ESK por fari tion.\n\nSe vi uzas OK / Enter, la provizora dosiero <code>.PARTIAL</code> estos elŝutita, kiu tre probable enhavas nekompletajn datumojn.",
 
@@ -456,7 +459,7 @@ Ls.epo = {
 	"tvt_prev": "montri malsekvan dokumenton$NFulmoklavo: i\">⬆ malsekva",
 	"tvt_next": "montri sekvan dokumenton$NFulmoklavo: K\">⬇ sekva",
 	"tvt_sel": "elekti dosieron &nbsp; ( por eltondado / kopiado / forigado / ... )$NFulmoklavo: S\">elekti",
-	"tvt_j": "beligi json$NFulmoklavo: shift-J\">j", //m
+	"tvt_j": "beligi JSONon$NFulmoklavo: MAJ-J\">j",
 	"tvt_edit": "malfermi dosieron en teksto-redaktilo$NFulmoklavo: E\">✏️ redakti",
 	"tvt_tail": "observi ŝanĝojn en dosiero; novaj linioj estos tuje montritaj\">📡 gvati",
 	"tvt_wrap": "linifaldo\">↵",
@@ -653,10 +656,13 @@ Ls.epo = {
 	"rc_cut": "eltondi", //m
 	"rc_cpy": "kopii", //m
 	"rc_pst": "alglui", //m
+	"rc_rnm": "alinomi", //m
 	"rc_nfo": "nova dosierujo", //m
 	"rc_nfi": "nova dosiero", //m
 	"rc_sal": "elekti ĉion", //m
 	"rc_sin": "inversigi elekton", //m
+	"rc_shf": "kunhavigi ĉi tiun dosierujon", //m
+	"rc_shs": "kunhavigi elekton", //m
 
 	"lang_set": "ĉu reŝargi paĝon por efektivigi lingvo-ŝanĝon?",
 

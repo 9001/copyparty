@@ -37,7 +37,6 @@ from .__init__ import EXE, PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .util import (
-    FN_EMB,
     UTC,
     BytesIO,
     Daemon,
@@ -268,7 +267,7 @@ class Tftpd(object):
         vfs, rem = self.asrv.vfs.get(vpath, "*", *perms)
         if perms[1] and "*" not in vfs.axs.uread and "wo_up_readme" not in vfs.flags:
             zs, fn = vsplit(vpath)
-            if fn.lower() in FN_EMB:
+            if fn.lower() in vfs.flags["emb_all"]:
                 vpath = vjoin(zs, "_wo_" + fn)
                 vfs, rem = self.asrv.vfs.get(vpath, "*", *perms)
 

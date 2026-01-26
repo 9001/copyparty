@@ -766,9 +766,9 @@ function assert_vp(path) {
 }
 
 
-function linksplit(rp, id) {
+function linksplit(rp, base, id) {
     var ret = [],
-        apath = '/',
+        apath = base || '/',
         q = null;
 
     if (rp && rp.indexOf('?') + 1) {
@@ -1326,9 +1326,10 @@ function scfg_bind(obj, oname, cname, defval, cb) {
     return v;
 }
 
-function setck(v) {
+function setck(v, cb) {
     var xhr = new XHR();
     xhr.open('GET', SR + '/?setck=' + v, true);
+    xhr.onload = cb;
     xhr.send();
 }
 

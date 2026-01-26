@@ -84,8 +84,8 @@ Ls.por = {
 			["M", "fechar arquivo de texto"],
 			["E", "editar arquivo de texto"],
 			["S", "selecionar arquivo (para recortar/copiar/renomear)"],
-			["Y", "baixar arquivo de texto"], //m
-			["⇧ J", "embelezar json"], //m
+			["Y", "baixar arquivo de texto"],
+			["⇧ J", "embelezar json"],
 		]
 	],
 
@@ -118,7 +118,7 @@ Ls.por = {
 	"ot_unpost": "despublicar: excluir seus uploads recentes, ou abortar os que não foram concluídos",
 	"ot_bup": "bup: uploader básico, até suporta netscape 4.0",
 	"ot_mkdir": "mkdir: criar um novo diretório",
-	"ot_md": "new-file: criar um novo ficheiro de texto", //m
+	"ot_md": "new-file: criar um novo arquivo de texto",
 	"ot_msg": "msg: enviar uma mensagem para o log do servidor",
 	"ot_mp": "opções do reprodutor de mídia",
 	"ot_cfg": "opções de configuração",
@@ -127,7 +127,7 @@ Ls.por = {
 	"ot_noie": 'Por favor, use Chrome / Firefox / Edge',
 
 	"ab_mkdir": "criar diretório",
-	"ab_mkdoc": "novo ficheiro de texto", //m
+	"ab_mkdoc": "novo arquivo de texto",
 	"ab_msg": "enviar msg para o log do srv",
 
 	"ay_path": "pular para pastas",
@@ -155,12 +155,12 @@ Ls.por = {
 	"ul_par": "uploads paralelos:",
 	"ut_rand": "randomizar nomes de arquivos",
 	"ut_u2ts": "copiar o carimbo de data/hora de última modificação$Ndo seu sistema de arquivos para o servidor\">📅",
-	"ut_ow": "substituir arquivos existentes no servidor?$N🛡️: nunca (irá gerar um novo nome de arquivo em vez disso)$N🕒: substituir se o arquivo no servidor for mais antigo que o seu$N♻️: sempre substituir se os arquivos forem diferentes$N⏭️: ignorar incondicionalmente todos os arquivos existentes", //m
+	"ut_ow": "substituir arquivos existentes no servidor?$N🛡️: nunca (irá gerar um novo nome de arquivo em vez disso)$N🕒: substituir se o arquivo no servidor for mais antigo que o seu$N♻️: sempre substituir se os arquivos forem diferentes$N⏭️: ignorar incondicionalmente todos os arquivos existentes",
 	"ut_mt": "continuar a fazer o hash de outros arquivos enquanto faz upload$N$Ntalvez desativar se sua CPU ou HDD for um gargalo",
 	"ut_ask": 'pedir confirmação antes do upload começar">💭',
 	"ut_pot": "melhorar a velocidade de upload em dispositivos lentos$Ntornando a UI menos complexa",
 	"ut_srch": "não fazer upload, em vez disso verificar se os arquivos já$N existem no servidor (irá escanear todas as pastas que você pode ler)",
-	"ut_par": "pausar uploads definindo para 0$N$naumentar se sua conexão for lenta / alta latência$N$nmanter em 1 em LAN ou se o HDD do servidor for um gargalo",
+	"ut_par": "pausar uploads definindo para 0$N$Naumentar se sua conexão for lenta / alta latência$N$Nmanter em 1 em LAN ou se o HDD do servidor for um gargalo",
 	"ul_btn": "soltar arquivos / pastas<br>aqui (ou clique em mim)",
 	"ul_btnu": "U P L O A D",
 	"ul_btns": "B U S C A R",
@@ -206,7 +206,7 @@ Ls.por = {
 	"u_nav_b": '<a href="#" id="modal-ok">Arquivos</a><a href="#" id="modal-ng">Uma pasta</a>',
 
 	"cl_opts": "interruptores",
-	"cl_hfsz": "tamanho do arquivo", //m
+	"cl_hfsz": "tamanho do arquivo", 
 	"cl_themes": "tema",
 	"cl_langs": "idioma",
 	"cl_ziptype": "download de pasta",
@@ -220,13 +220,14 @@ Ls.por = {
 	"cl_reset": "resetar",
 	"cl_hpick": "toque nos cabeçalhos das colunas para ocultá-los na tabela abaixo",
 	"cl_hcancel": "ocultar coluna abortado",
-	"cl_rcm": "menu de clique direito", //m
+	"cl_rcm": "menu de clique direito",
 
 	"ct_grid": '田 a grade',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ dicas de ferramentas',
 	"ct_thumb": 'na visualização de grade, alternar entre ícones ou miniaturas$NHotkey: T">🖼️ miniaturas',
 	"ct_csel": 'usar CTRL e SHIFT para seleção de arquivo na visualização de grade">sel',
-	"ct_dl": 'forçar download (não exibir inline) ao clicar em um arquivo">dl', //m
+	"ct_dsel": 'usar seleção por arrasto na visualização de grade">arrastar',
+	"ct_dl": 'forçar download (não exibir na página) ao clicar em um arquivo">dl',
 	"ct_ihop": 'quando o visualizador de imagens for fechado, rolar para o último arquivo visualizado">g⮯',
 	"ct_dots": 'mostrar arquivos ocultos (se o servidor permitir)">dotfiles',
 	"ct_qdel": 'ao excluir arquivos, pedir confirmação apenas uma vez">qdel',
@@ -241,18 +242,18 @@ Ls.por = {
 
 	"cut_turbo": "o botão yolo, você provavelmente NÃO quer habilitar isso:$N$Nuse isto se você estava fazendo upload de uma enorme quantidade de arquivos e teve que reiniciar por algum motivo, e quer continuar o upload o mais rápido possível$N$Nisto substitui a verificação de hash por uma simples <em>&quot;este arquivo tem o mesmo tamanho no servidor?&quot;</em> então se o conteúdo do arquivo for diferente ele NÃO será enviado$N$Nvocê deve desativar isso quando o upload estiver concluído, e então &quot;enviar&quot; os mesmos arquivos novamente para permitir que o cliente os verifique\">turbo",
 
-	"cut_datechk": "não tem efeito a menos que o botão turbo esteja ativado$N$Nreduz o fator yolo por uma pequena quantidade; verifica se os carimbos de data/hora dos arquivos no servidor correspondem aos seus$N$ndeve <em>teoricamente</em> pegar a maioria dos uploads incompletos / corrompidos, mas não é um substituto para fazer uma verificação com o turbo desativado depois\">date-chk",
+	"cut_datechk": "não tem efeito a menos que o botão turbo esteja ativado$N$Nreduz o fator yolo por uma pequena quantidade; verifica se os carimbos de data/hora dos arquivos no servidor correspondem aos seus$N$Ndeve <em>teoricamente</em> pegar a maioria dos uploads incompletos / corrompidos, mas não é um substituto para fazer uma verificação com o turbo desativado depois\">date-chk",
 
 	"cut_u2sz": "tamanho (em MiB) de cada bloco de upload; valores grandes voam melhor pelo atlântico. Tente valores baixos em conexões muito não confiáveis",
 
 	"cut_flag": "garantir que apenas uma aba esteja fazendo upload por vez $N -- outras abas devem ter isso ativado também $N -- só afeta abas no mesmo domínio",
 
-	"cut_az": "enviar arquivos em ordem alfabética, em vez de o menor primeiro$N$na ordem alfabética pode tornar mais fácil de verificar se algo deu errado no servidor, mas torna o upload um pouco mais lento em fibra / LAN",
+	"cut_az": "enviar arquivos em ordem alfabética, em vez de o menor primeiro$N$Na ordem alfabética pode tornar mais fácil de verificar se algo deu errado no servidor, mas torna o upload um pouco mais lento em fibra / LAN",
 
 	"cut_nag": "notificação do SO quando o upload for concluído$N(somente se o navegador ou aba não estiver ativo)",
 	"cut_sfx": "alerta audível quando o upload for concluído$N(somente se o navegador ou aba não estiver ativo)",
 
-	"cut_mt": "usar multithreading para acelerar o hash de arquivos$N$nisto usa web-workers e requer$Nmais RAM (até 512 MiB extras)$N$ntorna https 30% mais rápido, http 4.5x mais rápido\">mt",
+	"cut_mt": "usar multithreading para acelerar o hash de arquivos$N$Nisto usa web-workers e requer$Nmais RAM (até 512 MiB extras)$N$Ntorna https 30% mais rápido, http 4.5x mais rápido\">mt",
 
 	"cut_wasm": "usar wasm em vez do hasher embutido do navegador; melhora a velocidade em navegadores baseados em chrome mas aumenta a carga da CPU, e muitas versões antigas do chrome têm bugs que fazem o navegador consumir toda a RAM e travar se isso for ativado\">wasm",
 
@@ -261,9 +262,10 @@ Ls.por = {
 	"cft_bg": "cor do fundo",
 
 	"cdt_lim": "número máximo de arquivos para mostrar em uma pasta",
-	"cdt_ask": "ao rolar para o final,$nem vez de carregar mais arquivos,$nperguntar o que fazer",
+	"cdt_ask": "ao rolar para o final,$Nem vez de carregar mais arquivos,$Nperguntar o que fazer",
 	"cdt_hsort": "quantas regras de ordenação (&lt;code&gt;,sorthref&lt;/code&gt;) incluir em URLs de mídia. Definir isso para 0 também ignorará as regras de ordenação incluídas em links de mídia quando você clicar neles",
-	"cdt_ren": "ativar menu de clique direito personalizado, o menu normal permanece acessível com shift + clique direito", //m
+	"cdt_ren": "ativar menu de clique direito personalizado, o menu normal permanece acessível com shift + clique direito",
+	"cdt_rdb": "mostrar o menu padrão do botão direito quando o menu personalizado já estiver aberto e houver um novo clique",
 
 	"tt_entree": "mostrar painel de navegação (árvore de diretórios)$NHotkey: B",
 	"tt_detree": "mostrar breadcrumbs$NHotkey: B",
@@ -285,7 +287,7 @@ Ls.por = {
 	"mt_loop": "loop/repetir uma música\">🔁",
 	"mt_one": "parar depois de uma música\">1️⃣",
 	"mt_shuf": "embaralhar as músicas em cada pasta\">🔀",
-	"mt_aplay": "reproduzir automaticamente se houver um ID de música no link que você clicou para acessar o servidor$N$ndesativar isso também impedirá que a URL da página seja atualizada com IDs de música ao tocar música, para evitar a reprodução automática se essas configurações forem perdidas mas a URL permanecer\">a▶",
+	"mt_aplay": "reproduzir automaticamente se houver um ID de música no link que você clicou para acessar o servidor$N$Ndesativar isso também impedirá que a URL da página seja atualizada com IDs de música ao tocar música, para evitar a reprodução automática se essas configurações forem perdidas mas a URL permanecer\">a▶",
 	"mt_preload": "começar a carregar a próxima música perto do final para uma reprodução sem interrupções\">preload",
 	"mt_prescan": "ir para a próxima pasta antes que a última música$Ntermine, mantendo o navegador feliz$Npara que ele não pare a reprodução\">nav",
 	"mt_fullpre": "tentar pré-carregar a música inteira;$N✅ ativar em conexões <b>não confiáveis</b>,$N❌ <b>desativar</b> em conexões lentas provavelmente\">full",
@@ -294,7 +296,7 @@ Ls.por = {
 	"mt_npclip": "mostrar botões para copiar a música que está tocando para a área de transferência\">/np",
 	"mt_m3u_c": "mostrar botões para copiar as$Nmúsicas selecionadas como entradas de playlist m3u8 para a área de transferência\">📻",
 	"mt_octl": "integração com o SO (atalhos de mídia / osd)\">os-ctl",
-	"mt_oseek": "permitir busca através da integração com o SO$N$nnota: em alguns dispositivos (iPhones),$nisto substitui o botão de próxima música\">seek",
+	"mt_oseek": "permitir busca através da integração com o SO$N$Nnota: em alguns dispositivos (iPhones),$Nisto substitui o botão de próxima música\">seek",
 	"mt_oscv": "mostrar capa do álbum no osd\">art",
 	"mt_follow": "manter a faixa que está tocando rolando à vista\">🎯",
 	"mt_compact": "controles compactos\">⟎",
@@ -316,8 +318,8 @@ Ls.por = {
 	"mt_c2ng": "seu dispositivo não parece suportar este formato de saída, mas vamos tentar mesmo assim",
 	"mt_xowa": "existem bugs no iOS que impedem a reprodução em segundo plano usando este formato; por favor, use caf ou mp3 em vez disso",
 	"mt_tint": "nível de fundo (0-100) na barra de busca$Npara tornar o buffer menos distrativo",
-	"mt_eq": "ativa o equalizador e o controle de ganho;$N$nimpulsão &lt;code&gt;0&lt;/code&gt; = volume padrão de 100% (não modificado)$N$nlargura &lt;code&gt;1 &nbsp;&lt;/code&gt; = estéreo padrão (não modificado)$nlargura &lt;code&gt;0.5&lt;/code&gt; = 50% de crossfeed esquerda-direita$nlargura &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$nimpulsão &lt;code&gt;-0.8&lt;/code&gt; & largura &lt;code&gt;10&lt;/code&gt; = remoção de vocal :^)$N$natvar o equalizador torna os álbuns sem interrupções totalmente sem interrupções, então deixe-o ligado com todos os valores em zero (exceto largura = 1) se você se importa com isso",
-	"mt_drc": "ativa o compressor de faixa dinâmica (nivelador de volume / brickwaller); também ativará o EQ para equilibrar o spaghetti, então defina todos os campos EQ exceto 'width' para 0 se você não quiser$N$nabaixa o volume do áudio acima do THRESHOLD dB; para cada RATIO dB após o THRESHOLD há 1 dB de saída, então os valores padrão de tresh -24 e ratio 12 significam que nunca deve ficar mais alto que -22 dB e é seguro aumentar o impulso do equalizador para 0.8, ou até 1.8 com ATK 0 e um enorme RLS como 90 (só funciona no firefox; RLS é no máximo 1 em outros navegadores)$N$n(veja a wikipedia, eles explicam muito melhor)",
+	"mt_eq": "ativa o equalizador e o controle de ganho;$N$Nimpulsão &lt;code&gt;0&lt;/code&gt; = volume padrão de 100% (não modificado)$N$Nlargura &lt;code&gt;1 &nbsp;&lt;/code&gt; = estéreo padrão (não modificado)$Nlargura &lt;code&gt;0.5&lt;/code&gt; = 50% de crossfeed esquerda-direita$Nlargura &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nimpulsão &lt;code&gt;-0.8&lt;/code&gt; & largura &lt;code&gt;10&lt;/code&gt; = remoção de vocal :^)$N$Natvar o equalizador torna os álbuns sem interrupções totalmente sem interrupções, então deixe-o ligado com todos os valores em zero (exceto largura = 1) se você se importa com isso",
+	"mt_drc": "ativa o compressor de faixa dinâmica (nivelador de volume / brickwaller); também ativará o EQ para equilibrar o spaghetti, então defina todos os campos EQ exceto 'width' para 0 se você não quiser$N$Nabaixa o volume do áudio acima do THRESHOLD dB; para cada RATIO dB após o THRESHOLD há 1 dB de saída, então os valores padrão de tresh -24 e ratio 12 significam que nunca deve ficar mais alto que -22 dB e é seguro aumentar o impulso do equalizador para 0.8, ou até 1.8 com ATK 0 e um enorme RLS como 90 (só funciona no firefox; RLS é no máximo 1 em outros navegadores)$N$N(veja a wikipedia, eles explicam muito melhor)",
 
 	"mb_play": "reproduzir",
 	"mm_hashplay": "reproduzir este arquivo de áudio?",
@@ -334,7 +336,7 @@ Ls.por = {
 	"mm_eunk": "Erro Desconhecido",
 	"mm_e404": "Não foi possível reproduzir áudio; erro 404: Arquivo não encontrado.",
 	"mm_e403": "Não foi possível reproduzir áudio; erro 403: Acesso negado.\n\nTente pressionar F5 para recarregar, talvez você tenha saído da conta",
-	"mm_e415": "Não foi possível reproduzir áudio; erro 415: Falha na conversão do ficheiro; verifique os logs do servidor.", //m
+	"mm_e415": "Não foi possível reproduzir áudio; erro 415: Falha na conversão do arquivo; verifique os logs do servidor.",
 	"mm_e500": "Não foi possível reproduzir áudio; erro 500: Verifique os logs do servidor.",
 	"mm_e5xx": "Não foi possível reproduzir áudio; erro do servidor ",
 	"mm_nof": "não encontrando mais arquivos de áudio por perto",
@@ -354,6 +356,7 @@ Ls.por = {
 	"f_anota": "apenas {0} dos {1} itens foram selecionados;\npara selecionar a pasta inteira, primeiro role para o final",
 
 	"f_dls": 'os links de arquivo na pasta atual foram\nalterados para links de download',
+	"f_dl_nd": 'pulando pasta (use o download zip/tar em vez disso):\n',
 
 	"f_partial": "Para baixar com segurança um arquivo que está sendo enviado, por favor, clique no arquivo que tem o mesmo nome, mas sem a extensão <code>.PARTIAL</code>. Por favor, pressione CANCELAR ou Escape para fazer isso.\n\nPressionar OK / Enter irá ignorar este aviso e continuar baixando o arquivo temporário <code>.PARTIAL</code>, o que quase certamente lhe dará dados corrompidos.",
 
@@ -422,10 +425,10 @@ Ls.por = {
 	"fcc_warn": 'copiado {0} itens para a área de transferência\n\nmas: apenas <b>esta</b> aba do navegador pode colá-los\n(já que a seleção é tão absolutamente massiva)',
 
 	"fp_apply": "usar estes nomes",
-	"fp_skip": "pular conflitos", //m
+	"fp_skip": "pular conflitos",
 	"fp_ecut": "primeiro recorte ou copie alguns arquivos / pastas para colar / mover\n\nnota: você pode recortar / colar entre abas diferentes do navegador",
-	"fp_ename": "{0} itens não podem ser movidos para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco (\"pular conflitos\") para pular:", //m
-	"fcp_ename": "{0} itens não podem ser copiados para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco (\"pular conflitos\") para pular:", //m
+	"fp_ename": "{0} itens não podem ser movidos para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco (\"pular conflitos\") para pular:",
+	"fcp_ename": "{0} itens não podem ser copiados para cá porque os nomes já estão em uso. Dê a eles novos nomes abaixo para continuar, ou deixe o nome em branco (\"pular conflitos\") para pular:",
 	"fp_emore": "ainda há algumas colisões de nome de arquivo para consertar",
 	"fp_ok": "movimento OK",
 	"fcp_ok": "cópia OK",
@@ -444,8 +447,8 @@ Ls.por = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Copiar</a><a href="#" id="modal-ng">Enviar</a>',
 
 	"mk_noname": "digite um nome no campo de texto à esquerda antes de fazer isso :p",
-	"nmd_i1": "também pode adicionar a extensão desejada, por exemplo <code>.md</code>", //m
-	"nmd_i2": "só pode criar ficheiros <code>.md</code> porque não tem permissão para apagar", //m
+	"nmd_i1": "também adicione a extensão desejada, por exemplo <code>.md</code>",
+	"nmd_i2": "só pode criar arquivos <code>.md</code> porque não tem permissão para apagar",
 
 	"tv_load": "Carregando documento de texto:\n\n{0}\n\n{1}% ({2} de {3} MiB carregados)",
 	"tv_xe1": "não foi possível carregar o arquivo de texto:\n\nerro ",
@@ -456,7 +459,7 @@ Ls.por = {
 	"tvt_prev": "mostrar documento anterior$NHotkey: i\">⬆ anterior",
 	"tvt_next": "mostrar próximo documento$NHotkey: K\">⬇ próximo",
 	"tvt_sel": "selecionar arquivo &nbsp; ( para recortar / copiar / excluir / ... )$NHotkey: S\">sel",
-	"tvt_j": "embelezar json$NHotkey: shift-J\">j", //m
+	"tvt_j": "embelezar json$NHotkey: shift-J\">j",
 	"tvt_edit": "abrir arquivo no editor de texto$NHotkey: E\">✏️ editar",
 	"tvt_tail": "monitorar arquivo para alterações; mostrar novas linhas em tempo real\">📡 seguir",
 	"tvt_wrap": "quebra de linha\">↵",
@@ -469,7 +472,7 @@ Ls.por = {
 	"m3u_clip": "playlist m3u agora copiada para a área de transferência\n\nvocê deve criar um novo arquivo de texto chamado something.m3u e colar a playlist nesse documento; isso a tornará reproduzível",
 
 	"gt_vau": "não mostrar vídeos, apenas tocar o áudio\">🎧",
-	"gt_msel": "ativar seleção de arquivo; ctrl-clique em um arquivo para substituir$N$n&lt;em&gt;quando ativo: clique duas vezes em um arquivo / pasta para abri-lo&&gt;t;/em&gt;$N$nHotkey: S\">multisseleção",
+	"gt_msel": "ativar seleção de arquivo; ctrl-clique em um arquivo para substituir$N$N&lt;em&gt;quando ativo: clique duas vezes em um arquivo / pasta para abri-lo&&gt;t;/em&gt;$N$NHotkey: S\">multisseleção",
 	"gt_crop": "cortar miniaturas ao centro\">cortar",
 	"gt_3x": "miniaturas de alta resolução\">3x",
 	"gt_zoom": "zoom",
@@ -527,11 +530,11 @@ Ls.por = {
 
 	"fz_tar": "arquivo gnu-tar não comprimido (linux / mac)",
 	"fz_pax": "tar de formato pax não comprimido (mais lento)",
-	"fz_targz": "gnu-tar com compressão gzip nível 3$N$nisto é geralmente muito lento, então$nuse tar não comprimido em vez disso",
-	"fz_tarxz": "gnu-tar com compressão xz nível 1$N$nisto é geralmente muito lento, então$nuse tar não comprimido em vez disso",
+	"fz_targz": "gnu-tar com compressão gzip nível 3$N$Nisto é geralmente muito lento, então$Nuse tar não comprimido em vez disso",
+	"fz_tarxz": "gnu-tar com compressão xz nível 1$N$Nisto é geralmente muito lento, então$Nuse tar não comprimido em vez disso",
 	"fz_zip8": "zip com nomes de arquivos utf8 (pode ser instável no windows 7 e mais antigos)",
 	"fz_zipd": "zip com nomes de arquivos cp437 tradicionais, para software realmente antigo",
-	"fz_zipc": "cp437 com crc32 calculado antecipadamente,$npara MS-DOS PKZIP v2.04g (outubro de 1993)$n(leva mais tempo para processar antes que o download possa começar)",
+	"fz_zipc": "cp437 com crc32 calculado antecipadamente,$Npara MS-DOS PKZIP v2.04g (outubro de 1993)$N(leva mais tempo para processar antes que o download possa começar)",
 
 	"un_m1": "você pode excluir seus uploads recentes (ou abortar os que não foram concluídos) abaixo",
 	"un_upd": "atualizar",
@@ -641,22 +644,25 @@ Ls.por = {
 	"ur_um": "Concluído;\n{0} uploads OK,\n{1} uploads falharam, desculpe",
 	"ur_sm": "Concluído;\n{0} arquivos encontrados no servidor,\n{1} arquivos NÃO encontrados no servidor",
 
-	"rc_opn": "abrir", //m
-	"rc_ply": "reproduzir", //m
-	"rc_pla": "reproduzir como áudio", //m
-	"rc_txt": "abrir no visualizador de arquivos", //m
-	"rc_md": "abrir no editor de texto", //m
-	"rc_dl": "baixar", //m
-	"rc_zip": "baixar como arquivo", //m
-	"rc_cpl": "copiar link", //m
-	"rc_del": "excluir", //m
-	"rc_cut": "recortar", //m
-	"rc_cpy": "copiar", //m
-	"rc_pst": "colar", //m
-	"rc_nfo": "nova pasta", //m
-	"rc_nfi": "novo arquivo", //m
-	"rc_sal": "selecionar tudo", //m
-	"rc_sin": "inverter seleção", //m
+	"rc_opn": "abrir",
+	"rc_ply": "reproduzir",
+	"rc_pla": "reproduzir como áudio",
+	"rc_txt": "abrir no leitor de texto",
+	"rc_md": "abrir no leitor markdown",
+	"rc_dl": "baixar",
+	"rc_zip": "baixar compactado",
+	"rc_cpl": "copiar link",
+	"rc_del": "excluir",
+	"rc_cut": "recortar",
+	"rc_cpy": "copiar",
+	"rc_pst": "colar",
+	"rc_rnm": "renomear",
+	"rc_nfo": "nova pasta",
+	"rc_nfi": "novo arquivo",
+	"rc_sal": "selecionar tudo",
+	"rc_sin": "inverter seleção",
+	"rc_shf": "compartilhar esta pasta",
+	"rc_shs": "compartilhar seleção",
 
 	"lang_set": "atualizar para a mudança ter efeito?",
 
@@ -699,8 +705,8 @@ Ls.por = {
 		"ta1": "primeiro digite sua nova senha",
 		"ta2": "repita para confirmar a nova senha:",
 		"ta3": "há um erro; por favor, tente novamente",
-		"nop": "ERRO: A senha não pode estar em branco", //m
-		"nou": "ERRO: O nome de usuário e/ou a senha não podem estar em branco", //m
+		"nop": "ERRO: A senha não pode estar em branco",
+		"nou": "ERRO: O nome de usuário e/ou a senha não podem estar em branco",
 		"aa1": "arquivos de entrada:",
 		"ab1": "desativar no304",
 		"ac1": "ativar no304",

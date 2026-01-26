@@ -226,6 +226,7 @@ Ls.fin = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ vihjelaatikot',
 	"ct_thumb": 'valitse kuvakkeiden / pienoiskuvien välillä kuvanäkymässä $NPikanäppäin: T">🖼️ pienoiskuvat',
 	"ct_csel": 'käytä CTRL ja SHIFT tiedostojen valintaan kuvanäkymässä">valitse',
+	"ct_dsel": 'käytä aluevalintaa tiedostojen valintaan kuvanäkymässä">aluevalinta',
 	"ct_dl": 'pakota lataus (älä näytä upotettuna), kun tiedostoa napsautetaan">dl', //m
 	"ct_ihop": 'kun kuvakatselin suljetaan, vieritä alas viimeksi katsottuun tiedostoon">g⮯',
 	"ct_dots": 'näytä piilotetut tiedostot (jos palvelin sallii)">piilotiedostot',
@@ -264,6 +265,7 @@ Ls.fin = {
 	"cdt_ask": "sivun lopussa, sen sijaan että lataa $Nautomaattisesti lisää tiedostoja, kysy mitä tehdä",
 	"cdt_hsort": "kuinka monta lajittelusääntöä (&lt;code&gt;,sorthref&lt;/code&gt;) sisällyttää media-URL:eihin. Tämän asettaminen nollaan jättää myös huomioimatta media-linkeissä sisällytetyt lajittelusäännöt kun napsautat niitä",
 	"cdt_ren": "ota käyttöön mukautettu valikko, tavallinen valikko on käytettävissä painamalla shift ja napsauttamalla oikealla", //m
+	"cdt_rdb": "näytä tavallinen oikean painikkeen valikko, kun mukautettu on jo auki ja oikeaa painiketta painetaan uudelleen", //m
 
 	"tt_entree": "näytä navigointipaneeli$NPikanäppäin: B",
 	"tt_detree": "näytä linkkipolku$NPikanäppäin: B",
@@ -354,6 +356,7 @@ Ls.fin = {
 	"f_anota": "vain {0} / {1} kohdetta valittiin;\nvalitaksesi koko hakemiston, vieritä ensin loppuun",
 
 	"f_dls": 'nykyisen hakemiston tiedostolinkit on\nvaihdettu latauslinkeiksi',
+	"f_dl_nd": 'ohitetaan kansio (käytä zip/tar-latausta sen sijaan):\n', //m
 
 	"f_partial": "Ladataksesi turvallisesti tiedoston joka on parhaillaan latautumassa, klikkaa tiedostoa jolla on sama nimi mutta ilman <code>.PARTIAL</code> päätettä. Paina PERUUTA tai Escape tehdäksesi tämän.\n\nOK / Enter painaminen sivuuttaa tämän varoituksen ja jatkaa <code>.PARTIAL</code> väliaikaistiedoston lataamista, mikä todennäköisesti antaa sinulle vioittunutta dataa.",
 
@@ -653,10 +656,13 @@ Ls.fin = {
 	"rc_cut": "Leikkaa", //m
 	"rc_cpy": "kopioi", //m
 	"rc_pst": "Liitä", //m
+	"rc_rnm": "nimeä uudelleen", //m
 	"rc_nfo": "uusi kansio", //m
 	"rc_nfi": "uusi tiedosto", //m
 	"rc_sal": "valitse kaikki", //m
 	"rc_sin": "käännä valinta", //m
+	"rc_shf": "jaa tämä kansio", //m
+	"rc_shs": "jaa valinta", //m
 
 	"lang_set": "ladataanko sivu uudestaan kielen vaihtamiseksi?",
 

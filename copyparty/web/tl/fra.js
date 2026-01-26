@@ -226,6 +226,7 @@ Ls.fra = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ infobulles',
 	"ct_thumb": 'vue en grille, activer les icônes ou les miniatures$NHotkey: T">🖼️ minia',
 	"ct_csel": 'utiliser CTRL et MAJ pour selectioner des fichiers en vue en grille">sel',
+	"ct_dsel": 'utiliser la sélection par glisser en vue en grille">glisser', //m
 	"ct_dl": 'forcer le téléchargement (ne pas afficher en ligne) lorsqu’un fichier est cliqué">dl', //m
 	"ct_ihop": 'quand le visionneuse d\'image est fermé, faire defiller vers le bas jusqu\'au dernier fichier">g⮯',
 	"ct_dots": 'voir les fichiers caché (si le serveur le permet)">dotfiles',
@@ -264,6 +265,7 @@ Ls.fra = {
 	"cdt_ask": "lorsque vous faites défiler vers le bas,$Nau lieu de charger plus de fichiers,$Ndemander quoi faire",
 	"cdt_hsort": "combien de règles de tri (&lt;code&gt;,sorthref&lt;/code&gt;) à inclure dans les media-URLs. Définir cette valeur à 0 ignorera également les règles de tri incluses dans les liens média lorsque vous cliquez dessus.",
 	"cdt_ren": "activer le menu contextuel personnalisé, le menu normal reste accessible avec shift + clic droit", //m
+	"cdt_rdb": "afficher le menu clic droit normal lorsque le menu personnalisé est déjà ouvert et qu’on clique à nouveau", //m
 
 	"tt_entree": "afficher le panneau de navigation (arborescence des dossiers)$NHotkey: B",
 	"tt_detree": "afficher le fil d’Ariane$NHotkey: B",
@@ -354,6 +356,7 @@ Ls.fra = {
 	"f_anota": "seulement {0} des {1} elements sont selectioné;\npour selectioner le dossier entier, fait défiler jusqu'au fond",
 
 	"f_dls": 'le lien de fichier dans le répertoire actuel\nà été changé en lien de téléchargement',
+	"f_dl_nd": 'dossier ignoré (utilisez le téléchargement zip/tar à la place):\n', //m
 
 	"f_partial": "Pour télécharger de façon sécurisée un fichier qui est entrain de se faire téléverser, cliquez sur le fichier qui a le même nom, mais sans l'extension de fichier <code>.PARTIAL</code>. Choisissez ANNULER ou appuiez sur la touche Échap pour faire cela.\n\nAppuyer sur OK / Entrée ignorera cet avertissement et continuera à télécharger le fichier temporaire <code>.PARTIAL</code> à la place, ce qui donnera presque certainement des données corrompues.",
 
@@ -653,10 +656,13 @@ Ls.fra = {
 	"rc_cut": "couper", //m
 	"rc_cpy": "copier", //m
 	"rc_pst": "coller", //m
+	"rc_rnm": "renommer", //m
 	"rc_nfo": "nouveau dossier", //m
 	"rc_nfi": "nouveau fichier", //m
 	"rc_sal": "tout sélectionner", //m
 	"rc_sin": "inverser la sélection", //m
+	"rc_shf": "partager ce dossier", //m
+	"rc_shs": "partager la sélection", //m
 
 	"lang_set": "rafraîchir pour que les changements prennent effet ?",
 

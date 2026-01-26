@@ -1,4 +1,108 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0121-0505  `v1.20.3`  dillo approves
+
+## 🧪 new features
+
+* send-message-to-serverlog now also available as url-parameter `?smsg=foo` 6dcb1efb
+  * option `smsg` configures which HTTP-methods to allow; can be set to `GET,POST` but default is only `POST` because `GET` is dangerous (CSRF)
+
+## 🩹 bugfixes
+
+* #1227 [dillo](https://dillo-browser.github.io/) was not able to login because dillo is more standards-compliant than every other browser (nice) b4df8fa2
+* a web-scraper which got banned for making malicious requests could remain banned for one request longer than intended (wait why did I fix this) ba67b279
+* `?ls` was still a bit jank 0a3a8072
+
+## 🌠 fun facts
+
+* this 6AM release was [powered by void/mournfinale](https://www.youtube.com/watch?v=lFEEXloqk9Q&list=PLlEk36g9RI8Ppjr3HhaO3wjjmA6HnSo2U)
+* was going to name the release "dilla på dillo" but somehow google-translate thinks that means "fuck on fuck" which would have been inappropriate
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0119-0126  `v1.20.2`  xattrs + range-select
+
+## 🧪 new features
+
+* #1212, #1214 range-select in the grid-view by click-and-drag (thx @icxes!) 3e3228e0 72c59405
+* #134 xattrs (linux extended file attributes) can now be indexed and searchable 8240ef61
+* rightclick-menu:
+  * #1184 add rename option (thx @stackxp!) 25a8b96f
+  * #1216 add sharing options (thx @stackxp!) ffb25603
+  * #1198, #1206 also works in the search-results view (thx @hackysphere!) 04f612ff d32704ed
+* option to override the domain in certain links, so copyparty returns an external URL even if you're accessing it by a LAN address:
+  * #1211 newly created shares 41d3bae9
+  * #255 newly uploaded files d9255538
+* new option `vol-nospawn` (volflag `nospawn`) to *not* automatically create the volume's folder on the server's HDD if it doesn't exist
+* new option `vol-or-crash` (volflag `assert_root`) to intentionally crash on startup if a volume's folder doesn't already exist on the server HDD
+* new option `--flo` to tweak the log-format used by the `-lo` option for logging to a file 826e84c8
+* #1197 u2c ([commandline uploader](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy)): give up and crash if server is offline for longer than 3 minutes (configurable) 67c5d8da
+
+## 🩹 bugfixes
+
+* #1203 configured chmod/chown rules were not applied when a file was being deduped bef07720
+* the `unlistc*` volflags could not be specified for single-file volumes 26648911
+* the defensive renaming of uploaded readmes/logues would assume the default filenames, not considering the recently added option to customize these names c17c3be0
+* #1191 the `ipu` option can once again be used to reject connections from certain IP-ranges caf831fc
+  * this was a regression in v1.19.21 causing the server to crash on startup if such a config was attempted
+* some empty folders could be created during startup in certain server-configs with nested volumes 4e67b467
+* api: trying to `?ls` nested virtual folders could return an error 66750391
+* ui/ux:
+  * #1179 improve errormessage if audio transcoding fails 7357d46f
+  * ensure a trailing slash when viewing a folder with the `h` permission; good for relative links in html-files
+
+## 🔧 other changes
+
+* #1193, #1194: NixOS improvements (thx @toast003!) 9d223d6c d5a8a34b
+* truncate huge errormessages from ffmpeg so the log doesn't get flooded 3aebfabd
+* ui/ux:
+  * the `dl` button (to download selected files individually) now skips folders, since that never worked bc24604a
+  * #1200 add html classes to make custom styling easier c46cd7f5
+  * rephrase errormessages from `see serverlog` to `see fileserver log`
+* docs:
+  * mention in the readme that uploading files from a deeply nested folder using a webbrowser on Windows can fail because browsers don't handle the max-pathlen limitation of Windows optimally (not a copyparty-specific issue, but still hits us)
+
+## 🌠 fun facts
+
+* n/a; no fun has been had since [v1.20.0](https://github.com/9001/copyparty/releases/tag/v1.20.0)
+  * (that's a lie btw, [sniffing the airwaves](https://a.ocv.me/pub/g/2026/01/PXL_20260117_192619830.jpg?cache) *is* pretty darn fun 😁)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0109-0052  `v1.20.1`  sftp fixes
+
+## 🧪 new features
+
+* #1174 add Japanese translation (thx @tkymmm!) b918b592
+* #1164 rightclick-menu now works in the gridview too (thx @Foox-dev!) feabbf3e
+* #1176 IP to bind can be specified per protocol 87a5c22a
+
+## 🩹 bugfixes
+
+* various SFTP fixes (i blame the single [tschunk](https://germanfoods.org/tschunk/) on day 3):
+  * #1170 be more lenient regarding `stat` permissions 90308284
+  * #1170 deletes could return EPERM when ENOENT was more appropriate 8c9e1016
+  * #1170 files would be created with an extremely restrictive chmod 2f4a30b6
+    * certified octal moment
+  * write-only folders could return ENOENT 6c41bac6
+* #1177 disk-usage quotas became incompatible with shares in v1.20.0 038af507
+* appending to existing files with `?apnd` was possible in volumes with non-reflink dedup, where it could propagate to deduped copies of the file 738a419b
+  * (was only possible for users with write+delete perms, so at least it couldn't be used for nefarious purposes)
+* rightclick-menu: "copy link" would strip filekeys 3a16d346
+
+## 🔧 other changes
+
+* copyparty.exe: updated pillow to 12.1.0 a9ae6d51
+
+## 🌠 fun facts
+
+* [tschunk](https://germanfoods.org/tschunk/) is the sound a hacker makes as they faceplant onto the table after having one too many
+  * also see the funfacts in [the previous release](https://github.com/9001/copyparty/releases/tag/v1.20.0) for more CCC hijinks :p
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0102-0007  `v1.20.0`  sftp is fine too
 
 ## 🧪 new features

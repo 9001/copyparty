@@ -61,6 +61,8 @@ from .util import (
     s3dec,
     s3enc,
     sanitize_fn,
+    set_ap_perms,
+    set_fperms,
     sfsenc,
     spack,
     statdir,
@@ -130,6 +132,7 @@ class Mpqe(object):
         self,
         mtp: dict[str, MParser],
         entags: set[str],
+        vf: dict[str, Any],
         w: str,
         abspath: str,
         oth_tags: dict[str, Any],
@@ -137,6 +140,7 @@ class Mpqe(object):
         # mtp empty = mtag
         self.mtp = mtp
         self.entags = entags
+        self.vf = vf
         self.w = w
         self.abspath = abspath
         self.oth_tags = oth_tags
@@ -1148,7 +1152,7 @@ class Up2k(object):
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
-        zs = "bcasechk du_iwho emb_lgs emb_mds ext_th_d html_head html_head_d html_head_s ls_q_m put_name2 mv_re_r mv_re_t rm_re_r rm_re_t srch_re_dots srch_re_nodot zipmax zipmaxn_v zipmaxs_v"
+        zs = "bcasechk du_iwho emb_all emb_lgs emb_mds ext_th_d html_head html_head_d html_head_s ls_q_m put_name2 mv_re_r mv_re_t rm_re_r rm_re_t srch_re_dots srch_re_nodot zipmax zipmaxn_v zipmaxs_v"
         fx = set(zs.split())
         fd = vf_bmap()
         fd.update(vf_cmap())
@@ -2199,7 +2203,7 @@ class Up2k(object):
             abspath = djoin(ptop, rd, fn)
             self.pp.msg = "c%d %s" % (nq, abspath)
             if not mpool:
-                n_tags = self._tagscan_file(cur, entags, w, abspath, ip, at, un)
+                n_tags = self._tagscan_file(cur, entags, flags, w, abspath, ip, at, un)
             else:
                 oth_tags = {}
                 if ip:
@@ -2209,7 +2213,7 @@ class Up2k(object):
                 if un:
                     oth_tags["up_by"] = un
 
-                mpool.put(Mpqe({}, entags, w, abspath, oth_tags))
+                mpool.put(Mpqe({}, entags, flags, w, abspath, oth_tags))
                 with self.mutex:
                     n_tags = len(self._flush_mpool(cur))
 
@@ -2316,9 +2320,10 @@ class Up2k(object):
             return
 
         entags = self.entags[ptop]
+        vf = self.flags[ptop]
 
         parsers = {}
-        for parser in self.flags[ptop]["mtp"]:
+        for parser in vf["mtp"]:
             try:
                 parser = MParser(parser)
             except:
@@ -2393,7 +2398,7 @@ class Up2k(object):
                     if un:
                         oth_tags["up_by"] = un
 
-                    jobs.append(Mpqe(parsers, set(), w, abspath, oth_tags))
+                    jobs.append(Mpqe(parsers, set(), vf, w, abspath, oth_tags))
                     in_progress[w] = True
 
             with self.mutex:
@@ -2524,7 +2529,7 @@ class Up2k(object):
             return
 
         for _ in range(mpool.maxsize):
-            mpool.put(Mpqe({}, set(), "", "", {}))
+            mpool.put(Mpqe({}, set(), {}, "", "", {}))
 
         mpool.join()
 
@@ -2543,7 +2548,7 @@ class Up2k(object):
                         t = "tag-thr: {}({})"
                         self.log(t.format(self.mtag.backend, qe.abspath), "90")
 
-                    tags = self.mtag.get(qe.abspath) if st.st_size else {}
+                    tags = self.mtag.get(qe.abspath, qe.vf) if st.st_size else {}
                 else:
                     if self.args.mtag_vv:
                         t = "tag-thr: {}({})"
@@ -2576,6 +2581,7 @@ class Up2k(object):
         self,
         write_cur: "sqlite3.Cursor",
         entags: set[str],
+        vf: dict[str, Any],
         wark: str,
         abspath: str,
         ip: str,
@@ -2594,7 +2600,7 @@ class Up2k(object):
             return 0
 
         try:
-            tags = self.mtag.get(abspath) if st.st_size else {}
+            tags = self.mtag.get(abspath, vf) if st.st_size else {}
         except Exception as ex:
             self._log_tag_err("", abspath, ex)
             return 0
@@ -3542,7 +3548,7 @@ class Up2k(object):
         if self.args.nw:
             return
 
-        linked = False
+        linked = 0
         try:
             if rm and bos.path.exists(dst):
                 wunlink(self.log, dst, flags)
@@ -3556,6 +3562,8 @@ class Up2k(object):
                 try:
                     with open(fsenc(src), "rb") as fi, open(fsenc(dst), "wb") as fo:
                         fcntl.ioctl(fo.fileno(), fcntl.FICLONE, fi.fileno())
+                        if "fperms" in flags:
+                            set_fperms(fo, flags)
                 except:
                     if bos.path.exists(dst):
                         wunlink(self.log, dst, flags)
@@ -3593,7 +3601,7 @@ class Up2k(object):
             try:
                 if "hardlink" in flags:
                     os.link(fsenc(absreal(src)), fsenc(dst))
-                    linked = True
+                    linked = 2
             except Exception as ex:
                 self.log("cannot hardlink: " + repr(ex))
                 if "hardlinkonly" in flags:
@@ -3612,7 +3620,7 @@ class Up2k(object):
                 else:
                     os.symlink(fsenc(lsrc), fsenc(ldst))
 
-                linked = True
+                linked = 1
         except Exception as ex:
             if str(ex) != "reflink":
                 self.log("cannot link; creating copy: " + repr(ex))
@@ -3626,8 +3634,11 @@ class Up2k(object):
                 raise Exception(t % (src, fsrc, dst))
             trystat_shutil_copy2(self.log, fsenc(csrc), fsenc(dst))
 
-        if lmod and (not linked or SYMTIME):
-            bos.utime_c(self.log, dst, int(lmod), False)
+        if linked < 2 and (linked < 1 or SYMTIME):
+            if lmod:
+                bos.utime_c(self.log, dst, int(lmod), False)
+            if "fperms" in flags:
+                set_ap_perms(dst, flags)
 
     def handle_chunks(
         self, ptop: str, wark: str, chashes: list[str]
@@ -4503,6 +4514,8 @@ class Up2k(object):
                     bos.utime(dabs, times, False)
                 except:
                     pass
+            if "fperms" in dvn.flags:
+                set_ap_perms(dabs, dvn.flags)
 
         if xac:
             runhook(
@@ -4788,6 +4801,8 @@ class Up2k(object):
                 wunlink(self.log, sabs, svn.flags)
             else:
                 atomic_move(self.log, sabs, dabs, svn.flags)
+                if svn != dvn and "fperms" in dvn.flags:
+                    set_ap_perms(dabs, dvn.flags)
 
         except OSError as ex:
             if ex.errno != errno.EXDEV:
@@ -4821,6 +4836,8 @@ class Up2k(object):
                     bos.utime(dabs, times, False)
                 except:
                     pass
+            if "fperms" in dvn.flags:
+                set_ap_perms(dabs, dvn.flags)
 
             wunlink(self.log, sabs, svn.flags)
 
@@ -5404,7 +5421,7 @@ class Up2k(object):
             # self.log("\n  " + repr([ptop, rd, fn]))
             abspath = djoin(ptop, rd, fn)
             try:
-                tags = self.mtag.get(abspath) if sz else {}
+                tags = self.mtag.get(abspath, self.flags[ptop]) if sz else {}
                 ntags1 = len(tags)
                 parsers = self._get_parsers(ptop, tags, abspath)
                 if self.args.mtag_vv:

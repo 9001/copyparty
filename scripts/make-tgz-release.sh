@@ -91,7 +91,8 @@ grep -qE "^VERSION *= \(${commaver}\)$" copyparty/__version__.py ||
 }
 
 rm -rf .vscode
-rm \
+rm -f \
+  copyparty/web/deps/README.md \
   .gitattributes \
   .gitignore
 

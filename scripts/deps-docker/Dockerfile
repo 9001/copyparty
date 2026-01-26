@@ -1,13 +1,12 @@
-FROM    alpine:3.18
+FROM    alpine:3.23
 WORKDIR /z
-ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
-        ver_hashwasm=4.12.0 \
+ENV     ver_hashwasm=4.12.0 \
         ver_marked=4.3.0 \
         ver_dompf=3.3.1 \
         ver_mde=2.18.0 \
         ver_codemirror=5.65.18 \
         ver_fontawesome=5.13.0 \
-        ver_prism=1.29.0 \
+        ver_prism=1.30.0 \
         ver_zopfli=1.0.3
 
 # versioncheck:
@@ -16,7 +15,6 @@ ENV     ver_asmcrypto=c72492f4a66e17a0e5dd8ad7874de354f3ccdaa5 \
 # https://github.com/codemirror/codemirror5/releases
 # https://github.com/cure53/DOMPurify/releases
 # https://github.com/Daninet/hash-wasm/releases
-# https://github.com/openpgpjs/asmcrypto.js/commits/main/
 # https://github.com/google/zopfli/tags
 
 
@@ -28,7 +26,6 @@ RUN     mkdir -p /z/dist/no-pk \
                 bash brotli cmake make g++ git gzip lame npm patch pigz \
                 python3 python3-dev py3-brotli sox tar unzip wget \
         && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
-        && wget https://github.com/openpgpjs/asmcrypto.js/archive/$ver_asmcrypto.tar.gz -O asmcrypto.tgz \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
         && wget https://github.com/Ionaru/easy-markdown-editor/archive/$ver_mde.tar.gz -O mde.tgz \
         && wget https://github.com/codemirror/codemirror5/archive/$ver_codemirror.tar.gz -O codemirror.tgz \
@@ -41,9 +38,6 @@ RUN     mkdir -p /z/dist/no-pk \
         && (mkdir hash-wasm \
             && cd hash-wasm \
             && unzip ../hash-wasm.zip) \
-        && (tar --no-same-owner -xf asmcrypto.tgz \
-            && cd asmcrypto.js-$ver_asmcrypto \
-            && npm install ) \
         && (tar --no-same-owner -xf marked.tgz \
             && cd marked-$ver_marked \
             && npm install \
@@ -71,6 +65,7 @@ RUN     /z/busy-mp3.sh \
 RUN     tar --no-same-owner -xf zopfli.tgz \
         && cd zopfli* \
         && cmake \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
             -DCMAKE_INSTALL_PREFIX=/usr \
             -DZOPFLI_BUILD_SHARED=ON \
             -B build \
@@ -79,13 +74,6 @@ RUN     tar --no-same-owner -xf zopfli.tgz \
         && make -C build install \
         && python3 -m ensurepip \
         && python3 -m pip install fonttools zopfli
-
-
-# build asmcrypto
-RUN     cd asmcrypto.js-$ver_asmcrypto \
-        && echo "export { Sha512 } from './hash/sha512/sha512';" > src/entry-export_all.ts \
-        && node -r esm build.js \
-        && awk '/HMAC state/{o=1}  /var HEAP/{o=0}  /function hmac_reset/{o=1}  /return \{/{o=0}  /var __extends =/{o=1}  /var Hash =/{o=0}  /hmac_|pbkdf2_/{next}  o{next}  {gsub(/IllegalStateError/,"Exception")}  {sub(/^ +/,"");sub(/^\/\/ .*/,"");sub(/;$/," ;")}  1' < asmcrypto.all.es5.js > /z/dist/sha512.ac.js
 
 
 # build hash-wasm

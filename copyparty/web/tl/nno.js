@@ -223,6 +223,7 @@ Ls.nno = {
 	"ct_ttips": 'vis hjelpetekst ved å holde musa over ting">ℹ️ tips',
 	"ct_thumb": 'vis miniatyrbilder i staden for ikon$NSnarvei: T">🖼️ bilder',
 	"ct_csel": 'bruk tastane CTRL og SHIFT for markering av filer i ikonvising">merk',
+	"ct_dsel": 'klikk-og-dra for å merke filer i ikonvising">dra',
 	"ct_dl": 'last ned filer (ikkje vis i nettleseren)">dl',
 	"ct_ihop": 'bla ned åt sist viste bilde når bildevisaren lukkast">g⮯',
 	"ct_dots": 'vis skjulte filer (gitt at serveren tillèt det)">.synlig',
@@ -261,6 +262,7 @@ Ls.nno = {
 	"cdt_ask": "vis knappar for å laste fleire filer nederst på sida i staden for å gradvis laste meir av mappea når man scroller ned",
 	"cdt_hsort": "antall sorteringsreglar (&lt;code&gt;,sorthref&lt;/code&gt;) som skal inkluderast når media-URL'ar genererast. Dersom denne er 0 så vil sorteringsreglar i URL'ar korkje bli generert eller lest",
 	"cdt_ren": "slå på tilpassa høgreklikkmeny (den vanlege menyen er tilgjengeleg med shift + høgreklikk)",
+	"cdt_rdb": "høgreklikk to gonger for å vise den vanlege høgreklikkmenyen",
 
 	"tt_entree": "bytt åt mappehierarki$NSnarvei: B",
 	"tt_detree": "bytt åt tradisjonell stivising$NSnarvei: B",
@@ -351,6 +353,7 @@ Ls.nno = {
 	"f_anota": "kun {0} av totalt {1} element blei markert;\nfor å velje alt må du bla åt bunnen av mappa først",
 
 	"f_dls": 'lenkane i denne mappa er no\nomgjort åt nedlastingsknappar',
+	"f_dl_nd": 'hoppar over mappe (bruk zip/tar-nedlasting i staden):\n',
 
 	"f_partial": "For å laste ned ei fil som enda ikkje er ferdig opplasta, klikk på filen som har same filnamn som denne, men uten <code>.PARTIAL</code> på slutten. Da vil serveren passe på at nedlastinga går bra. Derfor anbefalast det sterkt å trykkje AVBRYT eller Escape-tasten.\n\nViss du verkelig ønskjer å laste ned denne <code>.PARTIAL</code>-filen på ein ukontrollert måte, trykk OK / Enter for å ignorere denne advarselen. Slik vil du høgst sannsynleg motta korrupt data.",
 
@@ -650,10 +653,13 @@ Ls.nno = {
 	"rc_cut": "klipp ut",
 	"rc_cpy": "kopier",
 	"rc_pst": "Lim inn",
+	"rc_rnm": "endre namn",
 	"rc_nfo": "ny mappe",
 	"rc_nfi": "ny fil",
 	"rc_sal": "vel alle",
 	"rc_sin": "inverter val",
+	"rc_shf": "del denne mappa",
+	"rc_shs": "del markering",
 
 	"lang_set": "passar det å laste sida på nytt?",
 

@@ -2,6 +2,8 @@
 
 var J_BRW = 1;
 
+if (!window.drcm) alert('FATAL ERROR: receiving stale data from the server; this may be due to a broken reverse-proxy (stuck cache). Try restarting copyparty and press CTRL-SHIFT-R in the browser');
+
 var XHR = XMLHttpRequest,
 	img_re = /\.(a?png|avif|bmp|gif|heif|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
 
@@ -231,6 +233,7 @@ if (1)
 		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
+		"ct_dsel": 'use drag-selection in grid-view">dsel',
 		"ct_dl": 'force download (don\'t display inline) when a file is clicked">dl',
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
@@ -360,6 +363,7 @@ if (1)
 		"f_anota": "only {0} of the {1} items were selected;\nto select the full folder, first scroll to the bottom",
 
 		"f_dls": 'the file links in the current folder have\nbeen changed into download links',
+		"f_dl_nd": 'skipping folder (use zip/tar download instead):\n',
 
 		"f_partial": "To safely download a file which is currently being uploaded, please click the file which has the same filename, but without the <code>.PARTIAL</code> file extension. Please press CANCEL or Escape to do this.\n\nPressing OK / Enter will ignore this warning and continue downloading the <code>.PARTIAL</code> scratchfile instead, which will almost definitely give you corrupted data.",
 
@@ -664,6 +668,8 @@ if (1)
 		"rc_nfi": "new file",
 		"rc_sal": "select all",
 		"rc_sin": "invert selection",
+		"rc_shf": "share this folder",
+		"rc_shs": "share selection",
 
 		"lang_set": "refresh to make the change take effect?",
 };
@@ -909,6 +915,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
 	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '</a>\n' +
 	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '</a>\n' +
+	'		<a id="dsel" class="tgl btn" href="#" tt="' + L.ct_dsel + '</a>\n' +
 	'		<a id="dlni" class="tgl btn" href="#" tt="' + L.ct_dl + '</a>\n' +
 	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '</a>\n' +
@@ -992,7 +999,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="ren" class="tgl btn" href="#" tt="' + L.cdt_ren + '">enable</a><a id="rdb" class="tgl btn" href="#" tt="' + L.cdt_rdb + '">double</a></div></div>' : '') +
+	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" href="#" tt="' + L.cdt_ren + '">enable</a><a id="rcm_db" class="tgl btn" href="#" tt="' + L.cdt_rdb + '">double</a></div></div>' : '') +
 	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
 );
 
@@ -1048,7 +1055,8 @@ ebi('rcm').innerHTML = (
 	: '') +
 	'<div id="rs4" class="sep"></div>' +
 	'<a href="#" id="rsal">' + L.rc_sal + '</a>' +
-	'<a href="#" id="rsin">' + L.rc_sin + '</a>'
+	'<a href="#" id="rsin">' + L.rc_sin + '</a>' +
+	'<a id="rshr" href="#"></a>'
 );
 
 (function () {
@@ -4850,7 +4858,7 @@ var showfile = (function () {
 		'nrend': 0,
 	};
 	r.map = {
-		'.ahk': 'autohotkey',
+		'.asm': 'nasm',
 		'.bas': 'basic',
 		'.bat': 'batch',
 		'.cxx': 'cpp',
@@ -4873,6 +4881,8 @@ var showfile = (function () {
 		'.rs': 'rust',
 		'.sh': 'bash',
 		'.service': 'systemd',
+		'.socket': 'systemd',
+		'.timer': 'systemd',
 		'.txt': 'ans',
 		'.vb': 'vbnet',
 		'.v': 'verilog',
@@ -4881,10 +4891,9 @@ var showfile = (function () {
 		'.yml': 'yaml'
 	};
 	r.nmap = {
-		'cmakelists.txt': 'cmake',
 		'dockerfile': 'docker'
 	};
-	var x = txt_ext + ' ans c cfg conf cpp cs css diff glsl go html ini java js json jsx kt kts latex less lisp lua makefile md nim py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml zig';
+	var x = txt_ext + ' ans c cfg conf cpp cs css diff glsl go html ini java js json jsx kt kts latex less lisp lua makefile md nasm nim nix py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml zig';
 	x = x.split(/ +/g);
 	for (var a = 0; a < x.length; a++)
 		if (!r.map["." + x[a]])
@@ -6518,7 +6527,7 @@ var search_ui = (function () {
 			if (ext.length > 8)
 				ext = '%';
 
-			var links = linksplit(r.rp + '', id).join('<span>/</span>'),
+			var links = linksplit(r.rp + '', null, id).join('<span>/</span>'),
 				nodes = ['<tr><td>-</td><td><div>' + links +
 					'</div></td><td sortv="' + sz + '">' + hsz];
 
@@ -6744,6 +6753,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
 	bcfg_bind(r, 'csel', 'csel', dgsel);
+	bcfg_bind(r, 'dsel', 'dsel', !MOBILE);
 	bcfg_bind(r, 'dlni', 'dlni', dlni, resort);
 	bcfg_bind(r, 'dots', 'dotfiles', see_dots, function (v) {
 		r.goto();
@@ -7551,9 +7561,10 @@ var treectl = (function () {
 		qsr('#bbsw');
 		srvinf = ebi('srv_info').innerHTML.slice(6, -7);
 		if (ls0 === null) {
-			setck('js=y');
 			r.ls_cb = showfile.addlinks;
-			return r.reqls(get_evpath(), false, undefined, true);
+			return setck('js=y', function () {
+				r.reqls(get_evpath(), false, undefined, true);
+			});
 		}
 		ls0.unlist = unlist0;
 		ls0.u2ts = u2ts;
@@ -8503,9 +8514,13 @@ var msel = (function () {
 
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			var qhref = links[a].getAttribute('href'),
-				href = qhref.split('?')[0].replace(/\/$/, ""),
+				href = qhref.split('?')[0],
 				item = {};
 
+			if (href.endsWith('/')) {
+				href = href.slice(0, -1);
+				item.isd = true;
+			}
 			item.id = links[a].getAttribute('id');
 			item.sel = clgot(links[a].closest('tr'), 'sel');
 			item.vp = href.indexOf('/') !== -1 ? href : vbase + href;
@@ -8668,7 +8683,10 @@ var msel = (function () {
 		ev(e);
 		var sel = r.getsel();
 		for (var a = 0; a < sel.length; a++)
-			dl_file(sel[a].vp + sel[a].q);
+			if (sel[a].isd)
+				toast.warn(7, L.f_dl_nd + esc(sel[a].vp));
+			else
+				dl_file(sel[a].vp + sel[a].q);
 	};
 	r.render = function () {
 		var tds = QSA('#files tbody td+td+td'),
@@ -9480,31 +9498,38 @@ var rcm = (function () {
 	if (MOBILE)
 		return {enabled: false}
 
-	var r = {
-		enabled: true,
-		double: false
-	};
-	bcfg_bind(r, 'enabled', 'ren', true);
-	bcfg_bind(r, 'double', 'rdb', false);
+	var r = {};
+	bcfg_bind(r, 'enabled', 'rcm_en', drcm.charAt(0)=='y');
+	bcfg_bind(r, 'double', 'rcm_db', drcm.charAt(1)=='y');
 
 	var menu = ebi('rcm');
 	var nsFile = {
 		elem: null,
 		type: null,
 		path: null,
+		dpath: null,
 		url: null,
 		id: null,
-		relpath: null,
+		name: null,
 		no_dsel: false
 	};
 	var selFile = jcp(nsFile);
 
 	function mktemp(is_dir) {
-		var row = mknod('tr', 'temp',
-			'<td>-new-</td>' +
-			'<td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : "File") + ' Name"></td>'
-		);
-		QS("#files tbody").appendChild(row);
+		qsr('#rcm_tmp');
+		if (!thegrid.en) {
+			var row = mknod('tr', 'rcm_tmp',
+				'<td>-new-</td><td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></td>');
+			QS("#files tbody").appendChild(row);
+	    }
+		else {
+			var row = mknod('a', 'rcm_tmp',
+				'<span class="dir" style="align-self:end"><input id="tempname" class="dir" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></span>');
+			if (is_dir)
+				row.className = 'dir';
+			row.style.display = 'flex';
+			QS("#ggrid").appendChild(row);
+		}
 
 		function sendit(name) {
 			name = ('' + name).trim();
@@ -9556,9 +9581,9 @@ var rcm = (function () {
 					a.target = selFile.type == "dir" ? '' : '_blank';
 					a.click();
 					break;
-				case 'ply': selFile.type == 'gf' ? thegrid.imshow(selFile.relpath) : play('f-' + selFile.id); break;
+				case 'ply': selFile.type == 'gf' ? thegrid.imshow(selFile.name) : play('f-' + selFile.id); break;
 				case 'pla': play('f-' + selFile.id); break;
-				case 'txt': location = '?doc=' + selFile.relpath; break;
+				case 'txt': location = selFile.dpath + '?doc=' + selFile.name; break;
 				case 'md': location = selFile.path + (has(selFile.path, '?') ? '&v' : '?v'); break;
 				case 'cpl': cliptxt(selFile.url, function() {toast.ok(2, L.clipped)}); break;
 				case 'dl': ebi('seldl').click(); break;
@@ -9578,6 +9603,7 @@ var rcm = (function () {
 					selFile.no_dsel = true;
 					break;
 				case 'sin': msel.evsel(null, 't'); break;
+				case 'shr': fileman.share(); break;
 			}
 			r.hide(true);
 		};
@@ -9591,24 +9617,30 @@ var rcm = (function () {
 				var ref = ebi(target.getAttribute('ref'));
 				file = ref && ref.closest('#files tbody tr');
 			}
-			if (file) {
+			var fa = file && file.children[1].querySelector('a[id]');
+			if (fa && fa.id != 'unsearch') {
 				selFile.no_dsel = clgot(file, "sel");
 				clmod(file, "sel", true);
 				selFile.elem = file;
-
-				selFile.url = file.children[1].firstChild.href;
+				selFile.url = fa.href;
 				selFile.path = basenames(selFile.url).replace(/(&|\?)v/, '');
-				selFile.relpath = selFile.path.split('/').slice(-1)[0].split("?")[0];
-				if (noq_href(file.children[1].firstChild).endsWith("/"))
+				var url = selFile.url.split("?")[0],
+					vsp = vsplit(url);
+				selFile.dpath = vsp[0];
+				selFile.name = vsp[1];
+				if (url.endsWith("/"))
 					selFile.type = "dir";
 				else {
 					var lead = file.firstChild.firstChild;
-					selFile.id = lead.id.split('-')[1];
-					selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
+					if (lead.id === undefined)
+						selFile.type = "tf";
+					else {
+						selFile.id = lead.id.split('-')[1];
+						selFile.type = lead.innerHTML[0] == '(' ? 'gf' : lead.id.split('-')[0];
+					}
 				}
 			}
 		}
-		console.log(selFile);
 		msel.selui();
 
 		var has_sel = msel.getsel().length;
@@ -9619,7 +9651,7 @@ var rcm = (function () {
 		clmod(ebi('rpla'), 'hide', selFile.type != 'gf');
 		clmod(ebi('rtxt'), 'hide', !selFile.id);
 		clmod(ebi('rs1'), 'hide', !selFile.path);
-		clmod(ebi('rmd'), 'hide', !selFile.id || selFile.relpath.slice(-3) != ".md");
+		clmod(ebi('rmd'), 'hide', !selFile.name || selFile.name.slice(-3) != ".md");
 		clmod(ebi('rcpl'), 'hide', !selFile.path);
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);
@@ -9631,6 +9663,9 @@ var rcm = (function () {
 		clmod(ebi('rrnm'), 'hide', !has_sel);
 		clmod(ebi('rs3'), 'hide', !has_sel);
 		clmod(ebi('rs4'), 'hide', !has_sel && !has(perms, "write"));
+		var shr = ebi('rshr');
+		clmod(shr, 'hide', !can_shr || !get_evpath().indexOf(have_shr));
+		shr.innerHTML = has_sel ? L.rc_shs : L.rc_shf;
 
 		menu.style.left = x + 5 + 'px';
 		menu.style.top = y + 5 + 'px';
@@ -9650,10 +9685,11 @@ var rcm = (function () {
 	}
 
 	ebi('wrap').oncontextmenu = function(e) {
-		r.hide(true);
 		if (!r.enabled || e.shiftKey || (r.double && menu.style.display)) {
+			r.hide(true);
 			return true;
 		}
+		r.hide(true);
 		if (selFile.elem && !selFile.no_dsel) {
 			clmod(selFile.elem, "sel", false);
 			msel.selui();
@@ -9737,6 +9773,157 @@ function reload_browser() {
 	thegrid.setdirty();
 	msel.render();
 }
+
+(function() {
+	var is_selma = false;
+	var dragging = false;
+
+	var startx, starty;
+	var fwrap = null;
+	var selbox = null;
+	var ttimer = null;
+
+	var lpdelay = 250; 
+	var mvthresh = 44;
+
+	function unbox() {
+		qsr('.selbox');
+		ebi('gfiles').style.removeProperty('pointer-events')
+		ebi('wrap').style.removeProperty('user-select')
+		
+		if (selbox) {
+			console.log(selbox)
+			window.getSelection().removeAllRanges();
+		}
+		
+		is_selma = false;
+		dragging = false;
+		fwrap = null;
+		selbox = null;
+		ttimer = null;
+	}
+
+	function getpp(e) {
+		var touch = (e.touches && e.touches[0]) || e;
+		return { x: touch.clientX, y: touch.clientY };
+	}
+
+	function sel_toggle(el, m) {
+		clmod(el, 'sel', m);
+		var eref = el.getAttribute('ref');
+		if (eref) {
+			var ehidden = ebi(eref);
+			if (ehidden) {
+				var tr = ehidden.closest('tr');
+				if (tr) clmod(tr, 'sel', m);
+			}
+		}
+	}
+
+	function bob(b1, b2) {
+		return !(b1.right < b2.left || b1.left > b2.right ||
+				 b1.bottom < b2.top || b1.top > b2.bottom);
+	}
+
+	function sel_start(e) {
+		if (e.button !== 0 && e.type !== 'touchstart') return;
+		if (!thegrid.en || !treectl.dsel) return;
+		if (e.target.closest('#widget,#ops,.opview,.doc')) return;
+
+		if (e.target.closest('#gfiles'))
+			ebi('gfiles').style.userSelect = "none"
+
+		var pos = getpp(e);
+		startx = pos.x;
+		starty = pos.y;
+		is_selma = true;
+		ttimer = null;
+		
+		if (e.type === 'touchstart') {
+			ttimer = setTimeout(function() {
+				ttimer = null;
+				start_drag();
+			}, lpdelay);
+		}
+	}
+	
+	function start_drag() {
+		if (dragging) return;
+
+		dragging = true;
+		selbox = document.createElement('div');
+		selbox.className = 'selbox';
+		document.body.appendChild(selbox);
+
+		ebi('gfiles').style.pointerEvents = 'none';
+	}
+	
+	function sel_move(e) {
+		if (!is_selma) return;
+		var pos = getpp(e);
+		var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
+
+		if (e.type === 'touchmove' && ttimer) {
+			if (dist > mvthresh) {
+				clearTimeout(ttimer);
+				ttimer = null;
+				is_selma = false;
+			}
+			return;
+		}
+		if (!dragging && dist > mvthresh && !window.getSelection().toString()) {
+			if (fwrap = e.target.closest('#wrap')) 
+				fwrap.style.userSelect = 'none';
+			else return;
+			start_drag();
+		}
+
+		if (!dragging || !selbox) return;
+		ev(e);
+
+		selbox.style.width = Math.abs(pos.x - startx) + 'px';
+		selbox.style.height = Math.abs(pos.y - starty) + 'px';
+		selbox.style.left = Math.min(pos.x, startx) + 'px';
+		selbox.style.top = Math.min(pos.y, starty) + 'px';
+
+		if (IE && window.getSelection)
+			window.getSelection().removeAllRanges();
+	}
+
+	function sel_end(e) {
+		clearTimeout(ttimer);
+		if (dragging && selbox) {
+			var sbrect = selbox.getBoundingClientRect();
+			var faf = QSA('#ggrid a');
+			var sadmode = e.shiftKey ? true : e.altKey ? false : "t";
+			for (var a = 0, aa = faf.length; a < aa; a++)
+				if (bob(sbrect, faf[a].getBoundingClientRect()))
+					sel_toggle(faf[a], sadmode);
+			msel.selui();
+			ev(e);
+		}
+		unbox();
+	}
+
+	function dsel_init() {
+		window.addEventListener('mousedown', sel_start);
+		window.addEventListener('mousemove', sel_move);
+		window.addEventListener('mouseup', sel_end);
+
+		window.addEventListener('touchstart', sel_start, { passive: true });
+		window.addEventListener('touchmove', sel_move, { passive: false });
+		window.addEventListener('touchend', sel_end, { passive: true });
+
+		window.addEventListener('dragstart', function(e) {
+			if (treectl.dsel && (is_selma || dragging)) {
+				e.preventDefault();
+			}
+		});
+	}
+	
+	dsel_init();
+})();
+
 treectl.hydrate();
 
 J_BRW = 2;

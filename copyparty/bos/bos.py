@@ -106,14 +106,14 @@ def utime(
 def utime_c(
     log: Union["NamedLogger", Any],
     p: str,
-    ts: int,
+    ts: float,
     follow_symlinks: bool = True,
     throw: bool = False,
-) -> Optional[int]:
+) -> Optional[float]:
     clamp = 0
     ov = ts
     bp = fsenc(p)
-    now = int(time.time())
+    now = time.time()
     while True:
         try:
             if SYMTIME:

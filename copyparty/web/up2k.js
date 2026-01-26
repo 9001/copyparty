@@ -1535,7 +1535,7 @@ function up2k_init(subtle) {
 
             pvis.addfile([
                 uc.fsearch ? esc(entry.name) : linksplit(
-                    entry.purl + uricom_enc(entry.name)).join(' / '),
+                    entry.purl + uricom_enc(entry.name), window.up_site).join(' / '),
                 '📐 ' + L.u_hashing,
                 ''
             ], entry.size, draw_each);
@@ -1575,8 +1575,8 @@ function up2k_init(subtle) {
     more_one_file();
 
     function linklist() {
-        var ret = [],
-            base = location.origin.replace(/\/$/, '');
+		var ret = [],
+            base = (window.up_site || location.origin).replace(/\/$/, '');
 
         for (var a = 0; a < st.files.length; a++) {
             var t = st.files[a],
@@ -2562,7 +2562,7 @@ function up2k_init(subtle) {
                                 cdiff = (Math.abs(diff) <= 2) ? '3c0' : 'f0b',
                                 sdiff = '<span style="color:#' + cdiff + '">diff ' + diff;
 
-                            msg.push(linksplit(hit.rp).join(' / ') + '<br /><small>' + tr + ' (srv), ' + tu + ' (You), ' + sdiff + '</small></span>');
+                            msg.push(linksplit(hit.rp, window.up_site).join(' / ') + '<br /><small>' + tr + ' (srv), ' + tu + ' (You), ' + sdiff + '</small></span>');
                         }
                         msg = msg.join('<br />\n');
                     }
@@ -2596,7 +2596,7 @@ function up2k_init(subtle) {
                         url += '?k=' + fk;
                     }
 
-                    pvis.seth(t.n, 0, linksplit(url).join(' / '));
+                    pvis.seth(t.n, 0, linksplit(url, window.up_site).join(' / '));
                 }
 
                 var chunksize = get_chunksize(t.size),

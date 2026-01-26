@@ -961,11 +961,13 @@ class _Unrecv(object):
         self.s = s
         self.log = log
         self.buf: bytes = b""
+        self.nb = 0
 
     def recv(self, nbytes: int, spins: int = 1) -> bytes:
         if self.buf:
             ret = self.buf[:nbytes]
             self.buf = self.buf[nbytes:]
+            self.nb += len(ret)
             return ret
 
         while True:
@@ -985,6 +987,7 @@ class _Unrecv(object):
         if not ret:
             raise UnrecvEOF("client stopped sending data")
 
+        self.nb += len(ret)
         return ret
 
     def recv_ex(self, nbytes: int, raise_on_trunc: bool = True) -> bytes:
@@ -1012,6 +1015,7 @@ class _Unrecv(object):
 
     def unrecv(self, buf: bytes) -> None:
         self.buf = buf + self.buf
+        self.nb -= len(buf)
 
 
 # !rm.yes>
@@ -1024,6 +1028,7 @@ class _LUnrecv(object):
         self.s = s
         self.log = log
         self.buf = b""
+        self.nb = 0
 
     def recv(self, nbytes: int, spins: int) -> bytes:
         if self.buf:
@@ -1031,6 +1036,7 @@ class _LUnrecv(object):
             self.buf = self.buf[nbytes:]
             t = "\033[0;7mur:pop:\033[0;1;32m {}\n\033[0;7mur:rem:\033[0;1;35m {}\033[0m"
             print(t.format(ret, self.buf))
+            self.nb += len(ret)
             return ret
 
         ret = self.s.recv(nbytes)
@@ -1039,6 +1045,7 @@ class _LUnrecv(object):
         if not ret:
             raise UnrecvEOF("client stopped sending data")
 
+        self.nb += len(ret)
         return ret
 
     def recv_ex(self, nbytes: int, raise_on_trunc: bool = True) -> bytes:
@@ -1067,6 +1074,7 @@ class _LUnrecv(object):
 
     def unrecv(self, buf: bytes) -> None:
         self.buf = buf + self.buf
+        self.nb -= len(buf)
         t = "\033[0;7mur:push\033[0;1;31m {}\n\033[0;7mur:rem:\033[0;1;35m {}\033[0m"
         print(t.format(buf, self.buf))
 
@@ -1807,6 +1815,11 @@ class MultipartParser(object):
         self.log = log_func
         self.args = args
         self.headers = http_headers
+        try:
+            self.clen = int(http_headers["content-length"])
+            sr.nb = 0
+        except:
+            self.clen = 0
 
         self.re_ctype = RE_CTYPE
         self.re_cdisp = RE_CDISP
@@ -1962,7 +1975,10 @@ class MultipartParser(object):
 
             if tail == b"--":
                 # EOF indicated by this immediately after final boundary
-                tail = self.sr.recv_ex(2, False)
+                if self.clen == self.sr.nb:
+                    tail = b"\r\n"  # dillo doesn't terminate with trailing \r\n
+                else:
+                    tail = self.sr.recv_ex(2, False)
                 run = False
 
             if tail != b"\r\n":
@@ -1980,6 +1996,8 @@ class MultipartParser(object):
 
     def parse(self) -> None:
         boundary = get_boundary(self.headers)
+        if boundary.startswith('"') and boundary.endswith('"'):
+            boundary = boundary[1:-1]  # dillo uses quotes
         self.log("boundary=%r" % (boundary,))
 
         # spec says there might be junk before the first boundary,
@@ -2719,6 +2737,14 @@ def set_fperms(f: Union[typing.BinaryIO, typing.IO[Any]], vf: dict[str, Any]) ->
         os.fchmod(fno, vf["chmod_f"])
     if "chown" in vf:
         os.fchown(fno, vf["uid"], vf["gid"])
+
+
+def set_ap_perms(ap: str, vf: dict[str, Any]) -> None:
+    zb = fsenc(ap)
+    if "chmod_f" in vf:
+        os.chmod(zb, vf["chmod_f"])
+    if "chown" in vf:
+        os.chown(zb, vf["uid"], vf["gid"])
 
 
 def trystat_shutil_copy2(log: "NamedLogger", src: bytes, dst: bytes) -> bytes:

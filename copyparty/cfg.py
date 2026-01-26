@@ -27,6 +27,8 @@ def vf_bmap() -> dict[str, str]:
         "no_thumb": "dthumb",
         "no_vthumb": "dvthumb",
         "no_athumb": "dathumb",
+        "vol_nospawn": "nospawn",
+        "vol_or_crash": "assert_root",
     }
     for k in (
         "dedup",
@@ -101,6 +103,7 @@ def vf_vmap() -> dict[str, str]:
         "chmod_d",
         "chmod_f",
         "dbd",
+        "db_xattr",
         "du_who",
         "epilogues",
         "ufavico",
@@ -286,6 +289,7 @@ flagcats = {
         "dotsrch": "show dotfiles in search results",
         "nodotsrch": "hide dotfiles in search results (default)",
         "srch_excl": "exclude search results with URL matching this regex",
+        "db_xattr=user.foo,user.bar": "index file xattrs as media-tags",
     },
     'database, audio tags\n"mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...': {
         "mte=artist,title": "media-tags to index/display",
@@ -425,6 +429,8 @@ flagcats = {
         "cachectl=no-cache": "controls caching in webbrowsers",
         "mv_retry": "ms-windows: timeout for renaming busy files",
         "rm_retry": "ms-windows: timeout for deleting busy files",
+        "nospawn": "don't create volume's folder if not exist",
+        "assert_root": "crash on startup if volume's folder not exist",
         "davauth": "ask webdav clients to login for all folders",
         "davrt": "show lastmod time of symlink destination, not the link itself\n(note: this option is always enabled for recursive listings)",
     },

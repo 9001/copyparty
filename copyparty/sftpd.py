@@ -26,7 +26,6 @@ from .__init__ import ANYWIN, TYPE_CHECKING
 from .authsrv import LEELOO_DALLAS, VFS, AuthSrv
 from .bos import bos
 from .util import (
-    FN_EMB,
     VF_CAREFUL,
     Daemon,
     ODict,
@@ -328,7 +327,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
         vn, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
         if (
             w
-            and fn.lower() in FN_EMB
+            and fn.lower() in vn.flags["emb_all"]
             and self.uname not in vn.axs.uread
             and "wo_up_readme" not in vn.flags
         ):

@@ -255,6 +255,7 @@ Ls.hmn = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 	"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 	"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
+	"ct_dsel": 'use drag-selection in grid-view">dsel',
 	"ct_dl": 'force download (don\'t display inline) when a file is clicked">dl',
 	"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 	"ct_dots": 'show hidden files (if server permits)">dotfiles',
@@ -293,6 +294,7 @@ Ls.hmn = {
 	"cdt_ask": "when scrolling to the bottom,$Ninstead of loading more files,$Nask what to do",
 	"cdt_hsort": "how many sorting rules (&lt;code&gt;,sorthref&lt;/code&gt;) to include in media-URLs. Setting this to 0 will also ignore sorting-rules included in media links when clicking them",
 	"cdt_ren": "enable custom right-click menu, you can still access the regular menu by pressing the shift key and right-clicking",
+	"cdt_rdb": "show the regular right-click menu when the custom one is already open and right-clicking again",
 
 	"tt_entree": "show navpane (directory tree sidebar)$NHotkey: B",
 	"tt_detree": "show breadcrumbs$NHotkey: B",
@@ -383,6 +385,7 @@ Ls.hmn = {
 	"f_anota": "only {0} of the {1} items were selected;\nto select the full folder, first scroll to the bottom",
 
 	"f_dls": 'the file links in the current folder have\nbeen changed into download links',
+	"f_dl_nd": 'skipping folder (use zip/tar download instead):\n',
 
 	"f_partial": "To safely download a file which is currently being uploaded, please click the file which has the same filename, but without the <code>.PARTIAL</code> file extension. Please press CANCEL or Escape to do this.\n\nPressing OK / Enter will ignore this warning and continue downloading the <code>.PARTIAL</code> scratchfile instead, which will almost definitely give you corrupted data.",
 
@@ -674,7 +677,7 @@ Ls.hmn = {
 	"rc_ply": "play",
 	"rc_pla": "play as audio",
 	"rc_txt": "open in textfile viewer",
-	"rc_md": "open in text editor",
+	"rc_md": "open in markdown viewer",
 	"rc_dl": "download",
 	"rc_zip": "download as archive",
 	"rc_cpl": "copy link",
@@ -682,10 +685,13 @@ Ls.hmn = {
 	"rc_cut": "cut",
 	"rc_cpy": "copy",
 	"rc_pst": "paste",
+	"rc_rnm": "rename",
 	"rc_nfo": "new folder",
 	"rc_nfi": "new file",
 	"rc_sal": "select all",
 	"rc_sin": "invert selection",
+	"rc_shf": "share this folder",
+	"rc_shs": "share selection",
 
 	"lang_set": "refresh to make the change take effect?",
 

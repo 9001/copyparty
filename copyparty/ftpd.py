@@ -19,7 +19,6 @@ from .__init__ import PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .util import (
-    FN_EMB,
     VF_CAREFUL,
     Daemon,
     ODict,
@@ -179,7 +178,7 @@ class FtpFs(AbstractedFS):
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
             if (
                 w
-                and fn.lower() in FN_EMB
+                and fn.lower() in vfs.flags["emb_all"]
                 and self.h.uname not in vfs.axs.uread
                 and "wo_up_readme" not in vfs.flags
             ):

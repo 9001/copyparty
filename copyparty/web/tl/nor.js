@@ -223,6 +223,7 @@ Ls.nor = {
 	"ct_ttips": 'vis hjelpetekst ved å holde musen over ting">ℹ️ tips',
 	"ct_thumb": 'vis miniatyrbilder istedenfor ikoner$NSnarvei: T">🖼️ bilder',
 	"ct_csel": 'bruk tastene CTRL og SHIFT for markering av filer i ikonvisning">merk',
+	"ct_dsel": 'marker filer med klikk-og-dra i ikonvisning">dsel',
 	"ct_dl": 'last ned filer (ikke vis i nettleseren)">dl',
 	"ct_ihop": 'bla ned til sist viste bilde når bildeviseren lukkes">g⮯',
 	"ct_dots": 'vis skjulte filer (gitt at serveren tillater det)">.synlig',
@@ -261,6 +262,7 @@ Ls.nor = {
 	"cdt_ask": "vis knapper for å laste flere filer nederst på siden istedenfor å gradvis laste mer av mappen når man scroller ned",
 	"cdt_hsort": "antall sorterings-regler (&lt;code&gt;,sorthref&lt;/code&gt;) som skal inkluderes når media-URL'er genereres. Hvis denne er 0 så vil sorterings-regler i URL'er hverken bli generert eller lest",
 	"cdt_ren": "bruk egendefinert høyreklikkmeny (den vanlige menyen er tilgjengelig med shift + høyreklikk)",
+	"cdt_rdb": "høyreklikk to ganger for å vise den vanlige høyreklikkmenyen",
 
 	"tt_entree": "bytt til mappehierarki$NSnarvei: B",
 	"tt_detree": "bytt til tradisjonell sti-visning$NSnarvei: B",
@@ -351,6 +353,7 @@ Ls.nor = {
 	"f_anota": "kun {0} av totalt {1} elementer ble markert;\nfor å velge alt må du bla til bunnen av mappen først",
 
 	"f_dls": 'linkene i denne mappen er nå\nomgjort til nedlastningsknapper',
+	"f_dl_nd": 'hopper over mappe (bruk zip/tar-nedlasting i stedet):\n',
 
 	"f_partial": "For å laste ned en fil som enda ikke er ferdig opplastet, klikk på filen som har samme filnavn som denne, men uten <code>.PARTIAL</code> på slutten. Da vil serveren passe på at nedlastning går bra. Derfor anbefales det sterkt å trykke AVBRYT eller Escape-tasten.\n\nHvis du virkelig ønsker å laste ned denne <code>.PARTIAL</code>-filen på en ukontrollert måte, trykk OK / Enter for å ignorere denne advarselen. Slik vil du høyst sannsynlig motta korrupt data.",
 
@@ -650,10 +653,13 @@ Ls.nor = {
 	"rc_cut": "klipp ut",
 	"rc_cpy": "kopier",
 	"rc_pst": "Lim inn",
+	"rc_rnm": "gi nytt navn",
 	"rc_nfo": "ny mappe",
 	"rc_nfi": "ny fil",
 	"rc_sal": "velg alle",
 	"rc_sin": "inverter utvalg",
+	"rc_shf": "del denne mappen",
+	"rc_shs": "del markering",
 
 	"lang_set": "passer det å laste siden på nytt?",
 

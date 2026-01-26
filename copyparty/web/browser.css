@@ -4169,3 +4169,13 @@ html.e #detree {
 	border-radius: .2em;
 	padding: .2em .3em;
 }
+
+.selbox {
+    position: fixed;
+    border: .5em solid #f0f;
+    border: .2em solid var(--btn-1h-bg);
+    background-color: rgba(128, 128, 128, 0.6);
+    background-color: rgb(from var(--btn-1h-bg) r g b / 0.5);
+    pointer-events: none;
+	z-index: 99;
+}

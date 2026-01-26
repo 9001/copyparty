@@ -87,6 +87,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
     * [other flags](#other-flags)
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
+        * [metadata from xattrs](#metadata-from-xattrs) - unix extended file attributes
     * [file parser plugins](#file-parser-plugins) - provide custom parsers to index additional tags
     * [event hooks](#event-hooks) - trigger a program on uploads, renames etc ([examples](./bin/hooks/))
         * [zeromq](#zeromq) - event-hooks can send zeromq messages
@@ -397,6 +398,8 @@ same order here too
   * copyparty has a workaround which seems to work well enough
 
 * [Firefox issue 1790500](https://bugzilla.mozilla.org/show_bug.cgi?id=1790500) -- entire browser can crash after uploading ~4000 small files
+
+* Windows: Uploading from a webbrowser may fail with "directory iterator got stuck" due to the [max path length](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation?tabs=registry); try moving the files somewhere shorter before uploading
 
 * Android: music playback randomly stops due to [battery usage settings](#fix-unreliable-playback-on-android)
 
@@ -1877,6 +1880,23 @@ see the beautiful mess of a dictionary in [mtag.py](https://github.com/9001/copy
 `--mtag-to` sets the tag-scan timeout; very high default (60 sec) to cater for zfs and other randomly-freezing filesystems. Lower values like 10 are usually safe, allowing for faster processing of tricky files
 
 
+### metadata from xattrs
+
+unix extended file attributes  (Linux-only) can be indexed into the db and made searchable;
+
+* `--db-xattr user.foo,user.bar` will index the xattrs `user.foo` and `user.bar`,
+* `--db-xattr user.foo=foo,user.bar=bar` will index them with the names `foo` and `bar`,
+* `--db-xattr ~~user.foo,user.bar` will index everything *except* `user.foo` and `user.bar`,
+* `--db-xattr ~~` will index everything
+
+however note that the tags must also be enabled with `-mte` so here are some complete examples:
+* `-e2ts --db-xattr user.foo,user.bar -mte +user.foo,user.bar`
+* `-e2ts --db-xattr user.foo=foo,user.bar=bar -mte +foo,bar`
+
+as for actually adding the xattr `user.foo` to a file in the first place,
+* `setfattr -n user.foo -v 'utsikt fra fløytoppen' photo.jpg`
+
+
 ## file parser plugins
 
 provide custom parsers to index additional tags,  also see [./bin/mtag/README.md](./bin/mtag/README.md)
@@ -2235,7 +2255,7 @@ example webserver / reverse-proxy configs:
 * [lighttpd subdomain](contrib/lighttpd/subdomain.conf) -- entire domain/subdomain
 * [lighttpd subpath](contrib/lighttpd/subpath.conf) -- location-based (not optimal, but in case you need it)
 * [nginx config](contrib/nginx/copyparty.conf) -- recommended
-* [traefik config](contrib/traefik/copyparty.yaml)
+* [traefik config](contrib/traefik/copyparty.yaml) -- only use v3.6.7 or newer [due to CVE-2025-66490](https://github.com/9001/copyparty/issues/1205)
 
 
 ### real-ip

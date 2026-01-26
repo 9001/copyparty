@@ -435,7 +435,7 @@ find -name py.typed -delete
 find -type f \( -name .DS_Store -or -name ._.DS_Store \) -delete
 find -type f -name ._\* | while IFS= read -r f; do cmp <(printf '\x00\x05\x16') <(head -c 3 -- "$f") && rm -fv -- "$f"; done
 
-rm -f copyparty/web/deps/*.full.* copyparty/web/dbg-* copyparty/web/Makefile
+rm -f copyparty/web/deps/*.full.* copyparty/web/deps/README.md copyparty/web/dbg-* copyparty/web/Makefile
 
 find copyparty | LC_ALL=C sort | sed -r 's/\.gz$//;s/$/,/' > have
 cat have | while IFS= read -r x; do

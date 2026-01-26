@@ -151,6 +151,7 @@ done
 rm -rf contrib
 [ $fast ] && sed -ri s/573/10/ copyparty/web/Makefile
 (cd copyparty/web && make -j$(nproc) && rm Makefile)
+rm -f copyparty/web/deps/README.md
 
 # build
 python3 -m build

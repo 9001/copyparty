@@ -465,6 +465,8 @@ class MTag(object):
             "ffprobe" if args.no_mutagen or (HAVE_FFPROBE and EXE) else "mutagen"
         )
         self.can_ffprobe = HAVE_FFPROBE and not args.no_mtag_ff
+        self.read_xattrs = args.have_db_xattr
+        self.get = self._get_xattr if self.read_xattrs else self._get_main
         mappings = args.mtm
         or_ffprobe = " or FFprobe"
 
@@ -486,7 +488,13 @@ class MTag(object):
                 msg = "found FFprobe but it was disabled by --no-mtag-ff"
                 self.log(msg, c=3)
 
+        if self.read_xattrs and not self.usable:
+            t = "don't have the necessary dependencies to read conventional media tags, but will read xattrs"
+            self.log(t)
+            self.usable = True
+
         if not self.usable:
+            self._get = None
             if EXE:
                 t = "copyparty.exe cannot use mutagen; need ffprobe.exe to read media tags: "
                 self.log(t + FFMPEG_URL)
@@ -645,7 +653,36 @@ class MTag(object):
 
         return r1
 
-    def get(self, abspath: str) -> dict[str, Union[str, float]]:
+    def _get_xattr(
+        self, abspath: str, vf: dict[str, Any]
+    ) -> dict[str, Union[str, float]]:
+        ret = self._get_main(abspath, vf) if self._get else {}
+        if "db_xattr_no" in vf:
+            try:
+                neg = vf["db_xattr_no"]
+                zsl = os.listxattr(abspath)
+                zsl = [x for x in zsl if x not in neg]
+                for xattr in zsl:
+                    zb = os.getxattr(abspath, xattr)
+                    ret[xattr] = zb.decode("utf-8", "replace")
+            except:
+                self.log("failed to read xattrs from [%s]\n%s", abspath, min_ex(), 3)
+        elif "db_xattr_yes" in vf:
+            for xattr in vf["db_xattr_yes"]:
+                if "=" in xattr:
+                    xattr, name = xattr.split("=", 1)
+                else:
+                    name = xattr
+                try:
+                    zs = os.getxattr(abspath, xattr)
+                    ret[name] = zs.decode("utf-8", "replace")
+                except:
+                    pass
+        return ret
+
+    def _get_main(
+        self, abspath: str, vf: dict[str, Any]
+    ) -> dict[str, Union[str, float]]:
         ext = abspath.split(".")[-1].lower()
         if ext not in self.args.au_unpk:
             return self._get(abspath)

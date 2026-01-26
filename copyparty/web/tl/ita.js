@@ -226,6 +226,7 @@ Ls.ita = {
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltip',
 	"ct_thumb": 'nella vista griglia, alterna icone o miniature$NTasto rapido: T">🖼️ miniature',
 	"ct_csel": 'usa CTRL e SHIFT per la selezione file nella vista griglia">sel',
+	"ct_dsel": 'usa la selezione tramite trascinamento nella vista griglia">trascina', //m
 	"ct_dl": 'forza il download (non visualizzare inline) quando si clicca su un file">dl', //m
 	"ct_ihop": 'quando il visualizzatore immagini è chiuso, scorri fino all\'ultimo file visualizzato">g⮯',
 	"ct_dots": 'mostra file nascosti (se il server lo permette)">dotfile',
@@ -264,6 +265,7 @@ Ls.ita = {
 	"cdt_ask": "quando scorri verso il fondo,$Ninvece di caricare più file,$Nchiedi cosa fare",
 	"cdt_hsort": "quante regole di ordinamento (&lt;code&gt;,sorthref&lt;/code&gt;) includere negli URL multimediali. Impostandolo a 0 ignorerà anche le regole di ordinamento incluse nei link multimediali quando li clicchi",
 	"cdt_ren": "abilita il menu contestuale personalizzato, il menu normale è accessibile con shift + clic destro", //m
+	"cdt_rdb": "mostra il menu normale con il tasto destro quando quello personalizzato è già aperto e si clicca di nuovo", //m
 
 	"tt_entree": "mostra pannello nav (barra laterale albero directory)$NTasto rapido: B",
 	"tt_detree": "mostra breadcrumb$NTasto rapido: B",
@@ -354,6 +356,7 @@ Ls.ita = {
 	"f_anota": "solo {0} dei {1} elementi sono stati selezionati;\nper selezionare l'intera cartella, prima scorri fino in fondo",
 
 	"f_dls": 'i link dei file nella cartella corrente sono stati\ncambiati in link di download',
+	"f_dl_nd": 'cartella ignorata (usa invece il download zip/tar):\n', //m
 
 	"f_partial": "Per scaricare in sicurezza un file che è attualmente in fase di caricamento, clicca il file che ha lo stesso nome, ma senza l'estensione <code>.PARTIAL</code>. Premi ANNULLA o Escape per farlo.\n\nPremendo OK / Invio ignorerai questo avviso e continuerai a scaricare il file <code>.PARTIAL</code> scratch, che quasi sicuramente ti darà dati corrotti.",
 
@@ -653,10 +656,13 @@ Ls.ita = {
 	"rc_cut": "taglia", //m
 	"rc_cpy": "copia", //m
 	"rc_pst": "incolla", //m
+	"rc_rnm": "rinomina", //m
 	"rc_nfo": "nuova cartella", //m
 	"rc_nfi": "nuovo file", //m
 	"rc_sal": "seleziona tutto", //m
 	"rc_sin": "inverti selezione", //m
+	"rc_shf": "condividi questa cartella", //m
+	"rc_shs": "condividi selezione", //m
 
 	"lang_set": "aggiornare per rendere effettivo il cambiamento?",
 

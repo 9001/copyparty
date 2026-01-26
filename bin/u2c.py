@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.18"
-S_BUILD_DT = "2026-01-02"
+S_VERSION = "2.19"
+S_BUILD_DT = "2026-01-18"
 
 """
 u2c.py: upload to copyparty
@@ -100,7 +100,7 @@ except:
     ub64enc = base64.urlsafe_b64encode
 
 
-class BadAuth(Exception):
+class Fatal(Exception):
     pass
 
 
@@ -835,10 +835,15 @@ def handshake(ar, file, search):
             url = ""
         url = ar.vtop + url
 
+    t0 = time.time()
+    tmax = t0 + ar.t_hs
     while True:
         sc = 600
         txt = ""
-        t0 = time.time()
+        t1 = time.time()
+        if t1 >= tmax:
+            print("\nERROR: server offline for longer than --t-hs; giving up")
+            raise Fatal()
         try:
             zs = json.dumps(req, separators=(",\n", ": "))
             sc, txt = web.req("POST", url, {}, zs.encode("utf-8"), MJ)
@@ -861,11 +866,11 @@ def handshake(ar, file, search):
                 return [], False
             elif sc == 403 or sc == 401:
                 print("\nERROR: login required, or wrong password:\n%s" % (txt,))
-                raise BadAuth()
+                raise Fatal()
 
-            t = "handshake failed, retrying: %s\n  t0=%.3f t1=%.3f td=%.3f\n  %s\n\n"
+            t = "handshake failed, retrying: %s\n  t0=%.3f t1=%.3f t2=%.3f td1=%.3f td2=%.3f\n  %s\n\n"
             now = time.time()
-            eprint(t % (file.name, t0, now, now - t0, em))
+            eprint(t % (file.name, t0, t1, now, now - t0, now - t1, em))
             time.sleep(ar.cd)
 
     try:
@@ -1051,7 +1056,7 @@ class Ctl(object):
                 print("  hs...")
                 try:
                     hs, _ = handshake(self.ar, file, search)
-                except BadAuth:
+                except Fatal:
                     sys.exit(1)
 
                 if search:
@@ -1356,7 +1361,7 @@ class Ctl(object):
 
             try:
                 hs, sprs = handshake(self.ar, file, search)
-            except BadAuth:
+            except Fatal:
                 self.panik = 1
                 break
 
@@ -1591,6 +1596,7 @@ NOTE: if server has --usernames enabled, then password is "username:password"
     ap.add_argument("-ns", action="store_true", help="no status panel (for slow consoles and macos)")
     ap.add_argument("--cxp", type=float, metavar="SEC", default=57, help="assume http connections expired after SEConds")
     ap.add_argument("--cd", type=float, metavar="SEC", default=5, help="delay before reattempting a failed handshake/upload")
+    ap.add_argument("--t-hs", type=float, metavar="SEC", default=186, help="crash if handshakes fail due to server-offline for this long")
     ap.add_argument("--safe", action="store_true", help="use simple fallback approach")
     ap.add_argument("-z", action="store_true", help="ZOOMIN' (skip uploading files if they exist at the destination with the ~same last-modified timestamp, so same as yolo / turbo with date-chk but even faster)")
 

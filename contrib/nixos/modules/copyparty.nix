@@ -69,11 +69,8 @@ in
   options.services.copyparty = {
     enable = mkEnableOption "web-based file manager";
 
-    package = mkOption {
-      type = types.package;
-      default = pkgs.copyparty;
-      defaultText = "pkgs.copyparty";
-      description = ''
+    package = mkPackageOption pkgs "copyparty" {
+      extraDescription = ''
         Package of the application to run, exposed for overriding purposes.
       '';
     };
@@ -82,7 +79,7 @@ in
       type = types.bool;
       default = true;
       description = ''
-        Make a shell script wrapper called 'copyparty-hash' with all options set here,
+        Make a shell script wrapper called {command}`copyparty-hash` with all options set here,
         that launches the hashing cli.
       '';
     };
@@ -117,9 +114,9 @@ in
       type = types.attrs;
       description = ''
         Global settings to apply.
-        Directly maps to values in the [global] section of the copyparty config.
+        Directly maps to values in the `[global]` section of the copyparty config.
         Cannot set "c" or "hist", those are set by this module.
-        See `${getExe cfg.package} --help` for more details.
+        See {command}`copyparty --help` for more details.
       '';
       default = {
         i = "127.0.0.1";
@@ -138,7 +135,7 @@ in
     globalExtraConfig = mkOption {
       type = types.str;
       default = "";
-      description = "Appended to the end of the [global] section verbatim. This is useful for flags which are used in a repeating manner (e.g. ipu: 255.255.255.1=user) which can't be repeated in the settings = {} attribute set.";
+      description = "Appended to the end of the `[global]` section verbatim. This is useful for flags which are used in a repeating manner (e.g. `ipu: 255.255.255.1=user`) which can't be repeated in the settings = {} attribute set.";
     };
 
     accounts = mkOption {
@@ -201,21 +198,21 @@ in
                   Attribute list of permissions and the users to apply them to.
 
                   The key must be a string containing any combination of allowed permission:
-                    "r" (read):   list folder contents, download files
-                    "w" (write):  upload files; need "r" to see the uploads
-                    "m" (move):   move files and folders; need "w" at destination
-                    "d" (delete): permanently delete files and folders
-                    "g" (get):    download files, but cannot see folder contents
-                    "G" (upget):  "get", but can see filekeys of their own uploads
-                    "h" (html):   "get", but folders return their index.html
-                    "a" (admin):  can see uploader IPs, config-reload
+                  * "r" (read):   list folder contents, download files
+                  * "w" (write):  upload files; need "r" to see the uploads
+                  * "m" (move):   move files and folders; need "w" at destination
+                  * "d" (delete): permanently delete files and folders
+                  * "g" (get):    download files, but cannot see folder contents
+                  * "G" (upget):  "get", but can see filekeys of their own uploads
+                  * "h" (html):   "get", but folders return their index.html
+                  * "a" (admin):  can see uploader IPs, config-reload
 
                   For example: "rwmd"
 
                   The value must be one of:
-                    an account name, defined in `accounts`
-                    a list of account names
-                    "*", which means "any account"
+                  * an account name, defined in `accounts`
+                  * a list of account names
+                  * "*", which means "any account"
                 '';
                 example = literalExpression ''
                   {
@@ -230,7 +227,7 @@ in
                 type = types.attrs;
                 description = ''
                   Attribute list of volume flags to apply.
-                  See `${getExe cfg.package} --help-flags` for more details.
+                  See {command}`copyparty --help-flags` for more details.
                 '';
                 example = literalExpression ''
                   {

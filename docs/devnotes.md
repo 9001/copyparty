@@ -289,6 +289,7 @@ upload modifiers:
 | GET | `?imgs=0` | ui: show list-view |
 | GET | `?thumb` | ui, grid-mode: show thumbnails |
 | GET | `?thumb=0` | ui, grid-mode: show icons |
+| POST | `?smsg=foo` | send-msg-to-serverlog / run xm hook |
 
 
 # event hooks

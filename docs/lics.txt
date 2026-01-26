@@ -46,7 +46,7 @@ https://github.com/Daninet/hash-wasm/
 C: 2020 Dani Biró
 L: MIT
 
-https://github.com/openpgpjs/asmcrypto.js/
+https://github.com/asmcrypto/asmcrypto.js/
 C: 2013 Artem S Vybornov
 L: MIT
 

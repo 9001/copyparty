@@ -124,6 +124,7 @@ class SvcHub(object):
         self.argv = argv
         self.E: EnvParams = args.E
         self.no_ansi = args.no_ansi
+        self.flo = args.flo
         self.tz = UTC if args.log_utc else None
         self.logf: Optional[typing.TextIO] = None
         self.logf_base_fn = ""
@@ -314,6 +315,10 @@ class SvcHub(object):
             args.vname = args.name
         args.doctitle = args.doctitle.replace("--name", args.vname)
         args.bname = args.bname.replace("--name", args.vname) or args.vname
+
+        for zs in "shr_site up_site".split():
+            if getattr(args, zs) == "--site":
+                setattr(args, zs, args.site)
 
         if args.log_fk:
             args.log_fk = re.compile(args.log_fk)
@@ -1113,6 +1118,12 @@ class SvcHub(object):
             vsa = [x.lower() for x in vsa if x]
             setattr(al, k + "_set", set(vsa))
 
+        for k in "smsg".split(" "):
+            vs = getattr(al, k)
+            vsa = [x.strip() for x in vs.split(",")]
+            vsa = [x.upper() for x in vsa if x]
+            setattr(al, k + "_set", set(vsa))
+
         zs = "dav_ua1 sus_urls nonsus_urls ua_nodav ua_nodoc ua_nozip"
         for k in zs.split(" "):
             vs = getattr(al, k)
@@ -1567,21 +1578,38 @@ class SvcHub(object):
                 dt.microsecond // self.log_div,
             )
 
-            if c and not self.args.no_ansi:
-                if isinstance(c, int):
+            if self.flo == 1:
+                fmt = "@%s [%-21s] %s\n"
+                if not c:
+                    if "\033" in msg:
+                        msg += "\033[0m"
+                elif isinstance(c, int):
                     msg = "\033[3%sm%s\033[0m" % (c, msg)
                 elif "\033" not in c:
                     msg = "\033[%sm%s\033[0m" % (c, msg)
                 else:
                     msg = "%s%s\033[0m" % (c, msg)
 
-            if "\033" in src:
-                src += "\033[0m"
+                if "\033" in src:
+                    src += "\033[0m"
+            else:
+                if not c:
+                    fmt = "@%s  LOG [%-21s] %s\n"
+                elif c == 1:
+                    fmt = "@%s CRIT [%-21s] %s\n"
+                elif c == 3:
+                    fmt = "@%s WARN [%-21s] %s\n"
+                elif c == 6:
+                    fmt = "@%s  BTW [%-21s] %s\n"
+                else:
+                    fmt = "@%s  LOG [%-21s] %s\n"
 
-            if "\033" in msg:
-                msg += "\033[0m"
+                if "\033" in src:
+                    src = RE_ANSI.sub("", src)
+                if "\033" in msg:
+                    msg = RE_ANSI.sub("", msg)
 
-            self.logf.write("@%s [%-21s] %s\n" % (ts, src, msg))
+            self.logf.write(fmt % (ts, src, msg))
             if not self.args.no_logflush:
                 self.logf.flush()
 
@@ -1611,9 +1639,10 @@ class SvcHub(object):
                 if self.logf:
                     self.logf.write(zs)
 
-            fmt = "\033[36m%s \033[33m%-21s \033[0m%s\n"
             if self.no_ansi:
-                if c == 1:
+                if not c:
+                    fmt = "%s %-21s  LOG: %s\n"
+                elif c == 1:
                     fmt = "%s %-21s CRIT: %s\n"
                 elif c == 3:
                     fmt = "%s %-21s WARN: %s\n"
@@ -1621,12 +1650,16 @@ class SvcHub(object):
                     fmt = "%s %-21s  BTW: %s\n"
                 else:
                     fmt = "%s %-21s  LOG: %s\n"
+
                 if "\033" in msg:
                     msg = RE_ANSI.sub("", msg)
                 if "\033" in src:
                     src = RE_ANSI.sub("", src)
-            elif c:
-                if isinstance(c, int):
+            else:
+                fmt = "\033[36m%s \033[33m%-21s \033[0m%s\n"
+                if not c:
+                    pass
+                elif isinstance(c, int):
                     msg = "\033[3%sm%s\033[0m" % (c, msg)
                 elif "\033" not in c:
                     msg = "\033[%sm%s\033[0m" % (c, msg)

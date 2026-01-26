@@ -22,6 +22,7 @@ from .util import (
     DEF_MTH,
     EXTS,
     FAVICON_MIMES,
+    FN_EMB,
     HAVE_SQLITE3,
     IMPLICATIONS,
     META_NOBOTS,
@@ -101,7 +102,7 @@ UP_MTE_MAP = {  # db-order
 }
 
 SEE_LOG = "see log for details"
-SEESLOG = " (see serverlog for details)"
+SEESLOG = " (see fileserver log for details)"
 SSEELOG = " ({})".format(SEE_LOG)
 BAD_CFG = "invalid config; {}".format(SEE_LOG)
 SBADCFG = " ({})".format(BAD_CFG)
@@ -1070,6 +1071,7 @@ class AuthSrv(object):
             "tcolor": self.args.tcolor,
             "du_iwho": self.args.du_iwho,
             "shr_who": self.args.shr_who if self.args.shr else "no",
+            "emb_all": FN_EMB,
             "ls_q_m": ("", ""),
         }
         self._vf0 = self._vf0b.copy()
@@ -2090,6 +2092,49 @@ class AuthSrv(object):
                     t = "WARNING: the account [%s] is not mentioned in any volume definitions and thus has the same access-level and privileges that guests have; please see --help-accounts for details.  For example, if you intended to give that user full access to the current directory, you could do this:  -v .::A,%s"
                     self.log(t % (usr, usr), 1)
 
+        dropvols = []
+        errors = False
+        for vol in vfs.all_vols.values():
+            if (
+                not vol.realpath
+                or (
+                    "assert_root" not in vol.flags
+                    and "nospawn" not in vol.flags
+                    and not self.args.vol_or_crash
+                    and not self.args.vol_nospawn
+                )
+                or bos.path.exists(vol.realpath)
+            ):
+                pass
+            elif "assert_root" in vol.flags or self.args.vol_or_crash:
+                t = "ERROR: volume [/%s] root folder %r does not exist on server HDD; will now crash due to volflag 'assert_root'"
+                self.log(t % (vol.vpath, vol.realpath), 1)
+                errors = True
+            else:
+                t = "WARNING: volume [/%s] root folder %r does not exist on server HDD; volume will be unavailable due to volflag 'nospawn'"
+                self.log(t % (vol.vpath, vol.realpath), 3)
+                dropvols.append(vol)
+        if errors:
+            sys.exit(1)
+        for vol in dropvols:
+            vol.axs = AXS()
+            vol.uaxs = {}
+            vfs.all_vols.pop(vol.vpath, None)
+            vfs.all_nodes.pop(vol.vpath, None)
+            for zv in vfs.all_nodes.values():
+                try:
+                    zv.all_aps.remove(vol.realpath)
+                    zv.all_vps.remove(vol.vpath)
+                    # pointless but might as well:
+                    zv.all_vols.pop(vol.vpath)
+                    zv.all_nodes.pop(vol.vpath)
+                except:
+                    pass
+                zs = next((x for x, y in zv.nodes.items() if y == vol), "")
+                if zs:
+                    zv.nodes.pop(zs)
+            vol.realpath = ""
+
         promote = []
         demote = []
         for vol in vfs.all_vols.values():
@@ -2538,16 +2583,22 @@ class AuthSrv(object):
                 t = "WARNING: volume [/%s]: invalid value specified for ext-th: %s"
                 self.log(t % (vol.vpath, etv), 3)
 
+            emb_all = vol.flags["emb_all"] = set()
+
             zsl1 = [x for x in vol.flags["preadmes"].split(",") if x]
             zsl2 = [x for x in vol.flags["readmes"].split(",") if x]
             zsl3 = list(set([x.lower() for x in zsl1]))
             zsl4 = list(set([x.lower() for x in zsl2]))
+            emb_all.update(zsl3)
+            emb_all.update(zsl4)
             vol.flags["emb_mds"] = [[0, zsl1, zsl3], [1, zsl2, zsl4]]
 
             zsl1 = [x for x in vol.flags["prologues"].split(",") if x]
             zsl2 = [x for x in vol.flags["epilogues"].split(",") if x]
             zsl3 = list(set([x.lower() for x in zsl1]))
             zsl4 = list(set([x.lower() for x in zsl2]))
+            emb_all.update(zsl3)
+            emb_all.update(zsl4)
             vol.flags["emb_lgs"] = [[0, zsl1, zsl3], [1, zsl2, zsl4]]
 
             zs = str(vol.flags.get("html_head") or "")
@@ -2590,6 +2641,19 @@ class AuthSrv(object):
                 vol.flags.pop("html_head_d", None)
 
             vol.check_landmarks()
+
+            if vol.flags.get("db_xattr"):
+                self.args.have_db_xattr = True
+                zs = str(vol.flags["db_xattr"])
+                neg = zs.startswith("~~")
+                if neg:
+                    zs = zs[2:]
+                zsl = [x.strip() for x in zs.split(",")]
+                zsl = [x for x in zsl if x]
+                if neg:
+                    vol.flags["db_xattr_no"] = set(zsl)
+                else:
+                    vol.flags["db_xattr_yes"] = zsl
 
             # d2d drops all database features for a volume
             for grp, rm in [["d2d", "e2d"], ["d2t", "e2t"], ["d2d", "e2v"]]:
@@ -2709,7 +2773,7 @@ class AuthSrv(object):
             for zs in zs.split():
                 vol.flags.pop(zs, None)
 
-        for vol in vfs.all_nodes.values():
+        for vol in vfs.all_vols.values():
             if not vol.realpath or vol.flags.get("is_file"):
                 continue
             ccs = vol.flags["casechk"][:1].lower()
@@ -3145,6 +3209,7 @@ class AuthSrv(object):
                 "dsort": vf["sort"],
                 "dcrop": vf["crop"],
                 "dth3x": vf["th3x"],
+                "drcm": self.args.rcm,
                 "dvol": self.args.au_vol,
                 "idxh": int(self.args.ih),
                 "dutc": not self.args.localtime,
@@ -3168,6 +3233,11 @@ class AuthSrv(object):
             for zs in zs.split():
                 if getattr(self.args, zs, False):
                     js_htm[zs] = 1
+            zs = "up_site"
+            for zs in zs.split():
+                zs2 = getattr(self.args, zs, "")
+                if zs2:
+                    js_htm[zs] = zs2
             vn.js_htm = json_hesc(json.dumps(js_htm))
 
         vols = list(vfs.all_nodes.values())
