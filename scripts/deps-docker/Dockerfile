@@ -13,8 +13,6 @@ COPY    build.sh /z/
 RUN     /z/build.sh download
 RUN     /z/build.sh unpack
 
-COPY    busy-mp3.sh /z/
-RUN     /z/build.sh build busy-mp3
 
 # build fonttools (which needs zopfli)
 RUN     /z/build.sh build fonttools

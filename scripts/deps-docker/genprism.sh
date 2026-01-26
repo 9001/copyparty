@@ -188,7 +188,7 @@ langs=(
     # nevod
     # nginx
     nim
-    # nix
+    nix
     # nsis
     objectivec
     # ocaml
