@@ -1,142 +1,61 @@
 FROM    alpine:3.23
 WORKDIR /z
-ENV     ver_hashwasm=4.12.0 \
-        ver_marked=4.3.0 \
-        ver_dompf=3.3.1 \
-        ver_mde=2.18.0 \
-        ver_codemirror=5.65.18 \
-        ver_fontawesome=5.13.0 \
-        ver_prism=1.30.0 \
-        ver_zopfli=1.0.3
-
-# versioncheck:
-# https://github.com/markedjs/marked/releases
-# https://github.com/Ionaru/easy-markdown-editor/tags  # ignore 2.20.0
-# https://github.com/codemirror/codemirror5/releases
-# https://github.com/cure53/DOMPurify/releases
-# https://github.com/Daninet/hash-wasm/releases
-# https://github.com/google/zopfli/tags
 
 
-# download;
-# the scp url is regular latin from https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap
-RUN     mkdir -p /z/dist/no-pk \
-        && wget https://fonts.gstatic.com/s/sourcecodepro/v11/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2 -O scp.woff2 \
-        && apk add \
+RUN     apk add \
                 bash brotli cmake make g++ git gzip lame npm patch pigz \
                 python3 python3-dev py3-brotli sox tar unzip wget \
-        && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
-        && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
-        && wget https://github.com/Ionaru/easy-markdown-editor/archive/$ver_mde.tar.gz -O mde.tgz \
-        && wget https://github.com/codemirror/codemirror5/archive/$ver_codemirror.tar.gz -O codemirror.tgz \
-        && wget https://github.com/cure53/DOMPurify/archive/refs/tags/$ver_dompf.tar.gz -O dompurify.tgz \
-        && wget https://github.com/FortAwesome/Font-Awesome/releases/download/$ver_fontawesome/fontawesome-free-$ver_fontawesome-web.zip -O fontawesome.zip \
-        && wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz \
-        && wget https://github.com/Daninet/hash-wasm/releases/download/v$ver_hashwasm/hash-wasm@$ver_hashwasm.zip -O hash-wasm.zip \
-        && wget https://github.com/PrismJS/prism/archive/refs/tags/v$ver_prism.tar.gz -O prism.tgz \
-        && wget https://files.pythonhosted.org/packages/04/0b/4506cb2e831cea4b0214d3625430e921faaa05a7fb520458c75a2dbd2152/fusepy-3.0.1.tar.gz -O fusepy.tgz \
-        && (mkdir hash-wasm \
-            && cd hash-wasm \
-            && unzip ../hash-wasm.zip) \
-        && (tar --no-same-owner -xf marked.tgz \
-            && cd marked-$ver_marked \
-            && npm install \
-            && npm i grunt uglify-js -g ) \
-        && (tar --no-same-owner -xf codemirror.tgz \
-            && cd codemirror5-$ver_codemirror \
-            && npm install ) \
-        && (tar --no-same-owner -xf mde.tgz \
-            && cd easy-markdown-editor* \
-            && npm install \
-            && npm i gulp-cli -g ) \
-        && tar --no-same-owner -xf dompurify.tgz \
-        && tar --no-same-owner -xf prism.tgz \
-        && tar --no-same-owner -xf fusepy.tgz \
-        && unzip fontawesome.zip \
-        && tar --no-same-owner -xf zopfli.tgz
+        && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED
 
+
+RUN     mkdir -p /z/dist/no-pk
+COPY    build.sh /z/
+RUN     /z/build.sh download
+RUN     /z/build.sh unpack
 
 COPY    busy-mp3.sh /z/
-RUN     /z/busy-mp3.sh \
-        && mv -v /dev/shm/busy.mp3.gz /z/dist
-
+RUN     /z/build.sh build busy-mp3
 
 # build fonttools (which needs zopfli)
-RUN     tar --no-same-owner -xf zopfli.tgz \
-        && cd zopfli* \
-        && cmake \
-            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-            -DCMAKE_INSTALL_PREFIX=/usr \
-            -DZOPFLI_BUILD_SHARED=ON \
-            -B build \
-            -S . \
-        && make -C build \
-        && make -C build install \
-        && python3 -m ensurepip \
-        && python3 -m pip install fonttools zopfli
+RUN     /z/build.sh build fonttools
 
 
 # build hash-wasm
-RUN     cd hash-wasm/dist \
-        && mv sha512.umd.min.js /z/dist/sha512.hw.js
+RUN     /z/build.sh build hash-wasm
 
 
 # build marked
 COPY    marked.patch /z/
 COPY    marked-ln.patch /z/
-RUN     cd marked-$ver_marked \
-        && patch -p1 < /z/marked-ln.patch \
-        && patch -p1 < /z/marked.patch \
-        && npm run build \
-        && cp -pv marked.min.js /z/dist/marked.js \
-        && mkdir -p /z/nodepkgs \
-        && ln -s $(pwd) /z/nodepkgs/marked
-#        && npm run test \
+RUN     /z/build.sh build marked
 
 
 # build codemirror
 COPY    codemirror.patch /z/
-RUN     cd codemirror5-$ver_codemirror \
-        && patch -p1 < /z/codemirror.patch \
-        && sed -ri '/^var urlRE = /d' mode/gfm/gfm.js \
-        && npm run build \
-        && ln -s $(pwd) /z/nodepkgs/codemirror
+RUN     /z/build.sh build codemirror
 
 
 # build easymde
 COPY    easymde.patch /z/
-RUN     cd easy-markdown-editor-$ver_mde \
-        && patch -p1 < /z/easymde.patch \
-        && sed -ri 's`https://registry.npmjs.org/marked/-/marked-[0-9\.]+.tgz`file:/z/nodepkgs/marked`' package-lock.json \
-        && sed -ri 's`https://registry.npmjs.org/codemirror/-/codemirror-[0-9\.]+.tgz`file:/z/nodepkgs/codemirror`' package-lock.json \
-        && sed -ri 's`("marked": ")[^"]+`\1file:/z/nodepkgs/marked`' ./package.json \
-        && sed -ri 's`("codemirror": ")[^"]+`\1file:/z/nodepkgs/codemirror`' ./package.json \
-        && sed -ri 's`^var marked = require\(.marked.\).marked;$`var marked = window.marked;`' src/js/easymde.js \
-        && npm install
-
 COPY    easymde-ln.patch /z/
-RUN     cd easy-markdown-editor-$ver_mde \
-        && patch -p1 < /z/easymde-ln.patch \
-        && gulp \
-        && cp -pv dist/easymde.min.css /z/dist/easymde.css \
-        && cp -pv dist/easymde.min.js /z/dist/easymde.js
+RUN     /z/build.sh build easymde
 
 
 # build dompurify
-RUN     (echo; cat DOMPurify-$ver_dompf/dist/purify.min.js) >> /z/dist/marked.js
+RUN     /z/build.sh build dompurify
 
 
 # build fontawesome and scp
 COPY    mini-fa.sh /z
 COPY    mini-fa.css /z
 COPY    shiftbase.py /z
-RUN     /bin/ash /z/mini-fa.sh
+RUN     /z/build.sh build fonts
 
 
 # build prismjs
 COPY    genprism.py /z
 COPY    genprism.sh /z
-RUN     ./genprism.sh $ver_prism
+RUN     /z/build.sh build prismjs
 
 
 # compress
