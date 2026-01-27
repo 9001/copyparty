@@ -10,7 +10,6 @@ ver_mde=2.18.0
 ver_codemirror=5.65.18
 ver_fontawesome=5.13.0
 ver_prism=1.30.0
-ver_zopfli=1.0.3
 
 # versioncheck:
 # https://github.com/markedjs/marked/releases
@@ -18,7 +17,6 @@ ver_zopfli=1.0.3
 # https://github.com/codemirror/codemirror5/releases
 # https://github.com/cure53/DOMPurify/releases
 # https://github.com/Daninet/hash-wasm/releases
-# https://github.com/google/zopfli/tags
 
 explode() {
   return 1
@@ -29,21 +27,6 @@ build() {
     busy-mp3)
       /z/busy-mp3.sh
       mv -v /dev/shm/busy.mp3.gz /z/dist
-    ;;
-    fonttools)
-      # We build zopfli from source even if it's available in alpine's repos?
-      tar --no-same-owner -xf zopfli.tgz
-      cd zopfli-zopfli-$ver_zopfli
-      cmake \
-        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-        -DCMAKE_INSTALL_PREFIX=/usr \
-        -DZOPFLI_BUILD_SHARED=ON \
-        -B build \
-        -S .
-      make -C build
-      make -C build install
-      python3 -m ensurepip
-      python3 -m pip install fonttools zopfli
     ;;
     hash-wasm)
       cd hash-wasm/dist
@@ -107,7 +90,6 @@ case $1 in
     wget https://github.com/codemirror/codemirror5/archive/$ver_codemirror.tar.gz -O codemirror.tgz
     wget https://github.com/cure53/DOMPurify/archive/refs/tags/$ver_dompf.tar.gz -O dompurify.tgz
     wget https://github.com/FortAwesome/Font-Awesome/releases/download/$ver_fontawesome/fontawesome-free-$ver_fontawesome-web.zip -O fontawesome.zip
-    wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz
     wget https://github.com/Daninet/hash-wasm/releases/download/v$ver_hashwasm/hash-wasm@$ver_hashwasm.zip -O hash-wasm.zip
     wget https://github.com/PrismJS/prism/archive/refs/tags/v$ver_prism.tar.gz -O prism.tgz
     wget https://files.pythonhosted.org/packages/04/0b/4506cb2e831cea4b0214d3625430e921faaa05a7fb520458c75a2dbd2152/fusepy-3.0.1.tar.gz -O fusepy.tgz
@@ -131,7 +113,6 @@ case $1 in
     tar --no-same-owner -xf prism.tgz
     tar --no-same-owner -xf fusepy.tgz
     unzip fontawesome.zip
-    tar --no-same-owner -xf zopfli.tgz
     ;;
   build)
     build $2

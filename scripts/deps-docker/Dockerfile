@@ -3,19 +3,14 @@ WORKDIR /z
 
 
 RUN     apk add \
-                bash brotli cmake make g++ git gzip lame npm patch pigz \
-                python3 python3-dev py3-brotli sox tar unzip wget \
-        && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED
+                bash brotli make git gzip npm patch pigz tar unzip wget \
+                python3 python3-dev py3-brotli py3-fonttools py3-zopfli
 
 
 RUN     mkdir -p /z/dist/no-pk
 COPY    build.sh /z/
 RUN     /z/build.sh download
 RUN     /z/build.sh unpack
-
-
-# build fonttools (which needs zopfli)
-RUN     /z/build.sh build fonttools
 
 
 # build hash-wasm
