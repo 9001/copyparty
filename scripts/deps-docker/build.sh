@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2016
 
 set -o errexit
 set -o pipefail
@@ -39,7 +40,7 @@ build() {
       npm run build
       cp -pv marked.min.js /z/dist/marked.js
       mkdir -p /z/nodepkgs
-      ln -s $(pwd) /z/nodepkgs/marked
+      ln -s "$(pwd)" /z/nodepkgs/marked
       # npm run test
     ;;
     codemirror)
@@ -47,7 +48,7 @@ build() {
         patch -p1 < /z/codemirror.patch
         sed -ri '/^var urlRE = /d' mode/gfm/gfm.js
         npm run build
-        ln -s $(pwd) /z/nodepkgs/codemirror
+        ln -s "$(pwd)" /z/nodepkgs/codemirror
     ;;
     easymde)
         cd easy-markdown-editor-$ver_mde
@@ -115,7 +116,7 @@ case $1 in
     unzip fontawesome.zip
     ;;
   build)
-    build $2
+    build "$2"
   ;;
   *)
     echo "idk"
