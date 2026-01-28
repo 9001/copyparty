@@ -6941,7 +6941,7 @@ class HttpCli(object):
             "have_b_u": (self.can_write and self.uparam.get("b") == "u"),
             "sb_lg": vn.js_ls["sb_lg"],
             "url_suf": url_suf,
-            "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
+            "title": html_escape((self.vpath or "copyparty") if self.args.nih else "%s %s" % (self.args.bname, self.vpath), crlf=True),
             "srv_info": srv_infot,
             "dtheme": self.args.theme,
         }

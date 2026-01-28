@@ -9395,7 +9395,7 @@ function wintitle(txt, noname) {
 
 	txt += uricom_dec(get_evpath()).slice(1, -1).split('/').pop();
 
-	document.title = txt;
+	document.title = txt || "copyparty";
 }
 
 
