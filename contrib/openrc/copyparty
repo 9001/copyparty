@@ -9,10 +9,19 @@
 # you may want to:
 #   change '/usr/bin/python' to another interpreter
 #   change '/mnt::rw' to another location or permission-set
+#   use a config file instead of command arguments, e.g.:
+#      command_args="-c /etc/copyparty.conf"
 
 name="$SVCNAME"
 command_background=true
+extra_commands="checkconfig"
 pidfile="/var/run/$SVCNAME.pid"
 
 command="/usr/bin/python3 /usr/local/bin/copyparty-sfx.py"
 command_args="-q -v /mnt::rw"
+
+checkconfig() {
+        ebegin "Checking $RC_SVCNAME configuration"
+        $command $command_args --exit cfg
+        eend $?
+}
