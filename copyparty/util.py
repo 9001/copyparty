@@ -57,6 +57,11 @@ from .__init__ import (
 )
 from .__version__ import S_BUILD_DT, S_VERSION
 
+
+def noop(*a, **ka):
+    pass
+
+
 try:
     from datetime import datetime, timezone
 
@@ -279,6 +284,9 @@ try:
     BITNESS = struct.calcsize(b"P") * 8
 except:
     BITNESS = struct.calcsize("P") * 8
+
+
+CAN_SIGMASK = not (ANYWIN or PY2 or GRAAL)
 
 
 RE_ANSI = re.compile("\033\\[[^mK]*[mK]")
@@ -780,7 +788,7 @@ class Daemon(threading.Thread):
             self.start()
 
     def run(self):
-        if not ANYWIN and not PY2 and not GRAAL:
+        if CAN_SIGMASK:
             signal.pthread_sigmask(
                 signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]
             )
@@ -1656,13 +1664,13 @@ def log_thrs(log: Callable[[str, str, int], None], ival: float, name: str) -> No
         log(name, "\033[0m \033[33m".join(tv), 3)
 
 
-def sigblock():
-    if ANYWIN or PY2 or GRAAL:
-        return
-
+def _sigblock():
     signal.pthread_sigmask(
         signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]
     )
+
+
+sigblock = _sigblock if CAN_SIGMASK else noop
 
 
 def vol_san(vols: list["VFS"], txt: bytes) -> bytes:
