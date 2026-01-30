@@ -8,6 +8,7 @@ https://github.com/pydron/ifaddr/tree/0.2.0
 """
 
 import os
+import platform
 
 from ._shared import IP, Adapter
 
@@ -22,7 +23,7 @@ except:
     S390X = False
 
 
-if os.environ.get("PRTY_NO_IFADDR") or S390X:
+if os.environ.get("PRTY_NO_IFADDR") or S390X or platform.python_implementation() == "GraalVM":
     # s390x deadlocks at libc.getifaddrs
     get_adapters = nope
 elif os.name == "nt":

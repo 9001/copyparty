@@ -45,6 +45,7 @@ except:
 from .__init__ import (
     ANYWIN,
     EXE,
+    GRAAL,
     MACOS,
     PY2,
     PY36,
@@ -779,7 +780,7 @@ class Daemon(threading.Thread):
             self.start()
 
     def run(self):
-        if not ANYWIN and not PY2:
+        if not ANYWIN and not PY2 and not GRAAL:
             signal.pthread_sigmask(
                 signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]
             )
@@ -1656,7 +1657,7 @@ def log_thrs(log: Callable[[str, str, int], None], ival: float, name: str) -> No
 
 
 def sigblock():
-    if ANYWIN or PY2:
+    if ANYWIN or PY2 or GRAAL:
         return
 
     signal.pthread_sigmask(

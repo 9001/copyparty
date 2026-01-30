@@ -46,6 +46,8 @@ MACOS = platform.system() == "Darwin"
 
 EXE = bool(getattr(sys, "frozen", False))
 
+GRAAL = platform.python_implementation() == "GraalVM"
+
 try:
     CORES = len(os.sched_getaffinity(0))
 except:
