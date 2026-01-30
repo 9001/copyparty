@@ -17,20 +17,28 @@ def nope(include_unconfigured=False):
     return []
 
 
-try:
-    S390X = os.uname().machine == "s390x"
-except:
-    S390X = False
+host_os = platform.system()
+machine = platform.machine()
+py_impl = platform.python_implementation()
 
 
-if os.environ.get("PRTY_NO_IFADDR") or S390X or platform.python_implementation() == "GraalVM":
+if os.environ.get("PRTY_NO_IFADDR"):
+    get_adapters = nope
+elif machine in ("s390x",) or host_os in ("IRIX32",):
     # s390x deadlocks at libc.getifaddrs
+    # irix libc does not have getifaddrs at all
+    print("ifaddr unavailable; can't determine LAN IP: unsupported OS")
+    get_adapters = nope
+elif py_impl in ("GraalVM",):
+    print("ifaddr unavailable; can't determine LAN IP: unsupported interpreter")
     get_adapters = nope
 elif os.name == "nt":
     from ._win32 import get_adapters
 elif os.name == "posix":
     from ._posix import get_adapters
 else:
-    raise RuntimeError("Unsupported Operating System: %s" % os.name)
+    print("ifaddr unavailable; can't determine LAN IP: unsupported OS")
+    get_adapters = nope
+
 
 __all__ = ["Adapter", "IP", "get_adapters"]
