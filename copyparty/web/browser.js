@@ -290,6 +290,7 @@ if (1)
 		"ml_tint": "tint",
 		"ml_eq": "audio equalizer",
 		"ml_drc": "dynamic range compressor",
+		"ml_ss": "skip silence",
 
 		"mt_loop": "loop/repeat one song\">🔁",
 		"mt_one": "stop after one song\">1️⃣",
@@ -326,7 +327,13 @@ if (1)
 		"mt_xowa": "there are bugs in iOS preventing background playback using this format; please use caf or mp3 instead",
 		"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
 		"mt_eq": "enables the equalizer and gain control;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standard 100% volume (unmodified)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standard stereo (unmodified)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% left-right crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = vocal removal :^)$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero (except width = 1) if you care about that",
-		"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of tresh -24 and ratio 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90 (only works in firefox; RLS is max 1 in other browsers)$N$N(see wikipedia, they explain it much better)",
+		"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of thresh -24 and ratio 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90 (only works in firefox; RLS is max 1 in other browsers)$N$N(see wikipedia, they explain it much better)",
+		"mt_ss": "enables skip silence; multiplies playback speed by &lt;code&gt;sspeed&lt;/code&gt$Nat the start/end of audio tracks when volume is under &lt;code&gt;vthresh&lt;/code&gt$Nand the track is within 0 to &lt;code&gt;sthresh&lt;/code&gt% of the start$Nor &lt;code&gt;100-ethresh&lt;/code&gt to 100% of the end of the track",
+		"mt_ssvt": "skip silence volume threshold (0-255)",
+		"mt_ssts": "skip silence active threshold (% of track, start)",
+		"mt_sste": "skip silence active threshold (% of track, end)",
+		"mt_ssrt": "skip silence volume/speed ramp up/down time",
+		"mt_sssm": "skip silence playback speed multiplier",
 
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
@@ -1313,6 +1320,7 @@ var mpl = (function () {
 
 		'<div><h3 id="h_drc">' + L.ml_drc + '</h3><div id="audio_drc"></div></div>' +
 		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>' +
+		'<div><h3>' + L.ml_ss + '</h3><div id="audio_ss"></div></div>' +
 		'');
 
 	var r = {
@@ -2583,6 +2591,8 @@ var mpui = (function () {
 			// occasionally draw buffered regions
 			if (nth % 5 == 0)
 				pbar.drawbuf();
+
+			if (!IE && jread('au_ss', false)) skipSilence();
 		}
 
 		// preload next song
@@ -2690,11 +2700,15 @@ var afilt = (function () {
 	var r = {
 		"eqen": false,
 		"drcen": false,
+		"ssen": false,
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
 		"drcv": [-24, 30, 12, 0.01, 0.25],
-		"drch": ['tresh', 'knee', 'ratio', 'atk', 'rls'],
+		"drch": ['thresh', 'knee', 'ratio', 'atk', 'rls'],
 		"drck": ['threshold', 'knee', 'ratio', 'attack', 'release'],
+		"sscl": ['vthresh', "sthresh", "ethresh", 'sspeed', 'rspeed'],
+		"sstt": [L.mt_ssvt, L.mt_ssts, L.mt_sste, L.mt_ssrt, L.mt_sssm],
+		"sscv": [1, 5, 5, 5.0, 0.2],
 		"drcn": null,
 		"filters": [],
 		"filterskip": [],
@@ -2769,6 +2783,7 @@ var afilt = (function () {
 			r.gains = gains;
 
 		r.drcv = jread('au_drcv', r.drcv);
+		r.sscv = jread('au_sscv', r.sscv)
 	}
 	catch (ex) { }
 
@@ -2998,6 +3013,28 @@ var afilt = (function () {
 		clmod(this, 'err', err);
 	}
 
+	function adj_ss() {
+		var err = false;
+		try {
+			var n = this.getAttribute('k'),
+			ov = r.sscv[n],
+			vs = this.value,
+			v = parseFloat(vs);
+			if (!isNum(v) || v + '' != vs)
+				throw new Error('inval v');
+
+			if (v == ov)
+				return;
+
+			r.sscv[n] = v;
+			jwrite('au_sscv', r.sscv);
+		}
+		catch (ex) {
+			err = true;
+		}
+		clmod(this, 'err', err);
+	}
+
 	function eq_mod(e) {
 		ev(e);
 		adj_band(this, 0);
@@ -3057,6 +3094,19 @@ var afilt = (function () {
 	html += h2.join('\n') + '</tr><table>';
 	ebi('audio_drc').innerHTML = html;
 
+	h2 = [];
+	html = ['<table><tr><td rowspan="2">',
+		'<a id="au_ss" class="tgl btn" href="#" tt="' + L.mt_ss + '">' + L.enable + '</a></td>'];
+
+	for (var a = 0; a < r.sscl.length; a++) {
+		html.push('<td tt="' + r.sstt[a] + '">' + r.sscl[a] + '</td>');
+		h2.push('<td><input type="text" class="ssconf_v" ' + NOAC + ' k="' + a + '" value="' + r.sscv[a] + '" /></td>');
+	}
+
+	html = html.join('\n') + '</tr><tr>';
+	html += h2.join('\n') + '</tr><table>';
+	ebi('audio_ss').innerHTML = html;
+
 	var stp = QSA('a.eq_step');
 	for (var a = 0, aa = stp.length; a < aa; a++)
 		stp[a].onclick = eq_step;
@@ -3070,8 +3120,13 @@ var afilt = (function () {
 	for (var a = 0; a < txt.length; a++)
 		txt[a].oninput = txt[a].onkeydown = adj_drc;
 
+	txt = QSA('input.ssconf_v');
+	for (var a = 0; a < txt.length; a++)
+		txt[a].oninput = txt[a].onkeydown = adj_ss;
+
 	bcfg_bind(r, 'eqen', 'au_eq', false, r.apply);
 	bcfg_bind(r, 'drcen', 'au_drc', false, r.apply);
+	bcfg_bind(r, 'ssen', 'au_ss', false, r.apply);
 
 	r.draw();
 	return r;
@@ -9928,6 +9983,94 @@ function reload_browser() {
 	
 	dsel_init();
 })();
+
+function skipSilence() {
+	var ae = mp.au;
+	var ssconf = jread('au_sscv', [1, 5, 5, 5.0, 0.2]);
+
+	var config = {
+		vthresh: ssconf[0],
+		sthresh: ssconf[1],
+		etresh: ssconf[2],
+		sspeed: ssconf[3],
+		rspeed: ssconf[4],
+		loopInterval: 10
+	};
+
+	if (!ae._ssa) {
+		var ctx = new AudioContext();
+	
+		var asrc = ctx.createMediaElementSource(ae);
+		var analyser = ctx.createAnalyser();
+		var gnod = ctx.createGain();
+
+		analyser.fftSize = 256;
+		asrc.connect(analyser);
+		analyser.connect(gnod);
+		gnod.connect(ctx.destination);
+
+		ae._analyser = analyser;
+		ae._gnod = gnod;
+		ae._actx = ctx;
+		ae._ssa = true;
+
+		detectSilence();
+
+		ae.addEventListener('play', function() {
+			if (ctx.state === 'suspended') ctx.resume();
+			detectSilence();
+		});
+
+		ae.addEventListener('durationchange', function() {
+			if (ae._gnod) ae._gnod.gain.value = 1.0;
+			ae.playbackRate = 1.0;
+		});
+	}
+
+	function detectSilence() {
+		if (ae.paused || ae.ended) return;
+
+		var duration = ae.duration || 0;
+	
+		var slimit = duration * (config.sthresh / 100);
+		var elimit = duration * (1 - (config.etresh / 100));
+		var in_limits = ae.currentTime < slimit || ae.currentTime > elimit;
+
+		var tspeed = 1.0;
+		var tvol = 1.0;
+		var is_silent = false;
+
+		if (in_limits) {
+			var analyser = ae._analyser;
+			var da = new Uint8Array(analyser.frequencyBinCount);
+			analyser.getByteFrequencyData(da);
+
+			var maxvol = 0;
+			for (var i = 0; i < da.length; i++) {
+				if (da[i] > maxvol) maxvol = da[i];
+			}
+
+			if (maxvol < config.vthresh) {
+				tspeed = config.sspeed;
+				tvol = 0.0;
+				is_silent = true;
+			}
+		}
+
+		if (is_silent) {
+			if (Math.abs(ae.playbackRate - tspeed) > 0.01) {
+				ae.playbackRate += (tspeed - ae.playbackRate) * config.rspeed;
+			}
+			if (Math.abs(ae._gnod.gain.value - tvol) > 0.01) {
+				ae._gnod.gain.value += (tvol - ae._gnod.gain.value) * config.rspeed;
+			}
+		} else {
+			ae.playbackRate = 1.0;
+			ae._gnod.gain.value = 1.0;
+		}
+		setTimeout(detectSilence, config.loopInterval);
+	}
+}
 
 treectl.hydrate();
 

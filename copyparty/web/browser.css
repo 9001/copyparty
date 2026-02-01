@@ -1456,7 +1456,8 @@ html.dz input {
 	width: calc(100% - 16.2em);
 }
 input.drc_v,
-input.eq_gain {
+input.eq_gain,
+input.ssconf_v {
 	width: 3em;
 	text-align: center;
 	margin: 0 .6em;
@@ -1466,7 +1467,8 @@ input.eq_gain {
 	border-collapse: collapse;
 }
 #audio_drc td,
-#audio_eq td {
+#audio_eq td,
+#audio_ss td {
 	text-align: center;
 }
 #audio_eq a.eq_step {
