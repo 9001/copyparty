@@ -327,7 +327,7 @@ if (1)
 		"mt_xowa": "there are bugs in iOS preventing background playback using this format; please use caf or mp3 instead",
 		"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
 		"mt_eq": "enables the equalizer and gain control;$N$Nboost &lt;code&gt;0&lt;/code&gt; = standard 100% volume (unmodified)$N$Nwidth &lt;code&gt;1 &nbsp;&lt;/code&gt; = standard stereo (unmodified)$Nwidth &lt;code&gt;0.5&lt;/code&gt; = 50% left-right crossfeed$Nwidth &lt;code&gt;0 &nbsp;&lt;/code&gt; = mono$N$Nboost &lt;code&gt;-0.8&lt;/code&gt; &amp; width &lt;code&gt;10&lt;/code&gt; = vocal removal :^)$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero (except width = 1) if you care about that",
-		"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of thresh -24 and ratio 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90 (only works in firefox; RLS is max 1 in other browsers)$N$N(see wikipedia, they explain it much better)",
+		"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of 'tresh' -24 and 'ratio' 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90 (only works in firefox; RLS is max 1 in other browsers)$N$N(see wikipedia, they explain it much better)",
 		"mt_ss": "enables skip silence; multiplies playback speed by &lt;code&gt;sspeed&lt;/code&gt$Nat the start/end of audio tracks when volume is under &lt;code&gt;vthresh&lt;/code&gt$Nand the track is within 0 to &lt;code&gt;sthresh&lt;/code&gt% of the start$Nor &lt;code&gt;100-ethresh&lt;/code&gt to 100% of the end of the track",
 		"mt_ssvt": "skip silence volume threshold (0-255)",
 		"mt_ssts": "skip silence active threshold (% of track, start)",
@@ -2592,7 +2592,7 @@ var mpui = (function () {
 			if (nth % 5 == 0)
 				pbar.drawbuf();
 
-			if (!IE && jread('au_ss', false)) skipSilence();
+			if (!IE && afilt.ssen) skipSilence();
 		}
 
 		// preload next song
@@ -2704,7 +2704,7 @@ var afilt = (function () {
 		"bands": [31.25, 62.5, 125, 250, 500, 1000, 2000, 4000, 8000, 16000],
 		"gains": [4, 3, 2, 1, 0, 0, 1, 2, 3, 4],
 		"drcv": [-24, 30, 12, 0.01, 0.25],
-		"drch": ['thresh', 'knee', 'ratio', 'atk', 'rls'],
+		"drch": ['tresh', 'knee', 'ratio', 'atk', 'rls'],
 		"drck": ['threshold', 'knee', 'ratio', 'attack', 'release'],
 		"sscl": ['vthresh', "sthresh", "ethresh", 'sspeed', 'rspeed'],
 		"sstt": [L.mt_ssvt, L.mt_ssts, L.mt_sste, L.mt_ssrt, L.mt_sssm],
@@ -2783,7 +2783,7 @@ var afilt = (function () {
 			r.gains = gains;
 
 		r.drcv = jread('au_drcv', r.drcv);
-		r.sscv = jread('au_sscv', r.sscv)
+		r.sscv = jread('au_sscv', r.sscv);
 	}
 	catch (ex) { }
 
@@ -9984,9 +9984,11 @@ function reload_browser() {
 	dsel_init();
 })();
 
+var ssint = null;
+
 function skipSilence() {
 	var ae = mp.au;
-	var ssconf = jread('au_sscv', [1, 5, 5, 5.0, 0.2]);
+	var ssconf = afilt.sscv;
 
 	var config = {
 		vthresh: ssconf[0],
@@ -9994,7 +9996,7 @@ function skipSilence() {
 		etresh: ssconf[2],
 		sspeed: ssconf[3],
 		rspeed: ssconf[4],
-		loopInterval: 10
+		loopInterval: 25
 	};
 
 	if (!ae._ssa) {
@@ -10014,22 +10016,40 @@ function skipSilence() {
 		ae._actx = ctx;
 		ae._ssa = true;
 
-		detectSilence();
-
 		ae.addEventListener('play', function() {
 			if (ctx.state === 'suspended') ctx.resume();
-			detectSilence();
+			startLoop();
 		});
+
+		ae.addEventListener('pause', stopLoop);
+		ae.addEventListener('ended', stopLoop);
 
 		ae.addEventListener('durationchange', function() {
 			if (ae._gnod) ae._gnod.gain.value = 1.0;
 			ae.playbackRate = 1.0;
 		});
+
+		if (!ae.paused && !ae.ended) {
+			startLoop();
+		}
+	}
+
+	function startLoop() {
+		if (!ssint) { 
+			ssint = setInterval(detectSilence, config.loopInterval);
+		}
+	}
+
+	function stopLoop() {
+		if (ssint) {
+			clearInterval(ssint);
+			ssint = null;
+		}
+		if(ae._gnod) ae._gnod.gain.value = 1.0;
+		ae.playbackRate = 1.0;
 	}
 
 	function detectSilence() {
-		if (ae.paused || ae.ended) return;
-
 		var duration = ae.duration || 0;
 	
 		var slimit = duration * (config.sthresh / 100);
@@ -10068,7 +10088,6 @@ function skipSilence() {
 			ae.playbackRate = 1.0;
 			ae._gnod.gain.value = 1.0;
 		}
-		setTimeout(detectSilence, config.loopInterval);
 	}
 }
 
