@@ -186,6 +186,7 @@ try:
     HAVE_VIPS = True
     import pyvips
 
+    pyvips.cache_set_max(0)
     logging.getLogger("pyvips").setLevel(logging.WARNING)
 except Exception as e:
     HAVE_VIPS = False
@@ -694,6 +695,7 @@ class ThumbSrv(object):
             qv = VIPS_JPG_Q[qv // 5]
             args["optimize_coding"] = True
         img.write_to_file(tpath, Q=qv, strip=True, **args)
+        img.invalidate()
 
     def conv_raw(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.2, tpath)
@@ -733,6 +735,7 @@ class ThumbSrv(object):
                 qv = VIPS_JPG_Q[qv // 5]
                 args["optimize_coding"] = True
             img.write_to_file(tpath, Q=qv, strip=True, **args)
+            img.invalidate()
         elif HAVE_PIL:
             if thumb.format == rawpy.ThumbFormat.BITMAP:
                 im = Image.fromarray(thumb.data, "RGB")
