@@ -49,8 +49,9 @@ HAVE_PILF = False
 HAVE_HEIF = False
 HAVE_AVIF = False
 HAVE_WEBP = False
+HAVE_JXL = False
 
-EXTS_TH = set(["jpg", "webp", "png"])
+EXTS_TH = set(["jpg", "webp", "jxl", "png"])
 EXTS_AC = set(["opus", "owa", "caf", "mp3", "flac", "wav"])
 EXTS_SPEC_SAFE = set("aif aiff flac mp3 opus wav".split())
 
@@ -133,6 +134,20 @@ try:
         pass
 
     try:
+        if os.environ.get("PRTY_NO_PIL_JXL"):
+            raise Exception()
+
+        try:
+            import pillow_jxl
+        except ImportError:
+            pass
+
+        Image.new("RGB", (2, 2)).save(BytesIO(), format="jxl")
+        HAVE_JXL = True
+    except:
+        pass
+
+    try:
         if os.environ.get("PRTY_NO_PIL_HEIF"):
             raise Exception()
 
@@ -203,7 +218,7 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -
 
     # spectrograms are never cropped; strip fullsize flag
     ext = rem.split(".")[-1].lower()
-    if ext in ffa and fmt[:2] in ("wf", "jf"):
+    if ext in ffa and fmt[:2] in ("wf", "jf", "xf"):
         fmt = fmt.replace("f", "")
 
     dcache = th_dir_cache
@@ -225,7 +240,7 @@ def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -
         cat = "ac"
     else:
         fc = fmt[:1]
-        fmt = "webp" if fc == "w" else "png" if fc == "p" else "jpg"
+        fmt = "webp" if fc == "w" else "png" if fc == "p" else "jxl" if fc == "x" else "jpg"
         cat = "th"
 
     return "%s/%s/%s/%s.%x.%s" % (histpath, cat, rd, fn, int(mtime), fmt)
@@ -302,6 +317,10 @@ class ThumbSrv(object):
 
         if not HAVE_WEBP:
             for f in "webp".split(" "):
+                self.fmt_pil.discard(f)
+
+        if not HAVE_JXL:
+            for f in "jxl".split(" "):
                 self.fmt_pil.discard(f)
 
         self.thumbable: set[str] = set()

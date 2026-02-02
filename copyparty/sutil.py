@@ -95,7 +95,7 @@ def enthumb(
     if not thp:
         raise Exception()
 
-    ext = "jpg" if fmt == "j" else "webp" if fmt == "w" else fmt
+    ext = "jpg" if fmt == "j" else "webp" if fmt == "w" else "jxl" if fmt == "x" else fmt
     sz = bos.path.getsize(thp)
     st: os.stat_result = f["st"]
     ts = st.st_mtime

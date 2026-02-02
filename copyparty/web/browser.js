@@ -1154,22 +1154,26 @@ function read_sbw() {
 onresize100.add(read_sbw, true);
 
 
-var have_webp = sread('have_webp');
-(function () {
-	if (have_webp !== null)
+function check_image_support(format, uri) {
+	var cached
+	    = window['have_' + format]
+	    = sread('have_' + format);
+	if (cached !== null)
 		return;
 
 	var img = new Image();
 	img.onload = function () {
-		have_webp = img.width > 0 && img.height > 0;
-		swrite('have_webp', 'ya');
+		window['have_' + format] = img.width > 0 && img.height > 0;
+		swrite('have_' + format, 'ya');
 	};
 	img.onerror = function () {
-		have_webp = false;
-		swrite('have_webp', '');
+		window['have_' + format] = false;
+		swrite('have_' + format, '');
 	};
-	img.src = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
-})();
+	img.src = uri;
+}
+check_image_support('webp', "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==");
+check_image_support('jxl', "data:image/jxl;base64,/woIAAAMABKIAgC4AF3lEgA=");
 
 
 function set_files_html(html) {
@@ -5685,7 +5689,7 @@ var thegrid = (function () {
 	};
 
 	function loadgrid() {
-		if (have_webp === null)
+		if (have_webp === null || have_jxl === null)
 			return setTimeout(loadgrid, 50);
 
 		r.setvis();
@@ -5738,7 +5742,11 @@ var thegrid = (function () {
 				ihref = ext_th[ext] || ext_th[ext0];
 			}
 			else if (r.thumbs) {
-				ihref = addq(ihref, 'th=' + (have_webp ? 'w' : 'j'));
+				ihref = addq(ihref, 'th=' + (
+					have_jxl  ? 'x' :
+					have_webp ? 'w' :
+					            'j'
+				));
 				if (!r.crop)
 					ihref += 'f';
 				if (r.x3)

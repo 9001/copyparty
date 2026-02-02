@@ -36,7 +36,7 @@
 
 		for (var a = 0; a < files.length; a++) {
 			var file = files[a],
-				is_pic = /\.(jpe?g|png|gif|webp)$/i.exec(file.vp),
+				is_pic = /\.(jpe?g|png|gif|webp|jxl)$/i.exec(file.vp),
 				is_audio = re_au_all.exec(file.vp),
 				basename = file.vp.replace(/\.[^\.]+$/, ""),
 				entry = pairs[basename];

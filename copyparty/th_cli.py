@@ -8,7 +8,7 @@ import stat
 from .__init__ import TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
-from .th_srv import EXTS_AC, HAVE_WEBP, thumb_path
+from .th_srv import EXTS_AC, HAVE_WEBP, HAVE_JXL, thumb_path
 from .util import Cooldown, Pebkac
 
 if True:  # pylint: disable=using-constant-test
@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 IOERROR = "reading the file was denied by the server os; either due to filesystem permissions, selinux, apparmor, or similar:\n%r"
 
-IMG_EXTS = set(["webp", "jpg", "png"])
+IMG_EXTS = set(["webp", "jpg", "png", "jxl"])
 
 
 class ThumbCli(object):
@@ -54,6 +54,7 @@ class ThumbCli(object):
         # defer args.th_ff_jpg, can change at runtime
         d = next((x for x in self.args.th_dec if x in ("vips", "pil")), None)
         self.can_webp = HAVE_WEBP or d == "vips"
+        self.can_jxl = HAVE_JXL or d == "vips"
 
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("thumbcli", msg, c)
@@ -94,7 +95,7 @@ class ThumbCli(object):
         if rem.startswith(".hist/th/") and rem.split(".")[-1] in IMG_EXTS:
             return os.path.join(ptop, rem)
 
-        if fmt[:1] in "jw" and fmt != "wav":
+        if fmt[:1] in "jwx" and fmt != "wav":
             sfmt = fmt[:1]
 
             if sfmt == "j" and self.args.th_no_jpg:
@@ -104,6 +105,14 @@ class ThumbCli(object):
                 if (
                     self.args.th_no_webp
                     or (is_img and not self.can_webp)
+                    or (self.args.th_ff_jpg and (not is_img or preferred == "ff"))
+                ):
+                    sfmt = "j"
+
+            if sfmt == "x":
+                if (
+                    self.args.th_no_jxl
+                    or (is_img and not self.can_jxl)
                     or (self.args.th_ff_jpg and (not is_img or preferred == "ff"))
                 ):
                     sfmt = "j"
