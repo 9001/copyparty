@@ -36,7 +36,7 @@ from .util import (
 )
 
 if True:  # pylint: disable=using-constant-test
-    from typing import Any, Optional, Union
+    from typing import Any, Callable, Optional, Union
 
 if TYPE_CHECKING:
     from .svchub import SvcHub
@@ -670,8 +670,8 @@ class ThumbSrv(object):
         with Image.open(fsenc(abspath)) as im:
             self.conv_image_pil(im, tpath, fmt, vn)
 
-    def conv_vips(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        self.wait4ram(0.2, tpath)
+    def conv_image_vips(self, loader: "Callable[[int, dict], Any]",
+                        tpath: str, fmt: str, vn: VFS) -> None:
         crops = ["centre", "none"]
         if "f" in fmt:
             crops = ["none"]
@@ -679,10 +679,11 @@ class ThumbSrv(object):
         w, h = self.getres(vn, fmt)
         kw = {"height": h, "size": "down", "intent": "relative"}
 
+        img = None
         for c in crops:
             try:
                 kw["crop"] = c
-                img = pyvips.Image.thumbnail(abspath, w, **kw)
+                img = loader(w, kw)
                 break
             except:
                 if c == crops[-1]:
@@ -697,6 +698,12 @@ class ThumbSrv(object):
         img.write_to_file(tpath, Q=qv, strip=True, **args)
         img.invalidate()
 
+    def conv_vips(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
+        self.wait4ram(0.2, tpath)
+        def _loader(w: int, kw: dict) -> Any:
+            return pyvips.Image.thumbnail(abspath, w, **kw)
+        self.conv_image_vips(_loader, tpath, fmt, vn)
+
     def conv_raw(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.2, tpath)
         with rawpy.imread(abspath) as raw:
@@ -707,35 +714,13 @@ class ThumbSrv(object):
             with open(tpath, "wb") as f:
                 f.write(thumb.data)
         if HAVE_VIPS:
-            crops = ["centre", "none"]
-            if "f" in fmt:
-                crops = ["none"]
-            w, h = self.getres(vn, fmt)
-            kw = {"height": h, "size": "down", "intent": "relative"}
-
-            for c in crops:
-                try:
-                    kw["crop"] = c
-                    if thumb.format == rawpy.ThumbFormat.BITMAP:
-                        img = pyvips.Image.new_from_array(
-                            thumb.data, interpretation="rgb"
-                        )
-                        img = img.thumbnail_image(w, **kw)
-                    else:
-                        img = pyvips.Image.thumbnail_buffer(thumb.data, w, **kw)
-                    break
-                except:
-                    if c == crops[-1]:
-                        raise
-
-            assert img  # type: ignore  # !rm
-            args = {}
-            qv = vn.flags["th_qv"]
-            if tpath.endswith("jpg"):
-                qv = VIPS_JPG_Q[qv // 5]
-                args["optimize_coding"] = True
-            img.write_to_file(tpath, Q=qv, strip=True, **args)
-            img.invalidate()
+            def _loader(w: int, kw: dict) -> Any:
+                if thumb.format == rawpy.ThumbFormat.BITMAP:
+                    img = pyvips.Image.new_from_array(thumb.data, interpretation="rgb")
+                    return img.thumbnail_image(w, **kw)
+                else:
+                    return pyvips.Image.thumbnail_buffer(thumb.data, w, **kw)
+            self.conv_image_vips(_loader, tpath, fmt, vn)
         elif HAVE_PIL:
             if thumb.format == rawpy.ThumbFormat.BITMAP:
                 im = Image.fromarray(thumb.data, "RGB")
