@@ -20,6 +20,8 @@ if TYPE_CHECKING:
 
 IOERROR = "reading the file was denied by the server os; either due to filesystem permissions, selinux, apparmor, or similar:\n%r"
 
+IMG_EXTS = set(["webp", "jpg", "png"])
+
 
 class ThumbCli(object):
     def __init__(self, hsrv: "HttpSrv") -> None:
@@ -89,7 +91,7 @@ class ThumbCli(object):
 
         preferred = self.args.th_dec[0] if self.args.th_dec else ""
 
-        if rem.startswith(".hist/th/") and rem.split(".")[-1] in ["webp", "jpg", "png"]:
+        if rem.startswith(".hist/th/") and rem.split(".")[-1] in IMG_EXTS:
             return os.path.join(ptop, rem)
 
         if fmt[:1] in "jw" and fmt != "wav":
