@@ -300,6 +300,10 @@ class ThumbSrv(object):
             for f in "avif avifs".split(" "):
                 self.fmt_pil.discard(f)
 
+        if not HAVE_WEBP:
+            for f in "webp".split(" "):
+                self.fmt_pil.discard(f)
+
         self.thumbable: set[str] = set()
 
         if "pil" in self.args.th_dec:
