@@ -69,7 +69,7 @@ okay now continue with one of these:
 * open the `Package Center` and install the [Container Manager package](https://ocv.me/copyparty/doc/pics/dsm72-01.png) by `Docker Inc.`
 * open the `Container Manager` app
 * go to the `Registry` tab and search for `copyparty`
-* [doubleclick copyparty/ac](https://ocv.me/copyparty/doc/pics/dsm72-02.png) and keep the [default `latest`](https://ocv.me/copyparty/doc/pics/dsm72-03.png) when it asks you which tag to use
+* [double-click copyparty/ac](https://ocv.me/copyparty/doc/pics/dsm72-02.png) and keep the [default `latest`](https://ocv.me/copyparty/doc/pics/dsm72-03.png) when it asks you which tag to use
 * switch to the `Container` tab and click `Create`
 * [choose `copyparty/ac:latest`](https://ocv.me/copyparty/doc/pics/dsm72-04.png) and click `Next`
 
@@ -90,7 +90,7 @@ if you're using DSM 7.1 or older, then you don't have [Container Manager](https:
 * open the `Package Center` and install the [Docker package](https://ocv.me/copyparty/doc/pics/dsm71-01.png) by `Docker Inc.`
 * open the `Docker` app
 * go to the `Registry` tab and search for `copyparty`
-* [doubleclick copyparty/ac](https://ocv.me/copyparty/doc/pics/dsm71-02.png) and keep the [default `latest`](https://ocv.me/copyparty/doc/pics/dsm71-03.png) when it asks you which tag to use
+* [double-click copyparty/ac](https://ocv.me/copyparty/doc/pics/dsm71-02.png) and keep the [default `latest`](https://ocv.me/copyparty/doc/pics/dsm71-03.png) when it asks you which tag to use
 * switch to the `Container` tab and click `Create`
 * [choose `copyparty/ac:latest`](https://ocv.me/copyparty/doc/pics/dsm71-04.png) and `Next`
 * in the [Network](https://ocv.me/copyparty/doc/pics/dsm71-05.png) window, keep the default `Use the selected networks: [x] bridge`

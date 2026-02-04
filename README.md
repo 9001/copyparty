@@ -1000,7 +1000,7 @@ specify `--shr /foobar` to enable this feature; a toplevel virtual folder named 
 * you can name it whatever, `foobar` is just an example
 * if you're using config files, put `shr: /foobar` inside the `[global]` section instead
 
-users can delete their own shares in the controlpanel, and a list of privileged users (`--shr-adm`) are allowed to see and/or delet any share on the server
+users can delete their own shares in the controlpanel, and a list of privileged users (`--shr-adm`) are allowed to see and/or delete any share on the server
 
 after a share has expired, it remains visible in the controlpanel for `--shr-rt` minutes (default is 1 day), and the owner can revive it by extending the expiration time there
 
@@ -2758,7 +2758,7 @@ sync folders to/from copyparty
 
 NOTE: full bidirectional sync, like what [nextcloud](https://docs.nextcloud.com/server/latest/user_manual/sv/files/desktop_mobile_sync.html) and [syncthing](https://syncthing.net/) does, will never be supported! Only single-direction sync (server-to-client, or client-to-server) is possible with copyparty
 
-* if you want bidirectional sync, then copyparty and syncthing *should* be entirely safe to combine; they should be able to collaborate on the same folders without causing any trouble for eachother. Many people do this, and there have been no issues so far. But, if you *do* encounter any problems, please [file a copyparty bug](https://github.com/9001/copyparty/issues/new/choose) and I'll try to help -- just keep in mind I've never used syncthing before :-)
+* if you want bidirectional sync, then copyparty and syncthing *should* be entirely safe to combine; they should be able to collaborate on the same folders without causing any trouble for each other. Many people do this, and there have been no issues so far. But, if you *do* encounter any problems, please [file a copyparty bug](https://github.com/9001/copyparty/issues/new/choose) and I'll try to help -- just keep in mind I've never used syncthing before :-)
 
 the commandline uploader [u2c.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy) with `--dr` is the best way to sync a folder to copyparty; verifies checksums and does files in parallel, and deletes unexpected files on the server after upload has finished which makes file-renames really cheap (it'll rename serverside and skip uploading)
 

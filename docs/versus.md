@@ -82,9 +82,9 @@ currently up to date with [awesome-selfhosted](https://github.com/awesome-selfho
 <&Kethsar> copyparty is very much bloat ed, so yeah
 ```
 
-the table headers in the matrixes below are the different softwares, with a quick review of each software in the next section
+the table headers in the matrixes below are the different software, with a quick review of each software in the next section
 
-the softwares,
+the software,
 
 [a]: https://github.com/9001/copyparty "copyparty"
 [b]: https://github.com/rejetto/hfs2/ "hfs2"
@@ -114,7 +114,7 @@ the softwares,
 * `l` = [sftpgo][l]
 * `m` = [arozos][m]
 
-some softwares not in the matrixes,
+some software not in the matrixes,
 * [updog](#updog)
 * [goshs](#goshs)
 * [gimme-that](#gimmethat)
@@ -263,7 +263,7 @@ symbol legend,
   * you can successfully play `$'\355\221'` with mpv through mounting a remote copyparty server with rclone, pog
 * `a`/copyparty remarks:
   * extremely minimal samba/cifs server
-  * netscape 4 / ie6 support is mostly listed as a joke altho some people have actually found it useful ([ie4 tho](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png))
+  * netscape 4 / ie6 support is mostly listed as a joke although some people have actually found it useful ([ie4 tho](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png))
 * `l`/sftpgo translates mojibake filenames into valid utf-8 (information loss)
 * `m`/arozos has readonly-support for older browsers; no uploading
 

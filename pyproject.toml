@@ -165,3 +165,11 @@ follow_imports = "silent"
 
 [[tool.mypy.overrides]]
 no_implicit_reexport = false
+
+[tool.codespell]
+# Ref: https://github.com/codespell-project/codespell#using-a-config-file
+skip = '.git*,*.svg,*.lock,*.css,*.min.*,tl,pyproject.toml,*.patch'
+check-hidden = true
+# ignore camelcase
+ignore-regex = '(\b[a-z]+[A-Z][A-Za-z0-9]*\b|\[[a-z]\][a-z]+\b)'
+ignore-words-list = 'caf,cips,ans,ded,wark,warks,halp,ser,oen,datas,slin,nd,te,pres,ths,wast,clen,fo,nin,fils,tre,tred,tread,noice,unick,memers,idel'

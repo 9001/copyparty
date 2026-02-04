@@ -2753,7 +2753,7 @@ class AuthSrv(object):
 
             for mtp in local_only_mtp:
                 if mtp not in local_mte:
-                    t = 'volume "/{}" defines metadata tag "{}", but doesnt use it in "-mte" (or with "cmte" in its volflags)'
+                    t = 'volume "/{}" defines metadata tag "{}", but does not use it in "-mte" (or with "cmte" in its volflags)'
                     self.log(t.format(vol.vpath, mtp), 1)
                     errors = True
 

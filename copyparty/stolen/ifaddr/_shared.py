@@ -41,7 +41,7 @@ class Adapter(object):
         #: `{846EE342-7039-11DE-9D20-806E6F6E6963}`.
         self.name = name
 
-        #: Human readable name of the adpater. On Linux this
+        #: Human readable name of the adapter. On Linux this
         #: is currently the same as :attr:`name`. On Windows
         #: this is the name of the device.
         self.nice_name = nice_name

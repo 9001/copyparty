@@ -360,7 +360,7 @@ in
           name: value:
           lib.attrsets.nameValuePair (value.path) {
             d = {
-              #: in front of things means it wont change it if the directory already exists.
+              #: in front of things means it won't change it if the directory already exists.
               group = ":${cfg.group}";
               user = ":${cfg.user}";
               mode = ":${

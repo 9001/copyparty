@@ -1,4 +1,4 @@
-copyparty is availabe in these repos:
+copyparty is available in these repos:
 * https://hub.docker.com/u/copyparty
 * https://github.com/9001?tab=packages&repo_name=copyparty
 

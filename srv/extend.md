@@ -30,7 +30,7 @@ finally ./except/these/ones.md
 
 
 ### also-this.md
-whic hshoud be ./except/also-this.md
+which should be ./except/also-this.md
 
 
 

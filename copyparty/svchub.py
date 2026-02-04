@@ -1402,7 +1402,7 @@ class SvcHub(object):
                 pass
 
             self.shutdown()
-            # cant join; eats signals on win10
+            # can't join; eats signals on win10
             while not self.stopped:
                 time.sleep(0.1)
         else:

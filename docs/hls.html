@@ -27,7 +27,7 @@ hls.on(Hls.Events.MEDIA_ATTACHED, function() {
 general good news:
 - doesn't need fixed-length segments; ok to let x264 pick optimal keyframes and slice on those
 - hls.js polls the m3u8 for new segments, scales the duration accordingly, seeking works great
-- the sfx will grow by 66 KiB since that's how small hls.js can get, wait thats not good
+- the sfx will grow by 66 KiB since that's how small hls.js can get, wait that's not good
 
 # vod, creates m3u8 at the end, fixed keyframes, v bad
 ffmpeg -hide_banner -threads 0 -flags -global_header -i ..\CowboyBebopMovie-OP1.webm -vf scale=1280:-4,format=yuv420p -ac 2 -c:a libopus -b:a 128k -c:v libx264 -preset slow -crf 24 -maxrate:v 5M -bufsize:v 10M -g 120 -keyint_min 120 -sc_threshold 0 -hls_time 4 -hls_playlist_type vod -hls_segment_filename v%05d.ts v.m3u8

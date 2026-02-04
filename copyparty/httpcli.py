@@ -2210,7 +2210,7 @@ class HttpCli(object):
             oh["Dav"] = "1, 2"
             oh["Ms-Author-Via"] = "DAV"
 
-        # winxp-webdav doesnt know what 204 is
+        # winxp-webdav does not know what 204 is
         self.send_headers(0, 200)
         return True
 
@@ -2483,7 +2483,7 @@ class HttpCli(object):
                 open_ka = {"fun": lzma.open, "preset": lv[alg]}
                 open_a = ["wb"]
             else:
-                self.log("fallthrough? thats a bug", 1)
+                self.log("fallthrough? that's a bug", 1)
 
         suffix = "-{:.6f}-{}".format(time.time(), self.dip())
         nameless = not fn

@@ -151,7 +151,7 @@ def open_url(txt):
         for _ in range(20):
             sp.call(["xdotool", "key", "ctrl+w"])  # closes the open tab correctly
     # else:
-    #    sp.call(["xdotool", "getactivewindow", "windowminimize"])  # minimizes the focused windo
+    #    sp.call(["xdotool", "getactivewindow", "windowminimize"])  # minimizes the focused window
 
     # mpv is probably smart enough to use streamlink automatically
     if try_mpv(txt):
@@ -166,7 +166,7 @@ def open_url(txt):
     # nope,
     # close any error messages:
     sp.call(["xdotool", "search", "--name", "Error", "windowclose"])
-    # sp.call(["xdotool", "key", "ctrl+alt+d"])  # doesnt work at all
+    # sp.call(["xdotool", "key", "ctrl+alt+d"])  # does not work at all
     # sp.call(["xdotool", "keydown", "--delay", "100", "ctrl+alt+d"])
     # sp.call(["xdotool", "keyup", "ctrl+alt+d"])
     sp.call(["xdg-open", txt])

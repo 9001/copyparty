@@ -27,7 +27,7 @@ set -e
 # 270004  copyparty-extras/sfx-lite/copyparty-sfx.py
 # 293159  copyparty-extras/sfx-lite/copyparty-sfx-gz.py
 #           `- also removed the codemirror markdown editor
-#              and the text-viewer syntax hilighting,
+#              and the text-viewer syntax highlighting,
 #              only essential features remaining
 #
 # 646297  copyparty-extras/copyparty-1.0.14.tar.gz

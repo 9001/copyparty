@@ -123,7 +123,7 @@ grep '"name": "2021-07-18 02-17-59.mkv"' fug.log | head -n 1 | sed -r 's/.*"hash
 
 
 ##
-## js oneliners
+## js one-liners
 
 # get all up2k search result URLs
 var t=[]; var b=document.location.href.split('#')[0].slice(0, -1); document.querySelectorAll('#u2tab .prog a').forEach((x) => {t.push(b+encodeURI(x.getAttribute("href")))}); console.log(t.join("\n"));
@@ -133,7 +133,7 @@ var s=mknod('style');s.innerHTML='*[data-ln]:before {content:attr(data-ln)!impor
 
 
 ##
-## bash oneliners
+## bash one-liners
 
 # get the size and video-id of all youtube vids in folder, assuming filename ends with -id.ext, and create a copyparty search query
 find -maxdepth 1 -printf '%s %p\n' | sort -n | awk '!/-([0-9a-zA-Z_-]{11})\.(mkv|mp4|webm)$/{next} {sub(/\.[^\.]+$/,"");n=length($0);v=substr($0,n-10);print $1, v}' | tee /dev/stderr | awk 'BEGIN {p="("} {printf("%s name like *-%s.* ",p,$2);p="or"} END {print ")\n"}' | cat >&2
@@ -271,7 +271,7 @@ brew install python@2
 pip install virtualenv
 
 # fix firefox phantom breakpoints,
-# suggestions from bugtracker, doesnt work (debugger is not attachable)
+# suggestions from bugtracker, does not work (debugger is not attachable)
 devtools settings >> advanced >> enable browser chrome debugging + enable remote debugging
 burger > developer >> browser toolbox  (ctrl-alt-shift-i)
 iframe btn topright >> chrome://devtools/content/debugger/index.html

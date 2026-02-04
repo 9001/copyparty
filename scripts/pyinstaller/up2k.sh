@@ -36,10 +36,10 @@ $APPDATA/python/python37/scripts/pyinstaller -y --clean --upx-dir=. up2k.spec
 
 csum=$(sha512sum <dist/u2c.exe | cut -c-56)
 
-curl -fkT dist/u2c.exe -HPW:wark https://192.168.123.1:3923/ >uplod.log
-cat uplod.log
+curl -fkT dist/u2c.exe -HPW:wark https://192.168.123.1:3923/ >upload.log
+cat upload.log
 
-grep -q $csum uplod.log && echo upload OK || {
+grep -q $csum upload.log && echo upload OK || {
     echo UPLOAD FAILED
     exit 1
 }

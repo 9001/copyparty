@@ -249,7 +249,7 @@ necho() {
 	rm -rf pyftpdlib-* pyftpdlib/test
 	patch -s -p1 <../scripts/patches/pyftpdlib-win313.patch
 	patch -s -p1 <../scripts/patches/pyftpdlib-fe80.patch
-	for f in pyftpdlib/_async{hat,ore}.py; do
+	for f in pyftpdlib/_async{hat,ore}.py; do  # codespell:ignore
 		[ -e "$f" ] || continue;
 		iawk 'NR<4||NR>27||!/^#/;NR==4{print"# license: https://opensource.org/licenses/ISC\n"}' $f
 	done

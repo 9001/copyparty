@@ -322,7 +322,7 @@ class MDNS(MCast):
         self.build_replies()
         Daemon(self.send_probes)
         zf = time.time() + 2
-        self.probing = zf  # cant unicast so give everyone an extra sec
+        self.probing = zf  # can't unicast so give everyone an extra sec
         self.unsolicited = [zf, zf + 1, zf + 3, zf + 7]  # rfc-8.3
 
         try:

@@ -2316,7 +2316,7 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
     var errtxt = ((xhr.response && xhr.response.err) || xhr.responseText) || '',
         suf = '',
         fun = toast[lvl || 'err'],
-        is_cf = /[Cc]loud[f]lare|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser|\/chall[e]nge-platform|"chall[e]nge-error|nable Ja[v]aScript and cook/.test(errtxt);
+        is_cf = /[Cc]loud[f]lare|>Just a mo[m]ent|#cf-b[u]bbles|Chec[k]ing your br[o]wser|\/chall[e]nge-platform|"chall[e]nge-error|nable Ja[v]aScript and cook/.test(errtxt);  # codespell:ignore
 
     if (errtxt.startsWith('<pre>'))
         suf = '\n\nerror-details: «' + unpre(errtxt).split('\n')[0].trim() + '»';

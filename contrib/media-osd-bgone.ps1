@@ -14,7 +14,7 @@
 # then create a shortcut to that bat-file and move the shortcut here:
 #   %appdata%\Microsoft\Windows\Start Menu\Programs\Startup
 #
-# and now this will autorun on bootup
+# and now this will autorun on boot-up
 
 
 Add-Type -TypeDefinition @"

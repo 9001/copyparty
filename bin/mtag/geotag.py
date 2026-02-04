@@ -9,7 +9,7 @@ from copyparty.util import fsenc, runcmd
 uses exiftool to geotag images based on embedded gps coordinates in exif data
 
 adds four new metadata keys:
-    .gps_lat = latitute
+    .gps_lat = latitude
     .gps_lon = longitude
     .masl = meters above sea level
     city = "city, subregion, region"

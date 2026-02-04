@@ -165,7 +165,7 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
     try:
         expiry, inf = _read_crt(args, "srv.pem")
         if "sans" not in inf:
-            raise Exception("no useable cert found")
+            raise Exception("no usable cert found")
 
         expired = time.time() + args.crt_sdays * 60 * 60 * 24 * 0.5 > expiry
         if expired:

@@ -501,7 +501,7 @@ Ls.hmn = {
 	"m3u_clip": "m3u playlist now copied to clipboard\n\nyou should create a new textfile named something.m3u and paste the playlist in that document; this will make it playable",
 
 	"gt_vau": "don't show videos, just play the audio\">🎧",
-	"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
+	"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: double-click a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
 	"gt_crop": "center-crop thumbnails\">crop",
 	"gt_3x": "hi-res thumbnails\">3x",
 	"gt_zoom": "zoom",

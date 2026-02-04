@@ -395,7 +395,7 @@ there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` i
   * does not include the smb-server, so antivirus doesn't think it's malware 7f5810f1
   * english-only, because antivirus apparently hates certain translations too 7f5810f1
   * renamed the webdav-config `.bat` to `.txt` because clearly only one of those are "dangerous" b624a387
-* show volumes with permssion `h` in the navpane fff7291d 
+* show volumes with permission `h` in the navpane fff7291d 
 * #937 global-option `--notooltips` to default-disable tooltips a325353b
 
 ## 🩹 bugfixes
@@ -432,7 +432,7 @@ there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` i
 * audioplayer: show embedded coverart as fallback for cover.jpg in OS widgets 9746b4e2
 * #928 option to [hide certain ui-elements](https://github.com/9001/copyparty/tree/hovudstraum/docs/rice#hide-ui-elements), either with volflags or url-params 98da5cc5
 * #911 users can now avoid autoban according to permissions 6f02812a
-* verbosity and permssion options for `?stack` 677fd8ee
+* verbosity and permission options for `?stack` 677fd8ee
   * default is now admin-only; previously it was "admin or read+write"
 
 ## 🩹 bugfixes
@@ -829,12 +829,12 @@ there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` i
 * #567 .raw image thumbnails (thx @ar-nelson!) 0177a9b4
   * available in docker-images `iv` and `dj`
 * #561 epub thumbnails (thx @Scotsguy!) 9435e6b2
-* #252 music thumbnails use embdded coverart if available 98d117b8
+* #252 music thumbnails use embedded coverart if available 98d117b8
   * thumbnails folder `.hist/th` must be deleted to take effect
 * #530 show username of uploaders in file listings; requires `a` (admin) permission 4df033ec
 * #604 a new group `@acct` which automatically contains all known usernames 68907eaf
 * controlpanel has a dedicated "logout all sessions" button, similar to the logout-link in the browser f4a3fba2
-* #397 accounts can be restricted to certian IPs 62e072a2
+* #397 accounts can be restricted to certain IPs 62e072a2
 * #504 automatic login through tailscale auth a4649d1e
 * #533 sticky qr-code with `--qr-pin 1` 1ebe06f5
 * #572 button to abort copy/move 715d374e
@@ -896,7 +896,7 @@ there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` i
   * if you have enabled password hashing (`ah-alg: argon2` or similar) then you will need to hash your passwords again after enabling usernames, hashing them as `username:password:`
 * #468 add Greek translation (thx @chamdim!) 50f46187 392abd06
 * #471 add Czech translation (thx @kubakubakuba!) c9556583
-* #515 support systemd socket acivation (thx @mati1210!) 9b9d2a92
+* #515 support systemd socket activation (thx @mati1210!) 9b9d2a92
 * #523 add QR-code to the connectpage bcc3b156
 * #513 optional EOL-conversion for texteditor 8b31ed88
 * controlpanel refresh-button now toggles automatic refresh 7ae84dea
@@ -1458,7 +1458,7 @@ get the party going anywhere, anytime, no OS required! [download flashdrive imag
 
 * option to specify max-size for download-as-zip/tar 494179bd 0a33336d
   * either the total download size (`--zipmaxs 500M`), and/or max number of files (`--zipmaxn 9k`)
-  * applies to all uesrs by default; can also ignore limits for authorized users (`--zipmaxu`)
+  * applies to all users by default; can also ignore limits for authorized users (`--zipmaxu`)
   * errormessage can be customized with `--zipmaxt "winter is coming... but this download isn't"`
 * [appledoubles](https://a.ocv.me/pub/stuff/?doc=appledoubles-and-friends.txt) are detected and skipped when uploading with the browser-UI 78208405
 * IdP-volumes can be filtered by group 9c2c4237
@@ -1913,7 +1913,7 @@ this release includes a build of [copyparty-winpe64.exe](https://github.com/9001
 * webdav: support listing unmapped root with infinite recursion (Depth:0) 21a3f369
 * embed current sort config into media URLs (gallery/music) 0f257c93 4cfdc4c5 01670827
   * ensures that anyone clicking your link will see the files in the same order as you
-  * can be confgured serverside (`--hsortn`, volflag `hsortn`) and clientside (`#sort` in settings)
+  * can be configured serverside (`--hsortn`, volflag `hsortn`) and clientside (`#sort` in settings)
 * URL and UI options to disable checksum calculation of PUT, bup, basic uploads c5a000d2
   * also allows [choosing either md5, sha1, sha256, or blake2](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#write) instead of the default sha512
   * can give uploads a nice speed boost when copyparty is running on a potato
@@ -3106,7 +3106,7 @@ probably last release before v1.10 (IdP), please watch warmly
 * now possible to POST files without having to set the `act: bput` multipart field 9bc09ce9
   * mainly to support [igloo irc](https://github.com/9001/copyparty#client-examples) and other simplistic upload clients
 * try to point the linux oom-killer at FFmpeg so it doesn't kill innocent processes instead dc8e621d
-  * only works if copyparty has acces to /proc, so not in prisonparty, and maybe not in docker (todo)
+  * only works if copyparty has access to /proc, so not in prisonparty, and maybe not in docker (todo)
 * UX:
   * do another search immediately if a search-filter gets unchecked a4239a46
   * several ie11 fixes (keyboard hotkeys and a working text editor) 2fd2c6b9
@@ -3426,7 +3426,7 @@ just adding requested features, nothing important
   * `--no-crop` and the `nocrop` volflag now sets the default value of this instead of forcing the setting
   * thumbnail cleanup is now more granular, cleaning full-jpg separately from cropped-webp for example
 * set default sort order with `--sort` or volflag `sort`
-  * one or more comma-separated values; `tags/Cirle,tags/.tn,tags/Artist,tags/Title,href`
+  * one or more comma-separated values; `tags/Circle,tags/.tn,tags/Artist,tags/Title,href`
     * see the column header tooltips in the browser to know what names (`id`) to use
   * prefix a column name with `-` for descending sort
   * specifying a sort order in the client will override all server-defined ones
@@ -3592,7 +3592,7 @@ hello! it's been a while, an entire day even...
 * iPhones and iPads are now able to...
   * 9986136d play entire albums while the screen is off without the music randomly stopping
     * apple keeps breaking AudioContext in new and interesting ways; time to give up (no more equalizer)
-  * 1c0d9789 perform search queries and execude js code
+  * 1c0d9789 perform search queries and execute js code
     * by translating [smart-quotes](https://stackoverflow.com/questions/48678359/ios-11-safari-html-disable-smart-punctuation) into regular `'` and `"` characters
 * python 3.12 support
   * technically a bugfix since it was added [a year ago](https://github.com/9001/copyparty/commit/32e22dfe) way before the first py3.12 alpha was released but turns out i botched it, oh well
@@ -4076,7 +4076,7 @@ don't get excited! nothing new and revolutionary, but `xvol` and `xdev` changed 
 
 ## bugfixes
 * more sqlite query-planner twiddling
-  * deleting files is MUCH faster now, and uploads / bootup might be a bit better too
+  * deleting files is MUCH faster now, and uploads / boot-up might be a bit better too
 * webdav optimizations / compliance
   * should make some webdav clients run faster than before
   * in very related news, the webdav-client in [rclone](https://github.com/rclone/rclone/) v1.63 ([currently beta](https://beta.rclone.org/?filter=latest)) will be ***FAST!***
@@ -4431,7 +4431,7 @@ hello from warsaw airport (goodbye japan ;_;)
 * browser ui didn't allow specifying number of threads for file search
 * dont panic if a digit key is pressed while viewing an image
 * workaround [linux kernel bug](https://utcc.utoronto.ca/~cks/space/blog/linux/KernelBindBugIn6016) causing log spam on dualstack
-  * ~~related issue (also mostly harmless) will be fixed next relese 01077068~~ 
+  * ~~related issue (also mostly harmless) will be fixed next release 01077068~~ 
     * they fixed it in linux 6.1 so these workarounds will be gone too
 
 
@@ -4576,7 +4576,7 @@ named after [that other thing](https://en.wikipedia.org/wiki/Tower_of_Babel), no
 * display a server [qr-code](https://github.com/9001/copyparty#qr-code) [(screenshot)](https://user-images.githubusercontent.com/241032/194728533-6f00849b-c6ac-43c6-9359-83e454d11e00.png) on startup
   * primarily for running copyparty on a phone and accessing it from another
   * optionally specify a path or password with `--qrl lootbox/?pw=hunter2`
-  * uses the server's exteral ip (default route) unless `--qri` specifies a domain / ip-prefix
+  * uses the server's external ip (default route) unless `--qri` specifies a domain / ip-prefix
   * classic cp437 `▄` `▀` for space efficiency; some misbehaving terminals / fonts need `--qrz 2`
 * new permission `G` returns the filekey of uploaded files for users without read-access
   * when combined with permission `w` and volflag `fk`, uploaded files will not be accessible unless the filekey is provided in the url, and `G` provides the filekey to the uploader unlike `g`
@@ -4797,7 +4797,7 @@ after two exciting releases, time for something boring
 
 ## new features
 *but wait, there's more!*   not only do you get the [multithreaded file hashing](https://github.com/9001/copyparty/releases/tag/v1.3.11) but also --
-* faster bootup and volume reindexing when `-e2ds` (file indexing) is enabled
+* faster boot-up and volume reindexing when `-e2ds` (file indexing) is enabled
   * `3x` faster is probably the average on most instances; more files per folder = faster
   * `9x` faster on a 36 TiB zfs music/media nas with `-e2ts` (metadata indexing), dropping from 46sec to 5sec
   * and `34x` on another zfs box, 63sec -> 1.8sec
@@ -5528,7 +5528,7 @@ so far just mild annoyances, nothing bad
 * last release broke folder listings if you left off the trailing slash in the url
   * also fix the markdown-editor breadcrumbs which made that very obvious
 * when running without `-e2d`, don't proactively create symlinks for dupe uploads
-  * prevents the client from accidentally pushing superflous links
+  * prevents the client from accidentally pushing superfluous links
 * ui didn't update correctly when navigating into a folder with indexing disabled
 
 # other changes
@@ -5645,7 +5645,7 @@ not super important but recommended
 # new features
 * navigate into textfiles using hotkeys (`v, k`)
 * close various UI elements by repeatedly hitting the Escape key
-* doubleclick files/folders to open them (in the grid view, when multiselect is enabled)
+* double-click files/folders to open them (in the grid view, when multiselect is enabled)
 * `--s-wr-slp` sets a delay between socket writes, simulates a slow network during downloads
 * `--s-wr-sz` sets socket write size, default 256 KiB (was hardcoded 32 KiB until now)
   * this increase download speed by ~50% (to around 3 GiB/s) when running on windows / where sendfile is unavailable
@@ -5714,7 +5714,7 @@ not super important but recommended
   * supported formats: same as transcoder + `mp3` `ogg` `opus`
   * needs FFmpeg and FFprobe, can be disabled with `--no-athumb`
 * **textfile viewer**
-  * with syntax hilighting
+  * with syntax highlighting
     * can be disabled by deleting `web/deps/prism.js.gz` or building the sfx with `no-hl`
   * and list of textfiles in the navpane; toggle with hotkey `v`
 * **navpane context dock**
@@ -5804,7 +5804,7 @@ for future releases, you can use a script to automatically grab the latest sfx a
 * latest gzip edition of the sfx: [v0.11.18](https://github.com/9001/copyparty/releases/tag/v0.11.18)
 
 ## bugfixes
-* currently-playing song didn't hilight correctly
+* currently-playing song didn't highlight correctly
 
 
 
@@ -5856,7 +5856,7 @@ thx to @Bevinsky and @icxes for the ux suggestions
   * and `?raw` POST without content-type is now allowed
 * file-listing is refreshed when all up2k uploads complete
 * new option `--ign-ebind` to continue startup even if one of the IPs / ports couldn't be listened on
-* new option `--ign-ebind-all` to run even if copyparty can't receieve any connections at all
+* new option `--ign-ebind-all` to run even if copyparty can't receive any connections at all
   * maybe useful for monitoring folders and hashing new files on a timer or something
 
 ## bugfixes
@@ -5939,7 +5939,7 @@ thx to @Bevinsky and @icxes for the ux suggestions
 
 ## bugfixes
 * race-condition initializing the up2k-client when dropping files into the browser and you're not using https
-* hilight active folder in the navpane even when the browser and copyparty disagrees on how to urlencode
+* highlight active folder in the navpane even when the browser and copyparty disagrees on how to urlencode
 * hide prologue/epilogue while search results are open
 * toasts could redefine css
 
@@ -6045,10 +6045,10 @@ thx to @Bevinsky and @icxes for the ux suggestions
 * loss of access to anon-read/write folders after logging in
   * affected filesearch, regular searching, and volume listings
 * more aggressively `no-cache`, preventing cloudflare from eating api calls
-* after deleteing all files inside a folder, don't delete the folder itself
+* after deleting all files inside a folder, don't delete the folder itself
   * was intended behavior but fairly confusing
 * don't reshow tooltips when alt-tabbing
-* accessibility: always hilight focused things
+* accessibility: always highlight focused things
 * markdown-editor modification poller doesn't cause performance issues after having a document open for several months
 * mtp plugins [audio-bpm.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/audio-bpm.py) and [audio-key.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/mtag/audio-key.py) explicitly asks for just the first audio stream, which prevents ffmpeg from transcoding video (nice)
 
@@ -6383,7 +6383,7 @@ note: `copyparty-sfx.py` is https://github.com/9001/copyparty/commit/5955940b wh
 * image-thumbnails: apply rotation hints from exif
 * image-thumbnails: higher quality AND slightly smaller
   * fix loss of detail on resize
-* argument `--th-mt` specifices number of cores to use for thumbnailing
+* argument `--th-mt` specifies number of cores to use for thumbnailing
   * default is 0 which means all cores
 
 ## bugfixes
@@ -6993,7 +6993,7 @@ all these changelogs are sorted by importance btw so here's the least important 
 
 ## new features
 * video player -- click a webm/mp4 in the grid-view to play it
-  * only does formats/codecs supported by your browser for now (thats the foreshadowing part)
+  * only does formats/codecs supported by your browser for now (that's the foreshadowing part)
 * `--th-clean 0` disables periodic cleanup of the thumbnail cache 
 
 ## bugfixes
@@ -7170,7 +7170,7 @@ unless the upload was paused for 6 hours or more, it can probably be resumed by 
 
 ## new features suggested by kipu
 * pause uploads by setting `parallel uploads` to `0`
-* increase max `parallel uploads` to 16 (using +/- buttons) and 64 (by manual text entry) to accomodate sad american internet connections
+* increase max `parallel uploads` to 16 (using +/- buttons) and 64 (by manual text entry) to accommodate sad american internet connections
 * also look for `cover.jpg` and `cover.png` as folder thumbnails by default, adjustable with `--th-covers`
 * change the description in the sfx so the corruption warning is the first plaintext you see
 
@@ -7324,7 +7324,7 @@ reason: [v0.11.12](https://github.com/9001/copyparty/releases/tag/v0.11.12) chan
 
 ## new features
 * much faster filesearch in chrome
-* skip hidden colums in the /np text
+* skip hidden columns in the /np text
 * support cygpaths when pointing to mtag tools
 
 ## bugfixes
@@ -7386,10 +7386,10 @@ this release includes [copyparty-sfx-gz.py](https://github.com/9001/copyparty/re
 * hotkey `b` to toggle breadcrumbs / directory tree sidebar
   * hotkey `p` is now play/pause
   * hotkey `m` is now parent-directory
-* hilight the playing track in gallery mode too
+* highlight the playing track in gallery mode too
 * toggle to disable the now-playing clipboard buttons
 * added lots of tooltips
-  * threw aray the competing tooltip implementations and did a single ok one
+  * threw array the competing tooltip implementations and did a single ok one
 * more accurate error-messages on upload failures due to filesystem permissions
 * add another output to the sfx repacker (gzip-compressed python sfx)
 
@@ -7437,7 +7437,7 @@ this release includes [copyparty-sfx-gz.py](https://github.com/9001/copyparty/re
 ## new features
 * media player can now continue into the next folder
 * eq curve supports both positive and negative values (and scales down to avoid clipping)
-* browser columns now fully hide when hidden; reenable them in the settings tab
+* browser columns now fully hide when hidden; re-enable them in the settings tab
 * other ux tweaks
   * add some icons
   * tree control buttons remain visible when scrolling
@@ -7561,7 +7561,7 @@ nothing really important happened since [v0.11.6](https://github.com/9001/copypa
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
-# 2021-0608-0741  `v0.11.10`  dont leave me hangin
+# 2021-0608-0741  `v0.11.10`  dont leave me hanging
 
 * drop-in upgrade, no additional steps since [v0.11.1](https://github.com/9001/copyparty/releases/tag/v0.11.1)
 * nothing really important since [v0.11.6](https://github.com/9001/copyparty/releases/tag/v0.11.6)
@@ -8053,7 +8053,7 @@ not so strong anymore
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2021-0315-0013  `v0.9.8`  the strongest for a while
 
-nothing more to add or fix for now (barely avoided adding bpm/tempo detection using keyfinder and vamp+qm since thats just too ridiculous)
+nothing more to add or fix for now (barely avoided adding bpm/tempo detection using keyfinder and vamp+qm since that's just too ridiculous)
 
 * browser: correct music playback order after sorting
 * browser: no more glitching on resize in non-tree-mode
@@ -8335,7 +8335,7 @@ valvrave-stop.jpg
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2020-1117-2258  `v0.5.4`  edovprim
 
-(get it? becasue reverse proxy haha)
+(get it? because reverse proxy haha)
 
 * reverse-proxy support
 * filetype column in the browser
