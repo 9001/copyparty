@@ -2421,6 +2421,7 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         rnd, lifetime, xbu, xau = self.upload_flags(vfs)
         lim = vfs.get_dbv(rem)[0].lim
+        max_sz = lim.smax if lim else 0
         fdir = vfs.canonical(rem)
         fn = None
         if rem and not self.trailing_slash and not bos.path.isdir(fdir):
@@ -2620,7 +2621,38 @@ class HttpCli(object):
 
         try:
             path = os.path.join(fdir, fn)
+            if max_sz and remains == -1:
+                if "apnd" in self.uparam and not self.args.nw:
+                    try:
+                        pre_sz = bos.path.getsize(path)
+                    except Exception:
+                        pre_sz = 0
+                else:
+                    pre_sz = 0
+
+                if pre_sz >= max_sz:
+                    raise Pebkac(400, "file too big")
+
+                def limit_reader(fin, limit):
+                    total = 0
+                    for buf in fin:
+                        if not buf:
+                            break
+                        total += len(buf)
+                        if total > limit:
+                            raise Pebkac(400, "file too big")
+                        yield buf
+
+                reader = limit_reader(reader, max_sz - pre_sz)
+
             post_sz, sha_hex, sha_b64 = copier(reader, f, hasher, 0, self.args.s_wr_slp)
+        except Pebkac:
+            if not self.args.nw:
+                try:
+                    wunlink(self.log, path, vfs.flags)
+                except Exception:
+                    pass
+            raise
         finally:
             f.close()
 
