@@ -9753,7 +9753,7 @@ var rcm = (function () {
 	}
 
 	ebi('wrap').oncontextmenu = function(e) {
-		if (!r.enabled || e.shiftKey || (r.double && menu.style.display)) {
+		if (!r.enabled || e.shiftKey || (r.double && menu.style.display) || /doc=/.exec(location.search)) {
 			r.hide(true);
 			return true;
 		}
