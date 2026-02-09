@@ -270,6 +270,20 @@ try:
 
     socket.inet_pton(socket.AF_INET6, "::1")
     HAVE_IPV6 = True
+
+    if GRAAL:
+        try:
+            # --python.PosixModuleBackend=java throws OSError: illegal IP address
+            socket.inet_pton(socket.AF_INET, "127.0.0.1")
+        except:
+            _inet_pton = socket.inet_pton
+
+            def inet_pton(fam, ip):
+                if fam == socket.AF_INET:
+                    return socket.inet_aton(ip)
+                return _inet_pton(fam, ip)
+
+            socket.inet_pton = inet_pton
 except:
 
     def inet_pton(fam, ip):
