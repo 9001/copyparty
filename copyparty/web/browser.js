@@ -4622,8 +4622,9 @@ var fileman = (function () {
 		r.ccp = true;
 		r.clip = vps.slice(2);
 
+		var prefix = sread("clip_au") || location.origin;
 		try {
-			cliptxt(location.origin + r.clip.join('\n' + location.origin));
+			cliptxt(prefix + r.clip.join('\n' + prefix));
 		}
 		catch (ex) {}
 
