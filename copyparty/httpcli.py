@@ -7412,12 +7412,67 @@ class HttpCli(object):
         dirs.sort(key=itemgetter("name"))
 
         if is_opds:
+            # OpenSearch Description format requires a full-qualified URL and a "Short Name" under 16 characters
+            # which will be the longname truncated in the template.
+            # Relevant specs:
+            # https://specs.opds.io/opds-1.2#3-search
+            # https://developer.mozilla.org/en-US/docs/Web/XML/Guides/OpenSearch
+            if "osd" in self.uparam:
+                j2a["longname"] = "%s %s" % (self.args.bname, self.vpath)
+                j2a["search_url"] = "/" + self.args.RS + vpath
+
+                xml = self.j2s("opds_osd", **j2a)
+                self.reply(xml.encode("utf-8"), mime="application/opensearchdescription+xml")
+                return True
+
+            if "q" in self.uparam:
+                q = self.uparam["q"]
+                idx = self.conn.get_u2idx()
+                if not idx:
+                    raise Pebkac(500, "indexer not available")
+
+                # generate a raw query similar to web interface for multiple words
+                r = " and ".join(f"name like *{part}*" for part in q.split())
+
+                hits, _, _ = idx.search(self.uname, [self.vn], r, 1000)
+
+                # clear files and dirs for search results
+                files = []
+                dirs = []
+
+                prefix = vpath + "/" if vpath else ""
+
+                for h in hits:
+                    rp = h["rp"]
+
+                    # if user starts in a subfolder they shouldn't see hits from parent
+                    if prefix and not rp.startswith(prefix):
+                        continue
+
+                    # remove base path assuming user knows where they are already in their structure
+                    name = rp[len(prefix):]
+
+                    dt = datetime.fromtimestamp(h["ts"], UTC).strftime("%Y-%m-%d %H:%M:%S")
+
+                    item = {
+                        "lead": "-",
+                        "href": "/" + self.args.RS + rp,
+                        "name": unquotep(name),
+                        "sz": h["sz"],
+                        "dt": dt,
+                        "ts": h["ts"],
+                    }
+                    files.append(item)
+
             # exclude files which don't match --opds-exts
             allowed_exts = vf.get("opds_exts") or self.args.opds_exts
             if allowed_exts:
                 files = [
                     x for x in files if x["name"].rsplit(".", 1)[-1] in allowed_exts
                 ]
+
+            j2a["opds_osd"] = "/%s?opds&osd" % (self.args.RS + quotep(vpath))
+
             for item in dirs:
                 href = item["href"]
                 href += ("&" if "?" in href else "?") + "opds"

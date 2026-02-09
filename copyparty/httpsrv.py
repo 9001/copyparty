@@ -188,6 +188,7 @@ class HttpSrv(object):
         ]
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
         self.j2["opds"] = env.get_template("opds.xml")
+        self.j2["opds_osd"] = env.get_template("opds_osd.xml")
         self.prism = has_resource(self.E, "web/deps/prism.js.gz")
 
         if self.args.ipu:

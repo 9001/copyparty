@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>CP {{ longname | truncate(13) }}</ShortName>
+  <Description>Copyparty {{ longname }}</Description>
+  <Url type="application/atom+xml;profile=opds-catalog" template="{{ search_url }}?opds&amp;q={searchTerms}"/>
+</OpenSearchDescription>

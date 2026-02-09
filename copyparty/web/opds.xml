@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
+    <link rel="search"
+    href="{{ opds_osd | e }}"
+    type="application/opensearchdescription+xml"
+    title="Search"/>
     {%- for d in dirs %}
     <entry>
         <title>{{ d.name }}</title>
