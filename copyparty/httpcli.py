@@ -168,9 +168,9 @@ A_FILE = os.stat_result(
     (0o644, -1, -1, 1, 1000, 1000, 8, 0x39230101, 0x39230101, 0x39230101)
 )
 
-RE_CC = re.compile(r"[\x00-\x1f]")  # search always faster
-RE_USAFE = re.compile(r'[\x00-\x1f<>"]')  # search always faster
-RE_HSAFE = re.compile(r"[\x00-\x1f<>\"'&]")  # search always much faster
+RE_CC = re.compile(r"[\x00-\x1f\x7f]")  # search always faster
+RE_USAFE = re.compile(r'[\x00-\x1f\x7f<>"]')  # search always faster
+RE_HSAFE = re.compile(r"[\x00-\x1f\x7f<>\"'&]")  # search always much faster
 RE_HOST = re.compile(r"[^][0-9a-zA-Z.:_-]")  # search faster <=17ch
 RE_MHOST = re.compile(r"^[][0-9a-zA-Z.:_-]+$")  # match faster >=18ch
 RE_K = re.compile(r"[^0-9a-zA-Z_-]")  # search faster <=17ch
@@ -7419,10 +7419,12 @@ class HttpCli(object):
             # https://developer.mozilla.org/en-US/docs/Web/XML/Guides/OpenSearch
             if "osd" in self.uparam:
                 j2a["longname"] = "%s %s" % (self.args.bname, self.vpath)
-                j2a["search_url"] = "/" + self.args.RS + vpath
+                j2a["search_url"] = self.args.SRS + vpath
 
                 xml = self.j2s("opds_osd", **j2a)
-                self.reply(xml.encode("utf-8"), mime="application/opensearchdescription+xml")
+                self.reply(
+                    xml.encode("utf-8"), mime="application/opensearchdescription+xml"
+                )
                 return True
 
             if "q" in self.uparam:
@@ -7432,32 +7434,33 @@ class HttpCli(object):
                     raise Pebkac(500, "indexer not available")
 
                 # generate a raw query similar to web interface for multiple words
-                r = " and ".join(f"name like *{part}*" for part in q.split())
+                r = " and ".join(("name like *%s*" % (x,)) for x in q.split())
 
                 hits, _, _ = idx.search(self.uname, [self.vn], r, 1000)
 
-                # clear files and dirs for search results
                 files = []
                 dirs = []
 
-                prefix = vpath + "/" if vpath else ""
+                prefix = quotep(vpath + "/" if vpath else "")
 
                 for h in hits:
                     rp = h["rp"]
-
-                    # if user starts in a subfolder they shouldn't see hits from parent
-                    if prefix and not rp.startswith(prefix):
+                    if not rp.startswith(prefix):
                         continue
 
-                    # remove base path assuming user knows where they are already in their structure
-                    name = rp[len(prefix):]
-
-                    dt = datetime.fromtimestamp(h["ts"], UTC).strftime("%Y-%m-%d %H:%M:%S")
+                    zd = datetime.fromtimestamp(h["ts"], UTC)
+                    dt = "%04d-%02d-%02d %02d:%02d:%02d" % (
+                        zd.year,
+                        zd.month,
+                        zd.day,
+                        zd.hour,
+                        zd.minute,
+                        zd.second,
+                    )
 
                     item = {
-                        "lead": "-",
-                        "href": "/" + self.args.RS + rp,
-                        "name": unquotep(name),
+                        "href": self.args.SRS + rp,
+                        "name": unquotep(rp[len(prefix) :].split("?")[0]),
                         "sz": h["sz"],
                         "dt": dt,
                         "ts": h["ts"],
@@ -7471,7 +7474,7 @@ class HttpCli(object):
                     x for x in files if x["name"].rsplit(".", 1)[-1] in allowed_exts
                 ]
 
-            j2a["opds_osd"] = "/%s?opds&osd" % (self.args.RS + quotep(vpath))
+            j2a["opds_osd"] = "%s%s?opds&osd" % (self.args.SRS, quotep(vpath))
 
             for item in dirs:
                 href = item["href"]
