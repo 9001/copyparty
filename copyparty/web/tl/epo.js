@@ -336,7 +336,7 @@ Ls.epo = {
 	"mm_eunk": "Nekonata eraro",
 	"mm_e404": "Ne povas ludi aŭdiaĵon; eraro 404: Dosiero ne trovita.",
 	"mm_e403": "Ne povas ludi aŭdiaĵon; eraro 403: Atingo malpermesita.\n\nKlopodu reŝargi paĝon per klavo F5, eble via seanco senvalidiĝis",
-	"mm_e415": "Ne povas ludi aŭdiaĵon; eraro 415: Transkodigo de dosiero malsukcesis; rigardu la protokolojn de servilo.", //m
+	"mm_e415": "Ne povas ludi aŭdiaĵon; eraro 415: Transkodigo de dosiero malsukcesis; rigardu la protokolojn de la servilo.",
 	"mm_e500": "Ne povas ludi aŭdiaĵon; eraro 500: Rigardu la protokolojn de servilo.",
 	"mm_e5xx": "Ne povas ludi aŭdiaĵon; servila eraro ",
 	"mm_nof": "neniuj aŭdio-dosieroj trovitaj proksime",
@@ -356,7 +356,7 @@ Ls.epo = {
 	"f_anota": "nur {0} de {1} eroj estis elektita;\nrulumi al la malsupro por elekti la tutan dosierujon",
 
 	"f_dls": 'la ligiloj de dosieroj en ĉi tiu dosierujo estis\nanstataŭigitaj per elŝuto-ligiloj',
-	"f_dl_nd": 'preterlasante dosierujon (uzu zip/tar-elŝuton anstataŭe):\n', //m
+	"f_dl_nd": 'dosierujo preterlasita (uzu zip/tar-elŝuton anstataŭe):\n',
 
 	"f_partial": "Por sendifekta elŝuto de nune-alŝutata dosiero, elektu dosieron kun sama nomo, sed sen etendaĵo <code>.PARTIAL</code>. Bonvolu uzi la butonon \"Rezigni\" aŭ klavon ESK por fari tion.\n\nSe vi uzas OK / Enter, la provizora dosiero <code>.PARTIAL</code> estos elŝutita, kiu tre probable enhavas nekompletajn datumojn.",
 
@@ -425,10 +425,10 @@ Ls.epo = {
 	"fcc_warn": '{0} aĵoj kopiitaj al tondujo\n\nnur <b>ĉi tiu</b> langeto de retumilo povas alglui ilin\n(pro la grando de elektaĵo)',
 
 	"fp_apply": "uzi ĉi tiujn nomojn",
-	"fp_skip": "preterpasi konfliktojn", //m
+	"fp_skip": "preterpasi konfliktojn",
 	"fp_ecut": "unue eltondi aŭ kopii dosier(uj)ojn, do alglui ĝin poste\n\nnoto: tondujo ankaŭ funkcias inter aliaj langetoj de retumilo",
-	"fp_ename": "{0} aĵoj ne povas esti movitaj, ĉar iliaj nomoj estas jam uzataj. Alinomi ilin sube aŭ lasi la nomokampojn malplenaj (\"preterpasi konfliktojn\") por preterpasi:", //m
-	"fcp_ename": "{0} aĵoj ne povas esti kopiitaj, ĉar iliaj nomoj estas jam uzataj. Alinomi ilin sube aŭ lasi la nomokampojn malplenaj (\"preterpasi konfliktojn\") por preterpasi:", //m
+	"fp_ename": "{0} aĵoj ne povas esti movitaj, ĉar iliaj nomoj estas jam uzataj. Alinomi ilin sube aŭ lasi la nomokampojn malplenaj (\"preterpasi konfliktojn\") por preterpasi:",
+	"fcp_ename": "{0} aĵoj ne povas esti kopiitaj, ĉar iliaj nomoj estas jam uzataj. Alinomi ilin sube aŭ lasi la nomokampojn malplenaj (\"preterpasi konfliktojn\") por preterpasi:",
 	"fp_emore": "ankoraŭ restas koincidoj de dosiernomoj, kiuj bezonas solvon",
 	"fp_ok": "movado sukcesis",
 	"fcp_ok": "kopiado sukcesis",
@@ -447,8 +447,8 @@ Ls.epo = {
 	"fcp_both_b": '<a href="#" id="modal-ok">Kopii</a><a href="#" id="modal-ng">Alŝuti</a>',
 
 	"mk_noname": "tajpu nomon en tekstokampo maldekstre antaŭ vi faras ĉi tion :p",
-	"nmd_i1": "vi povas aldoni la deziratan sufikson, ekzemple <code>.md</code>", //m
-	"nmd_i2": "vi povas krei nur <code>.{0}</code>-dosierojn ĉar vi ne havas forigan permeson", //m
+	"nmd_i1": "vi povas aldoni la deziratan sufikson, ekzemple <code>.md</code>",
+	"nmd_i2": "vi povas krei nur <code>.{0}</code>-dosierojn, ĉar vi ne rajtas forigi dosierojn",
 
 	"tv_load": "Ŝargado de teksto-dokumento:\n\n{0}\n\n{1}% ({2} da {3} MiB ŝargita)",
 	"tv_xe1": "ne povas ŝargi teksto-dosieron:\n\neraro ",
@@ -644,25 +644,25 @@ Ls.epo = {
 	"ur_um": "Finita;\n{0} alŝutoj sukcesis,\n{1} alŝutoj malsukcesis, pardonon",
 	"ur_sm": "Finita;\n{0} dosieroj trovitaj ĉe la servilo,\n{1} dosieroj NE trovitaj ĉe la servilo",
 
-	"rc_opn": "malfermi", //m
-	"rc_ply": "Ludi", //m
-	"rc_pla": "Ludi kiel sonon", //m
-	"rc_txt": "malfermi en dosiera vidilo", //m
-	"rc_md": "malfermi en tekstredaktilo", //m
-	"rc_dl": "elŝuti", //m
-	"rc_zip": "elŝuti kiel arkivon", //m
-	"rc_cpl": "kopii ligilon", //m
-	"rc_del": "forigi", //m
-	"rc_cut": "eltondi", //m
-	"rc_cpy": "kopii", //m
-	"rc_pst": "alglui", //m
-	"rc_rnm": "alinomi", //m
-	"rc_nfo": "nova dosierujo", //m
-	"rc_nfi": "nova dosiero", //m
-	"rc_sal": "elekti ĉion", //m
-	"rc_sin": "inversigi elekton", //m
-	"rc_shf": "kunhavigi ĉi tiun dosierujon", //m
-	"rc_shs": "kunhavigi elekton", //m
+	"rc_opn": "malfermi",
+	"rc_ply": "ludi",
+	"rc_pla": "ludi kiel aŭdiaĵo",
+	"rc_txt": "malfermi per tekstovidilo",
+	"rc_md": "malfermi per tekstoredaktilo",
+	"rc_dl": "elŝuti",
+	"rc_zip": "elŝuti kiel arkivo",
+	"rc_cpl": "kopii ligilon",
+	"rc_del": "forigi",
+	"rc_cut": "eltondi",
+	"rc_cpy": "kopii",
+	"rc_pst": "alglui",
+	"rc_rnm": "alinomi",
+	"rc_nfo": "nova dosierujo",
+	"rc_nfi": "nova dosiero",
+	"rc_sal": "elekti ĉiujn",
+	"rc_sin": "inversigi elekton",
+	"rc_shf": "kunhavigi ĉi tiun dosierujon",
+	"rc_shs": "kunhavigi elekton",
 
 	"lang_set": "ĉu reŝargi paĝon por efektivigi lingvo-ŝanĝon?",
 
@@ -705,8 +705,8 @@ Ls.epo = {
 		"ta1": "entajpu novan pasvorton unue",
 		"ta2": "retajpu por konfirmi:",
 		"ta3": "tajpo-eraro; bonvolu provu denove",
-		"nop": "ERARO: Pasvorto ne povas esti malplena", //m
-		"nou": "ERARO: Uzantnomo kaj/aŭ pasvorto ne povas esti malplena", //m
+		"nop": "ERARO: Pasvorto ne povas esti malplena",
+		"nou": "ERARO: Uzantnomo kaj/aŭ pasvorto ne povas esti malplena",
 		"aa1": "aktivaj alŝutoj:",
 		"ab1": "malŝalti no304-on",
 		"ac1": "ŝalti no304-on",
