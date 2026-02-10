@@ -2,8 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <link rel="search"
     href="{{ opds_osd | e }}"
-    type="application/opensearchdescription+xml"
-    title="Search"/>
+    type="application/opensearchdescription+xml"/>
     {%- for d in dirs %}
     <entry>
         <title>{{ d.name }}</title>
