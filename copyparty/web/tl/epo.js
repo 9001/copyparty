@@ -283,7 +283,7 @@ Ls.epo = {
 	"ml_tint": "kolorado",
 	"ml_eq": "ekvalizilo",
 	"ml_drc": "kompresoro",
-	"ml_ss": "preterpasi silenton", //m
+	"ml_ss": "preterpasi silenton",
 
 	"mt_loop": "ripeti unu kanton\">🔁",
 	"mt_one": "haltigi post unu kanto\">1️⃣",
@@ -321,12 +321,12 @@ Ls.epo = {
 	"mt_tint": "travideblo (0-100) de ludadbreto$Nvi povas ŝanĝi ĝin, se ĝi aspektas tro distre dum ŝargado",
 	"mt_eq": "`ŝaltas ekvalizilon kaj stirilon de plifortigado;$N$Nboost (plifortigado) `0` = senmodifa 100%a laŭteco$N$Nwidth (larĝo) `1 &nbsp;` = senmodifa dukanala sono$Nwidth (larĝo) `0.5` = 50% miksado inter maldekstra kaj dekstra kanaloj$Nwidth (larĝo) `0 &nbsp;` = unukanala sono$N$Nboost `-0.8` &amp; width `10` = senvokigo :^)$N$Nŝaltita ekvalizilo ankaŭ forigas paŭzojn inter muzikaĵoj en senpaŭzaj albumoj, agordi ĉion kiel 0 (sed 'width' kiel 1), se vi volas nur tion",
 	"mt_drc": "ŝaltas kompresoron de dinamiko (glatigas laŭtecon de muzikaĵoj); ankaŭ ŝaltas ekvalizilon, do agordu ĉion (sed 'width') kiel 0, se vi ne volas ĝin; $N$Nplimalgrandigas laŭtecon de aŭdio super sojlo-valoro ('tresh') da dB; ĉiu proporcio-valoro ('ratio') da dB post 'tresh' 1 dB estos eligita, do implicitaj valoroj (tresh = -24, ratio = 12) faras, ke laŭteco neniam pli grandas ol -22 dB; tiel estas sendanĝera agordi 'boost'on kiel 0.8 aŭ eĉ 1.8 dum ATK = 0 kaj grandega RLS, kiel 90 (funkcias nur en Firefox, RLS estas maksimume 1 en aliaj retumiloj)$N$N(rigardu vikipedion, ĝi klariĝas pli bone)",
-	"mt_ss": "`ebligas salti silenton; multobligas la ludrapidon per `rap` ĉe komenco/fino de kantoj kiam la laŭteco estas sub `laŭt` kaj la pozicio estas ene de la unuaj `kom`% aŭ lastaj `fin`%", //m
-	"mt_ssvt": "laŭteca sojlo (0-255)\">laŭt", //m
-	"mt_ssts": "aktiva sojlo (% trako, komenco)\">kom", //m
-	"mt_sste": "aktiva sojlo (% trako, fino)\">fin", //m
-	"mt_ssrt": "laŭteco/rapido rampotempo\">atk", //m
-	"mt_sssm": "ludrapida multiplikilo\">rap", //m
+	"mt_ss": "`ebligas transsalti silenton; multobligas la ludrapidon per `rap` ĉe komenco/fino de aŭdiaĵoj, kiam la laŭteco estas sub `laŭt` kaj la pozicio estas ene de la komencaj `kom`% aŭ finaj `fin`%",
+	"mt_ssvt": "laŭteca intervalo por silentsaltado (0-255)\">laŭt",
+	"mt_ssts": "komenca intervalo por silentsaltado (% de trakolongo)\">kom",
+	"mt_sste": "fina intervalo por silentsaltado (% de trakolongo)\">fin",
+	"mt_ssrt": "tempo por laŭgrada ŝanĝo de laŭteco/rapideco dum silentsaltado\">atak", //nomita tiel en la angla kaj esperanto nome de "attack", la nomo de valoro en ADSR-envolvaĵo, kiu regas, dum kiom da tempo la laŭteco de sono kreskas
+	"mt_sssm": "multiplikado de ludrapideco dum silentsaltado\">×rapid",
 
 	"mb_play": "ludi",
 	"mm_hashplay": "ludi ĉi tiun aŭdiodosieron?",
