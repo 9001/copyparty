@@ -325,7 +325,7 @@ Ls.epo = {
 	"mt_ssvt": "laŭteca intervalo por silentsaltado (0-255)\">laŭt",
 	"mt_ssts": "komenca intervalo por silentsaltado (% de trakolongo)\">kom",
 	"mt_sste": "fina intervalo por silentsaltado (% de trakolongo)\">fin",
-	"mt_ssrt": "tempo por laŭgrada ŝanĝo de laŭteco/rapideco dum silentsaltado\">atak", //nomita tiel en la angla kaj esperanto nome de "attack", la nomo de valoro en ADSR-envolvaĵo, kiu regas, dum kiom da tempo la laŭteco de sono kreskas
+	"mt_ssrt": "tempo por laŭgrada ŝanĝo de laŭteco/rapideco dum silentsaltado\">ŝanĝ⏱️",
 	"mt_sssm": "multiplikado de ludrapideco dum silentsaltado\">×rapid",
 
 	"mb_play": "ludi",
