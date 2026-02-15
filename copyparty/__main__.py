@@ -1059,13 +1059,17 @@ def get_sects():
 
             similarly, \033[33m--chmod-d\033[0m and \033[33mchmod_d\033[0m sets the directory/folder perm
 
-            the value is a three-digit octal number such as \033[32m755\033[0m, \033[32m750\033[0m, \033[32m644\033[0m, etc.
+            the value is a three- or four-digit octal number such as \033[32m755\033[0m, \033[32m0644\033[0m, \033[32m2750\033[0m, etc.
 
-            first digit = "User"; permission for the unix-user
-            second digit = "Group"; permission for the unix-group
-            third digit = "Other"; permission for all other users/groups
+            if 3 digits: User, Group, Other
+            if 4 digits: Special, User, Group, Other
 
-            for files:
+            "Special" digit (sum of the following):
+            \033[32m1\033[0m = sticky (files: n/a; dirs: files in directory can be deleted only by their owners)
+            \033[32m2\033[0m = setgid (files: run executable as file group; dirs: files inherit group from directory)
+            \033[32m4\033[0m = setuid (files: run executable as file owner; dirs: n/a)
+
+            "User", "Group", "Other" digits for files:
             \033[32m0\033[0m = \033[35m---\033[0m = no access
             \033[32m1\033[0m = \033[35m--x\033[0m = can execute the file as a program
             \033[32m2\033[0m = \033[35m-w-\033[0m = can write
@@ -1075,7 +1079,7 @@ def get_sects():
             \033[32m6\033[0m = \033[35mrw-\033[0m = can read and write
             \033[32m7\033[0m = \033[35mrwx\033[0m = can read, write, execute
 
-            for directories/folders:
+            "User", "Group", "Other" digits for directories/folders:
             \033[32m0\033[0m = \033[35m---\033[0m = no access
             \033[32m1\033[0m = \033[35m--x\033[0m = can read files in folder but not list contents
             \033[32m2\033[0m = \033[35m-w-\033[0m = n/a
@@ -1261,7 +1265,7 @@ def add_upload(ap):
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload (bad idea to enable this on windows and/or cow filesystems)")
     ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even when it might be dangerous (multiprocessing, filesystems lacking sparse-files support, ...)")
     ap2.add_argument("--chmod-f", metavar="UGO", type=u, default="", help="unix file permissions to use when creating files; default is probably 644 (OS-decided), see --help-chmod. Examples: [\033[32m644\033[0m] = owner-RW + all-R, [\033[32m755\033[0m] = owner-RWX + all-RX, [\033[32m777\033[0m] = full-yolo (volflag=chmod_f)")
-    ap2.add_argument("--chmod-d", metavar="UGO", type=u, default="755", help="unix file permissions to use when creating directories; see --help-chmod. Examples: [\033[32m755\033[0m] = owner-RW + all-R, [\033[32m777\033[0m] = full-yolo (volflag=chmod_d)")
+    ap2.add_argument("--chmod-d", metavar="UGO", type=u, default="755", help="unix file permissions to use when creating directories; see --help-chmod. Examples: [\033[32m755\033[0m] = owner-RW + all-R, [\033[32m2750\033[0m] = owner-RW + group-R + setgid, [\033[32m777\033[0m] = full-yolo (volflag=chmod_d)")
     ap2.add_argument("--uid", metavar="N", type=int, default=-1, help="unix user-id to chown new files/folders to; default = -1 = do-not-change (volflag=uid)")
     ap2.add_argument("--gid", metavar="N", type=int, default=-1, help="unix group-id to chown new files/folders to; default = -1 = do-not-change (volflag=gid)")
     ap2.add_argument("--wram", action="store_true", help="allow uploading even if a volume is inside a ramdisk, meaning that all data will be lost on the next server reboot (volflag=wram)")

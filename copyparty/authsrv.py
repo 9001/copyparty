@@ -2476,8 +2476,8 @@ class AuthSrv(object):
                 if not zs:
                     vol.flags.pop(k, None)
                     continue
-                if not re.match("^[0-7]{3}$", zs):
-                    t = "config-option '%s' must be a three-digit octal value such as [755] or [644] but the value was [%s]"
+                if not re.match("^[0-7]{3,4}$", zs):
+                    t = "config-option '%s' must be a three- or four-digit octal value such as [0755] or [644] but the value was [%s]"
                     t = t % (k, zs)
                     self.log(t, 1)
                     raise Exception(t)
