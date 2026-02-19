@@ -4,11 +4,11 @@
 
 Turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser.
 
-* Server only needs Python (2 or 3), all dependencies are optional.
+* Copyparty only needs Python (2 or 3), all the dependencies are optional.
 * 🔌 Protocols: [http(s)](#the-browser) // [webdav](#webdav-server) // [sftp](#sftp-server) // [ftp(s)](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
 * 📱 [Android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
-👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
+👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement.
 
 📷 **Screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
@@ -35,12 +35,12 @@ Built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
     * [shadowing](#shadowing) - hiding specific subfolders.
     * [dotfiles](#dotfiles) - unix-style hidden files/folders.
 * [The browser](#the-browser) - accessing a copyparty server using a web-browser.
-    * [tabs](#tabs) - the main tabs in the ui
-    * [hotkeys](#hotkeys) - the browser has the following hotkeys
-    * [navpane](#navpane) - switching between breadcrumbs or navpane
-    * [thumbnails](#thumbnails) - press `g` or `田` to toggle grid-view instead of the file listing
-    * [zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
-    * [uploading](#uploading) - drag files/folders into the web-browser to upload
+    * [Tabs](#tabs) - The main tabs in the ui.
+    * [Hotkeys](#hotkeys) - A list of available hotkeys.
+    * [Navpane](#navpane) - Switching between breadcrumbs and the navpane.
+    * [Thumbnails](#thumbnails) - Press `g` or `田` to toggle grid-view instead of list-view.
+    * [Zip downloads](#zip-downloads) - download folders (or file selections) as `zip` or `tar` files
+    * [Uploading](#uploading) - drag files/folders into the web-browser to upload
         * [file-search](#file-search) - dropping files into the browser also lets you see if they exist on the server
         * [unpost](#unpost) - undo/delete accidental uploads
         * [self-destruct](#self-destruct) - uploads can be given a lifetime
