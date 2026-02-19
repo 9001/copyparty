@@ -2,40 +2,39 @@
 
 ### 💾🎉 copyparty
 
-turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser
+Turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser.
 
-* server only needs Python (2 or 3), all dependencies optional
-* 🔌 protocols: [http(s)](#the-browser) // [webdav](#webdav-server) // [sftp](#sftp-server) // [ftp(s)](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
-* 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
+* Server only needs Python (2 or 3), all dependencies are optional.
+* 🔌 Protocols: [http(s)](#the-browser) // [webdav](#webdav-server) // [sftp](#sftp-server) // [ftp(s)](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
+* 📱 [Android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
 👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
 
-📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
+📷 **Screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
-🎬 **videos:** [upload](https://a.ocv.me/pub/demo/pics-vids/up2k.webm) // [cli-upload](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm) // [race-the-beam](https://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm) // 👉 **[feature-showcase](https://a.ocv.me/pub/demo/showcase-hq.webm)** ([youtube](https://www.youtube.com/watch?v=15_-hgsX2V0))
+🎬 **Videos:** [upload](https://a.ocv.me/pub/demo/pics-vids/up2k.webm) // [cli-upload](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm) // [race-the-beam](https://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm) // 👉 **[feature-showcase](https://a.ocv.me/pub/demo/showcase-hq.webm)** ([youtube](https://www.youtube.com/watch?v=15_-hgsX2V0))
 
-built in Norway 🇳🇴 with contributions from [not-norway](https://github.com/9001/copyparty/graphs/contributors)
+Built in Norway 🇳🇴 with contributions from [not-norway](https://github.com/9001/copyparty/graphs/contributors).
 
 
-## readme toc
+## Table of Contents
 
-* top
-    * [quickstart](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
-        * [mirrors](#mirrors) - other places to download copyparty from
-        * [at home](#at-home) - make it accessible over the internet
-        * [on servers](#on-servers) - you may also want these, especially on servers
-    * [features](#features) - also see [comparison to similar software](./docs/versus.md)
-    * [testimonials](#testimonials) - small collection of user feedback
-* [motivations](#motivations) - project goals / philosophy
+* [Quickstart](#quickstart) - just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
+  * [Mirrors](#mirrors) - other places you can download copyparty from.
+  * [Copyparty at home](#at-home) - make it accessible over the internet.
+  * [Copyparty on servers](#on-servers) - you may also want these, especially on servers.
+* [Features](#features) - also see [comparison to similar software](./docs/versus.md)
+* [Testimonials](#testimonials) - small collection of user feedback.
+* [Motivations](#motivations) - project goals and philosophy.
     * [notes](#notes) - general notes
-* [bugs](#bugs) - roughly sorted by chance of encounter
-    * [not my bugs](#not-my-bugs) - same order here too
-* [breaking changes](#breaking-changes) - upgrade notes
-* [FAQ](#FAQ) - "frequently" asked questions
-* [accounts and volumes](#accounts-and-volumes) - per-folder, per-user permissions
-    * [shadowing](#shadowing) - hiding specific subfolders
-    * [dotfiles](#dotfiles) - unix-style hidden files/folders
-* [the browser](#the-browser) - accessing a copyparty server using a web-browser
+* [Bugs](#bugs) - roughly sorted by chance of encounter.
+    * [Not my bugs](#not-my-bugs) - same order here too.
+* [Breaking changes](#breaking-changes) - upgrade notes.
+* [FAQ](#FAQ) - "frequently" asked questions.
+* [Accounts and Volumes](#accounts-and-volumes) - per-folder, per-user permissions.
+    * [shadowing](#shadowing) - hiding specific subfolders.
+    * [dotfiles](#dotfiles) - unix-style hidden files/folders.
+* [The browser](#the-browser) - accessing a copyparty server using a web-browser.
     * [tabs](#tabs) - the main tabs in the ui
     * [hotkeys](#hotkeys) - the browser has the following hotkeys
     * [navpane](#navpane) - switching between breadcrumbs or navpane
