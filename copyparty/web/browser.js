@@ -332,7 +332,7 @@ if (1)
 		"mt_ssvt": "volume threshold (0-255)\">vol",
 		"mt_ssts": "active threshold (% of track, start)\">start",
 		"mt_sste": "active threshold (% of track, end)\">end",
-		"mt_sssm": "playback speed multiplier (range: 0 to 8)\">ffwd",
+		"mt_sssm": "playback speed multiplier (range: 0.15 to 8)\">ffwd",
 
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
