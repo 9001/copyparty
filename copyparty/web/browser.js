@@ -10041,7 +10041,7 @@ var mpss = (function() {
 			vthresh: afilt.sscv[0],
 			sthresh: afilt.sscv[1],
 			etresh: afilt.sscv[2],
-			sspeed: afilt.sscv[3],
+			sspeed: Math.min(8.0, Math.max(0.15, afilt.sscv[3])),
 			rspeed: 0.2,
 			loopInterval: 25,
 		};
