@@ -332,8 +332,7 @@ if (1)
 		"mt_ssvt": "volume threshold (0-255)\">vol",
 		"mt_ssts": "active threshold (% of track, start)\">start",
 		"mt_sste": "active threshold (% of track, end)\">end",
-		"mt_ssrt": "volume/speed ramp up/down time\">fade",
-		"mt_sssm": "playback speed multiplier\">ffwd",
+		"mt_sssm": "playback speed multiplier (range: 0 to 8)\">ffwd",
 
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
@@ -2718,8 +2717,8 @@ var afilt = (function () {
 		"drcv": [-24, 30, 12, 0.01, 0.25],
 		"drch": ['tresh', 'knee', 'ratio', 'atk', 'rls'],
 		"drck": ['threshold', 'knee', 'ratio', 'attack', 'release'],
-		"sscl": [L.mt_ssvt, L.mt_ssts, L.mt_sste, L.mt_ssrt, L.mt_sssm],
-		"sscv": [1, 5, 5, 5.0, 0.2],
+		"sscl": [L.mt_ssvt, L.mt_ssts, L.mt_sste, L.mt_sssm],
+		"sscv": [1, 5, 5, 5.0],
 		"drcn": null,
 		"filters": [],
 		"filterskip": [],
@@ -10043,7 +10042,7 @@ var mpss = (function() {
 			sthresh: afilt.sscv[1],
 			etresh: afilt.sscv[2],
 			sspeed: afilt.sscv[3],
-			rspeed: afilt.sscv[4],
+			rspeed: 0.2,
 			loopInterval: 25,
 		};
 		return true;
