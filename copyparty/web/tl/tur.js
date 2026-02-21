@@ -325,7 +325,6 @@ Ls.tur = {
 	"mt_ssvt": "ses eşiği (0-255)\">ses", //m
 	"mt_ssts": "etkin eşik (% parça, başlangıç)\">bas", //m
 	"mt_sste": "etkin eşik (% parça, bitiş)\">son", //m
-	"mt_ssrt": "ses/hız rampa süresi\">fade", //m
 	"mt_sssm": "oynatma hızı çarpanı\">ileri", //m
 
 	"mb_play": "oynat",

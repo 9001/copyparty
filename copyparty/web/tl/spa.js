@@ -324,7 +324,6 @@ Ls.spa = {
 	"mt_ssvt": "umbral de volumen (0-255)\">vol", //m
 	"mt_ssts": "umbral activo (% pista, inicio)\">ini", //m
 	"mt_sste": "umbral activo (% pista, fin)\">fin", //m
-	"mt_ssrt": "tiempo de rampa volumen/velocidad\">fund", //m
 	"mt_sssm": "multiplicador de velocidad de reproducción\">av", //m
 
 	"mb_play": "reproducir",

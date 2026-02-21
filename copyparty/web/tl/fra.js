@@ -325,7 +325,6 @@ Ls.fra = {
 	"mt_ssvt": "seuil de volume (0-255)\">vol", //m
 	"mt_ssts": "seuil actif (% piste, début)\">deb", //m
 	"mt_sste": "seuil actif (% piste, fin)\">fin", //m
-	"mt_ssrt": "temps de montée/descente volume/vitesse\">fondu", //m
 	"mt_sssm": "multiplicateur de vitesse de lecture\">av", //m
 
 	"mb_play": "lecture",

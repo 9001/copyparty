@@ -325,7 +325,6 @@ Ls.ita = {
 	"mt_ssvt": "soglia volume (0-255)\">vol", //m
 	"mt_ssts": "soglia attiva (% traccia, inizio)\">ini", //m
 	"mt_sste": "soglia attiva (% traccia, fine)\">fin", //m
-	"mt_ssrt": "tempo rampa volume/velocità\">fade", //m
 	"mt_sssm": "moltiplicatore velocità riproduzione\">av", //m
 
 	"mb_play": "riproduci",

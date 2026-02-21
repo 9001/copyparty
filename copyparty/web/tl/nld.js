@@ -325,7 +325,6 @@ Ls.nld = {
 	"mt_ssvt": "Volumedrempel (0-255)\">vol", //m
 	"mt_ssts": "Actieve drempel (% track, begin)\">beg", //m
 	"mt_sste": "Actieve drempel (% track, einde)\">eind", //m
-	"mt_ssrt": "Op/aflooptijd volume/snelheid\">fade", //m
 	"mt_sssm": "Vermenigvuldiger afspeelsnelheid\">vrs", //m
 
 	"mb_play": "Afspelen",

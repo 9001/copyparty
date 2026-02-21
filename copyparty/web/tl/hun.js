@@ -326,7 +326,6 @@ Ls.hun = {
 	"mt_ssvt": 'hangerő küszöb (0-255)">vol',
 	"mt_ssts": 'aktív tartomány (%, eleje)">start',
 	"mt_sste": 'aktív tartomány (%, vége)">end',
-	"mt_ssrt": 'hangosodási/halkulási idő">fade',
 	"mt_sssm": 'lejátszási sebesség szorzó">ffwd',
 
 	"mb_play": 'play',

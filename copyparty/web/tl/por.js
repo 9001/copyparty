@@ -325,7 +325,6 @@ Ls.por = {
 	"mt_ssvt": "limiar de volume (0-255)\">vol", //m
 	"mt_ssts": "limiar ativo (% faixa, início)\">ini", //m
 	"mt_sste": "limiar ativo (% faixa, fim)\">fim", //m
-	"mt_ssrt": "tempo de rampa volume/velocidade\">fade", //m
 	"mt_sssm": "multiplicador de velocidade de reprodução\">av", //m
 
 	"mb_play": "reproduzir",

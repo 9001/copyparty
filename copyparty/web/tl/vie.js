@@ -332,7 +332,6 @@ Ls.vie = {
 	"mt_ssvt": "ngưỡng âm lượng (0-255)\">am", //m
 	"mt_ssts": "ngưỡng hoạt động (% bài, đầu)\">dau", //m
 	"mt_sste": "ngưỡng hoạt động (% bài, cuối)\">cuoi", //m
-	"mt_ssrt": "thời gian tăng/giảm âm lượng/tốc độ\">fade", //m
 	"mt_sssm": "hệ số tốc độ phát\">nh", //m
 
 	"mb_play": "phát",
