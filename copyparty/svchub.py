@@ -1788,11 +1788,15 @@ class SvcHub(object):
         self.log("stacks", zs)
 
     def parse_version(self, ver: str) -> tuple:
+        if not ver or not isinstance(ver, str):
+            return (0, 0, 0)
         match = re.search(r'[\d.]+', ver)
         if not match:
             return (0, 0, 0)
-        clean = match.group(0).strip('.')
-        return tuple(int(x) for x in clean.split("."))
+        parts = [int(x) for x in match.group(0).split(".")]
+        while len(parts) < 3:
+            parts.append(0)
+        return tuple(parts[:3])
 
     def get_vuln_cache_path(self) -> str:
         return os.path.join(self.E.cfg, "vuln_advisory.json")
