@@ -61,6 +61,10 @@ class BrokerThr(BrokerCli):
             self.httpsrv.set_netdevs(args[0])
             return
 
+        if dest == "httpsrv.set_bad_ver":
+            self.httpsrv.set_bad_ver(args[0])
+            return
+
         # new ipc invoking managed service in hub
         obj = self.hub
         for node in dest.split("."):

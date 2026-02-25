@@ -157,6 +157,10 @@ class BrokerMp(object):
         elif dest == "cb_httpsrv_up":
             self.hub.cb_httpsrv_up()
 
+        elif dest == "httpsrv.set_bad_ver":
+            for p in self.procs:
+                p.q_pend.put((0, dest, list(args)))
+
         else:
             raise Exception("what is " + str(dest))
 

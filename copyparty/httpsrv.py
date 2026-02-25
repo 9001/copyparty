@@ -119,6 +119,7 @@ class HttpSrv(object):
         socket.setdefaulttimeout(120)
 
         self.t0 = time.time()
+        self.bad_ver = False
         nsuf = "-n{}-i{:x}".format(nid, os.getpid()) if nid else ""
         self.magician = Magician()
         self.nm = NetMap([], [])
@@ -231,6 +232,9 @@ class HttpSrv(object):
 
         self.th_cfg: dict[str, set[str]] = {}
         Daemon(self.post_init, "hsrv-init2")
+
+    def set_bad_ver(self, val: bool) -> None:
+        self.bad_ver = val
 
     def post_init(self) -> None:
         try:

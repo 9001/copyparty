@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 import argparse
 import atexit
 import errno
+import json
 import logging
 import os
 import re
@@ -27,6 +28,7 @@ if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional, Union
 
 from .__init__ import ANYWIN, EXE, MACOS, PY2, TYPE_CHECKING, E, EnvParams, unicode
+from .__version__ import S_VERSION
 from .authsrv import BAD_CFG, AuthSrv, derive_args, n_du_who, n_ver_who
 from .bos import bos
 from .cert import ensure_cert
@@ -75,6 +77,7 @@ from .util import (
     mp,
     odfusion,
     pybin,
+    read_utf8,
     start_log_thrs,
     start_stackmon,
     termsize,
@@ -95,10 +98,18 @@ if TYPE_CHECKING:
 if PY2:
     range = xrange  # type: ignore
 
+if PY2:
+    from urllib2 import Request, urlopen
+else:
+    from urllib.request import Request, urlopen
+
 
 VER_IDP_DB = 1
 VER_SESSION_DB = 1
 VER_SHARES_DB = 2
+
+VULN_CHECK_URL = "https://api.github.com/repos/9001/copyparty/security-advisories"
+VULN_CHECK_INTERVAL = 86400
 
 
 class SvcHub(object):
@@ -1382,6 +1393,7 @@ class SvcHub(object):
             Daemon(self.tcpsrv.netmon, "netmon")
 
         Daemon(self.thr_httpsrv_up, "sig-hsrv-up2")
+        Daemon(self.check_ver, "ver-chk")
 
         sigs = [signal.SIGINT, signal.SIGTERM]
         if not ANYWIN:
@@ -1778,3 +1790,61 @@ class SvcHub(object):
         zb = gzip.compress(zb)
         zs = ub64enc(zb).decode("ascii")
         self.log("stacks", zs)
+
+    def parse_version(self, ver: str) -> tuple:
+        match = re.search(r'[\d.]+', ver)
+        if not match:
+            return ()
+        clean = match.group(0).strip('.')
+        return tuple(int(x) for x in clean.split("."))
+
+    def get_vuln_cache_path(self) -> str:
+        return os.path.join(self.E.cfg, "vuln_advisory.json")
+
+    def check_ver(self) -> None:
+        ver_cpp = self.parse_version(S_VERSION)
+
+        while not self.stopping:
+            fpath = self.get_vuln_cache_path()
+            data = None
+
+            try:
+                mtime = os.path.getmtime(fpath)
+                if time.time() - mtime < VULN_CHECK_INTERVAL:
+                    data = read_utf8(None, fpath, True)
+            except Exception as e:
+                self.log("ver-chk", "no vulnerability advisory cache found; {}".format(e))
+
+            if not data:
+                try:
+                    req = Request(VULN_CHECK_URL)
+                    with urlopen(req, timeout=30) as f:
+                        data = f.read().decode("utf-8")
+
+                    with open(fpath, "wb") as f:
+                        f.write(data.encode("utf-8"))
+
+                except Exception as e:
+                    self.log("ver-chk", "failed to fetch vulnerability advisory; {}".format(e))
+
+            if data:
+                try:
+                    advisories = json.loads(data)
+                    
+                    fixes = (
+                        self.parse_version(vuln.get("patched_versions"))
+                        for adv in advisories
+                        for vuln in adv.get("vulnerabilities", [])
+                        if vuln.get("patched_versions")
+                    )
+                    newest_fix = max(fixes, default=None)
+
+                    if newest_fix and ver_cpp < newest_fix:
+                        self.broker.say("httpsrv.set_bad_ver", True)
+                except Exception as e:
+                    self.log("ver-chk", "failed to process vulnerability advisory; {}".format(e))
+
+            for _ in range(VULN_CHECK_INTERVAL):
+                if self.stopping:
+                    return
+                time.sleep(1)
