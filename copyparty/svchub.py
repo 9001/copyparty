@@ -1790,7 +1790,7 @@ class SvcHub(object):
     def parse_version(self, ver: str) -> tuple:
         match = re.search(r'[\d.]+', ver)
         if not match:
-            return ()
+            return (0, 0, 0)
         clean = match.group(0).strip('.')
         return tuple(int(x) for x in clean.split("."))
 
