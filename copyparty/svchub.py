@@ -1816,7 +1816,7 @@ class SvcHub(object):
                 if time.time() - mtime < self.args.vc_interval:
                     data = read_utf8(None, fpath, True)
             except Exception as e:
-                self.log("ver-chk", "no vulnerability advisory cache found; {}".format(e))
+                self.log("ver-chk", "no cached vulnerability advisory found, fetching; {}".format(e))
 
             if not data:
                 try:
