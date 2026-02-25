@@ -1798,6 +1798,9 @@ class SvcHub(object):
         return os.path.join(self.E.cfg, "vuln_advisory.json")
 
     def check_ver(self) -> None:
+        if not self.args.vc_url:
+            return
+
         ver_cpp = self.parse_version(S_VERSION)
 
         while not self.stopping:
