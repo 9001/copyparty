@@ -1204,7 +1204,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
     ap2.add_argument("--versionb", action="store_true", help="show version and exit")
-    ap2.add_argument("--vc-url", metavar="URL", type=u, default="", help="URL to check for vulnerable versions (default: None)")
+    ap2.add_argument("--vc-url", metavar="URL", type=u, default="", help="URL to check for vulnerable versions (default: empty/disabled)")
     ap2.add_argument("--vc-interval", metavar="SEC", type=int, default=86400, help="how many seconds to wait between vulnerability checks (default: 86400)")
 
 

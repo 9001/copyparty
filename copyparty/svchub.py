@@ -1826,7 +1826,7 @@ class SvcHub(object):
             if data:
                 try:
                     advisories = json.loads(data)
-                    
+
                     fixes = (
                         self.parse_version(vuln.get("patched_versions"))
                         for adv in advisories
@@ -1837,7 +1837,7 @@ class SvcHub(object):
 
                     if newest_fix and ver_cpp < newest_fix:
                         self.broker.say("httpsrv.set_bad_ver", True)
-                    
+
                 except Exception as e:
                     self.log("ver-chk", "failed to process vulnerability advisory; {}".format(e))
 
