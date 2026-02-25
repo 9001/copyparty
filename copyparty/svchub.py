@@ -108,10 +108,6 @@ VER_IDP_DB = 1
 VER_SESSION_DB = 1
 VER_SHARES_DB = 2
 
-VULN_CHECK_URL = "https://api.github.com/repos/9001/copyparty/security-advisories"
-VULN_CHECK_INTERVAL = 86400
-
-
 class SvcHub(object):
     """
     Hosts all services which cannot be parallelized due to reliance on monolithic resources.
@@ -1810,14 +1806,14 @@ class SvcHub(object):
 
             try:
                 mtime = os.path.getmtime(fpath)
-                if time.time() - mtime < VULN_CHECK_INTERVAL:
+                if time.time() - mtime < self.args.vc_interval:
                     data = read_utf8(None, fpath, True)
             except Exception as e:
                 self.log("ver-chk", "no vulnerability advisory cache found; {}".format(e))
 
             if not data:
                 try:
-                    req = Request(VULN_CHECK_URL)
+                    req = Request(self.args.vc_url)
                     with urlopen(req, timeout=30) as f:
                         data = f.read().decode("utf-8")
 
@@ -1841,10 +1837,11 @@ class SvcHub(object):
 
                     if newest_fix and ver_cpp < newest_fix:
                         self.broker.say("httpsrv.set_bad_ver", True)
+                    
                 except Exception as e:
                     self.log("ver-chk", "failed to process vulnerability advisory; {}".format(e))
 
-            for _ in range(VULN_CHECK_INTERVAL):
+            for _ in range(self.args.vc_interval):
                 if self.stopping:
                     return
                 time.sleep(1)
