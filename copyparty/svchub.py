@@ -1833,16 +1833,23 @@ class SvcHub(object):
             if data:
                 try:
                     advisories = json.loads(data)
+                    has_vuln = False
 
-                    fixes = (
-                        self.parse_version(vuln.get("patched_versions"))
-                        for adv in advisories
-                        for vuln in adv.get("vulnerabilities", [])
-                        if vuln.get("patched_versions")
-                    )
-                    newest_fix = max(fixes, default=None)
+                    for adv in advisories:
+                        for vuln in adv.get("vulnerabilities", []):
+                            if vuln.get("package", {}).get("name") != "copyparty":
+                                continue
 
-                    if newest_fix and ver_cpp < newest_fix:
+                            patched_str = vuln.get("patched_versions")
+                            if patched_str:
+                                patched_ver = self.parse_version(patched_str)
+                                if ver_cpp < patched_ver:
+                                    has_vuln = True
+                                    break
+                        if has_vuln:
+                            break
+
+                    if has_vuln:
                         self.broker.say("httpsrv.set_bad_ver", True)
 
                 except Exception as e:
