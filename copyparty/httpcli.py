@@ -2762,8 +2762,9 @@ class HttpCli(object):
         vpath = quotep(vpath)
 
         if self.args.up_site:
-            url = "%s%s%s" % (
+            url = "%s%s%s%s" % (
                 self.args.up_site,
+                self.args.RS,
                 vpath,
                 vsuf,
             )
@@ -3048,7 +3049,7 @@ class HttpCli(object):
                 raise Pebkac(500, t % zt)
             ret["purl"] = vp_req + ret["purl"][len(vp_vfs) :]
 
-        if self.is_vproxied and not self.args.up_site:
+        if self.is_vproxied:
             if "purl" in ret:
                 ret["purl"] = self.args.SR + ret["purl"]
 
@@ -3957,7 +3958,7 @@ class HttpCli(object):
 
             vpath = vjoin(upload_vpath, lfn)
             if self.args.up_site:
-                ah_url = j_url = self.args.up_site + quotep(vpath) + vsuf
+                ah_url = j_url = self.args.up_site + self.args.RS + quotep(vpath) + vsuf
                 rel_url = "/" + j_url.split("//", 1)[-1].split("/", 1)[-1]
             else:
                 ah_url = rel_url = "/%s%s%s" % (self.args.RS, quotep(vpath), vsuf)
@@ -6290,10 +6291,10 @@ class HttpCli(object):
 
         if self.args.shr_site:
             site = self.args.shr_site[:-1]
-        elif self.is_vproxied:
-            site = self.args.SR
         else:
             site = ""
+        if self.is_vproxied:
+            site += self.args.SR
 
         html = self.j2s(
             "shares",
@@ -6459,9 +6460,10 @@ class HttpCli(object):
 
         # NOTE: several clients (frontend, party-up) expect url at response[15:]
         if self.args.shr_site:
-            surl = "created share: %s%s%s/%s" % (
-                self.args.shr_site,
-                self.args.shr[1:],
+            surl = "created share: %s%s%s%s/%s" % (
+                self.args.shr_site[:-1],
+                self.args.SR,
+                self.args.shr,
                 skey,
                 fn,
             )
