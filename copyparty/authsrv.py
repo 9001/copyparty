@@ -147,8 +147,11 @@ class AXS(object):
 
 
 class Lim(object):
-    def __init__(self, log_func: Optional["RootLogger"]) -> None:
+    def __init__(
+        self, args: argparse.Namespace, log_func: Optional["RootLogger"]
+    ) -> None:
         self.log_func = log_func
+        self.use_scandir = not args.no_scandir
 
         self.reg: Optional[dict[str, dict[str, Any]]] = None  # up2k registry
 
@@ -312,27 +315,17 @@ class Lim(object):
         return ret, d
 
     def dive(self, path: str, lvs: int) -> Optional[str]:
-        items = bos.listdir(path)
-
         if not lvs:
             # at leaf level
-            nfiles = 0
-            for name in items:
-                if name.endswith(".PARTIAL"):
-                    continue
+            items = statdir(self.log_func, self.use_scandir, False, path, True)
+            items = [
+                x
+                for x in items
+                if not stat.S_ISDIR(x[1].st_mode) and not x[0].endswith(".PARTIAL")
+            ]
+            return None if len(items) >= self.rotn else ""
 
-                ap = os.path.join(path, name)
-                try:
-                    is_dir = stat.S_ISDIR(bos.stat(ap).st_mode)
-                except:
-                    nfiles += 1
-                    continue
-
-                if not is_dir:
-                    nfiles += 1
-
-            return None if nfiles >= self.rotn else ""
-
+        items = bos.listdir(path)
         dirs = [int(x) for x in items if x and all(y in "1234567890" for y in x)]
         dirs.sort()
 
@@ -2299,7 +2292,7 @@ class AuthSrv(object):
                 vol.flags["zipmax"] = True
 
         for vol in vfs.all_vols.values():
-            lim = Lim(self.log_func)
+            lim = Lim(self.args, self.log_func)
             use = False
 
             if vol.flags.get("nosub"):
