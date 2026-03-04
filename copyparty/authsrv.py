@@ -316,7 +316,22 @@ class Lim(object):
 
         if not lvs:
             # at leaf level
-            return None if len(items) >= self.rotn else ""
+            nfiles = 0
+            for name in items:
+                if name.endswith(".PARTIAL"):
+                    continue
+
+                ap = os.path.join(path, name)
+                try:
+                    is_dir = stat.S_ISDIR(bos.stat(ap).st_mode)
+                except:
+                    nfiles += 1
+                    continue
+
+                if not is_dir:
+                    nfiles += 1
+
+            return None if nfiles >= self.rotn else ""
 
         dirs = [int(x) for x in items if x and all(y in "1234567890" for y in x)]
         dirs.sort()
