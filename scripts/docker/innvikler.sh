@@ -14,15 +14,29 @@ ised() {
 	tmv "$2"
 }
 
+# use custom ffmpeg if relevant
+echo $1 | grep -qE 'ac|iv|dj' && (
+  cp -pv /z/packages/*.pub /etc/apk/keys/
+  cd /z/packages/$(cat /etc/apk/arch)
+  apk add ./ffmpeg-*.apk
+  cd /z/test-aac
+  for f in *.m4a; do ffmpeg -v 0 -i $f ${f%.*}.flac || true; done
+  ls -1 *.flac | tee /dev/stderr | tr '\n' ' ' | grep -qE '^(lc.flac *)?$' || {
+    echo ERROR: incorrect aac decoder subset
+    exit 1
+  }
+)
+rm -rf /z/packages /z/test-aac
+
 # use zlib-ng if available
-f=/z/base/zlib_ng-0.5.1-cp312-cp312-linux_$(cat /etc/apk/arch).whl
+f=/z/whl/zlib_ng-0.5.1-cp312-cp312-linux_$(cat /etc/apk/arch).whl
 [ "$1" != min ] && [ -e $f ] && {
   apk add -t .bd !pyc py3-pip
   rm -f /usr/lib/python3*/EXTERNALLY-MANAGED
   pip install $f
   apk del .bd
 }
-rm -rf /z/base
+rm -rf /z/whl
 
 # cleanup for flavors with python build steps (dj/iv)
 rm -rf /var/cache/apk/* /root/.cache
@@ -69,6 +83,11 @@ cd /usr/lib/python3.*/
 rm -rf \
   /tmp/pe-* /z/copyparty-sfx.py \
   ensurepip pydoc_data turtle.py turtledemo lib2to3
+
+cd /usr/lib/python3.*/site-packages
+rm -rf \
+  numpy/*/tests \
+  /usr/share/mime/packages/freedesktop.org.xml
 
 cd /usr/lib/python3.*/site-packages/copyparty/
 rm stolen/surrogateescape.py

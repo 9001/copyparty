@@ -15,7 +15,7 @@ from copyparty.httpcli import HttpCli
 from copyparty.u2idx import U2idx
 from copyparty.up2k import Up2k
 from tests import util as tu
-from tests.util import Cfg
+from tests.util import J2_ENV, Cfg
 
 try:
     from typing import Optional
@@ -23,15 +23,16 @@ except:
     pass
 
 
-def hdr(query, uname):
-    h = "GET /%s HTTP/1.1\r\nPW: %s\r\nConnection: close\r\n\r\n"
-    return (h % (query, uname)).encode("utf-8")
+def hdr(query, uname, extra=""):
+    h = "GET /%s HTTP/1.1\r\nPW: %s\r\nConnection: close\r\n%s\r\n"
+    return (h % (query, uname, extra)).encode("utf-8")
 
 
 class TestDots(unittest.TestCase):
     def __init__(self, *a, **ka):
         super(TestDots, self).__init__(*a, **ka)
         self.is_dut = True
+        self.j2_brw = None
 
     def setUp(self):
         self.conn: Optional[tu.VHttpConn] = None
@@ -48,6 +49,13 @@ class TestDots(unittest.TestCase):
             self.conn.shutdown()
             self.conn = None
         self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        if not self.j2_brw:
+            zs = os.path.dirname(__file__)
+            with open("%s/../copyparty/web/browser.html" % (zs,), "rb") as f:
+                zs = f.read().decode("utf-8")
+            self.j2_brw = J2_ENV.from_string(zs)
+        self.conn.hsrv.j2["browser"] = self.j2_brw
 
     def test_dots(self):
         td = os.path.join(self.td, "vfs")
@@ -150,8 +158,10 @@ class TestDots(unittest.TestCase):
         os.chdir(td)
 
         vcfg = []
-        for k in "dk dks dky fk fka dk,fk dks,fk".split():
-            vcfg += ["{0}:{0}:r.,u1:g,u2:c,{0}".format(k)]
+        zs = "dk dks=12 dky fk fka dk,fk dks=12:c,fk"
+        for k2 in zs.split():
+            k = k2.replace("=12", "").replace(":c,", ",")
+            vcfg += ["{0}:{0}:r.,u1:g,u2:c,{1}".format(k, k2)]
             zs = "%s/s1/s2" % (k,)
             os.makedirs(zs)
 
@@ -219,6 +229,15 @@ class TestDots(unittest.TestCase):
         self.assertEqual(s1.split("/")[0], "s1")
         zs = self.curl("dks/%s&ls" % (s1), "u2")[1]
         self.assertIn('"s2/?k=', zs)
+
+        # parent key should not exist in response
+        self.assertNotIn(dk["dks"], zs)
+        # and not in html either
+        for ck in ("", "Cookie: js=y\r\n"):
+            zb = hdr("dks/%s" % (s1), "u2", ck)
+            zs = self.curl("", "", False, zb)[1]
+            self.assertNotIn(dk["dks"], zs)
+            self.assertIn('"s2/?k=', zs)
 
         ##
         ## dks thumbs
@@ -366,7 +385,7 @@ class TestDots(unittest.TestCase):
         zb = zs.encode("utf-8")
         hdr = "POST /%s HTTP/1.1\r\nPW: %s\r\nConnection: close\r\nContent-Type: multipart/form-data; boundary=XD\r\nContent-Length: %d\r\n\r\n"
         req = (hdr % (url, uname, len(zb))).encode("utf-8") + zb
-        h, b = self.curl("/" + url, uname, True, req)
+        h, b = self.curl("", "", True, req)
         tar = tarfile.open(fileobj=io.BytesIO(b), mode="r|").getnames()
         return " ".join(tar)
 

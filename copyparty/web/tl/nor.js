@@ -322,7 +322,6 @@ Ls.nor = {
 	"mt_ssvt": "volumterskel (0-255)\">volum",
 	"mt_ssts": "aktiv innenfor første % av sangen\">start",
 	"mt_sste": "aktiv innenfor siste % av sangen\">slutt",
-	"mt_ssrt": "hvor fort volum/tempo skal justeres\">fade",
 	"mt_sssm": "avspillingshastighetsmultiplikator\">ffwd",
 
 	"mb_play": "lytt",

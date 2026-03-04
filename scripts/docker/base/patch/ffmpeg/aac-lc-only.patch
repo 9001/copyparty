@@ -1,0 +1,59 @@
+remove all advanced aac features, leaving only aac-lc which is
+no longer patent-encumbered in any relevant parts of the world
+( and 99% of all aac files are lc-aac anyways so that's fine )
+
+diff --git a/libavcodec/aac/aacdec.c b/libavcodec/aac/aacdec.c
+index b8d53036d4..054c46f84e 100644
+--- a/libavcodec/aac/aacdec.c
++++ b/libavcodec/aac/aacdec.c
+@@ -880,9 +880,7 @@ static int decode_pce(AVCodecContext *avctx, MPEG4AudioConfig *m4ac,
+  */
+ static int decode_ga_specific_config(AACDecContext *ac, AVCodecContext *avctx,
+-                                     GetBitContext *gb,
+-                                     int get_bit_alignment,
+-                                     MPEG4AudioConfig *m4ac,
+-                                     int channel_config)
++    GetBitContext *gb, int get_bit_alignment, MPEG4AudioConfig *m4ac, int channel_config)
+ {
++    if (m4ac->sbr > 0) return AVERROR_DECODER_NOT_FOUND;
+     int extension_flag, ret, ep_config, res_flags;
+     uint8_t layout_map[MAX_ELEM_ID*4][3];
+@@ -961,8 +959,7 @@ static int decode_ga_specific_config(AACDecContext *ac, AVCodecContext *avctx,
+ 
+ static int decode_eld_specific_config(AACDecContext *ac, AVCodecContext *avctx,
+-                                     GetBitContext *gb,
+-                                     MPEG4AudioConfig *m4ac,
+-                                     int channel_config)
++    GetBitContext *gb, MPEG4AudioConfig *m4ac, int channel_config)
+ {
++    return AVERROR_DECODER_NOT_FOUND;  // kill ELD support
+     int ret, ep_config, res_flags;
+     uint8_t layout_map[MAX_ELEM_ID*4][3];
+@@ -1070,5 +1067,4 @@ static int decode_audio_specific_config_gb(AACDecContext *ac,
+     case AOT_AAC_LTP:
+     case AOT_ER_AAC_LC:
+-    case AOT_ER_AAC_LD:
+         if ((ret = decode_ga_specific_config(ac, avctx, gb, get_bit_alignment,
+                                              &oc->m4ac, m4ac->chan_config)) < 0)
+@@ -1948,4 +1944,5 @@ static int decode_extension_payload(AACDecContext *ac, GetBitContext *gb, int cn
+         crc_flag++;
+     case EXT_SBR_DATA:
++        return res;  // kill HE/SBR support
+         if (!che) {
+             av_log(ac->avctx, AV_LOG_ERROR, "SBR was found before the first channel element.\n");
+@@ -2087,4 +2084,5 @@ static void spectral_to_sample(AACDecContext *ac, int samples)
+                     }
+                     if (ac->oc[1].m4ac.sbr > 0) {
++                        exit(1);  // kill HE/SBR support
+                         ac->proc.sbr_apply(ac, che, type,
+                                            che->ch[0].output,
+diff --git a/libavcodec/aacsbr_template.c b/libavcodec/aacsbr_template.c
+index 31d2d844c4..b55f93752a 100644
+--- a/libavcodec/aacsbr_template.c
++++ b/libavcodec/aacsbr_template.c
+@@ -639,4 +639,5 @@ static int read_sbr_grid(AACDecContext *ac, SpectralBandReplication *sbr,
+                          GetBitContext *gb, SBRData *ch_data)
+ {
++    exit(1);  // kill SBR support
+     int i;
+     int bs_pointer = 0;

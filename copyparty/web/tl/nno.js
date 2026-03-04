@@ -322,7 +322,6 @@ Ls.nno = {
 	"mt_ssvt": "volumterskel (0-255)\">volum",
 	"mt_ssts": "aktiv innanfor første % av songen\">start",
 	"mt_sste": "aktiv innanfor siste % av songen\">slutt",
-	"mt_ssrt": "kor fort volum/tempo skal justerast\">fade",
 	"mt_sssm": "avspelingshastigheitsmultiplikator\">ffwd",
 
 	"mb_play": "lytt",

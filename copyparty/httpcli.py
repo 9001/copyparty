@@ -178,6 +178,7 @@ RE_HTTP1 = re.compile(r"(GET|HEAD|POST|PUT) [^ ]+ HTTP/1.1$")
 RE_HR = re.compile(r"[<>\"'&]")
 RE_MDV = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[Mm][Dd])$")
 RE_RSS_KW = re.compile(r"(\{[^} ]+\})")
+RE_SETCK = re.compile(r"[^0-9a-z=]")
 
 UPARAM_CC_OK = set("doc move tree".split())
 
@@ -649,8 +650,8 @@ class HttpCli(object):
             if len(zso) > self.args.cookie_cmax:
                 self.loud_reply("cookie header too big", status=400)
                 return False
-            zsll = [x.split("=", 1) for x in zso.split(";") if "=" in x]
-            cookies = {k.strip(): unescape_cookie(zs) for k, zs in zsll}
+            zsll = [x.lstrip().split("=", 1) for x in zso.split(";") if "=" in x]
+            cookies = {k.rstrip(): unescape_cookie(zs.strip(), k) for k, zs in zsll}
             cookie_pw = cookies.get("cppws" if self.is_https else "cppwd") or ""
             if "b" in cookies and "b" not in uparam:
                 uparam["b"] = cookies["b"]
@@ -2575,6 +2576,10 @@ class HttpCli(object):
                     vfs.flags.get("daw")
                     or "replace" in self.headers
                     or "x-oc-mtime" in self.headers
+                    or (
+                        self.args.dav_port
+                        and self.args.dav_port == self.s.getsockname()[1]
+                    )
                 )
             ) or (
                 not bos.path.exists(os.path.join(fdir, tnam))
@@ -5628,7 +5633,10 @@ class HttpCli(object):
         return True
 
     def setck(self) -> bool:
-        k, v = self.uparam["setck"].split("=", 1)
+        zs = self.uparam["setck"]
+        if len(zs) > 9 or RE_SETCK.search(zs):
+            raise Pebkac(400, "illegal value")
+        k, v = zs.split("=")
         t = 0 if v in ("", "x") else 86400 * 299
         ck = gencookie(k, v, self.args.R, True, False, t)
         self.out_headerlist.append(("Set-Cookie", ck))

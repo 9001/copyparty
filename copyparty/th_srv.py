@@ -6,6 +6,7 @@ import io
 import logging
 import os
 import re
+import shlex
 import shutil
 import subprocess as sp
 import tempfile
@@ -554,11 +555,12 @@ class ThumbSrv(object):
                     conv_ok = True
                     break
                 except Exception as ex:
+                    r321 = getattr(ex, "returncode", 0) == 321
                     msg = "%s could not create thumbnail of %r\n%s"
-                    msg = msg % (fun.__name__, abspath, min_ex())
+                    msg = msg % (fun.__name__, abspath, ex if r321 else min_ex())
                     c: Union[str, int] = 1 if "<Signals.SIG" in msg else "90"
                     self.log(msg, c)
-                    if getattr(ex, "returncode", 0) != 321:
+                    if not r321:
                         if fun == funs[-1]:
                             try:
                                 with open(ttpath, "wb") as _:
@@ -826,7 +828,13 @@ class ThumbSrv(object):
 
         c: Union[str, int] = "90"
         t = "FFmpeg failed (probably a corrupt file):\n"
-        if (
+
+        if "but no decoder found for: hevc" in serr:
+            t = "thumbnail cannot be created due to legal reasons; https://github.com/9001/copyparty/blob/hovudstraum/docs/bad-codecs.md \033[0;90m\n"
+            ret = 321
+            c = 3
+
+        elif (
             (not self.args.th_ff_jpg or time.time() - int(self.args.th_ff_jpg) < 60)
             and cmd[-1].lower().endswith(b".webp")
             and (
@@ -841,7 +849,7 @@ class ThumbSrv(object):
             ret = 321
             c = 1
 
-        if (
+        elif (
             not self.args.th_ff_swr or time.time() - int(self.args.th_ff_swr) < 60
         ) and (
             "Requested resampling engine is unavailable" in serr
@@ -860,7 +868,12 @@ class ThumbSrv(object):
         if len(txt) > 5000:
             txt = txt[:2500] + "...\nff: [...]\nff: ..." + txt[-2500:]
 
-        self.log(t + txt, c=c)
+        try:
+            zs = shlex.join([x.decode("utf-8", "replace") for x in cmd])
+        except:
+            zs = "'" + (b"' '".join(cmd2)).decode("utf-8", "replace") + "'"
+
+        self.log("%scmd: %s\n%s" % (t, zs, txt), c=c)
         raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
 
     def conv_waves(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:

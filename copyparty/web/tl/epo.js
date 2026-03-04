@@ -325,7 +325,6 @@ Ls.epo = {
 	"mt_ssvt": "maksimuma laŭtnivelo por silentsaltado (0-255)\">laŭt",
 	"mt_ssts": "komenca intervalo por silentsaltado (% de trakolongo)\">ek%",
 	"mt_sste": "fina intervalo por silentsaltado (% de trakolongo)\">fin%",
-	"mt_ssrt": "tempo por laŭgrada ŝanĝo de laŭteco/rapideco dum silentsaltado\">ŝanĝ⏱️",
 	"mt_sssm": "multiplikado de ludrapideco dum silentsaltado\">×rapid",
 
 	"mb_play": "ludi",

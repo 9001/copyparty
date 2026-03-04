@@ -3439,8 +3439,10 @@ def rmdirs_up(top: str, stop: str) -> tuple[list[str], list[str]]:
     return [top] + ok, ng
 
 
-def unescape_cookie(orig: str) -> str:
+def unescape_cookie(orig: str, name: str) -> str:
     # mw=idk; doot=qwe%2Crty%3Basd+fgh%2Bjkl%25zxc%26vbn  # qwe,rty;asd fgh+jkl%zxc&vbn
+    if not name.startswith("cppw"):
+        orig = orig[:3]
     ret = []
     esc = ""
     for ch in orig:

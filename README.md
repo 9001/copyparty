@@ -491,6 +491,9 @@ upgrade notes
 * thumbnails are broken (you get a colorful square which says the filetype instead)
   * you need to install `FFmpeg` or `Pillow`; see [thumbnails](#thumbnails)
 
+* thumbnails are broken, specifically for photos and videos taken by iphones
+  * the [docker image](https://github.com/9001/copyparty/blob/hovudstraum/scripts/docker) and [bootable flashdrive](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) are not able to read heif/heic images and h265/HEVC video due to [legal reasons](docs/bad-codecs.md)
+
 * thumbnails are broken (some images appear, but other files just get a blank box, and/or the broken-image placeholder)
   * probably due to a reverse-proxy messing with the request URLs and stripping the query parameters (`?th=w`), so check your URL rewrite rules
   * could also be due to incorrect caching settings in reverse-proxies and/or CDNs, so make sure that nothing is set to ignore the query string
@@ -760,8 +763,7 @@ to show `/icons/exe.png` and `/icons/elf.gif` as the thumbnail for all `.exe` an
   * be careful with svg; chrome will crash if you have too many unique svg files showing on the same page (the limit is 250 or so) -- showing the same handful of svg files thousands of times is ok however
 
 note:
-* heif/heifs/heic/heics images usually require the `libvips` [optional dependency](#optional-dependencies) (available in the `iv` docker image, `withFastThumbnails` in nixos)
-  * technical trivia: FFmpeg has basic support for tiled heic as of v7.0; need `-show_stream_groups` for correct resolution
+* heif/heifs/heic/heics images usually require the `libvips` [optional dependency](#optional-dependencies) but this is not possible with the docker-images due to [legal reasons](docs/bad-codecs.md)
 
 config file example:
 
@@ -1437,7 +1439,7 @@ general usage:
 on macos, connect from finder:
 * [Go] -> [Connect to Server...] -> http://192.168.123.1:3923/
 
-to upload or edit files with WebDAV clients, enable the `daw` volflag (because most WebDAV clients expect this) and give your account the delete-permission. This avoids getting several copies of the same file on the server. HOWEVER: This will also make all PUT-uploads overwrite existing files if the user has delete-access, so use with caution.
+to be able to edit existing files, the client must have the Delete-permission, and some webdav clients will also require the [daw](https://copyparty.eu/cli/#g-daw) volflag or global-option (not necessary if the client sends the `x-oc-mtime` header). Without `daw`, those clients will fail to modify existing files and instead create new copies with names like `notes.txt-1771978661.726032-3i9GPghL.txt`. **NOTE:** Enabling `daw` will also make all PUT-uploads overwrite existing files if the user has delete-access, so use with caution. Another alternative is the [dav-port](https://copyparty.eu/cli/#g-dav-port) option
 
 > note: if you have enabled [IdP authentication](#identity-providers) then that may cause issues for some/most webdav clients; see [the webdav section in the IdP docs](https://github.com/9001/copyparty/blob/hovudstraum/docs/idp.md#connecting-webdav-clients)
 

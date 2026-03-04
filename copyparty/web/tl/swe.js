@@ -325,7 +325,6 @@ Ls.swe = {
 	"mt_ssvt": "volymtröskel (0-255)\">vol", //m
 	"mt_ssts": "aktiv tröskel (% spår, start)\">sta", //m
 	"mt_sste": "aktiv tröskel (% spår, slut)\">slt", //m
-	"mt_ssrt": "upp/ned-rampningstid volym/hastighet\">fade", //m
 	"mt_sssm": "uppspelningshastighetsmultiplikator\">sn", //m
 
 	"mb_play": "play",

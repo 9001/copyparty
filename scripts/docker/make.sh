@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+self=$(cd -- "$(dirname "$BASH_SOURCE")"; pwd -P)
+cd "$self"
 
 [ $(id -u) -eq 0 ] && {
     echo dont root
@@ -78,6 +80,20 @@ filt=
 }
 
 [ $img ] && {
+    [ -e base/test-aac/lc.m4a ] || (
+        echo building aac smoketest
+        mkdir -p base/test-aac
+        cd base/test-aac
+        ffmpeg -nostdin -y -f lavfi -i sine -ac 2 -t 1 a.wav &&
+        fdkaac -m 3 -o lc.m4a a.wav &&
+        fdkaac -m 2 -p 5 -o he.m4a a.wav &&
+        fdkaac -m 1 -p 29 -o he2.m4a a.wav &&
+        fdkaac -m 3 -p 23 -o ld.m4a a.wav &&
+        fdkaac -m 3 -p 39 -o eld.m4a a.wav ||
+        echo "nevermind, failed to build test files, cannot verify aac decoding"
+        rm -f a.wav
+    )
+
     fp=../../dist/copyparty-sfx.py
     [ -e $fp ] || {
         echo downloading copyparty-sfx.py ...
@@ -96,7 +112,11 @@ filt=
     # grab deps
     rm -rf i err
     mkdir i
-    tar -cC../.. dist/copyparty-sfx.py bin/mtag | tar -xvCi
+    tar -cC "$self/base" whl test-aac \
+        -C "$self/base/b" packages \
+        -C "$self/../.."  bin/mtag \
+        -C dist copyparty-sfx.py \
+        | tar -xvCi
 
     for i in $imgs; do
         podman rm copyparty-$i || true  # old manifest

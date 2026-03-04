@@ -3260,6 +3260,21 @@ class Up2k(object):
                     dst = djoin(cj["ptop"], cj["prel"], cj["name"])
                     vsrc = djoin(job["vtop"], job["prel"], job["name"])
                     vsrc = vsrc.replace("\\", "/")  # just for prints anyways
+                    if vfs.lim:
+                        dst, cj["prel"] = vfs.lim.all(
+                            cj["addr"],
+                            cj["prel"],
+                            cj["size"],
+                            cj["ptop"],
+                            djoin(cj["ptop"], cj["prel"]),
+                            self.hub.broker,
+                            reg,
+                            "up2k._get_volsize",
+                        )
+                        bos.makedirs(dst, vf=vfs.flags)
+                        vfs.lim.nup(cj["addr"])
+                        vfs.lim.bup(cj["addr"], cj["size"])
+
                     if "done" not in job:
                         self.log("unfinished:\n  %r\n  %r" % (src, dst))
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"

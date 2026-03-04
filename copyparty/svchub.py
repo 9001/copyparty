@@ -1439,7 +1439,7 @@ class SvcHub(object):
                 self.log("root", "ssdp startup failed;\n" + min_ex(), 3)
 
     def reload(self, rescan_all_vols: bool, up2k: bool) -> str:
-        t = "config has been reloaded"
+        t = "users, volumes, and volflags have been reloaded"
         with self.reload_mutex:
             self.log("root", "reloading config")
             self.asrv.reload(9 if up2k else 4)
@@ -1449,6 +1449,7 @@ class SvcHub(object):
                 t += "; volumes are now reinitializing"
             else:
                 self.log("root", "reload done")
+            t += "\n\nchanges to global options (if any) require a restart of copyparty to take effect"
             self.broker.reload()
         return t
 

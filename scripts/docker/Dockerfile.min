@@ -10,7 +10,7 @@ ENV     XDG_CONFIG_HOME=/cfg
 RUN     apk --no-cache add !pyc \
             py3-jinja2
 
-COPY    i/dist/copyparty-sfx.py innvikler.sh ./
+COPY    i innvikler.sh ./
 RUN     ash innvikler.sh min
 
 WORKDIR /state

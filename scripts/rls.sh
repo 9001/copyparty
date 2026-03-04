@@ -23,6 +23,7 @@ v=$1; shift
     printf '%s\n' "$v" | grep -qE '^[0-9\.]+$' || exit 1
     grep -E "(${v//./, })" ../copyparty/__version__.py || exit 1
 
+    make -C docker/base
     ./make-sfx.sh nopk gz
     ../dist/copyparty-sfx.py --version >/dev/null
 

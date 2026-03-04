@@ -1,4 +1,89 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0225-0834  `v1.20.9`  SECURITY: XSS fix
+
+## ⚠️ ATTN: this release fixes an XSS vulnerability
+
+[GHSA-62cr-6wp5-q43h](https://github.com/9001/copyparty/security/advisories/GHSA-62cr-6wp5-q43h) could let an attacker execute arbitrary JS by tricking you into clicking a malicious link 31b2801f
+
+## 🔧 other changes
+
+* webdav: [dav-port](https://copyparty.eu/cli/#g-dav-port) can be used as an alternative to [daw](https://copyparty.eu/cli/#g-daw) d21242fc
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0222-1507  `v1.20.8`  no265
+
+## 🧪 new features
+
+* #1298 add Hungarian translation (thx @sonacl!) eefb181b f37c3b96
+* #1299 chown now accepts 4-digit values (thx @new-sashok724!) 5a7504fd
+
+## 🩹 bugfixes
+
+* audioplayer skip-silence:
+  * #1303 clamp ffwd to safe values (thx @icxes!) f5e70c7f
+  * fix crash on folderchange f1a433a6
+
+## 🔧 other changes
+
+* due to [legal reasons](https://github.com/9001/copyparty/blob/hovudstraum/docs/bad-codecs.md), the [docker-images](https://github.com/9001/copyparty/blob/hovudstraum/scripts/docker) and [bootable flashdrive](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) are now unable to create thumbnails of HEVC/h265 videos and heif/heic images 1bec91d1
+  * this primarily means photos/videos taken with iphones (and maybe some samsung phones)
+  * on the bright side, this has made the docker-images much smaller; `ac` is now half the size it used to be, and `iv` / `dj` are each 97 MiB smaller
+
+## 🌠 fun facts
+
+* if you wanna see your car doing its best impression of a frictionless spherical cow, I can warmly (heh) recommend the icy snowcoated countryroads of viken this weekend
+  * goes oddly well with [sakuraburst - deconstructing nature](https://www.youtube.com/watch?v=MJjO-pwYpJg)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0214-2315  `v1.20.7`  fika
+
+## 🧪 new features
+
+* now possible to upload/delete files while the filesystem-indexer is still busy d44ea245 0ca4c1bd
+  * global-option [fika](https://copyparty.eu/cli/#g-fika) decides which actions to allow while still indexing; default is upload+copy+delete
+  * full deduplication is only guaranteed if this option is set blank, as dupes are allowed while indexing
+* #1266 browsers can request thumbnails as jxl images, and view jxl files in the gallery (thx @intelfx!) b2711e05 720c83b2 93ffc65c a65a30b1 a7a25deb 59de5e2c 16403d8c 48c10178 0e8913c2
+  * only works in browsers which support jxl, which is FINALLY happening ([sure took a while](https://issues.chromium.org/issues/40168998))
+  * some notes on memory/RAM usage though -- it is fine on Alpine Linux, so docker is also fine, just don't enable mimalloc
+    * jxl can be disabled with global-option [th-no-jxl](https://copyparty.eu/cli/#g-th-no-jxl) if necessary on baremetal deployments until libvips fixes this
+* #1265 audioplayer can "skip silence" now (thx @icxes!) 66949989
+* #1287 opensearch support for opds (thx @philips!) 84e687a0
+* #1276 option [rw-edit](https://copyparty.eu/cli/#g-rw-edit) is the list of file-extensions that can be edited as textfiles with only permissions read+write (default is `md` like before); all other files still require read+write+delete 312f48e1 d6928380
+* #1288 option to customize the links copied when selecting files and pressing ctrl-c (thx @icxes!) e5d0a057
+* docker: add env-var [DI_PREPARTY](https://github.com/9001/copyparty/blob/hovudstraum/scripts/docker/devnotes.md#modding-on-the-fly) to run an arbitrary script during startup, for customizations and such bf01ca48
+
+## 🩹 bugfixes
+
+* #1279 the textfile-viewer would refuse to load huge documents when hotlinked f02e9cf6
+* #1280 the custom rightclick-menu was enabled in the textfile viewer fc8a4b8e
+* #1262 logtail now works on windows; would previously take an exclusive-lock on the monitored file, as windows does by default a368fc66
+
+## 🔧 other changes
+
+* volumes are hidden from the treeview if the name starts with a dot 76041fdb
+* #1277 `descript.ion` files no longer require the `e2d` and `e2t` options to be enabled 4cb4e820
+* chunked PUT-uploads are now terminated if they exceed a configured size limit dfadb5a7
+* #1282 improved compatibility with GraalPy (thx @vgskye!) e8609b87
+* #1292 #1296 updated Esperanto translation (thx @slashdevslashurandom!) 418bf2f9 914f84ce
+* thumbnails: use libvips as fallback for rawpy 27ae2e1e
+  * libvips doesn't support .arw files (sony) yet, so still need rawpy
+* make server config slightly easier:
+  * improve xff warnings 96aeb898
+  * warn if config-values are quoted 598df44e
+  * lowercase headernames in configs fd096385
+
+## 🌠 fun facts
+
+* the `fika` option sends the filesystem-indexer on [a coffee break](https://en.wikipedia.org/wiki/Coffee_in_Sweden#Fika)
+* exci wants me to mention aoi yuuki here for some reason :^) so here's [gekisou gungnir](https://www.youtube.com/watch?v=feeFscLH6QE)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0131-2001  `v1.20.6`  one safeguard too many
 
 ## 🧪 new features

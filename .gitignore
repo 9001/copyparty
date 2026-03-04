@@ -29,6 +29,10 @@ copyparty.egg-info/
 copyparty/res/COPYING.txt
 copyparty/web/deps/
 srv/
+scripts/docker/base/b/
+scripts/docker/base/cver*
+scripts/docker/base/test-aac/
+scripts/docker/base/whl/
 scripts/docker/i/
 scripts/deps-docker/uncomment.py
 contrib/package/arch/pkg/

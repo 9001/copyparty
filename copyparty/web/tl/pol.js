@@ -328,7 +328,6 @@ Ls.pol = {
 	"mt_ssvt": "próg głośności (0-255)\">gł", //m
 	"mt_ssts": "aktywny próg (% utworu, początek)\">pocz", //m
 	"mt_sste": "aktywny próg (% utworu, koniec)\">kon", //m
-	"mt_ssrt": "czas narastania/opadania głośn./pręd.\">fade", //m
 	"mt_sssm": "mnożnik prędkości odtwarzania\">szyb", //m
 
 	"mb_play": "odtwórz",

@@ -325,7 +325,6 @@ Ls.deu = {
 	"mt_ssvt": "Lautstärkeschwelle (0-255)\">laut", //m
 	"mt_ssts": "Aktiv-Schwelle (% Titel, Anfang)\">anf", //m
 	"mt_sste": "Aktiv-Schwelle (% Titel, Ende)\">end", //m
-	"mt_ssrt": "Ein/Ausblendzeit Lautstärke/Geschwindigkeit\">fade", //m
 	"mt_sssm": "Wiedergabegeschwindigkeits-Multiplikator\">vor", //m
 
 	"mb_play": "Abspielen",
