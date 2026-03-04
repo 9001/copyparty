@@ -190,12 +190,12 @@ class Lim(object):
             self.log_func("up-lim", msg, c)
 
     def set_rotf(self, fmt: str, tz: str) -> None:
-        self.rotf = fmt
+        self.rotf = fmt.rstrip("/\\")
         if tz != "UTC":
             from zoneinfo import ZoneInfo
 
             self.rotf_tz = ZoneInfo(tz)
-        r = re.escape(fmt).replace("%Y", "[0-9]{4}").replace("%j", "[0-9]{3}")
+        r = re.escape(self.rotf).replace("%Y", "[0-9]{4}").replace("%j", "[0-9]{3}")
         r = re.sub("%[mdHMSWU]", "[0-9]{2}", r)
         self.rot_re = re.compile("(^|/)" + r + "$")
 
