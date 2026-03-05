@@ -102,7 +102,7 @@ ICV_EXTS = set(zsg.split(","))
 zsg = "3gp,asf,av1,avc,avi,flv,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,vob,webm,wmv"
 VCV_EXTS = set(zsg.split(","))
 
-zsg = "aif,aiff,alac,ape,flac,m4a,mp3,oga,ogg,opus,tak,tta,wav,wma,wv,cbz,epub"
+zsg = "aif,aiff,alac,ape,flac,m4a,mp3,oga,ogg,opus,tak,tta,wav,wma,wv"
 ACV_EXTS = set(zsg.split(","))
 
 zsg = "nohash noidx xdev xvol"
@@ -1524,7 +1524,7 @@ class Up2k(object):
         unreg: list[str] = []
         files: list[tuple[int, int, str]] = []
         fat32 = True
-        cv = vcv = acv = ""
+        cv = ecv = icv = vcv = acv = othcv = ""
         e_d = {}
 
         th_cvd = self.args.th_coversd
@@ -1628,23 +1628,69 @@ class Up2k(object):
                 if sz:
                     liname = iname.lower()
                     ext = liname.rsplit(".", 1)[-1]
-                    if (
-                        liname in th_cvds
-                        or (not cv and ext in ICV_EXTS and not iname.startswith("."))
-                    ) and (
-                        not cv
-                        or liname not in th_cvds
-                        or cv.lower() not in th_cvds
-                        or th_cvd.index(liname) < th_cvd.index(cv.lower())
-                    ):
-                        cv = iname
-                    elif not vcv and ext in VCV_EXTS and not iname.startswith("."):
-                        vcv = iname
-                    elif not acv and ext in ACV_EXTS and not iname.startswith("."):
-                        acv = iname
+                    thumbable: set[str] = set()
+                    (
+                        fmt_pil,
+                        fmt_vips,
+                        fmt_raw,
+                        fmt_ffi,
+                        fmt_ffv,
+                        fmt_ffa,
+                    ) = [
+                        set(y.split(","))
+                        for y in [
+                            self.args.th_r_pil,
+                            self.args.th_r_vips,
+                            self.args.th_r_raw,
+                            self.args.th_r_ffi,
+                            self.args.th_r_ffv,
+                            self.args.th_r_ffa,
+                        ]
+                    ]
 
-        if not cv:
-            cv = vcv or acv
+                    if "pil" in self.args.th_dec:
+                        thumbable |= fmt_pil
+
+                    if "vips" in self.args.th_dec:
+                        thumbable |= fmt_vips
+
+                    if "raw" in self.args.th_dec:
+                        thumbable |= fmt_raw
+
+                    if "ff" in self.args.th_dec:
+                        for zss in [fmt_ffi, fmt_ffv, fmt_ffa]:
+                            thumbable |= zss
+
+
+                    # thumbnail priority:
+                    # 1. external cover in th_cvd (--th-covers) (priority: in the order specified in config)
+                    # 2. the first image file (ICV_EXTS) we find
+                    # 3. the first video file (VCV_EXTS) we find
+                    # 4. the first audio file (ACV_EXTS) we find (might be album art, might be spectrogram)
+                    # 5. the first file we find that we can generate a thumbnail for at all
+                    # 6. no cover (fallback to text)
+                    # 7. dotfiles, except as external cover
+
+                    if not cv:
+                        if liname in th_cvds:
+                            # does this external cover filename have higher priority than the new one?
+                            index = th_cvd.index(liname)
+                            if index == 0:
+                                cv = iname # this is the highest priority filename, stop looking
+                            elif index < th_cvd.index(cv.lower()):
+                                ecv = iname
+                        elif not iname.startswith("."):
+                            # only try new files if we didnt already find one of the same or higher priority
+                            if (not (ecv or icv)) and ext in ICV_EXTS:
+                                icv = iname
+                            elif (not (ecv or icv or vcv)) and ext in VCV_EXTS:
+                                vcv = iname
+                            elif (not (ecv or icv or vcv or acv)) and ext in ACV_EXTS:
+                                acv = iname
+                            elif (not (ecv or icv or vcv or acv or othcv)) and ext in thumbable:
+                                othcv = iname
+
+        cv = cv or icv or vcv or acv or othcv
 
         if not self.args.no_dirsz:
             tnf += len(files)
