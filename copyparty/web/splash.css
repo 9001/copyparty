@@ -257,11 +257,3 @@ html.bz {
 html.bz .vols img {
 	filter: sepia(0.8) hue-rotate(180deg);
 }
-.box-warning {
-	background: #804;
-	border-bottom: 1px solid #c28;
-	padding: .75em;
-	text-align: center;
-	border-radius: .2em;
-	margin-top: 0em;
-}
