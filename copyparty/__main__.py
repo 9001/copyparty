@@ -1201,11 +1201,12 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--mimes", action="store_true", help="list default mimetype mapping and exit")
     ap2.add_argument("--rmagic", action="store_true", help="do expensive analysis to improve accuracy of returned mimetypes; will make file-downloads, rss, and webdav slower (volflag=rmagic)")
     ap2.add_argument("-j", metavar="CORES", type=int, default=1, help="num cpu-cores for uploads/downloads (0=all); keeping the default is almost always best")
+    ap2.add_argument("--vc-url", metavar="URL", type=u, default="", help="URL to check for vulnerable versions (default-disabled)")
+    ap2.add_argument("--vc-age", metavar="HOURS", type=int, default=3, help="how many hours to wait between vulnerability checks")
+    ap2.add_argument("--vc-exit", action="store_true", help="panic and exit if current version is vulnerable")
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
     ap2.add_argument("--versionb", action="store_true", help="show version and exit")
-    ap2.add_argument("--vc-url", metavar="URL", type=u, default="", help="URL to check for vulnerable versions (default: empty/disabled)")
-    ap2.add_argument("--vc-interval", metavar="SEC", type=int, default=86400, help="how many seconds to wait between vulnerability checks (default: 86400)")
 
 
 def add_qr(ap, tty):
