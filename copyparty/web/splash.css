@@ -265,11 +265,3 @@ html.bz .vols img {
 	border-radius: .2em;
 	margin-top: 0em;
 }
-.box-warning + .box-warning {
-	margin-top: .5em;
-}
-.unbox {
-	border: unset !important;
-	padding: unset !important;
-	margin: unset !important;
-}
