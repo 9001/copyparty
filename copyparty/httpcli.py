@@ -155,8 +155,8 @@ ALL_COOKIES = "k304 no304 js idxh dots cppwd cppws".split()
 BADXFF = " due to dangerous misconfiguration (the http-header specified by --xff-hdr was received from an untrusted reverse-proxy)"
 BADXFF2 = ". Some copyparty features are now disabled as a safety measure.\n\n\n"
 BADXFP = ', or change the copyparty global-option "xf-proto" to another header-name to read this value from. Alternatively, if your reverseproxy is not able to provide a header similar to "X-Forwarded-Proto", then you must tell copyparty which protocol to assume; either "--xf-proto-fb=http" or "--xf-proto-fb=https"'
-BADXFFB = "<div class='box-warning'>NOTE: serverlog has a message regarding your reverse-proxy config</div>"
-BADVER = "<div class='box-warning'>The version of copyparty currently active has a known vulnerability <a class='unbox' href='https://github.com/9001/copyparty/security'>(more info)</a> that has been fixed; please update to the latest version. This message is only visible to users with the admin (a or A) permission.</div>"
+BADXFFB = "<b>NOTE: serverlog has a message regarding your reverse-proxy config</b>"
+BADVER = '<a class="r" href="https://github.com/9001/copyparty/security/advisories">Please upgrade copyparty; Your version has a vulnerability</a><p>(only users with permission "a" or "A" can see this message)</p>'
 
 H_CONN_KEEPALIVE = "Connection: Keep-Alive"
 H_CONN_CLOSE = "Connection: Close"
@@ -5625,8 +5625,13 @@ class HttpCli(object):
             no304=self.no304(),
             k304vis=self.args.k304 > 0,
             no304vis=self.args.no304 > 0,
-            msg=(BADXFFB if not hasattr(self, "bad_xff") else "")
-            + (BADVER if self.conn.hsrv.bad_ver and self.can_admin else ""),
+            msg=(
+                BADVER
+                if self.conn.hsrv.bad_ver and self.can_admin
+                else BADXFFB
+                if hasattr(self, "bad_xff")
+                else ""
+            ),
             ver=S_VERSION if show_ver else "",
             chpw=self.args.chpw and self.uname != "*",
             ahttps="" if self.is_https else "https://" + self.host + self.req,
