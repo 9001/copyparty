@@ -2381,6 +2381,13 @@ def u8safe(txt: str) -> str:
     except:
         return txt.encode("utf-8", "replace").decode("utf-8", "replace")
 
+def load_dothidden(dpath: str) -> set[str]:
+    try:
+        with open(os.path.join(dpath, ".hidden"), "rb") as f:
+            return {ln.strip() for ln in f.read().decode("utf-8", "replace").splitlines()}
+    except OSError:
+        return {}
+
 
 def exclude_dotfiles(filepaths: list[str]) -> list[str]:
     return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
