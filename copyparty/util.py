@@ -2389,14 +2389,22 @@ def load_dothidden(dpath: str) -> set[str]:
         return {}
 
 
-def exclude_dotfiles(filepaths: list[str]) -> list[str]:
-    return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
+def exclude_dotfiles(filepaths: list[str], dothidden: Optional[set[str]] = None) -> list[str]:
+    return [
+        x for x in filepaths
+        if not x.split("/")[-1].startswith(".")
+        and (dothidden is None or x.split("/")[-1] not in dothidden)
+    ]
 
 
 def exclude_dotfiles_ls(
-    vfs_ls: list[tuple[str, os.stat_result]]
+    vfs_ls: list[tuple[str, os.stat_result]], dothidden: Optional[set[str]] = None
 ) -> list[tuple[str, os.stat_result]]:
-    return [x for x in vfs_ls if not x[0].split("/")[-1].startswith(".")]
+    return [
+        x for x in vfs_ls
+        if not x[0].split("/")[-1].startswith(".")
+        and (dothidden is None or x[0].split("/")[-1] not in dothidden)
+    ]
 
 
 def odfusion(
