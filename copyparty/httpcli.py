@@ -80,6 +80,7 @@ from .util import (
     has_resource,
     hashcopy,
     hidedir,
+    load_dothidden,
     html_bescape,
     html_escape,
     html_sh_esc,
@@ -1845,13 +1846,14 @@ class HttpCli(object):
             if not self.can_read:
                 vfs_ls = []
             if not self.can_dot:
-                vfs_ls = exclude_dotfiles_ls(vfs_ls)
+                dothidden = load_dothidden(vn.canonical(rem))
+                vfs_ls = exclude_dotfiles_ls(vfs_ls, dothidden)
             fgen = [{"vp": vp, "st": st} for vp, st in vfs_ls]
 
             if vfs_virt:
                 zsl = list(vfs_virt)
                 if not self.can_dot:
-                    zsl = exclude_dotfiles(zsl)
+                    zsl = exclude_dotfiles(zsl, dothidden)
                 fgen += [{"vp": v, "st": vst} for v in zsl]
 
         else:
@@ -5852,9 +5854,10 @@ class HttpCli(object):
                     vfs_virt[d2] = vfs  # typechk, value never read
 
         dirs = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
+        dothidden = load_dothidden(fsroot) if fsroot else None
 
         if not dots:
-            dirs = exclude_dotfiles(dirs)
+            dirs = exclude_dotfiles(dirs, dothidden)
 
         dirs = [quotep(x) for x in dirs if x != excl]
 
@@ -5884,7 +5887,7 @@ class HttpCli(object):
                     x += "\n"
                 dirs.append(quotep(x))
             if not dots:
-                dirs = exclude_dotfiles(dirs)
+                dirs = exclude_dotfiles(dirs, dothidden)
 
         ret["a"] = dirs
         return ret
@@ -7134,7 +7137,8 @@ class HttpCli(object):
         if not self.can_dot or (
             "dots" not in self.uparam and (is_ls or "dots" not in self.cookies)
         ):
-            ls_names = exclude_dotfiles(ls_names)
+            dothidden = load_dothidden(fsroot)
+            ls_names = exclude_dotfiles(ls_names, dothidden)
 
         add_dk = vf.get("dk")
         add_fk = vf.get("fk")
