@@ -22,10 +22,11 @@ each plugin must define a `main()` which takes 3 arguments;
 
 * [redirect.py](redirect.py) sends an HTTP 301 or 302, redirecting the client to another page/file
 * [randpic.py](randpic.py) redirects `/foo/bar/randpic.jpg` to a random pic in `/foo/bar/`
-* [sorry.py](answer.py) replies with a custom message instead of the usual 404
+* [sorry.py](sorry.py) replies with a custom message instead of the usual 404
 * [nooo.py](nooo.py) replies with an endless noooooooooooooo
 * [never404.py](never404.py) 100% guarantee that 404 will never be a thing again as it automatically creates dummy files whenever necessary
 * [caching-proxy.py](caching-proxy.py) transforms copyparty into a squid/varnish knockoff
+* [404-to-fail2ban.py](404-to-fail2ban.py) creates 404 logs for fail2ban
 
 ## on403
 
