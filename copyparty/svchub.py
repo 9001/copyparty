@@ -1373,7 +1373,7 @@ class SvcHub(object):
             lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
 
         # Patch the opened log file write method
-        orig_w = getattr(lh, "write")
+        orig_w = lh.write
 
         def patched_write(data: str):
             try:
@@ -1382,8 +1382,7 @@ class SvcHub(object):
                 clean = data
             return orig_w(clean)
 
-        setattr(lh, "write", patched_write)
-        # lh.write = patched_write    #type: ignore
+        lh.write = patched_write    #type: ignore
 
         if getattr(self.args, "free_umask", False):
             os.fchmod(lh.fileno(), 0o644)
