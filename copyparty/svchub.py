@@ -1373,16 +1373,18 @@ class SvcHub(object):
             lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
 
         # Patch the opened log file write method
-        orig_w = lh.write
+        # Only patch when flo == 2 (i.e. no colors)
+        if self.flo == 2:
+            orig_w = lh.write
 
-        def patched_write(data: str):
-            try:
-                clean = self.clean(data)
-            except:
-                clean = data
-            return orig_w(clean)
+            def patched_write(data: str):
+                try:
+                    clean = self.clean(data)
+                except:
+                    clean = data
+                return orig_w(clean)
 
-        lh.write = patched_write    #type: ignore
+            lh.write = patched_write    #type: ignore
 
         if getattr(self.args, "free_umask", False):
             os.fchmod(lh.fileno(), 0o644)
