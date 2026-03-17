@@ -2047,6 +2047,20 @@ def run_argparse(
 
 
 def main(argv: Optional[list[str]] = None) -> None:
+    ## if ever want to use logging
+    # import re, logging
+    # COLOR_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    # def clean(msg: str):
+    #     return COLOR_RE.sub('', msg)
+    # orig_fac = logging.getLogRecordFactory()
+    # def logger_fac(*args, **kwargs):
+    #     record = orig_fac(*args, **kwargs)
+    #     print("Boing!")
+    #     if (isinstance(record.msg, str)):
+    #         record.msg = clean(record.msg)
+    #     return record
+    # logging.setLogRecordFactory(logger_fac)
+
     if argv is None:
         argv = sys.argv
 

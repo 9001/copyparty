@@ -1372,6 +1372,19 @@ class SvcHub(object):
 
             lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
 
+        # Patch the opened log file write method
+        orig_w = getattr(lh, "write")
+
+        def patched_write(data: str):
+            try:
+                clean = self.clean(data)
+            except:
+                clean = data
+            return orig_w(clean)
+
+        setattr(lh, "write", patched_write)
+        # lh.write = patched_write    #type: ignore
+
         if getattr(self.args, "free_umask", False):
             os.fchmod(lh.fileno(), 0o644)
 
@@ -1388,6 +1401,11 @@ class SvcHub(object):
         self.logf = lh
         self.logf_base_fn = base_fn
         print(msg, end="")
+
+    # https://regex101.com/r/96ZckU/1
+    COLOR_RE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    def clean(self, msg: str):
+        return self.COLOR_RE.sub('', msg)
 
     def run(self) -> None:
         self.tcpsrv.run()

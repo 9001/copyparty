@@ -491,6 +491,12 @@ mostly fine on android,  but still haven't find a way to massage iphones into be
 
 can be reproduced with `--no-sendfile --s-wr-sz 8192 --s-wr-slp 0.3 --rsp-slp 6` and then play a collection of small audio files with the screen off, `ffmpeg -i track01.cdda.flac -c:a libopus -b:a 128k -segment_time 12 -f segment smol-%02d.opus`
 
+## grabing colors
+to grab all color codes (ANSII escape seq) from the source (`../copyparty/`) (optional)
+
+```bash
+grep -roIE '\\033\[([0-9]{1,3};)?[0-9]{1,3}m' | sort -t ':' -k2 | cut -d ':' -f2 | sort -u
+```
 
 ## discarded ideas
 
