@@ -86,7 +86,7 @@ the table headers in the matrixes below are the different softwares, with a quic
 
 the softwares,
 
-[cp]: https://github.com/9001/copyparty "copyparty"
+[C]: https://github.com/9001/copyparty "copyparty"
 [h2]: https://github.com/rejetto/hfs2/ "hfs2"
 [h3]: https://rejetto.com/hfs/ "hfs3"
 [nc]: https://github.com/nextcloud/server "nextcloud"
@@ -100,7 +100,7 @@ the softwares,
 [sg]: https://github.com/drakkan/sftpgo "sftpgo"
 [az]: https://github.com/tobychui/arozos "arozos"
 
-* `cp` = [copyparty][cp]
+* `C` = [copyparty][C]
 * `h2` = [hfs2][h2] 🔥
 * `h3` = [hfs3][h3]
 * `nc` = [nextcloud][nc]
@@ -134,7 +134,7 @@ symbol legend,
 
 ## general
 
-| feature / software      |[cp]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
+| feature / software      |[C]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
 | ----------------------- |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | intuitive UX            |   | ╱ | █ | █ | █ |   | █ | █ | █ | █ | █ | █ | █ |
 | config GUI              |   | █ | █ | █ | █ |   |   | █ | █ | █ |   | █ | █ |
@@ -155,7 +155,7 @@ symbol legend,
 | iOS app                 | ╱ |   |   | █ | █ |   |   |   |   |   |   |   |   |
 
 * `zero setup` = you can get a mostly working setup by just launching the app, without having to install any software or configure whatever
-* `cp`/copyparty remarks:
+* `C`/copyparty remarks:
   * no gui for server settings; only for client-side stuff
   * runs on iOS / iPads using [a-Shell](https://holzschu.github.io/a-Shell_iOS/) (pretty good) or [iSH](https://ish.app/) (very slow) but cannot run in the background and is not able to share all of your phone storage (just a separate dedicated folder)
   * [android app](https://f-droid.org/en/packages/me.ocv.partyup/) is for uploading only
@@ -175,7 +175,7 @@ symbol legend,
 
 *the thing that copyparty is actually kinda good at*
 
-| feature / software      |[cp]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
+| feature / software      |[C]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
 | ----------------------- |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | download folder as zip  | █ | █ | █ | █ | ╱ |   | █ |   | █ | █ | ╱ | █ | ╱ |
 | download folder as tar  | █ |   |   |   |   |   |   |   |   |   |   |   |   |
@@ -224,7 +224,7 @@ symbol legend,
 
 * `cloud storage backend` = able to serve files from (and write to) s3 or similar cloud services; `╱` means the software can do this with some help from `rclone mount` as a bridge
 
-* `cp`/copyparty can reject uploaded files (based on complex conditions), for example [by extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) or [mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py)
+* `C`/copyparty can reject uploaded files (based on complex conditions), for example [by extension](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-extension.py) or [mimetype](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reject-mimetype.py)
 * `sf`/seafile download-as-zip is not streaming; it creates the full zipfile before download can start, and fails on big folders
 * `fg`/filebrowser remarks:
   * can provide checksums for single files on request
@@ -239,7 +239,7 @@ symbol legend,
 
 ## protocols and client support
 
-| feature / software      |[cp]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
+| feature / software      |[C]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
 | ----------------------- |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | serve https             | █ |   | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | serve webdav            | █ |   |   | █ | █ | █ | █ |   | █ |   |   | █ | █ |
@@ -261,7 +261,7 @@ symbol legend,
 * `mojibake filenames` = filenames decoded with the wrong codec and then reencoded (usually to utf-8), so `宇多田ヒカル` might look like `ëFæ╜ôcâqâJâï`
 * `undecodable filenames` = pure binary garbage which cannot be parsed as utf-8
   * you can successfully play `$'\355\221'` with mpv through mounting a remote copyparty server with rclone, pog
-* `cp`/copyparty remarks:
+* `C`/copyparty remarks:
   * extremely minimal samba/cifs server
   * netscape 4 / ie6 support is mostly listed as a joke altho some people have actually found it useful ([ie4 tho](https://user-images.githubusercontent.com/241032/118192791-fb31fe00-b446-11eb-9647-898ea8efc1f7.png))
 * `sg`/sftpgo translates mojibake filenames into valid utf-8 (information loss)
@@ -270,7 +270,7 @@ symbol legend,
 
 ## server configuration
 
-| feature / software      |[cp]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
+| feature / software      |[C]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
 | ----------------------- |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | config from cmd args    | █ |   | █ |   |   | █ | █ |   |   | █ |   | ╱ | ╱ |
 | config files            | █ | █ | █ | ╱ | ╱ | █ |   | █ |   | █ | • | ╱ | ╱ |
@@ -291,7 +291,7 @@ symbol legend,
 
 ## server capabilities
 
-| feature / software      |[cp]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
+| feature / software      |[C]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
 | ----------------------- |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | accounts                | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ |
 | per-account chroot      |   |   |   |   |   |   |   |   |   |   |   | █ |   |
@@ -337,7 +337,7 @@ symbol legend,
 * `speed throttle` = rate limiting (per ip, per user, per connection, anything like that)
 * `curl-friendly ls` = returns a [sortable plaintext folder listing](https://user-images.githubusercontent.com/241032/215322619-ea5fd606-3654-40ad-94ee-2bc058647bb2.png) when curled
 * `curl-friendly upload` = uploading with curl is just `curl -T some.bin http://.../`
-* `cp`/copyparty remarks:
+* `C`/copyparty remarks:
   * single-sign-on, token-auth, and 2fa is *possible* through authelia/authentik or similar, but nobody's made an example yet
   * one-way folder sync from local to server can be done efficiently with [u2c.py](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy), or with webdav and conventional rsync
   * can hot-reload config files (with just a few exceptions)
@@ -359,7 +359,7 @@ symbol legend,
 
 ## client features
 
-| feature / software      |[cp]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
+| feature / software      |[C]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
 | ----------------------  |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | single-page app         | █ |   | █ | █ | █ |   |   | █ | █ | █ | █ |   | █ |
 | themes                  | █ | █ | █ | █ |   |   |   |   | █ |   |   |   |   |
@@ -404,7 +404,7 @@ symbol legend,
 * `search by custom tags` = ability to tag files through the UI and search by those
 * `find local file` = drop a file into the browser to see if it exists on the server
 * `undo recent uploads` = accounts without delete permissions have a time window where they can undo their own uploads
-* `cp`/copyparty has teeny-tiny skips playing gapless albums depending on audio codec (opus best)
+* `C`/copyparty has teeny-tiny skips playing gapless albums depending on audio codec (opus best)
 * `h2`/hfs2 has a very basic directory tree view, not showing sibling folders
 * `rc`/rclone can do some file management (mkdir, rename, delete) when hosting througn webdav
 * `fg`/filebrowser remarks:
@@ -418,7 +418,7 @@ symbol legend,
 
 ## integration
 
-| feature / software      |[cp]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
+| feature / software      |[C]|[h2]|[h3]|[nc]|[sf]|[rc]|[df]|[cs]|[kb]|[fb]|[fg]|[sg]|[az]|
 | ----------------------- |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | OS alert on upload      | ╱ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |   |
 | discord                 | ╱ |   |   |   |   |   |   |   |   | ╱ |   | ╱ |   |
@@ -428,7 +428,7 @@ symbol legend,
 | flameshot               |   |   |   |   |   | █ |   |   |   |   |   |   |   |
 
 * sharex `╱` = yes, but does not provide example sharex config
-* `cp`/copyparty remarks:
+* `C`/copyparty remarks:
   * `OS alert on upload` available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/notify.py)
   * `discord » announce uploads` available as [a plugin](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/discord-announce.py)
 * `fg`/filebrowser can probably pull those off with command runners similar to copyparty
