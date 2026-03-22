@@ -2381,30 +2381,42 @@ def u8safe(txt: str) -> str:
     except:
         return txt.encode("utf-8", "replace").decode("utf-8", "replace")
 
-def load_dothidden(dpath: str) -> set[str]:
-    try:
-        with open(os.path.join(dpath, ".hidden"), "rb") as f:
-            return {ln.strip() for ln in f.read().decode("utf-8", "replace").splitlines()}
-    except OSError:
-        return {}
 
-
-def exclude_dotfiles(filepaths: list[str], dothidden: Optional[set[str]] = None) -> list[str]:
-    return [
-        x for x in filepaths
-        if not x.split("/")[-1].startswith(".")
-        and (dothidden is None or x.split("/")[-1] not in dothidden)
-    ]
+def exclude_dotfiles(filepaths: list[str]) -> list[str]:
+    return [x for x in filepaths if not x.split("/")[-1].startswith(".")]
 
 
 def exclude_dotfiles_ls(
-    vfs_ls: list[tuple[str, os.stat_result]], dothidden: Optional[set[str]] = None
+    vfs_ls: list[tuple[str, os.stat_result]]
 ) -> list[tuple[str, os.stat_result]]:
-    return [
-        x for x in vfs_ls
-        if not x[0].split("/")[-1].startswith(".")
-        and (dothidden is None or x[0].split("/")[-1] not in dothidden)
-    ]
+    return [x for x in vfs_ls if not x[0].split("/")[-1].startswith(".")]
+
+
+def exclude_dothidden(filepaths: list[str], fsroot: Any) -> list[str]:
+    ret = [x for x in filepaths if not x.split("/")[-1].startswith(".")]
+    filt = load_dothidden(fsroot)
+    if filt:
+        ret = [x for x in ret if x.split("/")[-1] not in filt]
+    return ret
+
+
+def exclude_dothidden_ls(
+    vfs_ls: list[tuple[str, os.stat_result]], fsroot: Any
+) -> list[tuple[str, os.stat_result]]:
+    ret = [x for x in vfs_ls if not x[0].split("/")[-1].startswith(".")]
+    filt = load_dothidden(fsroot)
+    if filt:
+        ret = [x for x in ret if x[0].split("/")[-1] not in filt]
+    return ret
+
+
+def load_dothidden(dpath: str) -> list[str]:
+    try:
+        with open(os.path.join(dpath, ".hidden"), "rb") as f:
+            zsl = f.read().decode("utf-8").splitlines()
+        return [x.strip() for x in zsl]
+    except OSError:
+        return []
 
 
 def odfusion(
