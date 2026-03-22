@@ -594,7 +594,16 @@ UNHUMANIZE_UNITS = {
 
 VF_CAREFUL = {"mv_re_t": 5, "rm_re_t": 5, "mv_re_r": 0.1, "rm_re_r": 0.1}
 
-FN_EMB = set([".prologue.html", ".epilogue.html", "readme.md", "preadme.md"])
+FN_EMB = set(
+    [
+        ".prologue.html",
+        ".epilogue.html",
+        "readme.md",
+        "preadme.md",
+        "readme.txt",
+        "readme",
+    ]
+)
 
 
 def read_ram() -> tuple[float, float]:

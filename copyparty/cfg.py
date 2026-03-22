@@ -352,7 +352,7 @@ flagcats = {
         "unlistcw": "don't list write-access in controlpanel",
         "prologues=.prologue.html": "files to embed above/before files",
         "epilogues=.epilogue.html": "files to embed below/after files",
-        "readmes=readme.md,README.md": "files to embed as readmes",
+        "readmes=readme.md,README.md,readme.txt,README.txt,README": "files to embed as readmes",
         "preadmes=preadme.md,PREADME.md": "files to embed as preadmes",
         "no_sb_md": "disable js sandbox for markdown files",
         "no_sb_lg": "disable js sandbox for prologue/epilogue",

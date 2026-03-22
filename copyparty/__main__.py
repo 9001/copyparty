@@ -1892,7 +1892,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--prologues", metavar="T,T", type=u, default=".prologue.html", help="comma-sep. list of filenames to scan for and use as prologues (embed above/before directory listing) (volflag=prologues)")
     ap2.add_argument("--epilogues", metavar="T,T", type=u, default=".epilogue.html", help="comma-sep. list of filenames to scan for and use as epilogues (embed below/after directory listing) (volflag=epilogues)")
     ap2.add_argument("--preadmes", metavar="T,T", type=u, default="preadme.md,PREADME.md", help="comma-sep. list of filenames to scan for and use as preadmes (embed above/before directory listing) (volflag=preadmes)")
-    ap2.add_argument("--readmes", metavar="T,T", type=u, default="readme.md,README.md", help="comma-sep. list of filenames to scan for and use as readmes (embed below/after directory listing) (volflag=readmes)")
+    ap2.add_argument("--readmes", metavar="T,T", type=u, default="readme.md,README.md,readme.txt,README.txt,README", help="comma-sep. list of filenames to scan for and use as readmes (embed below/after directory listing) (volflag=readmes)")
     ap2.add_argument("--doctitle", metavar="TXT", type=u, default="copyparty @ --name", help="title / service-name to show in html documents")
     ap2.add_argument("--bname", metavar="TXT", type=u, default="--name", help="server name (displayed in filebrowser document title)")
     ap2.add_argument("--pb-url", metavar="URL", type=u, default=URL_PRJ, help="powered-by link; disable with \033[33m-nb\033[0m")
