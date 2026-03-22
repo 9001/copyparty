@@ -65,6 +65,8 @@ from .util import (
     eol_conv,
     exclude_dotfiles,
     exclude_dotfiles_ls,
+    exclude_dothidden,
+    exclude_dothidden_ls,
     formatdate,
     fsenc,
     gen_content_disposition,
@@ -1835,7 +1837,7 @@ class HttpCli(object):
                 raise Pebkac(401, "authenticate")
 
         elif depth == "1":
-            _, vfs_ls, vfs_virt = vn.ls(
+            fsroot, vfs_ls, vfs_virt = vn.ls(
                 rem,
                 self.uname,
                 not self.args.no_scandir,
@@ -1846,14 +1848,20 @@ class HttpCli(object):
             if not self.can_read:
                 vfs_ls = []
             if not self.can_dot:
-                dothidden = load_dothidden(vn.canonical(rem))
-                vfs_ls = exclude_dotfiles_ls(vfs_ls, dothidden)
+                if "dothidden" in vn.flags and ".hidden" in [x[0] for x in vfs_ls]:
+                    vfs_ls = exclude_dothidden_ls(vfs_ls, fsroot)
+                    self.dothid = True
+                else:
+                    vfs_ls = exclude_dotfiles_ls(vfs_ls)
             fgen = [{"vp": vp, "st": st} for vp, st in vfs_ls]
 
             if vfs_virt:
                 zsl = list(vfs_virt)
                 if not self.can_dot:
-                    zsl = exclude_dotfiles(zsl, dothidden)
+                    if "dothidden" in vn.flags and getattr(self, "dothid", False):
+                        zsl = exclude_dothidden(zsl, fsroot)
+                    else:
+                        zsl = exclude_dotfiles(zsl)
                 fgen += [{"vp": v, "st": vst} for v in zsl]
 
         else:
@@ -5846,6 +5854,7 @@ class HttpCli(object):
             dk_sz = vn.flags.get("dk")
         except:
             dk_sz = None
+            vn = vfs
             vfs_ls = []
             vfs_virt = {}
             for v in self.rvol:
@@ -5854,10 +5863,13 @@ class HttpCli(object):
                     vfs_virt[d2] = vfs  # typechk, value never read
 
         dirs = [x[0] for x in vfs_ls if stat.S_ISDIR(x[1].st_mode)]
-        dothidden = load_dothidden(fsroot) if fsroot else None
 
         if not dots:
-            dirs = exclude_dotfiles(dirs, dothidden)
+            if "dothidden" in vn.flags and ".hidden" in [x[0] for x in vfs_ls]:
+                dirs = exclude_dothidden(dirs, fsroot)
+                self.dothid = True
+            else:
+                dirs = exclude_dotfiles(dirs)
 
         dirs = [quotep(x) for x in dirs if x != excl]
 
@@ -5887,7 +5899,10 @@ class HttpCli(object):
                     x += "\n"
                 dirs.append(quotep(x))
             if not dots:
-                dirs = exclude_dotfiles(dirs, dothidden)
+                if "dothidden" in vn.flags and getattr(self, "dothid", False):
+                    dirs = exclude_dothidden(dirs, fsroot)
+                else:
+                    dirs = exclude_dotfiles(dirs)
 
         ret["a"] = dirs
         return ret
@@ -7137,8 +7152,10 @@ class HttpCli(object):
         if not self.can_dot or (
             "dots" not in self.uparam and (is_ls or "dots" not in self.cookies)
         ):
-            dothidden = load_dothidden(fsroot)
-            ls_names = exclude_dotfiles(ls_names, dothidden)
+            if "dothidden" in vf and ".hidden" in ls_names:
+                ls_names = exclude_dothidden(ls_names, fsroot)
+            else:
+                ls_names = exclude_dotfiles(ls_names)
 
         add_dk = vf.get("dk")
         add_fk = vf.get("fk")
