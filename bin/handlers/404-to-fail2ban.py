@@ -1,16 +1,27 @@
+# /!\ Warning: be careful, as webdav clients often generate a large number of 404 requets.
+
 # In your `jail.local`, add:
 # [copyparty]
 # enabled = true
+# logtimezone = UTC
 # logpath = /path/to/log/file # or keep the default value if you're using systemd
 
 # Create the `copyparty.conf` file in `filter.d` with the following:
 # [Definition]
-# failregex = ^ fail2ban\s*WARN: <ADDR>$
+# failregex = ^ <ADDR>$
 # ignoreregex =
-# datepattern = ^%%H:%%M:%%S\.%%f
+# datepattern = ^fail2ban: %%Y-%%m-%%dT%%H:%%M:%%S
 
 # First check `--dont-ban`, and if it doesn't match, log the line to be intercepted by fail2ban.
-def main(cli, vn, rem):
+from datetime import datetime, UTC
+def main(cli, vn="", rem=""):
+    now = datetime.now(UTC).isoformat()[:19]
+    msg = "\nfail2ban: %s %s"
+    if not vn and not rem:
+        # got called by --xban
+        cli["log"](msg % (now, cli["ip"]), 3)
+        return {"rc": 0}
+
     cond = cli.args.dont_ban
     if (
         cond == "any"
@@ -21,5 +32,5 @@ def main(cli, vn, rem):
     ):
         return ""
 
-    cli.log_func("fail2ban", f"{cli.ip}", 3)
+    cli.log(msg % (now, cli.ip), 3)
     return ""
