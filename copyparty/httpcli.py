@@ -7375,9 +7375,17 @@ class HttpCli(object):
                 for fe in dirs:
                     try:
                         hit = icur.execute(q, (vdir + fe["name"],)).fetchone()
-                        (fe["sz"], fe["tags"][".files"]) = hit
+                        if not hit and self.args.deep_dirsz:
+                            child_rp = os.path.join(abspath, fe["name"])
+                            hit = self.conn.hsrv.broker.ask(
+                                "up2k.get_volrootsize", child_rp
+                            ).get()
+                            if hit == (0, 0):
+                                hit = None
+                        if hit:
+                            (fe["sz"], fe["tags"][".files"]) = hit
                     except:
-                        pass  # 404 or mojibake
+                        pass # 404 or mojibake
 
             taglist = [k for k in lmte if k in tagset]
         else:

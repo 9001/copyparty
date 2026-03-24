@@ -528,6 +528,13 @@ class Up2k(object):
 
         return (nbytes, nfiles)
 
+    def get_volrootsize(self, realpath: str) -> tuple[int, int]:
+        cur = self.cur.get(realpath)
+        if not cur:
+            return (0, 0)
+        hit = cur.execute("select sz, nf from ds where rd='' limit 1").fetchone()
+        return hit if hit else (0, 0)
+
     def rescan(
         self, all_vols: dict[str, VFS], scan_vols: list[str], wait: bool, fscan: bool
     ) -> str:
