@@ -120,6 +120,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - `pacman -S copyparty` (in [arch linux extra](https://archlinux.org/packages/extra/any/copyparty/))
     * [fedora package](#fedora-package) - does not exist yet
+    * [gentoo ::guru package](#gentoo-guru-package) - `emerge www-servers/copyparty::guru` (in [::guru](https://wiki.gentoo.org/wiki/Project:GURU))
     * [homebrew formulae](#homebrew-formulae) - `brew install copyparty ffmpeg`
     * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
     * [nixos module](#nixos-module)
@@ -2583,6 +2584,27 @@ after installing, start either the system service or the user service and naviga
 ## fedora package
 
 does not exist yet;  there are rumours that it is being packaged! keep an eye on this space...
+
+
+## gentoo ::guru package
+
+Enable the [`::guru` repository](https://wiki.gentoo.org/wiki/Project:GURU):
+
+```
+emerge -an app-eselect/eselect-repository
+eselect repository enable guru
+emerge --sync guru
+```
+
+Install the package:
+
+```
+emerge -a www-servers/copyparty::guru
+```
+
+To start the service as a user:
+* OpenRC: `rc-service -U copyparty start && rc-update -U add copyparty default`
+* systemd: [todo]
 
 
 ## homebrew formulae
