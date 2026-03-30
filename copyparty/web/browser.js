@@ -7853,7 +7853,7 @@ var treectl = (function () {
 	function autogrid(res) {
 		var icount = 0;
 		var fcount = res.files.length;
-		var iext = new Set(jread('ga_ext', "jpg,jpeg,png,gif,webp,webm,mp4").split(','));
+		var iext = new Set((sread('ga_ext') || "jpg,jpeg,png,gif,webp,webm,mp4").split(','));
 
 		for (var a = 0; a < fcount; a++) {
 			var fext = res.files[a].ext ? res.files[a].ext.toLowerCase() : '';
@@ -7862,7 +7862,7 @@ var treectl = (function () {
 		}
 
 		var iratio = fcount > 0 ? (icount / fcount) * 100 : 0;
-		var threshold = jread('ga_thresh', 70);
+		var threshold = sread('ga_thresh') || 70;
 
 		if (iratio >= threshold)
 			thegrid.en = true; 
