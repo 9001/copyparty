@@ -1719,7 +1719,9 @@ function MPlayer() {
 			if (!tid || tid.indexOf('af-') !== 0)
 				continue;
 
-			order.push(tid.slice(1));
+			var trackid = tid.slice(1);
+			if (r.tracks[trackid]) 
+				order.push(trackid);
 		}
 		r.order = order;
 		r.shuffle();
