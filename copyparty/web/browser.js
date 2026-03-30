@@ -155,6 +155,7 @@ if (1)
 		"wt_m3ua": "add to m3u playlist (click <code>📻copy</code> later)",
 		"wt_m3uc": "copy m3u playlist to clipboard",
 		"wt_grid": "toggle grid / list view$NHotkey: G",
+		"wt_gridauto": "toggle auto-grid mode",
 		"wt_prev": "previous track$NHotkey: J",
 		"wt_play": "play / pause$NHotkey: P",
 		"wt_next": "next track$NHotkey: L",
@@ -228,8 +229,10 @@ if (1)
 		"cl_hpick": "tap on column headers to hide in the table below",
 		"cl_hcancel": "column hiding aborted",
 		"cl_rcm": "right-click menu",
+		"cl_gridauto": "autogrid",
 
 		"ct_grid": '田 the grid',
+		"ct_gridauto": 'autogrid',
 		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
 		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
@@ -282,6 +285,8 @@ if (1)
 		"tt_dynt": "autogrow as tree expands",
 		"tt_wrap": "word wrap",
 		"tt_hover": "reveal overflowing lines on hover$N( breaks scrolling unless mouse $N&nbsp; cursor is in the left gutter )",
+		"tt_gathresh": "percentage of files required to trigger autogrid",
+		"tt_gaext": "comma-separated file extensions to consider for autogrid",
 
 		"ml_pmode": "at end of folder...",
 		"ml_btns": "cmds",
@@ -933,6 +938,14 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '</a>\n' +
 	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '</a>\n' +
 	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '</a>\n' +
+	'	</div>\n' +
+	'</div>\n' +
+	'<div>\n' +
+		'	<h3>' + L.cl_gridauto + '</h3>\n' +
+	'	<div>\n' +
+	'		<a id="gridauto" class="tgl btn" href="#" tt="' + L.wt_gridauto + '">' + L.ct_gridauto + '</a>\n' +
+	'		<input type="text" id="ga_thresh" value="" ' + NOAC + ' style="width:1.5em" tt="' + L.tt_gathresh + '" />' +
+	'		<input type="text" id="ga_ext" value="" ' + NOAC + ' style="width:5em" tt="' + L.tt_gaext + '" />' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -5944,6 +5957,7 @@ var thegrid = (function () {
 		pbar.onresize();
 		vbar.onresize();
 	});
+	bcfg_bind(r, 'gaen', 'gridauto', false, r.apply);
 	ebi('wtgrid').onclick = ebi('griden').onclick;
 
 	return r;
@@ -6876,6 +6890,16 @@ var treectl = (function () {
 		var n = parseInt(this.value);
 		swrite('bd_lim', r.lim = (isNum(n) ? n : 0) || 1000);
 	};
+	ebi('ga_thresh').value = r.gathresh = icfg_get('ga_thresh', 70);
+	ebi('ga_thresh').oninput = function (e) {
+		var n = parseInt(this.value);
+		swrite('ga_thresh', r.gathresh = (isNum(n) ? n : 0) || 70);
+	};
+	ebi('ga_ext').value = r.gaext = scfg_get('ga_ext', 'jpg,jpeg,png,gif,webp,webm,mp4');
+	ebi('ga_ext').oninput = function (e) {
+		var v = this.value;
+		swrite('ga_ext', r.gaext = v);
+	};
 	r.nvis = r.lim;
 
 	ldks = jread('dks', []);
@@ -7656,7 +7680,7 @@ var treectl = (function () {
 			}
 		}
 
-		if (sread('ag_enable') == 1)
+		if (sread('gridauto') == 1)
 			autogrid(res.files);
 
 		if (url) setTimeout(asdf, 1); else asdf();
@@ -7826,7 +7850,7 @@ var treectl = (function () {
 	function autogrid(files) {
 		var icount = 0;
 		var fcount = files.length;
-		var iext = new Set(sread('ag_ext').split(','));
+		var iext = new Set(sread('ga_ext').split(','));
 
 		for (var a = 0; a < fcount; a++) {
 			var fext = files[a].ext ? files[a].ext.toLowerCase() : '';
@@ -7835,7 +7859,7 @@ var treectl = (function () {
 		}
 
 		var iratio = fcount > 0 ? (icount / fcount) * 100 : 0;
-		var threshold = sread('ag_thresh');
+		var threshold = sread('ga_thresh');
 
 		if (iratio >= threshold) 
 			thegrid.en = true;
