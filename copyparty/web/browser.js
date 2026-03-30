@@ -7656,6 +7656,9 @@ var treectl = (function () {
 			}
 		}
 
+		if (sread('ag_enable') == 1)
+			autogrid(res.files);
+
 		if (url) setTimeout(asdf, 1); else asdf();
 	}
 
@@ -7818,6 +7821,26 @@ var treectl = (function () {
 		treesz = clamp(treesz, 2, 120);
 		swrite('treesz', treesz);
 		onresize();
+	}
+
+	function autogrid(files) {
+		var icount = 0;
+		var fcount = files.length;
+		var iext = new Set(sread('ag_ext').split(','));
+
+		for (var a = 0; a < fcount; a++) {
+			var fext = files[a].ext ? files[a].ext.toLowerCase() : '';
+			if (fext && iext.has(fext))
+				icount++;
+		}
+
+		var iratio = fcount > 0 ? (icount / fcount) * 100 : 0;
+		var threshold = sread('ag_thresh');
+
+		if (iratio >= threshold) 
+			thegrid.en = true;
+		else if (thegrid.en && sread('griden') == 0)
+			thegrid.en = false;
 	}
 
 	ebi('entree').onclick = r.entree;
