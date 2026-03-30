@@ -7683,7 +7683,7 @@ var treectl = (function () {
 			}
 		}
 
-		if (sread('gridauto') == 1)
+		if (jread('gridauto', false) && !jread('griden', false))
 			autogrid(res);
 
 		if (url) setTimeout(asdf, 1); else asdf();
@@ -7864,11 +7864,7 @@ var treectl = (function () {
 		var iratio = fcount > 0 ? (icount / fcount) * 100 : 0;
 		var threshold = jread('ga_thresh', 70);
 
-		if (jread('griden', 0) == 1)
-			thegrid.en = true;
-		else if (thegrid.en && !thegrid.gaen)
-			thegrid.en = false;
-		else if (iratio >= threshold)
+		if (iratio >= threshold)
 			thegrid.en = true; 
 		else
 			thegrid.en = false;
