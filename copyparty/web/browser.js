@@ -5957,7 +5957,10 @@ var thegrid = (function () {
 		pbar.onresize();
 		vbar.onresize();
 	});
-	bcfg_bind(r, 'gaen', 'gridauto', false, r.apply);
+	bcfg_bind(r, 'gaen', 'gridauto', false, function(v) {
+		if (!jread("griden", false) && thegrid.en)
+			thegrid.en = false;
+	});
 	ebi('wtgrid').onclick = ebi('griden').onclick;
 
 	return r;
@@ -7681,7 +7684,7 @@ var treectl = (function () {
 		}
 
 		if (sread('gridauto') == 1)
-			autogrid(res.files);
+			autogrid(res);
 
 		if (url) setTimeout(asdf, 1); else asdf();
 	}
@@ -7847,23 +7850,27 @@ var treectl = (function () {
 		onresize();
 	}
 
-	function autogrid(files) {
+	function autogrid(res) {
 		var icount = 0;
-		var fcount = files.length;
-		var iext = new Set(sread('ga_ext').split(','));
+		var fcount = res.files.length;
+		var iext = new Set(jread('ga_ext', "jpg,jpeg,png,gif,webp,webm,mp4").split(','));
 
 		for (var a = 0; a < fcount; a++) {
-			var fext = files[a].ext ? files[a].ext.toLowerCase() : '';
+			var fext = res.files[a].ext ? res.files[a].ext.toLowerCase() : '';
 			if (fext && iext.has(fext))
 				icount++;
 		}
 
 		var iratio = fcount > 0 ? (icount / fcount) * 100 : 0;
-		var threshold = sread('ga_thresh');
+		var threshold = jread('ga_thresh', 70);
 
-		if (iratio >= threshold) 
+		if (jread('griden', 0) == 1)
 			thegrid.en = true;
-		else if (thegrid.en && sread('griden') == 0)
+		else if (thegrid.en && !thegrid.gaen)
+			thegrid.en = false;
+		else if (iratio >= threshold)
+			thegrid.en = true; 
+		else
 			thegrid.en = false;
 	}
 
