@@ -2729,6 +2729,12 @@ services.copyparty = {
   };
   # you may increase the open file limit for the process
   openFilesLimit = 8192;
+  
+  # override the package used by the module to add dependencies, e.g. for hooks
+  package = pkgs.copyparty.override {
+    # provides exiftool for bin/hooks/image-noexif.py
+    extraPackages = [ pkgs.exiftool ];
+  };
 };
 ```
 
