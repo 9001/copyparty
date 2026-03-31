@@ -8496,6 +8496,43 @@ var setfszf = (function () {
 	}
 
 	freshen();
+
+	let lmap = [
+		["eng", /^en(-.+)?$/],
+		["nor", /^(no|nb)$/],
+		["chi", /^zh(-.+)?$/],
+		["cze", /^cs$/],
+		["deu", /^de(-.+)?$/],
+		["epo", /^eo$/],
+		["fin", /^fi$/],
+		["fra", /^fr(-.+)?$/],
+		["grc", /^el$/],
+		["hu", /^hu$/],
+		["ita", /^it(-ch)?$/],
+		["jpn", /^ja$/],
+		["kor", /^ko(-.+)?$/],
+		["nl", /^nl(-be)?$/],
+		["nyn", /^nn$/],
+		["pol", /^pl$/],
+		["por", /^pt(-.+)?$/],
+		["rus", /^ru(-md)?$/],
+		["spa", /^es(-.+)?$/],
+		["swe", /^sv(-.+)?$/],
+		["tur", /^tr$/],
+		["ukr", /^uk$/],
+		["vie", /^vi$/]
+	];
+	
+	if (glang && navigator.languages && !/(^|; )cplng=/.test(document.cookie)) {
+		for (let i = 0; i < navigator.languages.length; i++) {
+			for (let j = 0; j < lmap.length; j++) {
+				console.log(lmap[j]);
+				if (lmap[j][1].test(navigator.languages[i])) {
+					return setck('cplng=' + lmap[j][0], location.reload.bind(location));
+				}
+			}
+		}
+	}
 })();
 
 

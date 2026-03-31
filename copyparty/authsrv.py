@@ -3268,6 +3268,7 @@ class AuthSrv(object):
                 "frand": bool(vf.get("rand")),
                 "lifetime": vn.js_ls["lifetime"],
                 "u2sort": self.args.u2sort,
+                "glang": self.args.glang
             }
             zs = "ui_noacci ui_nocpla ui_noctxb ui_nolbar ui_nombar ui_nonav ui_notree ui_norepl ui_nosrvi"
             for zs in zs.split():
