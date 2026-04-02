@@ -2588,21 +2588,17 @@ does not exist yet;  there are rumours that it is being packaged! keep an eye on
 
 ## gentoo ::guru package
 
-Enable the [`::guru` repository](https://wiki.gentoo.org/wiki/Project:GURU):
+`emerge www-servers/copyparty::guru` (in [::guru](https://wiki.gentoo.org/wiki/Project:GURU))
 
-```
+but first enable the `::guru` repo;
+
+```bash
 emerge -an app-eselect/eselect-repository
 eselect repository enable guru
 emerge --sync guru
 ```
 
-Install the package:
-
-```
-emerge -a www-servers/copyparty::guru
-```
-
-To start the service as a user:
+to start the service as a user:
 * OpenRC: `rc-service -U copyparty start && rc-update -U add copyparty default`
 * systemd: [todo]
 
