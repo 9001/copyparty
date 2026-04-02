@@ -30,7 +30,7 @@ Ls.hun = {
 			['G', 'lista / rács nézet'],
 			['T', 'ikon / indexkép váltás'],
 			['⇧ A/D', 'méret módosítása'],
-			['ctrl-K', 'kijelöltek törlése'],
+			['ctrl-K/Del', 'kijelöltek törlése'],
 			['ctrl-X', 'kivágás vágólapra'],
 			['ctrl-C', 'másolás vágólapra'],
 			['ctrl-V', 'beillesztés ide'],

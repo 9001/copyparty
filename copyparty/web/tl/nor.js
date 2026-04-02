@@ -30,7 +30,7 @@ Ls.nor = {
 			["G", "listevisning eller ikoner"],
 			["T", "miniatyrbilder på/av"],
 			["⇧ A/D", "ikonstørrelse"],
-			["ctrl-K", "slett valgte"],
+			["ctrl-K/Del", "slett valgte"],
 			["ctrl-X", "klipp ut valgte"],
 			["ctrl-C", "kopiér til utklippstavle"],
 			["ctrl-V", "lim inn (flytt/kopiér)"],

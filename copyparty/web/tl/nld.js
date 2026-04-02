@@ -33,7 +33,7 @@ Ls.nld = {
 			["G", "Verwissel tussen list / grid weergave"],
 			["T", "Verwissel tussen miniaturen / iconen"],
 			["⇧ A/D", "Thumbnail formaat"],
-			["ctrl-K", "Verwijder geselecteerde"],
+			["ctrl-K/Del", "Verwijder geselecteerde"],
 			["ctrl-X", "Knip selectie naar klembord"],
 			["ctrl-C", "Kopieer selectie naar klembord"],
 			["ctrl-V", "Hier plakken (verplaatsen/kopieëren)"],

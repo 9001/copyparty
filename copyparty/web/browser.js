@@ -40,7 +40,7 @@ if (1)
 				["G", "toggle list / grid view"],
 				["T", "toggle thumbnails / icons"],
 				["⇧ A/D", "thumbnail size"],
-				["ctrl-K", "delete selected"],
+				["ctrl-K/Del", "delete selected"],
 				["ctrl-X", "cut selection to clipboard"],
 				["ctrl-C", "copy selection to clipboard"],
 				["ctrl-V", "paste (move/copy) here"],
@@ -6244,7 +6244,7 @@ var ahotkeys = function (e) {
 	if (k == '?')
 		return hkhelp();
 
-	if (!sh && ctrl(e)) {
+	if (!sh && ctrl(e) || k.endsWith('Delete')) {
 		var sel = window.getSelection && window.getSelection() || {};
 		sel = sel && !sel.isCollapsed && sel.direction != 'none';
 
@@ -6257,7 +6257,7 @@ var ahotkeys = function (e) {
 		if (kl == 'v')
 			return fileman.d_paste(e);
 
-		if (kl == 'k')
+		if (kl == 'k' || k.endsWith('Delete'))
 			return fileman.delete(e);
 
 		return;

@@ -30,7 +30,7 @@ Ls.vie = {
 			["G", "chuyển đổi chế độ xem danh sách / lưới"],
 			["T", "chuyển đổi ảnh thu nhỏ / biểu tượng"],
 			["⇧ A/D", "kích thước ảnh thu nhỏ"],
-			["ctrl-K", "xoá mục đã chọn"],
+			["ctrl-K/Del", "xoá mục đã chọn"],
 			["ctrl-X", "cắt mục đã chọn vào bảng nhớ tạm"],
 			["ctrl-C", "sao chép mục đã chọn vào bảng nhớ tạm"],
 			["ctrl-V", "dán (di chuyển/sao chép) tại đây"],

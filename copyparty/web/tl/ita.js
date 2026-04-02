@@ -33,7 +33,7 @@ Ls.ita = {
 			["G", "alterna vista lista / griglia"],
 			["T", "alterna miniature / icone"],
 			["⇧ A/D", "dimensione miniature"],
-			["ctrl-K", "elimina selezionati"],
+			["ctrl-K/Del", "elimina selezionati"],
 			["ctrl-X", "taglia selezione negli appunti"],
 			["ctrl-C", "copia selezione negli appunti"],
 			["ctrl-V", "incolla (sposta/copia) qui"],

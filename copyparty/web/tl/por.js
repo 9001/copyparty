@@ -33,7 +33,7 @@ Ls.por = {
 			["G", "alternar entre visualização de lista / grade"],
 			["T", "alternar entre miniaturas / ícones"],
 			["⇧ A/D", "tamanho da miniatura"],
-			["ctrl-K", "excluir selecionados"],
+			["ctrl-K/Del", "excluir selecionados"],
 			["ctrl-X", "recortar seleção para a área de transferência"],
 			["ctrl-C", "copiar seleção para a área de transferência"],
 			["ctrl-V", "colar (mover/copiar) aqui"],

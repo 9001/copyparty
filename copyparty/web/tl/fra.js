@@ -33,7 +33,7 @@ Ls.fra = {
 			["G", "activer vue en liste / vue en grille"],
 			["T", "activer les miniatures / icônes"],
 			["⇧ A/D", "taille des miniatures"],
-			["ctrl-K", "suprimer la sélection"],
+			["ctrl-K/Del", "suprimer la sélection"],
 			["ctrl-X", "couper la sélection au presse-papier"],
 			["ctrl-C", "copier la sélection au presse-papier"],
 			["ctrl-V", "coller (déplacer/copier) ici"],

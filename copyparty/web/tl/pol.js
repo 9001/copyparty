@@ -33,7 +33,7 @@ Ls.pol = {
 			["G", "przełącz widok lista / siatka"],
 			["T", "przełącz miniaturki / ikony"],
 			["⇧ A/D", "wielkość miniaturki"],
-			["ctrl-K", "usuń zaznaczone"],
+			["ctrl-K/Del", "usuń zaznaczone"],
 			["ctrl-X", "wytnij zaznaczone do schowka"],
 			["ctrl-C", "skopiuj zaznaczone do schowka"],
 			["ctrl-V", "wklej (przenieś/skopiuj) tutaj"],

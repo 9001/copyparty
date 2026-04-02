@@ -33,7 +33,7 @@ Ls.fin = {
 			["G", "vaihda lista/kuvanäkymään"],
 			["T", "vaihda pienoiskuviin/kuvakkeisiin"],
 			["⇧ A/D", "pienoiskuvien koko"],
-			["ctrl-K", "poista valitut"],
+			["ctrl-K/Del", "poista valitut"],
 			["ctrl-X", "siirrä valitut leikepöydälle"],
 			["ctrl-C", "kopioi valitut leikepöydälle"],
 			["ctrl-V", "siirrä tai kopioi tähän"],

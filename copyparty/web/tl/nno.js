@@ -30,7 +30,7 @@ Ls.nno = {
 			["G", "listevisning eller ikon"],
 			["T", "miniatyrbilder på/av"],
 			["⇧ A/D", "ikonstorleik"],
-			["ctrl-K", "slett valde"],
+			["ctrl-K/Del", "slett valde"],
 			["ctrl-X", "klipp ut valde"],
 			["ctrl-C", "kopiér åt utklippstavle"],
 			["ctrl-V", "lim inn (flytt/kopiér)"],

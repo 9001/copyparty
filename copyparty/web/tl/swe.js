@@ -33,7 +33,7 @@ Ls.swe = {
 			["G", "växla mellan listvy / rutnät"],
 			["T", "växla mellan miniatyrer / ikoner"],
 			["⇧ A/D", "miniatyrstorlek"],
-			["ctrl-K", "radera urval"],
+			["ctrl-K/Del", "radera urval"],
 			["ctrl-X", "klipp urval till urklipp"],
 			["ctrl-C", "kopiera urval till urklipp"],
 			["ctrl-V", "klistra in (kopiera/flytta) hit"],

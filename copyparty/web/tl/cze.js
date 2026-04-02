@@ -33,7 +33,7 @@ Ls.cze = {
 			["G", "přepnout seznam / zobrazení mřížky"],
 			["T", "přepnout náhledy / ikony"],
 			["⇧ A/D", "velikost náhledů"],
-			["ctrl-K", "smazat vybrané"],
+			["ctrl-K/Del", "smazat vybrané"],
 			["ctrl-X", "vyjmout výběr do schránky"],
 			["ctrl-C", "kopírovat výběr do schránky"],
 			["ctrl-V", "vložit (přesunout/kopírovat) zde"],

@@ -33,7 +33,7 @@ Ls.spa = {
 			["G", "alternar vista de lista / cuadrícula"],
 			["T", "alternar miniaturas / iconos"],
 			["⇧ A/D", "tamaño de miniatura"],
-			["ctrl-K", "eliminar seleccionados"],
+			["ctrl-K/Del", "eliminar seleccionados"],
 			["ctrl-X", "cortar selección al portapapeles"],
 			["ctrl-C", "copiar selección al portapapeles"],
 			["ctrl-V", "pegar (mover/copiar) aquí"],

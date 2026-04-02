@@ -33,7 +33,7 @@ Ls.tur = {
 			["G", "liste / ızgara görünümü arasında geçiş yap"],
 			["T", "küçük resimler / simgeler arasında geçiş yap"],
 			["⇧ A/D", "küçük resim boyutu"],
-			["ctrl-K", "seçileni sil"],
+			["ctrl-K/Del", "seçileni sil"],
 			["ctrl-X", "seçimi panoya kes"],
 			["ctrl-C", "seçimi panoya kopyala"],
 			["ctrl-V", "buraya yapıştır (taşı/kopyala)"],
