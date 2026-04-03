@@ -1158,8 +1158,8 @@ html.y #widget.open {
 }
 #wtgrid, #wtgrid2 {
 	font-size: .75em;
-	padding: .1em;
-	top: -.6em;
+	padding: 0;
+	top: -.7em;
 	display: inline-flex;
 }
 #wtico {
@@ -1438,9 +1438,6 @@ html.y #ops svg circle {
 	cursor: pointer;
 
 	display: block;
-}
-.on div{
-	background: var(--bg-u3);
 }
 #ops {
 	padding: .3em .6em;
@@ -4390,6 +4387,8 @@ html.e #detree {
 .listViewIcon{
 	width: 1.7em;
 	height: 1.7em;
+	padding: .2em;
+	top: 0;
 }
 .gridViewIcon{
 	display: grid;
@@ -4410,13 +4409,23 @@ html.e #detree {
 	margin-left: .8em;
 	background: var(--a);
 	border-radius: .1em;
+	max-height: .15em;
 }
+.on div{
+	background: var(--bg-u3);
+}
+
 .listRow::before{
 	position: absolute;
-	content: '▢';
-	text-shadow: none;
-	font-weight: bold;
-	font-size: x-small;
-	margin-left: -1em;
-	margin-top: -.7em;
+	content: '';
+	margin-left: -.7em;
+	margin-top: -.2em;
+	width: .3em;
+	height: .3em;
+	border: var(--a) solid .15em;
+	border-radius: .1em;
 }
+.on ::before{
+	border-color: var(--bg-u3);
+}
+
