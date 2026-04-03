@@ -7061,12 +7061,12 @@ var treectl = (function () {
 
 		if (fixedpos && atop >= 0) {
 			tree.style.position = 'absolute';
-			//tree.style.bottom = '';
+			tree.style.bottom = '';
 			fixedpos = false;
 		}
 		else if (!fixedpos && atop < 0) {
 			tree.style.position = 'fixed';
-			//tree.style.height = 'auto';
+			tree.style.height = 'auto';
 			fixedpos = true;
 		}
 

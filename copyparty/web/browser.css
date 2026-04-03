@@ -1633,7 +1633,6 @@ input.ssconf_v {
 	position: absolute;
 	left: 0;
 	bottom: 0;
-	height: auto !important;
 	overflow-x: hidden;
 	overflow-y: auto;
 	-ms-scroll-chaining: none;
@@ -1924,7 +1923,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	border-radius: .3em;
 	padding: .2em .5em;
 	line-height: 2.3em;
-	margin: 0 0 1.5em 0;
+	margin-bottom: 1.5em;
 }
 #hdoc,
 #ghead {
