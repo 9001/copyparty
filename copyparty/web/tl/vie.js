@@ -102,9 +102,9 @@ Ls.vie = {
 	"ht_and": " và ",
 
 	"goh": "bảng điều khiển",
-	"gop": 'thư mục trước">trước',
-	"gou": 'thư mục cha">lên',
-	"gon": 'thư mục sau">tiếp',
+	"gop": 'thư mục trước',
+	"gou": 'thư mục cha',
+	"gon": 'thư mục sau',
 	"logout": "Đăng xuất ",
 	"login": "Đăng nhập",
 	"access": "quyền truy cập",
