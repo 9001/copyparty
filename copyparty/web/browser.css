@@ -564,6 +564,9 @@ html,body,tr,th,td,#files,a,#blogout {
 	padding: 0;
 	border: none;
 }
+#files {
+	margin-top: .2em;
+}
 html {
 	color: var(--fg);
 	background: var(--bgg);
@@ -3292,6 +3295,9 @@ html.d #treepar {
 
 /* basically a phone layout */
 @media (max-width: 50em){
+	body {
+		margin: 1em;
+	}
 	#topBar {
 		display: block;
 	}
@@ -3309,7 +3315,7 @@ html.d #treepar {
 		display: block;
 	}
 	#srch_namev {
-		margin: .5em .5em 0 .5em;
+		margin: .5em 1em 0 1em;
 	}
 	#wrap {
 		margin-right: 0;
