@@ -668,13 +668,13 @@ a:hover {
 }
 .s0:after,
 .s1:after {
-	content: '⌄';
-	margin-left: -.15em;
+	content: '⏷';
+	/* margin-left: -.15em; */
 }
 .s0r:after,
 .s1r:after {
-	content: '⌃';
-	margin-left: -.15em;
+	content: '⏶';
+	/* margin-left: -.15em; */
 }
 .s0:after,
 .s0r:after {
