@@ -1422,7 +1422,7 @@ html.y #ops svg circle {
 }
 #headerArea{
 	display: flex;
-	margin: .2em;
+	margin: .5em .5em -.5em .5em;
 }
 .hamburger_line{
 	height: .2em;
@@ -2347,14 +2347,14 @@ html.y #bbox-overlay figcaption a {
 #bbox-overlay button {
 	cursor: pointer;
 	outline: none;
-	padding: 0 .3em;
-	margin: 0 .4em;
+	padding: 0 .4em;
+	margin: 0 .2em;
 	border: 0;
 	border-radius: 15%;
 	background: rgba(50, 50, 50, 0.5);
 	color: rgba(255,255,255,0.7);
 	font-size: 1.4em;
-	line-height: 1.4em;
+	line-height: 2em;
 	vertical-align: top;
 	font-variant: small-caps;
 }
@@ -2371,7 +2371,7 @@ html.y #bbox-overlay figcaption a {
 }
 #bbox-btns {
 	top: .5em;
-	right: 2%;
+	right: .5em;
 	position: fixed;
 }
 #bbox-halp {
@@ -3304,6 +3304,9 @@ html.d #treepar {
 	#topBar {
 		display: block;
 	}
+	#headerArea {
+		margin: .2em;
+	}
 	#ops {
 		margin: .5em !important;
 		border-radius: .3em !important;
@@ -3328,6 +3331,9 @@ html.d #treepar {
 	}
 	#ggrid {
 		margin: 0em -0.25em !important;
+	}
+	#ghead {
+		margin: .5em;
 	}
 }
 @media (max-width: 32em) {
