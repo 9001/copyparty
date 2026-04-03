@@ -16,7 +16,7 @@ html {
 }
 h1 {
 	border-bottom: 1px solid #ccc;
-	margin: 2em 0 .4em 0;
+	margin: 1em 0 .4em 0;
 	padding: 0;
 	line-height: 1em;
 	font-weight: normal;
@@ -41,8 +41,8 @@ td a {
 #wb,
 #w {
 	color: #fff;
-	background: #940;
-	border-color: #b70;
+	background: rgb(54, 153, 0);
+	border-color: rgb(106, 239, 34);
 }
 .af,
 .logout {
@@ -208,8 +208,8 @@ html.z a {
 html.z .logout,
 html.z #lo,
 html.z a.r {
-	background: #804;
-	border-color: #c28;
+	background: rgb(163, 0, 3);
+	border-color: rgb(214, 27, 27);
 }
 html.z a.g {
 	background: #470;
@@ -239,8 +239,8 @@ input::placeholder {
 #x,
 html.z input {
 	color: #fff;
-	background: #626;
-	border-color: #c2c;
+	background: rgb(39, 130, 204);
+	border-color: rgb(72, 182, 255);
 }
 html.z input::placeholder {
 	color: #fff;
@@ -256,4 +256,13 @@ html.bz {
 }
 html.bz .vols img {
 	filter: sepia(0.8) hue-rotate(180deg);
+}
+
+#homebtn {
+	font-size: x-large; 
+	top: 1em;
+	left: 1em;
+	border-radius: .3em; 
+	background: #333;
+	position: absolute;
 }
