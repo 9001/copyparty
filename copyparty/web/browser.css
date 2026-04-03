@@ -4188,3 +4188,10 @@ html.e #detree {
     pointer-events: none;
 	z-index: 99;
 }
+
+.overlay_plus{
+	position: absolute;
+	margin: -1.7em 0 0 .8em;
+	color: var(--fg);
+}
+
