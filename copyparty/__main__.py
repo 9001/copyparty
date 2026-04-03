@@ -1877,7 +1877,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--nsort", action="store_true", help="default-enable natural sort of filenames with leading numbers (volflag=nsort)")
     ap2.add_argument("--hsortn", metavar="N", type=int, default=2, help="number of sorting rules to include in media URLs by default (volflag=hsortn)")
     ap2.add_argument("--see-dots", action="store_true", help="default-enable seeing dotfiles; only takes effect if user has the necessary permissions")
-    ap2.add_argument("--qdel", metavar="LVL", type=int, default=2, help="number of confirmations to show when deleting files (2/1/0)")
+    ap2.add_argument("--qdel", metavar="LVL", type=int, default=1, help="number of confirmations to show when deleting files (2/1/0)")
     ap2.add_argument("--dlni", action="store_true", help="force download (don't show inline) when files are clicked (volflag:dlni)")
     ap2.add_argument("--unlist", metavar="REGEX", type=u, default="", help="don't show files/folders matching \033[33mREGEX\033[0m in file list. WARNING: Purely cosmetic! Does not affect API calls, just the browser. Example: [\033[32m\\.(js|css)$\033[0m] (volflag=unlist)")
     ap2.add_argument("--dothidden", action="store_true", help="hide specific files in a folder by listing them in a file named .hidden -- WARNING: Mostly cosmetic! Download-as-zip/tar will still download them. Do not rely on this for security (volflag=dothidden)")
