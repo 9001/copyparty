@@ -3323,6 +3323,9 @@ html.d #treepar {
 	#wfp {
 		margin-left: .1em !important;
 	}
+	#ggrid {
+		margin: 0em -0.25em !important;
+	}
 }
 @media (max-width: 32em) {
 	#u2conf {
@@ -3399,7 +3402,7 @@ html.d #treepar {
 @supports (display: grid) and (gap: 1em) {
 	#ggrid {
 		display: grid;
-		margin: 0em -0.25em;
+		margin: 0;
 		padding: unset;
 		grid-template-columns: repeat(auto-fit,var(--grid-sz));
 		justify-content: center;
