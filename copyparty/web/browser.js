@@ -9841,12 +9841,10 @@ function reload_browser() {
 	filecols.set_style();
 
 	var parts = get_evpath().split('/'),
-		rm = ebi('entree'),
 		ftab = ebi('files'),
 		link = '', o;
 
-	while (rm.nextSibling)
-		rm.parentNode.removeChild(rm.nextSibling);
+	ebi('path').innerHTML = "";
 
 	for (var a = 0; a < parts.length - 1; a++) {
 		link += parts[a] + '/';
