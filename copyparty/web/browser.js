@@ -7078,7 +7078,8 @@ var treectl = (function () {
 				treeh = winh - atop;
 
 			tree.style.top = top + 'px';
-			tree.style.height = treeh < 10 ? '' : Math.floor(treeh) + 'px';
+			// setting the height causes scrollbars to appear often because it's not exact most of the time
+			tree.style.height = '';// = treeh < 10 ? '' : Math.floor(treeh) + 'px';
 		}
 	}
 	timer.add(onscroll2, true);
