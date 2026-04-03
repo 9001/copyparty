@@ -2471,7 +2471,7 @@ html.y #bbox-overlay figcaption a {
 	display: table;
 	left: 10%;
 	width: 78%;
-	height: 26%;
+	height: 78%;
 	margin: 0;
 	font-size: 3em;
 	font-weight: bold;
@@ -2490,7 +2490,7 @@ html.y #bbox-overlay figcaption a {
 	background: rgba(24, 24, 24, 0.7);
 	left: 8%;
 	width: 82%;
-	height: 32%;
+	height: 82%;
 	margin: -3vh 0;
 }
 .dropdesc.hl.err {
@@ -2535,18 +2535,21 @@ html.y #bbox-overlay figcaption a {
 	height: 100%;
 }
 #up_dz {
-	bottom: 12%;
+	position: absolute;
+	bottom: 0;
 }
 #srch_dz {
-	display: none;
-	top: 50%;
+	position: absolute;
+	top: 0;
 }
 #up_zd {
+	position: absolute;
 	top: 12%;
 	bottom: 12%;
 }
 #srch_zd {
-	display: none;
+	position: absolute;
+	top: 12%;
 	bottom: 12%;
 }
 .dropdesc span {

@@ -1054,6 +1054,20 @@ function up2k_init(subtle) {
     function onoverbtn(e) {
         return onovercmn(this, e, true);
     }
+    function checkDropMode(){
+        if(ebi('fsearch')?.checked){
+            ebi('srch_zd').style.display = '';
+            ebi('up_zd').style.display = 'none';
+            ebi('srch_dz').style.display = '';
+            ebi('up_dz').style.display = 'none';
+        }
+        else{
+            ebi('srch_zd').style.display = 'none';
+            ebi('up_zd').style.display = '';
+            ebi('srch_dz').style.display = 'none';
+            ebi('up_dz').style.display = '';
+        }
+    }
     function onovercmn(self, e, btn) {
         try {
             var ok = false, dt = e.dataTransfer.types;
@@ -1087,6 +1101,7 @@ function up2k_init(subtle) {
         if (btn)
             return;
 
+        checkDropMode();
         clmod(ebi('drops'), 'vis', 1);
         var v = self.getAttribute('v');
         if (v)
@@ -1100,6 +1115,7 @@ function up2k_init(subtle) {
             clmod(ebi(v), 'hl');
 
         if (--nenters <= 0) {
+            checkDropMode();
             clmod(ebi('drops'), 'vis');
             clmod(ebi('up_dz'), 'hl');
             clmod(ebi('srch_dz'), 'hl');
@@ -1158,10 +1174,10 @@ function up2k_init(subtle) {
         ev(e);
         nenters = 0;
         offdrag.call(this);
-        var dz = this && this.getAttribute('id');
-        if (!dz && e && e.clientY)
-            // cuo2duo fallback
-            dz = e.clientY < window.innerHeight / 2 ? 'up_dz' : 'srch_dz';
+        // var dz = this && this.getAttribute('id');
+        // if (!dz && e && e.clientY)
+        //     // cuo2duo fallback
+        //     dz = e.clientY < window.innerHeight / 2 ? 'up_dz' : 'srch_dz';
 
         var err = this.getAttribute('err');
         if (err)
@@ -1169,10 +1185,11 @@ function up2k_init(subtle) {
 
         toast.inf(0, L.u_scan);
 
-        if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
-            tgl_fsearch();
+        // if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
+        //     tgl_fsearch();
 
-        if (!QS('#op_up2k.act'))
+        //if (!QS('#op_up2k.act'))
+        if(!uc.fsearch)
             goto('up2k');
 
         var files,
