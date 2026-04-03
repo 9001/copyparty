@@ -577,7 +577,7 @@ window.baguetteBox = (function () {
                 sel = true;
 
         ebi('bbox-overlay').style.background = sel ?
-            'rgba(153,34,85,0.7)' : '';
+            'rgba(153,85,34,0.7)' : '';
 
         img.style.borderRadius = sel ? '1em' : '';
         btnState(btnSel, sel);
@@ -585,9 +585,9 @@ window.baguetteBox = (function () {
 
     function btnState(btn, sel) {
         btn.style.color = sel ? '#fff' : '';
-        btn.style.background = sel ? '#d48' : '';
-        btn.style.textShadow = sel ? '1px 1px 0 #b38' : '';
-        btn.style.boxShadow = sel ? '.15em .15em 0 #502' : '';
+        btn.style.background = sel ? '#d84' : '';
+        btn.style.textShadow = sel ? '1px 1px 0 #b83' : '';
+        btn.style.boxShadow = sel ? '.15em .15em 0 #520' : '';
     }
 
     function keyUpHandler(e) {

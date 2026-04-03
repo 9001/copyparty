@@ -2270,6 +2270,9 @@ var favico = (function () {
             fg = dv.length < 2 ? 'fc5' : dv[1].toLowerCase() == 'none' ? '' : dv[1],
             bg = dv.length < 3 ? '222' : dv[2].toLowerCase() == 'none' ? '' : dv[2];
 
+        if(dv.length > 0)
+            ebi('srv_name')?.prepend(dv[0] + ' ');
+
         scfg_bind(r, 'txt', 'icot', dv[0], r.upd);
         scfg_bind(r, 'fg', 'icof', fg, r.upd);
         scfg_bind(r, 'bg', 'icob', bg, r.upd);

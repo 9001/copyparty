@@ -6976,15 +6976,19 @@ class HttpCli(object):
             elif not self.can_write:
                 return self.tx_404(True)
 
+        srv_name = ""
         srv_info = []
 
         try:
             if not self.args.nih:
+                srv_name = self.args.name_html
                 srv_info.append(self.args.name_html)
         except:
             self.log("#wow #whoa")
 
         zi = vn.flags["du_iwho"]
+        h1 = ""
+        h2 = ""
         if zi and (
             zi == 9
             or (zi == 7 and self.uname != "*")
@@ -7062,6 +7066,9 @@ class HttpCli(object):
             "files": [],
             "taglist": [],
             "srvinf": srv_infot,
+            "space_free": float(h1.split()[0]),
+            "space_total": float(h2.split()[0]),
+            "space_unit": h2.split()[1],
             "acct": self.uname,
             "perms": perms,
             "cfg": vn.js_ls,
@@ -7085,6 +7092,10 @@ class HttpCli(object):
             "url_suf": url_suf,
             "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
             "srv_info": srv_infot,
+            "srv_name": srv_name,
+            "space_free": float(h1.split()[0]),
+            "space_total": float(h2.split()[0]),
+            "space_unit": h2.split()[1],
             "dtheme": self.args.theme,
         }
 
