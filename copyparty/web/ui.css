@@ -371,9 +371,14 @@ html.y #tth {
 *:focus+label,
 #pctl *:focus,
 .btn:focus {
-	box-shadow: 0 .1em .2em #fc0 inset;
-	outline: #fc0 solid .1em;
+	/* box-shadow: 0 .1em .2em #fc0 inset; */
+	animation: outline_fadeOut 1s;
 	border-radius: .2em;
+}
+@keyframes outline_fadeOut {
+0% {outline: #fc0 solid .1em;}
+30% {outline: rgba(255, 204, 0, 0.755) solid .1em;}
+100% {outline: transparent solid .1em;}
 }
 html.y *:focus,
 html.y *:focus+label,
