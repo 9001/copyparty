@@ -313,11 +313,11 @@ window.baguetteBox = (function () {
                 '<button id="bbox-readdir" type="button" tt="a">ltr</button>' +
                 '<button id="bbox-rotl" type="button">↶</button>' +
                 '<button id="bbox-rotr" type="button">↷</button>' +
-                '<button id="bbox-tsel" type="button">sel</button>' +
+                '<button id="bbox-tsel" type="button">☑️sel</button>' +
                 '<button id="bbox-full" type="button" tt="full-screen">⛶</button>' +
-                '<button id="bbzoom" type="button" tt="zoom/stretch">z</button>' +
+                '<button id="bbzoom" type="button" tt="zoom/stretch smaller images to fill screen">↕</button>' +
                 '<button id="bbox-vmode" type="button" tt="a"></button>' +
-                '<button id="bbox-close" type="button" aria-label="Close">X</button>' +
+                '<button id="bbox-close" type="button" aria-label="Close">✕</button>' +
                 '</div></div>'
             );
             overlay = ctr.firstChild;
