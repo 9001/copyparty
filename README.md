@@ -673,7 +673,7 @@ the browser has the following hotkeys  (always qwerty)
 * `G` toggle list / [grid view](#thumbnails) -- same as `田` bottom-right
 * `T` toggle thumbnails / icons
 * `ESC` close various things
-* `ctrl-K` delete selected files/folders
+* `ctrl-K/Del` delete selected files/folders
 * `ctrl-X` cut selected files/folders
 * `ctrl-C` copy selected files/folders to clipboard
 * `ctrl-V` paste (move/copy)
