@@ -3399,7 +3399,7 @@ html.d #treepar {
 @supports (display: grid) and (gap: 1em) {
 	#ggrid {
 		display: grid;
-		margin: 0em 0.25em;
+		margin: 0em -0.25em;
 		padding: unset;
 		grid-template-columns: repeat(auto-fit,var(--grid-sz));
 		justify-content: center;
