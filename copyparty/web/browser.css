@@ -41,8 +41,8 @@
 	--btn-fg: var(--a);
 	--btn-bg: rgba(128,128,128,0.15);
 	--btn-h-fg: var(--a-hil);
-	--btn-h-bg: #805;
-	--btn-1-fg: #400;
+	--btn-h-bg: #850;
+	--btn-1-fg: rgb(25, 19, 12);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
 	--btn-h-bb: var(--btn-bb);
