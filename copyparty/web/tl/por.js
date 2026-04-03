@@ -107,9 +107,9 @@ Ls.por = {
 	"ht_and": " e ",
 
 	"goh": "painel de controle",
-	"gop": 'pai anterior">anterior',
-	"gou": 'pasta pai">acima',
-	"gon": 'próxima pasta">próximo',
+	"gop": 'pai anterior',
+	"gou": 'pasta pai',
+	"gon": 'próxima pasta',
 	"logout": "Sair ",
 	"login": "Fazer login",
 	"access": " acesso",

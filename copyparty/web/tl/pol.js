@@ -110,9 +110,9 @@ Ls.pol = {
 	"ht_and": " i ",
 
 	"goh": "panel sterowania",
-	"gop": 'poprzedni plik/folder">poprzedni',
-	"gou": 'nadrzędny folder">w górę',
-	"gon": 'następny folder">następny',
+	"gop": 'poprzedni plik/folder',
+	"gou": 'nadrzędny folder',
+	"gon": 'następny folder',
 	"logout": "Wyloguj ",
 	"login": "Zaloguj się", //m
 	"access": " dostęp",

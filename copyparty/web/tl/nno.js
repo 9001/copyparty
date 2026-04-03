@@ -104,9 +104,9 @@ Ls.nno = {
 	"ht_and": " og ",
 
 	"goh": "kontrollpanel",
-	"gop": 'navigér åt mappa før den her">forr.',
-	"gou": 'navigér eitt nivå opp">opp',
-	"gon": 'navigér åt mappa etter den her">neste',
+	"gop": 'navigér åt mappa før den her',
+	"gou": 'navigér eitt nivå opp',
+	"gon": 'navigér åt mappa etter den her',
 	"logout": "Logg ut ",
 	"login": "Logg inn",
 	"access": " åtgang",

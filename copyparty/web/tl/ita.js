@@ -107,9 +107,9 @@ Ls.ita = {
 	"ht_and": " e ",
 
 	"goh": "control-panel",
-	"gop": 'cartella sorella precedente">prec',
-	"gou": 'cartella genitore">su',
-	"gon": 'prossima cartella">succ',
+	"gop": 'cartella sorella precedente',
+	"gou": 'cartella genitore',
+	"gon": 'prossima cartella',
 	"logout": "Logout ",
 	"login": "Accedi", //m
 	"access": " accesso",

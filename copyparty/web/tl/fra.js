@@ -107,9 +107,9 @@ Ls.fra = {
 	"ht_and": " et ",
 
 	"goh": "panneau-de-commande",
-	"gop": 'élément "frère" précédent">précédent',
-	"gou": 'dossier parent">haut',
-	"gon": 'dossier suivant">suivant',
+	"gop": 'élément "frère" précédent',
+	"gou": 'dossier parent',
+	"gon": 'dossier suivant',
 	"logout": "Déconnexion ",
 	"login": "Se connecter", //m
 	"access": " accès",

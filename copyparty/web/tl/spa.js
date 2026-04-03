@@ -107,9 +107,9 @@ Ls.spa = {
 	"ht_and": " y ",
 
 	"goh": "panel de control",
-	"gop": 'hermano anterior">anterior',
-	"gou": 'carpeta de nivel superior">subir',
-	"gon": 'siguiente carpeta">siguiente',
+	"gop": 'hermano anterior',
+	"gou": 'carpeta de nivel superior',
+	"gon": 'siguiente carpeta',
 	"logout": "Cerrar sesión ",
 	"login": "Iniciar sesión", //m
 	"access": " acceso",

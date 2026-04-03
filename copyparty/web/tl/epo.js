@@ -107,9 +107,9 @@ Ls.epo = {
 	"ht_and": " kaj ",
 
 	"goh": "stirpanelo",
-	"gop": 'malsekva dosierujo">malsekva',
-	"gou": 'supra dosierujo">supren',
-	"gon": 'sekva dosierujo">sekva',
+	"gop": 'malsekva dosierujo',
+	"gou": 'supra dosierujo',
+	"gon": 'sekva dosierujo',
 	"logout": "Adiaŭi kiel ",
 	"login": "Ensaluti",
 	"access": " atingo",

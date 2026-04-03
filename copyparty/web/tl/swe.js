@@ -107,9 +107,9 @@ Ls.swe = {
 	"ht_and": " och ",
 
 	"goh": "kontrollpanel",
-	"gop": 'föregående mapp">föreg.',
-	"gou": 'överordnad mapp">upp',
-	"gon": 'nästa mapp">nästa',
+	"gop": 'föregående mapp',
+	"gou": 'överordnad mapp',
+	"gon": 'nästa mapp',
 	"logout": "Logga ut ",
 	"login": "Logga in", //m
 	"access": "-rättighet",

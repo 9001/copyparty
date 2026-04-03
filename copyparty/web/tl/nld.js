@@ -107,9 +107,9 @@ Ls.nld = {
 	"ht_and": " en ",
 
 	"goh": "Beheer-paneel",
-	"gop": 'Vorige map">Vorige',
-	"gou": 'Bovenligende map">Omhoog',
-	"gon": 'Volgende map">Volgende',
+	"gop": 'Vorige map',
+	"gou": 'Bovenligende map',
+	"gon": 'Volgende map',
 	"logout": "Uitloggen ",
 	"login": "Inloggen", //m
 	"access": " Toegang",

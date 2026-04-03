@@ -111,9 +111,9 @@ Ls.cze = {
 	"ht_and": " a ",
 
 	"goh": "ovládací panel",
-	"gop": 'předchozí sourozenec">předchozí',
-	"gou": 'nadřazená složka">nahoru',
-	"gon": 'následující složka">následující',
+	"gop": 'předchozí sourozenec',
+	"gou": 'nadřazená složka',
+	"gon": 'následující složka',
 	"logout": "Odhlásit ",
 	"login": "Přihlásit se", //m
 	"access": " přístup",

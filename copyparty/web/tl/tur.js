@@ -107,9 +107,9 @@ Ls.tur = {
 	"ht_and": " ve ",
 
 	"goh": "kontrol paneli",
-	"gop": 'önceki kardeş">önceki',
-	"gou": 'üst klasör">üst',
-	"gon": 'sonraki klasör">sonraki',
+	"gop": 'önceki kardeş',
+	"gou": 'üst klasör',
+	"gon": 'sonraki klasör',
 	"logout": "Çıkış ",
 	"login": "Giriş",
 	"access": " erişim",

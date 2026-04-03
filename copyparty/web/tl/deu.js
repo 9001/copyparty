@@ -107,9 +107,9 @@ Ls.deu = {
 	"ht_and": " und ",
 
 	"goh": "Einstellungen",
-	"gop": 'zum vorherigen Ordner springen">vorh.',
-	"gou": 'zum übergeordneter Ordner springen">hoch',
-	"gon": 'zum nächsten Ordner springen">nächst.',
+	"gop": 'zum vorherigen Ordner springen',
+	"gou": 'zum übergeordneter Ordner springen',
+	"gon": 'zum nächsten Ordner springen',
 	"logout": "Abmelden ",
 	"login": "Anmelden",
 	"access": " Zugriff",

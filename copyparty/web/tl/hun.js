@@ -109,9 +109,9 @@ Ls.hun = {
 	"ht_and": ' és ',
 
 	"goh": 'irányítópult',
-	"gop": 'előző mappába">előző',
-	"gou": 'szülőmappa">fel',
-	"gon": 'következő mappába">következő',
+	"gop": 'előző mappába',
+	"gou": 'szülőmappa',
+	"gon": 'következő mappába',
 	"logout": 'Kilépés ',
 	"login": 'Belépés',
 	"access": ' hozzáférés',

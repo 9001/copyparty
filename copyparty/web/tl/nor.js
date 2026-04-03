@@ -104,9 +104,9 @@ Ls.nor = {
 	"ht_and": " og ",
 
 	"goh": "kontrollpanel",
-	"gop": 'naviger til mappen før denne">forr.',
-	"gou": 'naviger ett nivå opp">opp',
-	"gon": 'naviger til mappen etter denne">neste',
+	"gop": 'naviger til mappen før denne',
+	"gou": 'naviger ett nivå opp',
+	"gon": 'naviger til mappen etter denne',
 	"logout": "Logg ut ",
 	"login": "Logg inn",
 	"access": " tilgang",

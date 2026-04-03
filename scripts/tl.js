@@ -139,9 +139,9 @@ Ls.hmn = {
 	"ht_and": " and ",
 
 	"goh": "control-panel",
-	"gop": 'previous sibling">prev',
-	"gou": 'parent folder">up',
-	"gon": 'next folder">next',
+	"gop": 'previous sibling',
+	"gou": 'parent folder',
+	"gon": 'next folder',
 	"logout": "Logout ",
 	"login": "Login",
 	"access": " access",

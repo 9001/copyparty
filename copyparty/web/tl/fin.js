@@ -107,9 +107,9 @@ Ls.fin = {
 	"ht_and": " ja ",
 
 	"goh": "hallintapaneeli",
-	"gop": 'viereinen hakemisto">edell',
-	"gou": 'ylempi hakemisto">ylös',
-	"gon": 'seuraava hakemisto">seur',
+	"gop": 'viereinen hakemisto',
+	"gou": 'ylempi hakemisto',
+	"gon": 'seuraava hakemisto',
 	"logout": "Kirjaudu ulos ",
 	"login": "Kirjaudu sisään",
 	"access": " -oikeudet",
