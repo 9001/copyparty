@@ -746,7 +746,7 @@ modal.load();
 
 // toolbar
 ebi('ops').innerHTML = (
-	'<a href="#" id="opa_x" data-dest="" tt="' + L.ot_close + '">--</a>' +
+	//'<a href="#" id="opa_x" data-dest="" tt="' + L.ot_close + '">--</a>' +
 	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
@@ -768,7 +768,7 @@ ebi('widget').innerHTML = (
 	'<span id="wfm"><a' +
 	' href="#" id="fshr" tt="' + L.wt_shr + '">📨<span>share</span></a><a' +
 	' href="#" id="fren" tt="' + L.wt_ren + '">✎<span>name</span></a><a' +
-	' href="#" id="fdel" tt="' + L.wt_del + '">⌫<span>del.</span></a><a' +
+	' href="#" id="fdel" tt="' + L.wt_del + '">🗑️<span>del.</span></a><a' +
 	' href="#" id="fcut" tt="' + L.wt_cut + '">✂<span>cut</span></a><a' +
 	' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
 	' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
@@ -786,7 +786,6 @@ ebi('widget').innerHTML = (
 	' href="#" id="m3ua" tt="' + L.wt_m3ua + '">📻<span>add</span></a><a' +
 	' href="#" id="m3uc" tt="' + L.wt_m3uc + '">📻<span>copy</span></a>' +
 	'</span><a' +
-	'	href="#" id="wtgrid" tt="' + L.wt_grid + '">田</a><a' +
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
@@ -1014,7 +1013,6 @@ ebi('op_cfg').innerHTML = (
 // navpane
 ebi('tree').innerHTML = (
 	'<div id="treeh">\n' +
-	'	<a href="#" id="detree" tt="' + L.tt_detree + '">🍞...</a>\n' +
 	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
 	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
 	'	<a href="#" class="btn" id="visdir" tt="' + L.tt_visdir + '">🎯</a>\n' +
@@ -1029,8 +1027,8 @@ ebi('tree').innerHTML = (
 	'<ul class="ntree" id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
 );
+ebi('thx_ff').before(ebi('acc_button'));
 clmod(ebi('tree'), 'sbar', 1);
-ebi('entree').setAttribute('tt', L.tt_entree);
 ebi('goh').textContent = L.goh;
 QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
 QS('#op_new_md input[type="submit"]').value = L.ab_mkdoc;
@@ -1074,6 +1072,7 @@ ebi('rcm').innerHTML = (
 		if (v)
 			ops[a].href = '#v=' + v;
 	}
+	ebi('acc_settings').onclick = opclick;
 })();
 
 
@@ -3568,7 +3567,7 @@ function eval_hash() {
 			d.setAttribute('href', '#');
 			d.setAttribute('class', 'ayjump');
 			d.innerHTML = a ? L.ay_path : L.ay_files;
-			document.body.insertBefore(d, ebi('ops'));
+			document.body.insertBefore(d, ebi('topBar'));
 			d.onclick = function (e) {
 				ev(e);
 				if (a)
@@ -3579,10 +3578,6 @@ function eval_hash() {
 					d.focus();
 			};
 		})(a);
-
-	// account-info label
-	var d = mknod('div', 'acc_info');
-	document.body.insertBefore(d, ebi('ops'));
 
 	// folder nav
 	ebi('wfp').appendChild(mknod('span', null,
@@ -5465,8 +5460,9 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
-		'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
+		'<a href="#" id="wtgrid" tt="' + L.wt_grid + '"></a>' +
 		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
+		'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
 		'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
 		'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
 		'<span>' + L.gt_zoom + ': ' +
@@ -5483,6 +5479,17 @@ var thegrid = (function () {
 	);
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
 	var ggrid = ebi('ggrid');
+
+	ebi('wtgrid').appendChild(ebi('gridicon_template'));
+	ebi('wtgrid').appendChild(ebi('listicon_template'));
+
+	var clone = ebi('wtgrid').cloneNode(true);
+	clone.id = 'wtgrid2';
+	clone.childNodes.forEach((el)=>{
+		clmod(el, 'on', 't');
+	});
+
+	ebi('files').before(clone);
 
 	var r = {
 		'sz': clamp(fcfg_get('gridsz', 10), 4, 80),
@@ -5533,6 +5540,7 @@ var thegrid = (function () {
 		var vis = has(perms, "read");
 		gfiles.style.display = vis && r.en ? '' : 'none';
 		lfiles.style.display = vis && !r.en ? '' : 'none';
+		ebi('wtgrid2').style.display = lfiles.style.display;
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
 		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
@@ -5945,6 +5953,8 @@ var thegrid = (function () {
 		vbar.onresize();
 	});
 	ebi('wtgrid').onclick = ebi('griden').onclick;
+	ebi('wtgrid2').onclick = ebi('griden').onclick;
+	ebi('listicon_template').onclick = ebi('griden').onclick;
 
 	return r;
 })();
@@ -6366,7 +6376,7 @@ var search_ui = (function () {
 		],
 		[
 			L.s_fn,
-			["name", "name", L.s_f1, "30", ".exe$"]
+			["name", "name", L.s_f1, "15", ".exe$"]
 		],
 		[
 			L.s_ta,
@@ -6418,6 +6428,10 @@ var search_ui = (function () {
 		o[a].oninput = ev_search_input;
 		o[a].onkeydown = ev_search_keydown;
 	}
+	// extract name search bar and place it next to path
+	var searchBar = document.getElementById('srch_namev');
+	searchBar.placeholder = "🔎 search for files";
+	ebi('pathBar').appendChild(searchBar);
 
 	function srch_msg(err, txt) {
 		var o = ebi('srch_q');
@@ -6908,6 +6922,8 @@ var treectl = (function () {
 
 		get_tree("", get_evpath(), true);
 		r.show();
+
+		ebi('treeToggleBtn').classList.add('on');
 	}
 
 	r.show = function () {
@@ -6917,7 +6933,6 @@ var treectl = (function () {
 			return;
 		}
 
-		ebi('path').style.display = 'none';
 		ebi('tree').style.display = 'block';
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
@@ -6934,12 +6949,23 @@ var treectl = (function () {
 		r.hide();
 		if (!nonav)
 			ebi('path').style.display = '';
+
+		ebi('treeToggleBtn').classList.remove('on');
+	};
+
+	r.toggleTree = function (e, nostore) {
+		if(entreed){
+			r.detree(e, nostore);
+		}
+		else{
+			r.entree(e, nostore);
+		}
 	};
 
 	r.hide = function () {
 		r.hidden = true;
-		ebi('path').style.display = 'none';
-		ebi('tree').style.display = 'none';
+		ebi('tree').style.width = '0';
+		ebi('widget').style.marginLeft = '0';
 		ebi('wrap').style.marginLeft = '';
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
@@ -7077,7 +7103,9 @@ var treectl = (function () {
 
 		setcvar('--nav-sz', w);
 		ebi('tree').style.width = w;
+		ebi('acc_button').style.width = (iw - 2) + 'em';
 		ebi('wrap').style.marginLeft = w2;
+		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
 		onscroll();
 	}
 
@@ -7418,6 +7446,8 @@ var treectl = (function () {
 			clmod(ebi('griden'), 'on', thegrid.en = dgrid);
 
 		srvinf = res.srvinf;
+		ebi('spaceFree').innerHTML = (res.space_total - res.space_free) + ' ' + res.space_unit + ' free of ' + res.space_total + ' ' + res.space_unit;
+		ebi('spaceUsed_bar').width = ((res.space_total - res.space_free) / res.space_total * 100) + '%';
 		if (rtt !== null)
 			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
 
@@ -7819,9 +7849,10 @@ var treectl = (function () {
 		swrite('treesz', treesz);
 		onresize();
 	}
-
-	ebi('entree').onclick = r.entree;
-	ebi('detree').onclick = r.detree;
+	
+	ebi('treeToggleBtn').tt = L.tt_entree;
+	
+	ebi('treeToggleBtn').onclick = r.toggleTree;
 	ebi('visdir').onclick = tree_scrollto;
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
@@ -7953,10 +7984,22 @@ function apply_perms(res) {
 	if (idp_login && acct == "*")
 		dst = idp_login.replace(/\{dst\}/g, get_evpath());
 
-	ebi('acc_info').innerHTML = '<span id="srv_info2"><span>' + srvinf +
-		'</span></span><span' + aclass + axs + L.access + '</span>' + (acct != '*' ?
-			'<form id="flogout" method="post" enctype="multipart/form-data"><input type="hidden" name="act" value="logout" /><input id="blogout" type="submit" value="' + L.logout + acct + '"></form>' :
-			'<a href="' + dst + '">' + L.login + '</a>');
+	function goHome(){
+		window.location.href = dst;
+	}
+
+	if(acct != '*'){
+		ebi('acc_name').innerHTML = acct;
+		ebi('acessType').innerHTML = '<span' + aclass + axs + L.access + '</span>';
+		ebi('blogout').value = L.logout;
+		ebi('acc_button').onclick = function(){
+			ebi('acc_popup').classList.toggle('show');
+		}
+	}
+	else{
+		ebi('acc_name').innerHTML = L.login;
+		ebi('acc_button').onclick = goHome;
+	}
 
 	var o = QSA('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++) {
@@ -9852,8 +9895,9 @@ function reload_browser() {
 
 		o = mknod('a');
 		o.setAttribute('href', link2);
-		o.textContent = uricom_dec(parts[a]) || '/';
-		ebi('path').appendChild(mknod('i'));
+		o.textContent = uricom_dec(parts[a]) || '🏠';
+		if(a > 0)
+			ebi('path').appendChild(mknod('i'));
 		ebi('path').appendChild(o);
 	}
 
