@@ -65,7 +65,7 @@ Ls.hmn = {
 			["G", "toggle list / grid view"],
 			["T", "toggle thumbnails / icons"],
 			["⇧ A/D", "thumbnail size"],
-			["ctrl-K", "delete selected"],
+			["ctrl-K/Del", "delete selected"],
 			["ctrl-X", "cut selection to clipboard"],
 			["ctrl-C", "copy selection to clipboard"],
 			["ctrl-V", "paste (move/copy) here"],
