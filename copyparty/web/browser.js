@@ -773,12 +773,12 @@ ebi('widget').innerHTML = (
 	' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
 	' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
 	'</span><span id="wzip1"><a' +
-	' href="#" id="zip1" tt="' + L.wt_zip1 + '">📦<span>zip</span></a>' +
+	' href="#" id="zip1" tt="' + L.wt_zip1 + '">⬇️📦<span>zip</span></a>' +
 	'</span><span id="wzip"><a' +
 	' href="#" id="selall" tt="' + L.wt_selall + '">sel.<br />all</a><a' +
 	' href="#" id="selinv" tt="' + L.wt_selinv + '">sel.<br />inv.</a><a' +
-	' href="#" id="selzip" class="l1" tt="' + L.wt_selzip + '">zip</a><a' +
-	' href="#" id="seldl" class="l1" tt="' + L.wt_seldl + '">dl</a>' +
+	' href="#" id="selzip" class="l1" tt="' + L.wt_selzip + '">⬇️zip</a><a' +
+	' href="#" id="seldl" class="l1" tt="' + L.wt_seldl + '">⬇️files</a>' +
 	'</span><span id="wnp"><a' +
 	' href="#" id="npirc" tt="' + L.wt_npirc + '">📋<span>irc</span></a><a' +
 	' href="#" id="nptxt" tt="' + L.wt_nptxt + '">📋<span>txt</span></a>' +
@@ -8548,7 +8548,7 @@ var arcfmt = (function () {
 			o.setAttribute("href", m[1] + arg + m[4]);
 			o.textContent = fmt.split('_')[0];
 		}
-		ebi('selzip').textContent = fmt.split('_')[0];
+		ebi('selzip').textContent = '⬇️' + fmt.split('_')[0];
 		ebi('selzip').setAttribute('fmt', arg);
 
 		QS('#zip1 span').textContent = fmt.split('_')[0];
