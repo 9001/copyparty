@@ -7447,8 +7447,8 @@ var treectl = (function () {
 			clmod(ebi('griden'), 'on', thegrid.en = dgrid);
 
 		srvinf = res.srvinf;
-		ebi('spaceFree').innerHTML = (res.space_total - res.space_free) + ' ' + res.space_unit + ' free of ' + res.space_total + ' ' + res.space_unit;
-		ebi('spaceUsed_bar').width = ((res.space_total - res.space_free) / res.space_total * 100) + '%';
+		ebi('spaceFree').innerHTML = res.space_free + ' free of ' + res.space_total ;
+		ebi('spaceUsed_bar').width = res.space_used_percent + '%';
 		if (rtt !== null)
 			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
 

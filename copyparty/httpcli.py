@@ -6989,6 +6989,7 @@ class HttpCli(object):
         zi = vn.flags["du_iwho"]
         h1 = ""
         h2 = ""
+        space_used_percent = 0
         if zi and (
             zi == 9
             or (zi == 7 and self.uname != "*")
@@ -7016,6 +7017,8 @@ class HttpCli(object):
                 h1 = humansize(free or 0)
                 h2 = humansize(total)
                 srv_info.append("{} free of {}".format(h1, h2))
+                if(total > 0)
+                    space_used_percent = (total - (free or 0)) / total * 100
             elif zs:
                 self.log("diskfree(%r): %s" % (abspath, zs), 3)
 
@@ -7066,9 +7069,9 @@ class HttpCli(object):
             "files": [],
             "taglist": [],
             "srvinf": srv_infot,
-            "space_free": float(h1.split()[0]),
-            "space_total": float(h2.split()[0]),
-            "space_unit": h2.split()[1],
+            "space_used_percent": space_used_percent
+            "space_free": h1,
+            "space_total": h2,
             "acct": self.uname,
             "perms": perms,
             "cfg": vn.js_ls,
@@ -7093,9 +7096,9 @@ class HttpCli(object):
             "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
             "srv_info": srv_infot,
             "srv_name": srv_name,
-            "space_free": float(h1.split()[0]),
-            "space_total": float(h2.split()[0]),
-            "space_unit": h2.split()[1],
+            "space_used_percent": space_used_percent
+            "space_free": h1,
+            "space_total": h2,
             "dtheme": self.args.theme,
         }
 
