@@ -7017,7 +7017,7 @@ class HttpCli(object):
                 h1 = humansize(free or 0)
                 h2 = humansize(total)
                 srv_info.append("{} free of {}".format(h1, h2))
-                if(total > 0)
+                if(total > 0):
                     space_used_percent = (total - (free or 0)) / total * 100
             elif zs:
                 self.log("diskfree(%r): %s" % (abspath, zs), 3)
