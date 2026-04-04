@@ -1804,8 +1804,9 @@ html.y #tree.nowrap .ntree a+a:hover {
 	color: var(--fg-max);
 }
 #docul a:hover,
+.popup_button:hover,
 #tree .ntree a+a:hover {
-	background: var(--bg-d2);
+	background: var(--btn-h-bg);
 	color: var(--fg-max);
 }
 .ntree a:first-child {
@@ -4334,8 +4335,6 @@ html.e #detree {
 	background: var(--btn-1-bg);
 	cursor: pointer;
 	height: 2.0em;
-}
-#acc_btnContent{
 	display: flex;
 	justify-content:space-between;
 	color: var(--btn-1-fg);
