@@ -7449,9 +7449,10 @@ var treectl = (function () {
 		srvinf = res.srvinf;
 		ebi('spaceFree').innerHTML = res.space_free + ' free of ' + res.space_total ;
 		ebi('spaceUsed_bar').width = res.space_used_percent + '%';
-		if (rtt !== null)
+		if (rtt !== null){
 			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
-
+			ebi('rtt_latency').innerHTML = 'latency: ' + rtt
+		}
 		var o = ebi('srv_info2');
 		if (o)
 			o.innerHTML = ebi('srv_info').innerHTML = '<span>' + srvinf + '</span>';
