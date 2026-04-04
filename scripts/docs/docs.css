@@ -76,6 +76,7 @@ main {
 article, nav.sitenav {
 	max-width: 50rem;
 	width: 100%;
+	overflow-x: hidden;
 }
 .content {
 	margin-left: 20rem;
