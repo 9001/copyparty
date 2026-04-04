@@ -3268,13 +3268,12 @@ class AuthSrv(object):
                 "frand": bool(vf.get("rand")),
                 "lifetime": vn.js_ls["lifetime"],
                 "u2sort": self.args.u2sort,
-                "glang": self.args.glang
             }
             zs = "ui_noacci ui_nocpla ui_noctxb ui_nolbar ui_nombar ui_nonav ui_notree ui_norepl ui_nosrvi"
             for zs in zs.split():
                 if vf.get(zs):
                     js_htm[zs] = 1
-            zs = "notooltips"
+            zs = "glang notooltips"
             for zs in zs.split():
                 if getattr(self.args, zs, False):
                     js_htm[zs] = 1
