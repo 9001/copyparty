@@ -4346,9 +4346,6 @@ html.e #detree {
 	height: 2.0em;
 }
 #acc_btnContent{
-	position: absolute;
-	width: 100%;
-	height: 100%;
 	display: flex;
 	justify-content:space-between;
 	color: var(--btn-1-fg);
