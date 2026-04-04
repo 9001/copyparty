@@ -7451,7 +7451,7 @@ var treectl = (function () {
 		ebi('spaceUsed_bar').width = res.space_used_percent + '%';
 		if (rtt !== null){
 			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
-			ebi('rtt_latency').innerHTML = 'latency: ' + rtt
+			ebi('rtt_latency').innerHTML = 'latency: ' + rtt + 'ms';
 		}
 		var o = ebi('srv_info2');
 		if (o)

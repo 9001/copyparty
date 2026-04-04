@@ -4305,33 +4305,23 @@ html.e #detree {
 	border-radius: .3em;
 	margin: .2em .3em;
 }
-#spaceFree{
+#spaceFree, #rtt_latency {
   color: var(--fg);
-  text-align: center;
+  text-align: left;
   padding: 2px;
-  position: absolute;
-  bottom: 150%;
-  left: 0%;
   font-size: small;
   cursor: default;
 }
-#spaceUsed_bar{
-	position: absolute;
-	left: 0;
-	bottom: 125%;
-	/* width: 50%; */
-	height: .3em;
-	border-radius: .3em;
-	background: var(--btn-1-bg);
-}
-#spaceTotal_bar{
-	position: absolute;
-	left: 0;
-	bottom: 125%;
-	width: 100%;
+#spaceUsed_bar, #spaceTotal_bar{
 	height: .3em;
 	border-radius: .3em;
 	background: var(--btn-h-bg);
+}
+#spaceUsed_bar{
+	background: var(--btn-1-bg);
+}
+#spaceTotal_bar {
+	margin-bottom: .5em;
 }
 #tree_footer {
 	position: absolute;
