@@ -1,0 +1,135 @@
+html {
+	color: #ccc;
+	background: #222;
+	font-family: sans-serif;
+}
+* {
+	line-height: 1.3em;
+}
+body {
+	margin: 0;
+}
+nav.sidebar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 20rem;
+	overflow-y: auto;
+	overflow-x: clip;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	background: #2b2b2b;
+}
+div.toc {
+	ul {
+		list-style: none;
+		ul a {
+			font-weight: normal;
+		}
+	}
+	li {
+		margin: 0.5em 0;
+	}
+	a {
+		white-space: normal;
+		text-decoration: none;
+	}
+}
+div.toc > ul {
+	padding-bottom: 1rem;
+	padding-top: 1rem;
+	margin-top: 0;
+}
+div.toc-header {
+	align-self: center;
+	padding-top: 1rem;
+	img {
+		width: 10rem;
+	}
+}
+footer {
+	background: #2b2b2b;
+	display: flex;
+	justify-content: center;
+}
+nav.sitenav {
+	display: flex;
+	justify-content: space-between;
+	padding: 1rem;
+	span.next {
+		text-align: end;
+	}
+}
+main {
+	display: flex;
+	padding: 1rem;
+	justify-content: center;
+	img {
+		/* Allow images to overflow past the sides of the text but center them */
+		margin-left: 50%;
+		transform: translateX(-50%);
+		max-width: calc(100vw - 20rem - 1rem)
+	}
+}
+article, nav.sitenav {
+	max-width: 50rem;
+	width: 100%;
+}
+.content {
+	margin-left: 20rem;
+}
+h1 {
+	font-size: 1.7em;
+	line-height: 1em;
+	padding: .6em 1em .15em 1em;
+	margin: 1em -1em .4em -1em;
+	color: #ddd;
+	background: #2b2b2b;
+	border: 1px solid #393939;
+	box-shadow: 0 0 .3em #111;
+	border-radius: .3em;
+	font-variant: small-caps;
+	font-weight: normal;
+}
+a {
+	color: #fc5;
+	font-weight: bold;
+	text-decoration: underline;
+	white-space: nowrap;
+}
+li {
+	margin: 1em 0;
+}
+ul {
+	padding: 0 0 0 1.3em;
+}
+a:hover,
+a:active,
+a:focus {
+	color: #fea;
+}
+@media (prefers-color-scheme: light) {
+	html {
+		color: #333;
+		background: #f7f7f7;
+	}
+	h1 {
+		color: #444;
+		background: #e4e4e4;
+		border-color: #ccc;
+		box-shadow: none;
+	}
+	nav.sidebar, footer {
+		background: #e4e4e4
+	}
+	a {
+		color: #079;
+	}
+	a:hover,
+	a:active,
+	a:focus {
+		color: #00c;
+	}
+}
