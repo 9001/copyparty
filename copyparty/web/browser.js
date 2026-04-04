@@ -1027,7 +1027,7 @@ ebi('tree').innerHTML = (
 	'<ul class="ntree" id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
 );
-ebi('thx_ff').before(ebi('acc_button'));
+ebi('thx_ff').before(ebi('tree_footer'));
 clmod(ebi('tree'), 'sbar', 1);
 ebi('goh').textContent = L.goh;
 QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
@@ -7104,7 +7104,7 @@ var treectl = (function () {
 
 		setcvar('--nav-sz', w);
 		ebi('tree').style.width = w;
-		ebi('acc_button').style.width = (iw - 2) + 'em';
+		ebi('tree_footer').style.width = (iw - 2) + 'em';
 		ebi('wrap').style.marginLeft = w2;
 		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
 		onscroll();

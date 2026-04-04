@@ -4333,14 +4333,15 @@ html.e #detree {
 	border-radius: .3em;
 	background: var(--btn-h-bg);
 }
-
+#tree_footer {
+	position: absolute;
+	bottom: 1em;
+	left: 1em;
+	transition: width .15s;
+}
 .popup_button {
 	border-radius: .3em;
 	background: var(--btn-1-bg);
-	margin: 1em;
-	position: absolute;
-	bottom: 0;
-	left: 0;
 	cursor: pointer;
 	height: 2.0em;
 }

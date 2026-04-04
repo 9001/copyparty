@@ -135,14 +135,15 @@
 </div>
 
 
+<div id="tree_footer">
+	<div id="spaceFree" style="display: block;">{{ space_free }} free of {{ space_total }}</div>
+
+	<div id="space_bar" style="display: block; cursor: default;">
+		<div id="spaceTotal_bar"></div>
+		<div id="spaceUsed_bar" style="width: {{ space_used_percent }}%;"></div>
+	</div>
+
 	<div id="acc_button" class="popup_button">
-		<div id="spaceFree" style="display: block;">{{ space_free }} free of {{ space_total }}</div>
-
-		<div id="space_bar" style="display: block; cursor: default;">
-			<div id="spaceTotal_bar"></div>
-			<div id="spaceUsed_bar" style="width: {{ space_used_percent }}%;"></div>
-		</div>
-
 		<div id="acc_btnContent">
 			<p id="acc_name"></p>
 			<a id="acc_settings" href="#v=cfg" data-dest="cfg">⚙️</a>
@@ -157,6 +158,8 @@
 			</form>
 		</span>
 	</div>
+</div>
+	
 
 	<a id="gridicon_template" class="gridViewIcon tgl btn on"><div class="gridSquare"></div><div class="gridSquare"></div><div class="gridSquare"></div><div class="gridSquare"></div></div></a>
 	<a id="listicon_template" class="listViewIcon tgl btn"><div class="listRow"></div><div class="listRow"></div></div></a>
