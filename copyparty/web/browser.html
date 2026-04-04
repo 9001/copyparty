@@ -144,20 +144,19 @@
 		<div id="spaceUsed_bar" style="width: {{ space_used_percent }}%;"></div>
 	</div>
 
+	<span id="acc_popup" class="popup">
+		<div id="acessType" style="display: block;"></div>
+		<a href="{{ r }}/?h" id="goh" style="display: block;">control-panel</a>
+		<form id="flogout" style="display: block;" method="post" enctype="multipart/form-data">
+			<input type="hidden" name="act" value="logout" />
+			<input id="blogout" type="submit" />
+		</form>
+	</span>
 	<div id="acc_button" class="popup_button">
 		<div id="acc_btnContent">
 			<p id="acc_name"></p>
 			<a id="acc_settings" href="#v=cfg" data-dest="cfg">⚙️</a>
 		</div>
-
-		<span id="acc_popup" class="popup">
-			<div id="acessType" style="display: block;"></div>
-			<a href="{{ r }}/?h" id="goh" style="display: block;">control-panel</a>
-			<form id="flogout" style="display: block;" method="post" enctype="multipart/form-data">
-				<input type="hidden" name="act" value="logout" />
-				<input id="blogout" type="submit" />
-			</form>
-		</span>
 	</div>
 </div>
 	

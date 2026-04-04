@@ -4347,28 +4347,23 @@ html.e #detree {
 	align-self: center;
 }
 
-/* Toggle this class - hide and show the popup */
-.popup_button .show {
+.popup.show {
   visibility: visible;
   -webkit-animation: fadeIn 1s;
   animation: fadeIn 1s;
 }
 
-/* The actual popup */
 .popup {
   visibility: hidden;
   width: fit-content;
-  background-color: #555;
-  color: #fff;
+  background-color: var(--bg-u6);
   text-align: center;
-  border-radius: 6px;
-  padding: 8px;
+  border-radius: .3em;
+  padding: .5em;
   position: absolute;
   display: block;
   z-index: 3;
-  bottom: 125%;
-  left: 0%;
-  cursor: default;
+  bottom: 2.5em;
 }
 
 /* Popup arrow */
@@ -4380,7 +4375,7 @@ html.e #detree {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: #555 transparent transparent transparent;
+  border-color: var(--bg-u6) transparent transparent transparent;
 }
 
 .overlay_plus{
