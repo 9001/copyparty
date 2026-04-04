@@ -7069,7 +7069,7 @@ class HttpCli(object):
             "files": [],
             "taglist": [],
             "srvinf": srv_infot,
-            "space_used_percent": space_used_percent
+            "space_used_percent": space_used_percent,
             "space_free": h1,
             "space_total": h2,
             "acct": self.uname,
@@ -7096,7 +7096,7 @@ class HttpCli(object):
             "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
             "srv_info": srv_infot,
             "srv_name": srv_name,
-            "space_used_percent": space_used_percent
+            "space_used_percent": space_used_percent,
             "space_free": h1,
             "space_total": h2,
             "dtheme": self.args.theme,
