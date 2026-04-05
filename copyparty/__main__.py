@@ -1452,6 +1452,14 @@ def add_zc_ssdp(ap):
     ap2.add_argument("--zsl", metavar="PATH", type=u, default="/?hc", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] (goes directly to /priv/ with password hunter2) or [\033[32m?hc=priv&pw=hunter2\033[0m] (shows mounting options for /priv/ with password)")
     ap2.add_argument("--zsid", metavar="UUID", type=u, default=zsid, help="USN (device identifier) to announce")
 
+def add_zc_dlna(ap):
+    ap2 = ap.add_argument_group("DLNA options")
+    ap2.add_argument("--zd", action="store_true", help="announce MediaServer:1 over SSDP for DLNA device support")
+    # ap2.add_argument("--dn-on", metavar="NETS", type=u, default="", help="enable SSDP ONLY on the comma-separated list of subnets and/or interface names/indexes")
+    # ap2.add_argument("--dn-off", metavar="NETS", type=u, default="", help="disable SSDP on the comma-separated list of subnets and/or interface names/indexes")
+    ap2.add_argument("--zdv", action="store_true", help="verbose DLNA")
+    # ap2.add_argument("--dnl", metavar="PATH", type=u, default="/?hc", help="location to include in the url (or a complete external URL), for example [\033[32mpriv/?pw=hunter2\033[0m] (goes directly to /priv/ with password hunter2) or [\033[32m?hc=priv&pw=hunter2\033[0m] (shows mounting options for /priv/ with password)")
+    # ap2.add_argument("--dnid", metavar="UUID", type=u, default=zsid, help="USN (device identifier) to announce")
 
 def add_sftp(ap):
     ap2 = ap.add_argument_group("SFTP options")
@@ -1990,6 +1998,7 @@ def run_argparse(
     add_zeroconf(ap)
     add_zc_mdns(ap)
     add_zc_ssdp(ap)
+    add_zc_dlna(ap)
     add_fs(ap)
     add_share(ap)
     add_upload(ap)

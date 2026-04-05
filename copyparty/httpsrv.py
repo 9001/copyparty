@@ -91,6 +91,7 @@ if TYPE_CHECKING:
     from .authsrv import VFS
     from .broker_util import BrokerCli
     from .ssdp import SSDPr
+    from .dlna import DLNAr
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Optional
@@ -129,6 +130,7 @@ class HttpSrv(object):
         self.magician = Magician()
         self.nm = NetMap([], [])
         self.ssdp: Optional["SSDPr"] = None
+        self.dlna: Optional["DLNAr"] = None
         self.gpwd = Garda(self.args.ban_pw)
         self.gpwc = Garda(self.args.ban_pwc)
         self.g404 = Garda(self.args.ban_404)
@@ -225,6 +227,11 @@ class HttpSrv(object):
             from .ssdp import SSDPr
 
             self.ssdp = SSDPr(broker)
+
+        if getattr(self.args, "zd", False):
+            from .dlna import DLNAr
+
+            self.dlna = DLNAr(broker)
 
         if self.tp_q:
             self.start_threads(4)

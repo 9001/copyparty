@@ -93,6 +93,8 @@ if TYPE_CHECKING:
     try:
         from .mdns import MDNS
         from .ssdp import SSDPd
+        from .dlna import DLNAd
+        from .dlna import DLNAd
     except:
         pass
 
@@ -477,6 +479,7 @@ class SvcHub(object):
         self.zc_ngen = 0
         self.mdns: Optional["MDNS"] = None
         self.ssdp: Optional["SSDPd"] = None
+        self.dlna: Optional["DLNAd"] = None
 
         # decide which worker impl to use
         if self.check_mp_enable():
@@ -1039,7 +1042,7 @@ class SvcHub(object):
                 have_tcp = True
         if not have_tcp:
             zb = False
-            zs = "z zm zm4 zm6 zmv zmvv zs zsv zv"
+            zs = "z zm zm4 zm6 zmv zmvv zs zsv zv zd zdv"
             for zs in zs.split():
                 if getattr(al, zs, False):
                     setattr(al, zs, False)
@@ -1468,6 +1471,18 @@ class SvcHub(object):
             except:
                 self.log("root", "ssdp startup failed;\n" + min_ex(), 3)
 
+        if getattr(self.args, "zd", False):
+            try:
+                from .dlna import DLNAd
+
+                if self.dlna:
+                    self.dlna.stop()
+
+                self.dlna = DLNAd(self, self.zc_ngen)
+                Daemon(self.dlna.run, "dlna")
+            except:
+                self.log("root", "dlna startup failed;\n" + min_ex(), 3)
+
     def reload(self, rescan_all_vols: bool, up2k: bool) -> str:
         t = "users, volumes, and volflags have been reloaded"
         with self.reload_mutex:
@@ -1564,6 +1579,10 @@ class SvcHub(object):
 
             if self.ssdp:
                 tasks.append(Daemon(self.ssdp.stop, "ssdp"))
+                slp = time.time() + 0.5
+
+            if self.dlna:
+                tasks.append(Daemon(self.dlna.stop, "dlna"))
                 slp = time.time() + 0.5
 
             self.broker.shutdown()

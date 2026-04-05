@@ -1382,6 +1382,13 @@ class HttpCli(object):
                     self.reply(b"ssdp is disabled in server config", 404)
                     return False
 
+            if self.vpath.startswith(".cpr/dlna"):
+                if self.conn.hsrv.dlna:
+                    return self.conn.hsrv.dlna.reply(self)
+                else:
+                    self.reply(b"dlna is disabled in server config", 404)
+                    return False
+
             if self.vpath == ".cpr/metrics":
                 return self.conn.hsrv.metrics.tx(self)
 
@@ -2279,6 +2286,14 @@ class HttpCli(object):
                 self.s.sendall(b"HTTP/1.1 100 Continue\r\n\r\n")
             except:
                 raise Pebkac(400, "client d/c before 100 continue")
+
+        # DLNA/SSDP control requests (SOAP)
+        if self.vpath.startswith(".cpr/dlna/ctl/"):
+            if self.conn.hsrv.dlna:
+                return self.conn.hsrv.dlna.reply(self)
+            else:
+                self.reply(b"dlna is disabled in server config", 404)
+                return False
 
         if "raw" in self.uparam:
             return self.handle_stash(False)
