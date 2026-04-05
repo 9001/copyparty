@@ -81,6 +81,20 @@ article, nav.sitenav {
 .content {
 	margin-left: 20rem;
 }
+table {
+	table-layout: fixed;
+	width: 100%;
+	margin: 1rem auto;
+	border-top: 3px solid #444;
+	border-bottom: 3px solid #444;
+	border-collapse: collapse;
+}
+tbody td {
+	border: 1px solid #444;
+}
+tbody tr:nth-child(odd) {
+	background: #2b2b2b;
+}
 h1 {
 	font-size: 1.7em;
 	line-height: 1em;
@@ -124,6 +138,16 @@ a:focus {
 	}
 	nav.sidebar, footer {
 		background: #e4e4e4
+	}
+	table {
+		border-top: 3px solid #ddd;
+		border-bottom: 3px solid #ddd;
+	}
+	tbody tr:nth-child(odd) {
+		background: #e4e4e4;
+	}
+	tbody td {
+		border: 1px solid #ddd;
 	}
 	a {
 		color: #079;
