@@ -234,6 +234,7 @@ if (1)
 		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
 		"ct_dsel": 'use drag-selection in grid-view">dsel',
+		"ct_den": 'use dragging to move files into other folders">mvd',
 		"ct_dl": 'force download (don\'t display inline) when a file is clicked">dl',
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
@@ -921,6 +922,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="thumbs" class="tgl btn" tt="' + L.ct_thumb + '</a>\n' +
 	'		<a id="csel" class="tgl btn" tt="' + L.ct_csel + '</a>\n' +
 	'		<a id="dsel" class="tgl btn" tt="' + L.ct_dsel + '</a>\n' +
+	'		<a id="den" class="tgl btn" tt="' + L.ct_den + '</a>\n' +
 	'		<a id="dlni" class="tgl btn" tt="' + L.ct_dl + '</a>\n' +
 	'		<a id="ihop" class="tgl btn" tt="' + L.ct_ihop + '</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" tt="' + L.ct_dots + '</a>\n' +
@@ -4784,7 +4786,7 @@ var fileman = (function () {
 		t_paste = setTimeout(r.paste, 50);
 	};
 
-	r.paste = function () {
+	r.paste = function (justgo) {
 		if (!r.clip.length)
 			return toast.err(5, L.fp_ecut);
 
@@ -4877,6 +4879,8 @@ var fileman = (function () {
 			for (var a = 0; a < f.length; a++)
 				src.push(f[a].src);
 
+			if (justgo)
+				return okgo();
 			return modal.confirm((r.ccp ? L.fcp_confirm : L.fp_confirm).format(f.length) + '<ul>' + uricom_adec(src, true).join('') + '</ul>', okgo, null);
 		}
 
@@ -5893,6 +5897,7 @@ var thegrid = (function () {
 		r.loadsel();
 		aligngriditems();
 		setTimeout(r.tippen, 20);
+		drag.initgrid();
 	}
 
 	r.bagit = function (isrc) {
@@ -7283,6 +7288,10 @@ var treectl = (function () {
 				console.log("dir_cb failed", ex);
 			}
 		}
+
+		var dirs = QSA("#treeul li a:nth-child(2)");
+		for (var i = 0; i < dirs.length; i++)
+			drag.mktarget(dirs[i]);
 	};
 
 	function reload_tree() {
@@ -7579,6 +7588,12 @@ var treectl = (function () {
 			fun();
 		}
 
+		if (drag.is_dragging) {
+			fileman.paste(true);
+			drag.is_dragging = false;
+		}
+		drag.initfiles();
+
 		if (can_shr && in_shr && QS('#op_unpost.act'))
 			goto('unpost');
 	}
@@ -7765,6 +7780,7 @@ var treectl = (function () {
 		pbar.onresize();
 		vbar.onresize();
 		showfile.addlinks();
+		drag.initfiles();
 		setTimeout(eval_hash, 1);
 	};
 
@@ -9909,6 +9925,89 @@ var rcm = (function () {
 	return r;
 })();
 
+var drag = (function() {
+	var r = {is_dragging: false, no_warn: false};
+	bcfg_bind(r, "enabled", "den", true, function() {setTimeout(reload_browser, 1)});
+	var current = null, currLink = null;
+
+	r.mktarget = function(elem) {
+		if (!r.enabled) return;
+		
+		elem.ondragenter = elem.ondragleave = elem.ondragover = function(e) {
+			if (!r.enabled) return;
+			var elemHref = basenames((elem.tagName == "A" ? elem : elem.querySelector("td:nth-child(2) a")).href.split("?")[0])
+			if (current == elem || elemHref == get_evpath() || currLink == elemHref) // Prevent folders being dragged into themselves
+				return;
+			ev(e);
+			clmod(elem, "dtarget", e.type != "dragleave");
+		};
+
+		elem.ondrop = function(e) {
+			ev(e);
+			clmod(elem, "dtarget");
+			clmod(current, "sel", true);
+			msel.selui();
+			fileman.clip = [];
+			fileman.cut();
+			msel.evsel();
+
+			if (fileman.clip.length) {
+				r.is_dragging = true;
+				(elem.tagName == "TR" ? elem.querySelector("a[id]") : elem).click();
+			}
+		};
+	}
+	
+	r.initfiles = function() {
+		if (!r.enabled) return;
+		
+		var files = QSA("#files tbody tr");
+		for (var i = 0; i < files.length; i++) {
+			var f = files[i];
+			f.draggable = true;
+			f.ondragstart = function(e) {
+				current = e.target;
+				currLink = basenames(current.querySelector("td:nth-child(2) a").href.split("?"));
+				r.no_warn = true;
+			};
+			f.ondragend = function() {
+				r.no_warn = false;
+			};
+			
+			var links = f.querySelectorAll("a");
+			for (var j = 0; j < links.length; j++)
+				links[j].draggable = false;
+
+			if (/(zip|DIR)/.test(f.firstChild.innerHTML)) // very cursed but it works
+				r.mktarget(f);
+		}
+	};
+
+	r.initgrid = function() {
+		if (!r.enabled) return;
+
+		var files = QSA("#ggrid a");
+		for (var i = 0; i < files.length; i++) {
+			var f = files[i];
+			f.draggable = true;
+			f.ondragstart = function(e) {
+				var a = ebi(e.target.getAttribute("ref"));
+				current = a.closest("tr");
+				currLink = basenames(a.href.split("?"));
+				r.no_warn = true;
+			}
+			f.ondragend = function() {
+				r.no_warn = false;
+			};
+
+			if (clgot(f, "dir"))
+				r.mktarget(f);
+		}
+	};
+
+	return r;
+})();
+
 
 function reload_mp() {
 	if (mp && mp.au) {
@@ -9956,6 +10055,7 @@ function reload_browser() {
 		if(a > 0)
 			ebi('path').appendChild(mknod('i'));
 		ebi('path').appendChild(o);
+		drag.mktarget(o);
 	}
 
 	reload_mp();
@@ -10032,7 +10132,7 @@ function reload_browser() {
 	function sel_start(e) {
 		if (e.button !== 0 && e.type !== 'touchstart') return;
 		if (!thegrid.en || !treectl.dsel) return;
-		if (e.target.closest('#widget,#ops,.opview,.doc')) return;
+		if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a')) return;
 
 		if (e.target.closest('#gfiles'))
 			ebi('gfiles').style.userSelect = "none"

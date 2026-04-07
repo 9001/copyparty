@@ -1080,7 +1080,7 @@ function up2k_init(subtle) {
                         if (toast.txt == L.u_uri)
                             toast.hide();
                     }
-                    else
+                    else if (!window.drag || !drag.no_warn)
                         return toast.inf(10, L.u_uri) || true;
                 }
 
