@@ -1434,7 +1434,7 @@ html.y #ops svg circle {
 }
 #headerArea{
 	display: flex;
-	margin: .2em;
+	margin: .5em .5em -.5em .5em;
 }
 .hamburger_line{
 	height: .2em;
@@ -1652,7 +1652,7 @@ input.ssconf_v {
 	overscroll-behavior-y: none;
 	box-shadow: 0 0 1em var(--bg-d2), 0 -1px 0 rgba(128,128,128,0.3);
 	border: 1px solid var(--bg-u3);
-	transition: .15s;
+	transition: width 0.15s;
 }
 #tree,
 html {
@@ -1820,8 +1820,9 @@ html.y #tree.nowrap .ntree a+a:hover {
 	color: var(--fg-max);
 }
 #docul a:hover,
+.popup_button:hover,
 #tree .ntree a+a:hover {
-	background: var(--bg-d2);
+	background: var(--btn-h-bg);
 	color: var(--fg-max);
 }
 .ntree a:first-child {
@@ -2363,14 +2364,14 @@ html.y #bbox-overlay figcaption a {
 #bbox-overlay button {
 	cursor: pointer;
 	outline: none;
-	padding: 0 .3em;
-	margin: 0 .4em;
+	padding: 0 .4em;
+	margin: 0 .2em;
 	border: 0;
 	border-radius: 15%;
 	background: rgba(50, 50, 50, 0.5);
 	color: rgba(255,255,255,0.7);
 	font-size: 1.4em;
-	line-height: 1.4em;
+	line-height: 2em;
 	vertical-align: top;
 	font-variant: small-caps;
 }
@@ -2387,7 +2388,7 @@ html.y #bbox-overlay figcaption a {
 }
 #bbox-btns {
 	top: .5em;
-	right: 2%;
+	right: .5em;
 	position: fixed;
 }
 #bbox-halp {
@@ -2460,6 +2461,73 @@ html.y #bbox-overlay figcaption a {
 
 
 
+/* settings css */
+#s_content{
+	display: grid;
+  	grid-template-rows: auto auto;
+	margin: 5%;
+	border-radius: .5em;
+	border: var(--a) solid 1px;
+	background: var(--bg-u1);
+	max-width: 60em;
+	position: relative;
+}
+#s_header{
+	margin: .5em;
+}
+#s_hor{
+	display: grid;
+  	grid-template-columns: auto auto auto;
+	min-height: 0;
+}
+#s_nav, #s_list{
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+	padding: .5em;
+	padding-top: 0;
+}
+#s_divider{
+	background: var(--a);
+	width: 1px;
+	margin: 1em .5em;
+}
+#s_nav .btn::after{
+	position: absolute;
+	content: ">";
+	right: .5em;
+}
+#s_nav .btn,
+#s_list{
+	padding-right: 2em;
+}
+.setting{
+	padding: .5em;
+	border: var(--bg-u5) solid 1px;
+	border-top: 0;
+	margin: -1.5em 0 1.5em 0;
+}
+.setting:hover{
+	background: var(--bg-u3);
+}
+.s_desc{
+	margin: .5em 0 0 0;
+	font-size: medium;
+	color: var(--fg-weak);
+}
+#s_list h3{
+	background-color: var(--bg-u5);
+	border-radius: .3em .3em 0 0;
+	padding: .5em;
+	margin: 0 0 1.3em 0;
+}
+#cs_btn{
+	position: absolute;
+	right: 0;
+	margin: .5em;
+	color: var(--fg);
+}
+
 
 
 
@@ -2468,14 +2536,15 @@ html.y #bbox-overlay figcaption a {
 #op_up2k {
 	padding: 0 1em 1em 1em;
 }
-#drops {
+.overlaybg {
 	display: none;
 	z-index: 3;
 	background: rgba(48, 48, 48, 0.7);
 }
-#drops.vis,
+.overlaybg.vis,
 .dropzone {
-	display: block;
+	display: flex;
+  	justify-content: center;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -2487,7 +2556,7 @@ html.y #bbox-overlay figcaption a {
 	display: table;
 	left: 10%;
 	width: 78%;
-	height: 26%;
+	height: 78%;
 	margin: 0;
 	font-size: 3em;
 	font-weight: bold;
@@ -2506,7 +2575,7 @@ html.y #bbox-overlay figcaption a {
 	background: rgba(24, 24, 24, 0.7);
 	left: 8%;
 	width: 82%;
-	height: 32%;
+	height: 82%;
 	margin: -3vh 0;
 }
 .dropdesc.hl.err {
@@ -2551,18 +2620,21 @@ html.y #bbox-overlay figcaption a {
 	height: 100%;
 }
 #up_dz {
-	bottom: 12%;
+	position: absolute;
+	bottom: 0;
 }
 #srch_dz {
-	display: none;
-	top: 50%;
+	position: absolute;
+	top: 0;
 }
 #up_zd {
+	position: absolute;
 	top: 12%;
 	bottom: 12%;
 }
 #srch_zd {
-	display: none;
+	position: absolute;
+	top: 12%;
 	bottom: 12%;
 }
 .dropdesc span {
@@ -3317,6 +3389,9 @@ html.d #treepar {
 	#topBar {
 		display: block;
 	}
+	#headerArea {
+		margin: .2em;
+	}
 	#ops {
 		margin: .5em !important;
 		border-radius: .3em !important;
@@ -3341,6 +3416,9 @@ html.d #treepar {
 	}
 	#ggrid {
 		margin: 0em -0.25em !important;
+	}
+	#ghead {
+		margin: .5em;
 	}
 }
 @media (max-width: 32em) {
@@ -4312,49 +4390,35 @@ html.e #detree {
 	border-radius: .3em;
 	margin: .2em .3em;
 }
-#spaceFree{
+#spaceFree, #rtt_latency {
   color: var(--fg);
-  text-align: center;
+  text-align: left;
   padding: 2px;
-  position: absolute;
-  bottom: 150%;
-  left: 0%;
   font-size: small;
   cursor: default;
 }
-#spaceUsed_bar{
-	position: absolute;
-	left: 0;
-	bottom: 125%;
-	/* width: 50%; */
-	height: .3em;
-	border-radius: .3em;
-	background: var(--btn-1-bg);
-}
-#spaceTotal_bar{
-	position: absolute;
-	left: 0;
-	bottom: 125%;
-	width: 100%;
+#spaceUsed_bar, #spaceTotal_bar{
 	height: .3em;
 	border-radius: .3em;
 	background: var(--btn-h-bg);
 }
-
+#spaceUsed_bar{
+	background: var(--btn-1-bg);
+}
+#spaceTotal_bar {
+	margin-bottom: .5em;
+}
+#tree_footer {
+	position: absolute;
+	bottom: 1em;
+	left: 1em;
+	transition: width .15s;
+}
 .popup_button {
 	border-radius: .3em;
 	background: var(--btn-1-bg);
-	margin: 1em;
-	position: absolute;
-	bottom: 0;
-	left: 0;
 	cursor: pointer;
 	height: 2.0em;
-}
-#acc_btnContent{
-	position: absolute;
-	width: 100%;
-	height: 100%;
 	display: flex;
 	justify-content:space-between;
 	color: var(--btn-1-fg);
@@ -4366,28 +4430,23 @@ html.e #detree {
 	align-self: center;
 }
 
-/* Toggle this class - hide and show the popup */
-.popup_button .show {
+.popup.show {
   visibility: visible;
   -webkit-animation: fadeIn 1s;
   animation: fadeIn 1s;
 }
 
-/* The actual popup */
 .popup {
   visibility: hidden;
   width: fit-content;
-  background-color: #555;
-  color: #fff;
+  background-color: var(--bg-u6);
   text-align: center;
-  border-radius: 6px;
-  padding: 8px;
+  border-radius: .3em;
+  padding: .5em;
   position: absolute;
   display: block;
   z-index: 3;
-  bottom: 125%;
-  left: 0%;
-  cursor: default;
+  bottom: 2.5em;
 }
 
 /* Popup arrow */
@@ -4399,7 +4458,7 @@ html.e #detree {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: #555 transparent transparent transparent;
+  border-color: var(--bg-u6) transparent transparent transparent;
 }
 
 .overlay_plus{

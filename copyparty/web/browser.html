@@ -135,28 +135,29 @@
 </div>
 
 
-	<div id="acc_button" class="popup_button">
-		<div id="spaceFree" style="display: block;">{{ space_free }} {{ space_unit }} free of {{ space_total }} {{ space_unit }}</div>
+<div id="tree_footer">
+	<div id="rtt_latency"></div>
 
-		<div id="space_bar" style="display: block; cursor: default;">
-			<div id="spaceTotal_bar"></div>
-			<div id="spaceUsed_bar" style="width: {{ (space_total - space_free) / space_total * 100 }}%;"></div>
-		</div>
+	<div id="spaceFree">{{ space_free }} free of {{ space_total }}</div>
 
-		<div id="acc_btnContent">
-			<p id="acc_name"></p>
-			<a id="acc_settings" href="#v=cfg" data-dest="cfg">⚙️</a>
-		</div>
-
-		<span id="acc_popup" class="popup">
-			<div id="acessType" style="display: block;"></div>
-			<a href="{{ r }}/?h" id="goh" style="display: block;">control-panel</a>
-			<form id="flogout" style="display: block;" method="post" enctype="multipart/form-data">
-				<input type="hidden" name="act" value="logout" />
-				<input id="blogout" type="submit" />
-			</form>
-		</span>
+	<div id="spaceTotal_bar">
+		<div id="spaceUsed_bar" style="width: {{ space_used_percent }}%;"></div>
 	</div>
+
+	<span id="acc_popup" class="popup">
+		<div id="acessType" style="display: block;"></div>
+		<a href="{{ r }}/?h" id="goh" style="display: block;">control-panel</a>
+		<form id="flogout" style="display: block;" method="post" enctype="multipart/form-data">
+			<input type="hidden" name="act" value="logout" />
+			<input id="blogout" type="submit" />
+		</form>
+	</span>
+	<div id="acc_button" class="popup_button">
+		<p id="acc_name"></p>
+		<a id="acc_settings" href="#v=cfg" data-dest="cfg">⚙️</a>
+	</div>
+</div>
+	
 
 	<a id="gridicon_template" class="gridViewIcon tgl btn on"><div class="gridSquare"></div><div class="gridSquare"></div><div class="gridSquare"></div><div class="gridSquare"></div></div></a>
 	<a id="listicon_template" class="listViewIcon tgl btn"><div class="listRow"></div><div class="listRow"></div></div></a>
@@ -166,6 +167,19 @@
 	<div id="widget"></div>
 
 	<div id="rcm" tabindex="0"></div>
+
+
+	<div id="cfg" class="overlaybg" tt="">
+		<div id="s_content">
+			<h3 id="s_header">⚙️ </h3>
+			<div id="s_hor">
+				<div id="s_nav"></div>
+				<div id="s_divider"></div>
+				<div id="s_list" class="opview"></div>
+			</div>
+			<a id="cs_btn" href="#" class="btn">✕</a>
+		</div>
+	</div>
 
 	<script>
 		var SR = "{{ r }}",

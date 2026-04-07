@@ -902,7 +902,7 @@ x.parentNode.insertBefore(mknod('div', null,
 (function () {
 	var o = mknod('div');
 	o.innerHTML = (
-		'<div id="drops">\n' +
+		'<div id="drops" class="overlaybg">\n' +
 		'	<div class="dropdesc" id="up_zd"><div>🚀 ' + L.udt_up + '<br /><span></span><div>🚀<b>' + L.udt_up + '</b></div><div><b>' + L.udt_up + '</b>🚀</div></div></div>\n' +
 		'	<div class="dropdesc" id="srch_zd"><div>🔎 ' + L.udt_srch + '<br /><span></span><div>🔎<b>' + L.udt_srch + '</b></div><div><b>' + L.udt_srch + '</b>🔎</div></div></div>\n' +
 		'	<div class="dropzone" id="up_dz" v="up_zd"></div>\n' +
@@ -912,28 +912,27 @@ x.parentNode.insertBefore(mknod('div', null,
 	document.body.appendChild(o);
 })();
 
-
 // config panel
 ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3>' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="tooltips" class="tgl btn" href="#" tt="' + L.ct_ttips + '</a>\n' +
-	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
-	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '</a>\n' +
-	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '</a>\n' +
-	'		<a id="dsel" class="tgl btn" href="#" tt="' + L.ct_dsel + '</a>\n' +
-	'		<a id="den" class="tgl btn" href="#" tt="' + L.ct_den + '</a>\n' +
-	'		<a id="dlni" class="tgl btn" href="#" tt="' + L.ct_dl + '</a>\n' +
-	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '</a>\n' +
-	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '</a>\n' +
-	'		<a id="qdel" class="tgl btn" href="#" tt="' + L.ct_qdel + '</a>\n' +
-	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '</a>\n' +
-	'		<a id="nsort" class="tgl btn" href="#" tt="' + L.ct_nsort + '</a>\n' +
-	'		<a id="utctid" class="tgl btn" href="#" tt="' + L.ct_utc + '</a>\n' +
-	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '</a>\n' +
-	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '</a>\n' +
-	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '</a>\n' +
+	'		<a id="tooltips" class="tgl btn" tt="' + L.ct_ttips + '</a>\n' +
+	'		<a id="griden" class="tgl btn" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
+	'		<a id="thumbs" class="tgl btn" tt="' + L.ct_thumb + '</a>\n' +
+	'		<a id="csel" class="tgl btn" tt="' + L.ct_csel + '</a>\n' +
+	'		<a id="dsel" class="tgl btn" tt="' + L.ct_dsel + '</a>\n' +
+	'		<a id="den" class="tgl btn" tt="' + L.ct_den + '</a>\n' +
+	'		<a id="dlni" class="tgl btn" tt="' + L.ct_dl + '</a>\n' +
+	'		<a id="ihop" class="tgl btn" tt="' + L.ct_ihop + '</a>\n' +
+	'		<a id="dotfiles" class="tgl btn" tt="' + L.ct_dots + '</a>\n' +
+	'		<a id="qdel" class="tgl btn" tt="' + L.ct_qdel + '</a>\n' +
+	'		<a id="dir1st" class="tgl btn" tt="' + L.ct_dir1st + '</a>\n' +
+	'		<a id="nsort" class="tgl btn" tt="' + L.ct_nsort + '</a>\n' +
+	'		<a id="utctid" class="tgl btn" tt="' + L.ct_utc + '</a>\n' +
+	'		<a id="ireadme" class="tgl btn" tt="' + L.ct_readme + '</a>\n' +
+	'		<a id="idxh" class="tgl btn" tt="' + L.ct_idxh + '</a>\n' +
+	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -962,23 +961,23 @@ ebi('op_cfg').innerHTML = (
 	'	<div><select id="langs"></select></div>\n' +
 	'</div>\n' +
 	(have_zip ? (
-		'<div><h3>' + L.cl_ziptype + '</h3><div id="arc_fmt"></div></div>\n'
+		'<div><h3>' + L.cl_ziptype + '</h3><div><div id="arc_fmt"></div></div></div>\n'
 	) : '') +
 	'<div>\n' +
 	'	<h3>' + L.cl_uopts + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="ask_up" class="tgl btn" href="#" tt="' + L.ut_ask + '</a>\n' +
-	'		<a id="u2ts" class="tgl btn" href="#" tt="' + L.ut_u2ts + '</a>\n' +
-	'		<a id="umod" class="tgl btn" href="#" tt="' + L.cut_umod + '</a>\n' +
-	'		<a id="hashw" class="tgl btn" href="#" tt="' + L.cut_mt + '</a>\n' +
-	'		<a id="nosubtle" class="tgl btn" href="#" tt="' + L.cut_wasm + '</a>\n' +
-	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '</a>\n' +
-	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '</a>\n' +
+	'		<a id="ask_up" class="tgl btn" tt="' + L.ut_ask + '</a>\n' +
+	'		<a id="u2ts" class="tgl btn" tt="' + L.ut_u2ts + '</a>\n' +
+	'		<a id="umod" class="tgl btn" tt="' + L.cut_umod + '</a>\n' +
+	'		<a id="hashw" class="tgl btn" tt="' + L.cut_mt + '</a>\n' +
+	'		<a id="nosubtle" class="tgl btn" tt="' + L.cut_wasm + '</a>\n' +
+	'		<a id="u2turbo" class="tgl btn ttb" tt="' + L.cut_turbo + '</a>\n' +
+	'		<a id="u2tdate" class="tgl btn ttb" tt="' + L.cut_datechk + '</a>\n' +
 	'		<input type="text" id="u2szg" value="" ' + NOAC + ' style="width:3em" tt="' + L.cut_u2sz + '" />' +
-	'		<a id="flag_en" class="tgl btn" href="#" tt="' + L.cut_flag + '">💤</a>\n' +
-	'		<a id="u2sort" class="tgl btn" href="#" tt="' + L.cut_az + '">az</a>\n' +
-	'		<a id="upnag" class="tgl btn" href="#" tt="' + L.cut_nag + '">🔔</a>\n' +
-	'		<a id="upsfx" class="tgl btn" href="#" tt="' + L.cut_sfx + '">🔊</a>\n' +
+	'		<a id="flag_en" class="tgl btn" tt="' + L.cut_flag + '">💤</a>\n' +
+	'		<a id="u2sort" class="tgl btn" tt="' + L.cut_az + '">az</a>\n' +
+	'		<a id="upnag" class="tgl btn" tt="' + L.cut_nag + '">🔔</a>\n' +
+	'		<a id="upsfx" class="tgl btn" tt="' + L.cut_sfx + '">🔊</a>\n' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -995,7 +994,7 @@ ebi('op_cfg').innerHTML = (
 	'	<h3>' + L.cl_bigdir + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="bd_lim" value="250" ' + NOAC + ' style="width:4em" tt="' + L.cdt_lim + '" />' +
-	'		<a id="bd_ask" class="tgl btn" href="#" tt="' + L.cdt_ask + '">ask</a>\n' +
+	'		<a id="bd_ask" class="tgl btn" tt="' + L.cdt_ask + '">ask</a>\n' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -1007,10 +1006,41 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" href="#" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" href="#" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
-	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
+	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
+	'<div><h3>' + L.cl_hiddenc + ' &nbsp;</h3><div>' + 
+	(MOBILE ? '<a id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a id="hcolsr">' + L.cl_reset + '</a><div id="hcols"></div></div></div>'
 );
 
+// modalize settings
+(function () {
+	ebi('s_header').innerHTML += L.ot_cfg;
+	var sections = ebi('op_cfg').children;
+	for (var i = 0; i < sections.length; i++){
+		var sName = sections[i].children[0].innerHTML;
+		var sId = 's_section_' + i;
+		var subSettings = sections[i].children[1];
+
+		var section = `<div id="${sId}" class="s_section"><h3>${sName}</h3>`;
+		for (var ii = 0; ii < subSettings.children.length; ii++){
+			var s = subSettings.children[ii];
+			var tt = s.getAttribute('tt')?.replace(/\$N/g, "<br />");
+			s.removeAttribute('tt');
+			s.href = '#' + sId;
+			section += `<div id="${subSettings.id}" class="setting">` +
+				s.outerHTML +
+				(tt?.length > 0 ? `<p class="s_desc">${tt}</p>` : '') + 
+				'</div>';
+		}
+		section += '</div>'
+		ebi('s_list').innerHTML += section;
+		subSettings.innerHTML = '';
+		ebi('s_nav').innerHTML += `<a href="#${sId}" class="btn">${sName}</a>\n`;
+	}
+
+	ebi('cs_btn').onclick = function(){
+		modalopen('cfg');
+	}
+})();
 
 // navpane
 ebi('tree').innerHTML = (
@@ -1029,7 +1059,7 @@ ebi('tree').innerHTML = (
 	'<ul class="ntree" id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
 );
-ebi('thx_ff').before(ebi('acc_button'));
+ebi('thx_ff').before(ebi('tree_footer'));
 clmod(ebi('tree'), 'sbar', 1);
 ebi('goh').textContent = L.goh;
 QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
@@ -1074,10 +1104,26 @@ ebi('rcm').innerHTML = (
 		if (v)
 			ops[a].href = '#v=' + v;
 	}
-	ebi('acc_settings').onclick = opclick;
+	ebi('acc_settings').onclick = function(e){
+		modalopen('cfg')
+		e.stopPropagation();
+	};
 })();
 
+function modalopen(dest){
+	if (QS('#' + dest + '.vis'))
+		dest = '';
 
+	swrite('opmode', dest || null);
+
+	goto(dest);
+
+	var input = QS('.opview.act input:not([type="hidden"])')
+	if (input && !TOUCH) {
+		tt.skip = true;
+		input.focus();
+	}
+}
 function opclick(e) {
 	var dest = this.getAttribute('data-dest');
 	if (QS('#op_' + dest + '.act'))
@@ -1107,6 +1153,10 @@ function goto(dest) {
 	for (var a = obj.length - 1; a >= 0; a--)
 		clmod(obj[a], 'act');
 
+	obj = QSA('.overlaybg');
+	for (var a = obj.length - 1; a >= 0; a--)
+		clmod(obj[a], 'vis');
+
 	if (dest) {
 		var lnk = QS('#ops>a[data-dest=' + dest + ']'),
 			nps = lnk.getAttribute('data-perm');
@@ -1121,6 +1171,10 @@ function goto(dest) {
 		if (!has(perms, 'read') && !has(perms, 'write') && (dest == 'up2k'))
 			return;
 
+		if(dest == 'cfg'){
+			clmod(ebi(dest), 'vis', 1);
+			return;
+		}
 		clmod(ebi('op_' + dest), 'act', 1);
 		clmod(lnk, 'act', 1);
 
@@ -7083,7 +7137,8 @@ var treectl = (function () {
 				treeh = winh - atop;
 
 			tree.style.top = top + 'px';
-			tree.style.height = treeh < 10 ? '' : Math.floor(treeh) + 'px';
+			// setting the height causes scrollbars to appear often because it's not exact most of the time
+			tree.style.height = '';// = treeh < 10 ? '' : Math.floor(treeh) + 'px';
 		}
 	}
 	timer.add(onscroll2, true);
@@ -7108,7 +7163,7 @@ var treectl = (function () {
 
 		setcvar('--nav-sz', w);
 		ebi('tree').style.width = w;
-		ebi('acc_button').style.width = (iw - 2) + 'em';
+		ebi('tree_footer').style.width = (iw - 2) + 'em';
 		ebi('wrap').style.marginLeft = w2;
 		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
 		onscroll();
@@ -7455,11 +7510,12 @@ var treectl = (function () {
 			clmod(ebi('griden'), 'on', thegrid.en = dgrid);
 
 		srvinf = res.srvinf;
-		ebi('spaceFree').innerHTML = (res.space_total - res.space_free) + ' ' + res.space_unit + ' free of ' + res.space_total + ' ' + res.space_unit;
-		ebi('spaceUsed_bar').width = ((res.space_total - res.space_free) / res.space_total * 100) + '%';
-		if (rtt !== null)
+		ebi('spaceFree').innerHTML = res.space_free + ' free of ' + res.space_total ;
+		ebi('spaceUsed_bar').width = res.space_used_percent + '%';
+		if (rtt !== null){
 			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
-
+			ebi('rtt_latency').innerHTML = 'latency: ' + rtt + 'ms';
+		}
 		var o = ebi('srv_info2');
 		if (o)
 			o.innerHTML = ebi('srv_info').innerHTML = '<span>' + srvinf + '</span>';
@@ -8177,7 +8233,8 @@ var filecols = (function () {
 
 	r.uivis = function () {
 		var hcols = ebi('hcols');
-		hcols.previousSibling.style.display = hcols.style.display = ((!thegrid || !thegrid.en) && (hidden.length || MOBILE)) ? 'block' : 'none';
+		var hcolDiv = hcols.parentElement.parentElement;
+		QS(`a[href='#${hcolDiv.id}']`).style.display = hcolDiv.style.display = ((!thegrid || !thegrid.en) && (hidden.length || MOBILE)) ? 'block' : 'none';
 	};
 
 	r.set_style = function (unhide) {
