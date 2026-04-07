@@ -634,6 +634,9 @@ html .ayjump:focus {
 html.y #path {
 	text-shadow: none;
 }
+#path a.dtarget {
+	text-shadow: var(--f-sel-sh) 0 0 5px;
+}
 #path #entree {
 	margin-left: -.7em;
 }
@@ -786,6 +789,12 @@ html.y #files span.fsz_P { font-weight: bold }
 }
 #files .srch_hdr a {
 	display: inline;
+}
+#files tr.dtarget {
+	box-shadow: 0 0 5px 0 var(--f-sel-sh) inset;
+}
+#files tr.dtarget td {
+	background: none;
 }
 #path a {
 	padding: 0 .35em;
@@ -1099,6 +1108,9 @@ html.dz #flogout {
 #ggrid a {
 	scroll-margin-top: 25vh;
 	scroll-margin-bottom: 20vh;
+}
+#ggrid a.dtarget {
+	box-shadow: 0 0 5px 0 var(--f-sel-sh);
 }
 #files tr.sel a,
 #files tr.sel a.play {
@@ -1623,6 +1635,7 @@ input.ssconf_v {
 	border-collapse: collapse;
 	width: 100%;
 }
+
 #wrap {
 	margin: .5em .7em 0 .7em;
 	min-height: 70vh;
@@ -1752,6 +1765,9 @@ html.dz .btn {
 	position: absolute;
 	margin-left: -.25em;
 	z-index: 3;
+}
+#tree li a.dtarget {
+	box-shadow: 0 0 5px 0 var(--f-sel-sh) inset;
 }
 #tree ul a.sel {
 	background: #000;
