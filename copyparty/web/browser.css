@@ -3221,10 +3221,6 @@ html.ay #tree {
 
 
 
-html.b #path {
-	margin: .3em 0;
-	line-height: 1.7em;
-}
 html.b.op_open #path {
 	margin-top: .2em;
 }
@@ -3294,9 +3290,6 @@ html.b #treepar {
 	margin-left: .63em;
 	width: calc(.1em + var(--nav-sz) - var(--sbw));
 	border-bottom: .2em solid var(--f-h-b1);
-}
-html.b #wrap {
-	margin-top: 2em;
 }
 html.by .ghead,
 html.bz .ghead {
