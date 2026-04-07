@@ -2445,6 +2445,73 @@ html.y #bbox-overlay figcaption a {
 
 
 
+/* settings css */
+#s_content{
+	display: grid;
+  	grid-template-rows: auto auto;
+	margin: 5%;
+	border-radius: .5em;
+	border: var(--a) solid 1px;
+	background: var(--bg-u1);
+	max-width: 60em;
+	position: relative;
+}
+#s_header{
+	margin: .5em;
+}
+#s_hor{
+	display: grid;
+  	grid-template-columns: auto auto auto;
+	min-height: 0;
+}
+#s_nav, #s_list{
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+	padding: .5em;
+	padding-top: 0;
+}
+#s_divider{
+	background: var(--a);
+	width: 1px;
+	margin: 1em .5em;
+}
+#s_nav .btn::after{
+	position: absolute;
+	content: ">";
+	right: .5em;
+}
+#s_nav .btn,
+#s_list{
+	padding-right: 2em;
+}
+.setting{
+	padding: .5em;
+	border: var(--bg-u5) solid 1px;
+	border-top: 0;
+	margin: -1.5em 0 1.5em 0;
+}
+.setting:hover{
+	background: var(--bg-u3);
+}
+.s_desc{
+	margin: .5em 0 0 0;
+	font-size: medium;
+	color: var(--fg-weak);
+}
+#s_list h3{
+	background-color: var(--bg-u5);
+	border-radius: .3em .3em 0 0;
+	padding: .5em;
+	margin: 0 0 1.3em 0;
+}
+#cs_btn{
+	position: absolute;
+	right: 0;
+	margin: .5em;
+	color: var(--fg);
+}
+
 
 
 
@@ -2453,14 +2520,15 @@ html.y #bbox-overlay figcaption a {
 #op_up2k {
 	padding: 0 1em 1em 1em;
 }
-#drops {
+.overlaybg {
 	display: none;
 	z-index: 3;
 	background: rgba(48, 48, 48, 0.7);
 }
-#drops.vis,
+.overlaybg.vis,
 .dropzone {
-	display: block;
+	display: flex;
+  	justify-content: center;
 	position: fixed;
 	top: 0;
 	left: 0;
