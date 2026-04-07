@@ -1013,7 +1013,7 @@ ebi('op_cfg').innerHTML = (
 
 // modalize settings
 (function () {
-	ebi('s_header').innerHTML = '⚙️' + L.ot_cfg;
+	ebi('s_header').innerHTML = '⚙️ ' + L.ot_cfg;
 	var sections = ebi('op_cfg').children;
 	for (var i = 0; i < sections.length; i++){
 		var sName = sections[i].children[0].innerHTML;
@@ -1037,7 +1037,7 @@ ebi('op_cfg').innerHTML = (
 		ebi('s_nav').innerHTML += `<a href="#${sId}" class="btn">${sName}</a>\n`;
 	}
 
-	ebi('cs_btn').onclick = function(){
+	ebi('s_outside').onclick = ebi('cs_btn').onclick = function(){
 		modalopen('cfg');
 	}
 })();

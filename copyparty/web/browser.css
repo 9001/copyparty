@@ -1490,6 +1490,8 @@ html.y #ops svg circle {
 	border-color: var(--a);
 	border-radius: .2em;
 	padding: .2em .3em;
+	font-size: medium;
+	min-width: 3em;
 }
 .opview select {
 	padding: .3em;
@@ -2528,6 +2530,10 @@ html.y #bbox-overlay figcaption a {
 	margin: .5em;
 	color: var(--fg);
 }
+#s_outside {
+	position: absolute;
+	inset: 0;
+}
 
 
 
@@ -3256,9 +3262,6 @@ html.by #barpos {
 }
 html.b #ops a {
 	background: var(--bg);
-}
-html.b .opview {
-	margin: 1em 0;
 }
 html.b #srch_q {
 	margin: .2em 0 0 1.6em;
