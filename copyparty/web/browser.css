@@ -1709,7 +1709,8 @@ html {
 	font-size: 1.2em;
 	margin: .2em;
 	display: inline-block;
-	white-space: pre;
+	text-wrap-mode: wrap;
+	white-space-collapse: preserve;
 	position: relative;
 	top: -.12em;
 }
@@ -2491,15 +2492,14 @@ html.y #bbox-overlay figcaption a {
 #s_divider{
 	background: var(--a);
 	width: 1px;
-	margin: 1em .5em;
+	margin: 1em 0;
 }
 #s_nav .btn::after{
 	position: absolute;
 	content: ">";
 	right: .5em;
 }
-#s_nav .btn,
-#s_list{
+#s_nav .btn{
 	padding-right: 2em;
 }
 .setting{
@@ -3388,14 +3388,14 @@ html.d #treepar {
 		margin: .2em;
 	}
 	#ops {
-		margin: .5em;
-		border-radius: .3em;
+		margin: .5em !important;
+		border-radius: .3em !important;
 	}
 	#tree {
 		z-index: 3;
 	}
 	#widget, #wrap {
-		margin-left: 0;
+		margin-left: 0 !important;
 	}
 	#pathBar {
 		display: block;
@@ -3935,7 +3935,6 @@ html.e #ops a {
   aspect-ratio: 1/1;
   justify-content: center;
   font-size: 1.25em;
-  z-index: 4;
 }
 html.e #blogout:focus,
 html.e #ops a:focus {
