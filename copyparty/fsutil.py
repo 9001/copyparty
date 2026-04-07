@@ -7,7 +7,7 @@ import os
 import re
 import time
 
-from .__init__ import ANYWIN, MACOS
+from .__init__ import ANYWIN, FREEBSD, MACOS, UNIX
 from .authsrv import AXS, VFS, AuthSrv
 from .bos import bos
 from .util import chkcmd, json_hesc, min_ex, undot
@@ -88,7 +88,7 @@ class Fstab(object):
 
     def _from_sp_mount(self) -> dict[str, str]:
         sptn = r"^.*? on (.*) type ([^ ]+) \(.*"
-        if MACOS:
+        if MACOS or FREEBSD:
             sptn = r"^.*? on (.*) \(([^ ]+), .*"
 
         ptn = re.compile(sptn)
@@ -118,7 +118,7 @@ class Fstab(object):
 
     def build_tab(self) -> None:
         self.log("inspecting mtab for changes")
-        dtab = self._from_sp_mount() if MACOS else self._from_proc()
+        dtab = self._from_sp_mount() if UNIX else self._from_proc()
 
         # keep empirically-correct values if mounttab unchanged
         srctab = str(sorted(dtab.items()))
@@ -130,7 +130,7 @@ class Fstab(object):
 
         try:
             fuses = [mp for mp, fs in dtab.items() if fs == "fuseblk"]
-            if not fuses or MACOS:
+            if not fuses or UNIX:
                 raise Exception()
             try:
                 so, _ = chkcmd(["lsblk", "-nrfo", "FSTYPE,MOUNTPOINT"])  # centos6

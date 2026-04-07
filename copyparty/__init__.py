@@ -44,6 +44,14 @@ ANYWIN = WINDOWS or sys.platform in ["msys", "cygwin"]
 
 MACOS = platform.system() == "Darwin"
 
+FREEBSD = platform.system() == "FreeBSD"
+
+OPENBSD = platform.system() == "OpenBSD"
+
+ANYBSD = FREEBSD or OPENBSD
+
+UNIX = MACOS or ANYBSD
+
 GRAAL = platform.python_implementation() == "GraalVM"
 
 EXE = bool(getattr(sys, "frozen", False))
