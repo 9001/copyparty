@@ -1030,7 +1030,7 @@ html.dz #flogout {
 	content: '📂';
 }
 #ggrid>a.dir>span {
-	color: var(--g-dfg);
+	color: var(--g-fg);
 }
 #ggrid>a.au:before {
 	content: '▶';
@@ -1446,12 +1446,12 @@ html.y #ops svg circle {
 #srv_name{
 	font-size: x-large;
 	margin-top: .2em;
+	align-self: baseline;
 }
 #treeToggleBtn{
 	padding: .2em;
 	margin-top: .3em;
 	cursor: pointer;
-
 	display: block;
 }
 #ops {
@@ -1820,7 +1820,6 @@ html.y #tree.nowrap .ntree a+a:hover {
 	color: var(--fg-max);
 }
 #docul a:hover,
-.popup_button:hover,
 #tree .ntree a+a:hover {
 	background: var(--btn-h-bg);
 	color: var(--fg-max);
@@ -2468,12 +2467,14 @@ html.y #bbox-overlay figcaption a {
 	margin: 5%;
 	border-radius: .5em;
 	border: var(--a) solid 1px;
-	background: var(--bg-u1);
+	background: var(--bg);
 	max-width: 60em;
 	position: relative;
 }
 #s_header{
-	margin: .5em;
+	margin: 0;
+	padding: .5em;
+	background: var(--ttlbar);
 }
 #s_hor{
 	display: grid;
@@ -3257,12 +3258,6 @@ html.b #barpos {
 html.by #barpos {
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.2) inset;
 }
-html.b #ops {
-	max-width: 1em;
-	margin-bottom: 1.7em;
-	position: relative;
-	z-index: 2;
-}
 html.b #ops a {
 	background: var(--bg);
 }
@@ -3393,14 +3388,14 @@ html.d #treepar {
 		margin: .2em;
 	}
 	#ops {
-		margin: .5em !important;
-		border-radius: .3em !important;
+		margin: .5em;
+		border-radius: .3em;
 	}
 	#tree {
 		z-index: 3;
 	}
 	#widget, #wrap {
-		margin-left: 0 !important;
+		margin-left: 0;
 	}
 	#pathBar {
 		display: block;
@@ -3412,10 +3407,10 @@ html.d #treepar {
 		margin-right: 0;
 	}
 	#wfp {
-		margin-left: .1em !important;
+		margin-left: .1em;
 	}
 	#ggrid {
-		margin: 0em -0.25em !important;
+		margin: 0em -0.25em;
 	}
 	#ghead {
 		margin: .5em;
@@ -3748,6 +3743,9 @@ html.ez {
 html.e {
   text-shadow: none;
 }
+html.e * {
+  border-radius: 0 !important;
+}
 html.e #files,
 html.e #u2conf input[type="checkbox"]:hover + label,
 html.e .tgl.btn.on:hover,
@@ -3847,6 +3845,15 @@ html.e #srv_info {
   display: flex;
   align-items: center;
 }
+html.e .overlay_plus {
+	margin-top: -1em;
+}
+html.e #spaceUsed_bar {
+	background: var(--ttlbar);
+}
+html.e #s_header {
+	color: #fff;
+}
 html.e #acc_info span.warn,
 html.e #acc_info a {
   color: var(--white);
@@ -3907,7 +3914,6 @@ html.e #ops {
   height: 2em;
   gap: 0.6em;
   padding: 0.2em;
-  flex-direction: row-reverse;
   margin-bottom: 1.2em;
 }
 html.e #srch_form,
@@ -3919,7 +3925,6 @@ html.e .opbox {
 html.e #ghead,
 html.e #ops a {
   align-items: center;
-  display: flex;
 }
 html.e #ops a {
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
@@ -4143,10 +4148,8 @@ html.e.noscroll #tree {
 html.e #treeh {
   background: var(--bg);
   box-shadow: var(--shadow-outset-top), var(--shadow-outset-bottom);
-  width: calc(1.5em + var(--nav-sz) - var(--sbw));
   height: 2.4em;
   border: none;
-  top: -2px;
   display: flex;
   align-items: center;
   gap: 0.6em;
@@ -4232,10 +4235,10 @@ html.e #docul {
   margin-left: 0 !important;
 }
 html.e #wrap {
-  transform: translateX(calc((var(--negative-space) * 2) - 1.2em));
+  transform: translateX(calc((var(--negative-space) * 2) - .5em));
   padding-right: var(--negative-space);
   position: relative;
-  margin-right: calc((var(--negative-space) * 2) - 1.2em);
+  margin-right: calc((var(--negative-space) * 2) - .5em);
   margin-top: var(--negative-space);
   margin-left: 1.2em;
   /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
@@ -4275,8 +4278,8 @@ html.e #wtico,
 html.e #zip1 {
   box-shadow: 0 0 !important;
 }
-html.e #wtgrid, #wtgrid2 {
-  top: -0.09em;
+html.e #wtgrid2 {
+  top: 0.2em;
 }
 html.e #wfs,
 html.e #wm3u,
@@ -4385,11 +4388,6 @@ html.e #detree {
 	margin: .2em .3em 0 -.3em;
 }
 
-#acc_settings{
-	background-color: rgba(0, 0, 0, 0.4);
-	border-radius: .3em;
-	margin: .2em .3em;
-}
 #spaceFree, #rtt_latency {
   color: var(--fg);
   text-align: left;
@@ -4418,7 +4416,8 @@ html.e #detree {
 	border-radius: .3em;
 	background: var(--btn-1-bg);
 	cursor: pointer;
-	height: 2.0em;
+	padding: 0;
+	margin: 0;
 	display: flex;
 	justify-content:space-between;
 	color: var(--btn-1-fg);
@@ -4428,6 +4427,17 @@ html.e #detree {
 .popup_button p{
 	margin: .2em .3em;
 	align-self: center;
+}
+#acc_settings{
+	background: rgba(0, 0, 0, 0.4);
+	position: absolute;
+	align-self: end;
+	right: 0;
+  	bottom: .1em;
+	font-size: medium;
+}
+#acc_settings:hover{
+	background: var(--a-b);
 }
 
 .popup.show {
@@ -4496,7 +4506,7 @@ html.e #detree {
 	max-height: .15em;
 }
 .on div{
-	background: var(--bg-u3);
+	background: var(--btn-1h-fg);
 }
 
 .listRow::before{
@@ -4510,6 +4520,6 @@ html.e #detree {
 	border-radius: .1em;
 }
 .on ::before{
-	border-color: var(--bg-u3);
+	border-color: var(--btn-1h-fg);
 }
 
