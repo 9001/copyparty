@@ -915,7 +915,7 @@ x.parentNode.insertBefore(mknod('div', null,
 // config panel
 ebi('op_cfg').innerHTML = (
 	'<div>\n' +
-	'	<h3>' + L.cl_opts + '</h3>\n' +
+	'	<h3>✅ ' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" tt="' + L.ct_ttips + '</a>\n' +
 	'		<a id="griden" class="tgl btn" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
@@ -936,7 +936,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_hfsz + '</h3>\n' +
+	'	<h3>🔢 ' + L.cl_hfsz + '</h3>\n' +
 	'	<div><select id="fszfmt">\n' +
 	'		<option value="0">0 ┃ 1234567</option>\n' +
 	'		<option value="1">1 ┃ 1 234 567</option>\n' +
@@ -952,19 +952,19 @@ ebi('op_cfg').innerHTML = (
 	'	</select></div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_themes + '</h3>\n' +
+	'	<h3>🎨 ' + L.cl_themes + '</h3>\n' +
 	'	<div><select id="themes"></select></div>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_langs + '</h3>\n' +
+	'	<h3>🌐 ' + L.cl_langs + '</h3>\n' +
 	'	<div><select id="langs"></select></div>\n' +
 	'</div>\n' +
 	(have_zip ? (
-		'<div><h3>' + L.cl_ziptype + '</h3><div><div id="arc_fmt"></div></div></div>\n'
+		'<div><h3>⬇️ ' + L.cl_ziptype + '</h3><div><div id="arc_fmt"></div></div></div>\n'
 	) : '') +
 	'<div>\n' +
-	'	<h3>' + L.cl_uopts + '</h3>\n' +
+	'	<h3>🚀 ' + L.cl_uopts + '</h3>\n' +
 	'	<div>\n' +
 	'		<a id="ask_up" class="tgl btn" tt="' + L.ut_ask + '</a>\n' +
 	'		<a id="u2ts" class="tgl btn" tt="' + L.ut_u2ts + '</a>\n' +
@@ -982,7 +982,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_favico + ' <span id="ico1">🎉</span></h3>\n' +
+	'	<h3><span id="ico1">🎉</span> ' + L.cl_favico + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="icot" value="" ' + NOAC + ' style="width:1.3em" tt="' + L.cft_text + '" />' +
 	'		<input type="text" id="icof" value="" ' + NOAC + ' style="width:2em" tt="' + L.cft_fg + '" />' +
@@ -991,7 +991,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_bigdir + '</h3>\n' +
+	'	<h3>📁 ' + L.cl_bigdir + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="bd_lim" value="250" ' + NOAC + ' style="width:4em" tt="' + L.cdt_lim + '" />' +
 	'		<a id="bd_ask" class="tgl btn" tt="' + L.cdt_ask + '">ask</a>\n' +
@@ -999,15 +999,15 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_hsort + '</h3>\n' +
+	'	<h3>🔃 ' + L.cl_hsort + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="hsortn" value="" ' + NOAC + ' style="width:3em" tt="' + L.cdt_hsort + '" />' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
-	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
-	'<div><h3>' + L.cl_hiddenc + ' &nbsp;</h3><div>' + 
+	'<div><h3>🎼 ' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
+	(!MOBILE ? '<div><h3>🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
+	'<div><h3>👁️ ' + L.cl_hiddenc + ' &nbsp;</h3><div>' + 
 	(MOBILE ? '<a id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a id="hcolsr">' + L.cl_reset + '</a><div id="hcols"></div></div></div>'
 );
 

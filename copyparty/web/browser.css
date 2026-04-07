@@ -1937,7 +1937,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	background: #fff;
 	background: var(--bg-u2);
 	border-radius: .3em;
-	padding: .2em .5em;
+	padding: .2em .5em 0 .5em;
 	line-height: 2.3em;
 	margin-bottom: 1.5em;
 }
