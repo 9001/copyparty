@@ -641,7 +641,7 @@ html.y #path {
 	margin-left: -.7em;
 }
 #files {
-	overflow-x: scroll;
+	overflow-x: auto;
 	display: block;
 	z-index: 1;
 	top: -.3em;
@@ -2494,7 +2494,7 @@ html.y #bbox-overlay figcaption a {
 #s_nav, #s_list{
 	display: flex;
 	flex-direction: column;
-	overflow-y: scroll;
+	overflow-y: auto;
 	padding: .5em;
 	padding-top: 0;
 }
@@ -2516,7 +2516,7 @@ html.y #bbox-overlay figcaption a {
 	border: var(--bg-u5) solid 1px;
 	border-top: 0;
 	margin: -1.5em 0 1.5em 0;
-	overflow-x: scroll;
+	overflow-x: auto;
 }
 .setting:hover{
 	background: var(--bg-u3);
@@ -3421,7 +3421,7 @@ html.d #treepar {
 	}
 	#s_hor {
 		display: block;
-		overflow-y: scroll;
+		overflow-y: auto;
 	}
 	#s_divider {
 		display: none;
@@ -4069,7 +4069,7 @@ html.e #ggrid {
   box-shadow: var(--shadow-input);
   padding: 1.5em;
   margin: 0;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 html.e #ghead {
   margin: 0;
