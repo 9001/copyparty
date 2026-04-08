@@ -3231,14 +3231,40 @@ html.d #treepar {
 
 
 
+@media (max-width: 28em) {
+	#u2conf {
+		font-size: .8em;
+	}
+}
 @media (max-width: 32em) {
 	#u2conf {
 		font-size: .9em;
 	}
 }
-@media (max-width: 28em) {
-	#u2conf {
-		font-size: .8em;
+@media (max-width: 35em) {
+	#wrap {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow-y: auto;
+		overscroll-behavior-y: contain;
+		-webkit-overflow-scrolling: touch;
+	}
+	#wtoggle {
+		left: 0;
+		right: 0;
+		height: auto;
+		min-height: 1em;
+		overflow-x: auto;
+		overflow-y: hidden;
+		-webkit-overflow-scrolling: touch;
+		touch-action: pan-x;
+		scrollbar-gutter: stable;
+		border-radius: 0;
+		padding-left: 0;
+		padding-bottom: .35em;
+	}
+	#wtoggle>* {
+		flex: 0 0 auto;
 	}
 }
 @media (min-width: 70em) {
