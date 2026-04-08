@@ -1474,7 +1474,7 @@ html.y #ops svg circle {
 }
 .opbox input {
 	position: relative;
-	margin: .5em;
+	margin: .2em;
 }
 #op_cfg input[type=text] {
 	top: -.3em;
@@ -1530,8 +1530,16 @@ html.dz input {
 .opview input.i {
 	width: calc(100% - 16.2em);
 }
+input.eq_gain[type=range]{
+	writing-mode: vertical-lr;
+    direction: rtl;
+	color: var(--a);
+}
+input.eq_gain[type=text]{
+    width: 1.5em;
+	text-align: center;
+}
 input.drc_v,
-input.eq_gain,
 input.ssconf_v {
 	width: 3em;
 	text-align: center;

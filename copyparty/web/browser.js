@@ -2861,9 +2861,9 @@ var afilt = (function () {
 		swrite('au_eq_amp', r.amp);
 		swrite('au_eq_chw', r.chw);
 
-		var txt = QSA('input.eq_gain');
+		var gains = QSA('input.eq_gain');
 		for (var a = 0; a < r.bands.length; a++)
-			txt[a].value = r.gains[a];
+			gains[a + gains.length / 2].value = gains[a].value = r.gains[a].toFixed(1);
 
 		QS('input.eq_gain[band="amp"]').value = r.amp;
 		QS('input.eq_gain[band="chw"]').value = r.chw;
@@ -3054,7 +3054,7 @@ var afilt = (function () {
 				vs = that.value,
 				v = parseFloat(vs);
 
-			if (!isNum(v) || v + '' != vs)
+			if (!isNum(v) || (v + '' != vs && v.toFixed(1) != vs))
 				throw new Error('inval band');
 
 			if (sb == 'amp')
@@ -3138,9 +3138,9 @@ var afilt = (function () {
 		ebi('h_drc').textContent = f2f(r.drcn.reduction, 1);
 	}
 
-	var html = ['<table><tr><td rowspan="4">',
+	var html = ['<table><tr><td rowspan="5">',
 		'<a id="au_eq" class="tgl btn" href="#" tt="' + L.mt_eq + '">' + L.enable + '</a></td>'],
-		h2 = [], h3 = [], h4 = [];
+		h2 = [], h3 = [], h4 = [], h5 = [];
 
 	var vs = [];
 	for (var a = 0; a < r.bands.length; a++) {
@@ -3156,15 +3156,17 @@ var afilt = (function () {
 
 	for (var a = 0; a < vs.length; a++) {
 		var b = vs[a][0];
-		html.push('<td><a href="#" class="eq_step" step="0.5" band="' + b + '">+</a></td>');
-		h2.push('<td>' + vs[a][1] + '</td>');
+		html.push('<td>' + vs[a][1] + '</td>');
+		h2.push('<td><a href="#" class="eq_step" step="0.5" band="' + b + '">+</a></td>');
+		h3.push('<td><input class="eq_gain" type="range" min="-6" max="6" step="0.5" orient="vertical" band="' + b + '" value="' + vs[a][2] + '" /></td>');
 		h4.push('<td><a href="#" class="eq_step" step="-0.5" band="' + b + '">&ndash;</a></td>');
-		h3.push('<td><input type="text" class="eq_gain" ' + NOAC + ' band="' + b + '" value="' + vs[a][2] + '" /></td>');
+		h5.push('<td><input class="eq_gain" type="text" ' + NOAC + ' band="' + b + '" value="' + vs[a][2] + '" /></td>');
 	}
 	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><tr>';
 	html += h3.join('\n') + '</tr><tr>';
-	html += h4.join('\n') + '</tr><table>';
+	html += h4.join('\n') + '</tr><tr>';
+	html += h5.join('\n') + '</tr><table>';
 	ebi('audio_eq').innerHTML = html;
 
 	h2 = [];
