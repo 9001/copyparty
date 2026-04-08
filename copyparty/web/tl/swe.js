@@ -285,9 +285,9 @@ Ls.swe = {
 	"ml_drc": "dynamikkompressor",
 	"ml_ss": "hoppa över tystnad", //m
 
-	"mt_loop": "upprepa en låt\">🔁",
+	"mt_loop": "upprepa en låt",
 	"mt_one": "stoppa uppspelningen efter en låt\">1️⃣",
-	"mt_shuf": "blanda låtarna i varje mapp\">🔀",
+	"mt_shuf": "blanda låtarna i varje mapp",
 	"mt_aplay": "spela automatiskt om det finns en låt-ID i länkar du har klickat på för att öppna sidan$N$Nom detta är avstängt kommer sidans adress inte att bli uppdaterad med en låt-ID om du spelar musik, för att förhindra automatisk uppspelning om dessa inställningar går förlorade men webbadressen återstår\">a▶",
 	"mt_preload": "påbörja nedladdning av nästa låt i förväg för gapfri uppspelning\">ladda",
 	"mt_prescan": "hoppa till nästa mapp i förväg så att webbläsaren$Nförblir glad och inte avbryter uppspelningen\">nav",
@@ -302,7 +302,7 @@ Ls.swe = {
 	"mt_follow": "skrolla vyn till den spelande låten\">🎯",
 	"mt_compact": "kompakt kontrollpanel\">⟎",
 	"mt_uncache": "rensa cachen &nbsp;(prova detta om din webbläsare har cachat$Nen trasig kopia av en låt och den vägrar spela upp den)\">rensa",
-	"mt_mloop": "upprepa den öppna mappen\">🔁 upprepa",
+	"mt_mloop": "upprepa den öppna mappen",
 	"mt_mnext": "ladda nästa mapp och fortsätt\">📂 nästa",
 	"mt_mstop": "stoppa uppspelningen\">⏸ stopp",
 	"mt_cflac": "konvertera flac / wav till {0}\">flac",

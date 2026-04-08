@@ -317,7 +317,7 @@ Ls.hmn = {
 	"ml_drc": "dynamic range compressor",
 	"ml_ss": "skip silence",
 
-	"mt_loop": "loop/repeat one song\">🔁",
+	"mt_loop": "loop/repeat one song",
 	"mt_one": "stop after one song\">1️⃣",
 	"mt_shuf": "shuffle the songs in each folder\">🔀",
 	"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",

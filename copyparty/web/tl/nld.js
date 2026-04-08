@@ -285,9 +285,9 @@ Ls.nld = {
 	"ml_drc": "Dynamisch bereikcompressor",
 	"ml_ss": "Stiltes overslaan", //m
 
-	"mt_loop": "Loop/herhaal een nummer\">🔁",
+	"mt_loop": "Loop/herhaal een nummer",
 	"mt_one": "Stop na een nummer\">1️⃣",
-	"mt_shuf": "Shuffle alle muziek in alle mappen\">🔀",
+	"mt_shuf": "Shuffle alle muziek in alle mappen",
 	"mt_aplay": "Autoplay als er een song-ID staat in de link waarop je hebt geklikt om naar de server te gaan$N$NAls u dit uitschakelt, wordt de pagina-URL ook niet meer bijgewerkt met nummer-ID's tijdens het afspelen van muziek. Dit voorkomt automatisch afspelen als deze instellingen verloren gaan, maar de URL behouden blijft.\">a▶",
 	"mt_preload": "Begin het laden van de volgende nummer vlak voordat de huidige nummer het einde bereikt voor gapless playback\">preload",
 	"mt_prescan": "Ga naar de volgende map voordat de laatste nummer eindigd$NMaakt de webbrower blij$NZo het afspelen van muziek niet gestopt word\">nav",
@@ -302,7 +302,7 @@ Ls.nld = {
 	"mt_follow": "Het afgespeelde nummer in beeld houden\">🎯",
 	"mt_compact": "Compacte bedieningselementen\">⟎",
 	"mt_uncache": "Cache wissen &nbsp;(Probeer dit als uw browser een kapotte kopie van een nummer heeft gecached, waardoor het niet afgespeeld kan worden)\">uncache",
-	"mt_mloop": "De open map herhalen\">🔁 loop",
+	"mt_mloop": "De open map herhalen",
 	"mt_mnext": "Laad de volgende map en ga verder\">📂 next",
 	"mt_mstop": "Stoppen met afspelen\">⏸ stop",
 	"mt_cflac": "flac / wav omzetten naar {0}\">flac",

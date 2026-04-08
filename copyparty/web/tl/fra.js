@@ -285,9 +285,9 @@ Ls.fra = {
 	"ml_drc": "compresseur de plage dynamique",
 	"ml_ss": "ignorer les silences", //m
 
-	"mt_loop": "répéter en boucle une musique\">🔁",
+	"mt_loop": "répéter en boucle une musique",
 	"mt_one": "stopper après une musique\">1️⃣",
-	"mt_shuf": "mélanger les musiques dans chaque dossiers\">🔀",
+	"mt_shuf": "mélanger les musiques dans chaque dossiers",
 	"mt_aplay": "jouer automatiquement si le lien utilisé pour accéder au serveur a un song-ID $N$N, désactiver cela arrêtera également la mise à jour de l'URL de la page avec les song-IDs lors de la lecture de la musique, pour éviter la lecture automatique si ces paramètres sont perdus mais que l'URL reste\">a▶",
 	"mt_preload": "commencer à charger la prochaine chanson près de la fin pour une lecture sans interruption\">preload",
 	"mt_prescan": "explorer le dossier suivant avant la dernière musique$Nne finisse, pour garder le navigateur content$Npour qu'il n'arrête pas la lecture\">nav",
@@ -302,7 +302,7 @@ Ls.fra = {
 	"mt_follow": "garder la piste en cours défilée dans la vue\">🎯",
 	"mt_compact": "contrôles compacts\">⟎",
 	"mt_uncache": "effacer le cache &nbsp;(essayez ceci si votre navigateur a mis en cache$Nun copie défectueuse d'une chanson, ce qui empêche sa lecture)\">uncache",
-	"mt_mloop": "lire en boucle le dossier ouvert\">🔁 loop",
+	"mt_mloop": "lire en boucle le dossier ouvert",
 	"mt_mnext": "charger le dossier suivant et continuer\">📂 next",
 	"mt_mstop": "arrêter la lecture\">⏸ stop",
 	"mt_cflac": "convertir flac / wav en {0}\">flac",

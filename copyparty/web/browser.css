@@ -1143,8 +1143,8 @@ html.dz #flogout {
 	font-size: 1.4em;
 	left: 0;
 	right: 0;
-	bottom: -6em;
-	height: 6em;
+	bottom: -2.5em;
+	height: 2.5em;
 	z-index: 1;
 	touch-action: none;
 }
@@ -1323,11 +1323,12 @@ html.y #widget.open {
 #barpos,
 #barbuf {
 	position: absolute;
-	bottom: 1em;
-	left: 1em;
-	height: 2em;
+	bottom: auto;
+	left: 9.8em;
+	top: .4em;
+	height: 1.6em;
 	border-radius: 9em;
-	width: calc(100% - 2em);
+	width: calc(100% - 21em);
 }
 #barbuf {
 	background: var(--mp-b-bg);
@@ -1339,26 +1340,33 @@ html.y #widget.open {
 }
 #pctl {
 	position: absolute;
-	top: .5em;
-	left: 1em;
+	top: .2em;
+	left: .7em;
 }
 #pctl a {
 	display: inline-block;
 	font-size: 1.25em;
-	width: 1.3em;
+	width: 1.1em;
 	height: 1.2em;
 	text-align: center;
 	border-radius: .3em;
 }
 #pvol {
 	position: absolute;
-	top: .7em;
+	top: .4em;
 	right: 1em;
 	height: 1.6em;
 	border-radius: 9em;
-	max-width: 12em;
+	max-width: 9em;
 	width: calc(100% - 10.5em);
 	background: rgba(0,0,0,0.2);
+}
+.vbar {
+	margin: 0 -.4em;
+	display: inline-block;
+	font-weight: bold;
+	transform: translateY(-.1em);
+	text-shadow: none;
 }
 #widget.cmp {
 	height: 1.6em;
@@ -2475,7 +2483,7 @@ html.y #bbox-overlay figcaption a {
 	border-radius: .5em;
 	border: var(--a) solid 1px;
 	background: var(--bg);
-	max-width: 60em;
+	max-width: 66.6em;
 	position: relative;
 }
 #s_header{
@@ -3090,12 +3098,6 @@ html.c #path,
 html.a #path {
 	border-radius: .3em;
 }
-html.c #pctl a,
-html.a #pctl a {
-	background: rgba(0,0,0,0.1);
-	margin-right: .5em;
-	box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
-}
 html.d #pctl,
 html.b #pctl {
 	left: .5em;
@@ -3438,27 +3440,12 @@ html.d #treepar {
 	}
 }
 @media (min-width: 70em) {
-	#barpos,
-	#barbuf {
-		width: calc(100% - 21em);
-		left: 9.8em;
-		top: .7em;
-		height: 1.6em;
-		bottom: auto;
-	}
 	html.d #barpos,
 	html.b #barpos,
 	html.d #barbuf,
 	html.b #barbuf {
 		width: calc(100% - 19em);
 		left: 8em;
-	}
-	#widget {
-		bottom: -3.2em;
-		height: 3.2em;
-	}
-	#pvol {
-		max-width: 9em;
 	}
 	html.d #ops,
 	html.b #ops {

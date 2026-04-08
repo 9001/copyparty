@@ -285,9 +285,9 @@ Ls.por = {
 	"ml_drc": "compressor de faixa dinâmica",
 	"ml_ss": "ignorar silêncio", //m
 
-	"mt_loop": "loop/repetir uma música\">🔁",
+	"mt_loop": "loop/repetir uma música",
 	"mt_one": "parar depois de uma música\">1️⃣",
-	"mt_shuf": "embaralhar as músicas em cada pasta\">🔀",
+	"mt_shuf": "embaralhar as músicas em cada pasta",
 	"mt_aplay": "reproduzir automaticamente se houver um ID de música no link que você clicou para acessar o servidor$N$Ndesativar isso também impedirá que a URL da página seja atualizada com IDs de música ao tocar música, para evitar a reprodução automática se essas configurações forem perdidas mas a URL permanecer\">a▶",
 	"mt_preload": "começar a carregar a próxima música perto do final para uma reprodução sem interrupções\">preload",
 	"mt_prescan": "ir para a próxima pasta antes que a última música$Ntermine, mantendo o navegador feliz$Npara que ele não pare a reprodução\">nav",
@@ -302,7 +302,7 @@ Ls.por = {
 	"mt_follow": "manter a faixa que está tocando rolando à vista\">🎯",
 	"mt_compact": "controles compactos\">⟎",
 	"mt_uncache": "limpar cache &nbsp;(tente isso se seu navegador armazenou em cache$Numa cópia quebrada de uma música e se recusa a tocar)\">uncache",
-	"mt_mloop": "loop na pasta aberta\">🔁 loop",
+	"mt_mloop": "loop na pasta aberta",
 	"mt_mnext": "carregar a próxima pasta e continuar\">📂 próximo",
 	"mt_mstop": "parar reprodução\">⏸ parar",
 	"mt_cflac": "converter flac / wav para {0}\">flac",

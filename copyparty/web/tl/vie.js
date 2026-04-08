@@ -289,9 +289,9 @@ Ls.vie = {
 	"ml_drc": "bộ nén dải động",
 	"ml_ss": "bỏ qua khoảng lặng", //m
 
-	"mt_loop": "lặp lại một bài\">🔁",
+	"mt_loop": "lặp lại một bài",
 	"mt_one": "dừng sau một bài\">1️⃣",
-	"mt_shuf": "trộn các bài trong thư mụcr\">🔀",
+	"mt_shuf": "trộn các bài trong thư mụcr",
 	"mt_aplay": "tự động phát nếu có ID bài trong link bạn nhấp để truy cập máy chủ$N$Ntắt tuỳ chọn sẽ ngăn URL của trang cập nhật theo ID bài khi phát nhạc, tránh tự động phát nếu cài đặt mất nhưng URL còn\">a▶",
 	"mt_preload": "bắt đầu tải bài hát tiếp theo khi gần hết bài để phát liền mạch\">preload",
 	"mt_prescan": "chuyển đến thư mục tiếp theo trước khi bài cuối cùng $Nkết thúc, giúp giữ trình duyệt hoạt động $N và không dừng phát nhạc\">nav",
@@ -306,7 +306,7 @@ Ls.vie = {
 	"mt_follow": "giữ bài đang phát trong tầm nhìn\">🎯",
 	"mt_compact": "giao diện điều khiển thu gọn\">⟎",
 	"mt_uncache": "xoá bộ nhớ đệm &nbsp;(thử nếu trình duyệt lưu trữ đệm $Nmột bản nhạc bị lỗi và không thể phát)\">uncache",
-	"mt_mloop": "lặp trong thư mục đang mở\">🔁 loop",
+	"mt_mloop": "lặp trong thư mục đang mở",
 	"mt_mnext": "tải thư mục tiếp theo và tiếp tục\">📂 next",
 	"mt_mstop": "dừng phát\">⏸ stop",
 	"mt_cflac": "chuyển flac / wav sang {0}\">flac",

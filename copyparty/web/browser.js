@@ -293,9 +293,9 @@ if (1)
 		"ml_drc": "dynamic range compressor",
 		"ml_ss": "skip silence",
 
-		"mt_loop": "loop/repeat one song\">🔁",
+		"mt_loop": "loop/repeat one song",
 		"mt_one": "stop after one song\">1️⃣",
-		"mt_shuf": "shuffle the songs in each folder\">🔀",
+		"mt_shuf": "shuffle the songs in each folder",
 		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
@@ -310,7 +310,7 @@ if (1)
 		"mt_follow": "keep the playing track scrolled into view\">🎯",
 		"mt_compact": "compact controls\">⟎",
 		"mt_uncache": "clear cache &nbsp;(try this if your browser cached$Na broken copy of a song so it refuses to play)\">uncache",
-		"mt_mloop": "loop the open folder\">🔁 loop",
+		"mt_mloop": "loop the open folder",
 		"mt_mnext": "load the next folder and continue\">📂 next",
 		"mt_mstop": "stop playback\">⏸ stop",
 		"mt_cflac": "convert flac / wav to {0}\">flac",
@@ -789,10 +789,10 @@ ebi('widget').innerHTML = (
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
-	'	<div id="pctl"><a href="#" id="bprev" tt="' + L.wt_prev + '">⏮</a><a href="#" id="bplay" tt="' + L.wt_play + '">▶</a><a href="#" id="bnext" tt="' + L.wt_next + '">⏭</a></div>' +
+	'	<div id="pctl"><a href="#" id="bprev" tt="' + L.wt_prev + '"><p class="vbar">|</p>◀</a><a href="#" id="bplay" tt="' + L.wt_play + '">▶</a><a href="#" id="bnext" tt="' + L.wt_next + '">▶<p class="vbar">|</p></a></div>' +
+	'	<div style="display flex"><canvas id="barpos"></canvas>' +
+	'	<canvas id="barbuf"></canvas></div>' +
 	'	<canvas id="pvol" width="288" height="38"></canvas>' +
-	'	<canvas id="barpos"></canvas>' +
-	'	<canvas id="barbuf"></canvas>' +
 	'</div>' +
 	'<div id="np_inf">' +
 	'	<img id="np_img" />' +
@@ -915,9 +915,9 @@ x.parentNode.insertBefore(mknod('div', null,
 
 var musicSettings = (
 	'<div><h3>🎵 ' + L.ot_mp + '</h3><div>' +
-	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '</a>' +
+	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
 	'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
-	'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
+	'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
 	'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
 	'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 	'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
@@ -938,7 +938,7 @@ var musicSettings = (
 	'</div></div>' +
 
 	'<div><h3>📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
-	'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '</a>' +
+	'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '">🔁</a>' +
 	'<a href="#" class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
 	'<a href="#" class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
 	'</div></div>' +
@@ -6886,7 +6886,7 @@ function aligngriditems() {
 	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
 		val = 'left';
 	} else {
-		val = treectl.hidden ? 'center' : 'space-between';
+		val = 'center';// treectl.hidden ? 'center' : 'space-between';
 	}
 	if (st.justifyContent != val)
 		st.justifyContent = val;

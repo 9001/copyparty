@@ -285,9 +285,9 @@ Ls.ita = {
 	"ml_drc": "compressore gamma dinamica",
 	"ml_ss": "salta i silenzi", //m
 
-	"mt_loop": "loop/ripeti una canzone\">🔁",
+	"mt_loop": "loop/ripeti una canzone",
 	"mt_one": "fermati dopo una canzone\">1️⃣",
-	"mt_shuf": "mescola le canzoni in ogni cartella\">🔀",
+	"mt_shuf": "mescola le canzoni in ogni cartella",
 	"mt_aplay": "autoplay se c'è un song-ID nel link che hai cliccato per accedere al server$N$NDisabilitando questo fermerà anche l'aggiornamento dell'URL della pagina con song-ID quando riproduci musica, per prevenire autoplay se queste impostazioni vengono perse ma l'URL rimane\">a▶",
 	"mt_preload": "inizia a caricare la prossima canzone verso la fine per riproduzione senza interruzioni\">preload",
 	"mt_prescan": "vai alla prossima cartella prima che finisca l'ultima canzone$Nmantenendo felice il browser web$Ncosì non si ferma la riproduzione\">nav",
@@ -302,7 +302,7 @@ Ls.ita = {
 	"mt_follow": "mantieni la traccia in riproduzione scorrevole nella vista\">🎯",
 	"mt_compact": "controlli compatti\">⟎",
 	"mt_uncache": "pulisci cache &nbsp;(prova ad attivare se il tuo browser ha messo in cache$Nuna copia rotta di una canzone e si rifiuta di riprodurla)\">uncache",
-	"mt_mloop": "loop della cartella aperta\">🔁 loop",
+	"mt_mloop": "loop della cartella aperta",
 	"mt_mnext": "carica la prossima cartella e continua\">📂 succ",
 	"mt_mstop": "ferma riproduzione\">⏸ stop",
 	"mt_cflac": "converti flac / wav in {0}\">flac",

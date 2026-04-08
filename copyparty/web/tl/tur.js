@@ -285,9 +285,9 @@ Ls.tur = {
 	"ml_drc": "dinamik aralık sıkıştırıcı",
 	"ml_ss": "sessizliği atla", //m
 
-	"mt_loop": "bir şarkıyı döngüye al / tekrar et\">🔁",
+	"mt_loop": "bir şarkıyı döngüye al / tekrar et",
 	"mt_one": "bir şarkıdan sonra dur\">1️⃣",
-	"mt_shuf": "klasörlerdeki şarkıları karıştır\">🔀",
+	"mt_shuf": "klasörlerdeki şarkıları karıştır",
 	"mt_aplay": "sunucuya erişmek için kullandığın bağlantıda geçerli bir şarkı varsa otomatik oynat$N$Nbunu etkisiz kılmak aynı zamanda müzik oynatıldığında sayfa URL'nin değişmesini de engeller\">a▶",
 	"mt_preload": "aralıksız oynatma için sıradaki şarkıyı önceden yüklemeye başla\">ön yükleme",
 	"mt_prescan": "son şarkı bitmeden önce bir sonraki klasöre git$Nweb tarayıcısını mutlu tutar$Nbu nedenle oynatmayı durdurmaz\">nav",
@@ -302,7 +302,7 @@ Ls.tur = {
 	"mt_follow": "oynatılan müzik ibaresini görünümde tut\">🎯",
 	"mt_compact": "kompakt kontroller\">⟎",
 	"mt_uncache": "önbelleği temizle &nbsp;(bunu, tarayıcınızın bozuk bir şarkı kopyasını önbelleğe alması nedeniyle çalmayı reddettiğinde deneyin)\">önbelleği temizle",
-	"mt_mloop": "açık klasörü döngüye al\">🔁 döngü",
+	"mt_mloop": "açık klasörü döngüye al",
 	"mt_mnext": "bir sonraki klasörü yükle ve devam et\">📂 sonraki",
 	"mt_mstop": "oynatmayı durdur\">⏸ durdur",
 	"mt_cflac": "flac / wav'ı {0}'a dönüştür\">flac",

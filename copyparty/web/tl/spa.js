@@ -284,9 +284,9 @@ Ls.spa = {
 	"ml_drc": "compresor de rango dinámico",
 	"ml_ss": "saltar silencios", //m
 
-	"mt_loop": 'poner en bucle/repetir una canción">🔁',
+	"mt_loop": 'poner en bucle/repetir una canción',
 	"mt_one": 'parar después de una canción">1️⃣',
-	"mt_shuf": 'reproducir aleatoriamente las canciones en cada carpeta">🔀',
+	"mt_shuf": 'reproducir aleatoriamente las canciones en cada carpeta',
 	"mt_aplay": 'reproducir automaticamente si hay un ID de canción en el enlace en el que hiciste clic para acceder al servidor$N$Ndesactivar esto también evitará que la URL de la página se actualice con IDs de canción al reproducir música, para prevenir la reproducción automática si se pierden estos ajustes pero la URL permanece">a▶',
 	"mt_preload": 'empezar a cargar la siguiente canción cerca del final para una reproducción sin pausas">precarga',
 	"mt_prescan": 'ir a la siguiente carpeta antes de que la última canción$Ntermine, manteniendo contento al navegador$Npara que no detenga la reproducción">nav',
@@ -301,7 +301,7 @@ Ls.spa = {
 	"mt_follow": 'mantener la pista en reproducción visible en pantalla">🎯',
 	"mt_compact": 'controles compactos">⟎',
 	"mt_uncache": 'limpiar caché &nbsp;(prueba esto si tu navegador guardó en caché$Nuna copia rota de una canción que se niega a reproducir)">limpiar caché',
-	"mt_mloop": 'repetir la carpeta actual">🔁 bucle',
+	"mt_mloop": 'repetir la carpeta actual',
 	"mt_mnext": 'cargar la siguiente carpeta y continuar">📂 sig',
 	"mt_mstop": 'detener reproducción">⏸ parar',
 	"mt_cflac": 'convertir flac / wav a {0}">flac',

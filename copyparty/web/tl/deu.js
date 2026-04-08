@@ -285,9 +285,9 @@ Ls.deu = {
 	"ml_drc": "Dynamic Range Compressor",
 	"ml_ss": "Stille Überspringen", //m
 
-	"mt_loop": "Song wiederholen\">🔁",
+	"mt_loop": "Song wiederholen",
 	"mt_one": "Wiedergabe nach diesem Song beenden\">1️⃣",
-	"mt_shuf": "Zufällige Wiedergabe im Ordner\">🔀",
+	"mt_shuf": "Zufällige Wiedergabe im Ordner",
 	"mt_aplay": "automatisch abspielen, wenn der Link, mit dem du auf den Server zugreifst, eine Titel-ID enthält$N$NDeaktivieren verhindert auch, dass die Seiten-URL bei Musikwiedergabe mit Titel-IDs aktualisiert wird, um Autoplay zu verhindern, falls diese Einstellungen verloren gehen, die URL aber bestehen bleibt\">a▶",
 	"mt_preload": "nächsten Titel gegen Ende vorladen für nahtlose Wiedergabe\">Vorladen",
 	"mt_prescan": "vor Ende des letzten Titels zum nächsten Ordner wechseln,$Ndamit der Browser die$NWiedergabe nicht stoppt\">Navigation",
@@ -302,7 +302,7 @@ Ls.deu = {
 	"mt_follow": "den spielenden Titel im Blick behalten\">🎯",
 	"mt_compact": "kompakte Steuerelemente\">⟎",
 	"mt_uncache": "Cache leeren &nbsp;(probier das, wenn dein Browser$Neine defekte Kopie eines Titels zwischenspeichert und sich weigert, ihn abzuspielen)\">Cache leeren",
-	"mt_mloop": "offenen Ordner wiederholen\">🔁 Schleife",
+	"mt_mloop": "offenen Ordner wiederholen",
 	"mt_mnext": "nächsten Ordner laden und fortfahren\">📂 nächster",
 	"mt_mstop": "Wiedergabe beenden\">⏸ Stop",
 	"mt_cflac": "FLAC / WAV zu {0} konvertierebn\">flac",

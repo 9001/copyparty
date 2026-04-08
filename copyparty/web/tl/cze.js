@@ -289,9 +289,9 @@ Ls.cze = {
 	"ml_drc": "kompresor dynamického rozsahu",
 	"ml_ss": "přeskočit ticho", //m
 
-	"mt_loop": "smyčka/opakovat jednu skladbu\">🔁",
+	"mt_loop": "smyčka/opakovat jednu skladbu",
 	"mt_one": "zastavit po jedné skladbě\">1️⃣",
-	"mt_shuf": "zamíchat skladby v každé složce\">🔀",
+	"mt_shuf": "zamíchat skladby v každé složce",
 	"mt_aplay": "automatické přehrávání pokud je ID skladby v odkazu kterým jste přišli na server$N$Nzakázání toho také zastaví aktualizaci URL stránky s ID skladby při přehrávání hudby, aby se zabránilo automatickému přehrávání pokud se tato nastavení ztratí ale URL zůstane\">a▶",
 	"mt_preload": "začít načítat následující skladbu před koncem pro plynulé přehrávání\">přednahrání",
 	"mt_prescan": "přejít do následující složky před tím než$Nskončí poslední skladba, aby byl webprohlížeč$Nspokojen aby nezastavil přehrávání\">nav",
@@ -306,7 +306,7 @@ Ls.cze = {
 	"mt_follow": "udržet přehrávanou stopu v zobrazení\">🎯",
 	"mt_compact": "kompaktní ovládání\">⟎",
 	"mt_uncache": "vymazat cache &nbsp;(zkuste to, pokud váš prohlížeč uložil$Nporušenou kopii písně a odmítá ji přehrát)\">uncache",
-	"mt_mloop": "opakovat otevřenou složku\">🔁 loop",
+	"mt_mloop": "opakovat otevřenou složku",
 	"mt_mnext": "načíst další složku a pokračovat\">📂 next",
 	"mt_mstop": "zastavit přehrávání\">⏸ stop",
 	"mt_cflac": "převést flac / wav na {0}\">flac",

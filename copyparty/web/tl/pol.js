@@ -288,9 +288,9 @@ Ls.pol = {
 	"ml_drc": "kompresor zasięgu dynamiki",
 	"ml_ss": "pomijaj ciszę", //m
 
-	"mt_loop": "pętla/powtarzaj jeden utwór\">🔁",
+	"mt_loop": "pętla/powtarzaj jeden utwór",
 	"mt_one": "zatrzymaj po jednym utworze\">1️⃣",
-	"mt_shuf": "odtwarzaj losowo w każdym folderze\">🔀",
+	"mt_shuf": "odtwarzaj losowo w każdym folderze",
 	"mt_aplay": "autoodtwarzanie po kliknięciu linku do tego serwera, zawierającego identyfikator utworu$N$Nwyłączenie tej opcji zapobiegnie aktualizowaniu adresu strony podczas odtwarzania muzyki, aby zapobiec autoodtwarzaniu przy utracie ustawień\">a▶",
 	"mt_preload": "rozpocznij ładowanie kolejnego utworu blisko końca aktualnego w celu uzyskania odtwarzania bez przerw\">preload",
 	"mt_prescan": "przechodzi do następnego folderu przed zakończeniem ostatniego utworu,$Naby udobruchać przeglądarkę,$Nżeby nie zatrzymała odtwarzania\">naw",
@@ -305,7 +305,7 @@ Ls.pol = {
 	"mt_follow": "podążaj za odtwarzanym utworem przewijając widok\">🎯",
 	"mt_compact": "kompaktowe sterowanie\">⟎",
 	"mt_uncache": "wyczyść pamięć podręczną &nbsp;(spróbuj jeśli przeglądarka$Nzachowała zepsutą kopię utworu, przez co nie odtwarza się ona)\">uncache",
-	"mt_mloop": "odtwarzaj utwory w folderze w pętli\">🔁 loop",
+	"mt_mloop": "odtwarzaj utwory w folderze w pętli",
 	"mt_mnext": "wczytaj następny folder i kontynuuj\">📂 next",
 	"mt_mstop": "zatrzymaj odtwarzanie\">⏸ stop",
 	"mt_cflac": "przekonwertuj format flac / wav na {0}\">flac",
