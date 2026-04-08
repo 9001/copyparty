@@ -212,12 +212,12 @@ if (1)
 		"u_nav_m": '<h6>aight, what do you have?</h6><code>Enter</code> = Files (one or more)\n<code>ESC</code> = One folder (including subfolders)',
 		"u_nav_b": '<a href="#" id="modal-ok">Files</a><a href="#" id="modal-ng">One folder</a>',
 
-		"cl_opts": "switches",
+		"cl_opts": "general",
 		"cl_hfsz": "filesize",
 		"cl_themes": "theme",
 		"cl_langs": "language",
 		"cl_ziptype": "folder download",
-		"cl_uopts": "up2k switches",
+		"cl_uopts": "upload",
 		"cl_favico": "favicon",
 		"cl_bigdir": "big dirs",
 		"cl_hsort": "#sort",
@@ -1333,7 +1333,7 @@ var mpl = (function () {
 	var have_mctl = 'mediaSession' in navigator && window.MediaMetadata;
 
 	ebi('op_player').innerHTML = (
-		'<div><h3>' + L.cl_opts + '</h3><div>' +
+		'<div><h3>' + L.ot_mp + '</h3><div>' +
 		'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '</a>' +
 		'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
 		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
@@ -8524,7 +8524,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
+			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'evil blue'];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));

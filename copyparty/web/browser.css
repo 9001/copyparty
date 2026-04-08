@@ -1639,7 +1639,7 @@ input.ssconf_v {
 }
 
 #wrap {
-	margin: .5em .7em 0 .7em;
+	margin: .5em 1em 0 .7em;
 	min-height: 70vh;
 	padding-bottom: 7em;
 }
@@ -4432,7 +4432,7 @@ html.e #detree {
 	font-size: medium;
 }
 #acc_settings:hover{
-	background: var(--a-b);
+	background: var(--a-hil);
 }
 
 .popup.show {
