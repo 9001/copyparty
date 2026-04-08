@@ -755,7 +755,6 @@ ebi('ops').innerHTML = (
 	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂 <p class="overlay_plus">+</p></a>' +
 	'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '">📝</a>' +
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
-	'<a href="#" id="opa_auc" data-dest="player" tt="' + L.ot_mp + '">🎺</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
 	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<div id="opdesc"></div>'
@@ -913,6 +912,62 @@ x.parentNode.insertBefore(mknod('div', null,
 })();
 
 // config panel
+
+var musicSettings = (
+	'<div><h3>🎵 ' + L.ot_mp + '</h3><div>' +
+	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '</a>' +
+	'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
+	'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
+	'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
+	'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
+	'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
+	'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
+	'<a href="#" class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
+	'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
+	'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
+	'<a href="#" class="tgl btn" id="au_m3u_c" tt="' + L.mt_m3u_c + '</a>' +
+	'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
+	'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
+	'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
+	'<a href="#" class="tgl btn" id="au_follow" tt="' + L.mt_follow + '</a>' +
+	'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
+	'</div></div>' +
+
+	'<div><h3>▶️ ' + L.ml_btns + '</h3><div>' +
+	'<a href="#" class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
+	'</div></div>' +
+
+	'<div><h3>📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
+	'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '</a>' +
+	'<a href="#" class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
+	'<a href="#" class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
+	'</div></div>' +
+
+	(have_acode ? (
+		'<div><h3>🏹 ' + L.ml_tcode + '</h3><div>' +
+		'<a href="#" id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
+		'<a href="#" id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
+		'<a href="#" id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
+		'</div></div>' +
+		'<div><h3>🎯 ' + L.ml_tcode2 + '</h3><div>' +
+		'<a href="#" id="ac2opus" class="tgl btn" tt="' + L.mt_c2opus + '</a>' +
+		'<a href="#" id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
+		'<a href="#" id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
+		'<a href="#" id="ac2mp3" class="tgl btn" tt="' + L.mt_c2mp3 + '</a>' +
+		'<a href="#" id="ac2flac" class="tgl btn" tt="' + L.mt_c2flac + '</a>' +
+		'<a href="#" id="ac2wav" class="tgl btn" tt="' + L.mt_c2wav + '</a>' +
+		'</div></div>'
+	) : '') +
+
+	'<div><h3>🕶️ ' + L.ml_tint + '</h3><div>' +
+	'<input type="text" id="pb_tint" value="0" ' + NOAC + ' style="width:2.4em" tt="' + L.mt_tint + '" />' +
+	'</div></div>' +
+
+	'<div><h3 id="h_drc">🐘 ' + L.ml_drc + '</h3><div><div id="audio_drc"></div></div></div>' +
+	'<div><h3>📊 ' + L.ml_eq + '</h3><div><div id="audio_eq"></div></div></div>' +
+	'<div><h3>🔇 ' + L.ml_ss + '</h3><div><div id="audio_ss"></div></div></div>' +
+	'');
+
 ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3>✅ ' + L.cl_opts + '</h3>\n' +
@@ -935,6 +990,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
+	(!MOBILE ? '<div><h3>🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
 	'<div>\n' +
 	'	<h3>🔢 ' + L.cl_hfsz + '</h3>\n' +
 	'	<div><select id="fszfmt">\n' +
@@ -1005,8 +1061,8 @@ ebi('op_cfg').innerHTML = (
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
+	musicSettings +
 	'<div><h3>🎼 ' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	(!MOBILE ? '<div><h3>🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
 	'<div><h3>👁️ ' + L.cl_hiddenc + ' &nbsp;</h3><div>' + 
 	(MOBILE ? '<a id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a id="hcolsr">' + L.cl_reset + '</a><div id="hcols"></div></div></div>'
 );
@@ -1023,12 +1079,12 @@ ebi('op_cfg').innerHTML = (
 		var section = `<div id="${sId}" class="s_section"><h3>${sName}</h3>`;
 		for (var ii = 0; ii < subSettings.children.length; ii++){
 			var s = subSettings.children[ii];
-			var tt = s.getAttribute('tt')?.replace(/\$N/g, "<br />");
+			var info = tt.parse(s.getAttribute('tt'));
 			s.removeAttribute('tt');
 			s.href = '#' + sId;
 			section += `<div id="${subSettings.id}" class="setting">` +
 				s.outerHTML +
-				(tt?.length > 0 ? `<p class="s_desc">${tt}</p>` : '') + 
+				(info?.length > 0 ? `<p class="s_desc">${info}</p>` : '') + 
 				'</div>';
 		}
 		section += '</div>'
@@ -1332,61 +1388,6 @@ ebi('hsortn').oninput = function (e) {
 var mpl = (function () {
 	var have_mctl = 'mediaSession' in navigator && window.MediaMetadata;
 
-	ebi('op_player').innerHTML = (
-		'<div><h3>' + L.ot_mp + '</h3><div>' +
-		'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '</a>' +
-		'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
-		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
-		'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
-		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
-		'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
-		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
-		'<a href="#" class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
-		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
-		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
-		'<a href="#" class="tgl btn" id="au_m3u_c" tt="' + L.mt_m3u_c + '</a>' +
-		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
-		'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
-		'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
-		'<a href="#" class="tgl btn" id="au_follow" tt="' + L.mt_follow + '</a>' +
-		'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
-		'</div></div>' +
-
-		'<div><h3>' + L.ml_btns + '</h3><div>' +
-		'<a href="#" class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
-		'</div></div>' +
-
-		'<div><h3>' + L.ml_pmode + '</h3><div id="pb_mode">' +
-		'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '</a>' +
-		'<a href="#" class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
-		'<a href="#" class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
-		'</div></div>' +
-
-		(have_acode ? (
-			'<div><h3>' + L.ml_tcode + '</h3><div>' +
-			'<a href="#" id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
-			'<a href="#" id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
-			'<a href="#" id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
-			'</div></div>' +
-			'<div><h3>' + L.ml_tcode2 + '</h3><div>' +
-			'<a href="#" id="ac2opus" class="tgl btn" tt="' + L.mt_c2opus + '</a>' +
-			'<a href="#" id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
-			'<a href="#" id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
-			'<a href="#" id="ac2mp3" class="tgl btn" tt="' + L.mt_c2mp3 + '</a>' +
-			'<a href="#" id="ac2flac" class="tgl btn" tt="' + L.mt_c2flac + '</a>' +
-			'<a href="#" id="ac2wav" class="tgl btn" tt="' + L.mt_c2wav + '</a>' +
-			'</div></div>'
-		) : '') +
-
-		'<div><h3>' + L.ml_tint + '</h3><div>' +
-		'<input type="text" id="pb_tint" value="0" ' + NOAC + ' style="width:2.4em" tt="' + L.mt_tint + '" />' +
-		'</div></div>' +
-
-		'<div><h3 id="h_drc">' + L.ml_drc + '</h3><div id="audio_drc"></div></div>' +
-		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>' +
-		'<div><h3>' + L.ml_ss + '</h3><div id="audio_ss"></div></div>' +
-		'');
-
 	var r = {
 		"pb_mode": (sread('pb_mode', ['loop', 'next', 'stop']) || 'next').split('-')[0],
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
@@ -1545,9 +1546,9 @@ var mpl = (function () {
 			btns.push(btn);
 		}
 		if (!IPHONE)
-			btns[1].style.display = btns[2].style.display = 'none';
-		btns[4].style.display = have_c2flac ? '' : 'none';
-		btns[5].style.display = have_c2wav ? '' : 'none';
+			btns[1].parentElement.style.display = btns[2].parentElement.style.display = 'none';
+		btns[4].parentElement.style.display = have_c2flac ? '' : 'none';
+		btns[5].parentElement.style.display = have_c2wav ? '' : 'none';
 
 		if (v)
 			swrite('acode2', v);
@@ -1559,9 +1560,9 @@ var mpl = (function () {
 			clmod(btns[a], 'on', fmts[a] == v)
 
 		r.ac2 = v;
-		ebi('ac_flac').setAttribute('tt', L.mt_cflac.split('"')[0].format(v));
-		ebi('ac_aac').setAttribute('tt', L.mt_caac.split('"')[0].format(v));
-		ebi('ac_oth').setAttribute('tt', L.mt_coth.split('"')[0].format(v));
+		ebi('ac_flac').nextSibling.innerHTML = L.mt_cflac.split('"')[0].format(v);
+		ebi('ac_aac').nextSibling.innerHTML = L.mt_caac.split('"')[0].format(v);
+		ebi('ac_oth').nextSibling.innerHTML = L.mt_coth.split('"')[0].format(v);
 	};
 
 	r.pp = function () {
@@ -2865,8 +2866,10 @@ var afilt = (function () {
 		for (var a = 0; a < r.bands.length; a++)
 			gains[a + gains.length / 2].value = gains[a].value = r.gains[a].toFixed(1);
 
-		QS('input.eq_gain[band="amp"]').value = r.amp;
-		QS('input.eq_gain[band="chw"]').value = r.chw;
+		var amps = QSA('input.eq_gain[band="amp"]');
+		amps[0].value = amps[1].value = r.amp;
+		var chws = QSA('input.eq_gain[band="chw"]');
+		chws[0].value = chws[1].value = r.chw;
 	};
 
 	r.stop = function () {
@@ -3138,8 +3141,10 @@ var afilt = (function () {
 		ebi('h_drc').textContent = f2f(r.drcn.reduction, 1);
 	}
 
-	var html = ['<table><tr><td rowspan="5">',
-		'<a id="au_eq" class="tgl btn" href="#" tt="' + L.mt_eq + '">' + L.enable + '</a></td>'],
+	ebi('audio_eq').innerHTML = '<a id="au_eq" class="tgl btn" href="#">' + L.enable + 
+		'</a><p class="s_desc">' + tt.parse(L.mt_eq) + '</p><br/>';
+
+	var html = ['<table><tr>'],
 		h2 = [], h3 = [], h4 = [], h5 = [];
 
 	var vs = [];
@@ -3167,11 +3172,12 @@ var afilt = (function () {
 	html += h3.join('\n') + '</tr><tr>';
 	html += h4.join('\n') + '</tr><tr>';
 	html += h5.join('\n') + '</tr><table>';
-	ebi('audio_eq').innerHTML = html;
+	ebi('audio_eq').innerHTML += html;
 
+	ebi('audio_drc').innerHTML = '<a id="au_drc" class="tgl btn" href="#">' + L.enable + 
+		'</a><p class="s_desc">' + tt.parse(L.mt_drc) + '</p><br/>';
 	h2 = [];
-	html = ['<table><tr><td rowspan="2">',
-		'<a id="au_drc" class="tgl btn" href="#" tt="' + L.mt_drc + '">' + L.enable + '</a></td>'];
+	html = ['<table><tr>'];
 
 	for (var a = 0; a < r.drch.length; a++) {
 		html.push('<td>' + r.drch[a] + '</td>');
@@ -3179,11 +3185,12 @@ var afilt = (function () {
 	}
 	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><table>';
-	ebi('audio_drc').innerHTML = html;
+	ebi('audio_drc').innerHTML += html;
 
+	ebi('audio_ss').innerHTML = '<a id="au_ss" class="tgl btn" href="#">' + L.enable + 
+		'</a><p class="s_desc">' + tt.parse(L.mt_ss) + '</p><br/>';
 	h2 = [];
-	html = ['<table><tr><td rowspan="2">',
-		'<a id="au_ss" class="tgl btn" href="#" tt="' + L.mt_ss + '">' + L.enable + '</a></td>'];
+	html = ['<table><tr>'];
 
 	for (var a = 0; a < r.sscl.length; a++) {
 		html.push('<td tt="' + r.sscl[a] + '</td>');
@@ -3192,7 +3199,7 @@ var afilt = (function () {
 
 	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><table>';
-	ebi('audio_ss').innerHTML = html;
+	ebi('audio_ss').innerHTML += html;
 
 	var stp = QSA('a.eq_step');
 	for (var a = 0, aa = stp.length; a < aa; a++)

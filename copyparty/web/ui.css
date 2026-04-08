@@ -210,7 +210,8 @@ html {
 }
 .logue code,
 #modalc code,
-#tt code {
+#tt code,
+.opview code{
 	color: #eee;
 	color: var(--fg-max);
 	background: #444;

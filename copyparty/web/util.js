@@ -1551,6 +1551,18 @@ var tt = (function () {
         return el.getAttribute('tt');
     };
 
+    r.parse = function(msg){
+        if(!(msg?.length > 0))
+            return msg;
+        if (msg.startsWith('`')) {
+            var x = false;
+            msg = msg.slice(1);
+            while (msg.indexOf('`') + 1)
+                msg = msg.replace('`', (x = !x) ? '<code>' : '</code>');
+        }
+        return msg.replace(/\$N/g, "<br />");
+    }
+
     r.show = function () {
         clearTimeout(tev);
         if (r.skip) {
@@ -1561,12 +1573,7 @@ var tt = (function () {
         if (!msg)
             return;
 
-        if (msg.startsWith('`')) {
-            var x = false;
-            msg = msg.slice(1);
-            while (msg.indexOf('`') + 1)
-                msg = msg.replace('`', (x = !x) ? '<code>' : '</code>')
-        }
+        
 
         r.el = this;
         var pos = this.getBoundingClientRect(),
@@ -1583,7 +1590,7 @@ var tt = (function () {
         r.tt.style.left = '0';
         r.tt.style.top = '0';
 
-        r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
+        r.tt.innerHTML = r.parse(msg);
         r.el.addEventListener('mouseleave', r.hide);
         window.addEventListener('scroll', r.hide);
         clmod(r.tt, 'show', 1);

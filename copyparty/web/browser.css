@@ -1492,6 +1492,7 @@ html.y #ops svg circle {
 	padding: .2em .3em;
 	font-size: medium;
 	min-width: 3em;
+	margin-bottom: .5em;
 }
 .opview select {
 	padding: .3em;
@@ -1536,7 +1537,9 @@ input.eq_gain[type=range]{
 	color: var(--a);
 }
 input.eq_gain[type=text]{
-    width: 1.5em;
+    width: 2em;
+	min-width: 0;
+	margin: 0 .15em .5em .15em;
 	text-align: center;
 }
 input.drc_v,
@@ -1558,13 +1561,6 @@ input.ssconf_v {
 	font-size: 1.5em;
 	display: block;
 	padding: 0;
-}
-#au_ss,
-#au_drc,
-#au_eq {
-	display: block;
-	margin-top: .5em;
-	padding: 1.3em .3em;
 }
 #au_ss,
 #au_drc {
@@ -2486,6 +2482,9 @@ html.y #bbox-overlay figcaption a {
 	margin: 0;
 	padding: .5em;
 	background: var(--ttlbar);
+	font-size: large;
+	font-weight: bold;
+	color: var(--fg);
 }
 #s_hor{
 	display: grid;
@@ -2517,12 +2516,13 @@ html.y #bbox-overlay figcaption a {
 	border: var(--bg-u5) solid 1px;
 	border-top: 0;
 	margin: -1.5em 0 1.5em 0;
+	overflow-x: scroll;
 }
 .setting:hover{
 	background: var(--bg-u3);
 }
 .s_desc{
-	margin: .5em 0 0 0;
+	margin: 0 0 0 0;
 	font-size: medium;
 	color: var(--fg-weak);
 }
@@ -3380,7 +3380,7 @@ html.d #treepar {
 
 
 
-/* basically a phone layout */
+/* basically a mobile / phone layout */
 @media (max-width: 50em){
 	body {
 		margin: 1em;
@@ -3418,6 +3418,13 @@ html.d #treepar {
 	}
 	#ghead {
 		margin: .5em;
+	}
+	#s_hor {
+		display: block;
+		overflow-y: scroll;
+	}
+	#s_divider {
+		display: none;
 	}
 }
 @media (max-width: 32em) {
