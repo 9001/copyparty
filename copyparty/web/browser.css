@@ -1407,8 +1407,7 @@ html.y #widget.open {
 #widget.cmp #wtoggle {
 	font-size: 1.2em;
 }
-#widget.cmp #fshr,
-#widget.cmp #wtgrid, #widget.cmp #wtgrid2 {
+#widget.cmp #fshr {
 	display: none;
 }
 #widget.cmp #pctl .icon {
@@ -1418,11 +1417,7 @@ html.y #widget.open {
 }
 #widget.cmp #barpos,
 #widget.cmp #barbuf {
-	height: 1.6em;
-	width: calc(100% - 11em);
 	border-radius: 0;
-	left: 5em;
-	top: 0;
 }
 #widget.cmp #pvol {
 	top: 0;
