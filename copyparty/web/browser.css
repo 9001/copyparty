@@ -1468,7 +1468,8 @@ input.ssconf_v {
 }
 #audio_drc td,
 #audio_eq td,
-#audio_ss td {
+#audio_ss td,
+#audio_nc td {
 	text-align: center;
 }
 #audio_eq a.eq_step {

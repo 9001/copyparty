@@ -288,6 +288,7 @@ if (1)
 		"ml_tcode": "transcode",
 		"ml_tcode2": "transcode to",
 		"ml_tint": "tint",
+		"ml_nc": "nightcore",
 		"ml_eq": "audio equalizer",
 		"ml_drc": "dynamic range compressor",
 		"ml_ss": "skip silence",
@@ -326,6 +327,8 @@ if (1)
 		"mt_c2ng": "your device does not seem to support this output format, but let's try anyways",
 		"mt_xowa": "there are bugs in iOS preventing background playback using this format; please use caf or mp3 instead",
 		"mt_tint": "background level (0-100) on the seekbar$Nto make buffering less distracting",
+		"mt_nc": "enable nightcore effect (speeds up playback and raises pitch)",
+		"mt_ncspd": "playback speed multiplier (e.g. 1.25 for classic nightcore)\">speed",
 		"mt_eq": "`enables the equalizer and gain control;$N$Nboost `0` = standard 100% volume (unmodified)$N$Nwidth `1 &nbsp;` = standard stereo (unmodified)$Nwidth `0.5` = 50% left-right crossfeed$Nwidth `0 &nbsp;` = mono$N$Nboost `-0.8` &amp; width `10` = vocal removal :^)$N$Nenabling the equalizer makes gapless albums fully gapless, so leave it on with all the values at zero (except width = 1) if you care about that",
 		"mt_drc": "enables the dynamic range compressor (volume flattener / brickwaller); will also enable EQ to balance the spaghetti, so set all EQ fields except for 'width' to 0 if you don't want it$N$Nlowers the volume of audio above THRESHOLD dB; for every RATIO dB past THRESHOLD there is 1 dB of output, so default values of 'tresh' -24 and 'ratio' 12 means it should never get louder than -22 dB and it is safe to increase the equalizer boost to 0.8, or even 1.8 with ATK 0 and a huge RLS like 90 (only works in firefox; RLS is max 1 in other browsers)$N$N(see wikipedia, they explain it much better)",
 		"mt_ss": "`enables skip-silence; multiplies playback speed by `ffwd` near the start/end of songs when volume is under `vol` and the playback position is within the first `start`% or the last `end`% of the track",
@@ -1378,6 +1381,7 @@ var mpl = (function () {
 		'<div><h3 id="h_drc">' + L.ml_drc + '</h3><div id="audio_drc"></div></div>' +
 		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>' +
 		'<div><h3>' + L.ml_ss + '</h3><div id="audio_ss"></div></div>' +
+		'<div><h3>' + L.ml_nc + '</h3><div id="audio_nc"></div></div>' +
 		'');
 
 	var r = {
@@ -1478,6 +1482,17 @@ var mpl = (function () {
 		set_tint();
 	};
 	set_tint();
+
+	r.apply_nc = function () {
+		var rate = r.nc ? (parseFloat(ebi('nc_spd').value) || 1.25) : 1.0;
+		var pitch = !r.nc;
+		[mp.au, mp.au2].forEach(function (ae) {
+			if (!ae) return;
+			ae.preservesPitch = pitch;
+			ae.mozPreservesPitch = pitch;
+			if (!ae._ss) ae.playbackRate = rate;
+		});
+	};
 
 	r.acode = function (url) {
 		var c = true,
@@ -2783,6 +2798,7 @@ var afilt = (function () {
 		ebi('audio_eq').parentNode.style.display =
 		ebi('audio_drc').parentNode.style.display =
 		ebi('audio_ss').parentNode.style.display =
+		ebi('audio_nc').parentNode.style.display =
 		(vis ? '' : 'none');
 	}
 
@@ -3187,6 +3203,15 @@ var afilt = (function () {
 	html += h2.join('\n') + '</tr><table>';
 	ebi('audio_ss').innerHTML = html;
 
+	h2 = [];
+	html = ['<table><tr><td rowspan="2">',
+		'<a id="au_nc" class="tgl btn" href="#" tt="' + L.mt_nc + '">' + L.enable + '</a></td>'];
+	html.push('<td tt="' + L.mt_ncspd + '</td>');
+	h2.push('<td><input type="text" id="nc_spd" ' + NOAC + ' value="' + (sread('nc_spd') || 1.25) + '" style="width:3em" /></td>');
+	html = html.join('') + '</tr><tr>';
+	html += h2.join('') + '</tr></table>';
+	ebi('audio_nc').innerHTML = html;
+
 	var stp = QSA('a.eq_step');
 	for (var a = 0, aa = stp.length; a < aa; a++)
 		stp[a].onclick = eq_step;
@@ -3204,9 +3229,18 @@ var afilt = (function () {
 	for (var a = 0; a < txt.length; a++)
 		txt[a].oninput = txt[a].onkeydown = adj_ss;
 
+	ebi('nc_spd').oninput = function () {
+		var v = parseFloat(this.value);
+		if (isNum(v) && v > 0) {
+			swrite('nc_spd', v);
+			if (mpl.nc) mpl.apply_nc();
+		}
+	};
+
 	bcfg_bind(r, 'eqen', 'au_eq', false, r.apply);
 	bcfg_bind(r, 'drcen', 'au_drc', false, r.apply);
 	bcfg_bind(r, 'ssen', 'au_ss', false, r.apply);
+	bcfg_bind(mpl, 'nc', 'au_nc', false, mpl.apply_nc);
 
 	r.draw();
 	return r;
@@ -3329,6 +3363,8 @@ function play(tid, is_ev, seek) {
 		mp.au.loop = mpl.loop && !mpl.one;
 		if (mpl.aplay || is_ev !== -1)
 			mp.au.play();
+
+		mpl.apply_nc();
 
 		if (mp.au.paused)
 			autoplay_blocked(seek);
@@ -10108,8 +10144,9 @@ var mpss = (function() {
 		ssint = null;
 		if (!mp) return;
 		if (afilt.ssg) afilt.ssg.gain.value = 1.0;
-		if (mp.au && mp.au._ss) mp.au.playbackRate = 1.0;
-		if (mp.au2 && mp.au2._ss) mp.au2.playbackRate = 1.0;
+		var base = mpl && mpl.nc ? (parseFloat(ebi('nc_spd').value) || 1.25) : 1.0;
+		if (mp.au && mp.au._ss) mp.au.playbackRate = base;
+		if (mp.au2 && mp.au2._ss) mp.au2.playbackRate = base;
 	};
 
 	function detectSilence() {
@@ -10157,7 +10194,7 @@ var mpss = (function() {
 				gain.value += (tvol - gain.value) * config.rspeed;
 			}
 		} else {
-			ae.playbackRate = 1.0;
+			ae.playbackRate = mpl && mpl.nc ? (parseFloat(ebi('nc_spd').value) || 1.25) : 1.0;
 			gain.value = 1.0;
 		}
 	}
