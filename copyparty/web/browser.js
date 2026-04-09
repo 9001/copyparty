@@ -752,8 +752,8 @@ ebi('ops').innerHTML = (
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
 	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
-	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂 <p class="overlay_plus">+</p></a>' +
-	'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '">📝</a>' +
+	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '"><p class="overlay_plus">+</p>📂</a>' +
+	'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '"><div><p class="overlay_plus">+</p>📝</div></a>' +
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
 	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
@@ -762,6 +762,15 @@ ebi('ops').innerHTML = (
 
 
 // media player
+
+// svg from https://www.svgrepo.com/collection/iconcino-interface-icons/8
+var svg_box = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+var svg_options = 'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+var svg_prev = svg_box + '<path d="M8 6V18M11.4761 12.7809L16.3753 16.7002C17.0301 17.2241 18 16.7579 18 15.9194V8.08062C18 7.24212 17.0301 6.77595 16.3753 7.29976L11.4761 11.2191C10.9757 11.6195 10.9757 12.3805 11.4761 12.7809Z" ' + svg_options + '/></svg>';
+var svg_next = svg_box + '<path d="M17 6V18M13.5239 12.7809L8.6247 16.7002C7.96993 17.2241 7 16.7579 7 15.9194V8.08062C7 7.24212 7.96993 6.77595 8.6247 7.29976L13.5239 11.2191C14.0243 11.6195 14.0243 12.3805 13.5239 12.7809Z" ' + svg_options + '/></svg>';
+var svg_play = svg_box + '<path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" ' + svg_options + '/><path fill-rule="evenodd" clip-rule="evenodd" d="M10.4706 8.78431C9.80448 8.42906 9 8.91175 9 9.66667V14.3333C9 15.0883 9.80448 15.5709 10.4706 15.2157L15.6728 12.4412C16.0257 12.2529 16.0257 11.7471 15.6728 11.5588L10.4706 8.78431Z" ' + svg_options + '/></svg>'
+var svg_pause = svg_box + '<path d="M10 9V15M14 9V15M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" ' + svg_options + '/></svg>'
+
 ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
 	'<span id="wfs"></span>' +
@@ -789,10 +798,24 @@ ebi('widget').innerHTML = (
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
-	'	<div id="pctl"><a href="#" id="bprev" tt="' + L.wt_prev + '"><p class="vbar">|</p>◀</a><a href="#" id="bplay" tt="' + L.wt_play + '">▶</a><a href="#" id="bnext" tt="' + L.wt_next + '">▶<p class="vbar">|</p></a></div>' +
-	'	<div style="display flex"><canvas id="barpos"></canvas>' +
-	'	<canvas id="barbuf"></canvas></div>' +
-	'	<canvas id="pvol" width="288" height="38"></canvas>' +
+	'	<div id="pctl">' +
+	'		<a href="#" id="bprev" class="icon" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
+	'		<a href="#" id="bplay" class="icon" tt="' + L.wt_play + '">' + svg_play + '</a>' +
+	'		<a href="#" id="bnext" class="icon" tt="' + L.wt_next + '">' + svg_next + '</a>' +
+	'		<a id="trackname"></a>' +
+	'		<div id="progbar" style="position: relative; height: 100%;">' +
+	'			<canvas id="barbuf"></canvas>' +
+	'			<canvas id="barpos"></canvas>' +
+	'		</div>' +
+	'		<div id="altprogbar" class="vis">' +
+	'			<a id="txtpos">0:00</a>' +
+	'			<input type="range" min="0" max="1" step="0.001" value="0" id="sliderpos"></input>' +
+	'			<a id="txtsongend"/>0:00</a>' +
+	'		</div>' +
+	'		<a href="#" class="tgl btn" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '">🔁</a>' +
+	'		<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
+	'		<div><canvas id="pvol" width="210" height="40"></canvas></div>' +
+	'	</div>' +
 	'</div>' +
 	'<div id="np_inf">' +
 	'	<img id="np_img" />' +
@@ -917,7 +940,6 @@ var musicSettings = (
 	'<div><h3>🎵 ' + L.ot_mp + '</h3><div>' +
 	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
 	'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
-	'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
 	'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
 	'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 	'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
@@ -1160,7 +1182,9 @@ ebi('rcm').innerHTML = (
 		if (v)
 			ops[a].href = '#v=' + v;
 	}
-	ebi('acc_settings').onclick = function(e){
+
+	// settings
+	ebi('acc_settings').onclick = ebi('opa_cfg').onclick = function(e){
 		modalopen('cfg')
 		e.stopPropagation();
 	};
@@ -1214,6 +1238,14 @@ function goto(dest) {
 		clmod(obj[a], 'vis');
 
 	if (dest) {
+		var rewritten = ['cfg', 'mkdir', 'new_md'];
+		if(rewritten.includes(dest)){
+			if(dest == 'cfg')
+				clmod(ebi('cfg'), 'vis', true);
+
+			return;
+		}
+
 		var lnk = QS('#ops>a[data-dest=' + dest + ']'),
 			nps = lnk.getAttribute('data-perm');
 
@@ -1227,10 +1259,6 @@ function goto(dest) {
 		if (!has(perms, 'read') && !has(perms, 'write') && (dest == 'up2k'))
 			return;
 
-		if(dest == 'cfg'){
-			clmod(ebi(dest), 'vis', 1);
-			return;
-		}
 		clmod(ebi('op_' + dest), 'act', 1);
 		clmod(lnk, 'act', 1);
 
@@ -1421,7 +1449,20 @@ var mpl = (function () {
 	});
 	bcfg_bind(r, 'waves', 'au_waves', true, function (v) {
 		if (!v) pbar.unwave();
+		r.selectprogbar();
 	});
+	r.selectprogbar =function(){
+		if (r.waves){
+			clmod(ebi('progbar'), 'vis', true)
+			clmod(ebi('altprogbar'), 'vis', false)
+		}
+		else{
+			clmod(ebi('progbar'), 'vis', false)
+			clmod(ebi('altprogbar'), 'vis', true)
+		}
+	}
+	r.selectprogbar();
+
 	bcfg_bind(r, 'os_seek', 'au_os_seek', !IPHONE, announce);
 	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true, announce);
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
@@ -1473,6 +1514,42 @@ var mpl = (function () {
 		swrite('pb_mode', r.pb_mode);
 		draw_pb_mode();
 	}
+
+	ebi('cyclebtn_loopmode').onclick = function(){
+		if(r.pb_mode == 'loop'){
+			// #3: folder loop was set, switch to none / next folder
+			r.pb_mode = 'next';
+		}
+		else if(clgot(ebi('au_loop'), 'on')) {
+			// #2: single loop was set, switch to folder loop
+			ebi('au_loop').click();
+			r.pb_mode = 'loop';
+		}
+		else {
+			// #1: no loop set, click single loop btn
+			ebi('au_loop').click();
+		}
+		swrite('pb_mode', r.pb_mode);
+		draw_pb_mode();
+		drawLoopStatus();
+	}
+
+	function drawLoopStatus(){
+		var btn = ebi('cyclebtn_loopmode');
+		if(r.pb_mode == 'loop'){
+			btn.innerHTML = '🔁';
+			clmod(btn, 'on', true);
+		}
+		else if(clgot(ebi('au_loop'), 'on')) {
+			btn.innerHTML = '🔂';
+			clmod(btn, 'on', true);
+		}
+		else {
+			btn.innerHTML = '🔁';
+			clmod(btn, 'on', false);
+		}
+	}
+	drawLoopStatus();
 
 	function set_tint() {
 		var tint = icfg_get('pb_tint', 0);
@@ -1979,7 +2056,7 @@ var widget = (function () {
 	r.paused = function (paused) {
 		if (was_paused != paused) {
 			was_paused = paused;
-			ebi('bplay').innerHTML = paused ? '▶' : '⏸';
+			ebi('bplay').innerHTML = paused ? svg_play : svg_pause;
 		}
 	};
 	r.setvis = function () {
@@ -2264,6 +2341,11 @@ var pbar = (function () {
 			t2 = s2ms(apos),
 			x = sm * apos;
 
+		ebi('txtpos').innerHTML = t2;
+		ebi('txtsongend').innerHTML = t1;
+		if(adur > 0)
+			ebi('sliderpos').value = apos / adur;
+
 		if (w && html_txt != t2) {
 			ebi('np_pos').textContent = html_txt = t2;
 			if (mpl.os_ctl)
@@ -2348,7 +2430,7 @@ var vbar = (function () {
 		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
 
-		var vt = 'volume ' + Math.floor(mp.vol * 100),
+		var vt = Math.floor(mp.vol * 100) + '%',
 			tw = ctx.measureText(vt).width,
 			x = w * mp.vol - tw - 8,
 			li = dy;
@@ -2581,6 +2663,13 @@ function mpause(e) {
 
 		seek_au_mul(x * 1.0 / rect.width);
 	};
+	ebi('sliderpos').oninput = function(){
+		if (!mp.au) {
+			play(0, true);
+			return mp.fade_in();
+		}
+		seek_au_mul(this.value);
+	}
 
 	if (!TOUCH) {
 		bar.onwheel = function (e) {
@@ -3308,7 +3397,9 @@ function play(tid, is_ev, seek) {
 		mp.au.src = mp.au.rsrc = url;
 	}
 
-	mp.au.osrc = mp.tracks[tid];
+	mp.au.osrc = decodeURI(mp.tracks[tid].split('/').pop());
+	ebi('trackname').innerHTML = mp.au.osrc;
+	ebi('trackname').setAttribute('tt', mp.au.osrc);
 	afilt.apply();
 
 	setTimeout(function () {
@@ -3361,6 +3452,7 @@ function play(tid, is_ev, seek) {
 		pbar.unwave();
 		if (mpl.waves)
 			pbar.loadwaves(url.replace(/\bth=(opus|mp3)&/, '') + '&th=p');
+		mpl.selectprogbar();
 
 		mpss.go();
 		mpui.progress_updater();
@@ -6429,6 +6521,14 @@ var ahotkeys = function (e) {
 var search_ui = (function () {
 	var sconf = [
 		[
+			L.s_fn,
+			["name", "name", L.s_f1, "15", ".exe$"]
+		],
+		[
+			L.s_rd,
+			["path", "path", L.s_r1, "30", "windows  -system32"]
+		],
+		[
 			L.s_sz,
 			["szl", "sz_min", L.s_s1, "14", ""],
 			["szu", "sz_max", L.s_s2, "14", ""]
@@ -6437,14 +6537,6 @@ var search_ui = (function () {
 			L.s_dt,
 			["dtl", "dt_min", L.s_d1, "14", "1997-08-15, 01:00"],
 			["dtu", "dt_max", L.s_d2, "14", "2020"]
-		],
-		[
-			L.s_rd,
-			["path", "path", L.s_r1, "30", "windows  -system32"]
-		],
-		[
-			L.s_fn,
-			["name", "name", L.s_f1, "15", ".exe$"]
 		],
 		[
 			L.s_ta,
@@ -7931,7 +8023,7 @@ var treectl = (function () {
 		onresize();
 	}
 	
-	ebi('treeToggleBtn').tt = L.tt_entree;
+	ebi('treeToggleBtn').setAttribute('tt', L.tt_entree);
 	
 	ebi('treeToggleBtn').onclick = r.toggleTree;
 	ebi('visdir').onclick = tree_scrollto;
@@ -9798,6 +9890,16 @@ var rcm = (function () {
 			}
 		};
 		input.focus();
+	}
+
+	// new file
+	ebi('opa_md').onclick = function(){
+		mktemp();
+	}
+
+	// new file
+	ebi('opa_mkd').onclick = function(){
+		mktemp(true);
 	}
 
 	var opts = QSA('#rcm a');

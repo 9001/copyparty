@@ -804,9 +804,6 @@ html.y #files span.fsz_P { font-weight: bold }
 	border-bottom: .1em solid #777\9;
 	margin-right: 1em\9;
 }
-#path a:first-child {
-	padding-left: .8em;
-}
 #path i {
 	width: 1.05em;
 	height: 1.05em;
@@ -1320,45 +1317,77 @@ html.y #widget.open {
 	top: -.6em;
 	padding: .4em .3em;
 }
+#trackname {
+	font-size: small;
+	font-weight: bold;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#progbar {
+	display: none;
+}
+#progbar.vis {
+	display: block;
+}
+#altprogbar {
+	display: none;
+	grid-template-columns: max-content auto max-content
+}
+#altprogbar.vis {
+	display: grid;
+}
+#txtpos,
+#txtsongend {
+	font-size: small;
+	color: var(--fg-weak);
+	margin: .2em;
+}
+#sliderpos {
+	width: 100%;
+}
 #barpos,
 #barbuf {
-	position: absolute;
-	bottom: auto;
-	left: 9.8em;
-	top: .4em;
-	height: 1.6em;
 	border-radius: 9em;
-	width: calc(100% - 21em);
+	position: absolute;
+	top: 0;
+	height: 100%;
+	width: 100%;
 }
 #barbuf {
 	background: var(--mp-b-bg);
-	z-index: 21;
 }
 #barpos {
 	box-shadow: -.03em -.03em .7em rgba(0,0,0,0.5) inset;
-	z-index: 22;
 }
 #pctl {
-	position: absolute;
-	top: .2em;
-	left: .7em;
+	accent-color: var(--a);
+
+	display: grid;
+  	grid-template-columns: max-content max-content max-content 20% auto max-content max-content max-content;
+	align-content: center;
+	align-items: center;
+	height: 100%;
+	margin-right: .5em;
 }
-#pctl a {
-	display: inline-block;
-	font-size: 1.25em;
-	width: 1.1em;
-	height: 1.2em;
+#pctl .icon {
+	font-size: 1em;
+	width: 1.5em;
+	height: 1.5em;
 	text-align: center;
-	border-radius: .3em;
+}
+#pctl .btn {
+	font-size: 1em;
+	padding: 0;
+	opacity: .4;
+}
+#pctl .btn.on {
+	opacity: 1;
 }
 #pvol {
-	position: absolute;
-	top: .4em;
-	right: 1em;
-	height: 1.6em;
 	border-radius: 9em;
 	max-width: 9em;
-	width: calc(100% - 10.5em);
+	width: 100%;
 	background: rgba(0,0,0,0.2);
 }
 .vbar {
@@ -1382,13 +1411,10 @@ html.y #widget.open {
 #widget.cmp #wtgrid, #widget.cmp #wtgrid2 {
 	display: none;
 }
-#widget.cmp #pctl {
+#widget.cmp #pctl .icon {
 	top: 0;
 	left: 0;
 	font-size: .75em;
-}
-#widget.cmp #pctl a {
-	margin: 0;
 }
 #widget.cmp #barpos,
 #widget.cmp #barbuf {
@@ -1559,6 +1585,7 @@ input.ssconf_v {
 #audio_drc table,
 #audio_eq table {
 	border-collapse: collapse;
+	accent-color: var(--a);
 }
 #audio_drc td,
 #audio_eq td,
@@ -1726,7 +1753,6 @@ html {
 	text-wrap-mode: wrap;
 	white-space-collapse: preserve;
 	position: relative;
-	top: -.12em;
 }
 html.c .btn,
 html.a .btn {
@@ -3099,8 +3125,9 @@ html.a #path {
 	border-radius: .3em;
 }
 html.d #pctl,
+html.e #pctl,
 html.b #pctl {
-	left: .5em;
+	margin-left: .5em;
 }
 html.d #ops,
 html.c #ops,
@@ -3844,7 +3871,8 @@ html.e #srv_info {
   align-items: center;
 }
 html.e .overlay_plus {
-	margin-top: -1em;
+	margin-top: -.3em;
+	text-shadow: none;
 }
 html.e #spaceUsed_bar {
 	background: var(--ttlbar);
@@ -4430,7 +4458,7 @@ html.e #detree {
 	position: absolute;
 	align-self: end;
 	right: 0;
-  	bottom: .1em;
+  	bottom: 0;
 	font-size: medium;
 }
 #acc_settings:hover{
@@ -4470,8 +4498,9 @@ html.e #detree {
 
 .overlay_plus{
 	position: absolute;
-	margin: -1.7em 0 0 .8em;
+	margin: -.5em 0 0 .8em;
 	color: var(--fg);
+	text-shadow: -1px 1px 1px #000;
 }
 
 .gridViewIcon, 
@@ -4519,4 +4548,3 @@ html.e #detree {
 .on ::before{
 	border-color: var(--btn-1h-fg);
 }
-
