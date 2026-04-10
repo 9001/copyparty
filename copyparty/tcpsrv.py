@@ -516,13 +516,13 @@ class TcpSrv(object):
                 if not ln.startswith("default"):
                     continue
                 yield ln.split()[7] if OPENBSD else ln.split()[3]
-        else:
-            with open("/proc/net/route", "rb") as f:
-                next(f)
-                for ln in f:
-                    r = ln.decode("utf-8").strip().split()
-                    if r[1] == "0" * 8 and int(r[3], 16) & 2:
-                        yield r[0]
+            return
+        with open("/proc/net/route", "rb") as f:
+            next(f)
+            for ln in f:
+                r = ln.decode("utf-8").strip().split()
+                if r[1] == "0" * 8 and int(r[3], 16) & 2:
+                    yield r[0]
 
     def _defroute(self) -> str:
         ret = ""
