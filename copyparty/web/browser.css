@@ -4292,6 +4292,7 @@ html.ez #hovertree:after {
 html.e #widget {
   box-shadow: 0 0;
   border: 0 !important;
+  padding-left: .5em;
 }
 html.e #wtico,
 html.e #zip1 {
