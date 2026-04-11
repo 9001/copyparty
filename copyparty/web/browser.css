@@ -1180,6 +1180,7 @@ html.y #widget.open {
 #wtgrid, #wtgrid2,
 #wtico {
 	position: relative;
+	font-size: .9em;
 	top: -.04em;
 }
 #wtgrid, #wtgrid2 {
