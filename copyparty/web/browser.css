@@ -4383,6 +4383,10 @@ html.e #detree {
 	border-bottom: 1px solid var(--a-gray);
 }
 
+#rcm_tmp {
+	min-height: 5em;
+}
+
 #tempname {
 	color: var(--fg);
 	background: var(--txt-bg);
