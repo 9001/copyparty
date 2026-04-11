@@ -760,6 +760,61 @@ ebi('ops').innerHTML = (
 	'<div id="opdesc"></div>'
 );
 
+// mkdir + md
+function mktemp(is_dir) {
+	qsr('#rcm_tmp');
+	if (!thegrid.en) {
+		var row = mknod('tr', 'rcm_tmp',
+			'<td>-new-</td><td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></td>');
+		QS("#files tbody").appendChild(row);
+	}
+	else {
+		var row = mknod('a', 'rcm_tmp',
+			'<span class="dir" style="align-self:end"><input id="tempname" class="dir" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></span>');
+		if (is_dir)
+			row.className = 'dir';
+		row.style.display = 'flex';
+		QS("#ggrid").appendChild(row);
+	}
+
+	function sendit(name) {
+		name = ('' + name).trim();
+		if (!name)
+			return;
+		var data = new FormData();
+		data.set("act", is_dir ? "mkdir" : "new_md");
+		data.set("name", name);
+
+		var req = new XHR();
+		req.open("POST", get_evpath());
+		req.onload = req.onerror = function() {
+			if (req.status == 405 || req.status == 500)
+				return toast.err(3, "a " + (is_dir ? "folder" : "file") + " with that name already exists.");
+			if (req.status < 200 || req.status > 399)
+				return toast.err(3, "couldn't create " + (is_dir ? "folder" : "file") + ": <br><code>" + esc(req.responseText) + '</code>');
+			treectl.goto();
+		};
+		req.send(data);
+	}
+
+	var input = ebi("tempname");
+	input.onblur = function() {
+		sendit(input.value);
+		// Chrome blurs elements when calling remove for some reason
+		input.onblur = null;
+		row.remove();
+	};
+	input.onkeydown = function(e) {
+		if (e.key == "Enter")
+			sendit(input.value);
+		if (e.key == "Enter" || e.key == "Escape") {
+			input.onblur = null;
+			row.remove();
+			ev(e);
+		}
+	};
+	input.focus();
+}
 
 // media player
 
@@ -1189,6 +1244,17 @@ ebi('rcm').innerHTML = (
 		modalopen('cfg')
 		e.stopPropagation();
 	};
+
+	// new file
+	ebi('opa_md').onclick = function(){
+		mktemp();
+	}
+
+	// new folder
+	ebi('opa_mkd').onclick = function(){
+		mktemp(true);
+	}
+
 })();
 
 function modalopen(dest){
@@ -5897,8 +5963,8 @@ var thegrid = (function () {
 		var ths = QSA('#ggrid>a');
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
-			var tr = ebi(ths[a].getAttribute('ref')).closest('tr'),
-				cl = tr.className || '';
+			var tr = ebi(ths[a].getAttribute('ref'))?.closest('tr'),
+				cl = tr?.className || '';
 
 			if (noq_href(ths[a]).endsWith('/'))
 				cl += ' dir';
@@ -9897,71 +9963,6 @@ var rcm = (function () {
 		no_dsel: false
 	};
 	var selFile = jcp(nsFile);
-
-	function mktemp(is_dir) {
-		qsr('#rcm_tmp');
-		if (!thegrid.en) {
-			var row = mknod('tr', 'rcm_tmp',
-				'<td>-new-</td><td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></td>');
-			QS("#files tbody").appendChild(row);
-	    }
-		else {
-			var row = mknod('a', 'rcm_tmp',
-				'<span class="dir" style="align-self:end"><input id="tempname" class="dir" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></span>');
-			if (is_dir)
-				row.className = 'dir';
-			row.style.display = 'flex';
-			QS("#ggrid").appendChild(row);
-		}
-
-		function sendit(name) {
-			name = ('' + name).trim();
-			if (!name)
-				return;
-			var data = new FormData();
-			data.set("act", is_dir ? "mkdir" : "new_md");
-			data.set("name", name);
-
-			var req = new XHR();
-			req.open("POST", get_evpath());
-			req.onload = req.onerror = function() {
-				if (req.status == 405 || req.status == 500)
-					return toast.err(3, "a " + (is_dir ? "folder" : "file") + " with that name already exists.");
-				if (req.status < 200 || req.status > 399)
-					return toast.err(3, "couldn't create " + (is_dir ? "folder" : "file") + ": <br><code>" + esc(req.responseText) + '</code>');
-				treectl.goto();
-			};
-			req.send(data);
-		}
-
-		var input = ebi("tempname");
-		input.onblur = function() {
-			sendit(input.value);
-			// Chrome blurs elements when calling remove for some reason
-			input.onblur = null;
-			row.remove();
-		};
-		input.onkeydown = function(e) {
-			if (e.key == "Enter")
-				sendit(input.value);
-			if (e.key == "Enter" || e.key == "Escape") {
-				input.onblur = null;
-				row.remove();
-				ev(e);
-			}
-		};
-		input.focus();
-	}
-
-	// new file
-	ebi('opa_md').onclick = function(){
-		mktemp();
-	}
-
-	// new file
-	ebi('opa_mkd').onclick = function(){
-		mktemp(true);
-	}
 
 	var opts = QSA('#rcm a');
 	for (var i = 0; i < opts.length; i++) {
