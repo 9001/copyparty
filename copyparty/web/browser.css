@@ -33,15 +33,15 @@
 	--sel-bg: var(--fg);
 
 	--a: #fc5;
-	--a-b: #c90;
-	--a-hil: #fd9;
-	--a-dark: #e70;
+	--a-hil: color-mix(in xyz, var(--a) 70%, var(--fg-max) 30%);
+	--a-dark: #e70; /* warning text etc */
 	--a-gray: #666;
 
+	accent-color: var(--a);
 	--btn-fg: var(--a);
 	--btn-bg: rgba(128,128,128,0.15);
 	--btn-h-fg: var(--a-hil);
-	--btn-h-bg: #850;
+	--btn-h-bg: color-mix(in xyz, var(--a) 30%, var(--bg) 70%);
 	--btn-1-fg: rgb(25, 19, 12);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
@@ -49,7 +49,7 @@
 	--btn-1-bs: var(--btn-bs);
 	--btn-1-bb: var(--btn-bb);
 	--btn-1h-fg: var(--btn-1-fg);
-	--btn-1h-bg: #fe8;
+	--btn-1h-bg: var(--a-hil);
 	--btn-1h-bs: var(--btn-1-bs);
 	--btn-1h-bb: var(--btn-1-bb);
 	--chk-fg: var(--tab-alt);
@@ -65,7 +65,7 @@
 	--u2-txt-bg: var(--bg-u5);
 	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u1));
 	--u2-tab-b1: rgba(128,128,128,0.8);
-	--u2-tab-1-fg: #fd7;
+	--u2-tab-1-fg: var(--a-hil);
 	--u2-tab-1-bg: linear-gradient(to bottom, #353, var(--bg) 80%);
 	--u2-tab-1-b1: #7c5;
 	--u2-tab-1-b2: #583;
@@ -81,7 +81,7 @@
 	--u2-err-b1: #d06;
 	--ud-b1: #888;
 
-	--sort-1: #fb0;
+	--sort-1: var(--a);
 	--sort-2: #d90;
 
 	--sz-b: #aaa;
@@ -166,7 +166,6 @@ html.y {
 	--scroll: #490;
 
 	--a: #06a;
-	--a-b: #08b;
 	--a-hil: #058;
 	--a-gray: #bbb;
 	--a-dark: #c0f;
@@ -274,8 +273,6 @@ html.bz {
 	--bg-d3: #34384e;
 
 	--row-alt: #181a27;
-
-	--a-b: #fb4;
 
 	--btn-bg: #202231;
 	--btn-h-bg: #2d2f45;
@@ -423,7 +420,6 @@ html.dz {
 	--scroll: #0f0;
 
 	--a: #9f9;
-	--a-b: #cfc;
 	--a-hil: #cfc;
 	--a-dark: #afa;
 	--a-gray: #2a2;
@@ -487,7 +483,6 @@ html.dy {
 	--scroll: #000;
 
 	--a: #000;
-	--a-b: #000;
 	--a-hil: #000;
 	--a-gray: #bbb;
 	--a-dark: #000;
@@ -622,7 +617,7 @@ html .ayjump:focus {
 	display: block;
 	margin: 0;
 	/* min-width: 10em; */
-	padding: .35em .5em .2em 0;
+	padding: .35em 0 .2em 0;
 	font-size: 1.4em;
 }
 #srch_namev {
@@ -1323,6 +1318,7 @@ html.y #widget.open {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	margin-left: .3em;
 }
 #progbar {
 	display: none;
@@ -1332,16 +1328,18 @@ html.y #widget.open {
 }
 #altprogbar {
 	display: none;
-	grid-template-columns: max-content auto max-content
+	grid-template-columns: max-content auto max-content;
+	max-width: 40vw;
+	text-align: center;
 }
 #altprogbar.vis {
 	display: grid;
 }
-#txtpos,
-#txtsongend {
+#altprogbar span {
 	font-size: small;
 	color: var(--fg-weak);
-	margin: .2em;
+	margin: .3em;
+	align-self: center;
 }
 #sliderpos {
 	width: 100%;
@@ -1361,8 +1359,6 @@ html.y #widget.open {
 	box-shadow: -.03em -.03em .7em rgba(0,0,0,0.5) inset;
 }
 #pctl {
-	accent-color: var(--a);
-
 	display: grid;
   	grid-template-columns: max-content max-content max-content 20% auto max-content max-content max-content;
 	align-content: center;
@@ -1387,15 +1383,20 @@ html.y #widget.open {
 #pvol {
 	border-radius: 9em;
 	max-width: 9em;
-	width: 100%;
+	height: .5em;
+	aspect-ratio: 8;
 	background: rgba(0,0,0,0.2);
 }
-.vbar {
-	margin: 0 -.4em;
-	display: inline-block;
-	font-weight: bold;
-	transform: translateY(-.1em);
-	text-shadow: none;
+#pvolbg {
+	height: 100%;
+	padding: .3em;
+	align-content: center;
+	align-items: center;
+	display: flex;
+}
+#pvolbg svg {
+	height: 1.3em;
+	margin-right: .3em;
 }
 #widget.cmp {
 	height: 1.6em;
@@ -1444,7 +1445,7 @@ html.y #widget.open {
 	background: #000;
 	background: var(--op-aa-bg);
 	border-radius: 0 0 .2em .2em;
-	border-bottom: .3em solid var(--a-b);
+	border-bottom: .3em solid var(--a);
 	box-shadow: var(--op-aa-sh);
 	margin: -.2em 0 -.6em 0;
 	padding-top: .4em;
@@ -1580,7 +1581,6 @@ input.ssconf_v {
 #audio_drc table,
 #audio_eq table {
 	border-collapse: collapse;
-	accent-color: var(--a);
 }
 #audio_drc td,
 #audio_eq td,
@@ -1630,7 +1630,7 @@ input.ssconf_v {
 }
 #srch_q {
 	white-space: pre;
-	color: var(--a-b);
+	color: var(--a);
 	min-height: 1em;
 	margin: .2em 0 -1em 1.6em;
 }
@@ -2500,7 +2500,7 @@ html.y #bbox-overlay figcaption a {
 #s_content{
 	display: grid;
   	grid-template-rows: auto auto;
-	margin: 5%;
+	margin: 5vh 5vw;
 	border-radius: .5em;
 	border: var(--a) solid 1px;
 	background: var(--bg);
@@ -3099,7 +3099,7 @@ html.b #u2conf a.b:hover {
 }
 .fsearch_explain {
 	color: var(--a-dark);
-	padding-left: .7em;
+	padding: .7em;
 	font-size: 1.1em;
 	line-height: 0;
 }
@@ -3586,7 +3586,6 @@ html.ey {
   --scroll: var(--silver);
   --f-sel-sh: transparent;
   --a: #000;
-  --a-b: #fff;
   --a-hil: #fff;
   --a-h-bg: var(--bg);
   --a-dark: var(--a);
@@ -3687,7 +3686,6 @@ html.ez {
   --scroll: #555555;
   --f-sel-sh: transparent;
   --a: var(--fg);
-  --a-b: var(--fg);
   --a-hil: var(--fg);
   --btn-1h-bg: var(--bg-d3);
   --a-h-bg: var(--bg);
@@ -4449,7 +4447,7 @@ html.e #detree {
 	align-self: center;
 }
 #acc_settings{
-	background: rgba(0, 0, 0, 0.4);
+	background: var(--a);
 	position: absolute;
 	align-self: end;
 	right: 0;
@@ -4457,7 +4455,7 @@ html.e #detree {
 	font-size: medium;
 }
 #acc_settings:hover{
-	background: var(--a-hil);
+	background: var(--btn-h-bg);
 }
 
 .popup.show {

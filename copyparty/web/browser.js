@@ -770,6 +770,7 @@ var svg_prev = svg_box + '<path d="M8 6V18M11.4761 12.7809L16.3753 16.7002C17.03
 var svg_next = svg_box + '<path d="M17 6V18M13.5239 12.7809L8.6247 16.7002C7.96993 17.2241 7 16.7579 7 15.9194V8.08062C7 7.24212 7.96993 6.77595 8.6247 7.29976L13.5239 11.2191C14.0243 11.6195 14.0243 12.3805 13.5239 12.7809Z" ' + svg_options + '/></svg>';
 var svg_play = svg_box + '<path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" ' + svg_options + '/><path fill-rule="evenodd" clip-rule="evenodd" d="M10.4706 8.78431C9.80448 8.42906 9 8.91175 9 9.66667V14.3333C9 15.0883 9.80448 15.5709 10.4706 15.2157L15.6728 12.4412C16.0257 12.2529 16.0257 11.7471 15.6728 11.5588L10.4706 8.78431Z" ' + svg_options + '/></svg>'
 var svg_pause = svg_box + '<path d="M10 9V15M14 9V15M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" ' + svg_options + '/></svg>'
+var svg_vol = svg_box + '<path d="M16.0004 9.00009C16.6281 9.83575 17 10.8745 17 12.0001C17 13.1257 16.6281 14.1644 16.0004 15.0001M18 5.29177C19.8412 6.93973 21 9.33459 21 12.0001C21 14.6656 19.8412 17.0604 18 18.7084M4.6 9.00009H5.5012C6.05213 9.00009 6.32759 9.00009 6.58285 8.93141C6.80903 8.87056 7.02275 8.77046 7.21429 8.63566C7.43047 8.48353 7.60681 8.27191 7.95951 7.84868L10.5854 4.69758C11.0211 4.17476 11.2389 3.91335 11.4292 3.88614C11.594 3.86258 11.7597 3.92258 11.8712 4.04617C12 4.18889 12 4.52917 12 5.20973V18.7904C12 19.471 12 19.8113 11.8712 19.954C11.7597 20.0776 11.594 20.1376 11.4292 20.114C11.239 20.0868 11.0211 19.8254 10.5854 19.3026L7.95951 16.1515C7.60681 15.7283 7.43047 15.5166 7.21429 15.3645C7.02275 15.2297 6.80903 15.1296 6.58285 15.0688C6.32759 15.0001 6.05213 15.0001 5.5012 15.0001H4.6C4.03995 15.0001 3.75992 15.0001 3.54601 14.8911C3.35785 14.7952 3.20487 14.6422 3.10899 14.4541C3 14.2402 3 13.9601 3 13.4001V10.6001C3 10.04 3 9.76001 3.10899 9.54609C3.20487 9.35793 3.35785 9.20495 3.54601 9.10908C3.75992 9.00009 4.03995 9.00009 4.6 9.00009Z" ' + svg_options + '/></svg>'
 
 ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
@@ -802,19 +803,19 @@ ebi('widget').innerHTML = (
 	'		<a href="#" id="bprev" class="icon" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
 	'		<a href="#" id="bplay" class="icon" tt="' + L.wt_play + '">' + svg_play + '</a>' +
 	'		<a href="#" id="bnext" class="icon" tt="' + L.wt_next + '">' + svg_next + '</a>' +
-	'		<a id="trackname"></a>' +
+	'		<span id="trackname"></span>' +
 	'		<div id="progbar" style="position: relative; height: 100%;">' +
 	'			<canvas id="barbuf"></canvas>' +
 	'			<canvas id="barpos"></canvas>' +
 	'		</div>' +
 	'		<div id="altprogbar" class="vis">' +
-	'			<a id="txtpos">0:00</a>' +
+	'			<span id="txtpos">0:00</span>' +
 	'			<input type="range" min="0" max="1" step="0.001" value="0" id="sliderpos"></input>' +
-	'			<a id="txtsongend"/>0:00</a>' +
+	'			<span id="txtsongend"/>0:00</span>' +
 	'		</div>' +
 	'		<a href="#" class="tgl btn" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '">🔁</a>' +
 	'		<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
-	'		<div><canvas id="pvol" width="210" height="40"></canvas></div>' +
+	'		<div id="pvolbg">' + svg_vol + '<canvas id="pvol"></canvas></div>' +
 	'	</div>' +
 	'</div>' +
 	'<div id="np_inf">' +
@@ -1103,7 +1104,7 @@ ebi('op_cfg').innerHTML = (
 			var s = subSettings.children[ii];
 			var info = tt.parse(s.getAttribute('tt'));
 			s.removeAttribute('tt');
-			s.href = '#' + sId;
+			//s.href = '#' + sId;
 			section += `<div id="${subSettings.id}" class="setting">` +
 				s.outerHTML +
 				(info?.length > 0 ? `<p class="s_desc">${info}</p>` : '') + 
@@ -2159,11 +2160,50 @@ function glossy_grad(can, h, s, l) {
 		p = [0, 0.49, 0.50, 1];
 
 	for (var a = 0; a < p.length; a++)
-		g.addColorStop(p[a], 'hsl(' + h + ',' + s[a] + '%,' + l[a] + '%)');
+		g.addColorStop(p[a], 'hsl(' + h + ',' + (Array.isArray(s) ? s[a] : s) + '%,' + (Array.isArray(l) ? l[a] : l) + '%)');
 
 	return g;
 }
 
+function hexToRgb(hex){
+	var long = hex.length >= 6;
+	var _r = long ? hex.substr(1,2) : hex.substr(1,1)
+	var _g = long ? hex.substr(3,2) : hex.substr(2,1)
+	var _b = long ? hex.substr(5,2) : hex.substr(3,1)
+
+	if(!long){
+		_r += _r;
+		_g += _g;
+		_b += _b;
+	}
+
+	return [
+		parseInt(_r, 16),
+		parseInt(_g, 16),
+		parseInt(_b, 16)
+	];
+}
+function rgbToHsl(r, g, b){
+    r /= 255, g /= 255, b /= 255;
+    var max = Math.max(r, g, b), min = Math.min(r, g, b);
+    var h, s, l = (max + min) / 2;
+
+    if(max == min){
+        h = s = 0; // achromatic
+    }else{
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+		h = Math.atan2(Math.sqrt(3) * (g - b), 2 * r - g - b)
+        switch(max){
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    return [h, s, l];
+}
 
 // buffer/position bar
 var pbar = (function () {
@@ -2256,11 +2296,20 @@ var pbar = (function () {
 			dz = themen == 'dz',
 			dy = themen == 'dy';
 
+		var accentRgb = hexToRgb(getComputedStyle(document.body).getPropertyValue('--a'));
+		var accentHsl = rgbToHsl(accentRgb[0], accentRgb[1], accentRgb[2]);
+		accentHsl[0] *= 360;
+		accentHsl[1] *= 100;
+		accentHsl[2] *= 100;
+
 		if (gradh != gk) {
 			gradh = gk;
-			grad = glossy_grad(bc, dz ? 120 : 85,
-				dy ? [0, 0, 0, 0] : [35, 40, 37, 35],
-				dy ? [20, 24, 22, 20] : light ? [45, 56, 50, 45] : [42, 51, 47, 42]);
+			var l = accentHsl[2]
+			var lArr = [l*.7, l, l*.9, l*.7]
+			grad = glossy_grad(bc, 
+				accentHsl[0],
+				accentHsl[1],
+				lArr);
 		}
 		bctx.fillStyle = grad;
 		for (var a = 0; a < mp.au.buffered.length; a++) {
@@ -2277,20 +2326,22 @@ var pbar = (function () {
 			bctx.globalAlpha = 1;
 		}
 
-		var step = sm > 1 ? 1 : sm > 0.4 ? 3 : sm > 0.05 ? 30 : 720;
-		bctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
-		for (var p = step, mins = adur / 10; p <= mins; p += step)
-			bctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
+		if(false){
+			var step = sm > 1 ? 1 : sm > 0.4 ? 3 : sm > 0.05 ? 30 : 720;
+			bctx.fillStyle = light && !dy ? 'rgba(0,0,0,0.15)' : 'rgba(255, 255, 255, 0.15)';
+			for (var p = step, mins = adur / 10; p <= mins; p += step)
+				bctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
 
-		step = sm > 0.15 ? 1 : sm > 0.05 ? 10 : 360;
-		bctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
-		for (var p = step, mins = adur / 60; p <= mins; p += step)
-			bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
+			step = sm > 0.15 ? 1 : sm > 0.05 ? 10 : 360;
+			bctx.fillStyle = light && !dy ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)';
+			for (var p = step, mins = adur / 60; p <= mins; p += step)
+				bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
-		step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
-		bctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
-		for (var p = step, mins = adur / 60; p <= mins; p += step) {
-			bctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
+			step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
+			bctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0, 0, 0, 0.9)' : 'rgb(255, 255, 255)';
+			for (var p = step, mins = adur / 60; p <= mins; p += step) {
+				bctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
+			}
 		}
 
 		step = sm > 0.2 ? 10 : sm > 0.1 ? 30 : sm > 0.01 ? 60 : sm > 0.005 ? 720 : 1440;
@@ -2303,7 +2354,7 @@ var pbar = (function () {
 		var bc = r.buf,
 			pc = r.pos,
 			pctx = pc.ctx,
-			w = 8,
+			w = 2,
 			apos, adur;
 
 		if (t_redraw) {
@@ -2359,8 +2410,8 @@ var pbar = (function () {
 		if (!widget.is_open)
 			return;
 
-		pctx.fillStyle = '#573'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
-		pctx.fillStyle = '#dfc'; pctx.fillRect((x - w / 2), 0, w, pc.h);
+		pctx.fillStyle = '#bbb'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
+		pctx.fillStyle = '#fff'; pctx.fillRect((x - w / 2), 0, w, pc.h);
 
 		pctx.lineWidth = 2.5;
 		pctx.fillStyle = '#fff';
@@ -2368,7 +2419,7 @@ var pbar = (function () {
 		var m1 = pctx.measureText(t1),
 			m1b = pctx.measureText(t1 + ":88"),
 			m2 = pctx.measureText(t2),
-			yt = pc.h * 0.94,
+			yt = pc.h * 0.65,
 			xt1 = pc.w - (m1.width + 12),
 			xt2 = x < m1.width * 1.4 ? (x + 12) : (Math.min(pc.w - m1b.width, x - 12) - m2.width);
 
@@ -2418,30 +2469,40 @@ var vbar = (function () {
 			dz = themen == 'dz',
 			dy = themen == 'dy';
 
+		var accentRgb = hexToRgb(getComputedStyle(document.body).getPropertyValue('--a'));
+		var accentHsl = rgbToHsl(accentRgb[0], accentRgb[1], accentRgb[2]);
+		accentHsl[0] *= 360;
+		accentHsl[1] *= 100;
+		accentHsl[2] *= 100;
+
 		if (gradh != gh) {
 			gradh = gh;
-			grad1 = glossy_grad(r.can, dz ? 120 : 50,
-				dy ? [0, 0, 0, 0] : light ? [50, 55, 52, 48] : [45, 52, 47, 43],
-				dy ? [20, 24, 22, 20] : light ? [54, 60, 52, 47] : [42, 51, 47, 42]);
-			grad2 = glossy_grad(r.can, dz ? 120 : 205,
-				dz ? [100, 100, 100, 100] : dy ? [0, 0, 0, 0] : [10, 15, 13, 10],
-				dz ? [10, 14, 12, 10] : dy ? [90, 90, 90, 90] : [16, 20, 18, 16]);
+			grad1 = glossy_grad(r.can, 
+				accentHsl[0],
+				accentHsl[1],
+				accentHsl[2]);
+			grad2 = glossy_grad(r.can,
+				accentHsl[0],
+				0,
+				(accentHsl[2] > 0.5 ? accentHsl[2] * 0.35 : accentHsl[2] + 50));
 		}
 		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
+		
+		if(false){
+			var vt = Math.floor(mp.vol * 100) + '%',
+				tw = ctx.measureText(vt).width,
+				x = w * mp.vol - tw - 8,
+				li = dy;
 
-		var vt = Math.floor(mp.vol * 100) + '%',
-			tw = ctx.measureText(vt).width,
-			x = w * mp.vol - tw - 8,
-			li = dy;
+			if (mp.vol < 0.5) {
+				x += tw + 16;
+				li = !li;
+			}
 
-		if (mp.vol < 0.5) {
-			x += tw + 16;
-			li = !li;
+			ctx.fillStyle = li ? '#fff' : '#210';
+			ctx.fillText(vt, x, h / 3 * 2);
 		}
-
-		ctx.fillStyle = li ? '#fff' : '#210';
-		ctx.fillText(vt, x, h / 3 * 2);
 
 		clearTimeout(untext);
 		untext = setTimeout(r.draw, 1000);
@@ -2477,20 +2538,20 @@ var vbar = (function () {
 				toast.inf(6, 'volume doesnt work because <a href="https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11" target="_blank">apple says no</a>');
 		}, 1);
 	}
-	can.onmousedown = function (e) {
+	ebi('pvolbg').onmousedown = can.onmousedown = function (e) {
 		if (e.button !== 0)
 			return;
 
-		can.onmousemove = mousemove;
+		ebi('pvolbg').onmousemove = can.onmousemove = mousemove;
 		mousedown(e);
 	};
-	can.onmouseup = function (e) {
+	ebi('pvolbg').onmouseup = can.onmouseup = function (e) {
 		if (e.button === 0)
-			can.onmousemove = null;
+			ebi('pvolbg').onmousemove = can.onmousemove = null;
 	};
 	if (TOUCH) {
-		can.ontouchstart = mousedown;
-		can.ontouchmove = mousemove;
+		ebi('pvolbg').ontouchstart = can.ontouchstart = mousedown;
+		ebi('pvolbg').ontouchmove = can.ontouchmove = mousemove;
 	}
 	return r;
 })();
@@ -2683,16 +2744,16 @@ function mpause(e) {
 			seek_au_rel(dist);
 			ev(e);
 		};
-		ebi('pvol').onwheel = function (e) {
+		ebi('pvolbg').onwheel = function (e) {
 			var dist = Math.sign(e.deltaY) * 10;
 			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
 				dist = e.deltaY;
 
-			if (!dist || !mp.au)
+			if (!dist)
 				return true;
 
 			dist *= -1;
-			mp.setvol(Math.round((mp.vol + dist / 500) * 100) / 100 );
+			mp.setvol(Math.round((mp.vol + dist / 250) * 100) / 100 );
 			vbar.draw();
 			ev(e);
 		};
