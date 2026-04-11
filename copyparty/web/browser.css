@@ -4351,7 +4351,8 @@ html.e #detree {
 }
 
 #rcm {
-	position: absolute;
+	position: fixed;
+	overflow-y: auto;
 	display: none;
 	background: #fff;
 	background: var(--bg);
@@ -4360,6 +4361,9 @@ html.e #detree {
 	border-radius: .3rem;
 	box-shadow: 0 0 .3rem var(--bg-d3);
 	z-index: 3;
+}
+#rcm.large a {
+	padding: 1em;
 }
 
 #rcm > * {

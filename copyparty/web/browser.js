@@ -10017,8 +10017,33 @@ var rcm = (function () {
 		clmod(shr, 'hide', !can_shr || !get_evpath().indexOf(have_shr));
 		shr.innerHTML = has_sel ? L.rc_shs : L.rc_shf;
 
-		menu.style.left = x + 5 + 'px';
-		menu.style.top = y + 5 + 'px';
+		if(MOBILE){
+			clmod(menu, 'large', true);
+		}
+		var vh = document.documentElement.clientHeight;
+		var vw = document.documentElement.clientWidth;
+
+		var maxh = Math.min(y, vh / 2);
+		menu.style.maxHeight = `calc(100vh - ${maxh}px - 2em)`;
+		
+		if(y > vh / 2){
+			// low click => menu upwards
+			menu.style.top = '';
+			menu.style.bottom = `${vh - y}px`;
+		}
+		else{
+			menu.style.top = `${y}px`;
+			menu.style.bottom = '';
+		}
+		if(x > vw / 2){
+			// far right click => menu leftwards
+			menu.style.left = '';
+			menu.style.right = `${vw - x}px`;
+		}
+		else{
+			menu.style.left = `${x}px`;
+			menu.style.right = '';
+		}
 		menu.style.display = 'block';
 		menu.focus();
 	}
@@ -10046,7 +10071,7 @@ var rcm = (function () {
 		}
 		ev(e);
 		var gfile = thegrid.en && e.target && e.target.closest('#ggrid > a');
-		show(xscroll() + e.clientX, yscroll() + e.clientY, gfile || e.target, gfile);
+		show(e.clientX, e.clientY, gfile || e.target, gfile);
 		return false;
 	};
 	menu.onblur = function() {setTimeout(r.hide)};
