@@ -854,12 +854,13 @@ ebi('widget').innerHTML = (
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
+	'	<div id="pbarthinpos"></div>' +
 	'	<div id="pctl">' +
 	'		<a href="#" id="bprev" class="icon" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
 	'		<a href="#" id="bplay" class="icon" tt="' + L.wt_play + '">' + svg_play + '</a>' +
 	'		<a href="#" id="bnext" class="icon" tt="' + L.wt_next + '">' + svg_next + '</a>' +
 	'		<span id="trackname"></span>' +
-	'		<div id="progbar" style="position: relative; height: 100%;">' +
+	'		<div id="progbar" style="position: relative; height: 80%;">' +
 	'			<canvas id="barbuf"></canvas>' +
 	'			<canvas id="barpos"></canvas>' +
 	'		</div>' +
@@ -872,7 +873,7 @@ ebi('widget').innerHTML = (
 	'		<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
 	'		<div id="pvolbg">' + svg_vol + '<canvas id="pvol"></canvas></div>' +
 	'	</div>' +
-	'</div>' +
+	'</div>'+
 	'<div id="np_inf">' +
 	'	<img id="np_img" />' +
 	'	<span id="np_url"></span>' +
@@ -7065,6 +7066,8 @@ function aligngriditems() {
 	}
 	if (st.justifyContent != val)
 		st.justifyContent = val;
+
+	onwidgetresize();
 }
 onresize100.add(aligngriditems);
 
@@ -7085,6 +7088,29 @@ var filecolwidth = (function () {
 })();
 onresize100.add(filecolwidth, true);
 
+function onwidgetresize(){
+	var widget = ebi('widget');
+	var bar = ebi('pctl');
+	var pbarthinpos = ebi('pbarthinpos');
+	var width = widget.offsetWidth;
+
+	var thin = width < 800; //px
+	var gtc = `max-content max-content max-content ${thin ? '' : '20%'} auto max-content max-content max-content`;
+	if(thin && bar.children.length > gtc.split(' ').length){
+		pbarthinpos.appendChild(ebi('progbar'));
+		pbarthinpos.appendChild(ebi('altprogbar'));
+	}
+	else if(!thin && bar.children.length < gtc.split(' ').length){
+		ebi('trackname').after(ebi('progbar'));
+		ebi('trackname').after(ebi('altprogbar'));
+	}
+	ebi('altprogbar').maxWidth = thin ? '' : '40vw'
+	bar.style.gridTemplateColumns = gtc;
+	
+	clmod(widget, 'thin', thin);
+}
+window.addEventListener('resize', onwidgetresize);
+onwidgetresize();
 
 var treectl = (function () {
 	var r = {
@@ -7350,6 +7376,7 @@ var treectl = (function () {
 		ebi('tree_footer').style.width = (iw - 2) + 'em';
 		ebi('wrap').style.marginLeft = w2;
 		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
+		onwidgetresize();
 		onscroll();
 	}
 

@@ -1135,18 +1135,33 @@ html.dz #flogout {
 	font-size: 1.4em;
 	left: 0;
 	right: 0;
-	bottom: -2.5em;
-	height: 2.5em;
+	bottom: 0;
 	z-index: 1;
 	touch-action: none;
 }
 #widget.anim {
-	transition: bottom 0.15s, margin-left 0.15s;
+	transition: margin-left 0; /* can't set this above 0 due to onwidgetresize */
 }
-#widget.open {
+#widget.anim #widgeti {
+	transition: transform 0.15s, height 0.15s;
+}
+#widget.open #widgeti{
 	/* box-shadow: 0 0 1em rgba(0,48,64,0.2); */
-	bottom: 0;
+	height: 100%;
+	transform: scaleY(1);
 }
+
+#pbarthinpos {
+	display: none;
+	align-content: center;
+	padding: .2em .5em;
+	padding-bottom: 0;
+	height: 2em;
+}
+#widget.thin #pbarthinpos{
+	display: block;
+}
+
 html.y #widget.open {
 	border-top: .2em solid var(--bg-u2);
 }
@@ -1154,7 +1169,12 @@ html.y #widget.open {
 	position: relative;
 	z-index: 10;
 	width: 100%;
-	height: 100%;
+	height: 0;
+	transform: scaleY(0);
+  	transform-origin: bottom;
+}
+#np_inf {
+	height: 0;
 }
 #fshr,
 #wtgrid, #wtgrid2,
@@ -1330,7 +1350,6 @@ html.y #widget.open {
 #altprogbar {
 	display: none;
 	grid-template-columns: max-content auto max-content;
-	max-width: 40vw;
 	text-align: center;
 }
 #altprogbar.vis {
@@ -3484,7 +3503,7 @@ html.d #treepar {
 	}
 }
 @media (max-width: 35em) {
-	#ops>a[data-dest="new_md"],
+	/* #ops>a[data-dest="new_md"], */
 	#ops>a[data-dest="msg"] {
 		display: none;
 	}
@@ -4371,7 +4390,7 @@ html.e #detree {
 }
 
 #rcm > a {
-	padding: .2rem .3rem;
+	padding: .3rem;
 }
 
 #rcm > .hide {
