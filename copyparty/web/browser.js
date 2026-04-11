@@ -889,7 +889,7 @@ ebi('widget').innerHTML = (
 
 
 // up2k ui
-ebi('op_up2k').innerHTML = (
+ebi('up_inner').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
 	'<table id="u2conf">\n' +
@@ -949,7 +949,8 @@ ebi('op_up2k').innerHTML = (
 	'	href="#" act="ng" tt="' + L.uct_ng + '">ng <span>0</span></a><a\n' +
 	'	href="#" act="done" tt="' + L.uct_done + '">done <span>0</span></a><a\n' +
 	'	href="#" act="bz" tt="' + L.uct_bz + '" class="act">busy <span>0</span></a><a\n' +
-	'	href="#" act="q" tt="' + L.uct_q + '">que <span>0</span></a>\n' +
+	'	href="#" act="q" tt="' + L.uct_q + '">que <span>0</span></a><a\n' +
+	'	href="#" style="pointer-events: none; width: 90%; display: inline-block; font-size: 1.1em;"><span style="opacity: 0">_</span></a>\n' +
 	'</div>\n' +
 
 	'</div>\n' +
@@ -970,6 +971,10 @@ ebi('op_up2k').innerHTML = (
 	'<div id="u2foot"></div>'
 );
 
+ebi('up_outside').onclick = ebi('c_up_btn').onclick = function(){
+	modaltoggle('up2k');
+}
+
 
 ebi('wrap').insertBefore(mknod('div', 'lazy'), ebi('epi'));
 
@@ -981,7 +986,7 @@ x.parentNode.insertBefore(mknod('div', null,
 (function () {
 	var o = mknod('div');
 	o.innerHTML = (
-		'<div id="drops" class="overlaybg">\n' +
+		'<div id="drops" class="modal">\n' +
 		'	<div class="dropdesc" id="up_zd"><div>🚀 ' + L.udt_up + '<br /><span></span><div>🚀<b>' + L.udt_up + '</b></div><div><b>' + L.udt_up + '</b>🚀</div></div></div>\n' +
 		'	<div class="dropdesc" id="srch_zd"><div>🔎 ' + L.udt_srch + '<br /><span></span><div>🔎<b>' + L.udt_srch + '</b></div><div><b>' + L.udt_srch + '</b>🔎</div></div></div>\n' +
 		'	<div class="dropzone" id="up_dz" v="up_zd"></div>\n' +
@@ -1173,7 +1178,7 @@ ebi('op_cfg').innerHTML = (
 	}
 
 	ebi('s_outside').onclick = ebi('cs_btn').onclick = function(){
-		modalopen('cfg');
+		modaltoggle('cfg');
 	}
 })();
 
@@ -1242,7 +1247,7 @@ ebi('rcm').innerHTML = (
 
 	// settings
 	ebi('acc_settings').onclick = ebi('opa_cfg').onclick = function(e){
-		modalopen('cfg')
+		modaltoggle('cfg')
 		e.stopPropagation();
 	};
 
@@ -1258,7 +1263,7 @@ ebi('rcm').innerHTML = (
 
 })();
 
-function modalopen(dest){
+function modaltoggle(dest){
 	if (QS('#' + dest + '.vis'))
 		dest = '';
 
@@ -1301,16 +1306,21 @@ function goto(dest) {
 	for (var a = obj.length - 1; a >= 0; a--)
 		clmod(obj[a], 'act');
 
-	obj = QSA('.overlaybg');
+	obj = QSA('.modal');
 	for (var a = obj.length - 1; a >= 0; a--)
 		clmod(obj[a], 'vis');
 
 	if (dest) {
-		var rewritten = ['cfg', 'mkdir', 'new_md'];
+		var rewritten = ['cfg', 'mkdir', 'new_md', 'up2k'];
 		if(rewritten.includes(dest)){
-			if(dest == 'cfg')
-				clmod(ebi('cfg'), 'vis', true);
-
+			switch(dest){
+				case 'cfg':
+				case 'up2k':
+					clmod(ebi(dest), 'vis', true);
+					break;
+				default:
+					break;
+			}
 			return;
 		}
 
@@ -2239,7 +2249,6 @@ function auto_grad(can, color, color2 = '#000') {
 
 	for (var a = 0; a < p.length; a++){
 		var c = `color-mix(in xyz, ${color} ${mix[a]}%, ${color2} ${100 - mix[a]}%)`;
-		console.log(c)
 		g.addColorStop(p[a], c);
 	}
 

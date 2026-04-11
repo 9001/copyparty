@@ -171,16 +171,25 @@
 	<div id="rcm" tabindex="0"></div>
 
 
-	<div id="cfg" class="overlaybg">
-		<div id="s_outside" tt=""></div>
-		<div id="s_content">
-			<a id="s_header" href="#s_nav"></a>
+	<div id="cfg" class="modal">
+		<div id="s_outside" class="closepane" tt=""></div>
+		<div id="s_content" class="modalcontent">
+			<a id="s_header" class="modalheader" href="#s_nav"></a>
 			<div id="s_hor">
 				<div id="s_nav"></div>
 				<div id="s_divider"></div>
 				<div id="s_list" class="opview"></div>
 			</div>
-			<a id="cs_btn" href="#" class="btn">✕</a>
+			<a id="cs_btn" href="#" class="close btn">✕</a>
+		</div>
+	</div>
+
+	<div id="up2k" class="modal">
+		<div id="up_outside" class="closepane" tt=""></div>
+		<div id="up_content" class="modalcontent">
+			<a id="up_header" class="modalheader" href="#">🚀 Upload</a>
+			<div id="up_inner"></div>
+			<a id="c_up_btn" href="#" class="close btn">✕</a>
 		</div>
 	</div>
 

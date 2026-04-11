@@ -39,7 +39,6 @@ var u2min = `
   display: none !important;
 }
 #u2conf {margin:5em auto 0 auto !important}
-#u2conf.ww {width:70em}
 #u2conf.w {width:50em}
 #u2conf.w .c,
 #u2conf.w #u2btn_cw {text-align:left}
@@ -51,8 +50,6 @@ var u2min = `
 }
 #u2etaw.w #u2etas {margin-right:-37em}
 #u2etaw.w #u2etas.o {margin-top:-2.2em}
-#u2etaw.ww {margin:-1em auto}
-#u2etaw.ww #u2etas {padding-left:4em}
 #u2etas {
   background: none !important;
   border: none !important;

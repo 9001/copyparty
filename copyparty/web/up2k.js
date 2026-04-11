@@ -3051,8 +3051,7 @@ function up2k_init(subtle) {
             ebi('u2conf').className = ebi('u2cards').className = ebi('u2etaw').className = wide;
         }
 
-        wide = wem > 86 ? 'ww' : wide;
-        parent = ebi(wide == 'ww' ? 'u2c3w' : 'u2c3t');
+        parent = ebi('u2c3t');
         var its = [ebi('u2etaw'), ebi('u2cards')];
         if (its[0].parentNode !== parent) {
             ebi('u2conf').className = wide;

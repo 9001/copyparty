@@ -1138,6 +1138,8 @@ html.dz #flogout {
 	bottom: 0;
 	z-index: 1;
 	touch-action: none;
+	box-shadow: 0 0 .5em var(--mp-sh);
+	clip-path: inset(-10em 0 0 0);
 }
 #widget.anim {
 	transition: margin-left 0; /* can't set this above 0 due to onwidgetresize */
@@ -1182,6 +1184,7 @@ html.y #widget.open {
 	position: relative;
 	font-size: .9em;
 	top: -.04em;
+	margin-right: .3em;
 }
 #wtgrid, #wtgrid2 {
 	font-size: .75em;
@@ -2507,10 +2510,10 @@ html.y #bbox-overlay figcaption a {
 
 
 
-/* settings css */
-#s_content{
+/* modals */
+.modalcontent{
 	display: grid;
-  	grid-template-rows: auto auto;
+  	grid-template-rows: max-content auto;
 	margin: 5vh 5vw;
 	border-radius: .5em;
 	border: var(--a) solid 1px;
@@ -2518,15 +2521,35 @@ html.y #bbox-overlay figcaption a {
 	max-width: 66.6em;
 	position: relative;
 }
-#s_header{
-	margin: 0;
-	padding: .5em;
+.modalheader {
+	display: flex;
+	align-items: center;
+	margin: 0 2.5em 0 0;
+	padding: .7em;
 	background: var(--ttlbar);
 	font-size: large;
 	font-weight: bold;
 	color: var(--fg);
 }
-#s_hor{
+.close{
+	position: absolute;
+	right: 0;
+	margin: .5em;
+	color: var(--fg);
+}
+.closepane {
+	position: absolute;
+	inset: 0;
+}
+
+/* up2k */
+#up_inner {
+	width: 100%;
+	overflow-y: auto;
+}
+
+/* settings */
+#s_hor {
 	display: grid;
   	grid-template-columns: auto auto auto;
 	min-height: 0;
@@ -2572,17 +2595,6 @@ html.y #bbox-overlay figcaption a {
 	padding: .5em;
 	margin: 0 0 1.3em 0;
 }
-#cs_btn{
-	position: absolute;
-	right: 0;
-	margin: .5em;
-	color: var(--fg);
-}
-#s_outside {
-	position: absolute;
-	inset: 0;
-}
-
 
 
 
@@ -2591,12 +2603,12 @@ html.y #bbox-overlay figcaption a {
 #op_up2k {
 	padding: 0 1em 1em 1em;
 }
-.overlaybg {
+.modal {
 	display: none;
 	z-index: 3;
 	background: rgba(48, 48, 48, 0.7);
 }
-.overlaybg.vis,
+.modal.vis,
 .dropzone {
 	display: flex;
   	justify-content: center;
@@ -2740,11 +2752,6 @@ html.y #bbox-overlay figcaption a {
 #op_up2k.srch #u2btn {
 	border-color: var(--u2-sbtn-b1);
 }
-#u2conf.ww #u2btn {
-	line-height: 1em;
-	padding: .5em 0;
-	margin: -2em 1em -3em 0;
-}
 #u2conf #u2btn {
 	padding: .4em 0;
 	margin: -2em 0;
@@ -2861,30 +2868,24 @@ html.y #bbox-overlay figcaption a {
 	width: 21em;
 }
 #u2cards {
-	padding: 1em 1em .42em 1em;
+	padding: 1em 1em 0 0;
 	margin: 0 auto;
 	white-space: nowrap;
 	text-align: center;
 	overflow: hidden;
 	min-width: 24em;
 }
-#u2cards.w {
-	width: 48em;
-	text-align: left;
-}
-#u2cards.ww {
-	display: inline-block;
-}
 #u2etaw.w {
 	width: 55em;
 	text-align: right;
-	margin: 2em auto -2.7em auto;
-}
-#u2etaw.ww {
-	margin: -1em 2em 1em 1em;
+	margin: 2em auto -2em auto;
+	z-index: 1;
+	position: relative;
+	pointer-events: none;
 }
 #u2cards a {
 	padding: .2em 1em;
+	padding-bottom: 5px;
 	background: var(--u2-tab-bg);
 	border: 1px solid #999;
 	border-color: var(--u2-tab-b1);
@@ -2918,20 +2919,11 @@ html.y #bbox-overlay figcaption a {
 	min-width: 1.3em;
 }
 #u2conf {
-	margin: 1em auto;
+	margin: 1em 1em;
 	width: 30em;
 }
 #u2conf.w {
 	width: 51em;
-}
-#u2conf.ww {
-	width: 82em;
-}
-#u2conf.ww #u2c3w {
-	width: 29em;
-}
-#u2conf.ww #u2c3w.s {
-	width: 39em;
 }
 #u2conf .c,
 #u2conf .c * {
@@ -3204,11 +3196,6 @@ html.ay #u2btn {
 }
 html.dz #u2btn {
 	letter-spacing: -.033em;
-}
-html.c #u2conf.ww #u2btn,
-html.a #u2conf.ww #u2btn {
-	margin: -2em .5em -3em 0;
-	padding: .9em 0;
 }
 html.c #op_up2k.srch #u2btn,
 html.a #op_up2k.srch #u2btn {
