@@ -25,7 +25,7 @@ class Ico(object):
             zb = [ord(x) for x in zb]  # type: ignore
 
         c1 = colorsys.hsv_to_rgb(zb[0] / 256.0, 1, 0.3)
-        c2 = colorsys.hsv_to_rgb(zb[0] / 256.0, 0.8 if HAVE_PILF else 1, 1)
+        c2 = colorsys.hsv_to_rgb(zb[0] / 256.0, 0.5 if HAVE_PILF else 1, 0.9)
         ci = [int(x * 255) for x in list(c1) + list(c2)]
         c = "".join(["%02x" % (x,) for x in ci])
 
