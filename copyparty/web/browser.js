@@ -9901,7 +9901,7 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 var rcm = (function () {
 	if (MOBILE)
-		return {enabled: false}
+		;//return {enabled: false}
 
 	var r = {};
 	bcfg_bind(r, 'enabled', 'rcm_en', drcm.charAt(0)=='y');
