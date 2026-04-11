@@ -2231,44 +2231,18 @@ function glossy_grad(can, h, s, l) {
 	return g;
 }
 
-function hexToRgb(hex){
-	var long = hex.length >= 6;
-	var _r = long ? hex.substr(1,2) : hex.substr(1,1)
-	var _g = long ? hex.substr(3,2) : hex.substr(2,1)
-	var _b = long ? hex.substr(5,2) : hex.substr(3,1)
+function auto_grad(can, color, color2 = '#000') {
+	var g = can.ctx.createLinearGradient(0, 0, 0, can.h),
+		p = [0, 0.49, 0.50, 1],
+		mix = [70, 100, 90, 70];
 
-	if(!long){
-		_r += _r;
-		_g += _g;
-		_b += _b;
+	for (var a = 0; a < p.length; a++){
+		var c = `color-mix(in xyz, ${color} ${mix[a]}%, ${color2} ${100 - mix[a]}%)`;
+		console.log(c)
+		g.addColorStop(p[a], c);
 	}
 
-	return [
-		parseInt(_r, 16),
-		parseInt(_g, 16),
-		parseInt(_b, 16)
-	];
-}
-function rgbToHsl(r, g, b){
-    r /= 255, g /= 255, b /= 255;
-    var max = Math.max(r, g, b), min = Math.min(r, g, b);
-    var h, s, l = (max + min) / 2;
-
-    if(max == min){
-        h = s = 0; // achromatic
-    }else{
-        var d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-		h = Math.atan2(Math.sqrt(3) * (g - b), 2 * r - g - b)
-        switch(max){
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            case b: h = (r - g) / d + 4; break;
-        }
-        h /= 6;
-    }
-
-    return [h, s, l];
+	return g;
 }
 
 // buffer/position bar
@@ -2362,20 +2336,11 @@ var pbar = (function () {
 			dz = themen == 'dz',
 			dy = themen == 'dy';
 
-		var accentRgb = hexToRgb(getComputedStyle(document.body).getPropertyValue('--a'));
-		var accentHsl = rgbToHsl(accentRgb[0], accentRgb[1], accentRgb[2]);
-		accentHsl[0] *= 360;
-		accentHsl[1] *= 100;
-		accentHsl[2] *= 100;
+		var accent = getComputedStyle(document.body).getPropertyValue('--a');
 
 		if (gradh != gk) {
 			gradh = gk;
-			var l = accentHsl[2]
-			var lArr = [l*.7, l, l*.9, l*.7]
-			grad = glossy_grad(bc, 
-				accentHsl[0],
-				accentHsl[1],
-				lArr);
+			grad = auto_grad(bc, accent);
 		}
 		bctx.fillStyle = grad;
 		for (var a = 0; a < mp.au.buffered.length; a++) {
@@ -2511,7 +2476,7 @@ var vbar = (function () {
 		gradh = -1,
 		lastv = -1,
 		untext = -1,
-		can, ctx, w, h, grad1, grad2;
+		can, ctx, w, h, style1, style2;
 
 	r.onresize = function () {
 		if (!widget.is_open && r.can)
@@ -2535,25 +2500,16 @@ var vbar = (function () {
 			dz = themen == 'dz',
 			dy = themen == 'dy';
 
-		var accentRgb = hexToRgb(getComputedStyle(document.body).getPropertyValue('--a'));
-		var accentHsl = rgbToHsl(accentRgb[0], accentRgb[1], accentRgb[2]);
-		accentHsl[0] *= 360;
-		accentHsl[1] *= 100;
-		accentHsl[2] *= 100;
-
+		var accent = getComputedStyle(document.body).getPropertyValue('--a');
+		var bg = getComputedStyle(document.body).getPropertyValue('--bg-u2');
+		
 		if (gradh != gh) {
 			gradh = gh;
-			grad1 = glossy_grad(r.can, 
-				accentHsl[0],
-				accentHsl[1],
-				accentHsl[2]);
-			grad2 = glossy_grad(r.can,
-				accentHsl[0],
-				0,
-				(accentHsl[2] > 0.5 ? accentHsl[2] * 0.35 : accentHsl[2] + 50));
+			style1 = auto_grad(r.can, accent, accent);
+			style2 = light ? `color-mix(${bg} 85%, #000 15%` : `color-mix(${bg} 85%, #fff 15%`;
 		}
-		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
-		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
+		ctx.fillStyle = style2; ctx.fillRect(0, 0, w, h);
+		ctx.fillStyle = style1; ctx.fillRect(0, 0, w * mp.vol, h);
 		
 		if(false){
 			var vt = Math.floor(mp.vol * 100) + '%',

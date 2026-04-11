@@ -1322,6 +1322,7 @@ html.y #widget.open {
 }
 #progbar {
 	display: none;
+	margin: 0 .3em;
 }
 #progbar.vis {
 	display: block;
