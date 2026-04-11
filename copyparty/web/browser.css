@@ -1180,7 +1180,6 @@ html.y #widget.open {
 #wtgrid, #wtgrid2,
 #wtico {
 	position: relative;
-	font-size: .9em;
 	top: -.04em;
 }
 #wtgrid, #wtgrid2 {
@@ -1418,23 +1417,14 @@ html.y #widget.open {
 	height: 1.3em;
 	margin-right: .3em;
 }
-#widget.cmp {
-	height: 1.6em;
-	bottom: -1.6em;
-}
-#widget.cmp.open {
-	bottom: 0;
-}
 #widget.cmp #wtoggle {
 	font-size: 1.2em;
 }
 #widget.cmp #fshr {
 	display: none;
 }
-#widget.cmp #pctl .icon {
-	top: 0;
-	left: 0;
-	font-size: .75em;
+#widget.cmp {
+	font-size: 1em;
 }
 #widget.cmp #barpos,
 #widget.cmp #barbuf {
@@ -3445,6 +3435,9 @@ html.d #treepar {
 	#widget, #wrap {
 		margin-left: 0 !important;
 	}
+	#widget {
+		font-size: 1.6em;
+	}
 	#pathBar {
 		display: block;
 	}
@@ -3469,6 +3462,9 @@ html.d #treepar {
 	}
 	#s_divider {
 		display: none;
+	}
+	#pctl {
+		padding: .2em .5em .5em .5em;
 	}
 }
 @media (max-width: 32em) {

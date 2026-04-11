@@ -2451,7 +2451,7 @@ var pbar = (function () {
 		var m1 = pctx.measureText(t1),
 			m1b = pctx.measureText(t1 + ":88"),
 			m2 = pctx.measureText(t2),
-			yt = pc.h * 0.65,
+			yt = pc.h * 0.7,
 			xt1 = pc.w - (m1.width + 12),
 			xt2 = x < m1.width * 1.4 ? (x + 12) : (Math.min(pc.w - m1b.width, x - 12) - m2.width);
 
