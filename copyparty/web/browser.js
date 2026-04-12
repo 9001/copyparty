@@ -6065,9 +6065,9 @@ var thegrid = (function () {
 				ihref += "&raster";
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
-				'"' + ac + ' ttt="' + esc(name) + '"><img style="height:' +
+				'"' + ac + ' ttt="' + esc(name) + '"><div class="imgcontainer"><img style="height:' +
 				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" src="' +
-				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
+				ihref + '" /></div><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
 		clmod(ggrid, 'crop', r.crop);
@@ -7357,7 +7357,7 @@ var treectl = (function () {
 
 			tree.style.top = top + 'px';
 			// setting the height causes scrollbars to appear often because it's not exact most of the time
-			tree.style.height = '';// = treeh < 10 ? '' : Math.floor(treeh) + 'px';
+			tree.style.height = winh - wraptop + Math.floor(yscroll()) - 2 + 'px'; //= treeh < 10 ? '' : Math.floor(treeh) + 'px';
 		}
 	}
 	timer.add(onscroll2, true);

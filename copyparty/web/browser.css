@@ -98,7 +98,6 @@
 	--g-play-bg: #750;
 	--g-play-b1: #c90;
 	--g-play-b2: #da4;
-	--g-play-sh: #b83;
 
 	--g-sel-fg: #fff;
 	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 30%, var(--bg) 70%);
@@ -124,7 +123,7 @@
 	--f-sh3: 0.2;
 	--f-h-b1: rgba(128,128,128,0.7);
 
-	--f-play-bg: #fc5;
+	--f-play-bg: var(--a-dark);
 	--f-play-fg: #000;
 	--f-sel-sh: #fc0;
 	--f-gray: #999;
@@ -936,7 +935,6 @@ html.dz #flogout {
 #files tbody tr.play td,
 #files tbody tr.play td+td,
 #files tbody tr.play div a {
-	background: #fc0;
 	background: var(--f-play-bg);
 	color: var(--f-play-fg);
 	text-shadow: none;
@@ -985,9 +983,10 @@ html.dz #flogout {
 	box-shadow: 0 .1em .3em var(--g-sh);
 }
 #ggrid>a img {
+	z-index: 1;
 	border-radius: .2em;
 	max-width: 10em;
-	max-width: var(--grid-sz);
+	max-width: calc(var(--grid-sz) - 4px);
 	max-height: 8em;
 	max-height: calc(var(--grid-sz)/1.25);
 	margin: 0 auto;
@@ -996,6 +995,39 @@ html.dz #flogout {
 #ggrid.nocrop>a img {
 	max-height: 20em;
 	max-height: calc(var(--grid-sz)*2);
+}
+
+.imgcontainer {
+	display: flex;
+	overflow: hidden;
+	position: relative;
+	border-radius: .3em;
+	box-sizing: border-box;
+	padding: 0;
+}
+
+@keyframes rotate {
+	100% {
+		transform: rotate(1turn);
+	}
+}
+
+.play .imgcontainer {
+	padding: 2px;
+	&::before {
+		content: '';
+	box-sizing: border-box;
+		position: absolute;
+		left: -50%;
+		top: -50%;
+		width: 200%;
+		height: 200%;
+		background-repeat: no-repeat;
+		background-size: 50% 50%, 50% 50%;
+		background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+		background-image: linear-gradient(var(--a-hil), var(--a-hil)), linear-gradient(transparent, transparent), linear-gradient(var(--a-hil), var(--a-hil)), linear-gradient(transparent, transparent);
+		animation: rotate 10s linear infinite;
+	}
 }
 #ggrid>a.dir:before {
 	content: '📂';
@@ -1007,6 +1039,7 @@ html.dz #flogout {
 	content: '▶';
 }
 #ggrid>a:before {
+	z-index: 2;
 	display: block;
 	position: absolute;
 	padding: .3em 0;
@@ -1032,11 +1065,8 @@ html.dz #flogout {
 #ggrid>a.play,
 #ggrid>a[tt].play {
 	color: var(--g-sel-fg);
-	background: #fc0;
-	background: var(--g-play-bg);
 	border-color: var(--g-play-b1);
 	border-top: 1px solid var(--g-play-b2);
-	box-shadow: 0 .1em 1.2em var(--g-play-sh);
 }
 #files tbody tr.sel td,
 #files tbody tr.sel span,
@@ -1065,16 +1095,8 @@ html.dz #flogout {
 	border-color: var(--g-fsel-b1);
 	text-shadow: 1px 1px 0 var(--g-fsel-ts);
 }
-#ggrid>a.sel img,
-#ggrid>a.play img {
-	opacity: .7;
-	filter: contrast(130%) brightness(107%);
-}
 #ggrid>a.sel img {
 	box-shadow: 0 0 1em var(--g-sel-sh);
-}
-#ggrid>a.play img {
-	box-shadow: 0 0 1em var(--g-play-sh);
 }
 #ggrid a {
 	scroll-margin-top: 25vh;
@@ -1115,7 +1137,7 @@ html.dz #flogout {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: 1;
+	z-index: 3;
 	touch-action: none;
 	box-shadow: 0 0 .5em var(--mp-sh);
 	clip-path: inset(-10em 0 0 0);
@@ -1186,7 +1208,7 @@ html.y #widget.open {
 	white-space: nowrap;
 	top: -1em;
 	right: 0;
-	height: 1em;
+	height: 2em;
 	font-size: 2em;
 	line-height: 1em;
 	text-align: center;
@@ -1682,7 +1704,7 @@ input.ssconf_v {
 	box-shadow: 0 0 1em var(--bg-d2), 0 -1px 0 rgba(128,128,128,0.3);
 	border: 1px solid var(--bg-u3);
 	transition: width 0.15s;
-	z-index: 2;
+	z-index: 4;
 }
 #tree,
 html {
@@ -1975,7 +1997,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 #ghead {
 	position: sticky;
 	top: -.3em;
-	z-index: 1;
+	z-index: 3;
 }
 .ghead .btn {
 	position: relative;
@@ -3392,7 +3414,7 @@ html.d #treepar {
 		border-radius: .3em !important;
 	}
 	#tree {
-		z-index: 3;
+		z-index: 4;
 	}
 	#widget, #wrap {
 		margin-left: 0 !important;
@@ -4410,7 +4432,7 @@ html.e #detree {
 	margin-bottom: .5em;
 }
 #tree_footer {
-	position: absolute;
+	position: fixed;
 	bottom: 1em;
 	left: 1em;
 	transition: width .15s;
