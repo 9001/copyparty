@@ -2544,6 +2544,7 @@ html.y #bbox-overlay figcaption a {
 
 /* up2k */
 #up_inner {
+	display: block;
 	width: 100%;
 	overflow-y: auto;
 }
