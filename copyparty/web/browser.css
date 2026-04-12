@@ -1682,6 +1682,7 @@ input.ssconf_v {
 	box-shadow: 0 0 1em var(--bg-d2), 0 -1px 0 rgba(128,128,128,0.3);
 	border: 1px solid var(--bg-u3);
 	transition: width 0.15s;
+	z-index: 2;
 }
 #tree,
 html {
@@ -1974,7 +1975,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 #ghead {
 	position: sticky;
 	top: -.3em;
-	z-index: 2;
+	z-index: 1;
 }
 .ghead .btn {
 	position: relative;
