@@ -7,41 +7,38 @@
 	--sbw: 0.5em;
 	--sbh: 0.5em;
 
-	--fg: #ccc;
 	--fg-max: #fff;
-	--fg2-max: #fff;
-	--fg-weak: #bbb;
-
-	--bg-u6: #4c4c4c;
-	--bg-u5: #444;
-	--bg-u4: #383838;
-	--bg-u3: #333;
-	--bg-u2: #2b2b2b;
-	--bg-u1: #282828;
-	--bg: #222;
-	--bgg: var(--bg);
-	--bg-d1: #1c1c1c;
-	--bg-d2: #181818;
-	--bg-d3: #111;
 	--bg-max: #000;
+	--a: #fc5;
 
-	--tab-alt: #fa5;
+	--fg: color-mix(var(--fg-max) 90%, var(--bg-max) 10%);
+	--fg-weak: color-mix(var(--fg-max) 80%, var(--bg-max) 20%);
+
+	--bg: color-mix(var(--bg-max) 85%, var(--fg-max) 15%);
+	--bg-u1: color-mix(var(--bg-max) 80%, var(--fg-max) 20%);
+	--bg-u2: color-mix(var(--bg-max) 75%, var(--fg-max) 25%);
+	--bg-u3: color-mix(var(--bg-max) 70%, var(--fg-max) 30%);
+	--bg-u5: color-mix(var(--bg-max) 65%, var(--fg-max) 35%);
+	--bgg: var(--bg);
+	--bg-d1: color-mix(var(--bg-max) 90%, var(--fg-max) 10%);
+	--bg-d2: color-mix(var(--bg-max) 92%, var(--fg-max) 8%);
+	--bg-d3: color-mix(var(--bg-max) 95%, var(--fg-max) 5%);
+
+	--tab-alt: var(--a);
 	--row-alt: #282828;
 
-	--scroll: #eb0;
 	--sel-fg: var(--bg-d1);
 	--sel-bg: var(--fg);
 
-	--a: #fc5;
-	--a-hil: color-mix(in xyz, var(--a) 70%, var(--fg-max) 30%);
-	--a-dark: #e70; /* warning text etc */
-	--a-gray: #666;
+	--a-hil: hsl(from var(--a) h 105% 80%);
+	--a-dark: hsl(from var(--a) h 110% 70%); /* warning text etc */
+	--a-gray: hsl(from var(--a) h 0 l);
 
 	accent-color: var(--a);
 	--btn-fg: var(--a);
 	--btn-bg: rgba(128,128,128,0.15);
 	--btn-h-fg: var(--a-hil);
-	--btn-h-bg: color-mix(in xyz, var(--a) 30%, var(--bg) 70%);
+	--btn-h-bg: hsl(from var(--a) h 105% 20%);
 	--btn-1-fg: rgb(25, 19, 12);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
@@ -58,7 +55,7 @@
 
 	--op-aa-fg: var(--a);
 	--op-aa-bg: var(--bg-d2);
-	--op-a-sh: rgba(0,0,0,0.5);
+	--op-a-sh: color-mix(var(--bg-max) 50%, transparent 50%);
 
 	--u2-btn-b1: #999;
 	--u2-sbtn-b1: #999;
@@ -82,7 +79,7 @@
 	--ud-b1: #888;
 
 	--sort-1: var(--a);
-	--sort-2: #d90;
+	--sort-2: var(--a-hil);
 
 	--sz-b: #aaa;
 	--sz-k: #4ff;
@@ -104,20 +101,20 @@
 	--g-play-sh: #b83;
 
 	--g-sel-fg: #fff;
-	--g-sel-bg: #952;
-	--g-sel-b1: #e93;
-	--g-sel-sh: #b63;
-	--g-fsel-bg: #d93;
-	--g-fsel-b1: #fa4;
-	--g-fsel-ts: #840;
+	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 30%, var(--bg) 70%);
+	--g-sel-b1: var(--a-dark);
+	--g-sel-sh: hsl(from var(--a) h 105% 30%);
+	--g-fsel-bg: color-mix(in xyz, var(--g-sel-b1) 70%, var(--bg-max) 30%);
+	--g-fsel-b1: var(--a);
+	--g-fsel-ts: hsl(from var(--a) h 105% 30%);
 	--g-dfg: #bbb;
 	--g-fg: #ccc;
 	--g-bg: var(--bg-u2);
-	--g-b1: var(--bg-u4);
+	--g-b1: var(--bg-u3);
 	--g-b2: var(--bg-u5);
 	--g-g1: var(--bg-u2);
 	--g-g2: var(--bg-u5);
-	--g-f-bg: var(--bg-u4);
+	--g-f-bg: var(--bg-u3);
 	--g-f-b1: var(--bg-u5);
 	--g-f-fg: #fff;
 	--g-sh: rgba(0,0,0,0.3);
@@ -155,18 +152,13 @@ html.y {
 	--bg-u1: #fff;
 	--bg-u2: #f7f7f7;
 	--bg-u3: #eaeaea;
-	--bg-u4: #fff;
 	--bg-u5: #ccc;
-	--bg-u6: #ddd;
 	--bg-max: #fff;
 
 	--tab-alt: #c07;
 	--row-alt: #f2f2f2;
 
-	--scroll: #490;
-
 	--a: #06a;
-	--a-hil: #058;
 	--a-gray: #bbb;
 	--a-dark: #c0f;
 
@@ -204,11 +196,11 @@ html.y {
 
 	--g-fg: var(--a);
 	--g-bg: var(--bg-u2);
-	--g-b1: var(--bg-u6);
-	--g-b2: var(--bg-u6);
+	--g-b1: var(--bg-u5);
+	--g-b2: var(--bg-u5);
 	--g-g1: var(--bg-u2);
 	--g-g2: var(--bg-u5);
-	--g-f-bg: var(--bg-u4);
+	--g-f-bg: var(--bg-u3);
 	--g-f-b1: var(--bg-u5);
 	--g-sh: rgba(0,0,0,0.07);
 
@@ -264,7 +256,6 @@ html.bz {
 	--fg-weak: #bbd;
 
 	--bg-u5: #3b3f58;
-	--bg-u4: #1e2130;
 	--bg-u3: #1e2130;
 	--bg-u1: #1e2130;
 	--bg: #11121d;
@@ -301,8 +292,6 @@ html.by {
 
 	--row-alt: #f9f9f9;
 
-	--scroll: var(--a);
-
 	--btn-1-bg: #07a;
 	--btn-1h-bg: var(--a-hil);
 
@@ -328,7 +317,6 @@ html.c {
 
 	--tab-alt: #6ef;
 	--row-alt: #47237d;
-	--scroll: #ff0;
 
 	--btn-fg: #fff;
 	--btn-bg: #9019bf;
@@ -377,7 +365,6 @@ html.cy {
 
 	--tab-alt: #f00;
 	--row-alt: #fff;
-	--scroll: #fff;
 
 	--btn-bg: #000;
 	--btn-fg: #ff0;
@@ -403,9 +390,7 @@ html.dz {
 	--fg: #4d4;
 	--fg-weak: #2a2;
 
-	--bg-u6: #020;
 	--bg-u5: #050;
-	--bg-u4: #020;
 	--bg-u3: #020;
 	--bg-u2: #020;
 	--bg-u1: #020;
@@ -416,8 +401,6 @@ html.dz {
 
 	--tab-alt: #6f6;
 	--row-alt: #030;
-
-	--scroll: #0f0;
 
 	--a: #9f9;
 	--a-hil: #cfc;
@@ -472,15 +455,11 @@ html.dy {
 	--bg-u1: #fff;
 	--bg-u2: #fff;
 	--bg-u3: #fff;
-	--bg-u4: #fff;
 	--bg-u5: #fff;
-	--bg-u6: #fff;
 	--bg-max: #fff;
 
 	--tab-alt: #000;
 	--row-alt: #eee;
-
-	--scroll: #000;
 
 	--a: #000;
 	--a-hil: #000;
@@ -1106,14 +1085,14 @@ html.dz #flogout {
 }
 #files tr.sel a,
 #files tr.sel a.play {
-	color: var(--fg2-max);
+	color: var(--fg-max);
 }
 #files tr.sel a:hover {
 	color: var(--fg-max);
 	text-shadow: none;
 }
 #files tr.sel a.play.act {
-	text-shadow: 0 0 1px var(--fg2-max);
+	text-shadow: 0 0 1px var(--fg-max);
 }
 #files tr:focus {
 	outline: none;
@@ -1706,7 +1685,7 @@ input.ssconf_v {
 }
 #tree,
 html {
-	scrollbar-color: var(--scroll) var(--bg-u3);
+	scrollbar-color: var(--a) var(--bg-u3);
 }
 #treeh {
 	position: sticky;
@@ -1741,7 +1720,7 @@ html {
 	background: var(--bg-u3);
 }
 #tree::-webkit-scrollbar-thumb {
-	background: var(--scroll);
+	background: var(--a);
 }
 #treeul {
 	position: relative;
@@ -2164,7 +2143,7 @@ html.y #doc .line-highlight {
 	display: block;
 }
 #seldoc.sel {
-	color: var(--fg2-max);
+	color: var(--fg-max);
 	background: #f0f;
 	background: var(--g-sel-b1);
 }
@@ -3581,7 +3560,6 @@ html.ey {
   --g-sel-bg: #00f;
   --g-fsel-b1: #fff;
   --row-alt: var(--w);
-  --scroll: var(--silver);
   --f-sel-sh: transparent;
   --a: #000;
   --a-hil: #fff;
@@ -3681,7 +3659,6 @@ html.ez {
   --g-sel-bg: #00f;
   --g-fsel-b1: #fff;
   --row-alt: #555555;
-  --scroll: #555555;
   --f-sel-sh: transparent;
   --a: var(--fg);
   --a-hil: var(--fg);
@@ -4102,7 +4079,7 @@ html.e::-webkit-scrollbar-button,
 html.e::-webkit-scrollbar-thumb {
   width: 16px !important;
   height: 16px !important;
-  background: var(--scroll) !important;
+  background: var(--a) !important;
   /*HC*/
   box-shadow: var(--shadow-outset);
   border: 1px solid !important;
@@ -4352,8 +4329,8 @@ html.e #detree {
 	overflow-y: auto;
 	display: none;
 	background: #fff;
-	background: var(--bg);
-	border: 1px solid var(--bg-u3);
+	background: var(--bg-u2);
+	border: 1px solid var(--bg-u5);
 	outline: none;
 	border-radius: .3rem;
 	box-shadow: 0 0 .3rem var(--bg-d3);
@@ -4381,7 +4358,7 @@ html.e #detree {
 
 #rcm > .sep {
 	margin: 0 .2rem;
-	border-bottom: 1px solid var(--a-gray);
+	border-bottom: 1px solid var(--bg-u5);
 }
 
 #rcm_tmp {
@@ -4474,7 +4451,7 @@ html.e #detree {
 .popup {
   visibility: hidden;
   width: fit-content;
-  background-color: var(--bg-u6);
+  background-color: var(--bg-u5);
   text-align: center;
   border-radius: .3em;
   padding: .5em;
@@ -4493,7 +4470,7 @@ html.e #detree {
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
-  border-color: var(--bg-u6) transparent transparent transparent;
+  border-color: var(--bg-u5) transparent transparent transparent;
 }
 
 .overlay_plus{
