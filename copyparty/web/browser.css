@@ -4432,6 +4432,7 @@ html.e #detree {
 	margin-bottom: .5em;
 }
 #tree_footer {
+	width: 0;
 	position: fixed;
 	bottom: 1em;
 	left: 1em;

@@ -7242,7 +7242,8 @@ var treectl = (function () {
 
 	r.hide = function () {
 		r.hidden = true;
-		ebi('tree').style.width = '0';
+		ebi('tree').style.width = ebi('tree_footer').style.width = '0';
+		ebi('tree_footer').style.display = 'none';
 		ebi('widget').style.marginLeft = '0';
 		ebi('wrap').style.marginLeft = '';
 		window.removeEventListener('resize', onresize);
@@ -7383,6 +7384,7 @@ var treectl = (function () {
 		setcvar('--nav-sz', w);
 		ebi('tree').style.width = w;
 		ebi('tree_footer').style.width = (iw - 2) + 'em';
+		ebi('tree_footer').style.display = 'block';
 		ebi('wrap').style.marginLeft = w2;
 		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
 		onwidgetresize();
