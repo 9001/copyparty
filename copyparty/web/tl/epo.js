@@ -221,7 +221,7 @@ Ls.epo = {
 	"cl_hpick": "alklaki la kapojn de kolumnoj por kasi en la suban tabelon",
 	"cl_hcancel": "kaŝado de kolumno nuligita",
 	"cl_rcm": "dekstra-klaka menuo",
-	"cl_gauto": "aŭto田", //m
+	"cl_gauto": "aŭto田",
 
 	"ct_grid": '田 krado',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ ŝpruchelpiloj',
@@ -276,8 +276,8 @@ Ls.epo = {
 	"tt_dynt": "aŭtomate pligrandigi panelon",
 	"tt_wrap": "linifaldo",
 	"tt_hover": "montri kompletajn nomojn sur musumo$N( paneas rulumadon, se la kursoro de muso $N&nbsp; ne estas en la maldekstra malplenaĵo )",
-	"tt_gauto": "montri kiel krado aŭ listo laŭ dosieruja enhavo", //m
-	"tt_gathr": "uzi kradon se ĉi tiu procento de dosieroj estas bildoj/filmetoj", //m
+	"tt_gauto": "montri kiel krado aŭ listo laŭ dosieruja enhavo",
+	"tt_gathr": "uzi kradon se ĉi tiu elcento da dosieroj estas bildoj/filmetoj",
 
 	"ml_pmode": "je la fino de dosierujo...",
 	"ml_btns": "komandoj",
