@@ -7108,10 +7108,12 @@ function onwidgetresize(){
 	if(thin && bar.children.length > gtc.split(' ').length){
 		pbarthinpos.appendChild(ebi('progbar'));
 		pbarthinpos.appendChild(ebi('altprogbar'));
+		bar.style.paddingTop = '0';
 	}
 	else if(!thin && bar.children.length < gtc.split(' ').length){
 		ebi('trackname').after(ebi('progbar'));
 		ebi('trackname').after(ebi('altprogbar'));
+		bar.style.paddingTop = '.3em';
 	}
 	ebi('altprogbar').maxWidth = thin ? '' : '40vw'
 	bar.style.gridTemplateColumns = gtc;

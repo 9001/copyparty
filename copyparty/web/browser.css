@@ -1016,7 +1016,7 @@ html.dz #flogout {
 .play .imgcontainer {
 	&::before {
 		content: '';
-	box-sizing: border-box;
+		box-sizing: border-box;
 		position: absolute;
 		left: -50%;
 		top: -50%;
@@ -1389,6 +1389,7 @@ html.y #widget.open {
 	align-items: center;
 	height: 100%;
 	margin-right: .5em;
+	padding: .3em 0;
 }
 #pctl .icon {
 	font-size: 1em;
