@@ -2605,7 +2605,7 @@ html.y #bbox-overlay figcaption a {
 
 .modal {
 	display: none;
-	z-index: 3;
+	z-index: 10;
 	background: rgba(48, 48, 48, 0.7);
 }
 .modal.vis,
