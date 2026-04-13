@@ -1003,7 +1003,8 @@ html.dz #flogout {
 	position: relative;
 	border-radius: .3em;
 	box-sizing: border-box;
-	padding: 0;
+	margin: -3px -2px;
+	padding: 4px 3px;
 }
 
 @keyframes rotate {
@@ -1013,7 +1014,6 @@ html.dz #flogout {
 }
 
 .play .imgcontainer {
-	padding: 2px;
 	&::before {
 		content: '';
 	box-sizing: border-box;
