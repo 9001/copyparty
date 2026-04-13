@@ -8,7 +8,7 @@
 	--sbh: 0.5em;
 
 	--fg-max: #fff;
-	--bg-max: #000;
+	--bg-max: #080808;
 	--a: #fc5;
 
 	--fg: color-mix(var(--fg-max) 90%, var(--bg-max) 10%);
@@ -2538,6 +2538,8 @@ html.y #bbox-overlay figcaption a {
 	right: 0;
 	margin: .5em;
 	color: var(--fg);
+	box-shadow: 0 0 .3em var(--bg-d3);
+	border: 1px solid var(--bg-u3);
 }
 .closepane {
 	position: absolute;
@@ -2576,6 +2578,7 @@ html.y #bbox-overlay figcaption a {
 }
 #s_nav .btn{
 	padding-right: 2em;
+	border: 1px solid var(--bg-u3);
 }
 .setting{
 	padding: .5em;
