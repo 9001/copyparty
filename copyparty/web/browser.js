@@ -6690,10 +6690,21 @@ var search_ui = (function () {
 		o[a].oninput = ev_search_input;
 		o[a].onkeydown = ev_search_keydown;
 	}
-	// extract name search bar and place it next to path
-	var searchBar = document.getElementById('srch_namev');
-	searchBar.placeholder = "🔎 search for files";
-	ebi('pathBar').appendChild(searchBar);
+	
+	var folderSearch = ebi('folder_search');
+	folderSearch.placeholder = '🔎 search this folder';
+	folderSearch.onclick = function(){
+		ebi('srch_pathc').checked = true;
+		var path = get_evpath();
+		ebi('srch_pathv').value = path.slice(1, -1);
+	}
+	folderSearch.oninput = function(){
+		var v = unsmart(this.value)
+		var nsearch = ebi('srch_namev');
+		nsearch.value = v;
+		nsearch.oninput();
+	}
+	folderSearch.onkeydown = ev_search_keydown;
 
 	function srch_msg(err, txt) {
 		var o = ebi('srch_q');

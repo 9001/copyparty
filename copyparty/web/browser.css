@@ -598,7 +598,7 @@ html .ayjump:focus {
 	padding: .35em 0 .2em 0;
 	font-size: 1.4em;
 }
-#srch_namev {
+#folder_search {
 	font-size: medium;
 	max-width: 12em;
 	height: 1.5em;
@@ -3434,7 +3434,7 @@ html.d #treepar {
 	#pathBar {
 		display: block;
 	}
-	#srch_namev {
+	#folder_search {
 		margin: .5em 1em 0 1em;
 	}
 	#wrap {
@@ -3521,7 +3521,7 @@ html.d #treepar {
 	#pathBar {
 		display: block;
 	}
-	#srch_namev {
+	#folder_search {
 		margin: .5em .5em 0 .5em ;
 	}
 	#path {
