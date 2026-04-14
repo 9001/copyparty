@@ -1774,7 +1774,7 @@ var mpl = (function () {
 		ebi('np_tn').textContent = np['.tn'] || '';
 		ebi('np_artist').textContent = np.artist || (fns.length > 1 ? fns[0] : '');
 		ebi('np_title').textContent = np.title || '';
-		ebi('np_dur').textContent = np['.dur'] || '';
+		ebi('txtsongend').innerHTML = ebi('np_dur').textContent = np['.dur'] || '';
 		ebi('np_url').textContent = uricom_dec(get_evpath()) + np.file.split('?')[0];
 		if (!MOBILE && cover)
 			ebi('np_img').setAttribute('src', cover);
@@ -2429,13 +2429,11 @@ var pbar = (function () {
 			t2 = s2ms(apos),
 			x = sm * apos;
 
-		ebi('txtpos').innerHTML = t2;
-		ebi('txtsongend').innerHTML = t1;
 		if(adur > 0)
 			ebi('sliderpos').value = apos / adur;
 
 		if (w && html_txt != t2) {
-			ebi('np_pos').textContent = html_txt = t2;
+			ebi('txtpos').innerHTML = ebi('np_pos').textContent = html_txt = t2;
 			if (mpl.os_ctl)
 				navigator.mediaSession.setPositionState({
 					'duration': adur,
