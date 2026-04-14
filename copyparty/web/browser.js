@@ -6693,7 +6693,7 @@ var search_ui = (function () {
 	
 	var folderSearch = ebi('folder_search');
 	folderSearch.placeholder = '🔎 search this folder';
-	folderSearch.onclick = function(){
+	folderSearch.onfocus = function(){
 		ebi('srch_pathc').checked = true;
 		var path = get_evpath();
 		ebi('srch_pathv').value = path.slice(1, -1);
