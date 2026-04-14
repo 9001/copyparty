@@ -12,7 +12,7 @@
 	--a: #fc5;
 
 	--fg: color-mix(var(--fg-max) 90%, var(--bg-max) 10%);
-	--fg-weak: color-mix(var(--fg-max) 80%, var(--bg-max) 20%);
+	--fg-weak: color-mix(var(--fg-max) 70%, var(--bg-max) 30%);
 
 	--bg: color-mix(var(--bg-max) 85%, var(--fg-max) 15%);
 	--bg-u1: color-mix(var(--bg-max) 80%, var(--fg-max) 20%);
@@ -584,7 +584,7 @@ html .ayjump:focus {
 }
 #pathBar {
 	display: flex;
-	margin: 0 0 .5em 0;
+	margin: 0 0 1em 0;
 	align-content: center;
 	justify-content: space-between;
 }
@@ -1480,7 +1480,7 @@ html.y #ops svg circle {
 }
 #headerArea{
 	display: flex;
-	margin: .5em .5em -.5em .5em;
+	margin: .5em .5em 0 .5em;
 }
 .hamburger_line{
 	height: .2em;
@@ -4423,6 +4423,9 @@ html.e #detree {
   padding: 2px;
   font-size: small;
   cursor: default;
+}
+#rtt_latency {
+	opacity: .5;
 }
 #spaceUsed_bar, #spaceTotal_bar{
 	height: .3em;
