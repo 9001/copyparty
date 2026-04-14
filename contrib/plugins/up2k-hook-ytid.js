@@ -14,7 +14,7 @@ function up2k_namefilter(good_files, nil_files, bad_files, hooks) {
     a_up2k_namefilter(good_files, nil_files, bad_files, hooks).then(() => { });
 }
 
-// ebi('up_inner').appendChild(mknod('input','unick'));
+// ebi('op_up2k').appendChild(mknod('input','unick'));
 
 function bstrpos(buf, ptn) {
     var ofs = 0,

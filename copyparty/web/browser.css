@@ -2548,7 +2548,7 @@ html.y #bbox-overlay figcaption a {
 }
 
 /* up2k */
-#up_inner {
+#op_up2k {
 	display: block;
 	width: 100%;
 	overflow-y: auto;
@@ -2753,7 +2753,7 @@ html.y #bbox-overlay figcaption a {
 	width: 16em;
 	cursor: pointer;
 }
-#up_inner.srch #u2btn {
+#op_up2k.srch #u2btn {
 	border-color: var(--u2-sbtn-b1);
 }
 #u2conf #u2btn {
@@ -2801,7 +2801,7 @@ html.y #bbox-overlay figcaption a {
 	max-width: 100em;
 	margin: 0 auto;
 }
-#up_inner.srch #u2tabf {
+#op_up2k.srch #u2tabf {
 	max-width: none;
 }
 #u2tab td {
@@ -2834,7 +2834,7 @@ html.y #bbox-overlay figcaption a {
 		width: 16em;
 	}
 }
-#up_inner.srch td.prog {
+#op_up2k.srch td.prog {
 	font-family: sans-serif;
 	font-family: var(--font-main), sans-serif;
 	font-size: 1em;
@@ -3007,8 +3007,8 @@ html.b #u2conf a.b:hover {
 	box-shadow: var(--btn-1h-bs);
 	border-bottom: var(--btn-1h-bb);
 }
-#up_inner.srch #u2conf td:nth-child(2)>*,
-#up_inner.srch #u2conf td:nth-child(3)>* {
+#op_up2k.srch #u2conf td:nth-child(2)>*,
+#op_up2k.srch #u2conf td:nth-child(3)>* {
 	background: #777;
 	border-color: var(--fg);
 	box-shadow: none;
@@ -3201,8 +3201,8 @@ html.ay #u2btn {
 html.dz #u2btn {
 	letter-spacing: -.033em;
 }
-html.c #up_inner.srch #u2btn,
-html.a #up_inner.srch #u2btn {
+html.c #op_up2k.srch #u2btn,
+html.a #op_up2k.srch #u2btn {
 	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
 	text-shadow: 1px 1px 1px #fc6;
 	color: #333;
@@ -3336,13 +3336,13 @@ html.b #files td {
 html.b .btn {
 	top: -.1em;
 }
-html.b #up_inner.srch sup {
+html.b #op_up2k.srch sup {
 	color: #fc0;
 }
 html.by #u2btn sup {
 	color: #06b;
 }
-html.by #up_inner.srch sup {
+html.by #op_up2k.srch sup {
 	color: #b70;
 }
 html.bz #u2cards a.act {

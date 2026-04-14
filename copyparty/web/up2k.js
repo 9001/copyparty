@@ -1188,7 +1188,7 @@ function up2k_init(subtle) {
         // if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
         //     tgl_fsearch();
 
-        //if (!QS('#up_inner.act'))
+        //if (!QS('#op_up2k.act'))
         if(!uc.fsearch)
             goto('up2k');
 
@@ -1644,7 +1644,7 @@ function up2k_init(subtle) {
             utw_minh = parseInt(ebi('u2tabw').style.minHeight || '0');
         }
 
-        var minh = QS('#up_inner.act') && st.is_busy ? Math.max(utw_minh, ebi('u2tab').offsetHeight + 32) : 0;
+        var minh = QS('#op_up2k.act') && st.is_busy ? Math.max(utw_minh, ebi('u2tab').offsetHeight + 32) : 0;
         if (utw_minh < minh || !utw_minh) {
             utw_minh = minh;
             ebi('u2tabw').style.minHeight = utw_minh + 'px';
@@ -3308,7 +3308,7 @@ function up2k_init(subtle) {
             var ico = uc.fsearch ? '🔎' : '🚀',
                 desc = uc.fsearch ? L.ul_btns : L.ul_btnu;
 
-            clmod(ebi('up_inner'), 'srch', uc.fsearch);
+            clmod(ebi('op_up2k'), 'srch', uc.fsearch);
             ebi('u2bm').innerHTML = ico + '&nbsp; <sup>' + desc + '</sup>';
         }
         catch (ex) { }
@@ -3464,7 +3464,7 @@ ebi('ico1').onclick = function () {
 };
 
 
-if (QS('#up_inner.act'))
+if (QS('#op_up2k.act'))
     goto_up2k();
 
 apply_perms({ "perms": perms, "frand": frand, "u2ts": u2ts });

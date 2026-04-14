@@ -889,7 +889,7 @@ ebi('widget').innerHTML = (
 
 
 // up2k ui
-ebi('up_inner').innerHTML = (
+ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
 	'<table id="u2conf">\n' +
@@ -1311,18 +1311,9 @@ function goto(dest) {
 		clmod(obj[a], 'vis');
 
 	if (dest) {
-		var rewritten = ['cfg', 'mkdir', 'new_md', 'up2k'];
-		if(rewritten.includes(dest)){
-			switch(dest){
-				case 'cfg':
-				case 'up2k':
-					clmod(ebi(dest), 'vis', true);
-					break;
-				default:
-					break;
-			}
+		var rewritten = ['mkdir', 'new_md'];
+		if(rewritten.includes(dest))
 			return;
-		}
 
 		var lnk = QS('#ops>a[data-dest=' + dest + ']'),
 			nps = lnk.getAttribute('data-perm');
@@ -1337,7 +1328,12 @@ function goto(dest) {
 		if (!has(perms, 'read') && !has(perms, 'write') && (dest == 'up2k'))
 			return;
 
-		clmod(ebi('op_' + dest), 'act', 1);
+		var modal = ebi(dest);
+		if(modal != null)
+			clmod(modal, 'vis', true);
+		
+		var page = ebi('op_' + dest) ?? QS('#' + dest + ' .opview')
+		clmod(page, 'act', 1);
 		clmod(lnk, 'act', 1);
 
 		var fn = window['goto_' + dest];
