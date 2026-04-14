@@ -2269,6 +2269,8 @@ var favico = (function () {
             document.head.appendChild(r.tag);
         }
         r.tag.href = 'data:image/svg+xml;base64,' + b64;
+
+        ebi('favico_onpage').innerHTML = r.txt;
     };
 
     r.init = function () {
@@ -2276,9 +2278,6 @@ var favico = (function () {
         var dv = (window.dfavico || '').trim().split(/ +/),
             fg = dv.length < 2 ? 'fc5' : dv[1].toLowerCase() == 'none' ? '' : dv[1],
             bg = dv.length < 3 ? '222' : dv[2].toLowerCase() == 'none' ? '' : dv[2];
-
-        if(dv.length > 0)
-            ebi('srv_name')?.prepend(dv[0] + ' ');
 
         scfg_bind(r, 'txt', 'icot', dv[0], r.upd);
         scfg_bind(r, 'fg', 'icof', fg, r.upd);

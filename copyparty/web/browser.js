@@ -7765,6 +7765,7 @@ var treectl = (function () {
 		if (res.ufavico && (!favico.en || !ebi('icot').value)) {
 			while (qsr('head>link[rel~="icon"]')) { }
 			document.head.insertAdjacentHTML('beforeend', res.ufavico);
+            ebi('favico_onpage').innerHTML = res.ufavico;
 		}
 
 		if (this.hpush && !showfile.active())
