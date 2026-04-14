@@ -1233,9 +1233,7 @@ window.baguetteBox = (function () {
     }
 
     function show_buttons(v) {
-        clmod(ebi('bbox-btns'), 'off', v);
-        clmod(btnPrev, 'off', v);
-        clmod(btnNext, 'off', v);
+        clmod(ebi('bbox-overlay'), 'immersive', v);
     }
 
     function bounceAnimation(direction) {
@@ -1297,11 +1295,11 @@ window.baguetteBox = (function () {
                 x = e.clientX - rc.left,
                 fx = x / (rc.right - rc.left);
 
-            if (fx < 0.3)
-                return showLeftImage();
+            // if (fx < 0.3)
+            //     return showLeftImage();
 
-            if (fx > 0.7)
-                return showRightImage();
+            // if (fx > 0.7)
+            //     return showRightImage();
 
             show_buttons('t');
 

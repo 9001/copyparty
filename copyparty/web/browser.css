@@ -1411,6 +1411,9 @@ html.y #widget.open {
 	height: .5em;
 	aspect-ratio: 8;
 	background: rgba(0,0,0,0.2);
+	border: 1px solid var(--bg-u1);
+	margin-left: .3em;
+	transition: opacity .15s;
 }
 #pvolbg {
 	height: 100%;
@@ -1421,7 +1424,6 @@ html.y #widget.open {
 }
 #pvolbg svg {
 	height: 1.3em;
-	margin-right: .3em;
 }
 #widget.cmp #wtoggle {
 	font-size: 1.2em;
@@ -2286,7 +2288,7 @@ html.noscroll .sbar::-webkit-scrollbar {
 	flex: none;
 }
 .full-image figure {
-	display: inline;
+	display: inline-block;
 	margin: 0;
 	height: 100%;
 }
@@ -2298,8 +2300,6 @@ html.noscroll .sbar::-webkit-scrollbar {
 	height: auto;
 	max-width: 100%;
 	max-height: 100%;
-	max-height: calc(100% - 1.4em);
-	margin-bottom: 1.4em;
 	vertical-align: middle;
 	transition: transform .23s, left .23s, top .23s, width .23s, height .23s;
 }
@@ -2340,6 +2340,10 @@ html.bb_fsc figcaption {
 	white-space: normal;
 	color: var(--fg);
 	z-index: 1;
+	transition: opacity .15s;
+}
+#bbox-overlay.immersive figcaption {
+	opacity: 0;
 }
 #bbox-overlay figcaption a {
 	background: rgba(0, 0, 0, 0.6);
@@ -2393,7 +2397,7 @@ html.y #bbox-overlay figcaption a {
 	top: calc(50% - 30px);
 	width: 44px;
 	height: 60px;
-	transition: background-color .3s ease, color .3s ease, left .3s ease, right .3s ease;
+	transition: background-color .3s ease, color .3s ease, opacity .3s ease;
 }
 #bbox-btns button {
 	transition: background-color .3s ease, color .3s ease;
@@ -2404,13 +2408,11 @@ html.y #bbox-overlay figcaption a {
 .bbox-btn {
 	position: fixed;
 }
-#bbox-next.off {
-	right: -2.6em;
+#bbox-overlay.immersive #bbox-next,
+#bbox-overlay.immersive #bbox-prev {
+	opacity: 0;
 }
-#bbox-prev.off {
-	left: -2.6em;
-}
-#bbox-btns.off {
+#bbox-overlay.immersive #bbox-btns {
 	top: -2.8em;
 }
 #bbox-overlay button {
@@ -2426,6 +2428,9 @@ html.y #bbox-overlay figcaption a {
 	line-height: 2em;
 	vertical-align: top;
 	font-variant: small-caps;
+}
+#bbox-overlay button:hover {
+	opacity: 1 !important;
 }
 #bbox-overlay button:focus,
 #bbox-overlay button:hover {
@@ -3454,6 +3459,22 @@ html.d #treepar {
 	#pctl {
 		padding: .2em .5em .5em .5em;
 	}
+	#pvol {
+		border: .7em solid var(--bg-u3);
+		transform: rotate(-90deg);
+		position: fixed;
+		bottom: 4.3em;
+		right: -.7em;
+		opacity: 0;
+		pointer-events: none;
+		box-shadow: 0 0 .5em var(--mp-sh);
+	}
+	#pvolbg:hover #pvol {
+		display: block;
+		opacity: 1;
+		pointer-events: all;
+	}
+
 }
 @media (max-width: 32em) {
 	#u2conf {

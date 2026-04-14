@@ -1331,7 +1331,7 @@ function goto(dest) {
 		var modal = ebi(dest);
 		if(modal != null)
 			clmod(modal, 'vis', true);
-		
+
 		var page = ebi('op_' + dest) ?? QS('#' + dest + ' .opview')
 		clmod(page, 'act', 1);
 		clmod(lnk, 'act', 1);
@@ -2538,8 +2538,15 @@ var vbar = (function () {
 	onresize100.add(r.onresize, true);
 
 	var rect;
+	var cs;
+	var left, top, width, height;
 	function mousedown(e) {
 		rect = can.getBoundingClientRect();
+		cs = getComputedStyle(ebi('pvol'));
+		top = rect.top + parseFloat(cs.borderTopWidth);
+		left = rect.left + parseFloat(cs.borderLeftWidth);
+		height = rect.height - 2 * parseFloat(cs.borderTopWidth);
+		width = rect.width - 2 * parseFloat(cs.borderLeftWidth);
 		mousemove(e);
 	}
 	function mousemove(e) {
@@ -2551,8 +2558,14 @@ var vbar = (function () {
 			return;
 		}
 
-		var x = e.clientX - rect.left,
-			mul = x * 1.0 / rect.width;
+		var x = e.clientX - left,
+			mul = x * 1.0 / width;
+
+		if(height > width) {
+			// vertical
+			var y = e.clientY - top;
+			mul = 1 - y * 1.0 / height;
+		}
 
 		if (mul > 0.98)
 			mul = 1;
