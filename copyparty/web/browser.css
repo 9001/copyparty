@@ -2288,7 +2288,7 @@ html.noscroll .sbar::-webkit-scrollbar {
 	flex: none;
 }
 .full-image figure {
-	display: inline-block;
+	display: inline;
 	margin: 0;
 	height: 100%;
 }
