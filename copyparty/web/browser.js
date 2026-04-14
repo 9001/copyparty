@@ -1630,7 +1630,7 @@ var mpl = (function () {
 		if (!tint)
 			ebi('barbuf').style.removeProperty('background');
 		else
-			ebi('barbuf').style.background = 'rgba(126,163,75,' + (tint / 100.0) + ')';
+			ebi('barbuf').style.background = 'rgba(126,126,126,' + (tint / 100.0) + ')';
 	}
 	ebi('pb_tint').oninput = function (e) {
 		swrite('pb_tint', this.value);
@@ -2270,7 +2270,7 @@ var pbar = (function () {
 		r.pos = canvas_cfg(ebi('barpos'));
 		r.buf.ctx.font = '.5em sans-serif';
 		r.pos.ctx.font = '.9em sans-serif';
-		r.pos.ctx.strokeStyle = 'rgba(24,56,0,0.5)';
+		r.pos.ctx.strokeStyle = 'rgba(40, 40, 40, 0.5)';
 		r.drawbuf();
 		r.drawpos();
 		if (!r.pos.can.onmouseleave)
