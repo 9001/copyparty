@@ -1995,7 +1995,7 @@ function up2k_init(subtle) {
             ng = pvis.ctr.ng,
             spd = Math.floor(st.bytes.finished / st.time.busy),
             suf = '\n\n{0} @ {1}/s'.format(shumantime(st.time.busy), humansize(spd)),
-            t = uc.ask_up ? 0 : 10;
+            t = 10; // uc.ask_up ? 0 : 10;
 
         console.log('toast', ok, ng);
 
