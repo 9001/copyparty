@@ -1500,7 +1500,8 @@ class Garda(object):
         if not self.lim:
             return 0, ip
 
-        ip = ipnorm(ip)
+        if ":" in ip:
+            ip = ipnorm(ip)
 
         if prev and self.uniq:
             if self.prev.get(ip) == prev:
