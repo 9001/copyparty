@@ -2443,7 +2443,7 @@ def odfusion(
 
 def ipnorm(ip: str) -> str:
     if ":" in ip:
-        # assume /56 clients; drop 4 groups
+        # assume /56 clients; drop final 72 bits
         return str(IPv6Network(ip + "/56", strict=False).network_address)
 
     return ip
