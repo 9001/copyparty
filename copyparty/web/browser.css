@@ -4499,22 +4499,44 @@ html.e #detree {
 }
 
 .popup.show {
-  visibility: visible;
-  -webkit-animation: fadeIn 1s;
-  animation: fadeIn 1s;
+	visibility: visible;
+	-webkit-animation: fadeIn 1s;
+	animation: fadeIn 1s;
 }
 
 .popup {
   visibility: hidden;
   width: fit-content;
   background-color: var(--bg-u5);
+  border: 1px solid var(--bg-u3);
+	box-shadow: 0 0 2px var(--txt-sh);
   text-align: center;
   border-radius: .3em;
   padding: .5em;
   position: absolute;
   display: block;
-  z-index: 3;
+  z-index: 6;
   bottom: 2.5em;
+}
+.under::after {
+	display: none;
+}
+.under {
+	top: calc(100% - .3em);
+	bottom: auto;
+	left: .5em;
+	right: 0;
+  	text-align: left;
+	width: auto;
+}
+#srchfolder_div {
+	position: relative;
+	box-shadow: 0 0 2px var(--txt-sh);
+}
+#srchfolder_div:focus-within .popup{
+	visibility: visible;
+	-webkit-animation: fadeIn 1s;
+	animation: fadeIn 1s;
 }
 
 /* Popup arrow */

@@ -86,7 +86,13 @@
 				{%- endfor %}
 			</h1>
 		</div>
-		<input id="folder_search" type="text"/>
+		<div id="srchfolder_div">
+			<input id="folder_search" type="text"/>
+			<span id="srch_quickopts" class="popup under">
+				<input type="checkbox" id="srch_recursivec" checked="true">
+				<label for="srch_recursivec" id="srch_recursivelbl" tabindex="0"></label>
+			</span>
+		</div>
 	</div>
 
 	{%- if doc %}

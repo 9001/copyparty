@@ -523,6 +523,7 @@ if (1)
 		"s_t1": "tags contains &nbsp; (^=start, end=$)",
 		"s_a1": "specific metadata properties",
 		"s_dir": "search this folder",
+		"s_rec": "include subfolders",
 
 		"md_eshow": "cannot render ",
 		"md_off": "[📜<em>readme</em>] disabled in [⚙️] -- document hidden",
@@ -6705,6 +6706,10 @@ var search_ui = (function () {
 	}
 	folderSearch.onkeydown = ev_search_keydown;
 
+	var recur_c = ebi('srch_recursivec');
+	recur_c.oninput = ev_search_input;
+	ebi('srch_recursivelbl').innerHTML = L.s_rec;
+
 	function srch_msg(err, txt) {
 		var o = ebi('srch_q');
 		o.textContent = txt;
@@ -6765,6 +6770,7 @@ var search_ui = (function () {
 	}
 
 	function encode_query() {
+		var recursive = ebi('srch_recursivec').checked;
 		var q = '';
 		for (var a = 0; a < sconf.length; a++) {
 			for (var b = 1; b < sconf[a].length; b++) {
@@ -6830,14 +6836,14 @@ var search_ui = (function () {
 						if (tv.slice(0, 1) == '^') {
 							tv = tv.slice(1);
 						}
-						else {
+						else if(!(k == 'path' && !recursive)) {
 							tv = '*' + tv;
 						}
 
 						if (tv.slice(-1) == '$') {
 							tv = tv.slice(0, -1);
 						}
-						else {
+						else if(!(k == 'path' && !recursive)) {
 							tv += '*';
 						}
 
