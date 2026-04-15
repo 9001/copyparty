@@ -522,6 +522,7 @@ if (1)
 		"s_f1": "name contains &nbsp; (negate with -nope)",
 		"s_t1": "tags contains &nbsp; (^=start, end=$)",
 		"s_a1": "specific metadata properties",
+		"s_dir": "search this folder",
 
 		"md_eshow": "cannot render ",
 		"md_off": "[📜<em>readme</em>] disabled in [⚙️] -- document hidden",
@@ -6690,7 +6691,7 @@ var search_ui = (function () {
 	}
 	
 	var folderSearch = ebi('folder_search');
-	folderSearch.placeholder = '🔎 search this folder';
+	folderSearch.placeholder = '🔎 ' + L.s_dir;
 	folderSearch.onfocus = function(){
 		ebi('srch_pathc').checked = true;
 		var path = get_evpath();
