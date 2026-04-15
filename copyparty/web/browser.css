@@ -4472,30 +4472,24 @@ html.e #detree {
 }
 .popup_button {
 	border-radius: .3em;
-	background: var(--btn-1-bg);
-	cursor: pointer;
-	padding: 0;
 	margin: 0;
-	display: flex;
-	justify-content:space-between;
 	color: var(--btn-1-fg);
 	text-align: left;
 	text-shadow: none;
 }
-.popup_button p{
-	margin: .2em .3em;
+#acc_button p{
+	margin: 0;
 	align-self: center;
 }
-#acc_settings{
-	background: var(--a);
-	position: absolute;
-	align-self: end;
-	right: 0;
-  	bottom: 0;
-	font-size: medium;
+#acc_button {
+	margin: 0;
+	cursor: pointer;
+	display: flex;
 }
-#acc_settings:hover{
-	background: var(--btn-h-bg);
+#acc_settings{
+	margin: 0 0 0 .3em;
+	font-size: large;
+	padding: .3em;
 }
 
 .popup.show {
@@ -4505,18 +4499,18 @@ html.e #detree {
 }
 
 .popup {
-  visibility: hidden;
-  width: fit-content;
-  background-color: var(--bg-u5);
-  border: 1px solid var(--bg-u3);
+	visibility: hidden;
+	width: fit-content;
+	background-color: var(--bg-u5);
+	border: 1px solid var(--bg-u3);
 	box-shadow: 0 0 2px var(--txt-sh);
-  text-align: center;
-  border-radius: .3em;
-  padding: .5em;
-  position: absolute;
-  display: block;
-  z-index: 6;
-  bottom: 2.5em;
+	text-align: center;
+	border-radius: .3em;
+	padding: .5em;
+	position: absolute;
+	display: block;
+	z-index: 6;
+	bottom: 2.5em;
 }
 .under::after {
 	display: none;
@@ -4541,14 +4535,14 @@ html.e #detree {
 
 /* Popup arrow */
 .popup::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: var(--bg-u5) transparent transparent transparent;
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px;
+	border-style: solid;
+	border-color: var(--bg-u5) transparent transparent transparent;
 }
 
 .overlay_plus{
