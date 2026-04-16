@@ -377,9 +377,9 @@ html.y #tth {
 	border-radius: .2em;
 }
 @keyframes outline_fadeOut {
-0% {outline: var(--a) solid .1em;}
-30% {outline: color-mix(var(--a) 75%, transparent 25%) solid .1em;}
-100% {outline: transparent solid .1em;}
+	0% {outline: var(--a) solid .1em;}
+	30% {outline: color-mix(var(--a) 75%, transparent 25%) solid .1em;}
+	100% {outline: transparent solid .1em;}
 }
 html.y *:focus,
 html.y *:focus+label,

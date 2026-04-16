@@ -1423,6 +1423,7 @@ html.y #widget.open {
 #pvolbg {
 	height: 100%;
 	padding: .3em;
+	cursor: pointer;
 	align-content: center;
 	align-items: center;
 	display: flex;
@@ -3479,7 +3480,17 @@ html.d #treepar {
 		opacity: 1;
 		pointer-events: all;
 	}
-
+	/* makes touch more intuitive by hiding after timeout */
+	@media (hover: none) {
+		#pvolbg:hover #pvol {
+			animation: timeout_hide 5s forwards;
+		}
+		@keyframes timeout_hide {
+			0% {opacity: 1; display: block;}
+			90% {opacity: 1; display: block;}
+			100% {opacity: 0; display: none;}
+		}
+	}
 }
 @media (max-width: 32em) {
 	#u2conf {

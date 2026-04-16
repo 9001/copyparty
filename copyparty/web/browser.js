@@ -871,9 +871,9 @@ ebi('widget').innerHTML = (
 	'			<input type="range" min="0" max="1" step="0.001" value="0" id="sliderpos"></input>' +
 	'			<span id="txtsongend"/>0:00</span>' +
 	'		</div>' +
-	'		<a class="tgl btn" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '">🔁</a>' +
-	'		<a class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
-	'		<div id="pvolbg">' + svg_vol + '<canvas id="pvol"></canvas></div>' +
+	'		<a class="tgl btn" tabindex="0" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '">🔁</a>' +
+	'		<a class="tgl btn" tabindex="0" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
+	'		<div id="pvolbg" tabindex="0">' + svg_vol + '<canvas id="pvol"></canvas></div>' +
 	'	</div>' +
 	'</div>'+
 	'<div id="np_inf">' +
