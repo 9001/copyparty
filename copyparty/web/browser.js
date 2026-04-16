@@ -3500,8 +3500,8 @@ function play(tid, is_ev, seek) {
 	}
 
 	mp.au.osrc = decodeURI(mp.tracks[tid].split('/').pop());
-	ebi('trackname').innerHTML = mp.au.osrc;
-	ebi('trackname').setAttribute('tt', mp.au.osrc);
+	ebi('trackname').innerHTML = esc(uricom_dec(mp.au.osrc.replace(/\+/g, ' ').split('?')[0]));
+	ebi('trackname').setAttribute('tt', ebi('trackname').innerHTML);
 	afilt.apply();
 
 	setTimeout(function () {
