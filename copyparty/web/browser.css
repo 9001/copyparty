@@ -1365,7 +1365,8 @@ html.y #widget.open {
 	display: grid;
 }
 #altprogbar span {
-	font-size: small;
+	font-size: medium;
+	font-family: monospace;
 	color: var(--fg-weak);
 	margin: .3em;
 	align-self: center;
