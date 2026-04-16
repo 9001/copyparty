@@ -2270,7 +2270,8 @@ var favico = (function () {
         }
         r.tag.href = 'data:image/svg+xml;base64,' + b64;
 
-        ebi('favico_onpage').innerHTML = r.txt;
+        if(ebi('favico_onpage') != null)
+            ebi('favico_onpage').innerHTML = r.txt;
     };
 
     r.init = function () {
