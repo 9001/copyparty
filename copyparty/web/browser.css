@@ -600,14 +600,14 @@ html .ayjump:focus {
 	display: block;
 	margin: 0;
 	/* min-width: 10em; */
-	padding: .35em 0 .2em 0;
+	align-content: center;
+	padding: .2em;
 	font-size: 1.4em;
 }
 #folder_search {
-	font-size: medium;
 	max-width: 12em;
-	height: 1.5em;
-	margin: .2em 0 0 .5em;
+	height: 1.8em;
+	margin-bottom: 0 !important;
 }
 html.y #path {
 	text-shadow: none;
@@ -4440,7 +4440,7 @@ html.e #detree {
 }
 
 #wfp{
-	margin: .2em .3em 0 -.3em;
+	margin: 0 .3em 0 -.3em;
 }
 
 #spaceFree, #rtt_latency {
@@ -4517,16 +4517,15 @@ html.e #detree {
 	display: none;
 }
 .under {
-	top: calc(100% - .3em);
-	bottom: auto;
-	left: .5em;
-	right: 0;
+	inset: calc(100% + .2em) 0 auto 0;
   	text-align: left;
 	width: auto;
 }
 #srchfolder_div {
 	position: relative;
-	box-shadow: 0 0 2px var(--txt-sh);
+	display: flex;
+	height: max-content;
+	margin-left: .3em;
 }
 #srchfolder_div:focus-within .popup{
 	visibility: visible;
