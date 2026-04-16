@@ -11,6 +11,7 @@
 	--bg-max: #080808;
 	--a: #fc5;
 	
+	/* mikudayo */
 	/* --fg-max: #d1d7e9;
 	--bg-max: #0a0b0e;
 	--a: #27efc9; */
@@ -42,7 +43,7 @@
 	--btn-fg: var(--a);
 	--btn-bg: rgba(128,128,128,0.15);
 	--btn-h-fg: var(--a-hil);
-	--btn-h-bg: hsl(from var(--a) h 105% 20%);
+	--btn-h-bg: hsl(from var(--a) h 0 35%);
 	--btn-1-fg: rgb(25, 19, 12);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
