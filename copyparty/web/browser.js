@@ -6637,8 +6637,8 @@ var search_ui = (function () {
 		],
 		[
 			L.s_dt,
-			["dtl", "dt_min", L.s_d1, "14", "1997-08-15, 01:00"],
-			["dtu", "dt_max", L.s_d2, "14", "2020"]
+			["dtl", "dt_min", L.s_d1, "14", "1997-08-15, 01:00", "date"],
+			["dtu", "dt_max", L.s_d2, "14", "2020", "date"]
 		],
 		[
 			L.s_ta,
@@ -6650,8 +6650,8 @@ var search_ui = (function () {
 		],
 		[
 			L.s_ua,
-			["utl", "ut_min", L.s_u1, "14", "2007-04-08"],
-			["utu", "ut_max", L.s_u2, "14", "2038-01-19"]
+			["utl", "ut_min", L.s_u1, "14", "2007-04-08", "date"],
+			["utu", "ut_max", L.s_u2, "14", "2038-01-19", "date"]
 		]
 	];
 
@@ -6665,12 +6665,13 @@ var search_ui = (function () {
 		var html = ['<tr id="tsrch_' + sconf[a][1][0] + '"><td><br />' + sconf[a][0] + '</td>'];
 		for (var b = 1; b < 3; b++) {
 			var hn = "srch_" + sconf[a][b][0],
-				csp = (sconf[a].length == 2) ? 2 : 1;
+				csp = (sconf[a].length == 2) ? 2 : 1,
+				type = sconf[a][b].length >= 6 ? sconf[a][b][5] : "text";
 
 			html.push(
 				'<td colspan="' + csp + '"><input id="' + hn + 'c" type="checkbox">\n' +
 				'<label for="' + hn + 'c">' + sconf[a][b][2] + '</label>\n' +
-				'<br /><input id="' + hn + 'v" type="text" style="width:' + sconf[a][b][3] +
+				'<br /><input id="' + hn + 'v" type="' + type + '" style="width:' + sconf[a][b][3] +
 				'em" name="' + sconf[a][b][1] + '" placeholder="' + sconf[a][b][4] + '" /></td>');
 			if (csp == 2)
 				break;
@@ -6695,8 +6696,8 @@ var search_ui = (function () {
 	folderSearch.placeholder = '🔎 ' + L.s_dir;
 	folderSearch.onfocus = function(){
 		ebi('srch_pathc').checked = true;
-		var path = get_evpath();
-		ebi('srch_pathv').value = path.slice(1, -1);
+		var path = decodeURI(get_evpath());
+		ebi('srch_pathv').value = path.slice(1);
 	}
 	folderSearch.oninput = function(){
 		var v = unsmart(this.value)
@@ -6779,8 +6780,21 @@ var search_ui = (function () {
 					vs = unsmart(ebi('srch_' + k + 'v').value),
 					tvs = [];
 
-				if (a == 1)
-					vs = vs.trim().replace(/ +/, 'T');
+				if(k == 'path' && vs?.endsWith('/') && !vs?.includes('"')){
+					vs = vs.slice(0, -1);
+					vs = `"${vs}${(recursive ? '*' : '')}"`;
+				}
+
+				function onlyUnique(value, index, array) {
+					return array.indexOf(value) === index && value?.length > 0;
+				}
+				var immune = vs.match(/(([^\s]*|)"[^"]*"([^\s]*|))/)?.filter(onlyUnique)
+				for(var i=0; i<immune?.length;i++){
+					if(immune[i].length > 0){
+						tvs.push(immune[i]);
+						vs = vs.replace(immune[i], '')
+					}
+				}
 
 				while (vs) {
 					vs = vs.trim();
@@ -6799,7 +6813,8 @@ var search_ui = (function () {
 						}
 					}
 					else {
-						var vp = vs.split(/ +(.*)/);
+						// split at spaces
+						var vp = vs.split(/\s+(.*)/);
 						v = vp[0].replace(/\\"/g, '"');
 						vs = vp[1] || '';
 					}
@@ -6836,18 +6851,18 @@ var search_ui = (function () {
 						if (tv.slice(0, 1) == '^') {
 							tv = tv.slice(1);
 						}
-						else if(!(k == 'path' && !recursive)) {
+						else if (!(tv.includes(' ') || tv.startsWith('"'))){
 							tv = '*' + tv;
 						}
 
 						if (tv.slice(-1) == '$') {
 							tv = tv.slice(0, -1);
 						}
-						else if(!(k == 'path' && !recursive)) {
+						else if(!(tv.includes(' ') || tv.endsWith('"'))){
 							tv += '*';
 						}
 
-						if (tv.indexOf(' ') + 1) {
+						if (tv.includes(' ') && !tv.includes('"')) {
 							tv = '"' + tv + '"';
 						}
 
