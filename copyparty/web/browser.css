@@ -2540,8 +2540,8 @@ html.y #bbox-overlay figcaption a {
 .modalheader {
 	display: flex;
 	align-items: center;
-	margin: 0 2.5em 0 0;
-	padding: .7em;
+	margin: 0;
+	padding: .7em 3em .7em .7em;
 	background: var(--ttlbar);
 	font-size: large;
 	font-weight: bold;

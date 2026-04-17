@@ -6788,8 +6788,8 @@ var search_ui = (function () {
 				function onlyUnique(value, index, array) {
 					return array.indexOf(value) === index && value?.length > 0;
 				}
-				var immune = vs.match(/(([^\s]*|)"[^"]*"([^\s]*|))/)?.filter(onlyUnique)
-				for(var i=0; i<immune?.length;i++){
+				var immune = vs.match(/\B("(?:[^"]|\\")*[^\\]")\B/g)?.filter(onlyUnique)
+				for(var i = 0; i < immune?.length; i++){
 					if(immune[i].length > 0){
 						tvs.push(immune[i]);
 						vs = vs.replace(immune[i], '')
