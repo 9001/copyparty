@@ -597,6 +597,7 @@ function U2pvis(act, btns, uc, st) {
     r.addrow = function (nfile) {
         var tr = r.genrow(nfile);
         ebi('u2tab').tBodies[0].appendChild(tr);
+        ebi('up_loading').appendChild(tr)
     };
 
     btns = QSA(btns + '>a[act]');
@@ -3036,40 +3037,6 @@ function up2k_init(subtle) {
     ///   config ui
     //
 
-    function onresize(e) {
-        // 10x faster than matchMedia('(min-width
-        var bar = ebi('ops'),
-            wpx = window.innerWidth,
-            fpx = parseInt(getComputedStyle(bar)['font-size']),
-            wem = wpx * 1.0 / fpx,
-            wide = wem > 57 ? 'w' : '',
-            parent = ebi(wide ? 'u2btn_cw' : 'u2btn_ct'),
-            btn = ebi('u2btn');
-
-        if (btn.parentNode !== parent) {
-            parent.appendChild(btn);
-            ebi('u2conf').className = ebi('u2cards').className = ebi('u2etaw').className = wide;
-        }
-
-        parent = ebi('u2c3t');
-        var its = [ebi('u2etaw'), ebi('u2cards')];
-        if (its[0].parentNode !== parent) {
-            ebi('u2conf').className = wide;
-            for (var a = 0; a < 2; a++) {
-                parent.appendChild(its[a]);
-                its[a].className = wide;
-            }
-        }
-    }
-    onresize100.add(onresize, true);
-
-    if (MOBILE) {
-        // android-chrome wobbles for a bit; firefox / iOS-safari are OK
-        setTimeout(onresize, 20);
-        setTimeout(onresize, 100);
-        setTimeout(onresize, 500);
-    }
-
     var o = QSA('#u2conf .c *[tt]');
     for (var a = o.length - 1; a >= 0; a--) {
         o[a].parentNode.getElementsByTagName('input')[0].setAttribute('tt', o[a].getAttribute('tt'));
@@ -3324,7 +3291,6 @@ function up2k_init(subtle) {
 
         draw_turbo();
         draw_life();
-        onresize();
     }
 
     function apply_flag_cfg() {

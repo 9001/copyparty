@@ -2560,27 +2560,20 @@ html.y #bbox-overlay figcaption a {
 	inset: 0;
 }
 
-/* up2k */
-#op_up2k {
-	display: block;
-	width: 100%;
-	overflow-y: auto;
-}
-
 /* settings */
-#s_hor {
+.modalsplit {
 	display: grid;
   	grid-template-columns: auto auto auto;
 	min-height: 0;
 }
-#s_nav, #s_list{
+.splitsub {
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
 	padding: .5em;
 	padding-top: 0;
 }
-#s_divider{
+.divider{
 	background: var(--a);
 	width: 1px;
 	margin: 1em 0;
@@ -2763,7 +2756,6 @@ html.y #bbox-overlay figcaption a {
 	font-size: 1.5em;
 	margin: .5em auto;
 	padding: .8em 0;
-	width: 16em;
 	cursor: pointer;
 }
 #op_up2k.srch #u2btn {
@@ -2802,7 +2794,6 @@ html.y #bbox-overlay figcaption a {
 #u2tabw {
 	min-height: 0;
 	transition: min-height .2s;
-	margin: 2em 0;
 }
 #u2tabw.na>table {
 	display: none;
@@ -2885,24 +2876,15 @@ html.y #bbox-overlay figcaption a {
 	width: 21em;
 }
 #u2cards {
-	padding: 1em 1em 0 0;
-	margin: 0 auto;
+	padding: 1em 1em .4em .3em;
 	white-space: nowrap;
 	text-align: center;
-	overflow: hidden;
-	min-width: 24em;
-}
-#u2etaw.w {
-	width: 55em;
-	text-align: right;
-	margin: 2em auto -2em auto;
-	z-index: 1;
-	position: relative;
-	pointer-events: none;
+	overflow-y: hidden;
+	overflow-x: auto;
 }
 #u2cards a {
 	padding: .2em 1em;
-	padding-bottom: 5px;
+	padding-bottom: .3em;
 	background: var(--u2-tab-bg);
 	border: 1px solid #999;
 	border-color: var(--u2-tab-b1);
@@ -2938,9 +2920,6 @@ html.y #bbox-overlay figcaption a {
 #u2conf {
 	margin: 1em 1em;
 	width: 30em;
-}
-#u2conf.w {
-	width: 51em;
 }
 #u2conf .c,
 #u2conf .c * {
@@ -3123,6 +3102,27 @@ html.b #u2conf a.b:hover {
 	font-size: 1.1em;
 	line-height: 0;
 }
+#up_list {
+	padding-bottom: 2em;
+}
+#up_list details {
+	border: var(--bg-u3) solid 1px;
+	border-radius: .3em;
+	margin: .3em;
+}
+#up_list summary {
+	cursor: pointer;
+	background: var(--bg-u1);
+	color: var(--a);
+	padding: .3em;
+	border-radius: .3em;
+}
+#up_list summary:hover {
+	background: var(--bg-u3);
+}
+#up_list .sub {
+	margin: .3em;
+}
 
 
 
@@ -3232,10 +3232,6 @@ html.a #u2etas {
 	border-width: .1em 0;
 	border-radius: .5em;
 	border-width: .25em 0;
-}
-html.c #u2cards,
-html.a #u2cards {
-	margin: 0 auto -1em auto;
 }
 html.c #u2foot:empty,
 html.a #u2foot:empty {
@@ -3457,11 +3453,14 @@ html.d #treepar {
 	#ghead {
 		margin: .5em;
 	}
-	#s_hor {
+	.modalsplit {
 		display: block;
 		overflow-y: auto;
 	}
-	#s_divider {
+	.splitsub {
+		overflow-y: hidden;
+	}
+	.divider {
 		display: none;
 	}
 	#pctl {

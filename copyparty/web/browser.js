@@ -944,18 +944,20 @@ ebi('op_up2k').innerHTML = (
 	L.ul_send + ': <span id="u2etau" tt="' + L.ut_etau + '">(' + L.ul_idle1 + ')</span><br />\n' +
 	'	</div><span class="o">' +
 	L.ul_done + ': </span><span id="u2etat" tt="' + L.ut_etat + '">(' + L.ul_idle1 + ')</span>\n' +
-	'</div></div>\n' +
+	'</div>');
 
-	'<div id="u2cards">\n' +
+
+ebi('up_info').innerHTML = (
+	'<h3>Status</h3>' +
+
+	'</div>\n<div id="u2cards">\n' +
 	'	<a href="#" act="ok" tt="' + L.uct_ok + '">ok <span>0</span></a><a\n' +
 	'	href="#" act="ng" tt="' + L.uct_ng + '">ng <span>0</span></a><a\n' +
 	'	href="#" act="done" tt="' + L.uct_done + '">done <span>0</span></a><a\n' +
 	'	href="#" act="bz" tt="' + L.uct_bz + '" class="act">busy <span>0</span></a><a\n' +
-	'	href="#" act="q" tt="' + L.uct_q + '">que <span>0</span></a><a\n' +
-	'	href="#" style="pointer-events: none; width: 90%; display: inline-block; font-size: 1.1em;"><span style="opacity: 0">_</span></a>\n' +
-	'</div>\n' +
-
-	'</div>\n' +
+	'	href="#" act="q" tt="' + L.uct_q + '">que <span>0</span></a>\n' +
+	//'	href="#" style="pointer-events: none; width: 90%; display: inline-block; font-size: 1.1em;"><span style="opacity: 0">_</span></a>\n' +
+	'</div>\n</div>\n' +
 
 	'<div id="u2tabw" class="na"><table id="u2tab">\n' +
 	'	<thead>\n' +
@@ -967,6 +969,13 @@ ebi('op_up2k').innerHTML = (
 	'	</thead>\n' +
 	'	<tbody></tbody>\n' +
 	'</table><div id="u2mu"></div></div>\n' +
+
+	'<div id="up_list">' +
+	'	<div id="up_status"></div>' +
+	'	<details open><summary>Uploading</summary><table id="up_loading" class="sub"></table></details>' +
+	'	<details open><summary>Failed</summary><table id="up_failed" class="sub"></table></details>' +
+	'	<details open><summary>Done</summary><table id="up_done" class="sub"></table></details>' +
+	'</div>' +
 
 	'<p id="u2flagblock"><b>' + L.ul_flagblk + '</p>\n' +
 	'<div id="u2life"></div>' +
