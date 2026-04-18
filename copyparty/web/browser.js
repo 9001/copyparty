@@ -894,40 +894,73 @@ ebi('widget').innerHTML = (
 ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
-	'<table id="u2conf">\n' +
-	'	<tr>\n' +
-	'		<td class="c" data-perm="read"><br />' + L.ul_par + '</td>\n' +
-	'		<td class="c" rowspan="2">\n' +
+	'<div id="u2conf" tt="">' +
+	'<details><summary>options</summary>' +
+
+	'	<div class="setting">' +
+	'		<table id="u2conft">\n' +
+	'			<tr>\n' +
+	'				<td class="c" data-perm="read">' + L.ul_par + '</td>\n' +
+	'			</tr>\n' +
+	'			<tr>\n' +
+	'				<td class="c" data-perm="read">\n' +
+	'					<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
+	'						class="txtbox" id="nthread" value=""/><a\n' +
+	'						href="#" class="b" id="nthread_add">+</a>&nbsp;\n' +
+	'				</td>\n' +
+	'			</tr>\n' +
+	'		</table>\n' +
+	'		<p class="s_desc">' + tt.parse(L.ut_par ) + '</p>\n' +
+	'	</div>\n' +
+
+	'	<div class="setting">' +
+	'		<div class="c">\n' +
 	'			<input type="checkbox" id="multitask" />\n' +
-	'			<label for="multitask" tt="' + L.ut_mt + '">🏃</label>\n' +
-	'		</td>\n' +
-	'		<td class="c" rowspan="2">\n' +
+	'			<label for="multitask">🏃</label>\n' +
+	'		</div>\n' +
+	'		<p class="s_desc">' + tt.parse(L.ut_mt ) + '</p>\n' +
+	'	</div>\n' +
+
+	'	<div class="setting">' +
+	'		<div class="c">\n' +
 	'			<input type="checkbox" id="potato" />\n' +
-	'			<label for="potato" tt="' + L.ut_pot + '">🥔</label>\n' +
-	'		</td>\n' +
-	'		<td class="c" rowspan="2">\n' +
+	'			<label for="potato">🥔</label>\n' +
+	'		</div>\n' +
+	'		<p class="s_desc">' + tt.parse(L.ut_pot ) + '</p>\n' +
+	'	</div>\n' +
+
+	'	<div class="setting">' +
+	'		<div class="c">\n' +
 	'			<input type="checkbox" id="u2rand" />\n' +
-	'			<label for="u2rand" tt="' + L.ut_rand + '">🎲</label>\n' +
-	'		</td>\n' +
-	'		<td class="c" rowspan="2">\n' +
+	'			<label for="u2rand">🎲</label>\n' +
+	'		</div>\n' +
+	'		<p class="s_desc">' + tt.parse(L.ut_rand ) + '</p>\n' +
+	'	</div>\n' +
+
+	'	<div class="setting">' +
+	'		<div class="c">\n' +
 	'			<input type="checkbox" id="u2ow" />\n' +
-	'			<label for="u2ow" tt="' + L.ut_ow + '">?</a>\n' +
-	'		</td>\n' +
-	'		<td class="c" data-perm="read" data-dep="idx" rowspan="2">\n' +
+	'			<label for="u2ow">?</a>\n' +
+	'		</div>\n' +
+	'		<p class="s_desc">' + tt.parse(L.ut_ow ) + '</p>\n' +
+	'	</div>\n' +
+
+	'	<div class="setting">' +
+	'		<div class="c" data-perm="read" data-dep="idx">\n' +
 	'			<input type="checkbox" id="fsearch" />\n' +
-	'			<label for="fsearch" tt="' + L.ut_srch + '">🔎</label>\n' +
-	'		</td>\n' +
-	'		<td data-perm="read" rowspan="2" id="u2btn_cw"></td>\n' +
-	'		<td data-perm="read" rowspan="2" id="u2c3w"></td>\n' +
-	'	</tr>\n' +
-	'	<tr>\n' +
-	'		<td class="c" data-perm="read">\n' +
-	'			<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
-	'				class="txtbox" id="nthread" value="" tt="' + L.ut_par + '"/><a\n' +
-	'				href="#" class="b" id="nthread_add">+</a><br />&nbsp;\n' +
-	'		</td>\n' +
-	'	</tr>\n' +
-	'</table>\n' +
+	'			<label for="fsearch">🔎</label>\n' +
+	'		</div>\n' +
+	'		<p class="s_desc">' + tt.parse(L.ut_srch ) + '</p>\n' +
+	'	</div>\n' +
+
+	'	<div class="setting">' +
+	'		<a id="up_moreopts" class="btn" href="#h_upload">↗️ more options</a>\n' +
+	'	</div>\n' +
+
+	'	<div data-perm="read" rowspan="2" id="u2c3w"></div>\n' +
+
+	'</details>' +
+	'</div>' +
 
 	'<div id="u2notbtn"></div>\n' +
 
@@ -939,16 +972,23 @@ ebi('op_up2k').innerHTML = (
 
 	'<div id="u2c3t">\n' +
 
-	'<div id="u2etaw"><div id="u2etas"><div class="o">\n' +
+	'	<div id="u2etaw">' +
+	'		<div id="u2etas">' +
+	'			<div class="o">\n' +
 	L.ul_hash + ': <span id="u2etah" tt="' + L.ut_etah + '">(' + L.ul_idle1 + ')</span><br />\n' +
 	L.ul_send + ': <span id="u2etau" tt="' + L.ut_etau + '">(' + L.ul_idle1 + ')</span><br />\n' +
-	'	</div><span class="o">' +
+	'			</div><span class="o">' +
 	L.ul_done + ': </span><span id="u2etat" tt="' + L.ut_etat + '">(' + L.ul_idle1 + ')</span>\n' +
-	'</div>');
+	'		</div>' +
+	'	</div>' +
+	'</div>' +
+
+	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write"><summary>basic uploader</summary></details>'
+);
 
 
 ebi('up_info').innerHTML = (
-	'<h3>Status</h3>' +
+	'<h3 id="up_status_h">Status</h3>' +
 
 	'</div>\n<div id="u2cards">\n' +
 	'	<a href="#" act="ok" tt="' + L.uct_ok + '">ok <span>0</span></a><a\n' +
@@ -970,13 +1010,6 @@ ebi('up_info').innerHTML = (
 	'	<tbody></tbody>\n' +
 	'</table><div id="u2mu"></div></div>\n' +
 
-	'<div id="up_list">' +
-	'	<div id="up_status"></div>' +
-	'	<details open><summary>Uploading</summary><table id="up_loading" class="sub"></table></details>' +
-	'	<details open><summary>Failed</summary><table id="up_failed" class="sub"></table></details>' +
-	'	<details open><summary>Done</summary><table id="up_done" class="sub"></table></details>' +
-	'</div>' +
-
 	'<p id="u2flagblock"><b>' + L.ul_flagblk + '</p>\n' +
 	'<div id="u2life"></div>' +
 	'<div id="u2foot"></div>'
@@ -993,6 +1026,21 @@ var x = ebi('bbsw');
 x.parentNode.insertBefore(mknod('div', null,
 	'<input type="checkbox" id="uput" name="uput"><label for="uput">' + L.u_uput + '</label>'), x);
 
+var bup = ebi('op_bup');
+ebi('bup_tgl').after(bup);
+ebi('bup_tgl').onclick = function() {
+	var open = !clgot(bup, 'act');
+	if(open)
+		modaltoggle('bup', true);
+	else
+		modaltoggle('up2k', true);
+	this.open = !open;
+};
+
+ebi('up_moreopts').onclick = function(){
+	modaltoggle('cfg', true);
+	location.hash = ebi('up_moreopts').href;
+};
 
 (function () {
 	var o = mknod('div');
@@ -1010,7 +1058,7 @@ x.parentNode.insertBefore(mknod('div', null,
 // config panel
 
 var musicSettings = (
-	'<div><h3>🎵 ' + L.ot_mp + '</h3><div>' +
+	'<div><h3 id="h_mpopts">🎵 ' + L.ot_mp + '</h3><div>' +
 	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
 	'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
 	'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
@@ -1028,23 +1076,23 @@ var musicSettings = (
 	'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
 	'</div></div>' +
 
-	'<div><h3>▶️ ' + L.ml_btns + '</h3><div>' +
+	'<div><h3 id="h_cmds">▶️ ' + L.ml_btns + '</h3><div>' +
 	'<a href="#" class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
 	'</div></div>' +
 
-	'<div><h3>📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
+	'<div><h3 id="h_pbmode">📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
 	'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '">🔁</a>' +
 	'<a href="#" class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
 	'<a href="#" class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
 	'</div></div>' +
 
 	(have_acode ? (
-		'<div><h3>🏹 ' + L.ml_tcode + '</h3><div>' +
+		'<div><h3 id="h_transfrom">🏹 ' + L.ml_tcode + '</h3><div>' +
 		'<a href="#" id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
 		'<a href="#" id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
 		'<a href="#" id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
 		'</div></div>' +
-		'<div><h3>🎯 ' + L.ml_tcode2 + '</h3><div>' +
+		'<div><h3 id="h_transto">🎯 ' + L.ml_tcode2 + '</h3><div>' +
 		'<a href="#" id="ac2opus" class="tgl btn" tt="' + L.mt_c2opus + '</a>' +
 		'<a href="#" id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
 		'<a href="#" id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
@@ -1054,18 +1102,18 @@ var musicSettings = (
 		'</div></div>'
 	) : '') +
 
-	'<div><h3>🕶️ ' + L.ml_tint + '</h3><div>' +
+	'<div><h3 id="h_tint">🕶️ ' + L.ml_tint + '</h3><div>' +
 	'<input type="text" id="pb_tint" value="0" ' + NOAC + ' style="width:2.4em" tt="' + L.mt_tint + '" />' +
 	'</div></div>' +
 
 	'<div><h3 id="h_drc">🐘 ' + L.ml_drc + '</h3><div><div id="audio_drc"></div></div></div>' +
-	'<div><h3>📊 ' + L.ml_eq + '</h3><div><div id="audio_eq"></div></div></div>' +
-	'<div><h3>🔇 ' + L.ml_ss + '</h3><div><div id="audio_ss"></div></div></div>' +
+	'<div><h3 id="h_eq">📊 ' + L.ml_eq + '</h3><div><div id="audio_eq"></div></div></div>' +
+	'<div><h3 id="h_silence">🔇 ' + L.ml_ss + '</h3><div><div id="audio_ss"></div></div></div>' +
 	'');
 
 ebi('op_cfg').innerHTML = (
 	'<div>\n' +
-	'	<h3>✅ ' + L.cl_opts + '</h3>\n' +
+	'	<h3 id="h_general">✅ ' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" tt="' + L.ct_ttips + '</a>\n' +
 	'		<a id="griden" class="tgl btn" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
@@ -1085,9 +1133,9 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
-	(!MOBILE ? '<div><h3>🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
+	(!MOBILE ? '<div><h3 id="h_mouse">🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
 	'<div>\n' +
-	'	<h3>🔢 ' + L.cl_hfsz + '</h3>\n' +
+	'	<h3 id="h_filesize">🔢 ' + L.cl_hfsz + '</h3>\n' +
 	'	<div><select id="fszfmt">\n' +
 	'		<option value="0">0 ┃ 1234567</option>\n' +
 	'		<option value="1">1 ┃ 1 234 567</option>\n' +
@@ -1103,19 +1151,19 @@ ebi('op_cfg').innerHTML = (
 	'	</select></div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>🎨 ' + L.cl_themes + '</h3>\n' +
+	'	<h3 id="h_theme">🎨 ' + L.cl_themes + '</h3>\n' +
 	'	<div><select id="themes"></select></div>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>🌐 ' + L.cl_langs + '</h3>\n' +
+	'	<h3 id="h_language">🌐 ' + L.cl_langs + '</h3>\n' +
 	'	<div><select id="langs"></select></div>\n' +
 	'</div>\n' +
 	(have_zip ? (
-		'<div><h3>⬇️ ' + L.cl_ziptype + '</h3><div><div id="arc_fmt"></div></div></div>\n'
+		'<div><h3 id="h_zip">⬇️ ' + L.cl_ziptype + '</h3><div><div id="arc_fmt"></div></div></div>\n'
 	) : '') +
 	'<div>\n' +
-	'	<h3>🚀 ' + L.cl_uopts + '</h3>\n' +
+	'	<h3 id="h_upload">🚀 ' + L.cl_uopts + '</h3>\n' +
 	'	<div>\n' +
 	'		<a id="ask_up" class="tgl btn" tt="' + L.ut_ask + '</a>\n' +
 	'		<a id="u2ts" class="tgl btn" tt="' + L.ut_u2ts + '</a>\n' +
@@ -1133,7 +1181,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3><span id="ico1">🎉</span> ' + L.cl_favico + '</h3>\n' +
+	'	<h3 id="h_favico"><span id="ico1">🎉</span> ' + L.cl_favico + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="icot" value="" ' + NOAC + ' style="width:1.3em" tt="' + L.cft_text + '" />' +
 	'		<input type="text" id="icof" value="" ' + NOAC + ' style="width:2em" tt="' + L.cft_fg + '" />' +
@@ -1142,7 +1190,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>📁 ' + L.cl_bigdir + '</h3>\n' +
+	'	<h3 id="h_bigdir">📁 ' + L.cl_bigdir + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="bd_lim" value="250" ' + NOAC + ' style="width:4em" tt="' + L.cdt_lim + '" />' +
 	'		<a id="bd_ask" class="tgl btn" tt="' + L.cdt_ask + '">ask</a>\n' +
@@ -1150,15 +1198,15 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>🔃 ' + L.cl_hsort + '</h3>\n' +
+	'	<h3 id="h_sort">🔃 ' + L.cl_hsort + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="hsortn" value="" ' + NOAC + ' style="width:3em" tt="' + L.cdt_hsort + '" />' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	musicSettings +
-	'<div><h3>🎼 ' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	'<div><h3>👁️ ' + L.cl_hiddenc + ' &nbsp;</h3><div>' + 
+	'<div><h3 id="h_keytype">🎼 ' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
+	'<div><h3 id="h_hidden">👁️ ' + L.cl_hiddenc + ' &nbsp;</h3><div>' + 
 	(MOBILE ? '<a id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a id="hcolsr">' + L.cl_reset + '</a><div id="hcols"></div></div></div>'
 );
 
@@ -1167,8 +1215,10 @@ ebi('op_cfg').innerHTML = (
 	ebi('s_header').innerHTML = '⚙️ ' + L.ot_cfg;
 	var sections = ebi('op_cfg').children;
 	for (var i = 0; i < sections.length; i++){
-		var sName = sections[i].children[0].innerHTML;
-		var sId = 's_section_' + i;
+		var h = sections[i].children[0];
+		var sName = h.innerHTML;
+		var sId = h.id;
+		h.id = ''
 		var subSettings = sections[i].children[1];
 
 		var section = `<div id="${sId}" class="s_section"><h3>${sName}</h3>`;
@@ -1274,8 +1324,8 @@ ebi('rcm').innerHTML = (
 
 })();
 
-function modaltoggle(dest){
-	if (QS('#' + dest + '.vis'))
+function modaltoggle(dest, show = 't'){
+	if (show == false || show == 't' && QS('#' + dest + '.vis'))
 		dest = '';
 
 	swrite('opmode', dest || null);
@@ -1346,6 +1396,12 @@ function goto(dest) {
 		var page = ebi('op_' + dest) ?? QS('#' + dest + ' .opview')
 		clmod(page, 'act', 1);
 		clmod(lnk, 'act', 1);
+
+		if(dest == 'bup'){
+			clmod(ebi('up2k'), 'vis', true);
+		}
+		if(dest == 'bup' || dest == 'up2k')
+			ebi('bup_tgl').open = dest == 'bup';
 
 		var fn = window['goto_' + dest];
 		if (fn)

@@ -68,10 +68,10 @@
 	--u2-tab-bg: linear-gradient(to bottom, var(--bg), var(--bg-u1));
 	--u2-tab-b1: rgba(128,128,128,0.8);
 	--u2-tab-1-fg: var(--a-hil);
-	--u2-tab-1-bg: linear-gradient(to bottom, #353, var(--bg) 80%);
-	--u2-tab-1-b1: #7c5;
-	--u2-tab-1-b2: #583;
-	--u2-tab-1-sh: #280;
+	--u2-tab-1-bg: var(--bg);
+	--u2-tab-1-b1: #999;
+	--u2-tab-1-b2: #999;
+	--u2-tab-1-sh: transparent;
 	--u2-b-fg: #fff;
 	--u2-b1-bg: #c83;
 	--u2-b2-bg: #d80;
@@ -1522,17 +1522,19 @@ html.y #ops svg circle {
 }
 .opbox {
 	padding: .5em;
-	border-radius: 0 .3em .3em 0;
-	border-width: 1px 1px 1px 0;
+	border-radius: .3em;
+	border-width: 1px;
 	max-width: 41em;
-	max-width: min(41em, calc(100% - 2.6em));
 }
 .opbox input {
 	position: relative;
 	margin: .2em;
 }
-#op_cfg input[type=text] {
-	top: -.3em;
+#op_bup {
+	margin-bottom: 1em;
+}
+#op_cfg {
+	display: none;
 }
 #pathBar input[type=text],
 .opview select,
@@ -1968,10 +1970,6 @@ html.y #tree.nowrap .ntree a+a:hover {
 	color: var(--fg-weak);
 	margin: 0 .4em;
 	padding: 0;
-}
-#op_cfg>div>div>span {
-	display: inline-block;
-	padding: .2em .4em;
 }
 .opbox h3 {
 	margin: .8em 0 0 .6em;
@@ -2570,8 +2568,7 @@ html.y #bbox-overlay figcaption a {
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
-	padding: .5em;
-	padding-top: 0;
+	padding: 0 .5em 5em .5em;
 }
 .divider{
 	background: var(--a);
@@ -2739,6 +2736,11 @@ html.y #bbox-overlay figcaption a {
 	background: var(--bg-u5);
 	border: 0px solid var(--bg-u5);
 }
+#up_status_h {
+	margin: -1.8em .5em 0 .5em;
+	position: absolute;
+	z-index: 1;
+}
 #u2err.err {
 	color: var(--a-dark);
 	padding: .5em;
@@ -2753,10 +2755,21 @@ html.y #bbox-overlay figcaption a {
 	border: .15em dashed var(--u2-btn-b1);
 	border-radius: .4em;
 	text-align: center;
-	font-size: 1.5em;
-	margin: .5em auto;
-	padding: .8em 0;
+	font-size: 1.3em;
+	padding: 1em 2em;
 	cursor: pointer;
+}
+#u2btn sup {
+	font-size: 1.1em;
+}
+#u2btn:hover {
+	background: linear-gradient(var(--a) 0%, var(--a) 20%, transparent 99%);
+	border-color: var(--bg);
+	border-style: solid;
+	color: var(--fg-max);
+}
+#u2c3t {
+	margin: 1em 0;
 }
 #op_up2k.srch #u2btn {
 	border-color: var(--u2-sbtn-b1);
@@ -2769,11 +2782,9 @@ html.y #bbox-overlay figcaption a {
 	max-width: 12em;
 	display: inline-block;
 }
-#u2conf #u2btn_cw {
-	text-align: right;
-}
 #u2bm {
-	display: block;
+	display: flex;
+	justify-content: center;
 }
 #u2bm sup {
 	font-weight: bold;
@@ -2821,11 +2832,6 @@ html.y #bbox-overlay figcaption a {
 #u2tab td:nth-child(3) {
 	width: 40%;
 }
-#u2tab.up.ok td:nth-child(3),
-#u2tab.up.bz td:nth-child(3),
-#u2tab.up.q  td:nth-child(3) {
-	width: 18em;
-}
 @media (max-width: 65em) {
 	#u2tab {
 		font-size: .9em;
@@ -2852,7 +2858,6 @@ html.y #bbox-overlay figcaption a {
 	width: 17em;
 	cursor: pointer;
 	text-align: center;
-	white-space: nowrap;
 	display: inline-block;
 	font-family: 'scp', monospace, monospace;
 	font-family: var(--font-mono), 'scp', monospace, monospace;
@@ -2868,9 +2873,8 @@ html.y #bbox-overlay figcaption a {
 	display: unset;
 }
 #u2etaw {
-	width: 18em;
-	font-size: .94em;
-	margin: 1.8em auto .5em auto;
+	display: flex;
+	justify-content: center;
 }
 #u2etas.o #u2etaw {
 	width: 21em;
@@ -2917,9 +2921,17 @@ html.y #bbox-overlay figcaption a {
 	text-align: center;
 	min-width: 1.3em;
 }
-#u2conf {
-	margin: 1em 1em;
-	width: 30em;
+#u2conft {
+	width: max-content;
+}
+#u2conf details[open] {
+	border-bottom: none;
+	border-radius: .3em .3em 0 0;
+}
+#u2conf .setting {
+	margin: 0;
+	border-left: none;
+	border-right: none;
 }
 #u2conf .c,
 #u2conf .c * {
@@ -2928,6 +2940,9 @@ html.y #bbox-overlay figcaption a {
 	margin: 0;
 	padding: 0;
 	border: none;
+}
+#u2conf .c {
+	margin: .3em;
 }
 #u2conf .txtbox {
 	width: 3em;
@@ -2971,9 +2986,8 @@ html.b #u2conf a.b:hover {
 	border-radius: .25em;
 }
 #u2conf input[type="checkbox"] {
-	position: relative;
+	position: absolute;
 	opacity: .02;
-	top: 2em;
 }
 #u2conf input[type="checkbox"]+label,
 #u2conf input[type="checkbox"]:checked+label {
@@ -3102,26 +3116,21 @@ html.b #u2conf a.b:hover {
 	font-size: 1.1em;
 	line-height: 0;
 }
-#up_list {
-	padding-bottom: 2em;
-}
-#up_list details {
+details {
 	border: var(--bg-u3) solid 1px;
 	border-radius: .3em;
-	margin: .3em;
+	margin: .3em 0;
 }
-#up_list summary {
+summary {
 	cursor: pointer;
 	background: var(--bg-u1);
 	color: var(--a);
 	padding: .3em;
 	border-radius: .3em;
+	font-size: large;
 }
-#up_list summary:hover {
+summary:hover {
 	background: var(--bg-u3);
-}
-#up_list .sub {
-	margin: .3em;
 }
 
 
@@ -3150,10 +3159,6 @@ html.a #ops {
 	margin: 0 0 0 1.5em;
 	border-radius: .3em;
 	border-width: 1px 0;
-}
-html.c .opbox,
-html.a .opbox {
-	margin: 1.5em 0 0 0;
 }
 html.dz .opview input.i {
 	width: calc(100% - 18em);
@@ -3198,7 +3203,7 @@ html.a .ghead {
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 0 .3em var(--bg-d3);
 }
-html.c #u2btn,
+/* html.c #u2btn,
 html.a #u2btn {
 	color: #eee;
 	background: var(--bg-u5);
@@ -3207,19 +3212,19 @@ html.a #u2btn {
 	background: linear-gradient(to bottom, #367 0%, #489 50%, #38788a 51%, #367 100%);
 	box-shadow: .4em .4em 0 var(--bg-d3);
 	border: 1px solid #222;
-}
+} */
 html.ay #u2btn {
 	box-shadow: .4em .4em 0 #ccc;
 }
 html.dz #u2btn {
 	letter-spacing: -.033em;
 }
-html.c #op_up2k.srch #u2btn,
+/* html.c #op_up2k.srch #u2btn,
 html.a #op_up2k.srch #u2btn {
 	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
 	text-shadow: 1px 1px 1px #fc6;
 	color: #333;
-}
+} */
 html.c #u2conf #u2btn,
 html.a #u2conf #u2btn {
 	padding: .6em 0;
@@ -3463,6 +3468,13 @@ html.d #treepar {
 	.divider {
 		display: none;
 	}
+	#up_status_h {
+		margin: .5em .5em 0 .5em;
+		position: inherit;
+	}
+	#u2btn {
+		padding: 1em .3em;
+	}
 	#pctl {
 		padding: .2em .5em .5em .5em;
 	}
@@ -3480,16 +3492,6 @@ html.d #treepar {
 		display: block;
 		opacity: 1;
 		pointer-events: all;
-	}
-}
-@media (max-width: 32em) {
-	#u2conf {
-		font-size: .9em;
-	}
-}
-@media (max-width: 28em) {
-	#u2conf {
-		font-size: .8em;
 	}
 }
 @media (min-width: 70em) {

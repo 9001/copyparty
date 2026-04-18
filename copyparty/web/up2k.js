@@ -597,7 +597,6 @@ function U2pvis(act, btns, uc, st) {
     r.addrow = function (nfile) {
         var tr = r.genrow(nfile);
         ebi('u2tab').tBodies[0].appendChild(tr);
-        ebi('up_loading').appendChild(tr)
     };
 
     btns = QSA(btns + '>a[act]');
@@ -872,7 +871,7 @@ function up2k_init(subtle) {
         return false;
     }
 
-    setmsg(suggest_up2k, 'msg');
+    //setmsg(suggest_up2k, 'msg');
 
     var u2szs = u2sz.split(','),
         u2sz_min = parseInt(u2szs[0]),
