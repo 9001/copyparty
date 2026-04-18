@@ -1369,7 +1369,8 @@ function opclick(e) {
 	if (QS('#op_' + dest + '.act'))
 		dest = '';
 
-	swrite('opmode', dest || null);
+	if(dest != 'acc')
+		swrite('opmode', dest || null);
 	if (ctrl(e))
 		return;
 
@@ -1426,8 +1427,8 @@ function goto(dest) {
 		if(dest == 'bup'){
 			clmod(ebi('up2k'), 'vis', true);
 		}
-		if(dest == 'bup' || dest == 'up2k')
-			ebi('bup_tgl').open = dest == 'bup';
+		if(dest == 'bup')
+			ebi('bup_tgl').open = true;
 
 		var fn = window['goto_' + dest];
 		if (fn)
