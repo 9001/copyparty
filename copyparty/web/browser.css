@@ -1154,12 +1154,12 @@ html.dz #flogout {
 	transition: margin-left 0; /* can't set this above 0 due to onwidgetresize */
 }
 #widget.anim #widgeti {
-	transition: transform 0.15s, height 0.15s;
+	transition: height 0.15s;
 }
 #widget.open #widgeti{
 	/* box-shadow: 0 0 1em rgba(0,48,64,0.2); */
 	height: 100%;
-	transform: scaleY(1);
+	display: block;
 }
 
 #pbarthinpos {
@@ -1175,11 +1175,8 @@ html.dz #flogout {
 
 #widgeti {
 	position: relative;
-	z-index: 10;
 	width: 100%;
-	height: 0;
-	transform: scaleY(0);
-  	transform-origin: bottom;
+	display: none;
 }
 #np_inf {
 	height: 0;
@@ -1236,7 +1233,6 @@ html.dz #flogout {
 	font-weight: bold;
 	box-shadow: 0 0 .5em var(--mp-sh);
 	transition: all .15s;
-	z-index: 1;
 	border-radius: .35em;
 	text-align: right;
 	background: var(--bg-u2);
