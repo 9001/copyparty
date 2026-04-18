@@ -7258,6 +7258,8 @@ function onwidgetresize(){
 	bar.style.gridTemplateColumns = gtc;
 	
 	clmod(widget, 'thin', thin);
+
+	pbar.onresize();
 }
 window.addEventListener('resize', onwidgetresize);
 onwidgetresize();
