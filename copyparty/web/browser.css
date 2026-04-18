@@ -1145,7 +1145,7 @@ html.dz #flogout {
 	z-index: 3;
 	touch-action: none;
 	box-shadow: 0 0 .5em var(--mp-sh);
-	clip-path: inset(-10em 0 0 0);
+	clip-path: inset(-100vh 0 0 0);
 }
 #widget.anim {
 	transition: margin-left 0; /* can't set this above 0 due to onwidgetresize */
@@ -1170,9 +1170,6 @@ html.dz #flogout {
 	display: block;
 }
 
-html.y #widget.open {
-	border-top: .2em solid var(--bg-u2);
-}
 #widgeti {
 	position: relative;
 	z-index: 10;
@@ -1234,12 +1231,13 @@ html.y #widget.open {
 	right: .4em;
 	font-size: xx-large;
 	font-weight: bold;
-	box-shadow: 0 0 .3em var(--bg-d3);
+	box-shadow: 0 0 .5em var(--mp-sh);
 	transition: all .15s;
 	z-index: 1;
-	border-radius: .3em;
+	border-radius: .35em;
 	text-align: right;
 	background: var(--bg-u2);
+	border: var(--btn-bg) solid 1px;
 }
 #up_quick_more {
 	display: none;
@@ -1267,11 +1265,13 @@ html.y #widget.open {
 #up_quick .btn{
 	box-shadow: none;
 	transition: all .15s;
-	margin: 0;
+	margin: -1px;
 	width: max-content;
+}
+html.a #up_quick .btn {
 	transform: rotate(90deg);
 }
-#up_quick .btn.on {
+html.a #up_quick .btn.on {
 	transform: rotate(0);
 }
 #wfs, #wfm, #wzip, #wnp, #wm3u {
@@ -2810,7 +2810,7 @@ html.y #bbox-overlay figcaption a {
 	font-size: 1.1em;
 }
 #u2btn:hover {
-	background: linear-gradient(var(--a) 0%, var(--a) 20%, transparent 99%);
+	background: linear-gradient(var(--a) 0%, var(--a) 20%, color-mix(transparent 85%, var(--a) 15%));
 	border-color: var(--bg);
 	border-style: solid;
 	color: var(--fg-max);
@@ -3277,9 +3277,8 @@ html.c #u2etas,
 html.a #u2etas {
 	background: var(--bg-d1);
 	border: 1px solid var(--bg-u1);
-	border-width: .1em 0;
+	border-width: 2px;
 	border-radius: .5em;
-	border-width: .25em 0;
 }
 html.c #u2foot:empty,
 html.a #u2foot:empty {
@@ -3389,9 +3388,6 @@ html.bz .ghead {
 }
 html.b #files td {
 	padding: .5em .7em;
-}
-html.b .btn {
-	top: -.1em;
 }
 html.b #op_up2k.srch sup {
 	color: #fc0;
@@ -3984,7 +3980,6 @@ html.e #u2cards a.act {
 html.e #u2btn {
   border: var(--border-dashed-black);
   border-radius: var(--border-radius);
-  transform: translateY(30%);
 }
 html.e #ops,
 html.e #ops a {
@@ -4082,7 +4077,7 @@ html.e #opa_x:before {
   position: absolute;
 }
 html.e .opbox {
-  margin: -1.2em 0 0;
+  margin: -.3em 0 0;
   box-shadow: var(--shadow-inset-bottom), var(--shadow-inset-left),
     var(--shadow-inset-right);
   border-radius: var(--radius);
