@@ -8,7 +8,7 @@ html {
 #wrap {
 	max-width: 40em;
 	margin: 2em auto;
-	padding: 0 1em 3em 1em;
+	padding: 2em 1em 3em 1em;
 	line-height: 1.3em;
 }
 #wrap.w {
@@ -19,6 +19,7 @@ h1 {
 	margin: 1em 0 .4em 0;
 	padding: 0;
 	line-height: 1em;
+	font-size: x-large;
 	font-weight: normal;
 }
 li {
@@ -264,5 +265,5 @@ html.bz .vols img {
 	left: 1em;
 	border-radius: .3em; 
 	background: #333;
-	position: absolute;
+	position: fixed;
 }

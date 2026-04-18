@@ -17,7 +17,7 @@
 <body>
 	<div id="wrap">
 		{%- if not in_shr %}
-		<a id="a" href="{{ r }}/?h{{ re }}" class="af">refresh</a>
+		<a id="a" href="{{ r }}/?h{{ re }}" class="af">auto-refresh</a>
 		<a id="v" href="{{ r }}/?hc" class="af">connect</a>
 
 			{%- if this.uname == '*' %}
@@ -201,7 +201,7 @@
 		</ul>
 
 	</div>
-	<a href="#" id="repl">π</a>
+	<a href="#" id="repl" style="opacity: .4;">π</a>
 	{%- if not this.args.nb %}
 	<span id="pb"><span>powered by</span> <a href="{{ this.args.pb_url }}">copyparty {{ver}}</a></span>
 	{%- endif %}
