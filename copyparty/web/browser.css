@@ -2614,6 +2614,9 @@ html.y #bbox-overlay figcaption a {
 	max-width: 66.6em;
 	position: relative;
 }
+html.c .modalcontent {
+	background: var(--bg-u2);
+}
 .modalheader {
 	display: flex;
 	align-items: center;
