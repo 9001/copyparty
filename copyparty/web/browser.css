@@ -4382,10 +4382,10 @@ html.e #docul {
   margin-left: 0 !important;
 }
 html.e #wrap {
-  transform: translateX(calc((var(--negative-space) * 2) - 1.2em));
+  transform: translateX(calc((var(--negative-space) * 2) - .2em));
   padding-right: var(--negative-space);
   position: relative;
-  margin-right: calc((var(--negative-space) * 2) - 1.1em);
+  margin-right: calc((var(--negative-space) * 2) - .1em);
   margin-top: var(--negative-space);
   margin-left: 1.2em;
   /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/

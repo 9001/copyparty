@@ -7522,7 +7522,7 @@ var treectl = (function () {
 		nq = Math.max(nq, get_evpath().split('/').length - 2);
 		var iw = (treesz + Math.max(0, nq)),
 			w = iw + 'em',
-			w2 = (iw + 2) + 'em';
+			w2 = (iw + 1) + 'em';
 
 		setcvar('--nav-sz', w);
 		ebi('tree').style.width = w;
