@@ -1213,7 +1213,7 @@ html.y #widget.open {
 	white-space: nowrap;
 	top: -1em;
 	right: 0;
-	height: 2em;
+	bottom: 0;
 	font-size: 2em;
 	line-height: 1em;
 	text-align: center;
@@ -1227,6 +1227,52 @@ html.y #widget.open {
 #widgeti {
 	background: #fff;
 	background: var(--bg-u2);
+}
+#up_quick {
+	position: absolute;
+	bottom: calc(100% + .4em);
+	right: .4em;
+	font-size: xx-large;
+	font-weight: bold;
+	box-shadow: 0 0 .3em var(--bg-d3);
+	transition: all .15s;
+	z-index: 1;
+	border-radius: .3em;
+	text-align: right;
+	background: var(--bg-u2);
+}
+#up_quick_more {
+	display: none;
+	min-width: 4em;
+	font-weight: normal;
+}
+#up_quick_more.vis {
+	display: grid;
+}
+#up_quick_more a:hover {
+	background: var(--btn-h-bg);
+}
+#up_quick_more a {
+	position: static;
+	font-size: large;
+	display: ruby;
+	padding: .5em;
+	cursor: pointer;
+	border-radius: .5em;
+}
+#up_quick .overlay_plus {
+	right: .3em;
+	margin-top: -1.5em;
+}
+#up_quick .btn{
+	box-shadow: none;
+	transition: all .15s;
+	margin: 0;
+	width: max-content;
+	transform: rotate(90deg);
+}
+#up_quick .btn.on {
+	transform: rotate(0);
 }
 #wfs, #wfm, #wzip, #wnp, #wm3u {
 	display: none;
@@ -2837,13 +2883,6 @@ html.y #bbox-overlay figcaption a {
 		font-size: .9em;
 	}
 }
-@media (max-width: 50em) {
-	#u2tab.up.ok td:nth-child(3),
-	#u2tab.up.bz td:nth-child(3),
-	#u2tab.up.q  td:nth-child(3) {
-		width: 16em;
-	}
-}
 #op_up2k.srch td.prog {
 	font-family: sans-serif;
 	font-family: var(--font-main), sans-serif;
@@ -3461,9 +3500,11 @@ html.d #treepar {
 	.modalsplit {
 		display: block;
 		overflow-y: auto;
+		padding-bottom: 5em;
 	}
 	.splitsub {
 		overflow-y: hidden;
+		padding-bottom: .5em;
 	}
 	.divider {
 		display: none;
@@ -3492,6 +3533,9 @@ html.d #treepar {
 		display: block;
 		opacity: 1;
 		pointer-events: all;
+	}
+	#up_quick_more a {
+		padding: .6em;
 	}
 }
 @media (min-width: 70em) {

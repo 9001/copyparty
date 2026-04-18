@@ -1015,7 +1015,7 @@ function up2k_init(subtle) {
 
         modal.confirm(L.u_nav_m, uf, ud, null, L.u_nav_b);
     }
-    ebi('u2btn').onclick = nav;
+    ebi('uq_up').onclick = ebi('u2btn').onclick = nav;
 
     var nenters = 0;
     function ondrag(e) {

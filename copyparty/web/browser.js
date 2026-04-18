@@ -831,6 +831,16 @@ var svg_vol = svg_box + '<path d="M16.0004 9.00009C16.6281 9.83575 17 10.8745 17
 
 ebi('widget').innerHTML = (
 	'<div id="wtoggle">' +
+
+	'<div id="up_quick">' +
+	'	<div id="up_quick_more">' +
+	'		<a id="uq_nd">new folder <span><p class="overlay_plus">+</p>📂</span></a>\n' +
+	'		<a id="uq_nf">new file <span><p class="overlay_plus">+</p>📝</span></a>\n' +
+	'		<a id="uq_up">upload 🚀</a>\n' +
+	'	</div>' +
+	'	<a id="up_quick_btn" class="tgl btn on">+</a>' +
+	'</div>' +
+
 	'<span id="wfs"></span>' +
 	'<span id="wfm"><a' +
 	' href="#" id="fshr" tt="' + L.wt_shr + '">📨<span>share</span></a><a' +
@@ -888,6 +898,20 @@ ebi('widget').innerHTML = (
 	'	<span id="np_dur"></span>' +
 	'</div>'
 );
+
+var more = ebi('up_quick_more');
+ebi('up_quick').onclick = function(){
+	var btn = ebi('up_quick_btn');
+	clmod(btn, 'on', 't');
+	var isOff = clgot(btn, 'on'); // button has inverted display logic
+	clmod(more, 'vis', !isOff)
+}
+ebi('uq_nd').onclick = function(){
+	mktemp(true);
+};
+ebi('uq_nf').onclick = function(){
+	mktemp();
+};
 
 
 // up2k ui
