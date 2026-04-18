@@ -1812,7 +1812,7 @@ html {
 	background: var(--tree-bg);
 	border-bottom: 1px solid var(--bg-d3);
 	overflow: auto;
-  	display: flex;
+  	display: block;
 	padding: .3em 0;
 }
 #treepar {
