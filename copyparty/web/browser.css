@@ -644,10 +644,12 @@ a, #blogout, #files tbody div a:last-child {
 	padding: .2em;
 	text-decoration: none;
 }
+#goh,
 #blogout {
 	margin: -.2em;
 	text-shadow: 1px 1px 0px var(--bg-max);
 }
+#goh:hover,
 #blogout:hover,
 a:hover {
 	color: var(--a-hil);
@@ -885,6 +887,7 @@ html.y #path a:hover {
 	left: 2em;
 	padding-right: .5em;
 }
+#acessType,
 #acc_info,
 #srv_info span,
 #srv_info2 span {
@@ -1516,7 +1519,6 @@ html.a #up_quick .btn.on {
 }
 #ops a {
 	color: var(--a);
-	text-shadow: 1px 1px 1px var(--op-a-sh);
 	font-size: 1.5em;
 	padding: .25em .4em;
 	margin: 0;
@@ -1571,11 +1573,22 @@ html.y #ops svg circle {
 	white-space: nowrap;
 	display: flex;
 	max-height: 2.5em;
-	border-radius: 0 0 0 .3em !important;
+	border-radius: 0 0 0 .3em;
 }
 #noie {
 	color: #b60;
 	margin: 0 0 0 .5em;
+}
+#acc_pfp {
+	aspect-ratio: 1 / 1;
+	width: 1.25em;
+	background: var(--a-dark);
+	color: var(--bg);
+	border: var(--btn-bg) solid 1px;
+	border-radius: .3em;  
+	justify-content: center;
+  	display: flex;
+	text-shadow: none;
 }
 .opbox {
 	padding: .5em;
@@ -3216,13 +3229,6 @@ html.e #pctl,
 html.b #pctl {
 	margin-left: .5em;
 }
-html.d #ops,
-html.c #ops,
-html.a #ops {
-	margin: 0 0 0 1.5em;
-	border-radius: .3em;
-	border-width: 1px 0;
-}
 html.dz .opview input.i {
 	width: calc(100% - 18em);
 }
@@ -3487,8 +3493,8 @@ html.d #treepar {
 		margin: .2em;
 	}
 	#ops {
-		margin: .5em !important;
-		border-radius: .3em !important;
+		margin: .5em;
+		border-radius: .3em;
 	}
 	#tree {
 		z-index: 4;
@@ -4544,19 +4550,22 @@ html.e #detree {
 }
 #acc_button p{
 	margin: 0;
-	align-self: center;
 }
 #acc_button {
 	margin: 0;
 	cursor: pointer;
 	display: flex;
 }
-#acc_settings{
-	margin: 0 0 0 .3em;
-	font-size: large;
-	padding: .3em;
+#op_acc {
+	font-size: medium;
+	margin-top: .3em;
+	text-align: right;
+}
+#ops #goh {
+	font-size: medium;
 }
 
+.popup.act,
 .popup.show {
 	visibility: visible;
 	-webkit-animation: fadeIn 1s;
@@ -4577,36 +4586,29 @@ html.e #detree {
 	z-index: 6;
 	bottom: 2.5em;
 }
-.under::after {
-	display: none;
-}
 .under {
 	inset: calc(100% + .2em) 0 auto 0;
   	text-align: left;
 	width: auto;
 }
+#opa_acc,
 #srchfolder_div {
 	position: relative;
 	display: flex;
 	height: max-content;
 	margin-left: .3em;
 }
+#op_acc {
+	left: auto;
+}
+#acessType {
+	font-size: small;
+}
+
 #srchfolder_div:focus-within .popup{
 	visibility: visible;
 	-webkit-animation: fadeIn 1s;
 	animation: fadeIn 1s;
-}
-
-/* Popup arrow */
-.popup::after {
-	content: "";
-	position: absolute;
-	top: 100%;
-	left: 50%;
-	margin-left: -5px;
-	border-width: 5px;
-	border-style: solid;
-	border-color: var(--bg-u5) transparent transparent transparent;
 }
 
 .overlay_plus{

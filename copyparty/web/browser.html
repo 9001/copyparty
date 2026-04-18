@@ -147,7 +147,10 @@
 		<div id="spaceUsed_bar" style="width: {{ space_used_percent }}%;"></div>
 	</div>
 
-	<span id="acc_popup" class="popup">
+	<span id="op_acc" class="opview popup under">
+		<div id="acc_button" class="tgl btn on">
+			<p id="acc_name"></p>
+		</div>
 		<div id="acessType" style="display: block;"></div>
 		<a href="{{ r }}/?h" id="goh" style="display: block;">control-panel</a>
 		<form id="flogout" style="display: block;" method="post" enctype="multipart/form-data">
@@ -155,12 +158,6 @@
 			<input id="blogout" type="submit" />
 		</form>
 	</span>
-	<div style="display: grid; grid-template-columns: auto max-content;">
-		<div id="acc_button" class="tgl btn on">
-			<p id="acc_name"></p>
-		</div>
-		<a id="acc_settings" href="#v=cfg" class="tgl btn on" data-dest="cfg">⚙️</a>
-	</div>
 </div>
 	
 

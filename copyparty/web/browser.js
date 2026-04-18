@@ -761,6 +761,7 @@ ebi('ops').innerHTML = (
 	'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '"><div><p class="overlay_plus">+</p>📝</div></a>' +
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
+	'<a href="#" id="opa_acc" data-dest="acc" tt=""><div id="acc_pfp">👤</div></a>' +
 	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<div id="opdesc"></div>'
 );
@@ -1333,12 +1334,6 @@ ebi('rcm').innerHTML = (
 			ops[a].href = '#v=' + v;
 	}
 
-	// settings
-	ebi('acc_settings').onclick = ebi('opa_cfg').onclick = function(e){
-		modaltoggle('cfg')
-		e.stopPropagation();
-	};
-
 	// new file
 	ebi('opa_md').onclick = function(){
 		mktemp();
@@ -1349,6 +1344,10 @@ ebi('rcm').innerHTML = (
 		mktemp(true);
 	}
 
+	ebi('acc_pfp').before(ebi('op_acc'));
+	ebi('op_acc').onclick = function (e){
+		e.stopPropagation();
+	};
 })();
 
 function modaltoggle(dest, show = 't'){
@@ -8426,14 +8425,15 @@ function apply_perms(res) {
 
 	if(acct != '*'){
 		ebi('acc_name').innerHTML = acct;
+		ebi('acc_pfp').innerHTML = acct.substring(0, 1);
 		ebi('acessType').innerHTML = '<span' + aclass + axs + L.access + '</span>';
 		ebi('blogout').value = L.logout;
-		ebi('acc_button').onclick = function(){
-			ebi('acc_popup').classList.toggle('show');
-		}
+		ebi('acc_button').onclick = function(){};
 	}
 	else{
+		ebi('blogout').style.display = 'none';
 		ebi('acc_name').innerHTML = L.login;
+		ebi('acc_pfp').innerHTML = '👤';
 		ebi('acc_button').onclick = goHome;
 	}
 
