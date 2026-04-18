@@ -5827,7 +5827,7 @@ var thegrid = (function () {
 		'<a href="#" s="ts">' + L.gt_ts + '</a> ' +
 		'<a href="#" s="ext">' + L.gt_ext + '</a>' +
 		'</span></div>' +
-		'<div id="ggrid"></div>'
+		'<div id="ggrid" tt=""></div>'
 	);
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
 	var ggrid = ebi('ggrid');
