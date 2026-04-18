@@ -1246,6 +1246,7 @@ html.dz #flogout {
 	display: none;
 	min-width: 4em;
 	font-weight: normal;
+	margin-bottom: .2em;
 }
 #up_quick_more.vis {
 	display: grid;
@@ -1559,7 +1560,7 @@ html.y #ops svg circle {
 }
 #srv_name{
 	font-size: x-large;
-	margin-top: .2em;
+	margin-top: .3em;
 	align-self: baseline;
 }
 #treeToggleBtn{
@@ -3571,8 +3572,9 @@ html.d #treepar {
 	}
 	#opa_acc {
 		position: absolute;
-		top: 1em;
-		right: 1em;
+		top: .5em;
+		right: .5em;
+		font-size: xx-large !important;
 	}
 }
 @media (min-width: 70em) {
@@ -4040,19 +4042,34 @@ html.e #ops a {
   }
 }
 html.e #ops {
-  background: var(--ttlbar);
-  /*HC*/
-  box-shadow: inset 0-1px grey, inset 0-2px var(--shadow-color-1);
-  height: 2em;
-  gap: 0.6em;
-  padding: 0.2em;
-  margin-bottom: 1.2em;
+	background: var(--ttlbar);
+	/*HC*/
+	box-shadow: inset 0-1px grey, inset 0-2px var(--shadow-color-1);
+	height: 2em;
+	gap: 0.6em;
+	padding: 0.2em;
+	margin-bottom: 1.2em;
+	width: 100%;
+	position: absolute;
+	justify-content: end;
+	font-size: larger;
 }
 html.e #srch_form,
 html.e .opbox {
   padding-bottom: 1em;
   padding-top: 1em;
   max-width: 100vw;
+}
+html.e #topBar {
+	margin-bottom: -.9em;
+}
+html.e #headerArea {
+	z-index: 1;
+	top: -.8em;
+	position: relative;
+}
+html.e #srv_name {
+	color: var(--bg-max);
 }
 html.e #ghead,
 html.e #ops a {
@@ -4064,7 +4081,6 @@ html.e #ops a {
   padding: 0;
   box-shadow: var(--shadow-outset);
   background: var(--bg);
-  aspect-ratio: 1/1;
   justify-content: center;
   font-size: 1.25em;
 }
@@ -4366,10 +4382,10 @@ html.e #docul {
   margin-left: 0 !important;
 }
 html.e #wrap {
-  transform: translateX(calc((var(--negative-space) * 2) - .5em));
+  transform: translateX(calc((var(--negative-space) * 2) - 1.2em));
   padding-right: var(--negative-space);
   position: relative;
-  margin-right: calc((var(--negative-space) * 2) - .5em);
+  margin-right: calc((var(--negative-space) * 2) - 1.1em);
   margin-top: var(--negative-space);
   margin-left: 1.2em;
   /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
@@ -4377,13 +4393,8 @@ html.e #wrap {
 html.e input[type="radio"] {
   accent-color: #232323;
 }
-html.e #path {
-  width: calc(100% - 0.4em);
-  display: flex;
-  align-items: center;
-  margin: 0;
-  padding: 0.2em;
-  overflow-x: auto;
+html.e #pathBar {
+	margin: 0;
 }
 html.e #path i {
   border: 1px solid var(--w);
