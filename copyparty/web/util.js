@@ -1784,7 +1784,7 @@ var toast = (function () {
             setcvar('--tmstep', Math.floor(sec * 20));
             html += '<div id="toastt"></div>';
         }
-        obj.innerHTML = html + '<a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
+        obj.innerHTML = html + '<a href="#" id="toastc">✕</a><div id="toastb">' + lf2br(txt) + '</div>';
         obj.className = cl;
         sec += obj.offsetWidth;
         obj.className += ' vis';

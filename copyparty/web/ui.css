@@ -54,8 +54,7 @@ html {
 	bottom: 5em;
 	right: -1em;
 	line-height: 1.5em;
-	padding: 1em 1.3em;
-	margin-left: 3em;
+	padding: 1em 2em 1em 1em;
 	border-width: .4em 0;
 	overflow-wrap: break-word;
 	transform: translateX(100%);
@@ -92,8 +91,8 @@ html {
 	display: inline-block;
 	position: absolute;
 	overflow: hidden;
-	left: 0;
-	width: 0;
+	right: 0;
+	top: -.1em;
 	opacity: 0;
 	padding: .3em 0;
 	margin: -.3em 0 0 0;
@@ -102,7 +101,7 @@ html {
 	border: none;
 	outline: none;
 	text-shadow: none;
-	border-radius: .5em 0 0 .5em;
+	border-radius: .5em;
 	transition: left .3s, width .3s, padding .3s, opacity .3s;
 }
 #toastb {
@@ -130,9 +129,7 @@ html {
 	transform: initial;
 }
 #toast.vis #toastc {
-	left: -2em;
-	width: .4em;
-	padding: .3em .8em;
+	padding: .3em .5em;
 	opacity: 1;
 }
 #toast.inf {
