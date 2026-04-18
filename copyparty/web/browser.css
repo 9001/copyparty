@@ -12,9 +12,9 @@
 	--a: #fc5;
 	
 	/* mikudayo */
-	--fg-max: #d1d7e9;
+	/* --fg-max: #d1d7e9;
 	--bg-max: #0a0b0e;
-	--a: #27efc9;
+	--a: #27efc9; */
 
 	--fg: color-mix(var(--fg-max) 90%, var(--bg-max) 10%);
 	--fg-weak: color-mix(var(--fg-max) 70%, var(--bg-max) 30%);
