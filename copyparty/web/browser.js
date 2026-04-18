@@ -841,7 +841,7 @@ ebi('widget').innerHTML = (
 	'		<a id="uq_nf">new file <span><p class="overlay_plus">+</p>📝</span></a>\n' +
 	'		<a id="uq_up">upload 🚀</a>\n' +
 	'	</div>' +
-	'	<a id="up_quick_btn" class="tgl btn on">+</a>' +
+	'	<a id="up_quick_btn" class="tgl btn on"><div class="rotatable">+</div></a>' +
 	'</div>' +
 
 	'<span id="wfs"></span>' +

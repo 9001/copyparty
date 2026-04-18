@@ -1264,7 +1264,7 @@ html.dz #flogout {
 }
 #up_quick .btn{
 	box-shadow: none;
-	transition: all .15s;
+	transition: all .25s;
 	margin: -1px;
 	width: max-content;
 }
@@ -1273,6 +1273,15 @@ html.a #up_quick .btn {
 }
 html.a #up_quick .btn.on {
 	transform: rotate(0);
+}
+#up_quick .btn .rotatable {
+	transition: all .20s;
+	transform: translateY(-.04em) rotate(-45deg);
+
+	background: none;
+}
+#up_quick .btn.on .rotatable {
+	transform: translateY(-.04em);
 }
 #wfs, #wfm, #wzip, #wnp, #wm3u {
 	display: none;
