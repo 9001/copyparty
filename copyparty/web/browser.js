@@ -3930,8 +3930,15 @@ function eval_hash() {
 		})(a);
 
 	// folder nav
-	ebi('wfp').appendChild(mknod('span', null,
-		'<a href="#" id="gop" tt="' + L.gop + '">⬅️</a><a href="#" id="gon" tt="' + L.gon + '">➡️</a><a href="#" id="gou" tt="' + L.gou + '">⬆️</a>'));
+	// from https://www.svgrepo.com/collection/iconcino-interface-icons/
+	var svg_left = svg_box + '<path d="M11 6L5 12M5 12L11 18M5 12H19" ' + svg_options +'/>';
+	var svg_right = svg_box + '<path d="M13 6L19 12M19 12L13 18M19 12H5" ' + svg_options +'/>';
+	var svg_up = svg_box + '<path d="M12 19V5M18 11L12 5L6 11" ' + svg_options +'/>';
+
+	ebi('wfp').innerHTML = (
+		'<a href="#" id="gop" tt="' + L.gop + '">' + svg_left + '</a>' +
+		'<a href="#" id="gon" tt="' + L.gon + '">' + svg_right + '</a>' +
+		'<a href="#" id="gou" tt="' + L.gou + '">' + svg_up + '</a>');
 	ebi('gop').onclick = function () { tree_neigh(-1); }
 	ebi('gon').onclick = function () { tree_neigh(1); }
 	ebi('gou').onclick = function () { tree_up(true); }

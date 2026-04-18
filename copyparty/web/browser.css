@@ -1725,6 +1725,16 @@ input.ssconf_v {
 	width: 100%;
 	display: block;
 }
+
+#wfp{
+	margin: 0 .3em 0 0;
+}
+#wfp a {
+	display: inline-block;
+	width: 1.3em;
+	height: 1.3em;
+}
+
 #files td div span {
 	color: var(--fg-max);
 	padding: 0 .4em;
@@ -4484,10 +4494,6 @@ html.e #detree {
     background-color: rgb(from var(--btn-1h-bg) r g b / 0.5);
     pointer-events: none;
 	z-index: 99;
-}
-
-#wfp{
-	margin: 0 .3em 0 -.3em;
 }
 
 #spaceFree, #rtt_latency {
