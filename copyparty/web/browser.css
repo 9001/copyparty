@@ -3208,7 +3208,13 @@ summary {
 summary:hover {
 	background: var(--bg-u3);
 }
-
+#opa_acc,
+#srchfolder_div {
+	position: relative;
+	display: flex;
+	height: max-content;
+	margin-left: .3em;
+}
 
 
 
@@ -3562,6 +3568,11 @@ html.d #treepar {
 	}
 	#up_quick_more a {
 		padding: .6em;
+	}
+	#opa_acc {
+		position: absolute;
+		top: 1em;
+		right: 1em;
 	}
 }
 @media (min-width: 70em) {
@@ -4590,13 +4601,6 @@ html.e #detree {
 	inset: calc(100% + .2em) 0 auto 0;
   	text-align: left;
 	width: auto;
-}
-#opa_acc,
-#srchfolder_div {
-	position: relative;
-	display: flex;
-	height: max-content;
-	margin-left: .3em;
 }
 #op_acc {
 	left: auto;
