@@ -120,6 +120,9 @@ if (1)
 		"logout": "Logout ",
 		"login": "Login",
 		"access": " access",
+		"options": "options",
+		"more_options": "more options",
+		"bup": "basic uploader",
 		"ot_close": "close submenu",
 		"ot_search": "`search for files by attributes, path / name, music tags, or any combination of those$N$N`foo bar` = must contain both «foo» and «bar»,$N`foo -bar` = must contain «foo» but not «bar»,$N`^yana .opus$` = start with «yana» and be an «opus» file$N`&quot;try unite&quot;` = contain exactly «try unite»$N$Nthe date format is iso-8601, like$N`2009-12-31` or `2020-09-12 23:30:00`",
 		"ot_unpost": "unpost: delete your recent uploads, or abort unfinished ones",
@@ -899,12 +902,11 @@ ebi('widget').innerHTML = (
 	'</div>'
 );
 
-var more = ebi('up_quick_more');
 ebi('up_quick').onclick = function(){
 	var btn = ebi('up_quick_btn');
 	clmod(btn, 'on', 't');
 	var isOff = clgot(btn, 'on'); // button has inverted display logic
-	clmod(more, 'vis', !isOff)
+	clmod(ebi('up_quick_more'), 'vis', !isOff)
 }
 ebi('uq_nd').onclick = function(){
 	mktemp(true);
@@ -919,7 +921,7 @@ ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
 	'<div id="u2conf" tt="">' +
-	'<details><summary>options</summary>' +
+	'<details><summary>' + L.options + '</summary>' +
 
 	'	<div class="setting">' +
 	'		<table id="u2conft">\n' +
@@ -978,7 +980,7 @@ ebi('op_up2k').innerHTML = (
 	'	</div>\n' +
 
 	'	<div class="setting">' +
-	'		<a id="up_moreopts" class="btn" href="#h_upload">↗️ more options</a>\n' +
+	'		<a id="up_moreopts" class="btn" href="#h_upload">↗️ ' + L.more_options + '</a>\n' +
 	'	</div>\n' +
 
 	'	<div data-perm="read" rowspan="2" id="u2c3w"></div>\n' +
@@ -1007,7 +1009,7 @@ ebi('op_up2k').innerHTML = (
 	'	</div>' +
 	'</div>' +
 
-	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write"><summary>basic uploader</summary></details>'
+	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write" tt="' + L.ot_bup + '"><summary>' + L.bup +'</summary></details>'
 );
 
 

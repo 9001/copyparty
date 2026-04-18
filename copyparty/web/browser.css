@@ -1453,6 +1453,7 @@ html.y #widget.open {
 	font-size: 1em;
 	padding: 0;
 	opacity: .4;
+	cursor: pointer;
 }
 #pctl .btn.on {
 	opacity: 1;
@@ -2817,6 +2818,9 @@ html.y #bbox-overlay figcaption a {
 #u2c3t {
 	margin: 1em 0;
 }
+#op_up2k {
+	display: block;
+}
 #op_up2k.srch #u2btn {
 	border-color: var(--u2-sbtn-b1);
 }
@@ -3626,6 +3630,7 @@ html.d #treepar {
 	#widget.anim,
 	#tree,
 	#u2tabw,
+	#up_quick,
 	.dropdesc,
 	.dropdesc b,
 	.dropdesc>div>div {
