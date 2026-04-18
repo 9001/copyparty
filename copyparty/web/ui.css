@@ -218,7 +218,7 @@ html {
 	line-height: 1.7em;
 }
 #tt em {
-	color: #f6a;
+	color: var(--a);
 }
 html.y #tt {
 	border-color: #888 #000 #777 #000;
@@ -234,9 +234,6 @@ html.y #toast {
 	color: #060;
 	background: transparent;
 	border: 1px solid #ccc;
-}
-html.y #tt em {
-	color: #d38;
 }
 html.y #tth {
 	color: #000;
@@ -377,13 +374,6 @@ html.y #tth {
 	0% {outline: var(--a) solid .1em;}
 	30% {outline: color-mix(var(--a) 75%, transparent 25%) solid .1em;}
 	100% {outline: transparent solid .1em;}
-}
-html.y *:focus,
-html.y *:focus+label,
-html.y #pctl *:focus,
-html.y .btn:focus {
-	box-shadow: 0 .1em .2em #037 inset;
-	outline: #037 solid .1em;
 }
 input, button {
 	font-family: var(--font-main), sans-serif;

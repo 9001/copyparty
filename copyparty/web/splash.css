@@ -264,6 +264,6 @@ html.bz .vols img {
 	top: 1em;
 	left: 1em;
 	border-radius: .3em; 
-	background: #333;
+	background: var(--bg-u5);
 	position: fixed;
 }

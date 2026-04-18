@@ -43,7 +43,7 @@
 	--btn-fg: var(--a);
 	--btn-bg: rgba(128,128,128,0.15);
 	--btn-h-fg: var(--a-hil);
-	--btn-h-bg: hsl(from var(--a) h 0 35%);
+	--btn-h-bg: hsl(from color-mix(var(--a-gray) 45%, var(--bg-max) 55%) h 0 l);
 	--btn-1-fg: rgb(25, 19, 12);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
@@ -163,12 +163,9 @@ html.y {
 	--row-alt: #f2f2f2;
 
 	--a: #06a;
-	--a-gray: #bbb;
-	--a-dark: #c0f;
 
 	--btn-fg: #555;
 	--btn-h-fg: #222;
-	--btn-h-bg: #caf;
 	--btn-1-fg: #fff;
 	--btn-1-bg: #4a0;
 	--btn-1h-bg: #5c0;
@@ -2840,6 +2837,7 @@ html.y #bbox-overlay figcaption a {
 	font-size: 1.3em;
 	padding: 1em 2em;
 	cursor: pointer;
+	box-shadow: .4em .4em 0 var(--bg-d1);
 }
 #u2btn sup {
 	font-size: 1.1em;
