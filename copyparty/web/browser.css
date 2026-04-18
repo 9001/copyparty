@@ -3580,8 +3580,9 @@ html.d #treepar {
 	}
 }
 @media (max-width: 35em) {
-	/* #ops>a[data-dest="new_md"], */
-	#ops>a[data-dest="msg"] {
+	#ops>a[data-dest="msg"],
+	#ops>a[data-dest="new_md"],
+	#ops>a[data-dest="mkdir"] {
 		display: none;
 	}
 	#op_mkdir.act+div,
