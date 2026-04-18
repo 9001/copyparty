@@ -1568,6 +1568,7 @@ html.y #ops svg circle {
 	margin-top: .3em;
 	cursor: pointer;
 	display: block;
+	align-self: center;
 }
 #ops {
 	padding: .3em .6em;
@@ -1596,6 +1597,8 @@ html.y #ops svg circle {
 	border-radius: .3em;
 	border-width: 1px;
 	max-width: 41em;
+	margin: .5em;
+	margin-left: auto;
 }
 .opbox input {
 	position: relative;
@@ -1658,7 +1661,7 @@ html.dz input {
 	cursor: pointer;
 }
 .opview input.i {
-	width: calc(100% - 16.2em);
+	width: calc(100% - 12em);
 }
 input.eq_gain[type=range]{
 	writing-mode: vertical-lr;
@@ -1812,7 +1815,9 @@ html {
 	line-height: 2.2em;
 	background: var(--tree-bg);
 	border-bottom: 1px solid var(--bg-d3);
-	overflow: hidden;
+	overflow: auto;
+  	display: flex;
+	padding: .3em 0;
 }
 #treepar {
 	z-index: 1;
@@ -2038,7 +2043,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 #op_unpost,
 #srch_form {
 	max-width: none;
-	margin-right: 1.5em;
+	margin: .5em;
 }
 .opwide>div {
 	display: inline-block;
@@ -2086,7 +2091,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 #hdoc,
 #ghead {
 	position: sticky;
-	top: -.3em;
+	top: 0;
 	z-index: 3;
 }
 .ghead .btn {
