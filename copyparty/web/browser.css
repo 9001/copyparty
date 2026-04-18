@@ -1266,6 +1266,7 @@ html.dz #flogout {
 	box-shadow: none;
 	transition: all .25s;
 	margin: -1px;
+	cursor: pointer;
 	width: max-content;
 }
 html.a #up_quick .btn {
