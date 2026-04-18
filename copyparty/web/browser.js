@@ -837,9 +837,9 @@ ebi('widget').innerHTML = (
 
 	'<div id="up_quick">' +
 	'	<div id="up_quick_more">' +
-	'		<a id="uq_nd">new folder <span><p class="overlay_plus">+</p>📂</span></a>\n' +
-	'		<a id="uq_nf">new file <span><p class="overlay_plus">+</p>📝</span></a>\n' +
-	'		<a id="uq_up">upload 🚀</a>\n' +
+	'		<a id="uq_nd">' + L.rc_nfo + ' <span><p class="overlay_plus">+</p>📂</span></a>\n' +
+	'		<a id="uq_nf">' + L.rc_nfi + ' <span><p class="overlay_plus">+</p>📝</span></a>\n' +
+	'		<a id="uq_up">' + L.cl_uopts + ' 🚀</a>\n' +
 	'	</div>' +
 	'	<a id="up_quick_btn" class="tgl btn on"><div class="rotatable">+</div></a>' +
 	'</div>' +
@@ -917,6 +917,7 @@ ebi('uq_nf').onclick = function(){
 
 
 // up2k ui
+ebi('up_header').innerHTML = '🚀 ' + L.cl_uopts;
 ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
@@ -1014,7 +1015,7 @@ ebi('op_up2k').innerHTML = (
 
 
 ebi('up_info').innerHTML = (
-	'<h3 id="up_status_h">Status</h3>' +
+	'<h3 id="up_status_h">' + L.utl_stat + '</h3>' +
 
 	'</div>\n<div id="u2cards">\n' +
 	'	<a href="#" act="ok" tt="' + L.uct_ok + '">ok <span>0</span></a><a\n' +
