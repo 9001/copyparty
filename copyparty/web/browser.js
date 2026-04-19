@@ -1427,8 +1427,8 @@ function goto(dest) {
 		if(dest == 'bup'){
 			clmod(ebi('up2k'), 'vis', true);
 		}
-		if(dest == 'bup')
-			ebi('bup_tgl').open = true;
+		if(dest == 'bup' || dest == 'up2k')
+			ebi('bup_tgl').open = dest == 'bup';
 
 		var fn = window['goto_' + dest];
 		if (fn)
