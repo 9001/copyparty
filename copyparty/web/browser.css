@@ -3492,16 +3492,16 @@ html.d #treepar {
 
 /* basically a mobile / phone layout */
 @media (max-width: 50em){
-	body {
+	html:not(.e) body {
 		margin: 1em;
 	}
-	#topBar {
+	html:not(.e) #topBar {
 		display: block;
 	}
 	#headerArea {
 		margin: .2em;
 	}
-	#ops {
+	html:not(.e) #ops {
 		margin: .5em;
 		border-radius: .3em;
 	}
@@ -3572,7 +3572,7 @@ html.d #treepar {
 	#up_quick_more a {
 		padding: .6em;
 	}
-	#opa_acc {
+	html:not(.e) #opa_acc {
 		position: absolute;
 		top: .5em;
 		right: .5em;
@@ -4064,6 +4064,7 @@ html.e .opbox {
 }
 html.e #topBar {
 	margin-bottom: -.9em;
+	margin-left: -.6em;
 }
 html.e #headerArea {
 	z-index: 1;
