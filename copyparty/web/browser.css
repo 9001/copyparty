@@ -3578,6 +3578,9 @@ html.d #treepar {
 		right: .5em;
 		font-size: xx-large !important;
 	}
+	#s_nav .btn {
+		padding: .5em;
+	}
 }
 @media (min-width: 70em) {
 	html.d #barpos,
