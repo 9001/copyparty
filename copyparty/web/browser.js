@@ -5740,7 +5740,11 @@ var thegrid = (function () {
 		var ths = QSA('#ggrid>a');
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
-			var tr = ebi(ths[a].getAttribute('ref')).closest('tr'),
+			var ref = ths[a].getAttribute('ref');
+			if (!ref)
+				continue;
+			var reft = ebi(ref);
+			var tr = reft && reft.closest('tr'),
 				cl = tr.className || '';
 
 			if (noq_href(ths[a]).endsWith('/'))
