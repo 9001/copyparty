@@ -3885,12 +3885,14 @@ html.e {
 html.e * {
   border-radius: 0 !important;
 }
+html.e details[open] summary:hover,
 html.e #files,
 html.e #u2conf input[type="checkbox"]:hover + label,
 html.e .tgl.btn.on:hover,
 html.e body {
   background: var(--bg);
 }
+html.e summary,
 html.e #pctl a,
 html.e #repl,
 html.e #u2conf a,
@@ -3904,6 +3906,7 @@ html.e input[type="submit"] {
   background: var(--bg);
   border: 0;
 }
+html.e details[open] summary,
 a.s0r,
 html.e #ghead a.s0,
 html.e #u2conf input[type="checkbox"]:checked + label,
@@ -3911,6 +3914,7 @@ html.e .tgl.btn.on,
 html.e input[type="submit"]:active {
   box-shadow: var(--shadow-inset) !important;
 }
+html.e summary:hover,
 html.e #ops a:hover,
 html.e #pctl a:hover,
 html.e #repl:hover,
@@ -3934,6 +3938,7 @@ input[type="text"]:focus {
 html.e tr:focus {
   box-shadow: none;
 }
+html.e summary:focus,
 html.e #pctl a:focus,
 html.e #repl:hover,
 html.e #u2conf input[type="checkbox"]:focus + label,
@@ -3991,7 +3996,13 @@ html.e .overlay_plus {
 html.e #spaceUsed_bar {
 	background: var(--ttlbar);
 }
+html.e #up_header,
+html.e #up_status_h,
 html.e #s_header {
+	color: #fff;
+}
+.modalheader:hover {
+	background: var(--ttlbar);
 	color: #fff;
 }
 html.e #acc_info span.warn,
@@ -4099,20 +4110,15 @@ html.e #blogout:hover {
   text-decoration: underline;
 }
 
-html.e #ops > a:not(:first-child).act {
-  height: 1.4em;
-  width: 1.4em;
-  padding-bottom: 0.3em;
-  margin-top: 0.3em;
+html.e #ops a.act {
+  border-bottom: 0;
+  height: 1.7em;
+  margin-top: -.3em;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   box-shadow: var(--shadow-inset-left), var(--shadow-inset-top),
     var(--shadow-inset-right);
   z-index: 6;
-}
-html.e #ops a.act {
-  box-shadow: var(--shadow-inset);
-  border-bottom: 0;
 }
 html.e a:active {
   border: 0;
