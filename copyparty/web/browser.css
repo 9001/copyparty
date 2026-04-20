@@ -565,7 +565,7 @@ pre, code, tt, #doc, #doc>code {
 	left: -10em;
 	color: var(--bg);
 }
-html .ayjump:focus {
+html .ayjump:focus-visible {
 	z-index: 80386;
 	color: #fff;
 	color: var(--a-hil);
@@ -828,8 +828,8 @@ html.y #path a:hover {
 	width: 100%;
 	height: 0;
 }
-#doc>iframe.focus,
-.logue>iframe.focus {
+#doc>iframe.focus-visible,
+.logue>iframe.-visible {
 	box-shadow: 0 0 .1em .1em var(--a);
 }
 #pro.logue>iframe {
@@ -980,7 +980,7 @@ html.dz #flogout {
 	border-top: 1px solid var(--g-b2);
 	box-shadow: 0 .1em .3em var(--g-sh);
 }
-#ggrid>a:focus,
+#ggrid>a:focus-visible,
 #ggrid>a:hover {
 	color: var(--g-f-fg);
 	background: var(--g-f-bg);
@@ -1055,7 +1055,7 @@ html.dz #flogout {
 	font-size: 2em;
 	transition: font-size .15s, margin .15s;
 }
-#ggrid>a:focus:before,
+#ggrid>a:focus-visible:before,
 #ggrid>a:hover:before {
 	font-size: 2.5em;
 	margin: -.2em;
@@ -1063,7 +1063,7 @@ html.dz #flogout {
 #ggrid>a[tt] {
 	background: linear-gradient(135deg, var(--g-g1) 95%, var(--g-g2) 95%);
 }
-#ggrid>a[tt]:focus,
+#ggrid>a[tt]:focus-visible,
 #ggrid>a[tt]:hover {
 	background: var(--g-f-bg);
 }
@@ -1092,9 +1092,9 @@ html.dz #flogout {
 	transition: all 0.2s cubic-bezier(.2, 2.2, .5, 1); /* https://cubic-bezier.com/#.4,2,.7,1 */
 }
 #files tbody tr.sel:hover td,
-#files tbody tr.sel:focus td,
+#files tbody tr.sel:focus-visible td,
 #ggrid>a.sel:hover,
-#ggrid>a.sel:focus {
+#ggrid>a.sel:focus-visible {
 	color: var(--g-sel-fg);
 	background: var(--g-fsel-bg);
 	border-color: var(--g-fsel-b1);
@@ -1121,15 +1121,15 @@ html.dz #flogout {
 #files tr.sel a.play.act {
 	text-shadow: 0 0 1px var(--fg-max);
 }
-#files tr:focus {
+#files tr:focus-visible {
 	outline: none;
 	position: relative;
 }
-#files tr:focus td+td {
+#files tr:focus-visible td+td {
 	background: var(--bg-d3);
 	box-shadow: 0 .2em 0 var(--f-sel-sh), 0 -.2em 0 var(--f-sel-sh);
 }
-#files tr:focus:not(.play):not(.sel) td:first-child {
+#files tr:focus-visible:not(.play):not(.sel) td:first-child {
 	background: var(--bg-d3);
 	box-shadow: -.2em .2em 0 var(--f-sel-sh), -.2em -.2em 0 var(--f-sel-sh);
 }
@@ -2517,7 +2517,7 @@ html.y #bbox-overlay figcaption a {
 #bbox-overlay button:hover {
 	opacity: 1 !important;
 }
-#bbox-overlay button:focus,
+#bbox-overlay button:focus-visible,
 #bbox-overlay button:hover {
 	color: rgba(255,255,255,0.9);
 	background: rgba(50, 50, 50, 0.9);
@@ -4090,8 +4090,8 @@ html.e #ops a {
   justify-content: center;
   font-size: 1.25em;
 }
-html.e #blogout:focus,
-html.e #ops a:focus {
+html.e #blogout:focus-visible,
+html.e #ops a:focus-visible {
   outline: 1px dashed var(--w) !important;
 }
 
