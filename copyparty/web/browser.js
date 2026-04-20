@@ -5743,9 +5743,7 @@ var thegrid = (function () {
 			var ref = ths[a].getAttribute('ref');
 			if (!ref)
 				continue;
-			var reft = ebi(ref);
-			var tr = reft && reft.closest('tr'),
-				cl = tr.className || '';
+			var cl = ebi(ref).closest('tr').className || '';
 
 			if (noq_href(ths[a]).endsWith('/'))
 				cl += ' dir';
@@ -6273,6 +6271,9 @@ var ahotkeys = function (e) {
 		if (thegrid.en)
 			return ebi('griden').click();
 	}
+
+	if (aet == 'input')
+		return;
 
 	var in_ftab = (aet == 'tr' || aet == 'td') && ae.closest('#files');
 	if (in_ftab) {
