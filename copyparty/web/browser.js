@@ -218,7 +218,7 @@ if (1)
 		"cl_opts": "general",
 		"cl_hfsz": "filesize",
 		"cl_themes": "theme",
-		"cl_accent": "accent color (default: #fc0)$Nsupports any css color, like rgba(255, 210, 0, 1)",
+		"cl_accent": "accent color (keep empty for default)$Nsupports any css color, like rgba(255, 210, 0, 1)",
 		"cl_langs": "language",
 		"cl_ziptype": "folder download",
 		"cl_uopts": "upload",
