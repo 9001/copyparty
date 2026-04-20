@@ -1567,7 +1567,7 @@ html.y #ops svg circle {
 	border-radius: .3em;  
 	justify-content: center;
   	display: flex;
-	text-shadow: none;
+	text-shadow: 1px 1px 0 var(--bg), 1px -1px 0 var(--bg), -1px -1px 0 var(--bg), -1px 1px 0 var(--bg);
 }
 .opbox {
 	padding: .5em;
