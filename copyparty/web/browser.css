@@ -4546,6 +4546,8 @@ html.e #detree {
   padding: 2px;
   font-size: small;
   cursor: default;
+  pointer-events: all;
+  max-width: max-content;
 }
 #rtt_latency {
 	opacity: .5;
@@ -4564,9 +4566,12 @@ html.e #detree {
 #tree_footer {
 	width: 0;
 	position: fixed;
-	bottom: 1em;
-	left: 1em;
+	bottom: 0;
+	left: 0;
+	padding: 1em;
+	pointer-events: none;
 	transition: width .15s;
+	background: linear-gradient(transparent, var(--bg-u2));
 }
 .popup_button {
 	border-radius: .3em;
