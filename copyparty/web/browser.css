@@ -4603,9 +4603,9 @@ html.e #detree {
 .popup {
 	visibility: hidden;
 	width: fit-content;
-	background-color: var(--bg-u5);
+	background: var(--bg-u2);
 	border: 1px solid var(--bg-u3);
-	box-shadow: 0 0 2px var(--txt-sh);
+	box-shadow: 0 .5em 1em var(--txt-sh);
 	text-align: center;
 	border-radius: .3em;
 	padding: .5em;

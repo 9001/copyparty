@@ -12,194 +12,200 @@
 {{ html_head }}
 </head>
 
-<a id="homebtn" href="/">🏠</a>
-
 <body>
-	<div id="wrap">
-		{%- if not in_shr %}
-		<a id="a" href="{{ r }}/?h{{ re }}" class="af">auto-refresh</a>
-		<a id="v" href="{{ r }}/?hc" class="af">connect</a>
+	<div id="outer">
+		<div id="middle">
+			<div id="wrap">
+				<a id="homebtn" href="/">🏠</a>
 
-			{%- if this.uname == '*' %}
-		<p id="b">howdy stranger &nbsp; <small>(you're not logged in)</small></p>
-			{%- else %}
-				{%- if this.args.idp_logout %}
-		<a id="c" href="{{ this.args.idp_logout }}" class="logout">logout</a>
-				{%- else %}
-		<a id="c" href="{{ r }}/?pw=x" class="logout">logout</a>
-				{%- endif %}
-		<p><span id="m">welcome back,</span> <strong id="un">{{ this.uname|e }}</strong></p>
-			{%- endif %}
-		{%- endif %}
+				{%- if not in_shr %}
+				<a id="a" href="{{ r }}/?h{{ re }}" class="af" tt="toggle auto-refresh">↻</a>
+				<a id="v" href="{{ r }}/?hc" class="af">Connect</a>
 
-		{%- if msg %}
-		<div id="msg">
-			{{ msg }}
-		</div>
-		{%- endif %}
-
-		{%- if ups %}
-		<h1 id="aa">incoming files:</h1>
-			<table class="vols">
-				<thead><tr><th>%</th><th>speed</th><th>eta</th><th>idle</th><th>dir</th><th>file</th></tr></thead>
-				<tbody>
-					{%- for u in ups %}
-					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ r }}{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
-					{%- endfor %}
-				</tbody>
-			</table>
-		{%- endif %}
-
-		{%- if dls %}
-		<h1 id="ae">active downloads:</h1>
-			<table class="vols">
-				<thead><tr><th>%</th><th>sent</th><th>speed</th><th>eta</th><th>idle</th><th></th><th>dir</th><th>file</th></tr></thead>
-				<tbody>
-					{%- for u in dls %}
-					<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td>{{ u[4] }}</td><td>{{ u[5] }}</td><td><a href="{{ r }}{{ u[6] }}">{{ u[7]|e }}</a></td><td>{{ u[8] }}</td></tr>
-					{%- endfor %}
-				</tbody>
-			</table>
-		{%- endif %}
-
-		{%- if avol %}
-		<h1>admin panel:</h1>
-		<table><tr><td> <!-- hehehe -->
-			<table class="num">
-				<tr><td>scanning</td><td>{{ scanning }}</td></tr>
-				<tr><td>hash-q</td><td>{{ hashq }}</td></tr>
-				<tr><td>tag-q</td><td>{{ tagq }}</td></tr>
-				<tr><td>mtp-q</td><td>{{ mtpq }}</td></tr>
-				<tr><td>db-act</td><td id="u">{{ dbwt }}</td></tr>
-			</table>
-		</td><td>
-			<table class="vols">
-				<thead><tr><th>vol</th><th id="t">action</th><th>status</th></tr></thead>
-				<tbody>
-					{%- for mp in avol %}
-					{%- if mp in vstate and vstate[mp] %}
-					<tr><td><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a class="s" href="{{ r }}{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
+					{%- if this.uname == '*' %}
+				<p id="b">howdy stranger &nbsp; <small>(you're not logged in)</small></p>
+					{%- else %}
+						{%- if this.args.idp_logout %}
+				<a id="c" href="{{ this.args.idp_logout }}" class="logout">Logout</a>
+						{%- else %}
+				<a id="c" href="{{ r }}/?pw=x" class="logout">Logout</a>
+						{%- endif %}
+				<p><span id="m">welcome back,</span> <strong id="un">{{ this.uname|e }}</strong></p>
 					{%- endif %}
+				{%- endif %}
+
+				<div id="login">
+					{%- if in_shr %}
+					<h1 id="z">Unlock this share</h1>
+					<div>
+						<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
+							<input type="hidden" id="la" name="act" value="login" />
+							<input type="password" id="lp" name="cppwd" placeholder="Password" />
+							<input type="hidden" name="uhash" id="uhash" value="x" />
+							<input type="submit" id="ls" value="Unlock" />
+							{%- if ahttps %}
+							<a id="w" href="{{ ahttps }}">Switch to https</a>
+							{%- endif %}
+							<div id="lm"></div>
+						</form>
+					</div>
+					{%- else %}
+						{%- if this.uname == '*' %}
+					<h1 id="l">Login for more</h1>
+						{%- else %}
+					<h1 id="l">Change account</h1>
+						{%- endif %}
+					<div>
+						{%- if this.args.idp_login %}
+						<ul><li>
+							<a href="{{ this.args.idp_login | replace("{dst}",r+"/"+qvpath) }}">{{ this.args.idp_login_t }}</a>
+							{%- if this.args.ao_have_pw %}or alternatively{%- endif %}
+						</li></ul>
+						{%- endif %}
+						{%- if this.args.ao_have_pw %}
+						<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
+							<input type="hidden" id="la" name="act" value="login" />
+							{%- if this.args.usernames %}
+							<input type="text" id="lu" name="uname" placeholder="Username" size="12" />
+							<input type="password" id="lp" name="cppwd" placeholder="Password" size="12" />
+							{%- else %}
+							<input type="password" id="lp" name="cppwd" placeholder="Password" />
+							{%- endif %}
+							<input type="hidden" name="uhash" id="uhash" value="x" />
+							<input type="submit" id="ls" value="Login" />
+							{%- if chpw %}
+							<a id="x" href="#">Change password</a>
+							{%- endif %}
+							<div id="lm"></div>
+						</form>
+						{%- endif %}
+					</div>
+					{%- endif %}
+				</div>
+
+				{%- if msg %}
+				<div id="msg">
+					{{ msg }}
+				</div>
+				{%- endif %}
+
+				{%- if ups %}
+				<h1 id="aa">Incoming files</h1>
+					<table class="vols">
+						<thead><tr><th>%</th><th>Speed</th><th>Eta</th><th>Idle</th><th>Dir</th><th>File</th></tr></thead>
+						<tbody>
+							{%- for u in ups %}
+							<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td><a href="{{ r }}{{ u[4] }}">{{ u[5]|e }}</a></td><td>{{ u[6]|e }}</td></tr>
+							{%- endfor %}
+						</tbody>
+					</table>
+				{%- endif %}
+
+				{%- if dls %}
+				<h1 id="ae">Active downloads</h1>
+					<table class="vols">
+						<thead><tr><th>%</th><th>Sent</th><th>Speed</th><th>Eta</th><th>Idle</th><th></th><th>Dir</th><th>File</th></tr></thead>
+						<tbody>
+							{%- for u in dls %}
+							<tr><td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td><td>{{ u[3] }}</td><td>{{ u[4] }}</td><td>{{ u[5] }}</td><td><a href="{{ r }}{{ u[6] }}">{{ u[7]|e }}</a></td><td>{{ u[8] }}</td></tr>
+							{%- endfor %}
+						</tbody>
+					</table>
+				{%- endif %}
+
+				{%- if avol %}
+				<h1>Admin panel</h1>
+				<table><tr><td> <!-- hehehe -->
+					<table class="num">
+						<tr><td>scanning</td><td>{{ scanning }}</td></tr>
+						<tr><td>hash-q</td><td>{{ hashq }}</td></tr>
+						<tr><td>tag-q</td><td>{{ tagq }}</td></tr>
+						<tr><td>mtp-q</td><td>{{ mtpq }}</td></tr>
+						<tr><td>db-act</td><td id="u">{{ dbwt }}</td></tr>
+					</table>
+				</td><td>
+					<table class="vols">
+						<thead><tr><th>vol</th><th id="t">action</th><th>status</th></tr></thead>
+						<tbody>
+							{%- for mp in avol %}
+							{%- if mp in vstate and vstate[mp] %}
+							<tr><td><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></td><td><a class="s" href="{{ r }}{{ mp }}?scan">rescan</a></td><td>{{ vstate[mp] }}</td></tr>
+							{%- endif %}
+							{%- endfor %}
+						</tbody>
+					</table>
+				</td></tr></table>
+				<div class="btns">
+					<a id="d" href="{{ r }}/?stack">Dump stack</a>
+					<a id="e" href="{{ r }}/?reload=cfg">Reload cfg</a>
+				</div>
+				{%- endif %}
+
+				{%- if rvol %}
+				<h1 id="f">You can browse</h1>
+				<ul>
+					{%- for mp in rvol %}
+					<li><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
 					{%- endfor %}
-				</tbody>
-			</table>
-		</td></tr></table>
-		<div class="btns">
-			<a id="d" href="{{ r }}/?stack">dump stack</a>
-			<a id="e" href="{{ r }}/?reload=cfg">reload cfg</a>
-		</div>
-		{%- endif %}
-
-		{%- if rvol %}
-		<h1 id="f">you can browse:</h1>
-		<ul>
-			{%- for mp in rvol %}
-			<li><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
-			{%- endfor %}
-		</ul>
-		{%- endif %}
-
-		{%- if wvol %}
-		<h1 id="g">you can upload to:</h1>
-		<ul>
-			{%- for mp in wvol %}
-			<li><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
-			{%- endfor %}
-		</ul>
-		{%- endif %}
-
-		{%- if in_shr %}
-		<h1 id="z">unlock this share:</h1>
-		<div>
-			<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
-				<input type="hidden" id="la" name="act" value="login" />
-				<input type="password" id="lp" name="cppwd" placeholder=" password" />
-				<input type="hidden" name="uhash" id="uhash" value="x" />
-				<input type="submit" id="ls" value="Unlock" />
-				{%- if ahttps %}
-				<a id="w" href="{{ ahttps }}">switch to https</a>
+				</ul>
 				{%- endif %}
-				<div id="lm"></div>
-			</form>
-		</div>
-		{%- else %}
-			{%- if this.uname == '*' %}
-		<h1 id="l">login for more:</h1>
-			{%- else %}
-		<h1 id="l">change account:</h1>
-			{%- endif %}
-		<div>
-			{%- if this.args.idp_login %}
-			<ul><li>
-				<a href="{{ this.args.idp_login | replace("{dst}",r+"/"+qvpath) }}">{{ this.args.idp_login_t }}</a>
-				{%- if this.args.ao_have_pw %}or alternatively:{%- endif %}
-			</li></ul>
-			{%- endif %}
-			{%- if this.args.ao_have_pw %}
-			<form id="lf" method="post" enctype="multipart/form-data" action="{{ r }}/{{ qvpath }}">
-				<input type="hidden" id="la" name="act" value="login" />
-				{%- if this.args.usernames %}
-				<input type="text" id="lu" name="uname" placeholder=" username" size="12" />
-				<input type="password" id="lp" name="cppwd" placeholder=" password" size="12" />
-				{%- else %}
-				<input type="password" id="lp" name="cppwd" placeholder=" password" />
+
+				{%- if wvol %}
+				<h1 id="g">You can upload to</h1>
+				<ul>
+					{%- for mp in wvol %}
+					<li><a href="{{ r }}{{ mp }}{{ url_suf }}">{{ mp }}</a></li>
+					{%- endfor %}
+				</ul>
 				{%- endif %}
-				<input type="hidden" name="uhash" id="uhash" value="x" />
-				<input type="submit" id="ls" value="login" />
-				{%- if chpw %}
-				<a id="x" href="#">change password</a>
-				{%- endif %}
-				<div id="lm"></div>
-			</form>
-			{%- endif %}
+
+				<h1 id="cc">Other stuff</h1>
+				<div class="agr">
+					{%- if ahttps %}
+					<a id="wb" href="{{ ahttps }}">Switch to https</a><br />
+					{%- endif %}
+
+					<a id="af" href="{{ r }}/?ru">Show recent uploads</a><br />
+
+					{%- if this.uname != '*' and this.args.shr %}
+					<a id="y" href="{{ r }}/?shares">Edit shares</a><br />
+					{%- endif %}
+
+					{%- if this.uname in this.args.idp_adm_set %}
+					<a id="ag" href="{{ r }}/?idp">View idp cache</a><br />
+					{%- endif %}
+
+					<a id="k" href="{{ r }}/?reset" class="r" onclick="localStorage.clear();return true">Reset client settings</a><br />
+
+					{%- if this.uname != '*' and not in_shr %}
+					<form method="post" enctype="multipart/form-data">
+						<input type="hidden" name="act" value="logout" />
+						<input type="submit" id="lo" value="Logout “{{ this.uname|e }}” everywhere" />
+					</form>
+					{%- endif %}
+				</div>
+				<ul>
+					{%- if k304 or k304vis %}
+					{%- if k304 %}
+					<li><a id="h" href="{{ r }}/?cc&setck=k304=n">disable k304</a> (currently enabled)
+					{%- else %}
+					<li><a id="i" href="{{ r }}/?cc&setck=k304=y" class="r">enable k304</a> (currently disabled)
+					{%- endif %}
+					<blockquote id="j">enabling k304 will disconnect your client on every HTTP 304, which can prevent some buggy proxies from getting stuck (suddenly not loading pages), <em>but</em> it will also make things slower in general</blockquote></li>
+					{%- endif %}
+
+					{%- if no304 or no304vis %}
+					{%- if no304 %}
+					<li><a id="ab" href="{{ r }}/?cc&setck=no304=n">disable no304</a> (currently enabled)
+					{%- else %}
+					<li><a id="ac" href="{{ r }}/?cc&setck=no304=y" class="r">enable no304</a> (currently disabled)
+					{%- endif %}
+					<blockquote id="ad">enabling no304 will disable all caching; try this if k304 wasn't enough. This will waste a huge amount of network traffic!</blockquote></li>
+					{%- endif %}
+				</ul>
+
+			</div>
 		</div>
-		{%- endif %}
-
-		<h1 id="cc">other stuff:</h1>
-		<div class="agr">
-			{%- if ahttps %}
-			<a id="wb" href="{{ ahttps }}">switch to https</a><br />
-			{%- endif %}
-
-			<a id="af" href="{{ r }}/?ru">show recent uploads</a><br />
-
-			{%- if this.uname != '*' and this.args.shr %}
-			<a id="y" href="{{ r }}/?shares">edit shares</a><br />
-			{%- endif %}
-
-            {%- if this.uname in this.args.idp_adm_set %}
-			<a id="ag" href="{{ r }}/?idp">view idp cache</a><br />
-			{%- endif %}
-
-			<a id="k" href="{{ r }}/?reset" class="r" onclick="localStorage.clear();return true">reset client settings</a><br />
-
-			{%- if this.uname != '*' and not in_shr %}
-			<form method="post" enctype="multipart/form-data">
-				<input type="hidden" name="act" value="logout" />
-				<input type="submit" id="lo" value="logout “{{ this.uname|e }}” everywhere" />
-			</form>
-			{%- endif %}
-		</div>
-		<ul>
-			{%- if k304 or k304vis %}
-			{%- if k304 %}
-			<li><a id="h" href="{{ r }}/?cc&setck=k304=n">disable k304</a> (currently enabled)
-			{%- else %}
-			<li><a id="i" href="{{ r }}/?cc&setck=k304=y" class="r">enable k304</a> (currently disabled)
-			{%- endif %}
-			<blockquote id="j">enabling k304 will disconnect your client on every HTTP 304, which can prevent some buggy proxies from getting stuck (suddenly not loading pages), <em>but</em> it will also make things slower in general</blockquote></li>
-			{%- endif %}
-
-			{%- if no304 or no304vis %}
-			{%- if no304 %}
-			<li><a id="ab" href="{{ r }}/?cc&setck=no304=n">disable no304</a> (currently enabled)
-			{%- else %}
-			<li><a id="ac" href="{{ r }}/?cc&setck=no304=y" class="r">enable no304</a> (currently disabled)
-			{%- endif %}
-			<blockquote id="ad">enabling no304 will disable all caching; try this if k304 wasn't enough. This will waste a huge amount of network traffic!</blockquote></li>
-			{%- endif %}
-		</ul>
-
 	</div>
 	<a href="#" id="repl" style="opacity: .4;">π</a>
 	{%- if not this.args.nb %}

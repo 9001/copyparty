@@ -1,4 +1,6 @@
 :root {
+	color-scheme: dark;
+
 	--font-main: sans-serif;
 	--font-serif: serif;
 	--font-mono: 'scp';
@@ -7,12 +9,16 @@
 	--fg-max: #fff;
 	--bg-u2: #2b2b2b;
 	--bg-u5: #444;
+	--bg-max: #080808;
 }
 html.y {
+	color-scheme: light;
+
 	--fg: #222;
 	--fg-max: #000;
 	--bg-u2: #f7f7f7;
 	--bg-u5: #ccc;
+	--bg-max: #fff;
 }
 html.bz {
 	--bg-u2: #202231;
