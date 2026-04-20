@@ -218,6 +218,7 @@ if (1)
 		"cl_opts": "general",
 		"cl_hfsz": "filesize",
 		"cl_themes": "theme",
+		"cl_accent": "accent color (default: #fc0)$Nsupports any css color, like rgba(255, 210, 0, 1)",
 		"cl_langs": "language",
 		"cl_ziptype": "folder download",
 		"cl_uopts": "upload",
@@ -1180,7 +1181,9 @@ ebi('op_cfg').innerHTML = (
 	'</div>\n' +
 	'<div>\n' +
 	'	<h3 id="h_theme">🎨 ' + L.cl_themes + '</h3>\n' +
-	'	<div><select id="themes"></select></div>\n' +
+	'	<div>' +
+	'		<select id="themes"></select>' +
+	'		<input type="text" id="accent" placeholder="#color" tt="' + L.cl_accent +'"></input>' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -1270,6 +1273,20 @@ ebi('op_cfg').innerHTML = (
 		modaltoggle('cfg');
 	}
 })();
+
+// accent color
+ebi('accent').oninput = function () {
+	if(this.value == accent) 
+		return;
+	accent = this.value;
+	swrite('accent', accent);
+	var a = accent || '#fc0';
+	console.log('accent color set to: ' + a);
+	document.documentElement.style.setProperty('--a', a);
+}
+var accent = ebi('accent').value = sread('accent') || '';
+if(accent)
+	document.documentElement.style.setProperty('--a', accent);
 
 // navpane
 ebi('tree').innerHTML = (
