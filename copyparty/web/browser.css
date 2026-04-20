@@ -30,13 +30,13 @@
 	--bg-d3: color-mix(var(--bg-max) 95%, var(--fg-max) 5%);
 
 	--tab-alt: var(--a);
-	--row-alt: #282828;
+	--row-alt: var(--bg-u1);
 
 	--sel-fg: var(--bg-d1);
 	--sel-bg: var(--fg);
 
-	--a-hil: hsl(from var(--a) h 105% 80%);
-	--a-dark: hsl(from var(--a) h 110% 70%); /* warning text etc */
+	--a-hil: hsl(from color-mix(var(--a) 80%, var(--fg-max) 20%) h 105% l);
+	--a-dark: hsl(from color-mix(var(--a) 70%, var(--bg-max) 30%) h 110% l); /* warning text etc */
 	--a-gray: hsl(from var(--a) h 0 l);
 
 	accent-color: var(--a);
@@ -44,7 +44,7 @@
 	--btn-bg: rgba(128,128,128,0.15);
 	--btn-h-fg: var(--a-hil);
 	--btn-h-bg: hsl(from color-mix(var(--a-gray) 45%, var(--bg-max) 55%) h 0 l);
-	--btn-1-fg: rgb(25, 19, 12);
+	--btn-1-fg: var(--bg);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
 	--btn-h-bb: var(--btn-bb);
@@ -98,13 +98,13 @@
 	--srv-3: #fc4;
 	--srv-3b: rgba(255,204,68,0.6);
 
-	--tree-bg: #2b2b2b;
+	--tree-bg: var(--bg-u1);
 
 	--g-play-bg: #750;
 	--g-play-b1: #c90;
 	--g-play-b2: #da4;
 
-	--g-sel-fg: #fff;
+	--g-sel-fg: var(--fg-max);
 	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 30%, var(--bg) 70%);
 	--g-sel-b1: var(--a-dark);
 	--g-sel-sh: hsl(from var(--a) h 105% 30%);
@@ -112,7 +112,7 @@
 	--g-fsel-b1: var(--a);
 	--g-fsel-ts: hsl(from var(--a) h 105% 30%);
 	--g-dfg: #bbb;
-	--g-fg: #ccc;
+	--g-fg: var(--fg);
 	--g-bg: var(--bg-u2);
 	--g-b1: var(--bg-u3);
 	--g-b2: var(--bg-u5);
@@ -120,8 +120,8 @@
 	--g-g2: var(--bg-u5);
 	--g-f-bg: var(--bg-u3);
 	--g-f-b1: var(--bg-u5);
-	--g-f-fg: #fff;
-	--g-sh: rgba(0,0,0,0.3);
+	--g-f-fg: var(--fg-max);
+	--g-sh: color-mix(var(--bg-max) 30%, transparent 70%);
 
 	--f-sh1: 0.33;
 	--f-sh2: 0.02;
@@ -129,13 +129,13 @@
 	--f-h-b1: rgba(128,128,128,0.7);
 
 	--f-play-bg: var(--a-dark);
-	--f-play-fg: #000;
-	--f-sel-sh: #fc0;
+	--f-play-fg: var(--bg-max);
+	--f-sel-sh: var(--a);
 	--f-gray: #999;
 
-	--fm-off: #fc6;
+	--fm-off: var(--a-hil);
 	--mp-sh: var(--bg-d3);
-	--mp-b-bg: rgba(0,0,0,0.2);
+	--mp-b-bg: color-mix(var(--bg-max) 20%, transparent 80%);
 
 	--err-fg: #fff;
 	--err-bg: #a20;
@@ -145,10 +145,11 @@
 html.y {
 	color-scheme: light;
 
-	--fg: #222;
 	--fg-max: #000;
+	--fg: #222;
 	--fg-weak: #555;
 
+	--bg-max: #fff;
 	--bg-d3: #fff;
 	--bg-d2: #fff;
 	--bg-d1: #fff;
@@ -157,18 +158,9 @@ html.y {
 	--bg-u2: #f7f7f7;
 	--bg-u3: #eaeaea;
 	--bg-u5: #ccc;
-	--bg-max: #fff;
 
-	--tab-alt: #c07;
-	--row-alt: #f2f2f2;
-
-	--a: #06a;
-
-	--btn-fg: #555;
-	--btn-h-fg: #222;
-	--btn-1-fg: #fff;
-	--btn-1-bg: #4a0;
-	--btn-1h-bg: #5c0;
+	--a: #07c;
+	
 	--chk-fg: var(--fg);
 	--txt-sh: #aaa;
 	--txt-bg: rgba(255,255,255,0.6);
@@ -193,9 +185,6 @@ html.y {
 	--srv-2: #c83;
 	--srv-3: #c0a;
 
-	--tree-bg: #fff;
-
-	--g-fg: var(--a);
 	--g-bg: var(--bg-u2);
 	--g-b1: var(--bg-u5);
 	--g-b2: var(--bg-u5);
@@ -1577,7 +1566,7 @@ html.y #ops svg circle {
 #acc_pfp {
 	aspect-ratio: 1 / 1;
 	width: 1.25em;
-	background: var(--a-dark);
+	background: var(--a);
 	color: var(--bg);
 	border: var(--btn-bg) solid 1px;
 	border-radius: .3em;  
@@ -2625,6 +2614,9 @@ html.c .modalcontent {
 	background: var(--ttlbar);
 	font-size: large;
 	font-weight: bold;
+	color: var(--fg);
+}
+.modalheader:hover {
 	color: var(--fg);
 }
 .close{
@@ -4001,9 +3993,8 @@ html.e #up_status_h,
 html.e #s_header {
 	color: #fff;
 }
-.modalheader:hover {
+html.e .modalheader:hover {
 	background: var(--ttlbar);
-	color: #fff;
 }
 html.e #acc_info span.warn,
 html.e #acc_info a {
@@ -4642,7 +4633,7 @@ html.e #detree {
 	position: absolute;
 	margin: -.5em 0 0 .8em;
 	color: var(--fg);
-	text-shadow: -1px 1px 1px #000;
+	text-shadow: -1px 1px 1px var(--bg-max);
 }
 
 .gridViewIcon, 
