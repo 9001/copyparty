@@ -356,24 +356,18 @@ html.y #tth {
 	border: .25em solid #ccc;
 	border-radius: .4em;
 }
-#modali:focus {
+#modali:focus-visible {
 	border-color: #06d;
 }
 #repl_pre {
 	max-width: 24em;
 }
-*:focus,
-*:focus+label,
-#pctl *:focus,
-.btn:focus {
+*:focus-visible,
+*:focus-visible+label,
+#pctl *:focus-visible,
+.btn:focus-visible {
 	/* box-shadow: 0 .1em .2em #fc0 inset; */
-	animation: outline_fadeOut 1s;
 	border-radius: .2em;
-}
-@keyframes outline_fadeOut {
-	0% {outline: var(--a) solid .1em;}
-	30% {outline: color-mix(var(--a) 75%, transparent 25%) solid .1em;}
-	100% {outline: transparent solid .1em;}
 }
 input, button {
 	font-family: var(--font-main), sans-serif;
