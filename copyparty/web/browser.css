@@ -10,6 +10,7 @@
 	--fg-max: #fff;
 	--bg-max: #080808;
 	--a: #fc5;
+	accent-color: var(--a);
 	
 	/* mikudayo */
 	/* --fg-max: #d1d7e9;
@@ -39,7 +40,6 @@
 	--a-dark: hsl(from color-mix(var(--a) 70%, var(--bg-max) 30%) h 110% l); /* warning text etc */
 	--a-gray: hsl(from var(--a) h 0 l);
 
-	accent-color: var(--a);
 	--btn-fg: var(--a);
 	--btn-bg: rgba(128,128,128,0.15);
 	--btn-h-fg: var(--a-hil);
@@ -167,11 +167,6 @@ html.y {
 
 	--op-a-sh: #fff;
 
-	--u2-txt-bg: var(--bg-max);
-	--u2-tab-1-sh: #0ad;
-	--u2-tab-1-b1: #09c;
-	--u2-tab-1-b2: #05a;
-	--u2-tab-1-fg: var(--fg-max);
 	--u2-tab-1-bg: inherit;
 	--ud-b1: #bbb;
 
@@ -1610,7 +1605,7 @@ html.y #ops svg circle {
 }
 .opview select {
 	padding: .3em;
-	margin: .2em .4em;
+	margin: .2em 0	;
 	background: var(--bg-u3);
 }
 .opview input.err {

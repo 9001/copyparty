@@ -373,6 +373,7 @@ html.y #tth {
 #pctl *:focus-visible,
 .btn:focus-visible {
 	/* box-shadow: 0 .1em .2em #fc0 inset; */
+	outline: var(--a) solid .1em;
 	border-radius: .2em;
 }
 input, button {
@@ -384,12 +385,7 @@ input[type="submit"] {
 input[type="text"]:focus,
 input:not([type]):focus,
 textarea:focus {
-	box-shadow: 0 .1em .3em #fc0, 0 -.1em .3em #fc0;
-}
-html.y input[type="text"]:focus,
-html.y input:not([type]):focus,
-html.y textarea:focus {
-	box-shadow: 0 .1em .3em #037, 0 -.1em .3em #037;
+	box-shadow: 0 .1em .3em var(--a), 0 -.1em .3em var(--a);
 }
 
 
