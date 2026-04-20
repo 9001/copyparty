@@ -21,6 +21,7 @@
 	--fg-weak: color-mix(var(--fg-max) 70%, var(--bg-max) 30%);
 
 	--bg: color-mix(var(--bg-max) 85%, var(--fg-max) 15%);
+	--bg-half: color-mix(var(--bg) 50%, transparent 50%);
 	--bg-u1: color-mix(var(--bg-max) 80%, var(--fg-max) 20%);
 	--bg-u2: color-mix(var(--bg-max) 75%, var(--fg-max) 25%);
 	--bg-u3: color-mix(var(--bg-max) 70%, var(--fg-max) 30%);
@@ -1567,7 +1568,10 @@ html.y #ops svg circle {
 	border-radius: .3em;  
 	justify-content: center;
   	display: flex;
-	text-shadow: 1px 1px 0 var(--bg), 1px -1px 0 var(--bg), -1px -1px 0 var(--bg), -1px 1px 0 var(--bg);
+	text-shadow: none;
+}
+#acc_pfp.placeholder {
+	text-shadow: 1px 1px 0 var(--bg-half), 1px -1px 0 var(--bg-half), -1px -1px 0 var(--bg-half), -1px 1px 0 var(--bg-half);
 }
 .opbox {
 	padding: .5em;

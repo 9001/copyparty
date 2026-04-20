@@ -8465,6 +8465,7 @@ function apply_perms(res) {
 		ebi('acc_pfp').innerHTML = '👤';
 		ebi('acc_button').onclick = goHome;
 	}
+	clmod(ebi('acc_pfp'), 'placeholder', acct == '*');
 
 	var o = QSA('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++) {
