@@ -1275,18 +1275,27 @@ ebi('op_cfg').innerHTML = (
 })();
 
 // accent color
+function parseColor (strColor) {
+  const s = new Option().style;
+  s.color = strColor;
+  return s.color !== '' ? s.color : '';
+}
+
 ebi('accent').oninput = function () {
-	if(this.value == accent) 
+	var validcolor = parseColor(this.value);
+	clmod(ebi('accent'), 'invalid', this.value.length != 0 && validcolor.length == 0);
+	if(validcolor == accent) 
 		return;
-	accent = this.value;
+	accent = validcolor;
 	swrite('accent', accent);
 	var a = accent || '#fc0';
 	console.log('accent color set to: ' + a);
 	document.documentElement.style.setProperty('--a', a);
 }
-var accent = ebi('accent').value = sread('accent') || '';
-if(accent)
-	document.documentElement.style.setProperty('--a', accent);
+var accent = ebi('accent').value = sread('accent');
+if(accent){
+	document.documentElement.style.setProperty('--a', parseColor(accent));
+}
 
 // navpane
 ebi('tree').innerHTML = (
