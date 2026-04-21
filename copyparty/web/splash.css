@@ -17,6 +17,7 @@ html {
 	border-left: var(--bg-u5) solid 1px;
 	border-top: var(--bg-u5) solid 1px;
 	border-right: var(--bg-u5) solid 1px;
+	border-bottom: 2px solid rgb(7, 130, 212);
 	position: fixed;
 	z-index: 10;
 	box-shadow: 0 0 1em color-mix(var(--bg-max) 60%, transparent 40%);
