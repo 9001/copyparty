@@ -1559,7 +1559,7 @@ html.y #ops svg circle {
 }
 #headerArea{
 	display: flex;
-	margin: 1em;
+	margin: .7em;
 	margin-bottom: 0;
 }
 #srv_name{
@@ -3545,7 +3545,7 @@ html.d #treepar {
 		display: block;
 	}
 	#headerArea {
-		margin: .2em;
+		margin: .5em;
 	}
 	html:not(.e) #ops {
 		margin: .5em;
@@ -3564,7 +3564,7 @@ html.d #treepar {
 		display: block;
 	}
 	#folder_search {
-		margin: .5em 1em 0 1em;
+		margin: .5em 1em 0 .2em;
 	}
 	#wrap {
 		margin-right: 0;
@@ -3619,8 +3619,8 @@ html.d #treepar {
 	}
 	html:not(.e) #opa_acc {
 		position: absolute;
-		top: .5em;
-		right: .5em;
+		top: .3em;
+		right: .3em;
 		font-size: xx-large !important;
 	}
 	#s_nav .btn {
@@ -3663,9 +3663,6 @@ html.d #treepar {
 
 	#pathBar {
 		display: block;
-	}
-	#folder_search {
-		margin: .5em .5em 0 .5em ;
 	}
 	#path {
 		min-width: auto;
@@ -4608,7 +4605,7 @@ html.e #detree {
 #spaceUsed_bar, #spaceTotal_bar{
 	height: .3em;
 	border-radius: .3em;
-	background: var(--btn-h-bg);
+	background: var(--bg-u5);
 }
 #spaceUsed_bar{
 	background: var(--btn-1-bg);
