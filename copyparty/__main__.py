@@ -1885,8 +1885,8 @@ def add_og(ap):
 def add_ui(ap, retry: int):
     THEMES = 10
     ap2 = ap.add_argument_group("ui options")
-    ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
-    ap2.add_argument("--gsel", action="store_true", help="select files in grid by ctrl-click (volflag=gsel)")
+    ap2.add_argument("--grid", action="store_true", default="true", help="show grid/thumbnails by default (volflag=grid)")
+    ap2.add_argument("--gsel", action="store_true", default="true", help="select files in grid by ctrl-click (volflag=gsel)")
     ap2.add_argument("--localtime", action="store_true", help="default to local timezone instead of UTC")
     ap2.add_argument("--ui-filesz", metavar="FMT", type=u, default="4", help="default filesize format; one of these: 0, 1, 2, 2c, 3, 3c, 4, 4c, 5, 5c, fuzzy (see UI)")
     ap2.add_argument("--gauto", metavar="PERCENT", type=int, default=0, help="switch to gridview if more than \033[33mPERCENT\033[0m of files are pics/vids; 0=disabled")
