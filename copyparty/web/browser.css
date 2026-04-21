@@ -1493,7 +1493,7 @@ html.a #up_quick .btn.on {
 }
 #pvolbg {
 	height: 1.3em;
-	min-width: 1em;
+	min-width: 1.5em;
 	padding: .3em;
 	cursor: pointer;
 	align-items: center;

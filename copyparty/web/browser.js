@@ -6919,7 +6919,7 @@ var search_ui = (function () {
 	folderSearch.onfocus = function(){
 		ebi('srch_pathc').checked = true;
 		var path = decodeURI(get_evpath());
-		ebi('srch_pathv').value = path.slice(1);
+		ebi('srch_pathv').value = path.slice(1) || '/';
 	}
 	if(IE)
 		folderSearch.onclick = function() {
@@ -7013,6 +7013,8 @@ var search_ui = (function () {
 				if(k == 'path' && vs.endsWith('/') && !vs.match('"')){
 					vs = vs.slice(0, -1);
 					vs = '"' + vs + (recursive ? '*' : '') + '"';
+					tvs.push(vs);
+					vs = '';
 				}
 
 				var match = vs.match(/\B("(?:[^"]|\\")*[^\\]")\B/g);
@@ -7081,14 +7083,14 @@ var search_ui = (function () {
 						if (tv.slice(0, 1) == '^') {
 							tv = tv.slice(1);
 						}
-						else if (!(tv.match(' ') || tv.startsWith('"'))){
+						else if (!tv.match(' ') && !tv.startsWith('"')){
 							tv = '*' + tv;
 						}
 
 						if (tv.slice(-1) == '$') {
 							tv = tv.slice(0, -1);
 						}
-						else if(!(tv.match(' ') || tv.endsWith('"'))){
+						else if(!tv.match(' ') && !tv.endsWith('"')){
 							tv += '*';
 						}
 
