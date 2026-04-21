@@ -1,5 +1,6 @@
 :root {
 	color-scheme: dark;
+  	--transparent: transparent;
 
 	--grid-sz: 10em;
 	--grid-ln: 3;
@@ -537,6 +538,9 @@ html {
 html, body {
 	margin: 0;
 	padding: 0;
+}
+.noscroll {
+	overflow: hidden;
 }
 pre, code, tt, #doc, #doc>code {
 	font-family: 'scp', monospace, monospace;
@@ -1140,7 +1144,6 @@ html.dz #flogout {
 }
 #widget.open #widgeti{
 	/* box-shadow: 0 0 1em rgba(0,48,64,0.2); */
-	height: 100%;
 	display: block;
 }
 
@@ -1154,29 +1157,49 @@ html.dz #flogout {
 #widget.thin #pbarthinpos{
 	display: block;
 }
+#widget.thin #trackname {
+	margin-right: auto;
+}
 
 #widgeti {
 	position: relative;
-	width: 100%;
 	display: none;
 }
 #np_inf {
 	height: 0;
 }
 #fshr,
-#wtgrid, #wtgrid2,
+#wtgrid,
 #wtico {
 	position: relative;
 	font-size: .9em;
 	top: -.04em;
 	margin-right: .3em;
 }
-#wtgrid, #wtgrid2 {
-	font-size: .75em;
-	padding: 0;
-	top: -.7em;
-	display: inline-flex;
+#wtc {
+	margin-top: -.5em;
+	font-size: 1.2em;
 }
+#wtgrid {
+	display: inline-block;
+	position: relative;
+  	top: 0;
+	padding: 0;
+	margin: .2em;
+}
+.btn.svgIcon {
+	width: 1.5em;
+  	height: 1.5em;
+	padding: .1em;
+	display: inline-block;
+	vertical-align: bottom;
+}
+.btn.svgIcon.gb1 {
+	width: 1.7em;
+  	height: 1.7em;
+	padding: 0;
+}
+
 #wtico {
 	cursor: pointer;
 }
@@ -1204,11 +1227,12 @@ html.dz #flogout {
 }
 #wtoggle,
 #widgeti {
-	background: #fff;
+	background: #ccc;
 	background: var(--bg-u2);
 }
 #up_quick {
 	position: absolute;
+	bottom: 100%;
 	bottom: calc(100% + .4em);
 	right: .4em;
 	font-size: xx-large;
@@ -1217,6 +1241,7 @@ html.dz #flogout {
 	transition: all .15s;
 	border-radius: .35em;
 	text-align: right;
+	background: #ccc;
 	background: var(--bg-u2);
 	border: var(--btn-bg) solid 1px;
 }
@@ -1227,6 +1252,7 @@ html.dz #flogout {
 	margin-bottom: .2em;
 }
 #up_quick_more.vis {
+	display: block;
 	display: grid;
 }
 #up_quick_more a:hover {
@@ -1427,19 +1453,20 @@ html.a #up_quick .btn.on {
 	box-shadow: -.03em -.03em .7em rgba(0,0,0,0.5) inset;
 }
 #pctl {
+	display: flex;
 	display: grid;
   	grid-template-columns: max-content max-content max-content 20% auto max-content max-content max-content;
-	align-content: center;
 	align-items: center;
-	height: 100%;
 	margin-right: .5em;
 	padding: .3em 0;
 }
 #pctl .icon {
-	font-size: 1em;
 	width: 1.5em;
 	height: 1.5em;
-	text-align: center;
+}
+#pctl svg {
+	width: 1.5em;
+	height: 1.5em;
 }
 #pctl .btn {
 	font-size: 1em;
@@ -1461,10 +1488,10 @@ html.a #up_quick .btn.on {
 	transition: opacity .15s;
 }
 #pvolbg {
-	height: 100%;
+	height: 1.3em;
+	min-width: 1em;
 	padding: .3em;
 	cursor: pointer;
-	align-content: center;
 	align-items: center;
 	display: flex;
 }
@@ -1497,6 +1524,11 @@ html.a #up_quick .btn.on {
 	display: block;
 }
 #ops a {
+	/* fallback if emojis don't render */
+	border: #777 solid 1px;
+	border-radius: .3em;
+
+	border: var(--transparent) solid 1px;
 	color: var(--a);
 	font-size: 1.5em;
 	padding: .25em .4em;
@@ -1527,26 +1559,20 @@ html.y #ops svg circle {
 }
 #headerArea{
 	display: flex;
-	margin: .5em .5em 0 .5em;
-}
-.hamburger_line{
-	height: .2em;
-	width: 1.4em;
-	margin: .3em;
-	background: var(--a);
-	border-radius: .1em;
+	margin: 1em;
+	margin-bottom: 0;
 }
 #srv_name{
+	margin-left: .3em;
 	font-size: x-large;
-	margin-top: .3em;
-	align-self: baseline;
+	vertical-align: bottom;
 }
 #treeToggleBtn{
-	padding: .2em;
-	margin-top: .3em;
-	cursor: pointer;
-	display: block;
-	align-self: center;
+	margin: 0;
+	padding: 0;
+	width: 2em;
+	height: 2em;
+	vertical-align: bottom;
 }
 #ops {
 	padding: .3em .6em;
@@ -1562,8 +1588,13 @@ html.y #ops svg circle {
 #acc_pfp {
 	aspect-ratio: 1 / 1;
 	width: 1.25em;
+
+	background: #ccc;
+	color: #000;
+
 	background: var(--a);
 	color: var(--bg);
+
 	border: var(--btn-bg) solid 1px;
 	border-radius: .3em;  
 	justify-content: center;
@@ -1586,7 +1617,8 @@ html.y #ops svg circle {
 	margin: .2em;
 }
 #op_bup {
-	margin-bottom: 1em;
+	margin: 0;
+	border-radius: 0 0 .3em .3em;
 }
 #op_cfg {
 	display: none;
@@ -1625,7 +1657,7 @@ input[type="checkbox"]+label {
 }
 input[type="radio"]:checked+label,
 input[type="checkbox"]:checked+label {
-	color: #0e0;
+	color: rgb(9, 185, 9);
 	color: var(--btn-1-bg);
 }
 input[type="checkbox"]:checked+label {
@@ -1783,6 +1815,7 @@ input.ssconf_v {
 	border: 1px solid var(--bg-u3);
 	transition: width 0.15s;
 	z-index: 4;
+	padding-bottom: 3em;
 }
 #tree,
 html {
@@ -2065,7 +2098,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	background: #fff;
 	background: var(--bg-u2);
 	border-radius: .3em;
-	padding: .2em .5em 0 .5em;
+	padding: .2em .2em .1em .2em;
 	line-height: 2.3em;
 	margin-bottom: 1.5em;
 }
@@ -2601,9 +2634,11 @@ html.y #bbox-overlay figcaption a {
 	margin: 5vh 5vw;
 	border-radius: .5em;
 	border: var(--a) solid 1px;
+	background: #fff;
 	background: var(--bg);
 	max-width: 66.6em;
 	position: relative;
+	overflow: auto;
 }
 html.c .modalcontent {
 	background: var(--bg-u2);
@@ -2623,6 +2658,7 @@ html.c .modalcontent {
 }
 .close{
 	position: absolute;
+	top: 0;
 	right: 0;
 	margin: .5em;
 	color: var(--fg);
@@ -2631,7 +2667,10 @@ html.c .modalcontent {
 }
 .closepane {
 	position: absolute;
-	inset: 0;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
 }
 
 /* settings */
@@ -2641,6 +2680,9 @@ html.c .modalcontent {
 	min-height: 0;
 }
 .splitsub {
+	/* fallback */
+	display: block;
+
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
@@ -2693,6 +2735,10 @@ html.c .modalcontent {
 }
 .modal.vis,
 .dropzone {
+	/* fallback */
+	display: block;
+	overflow-y: auto;
+
 	display: flex;
   	justify-content: center;
 	position: fixed;
@@ -3194,8 +3240,12 @@ details {
 	border-radius: .3em;
 	margin: .3em 0;
 }
+details:not(.open) .setting {
+	display: none;
+}
 summary {
 	cursor: pointer;
+	background: #ccc;
 	background: var(--bg-u1);
 	color: var(--a);
 	padding: .3em;
@@ -3240,6 +3290,7 @@ html.c #treeh,
 html.a #tree,
 html.a #treeh {
 	border-radius: 0 .3em 0 0;
+	background: #fff;
 	background: var(--bg-u2);
 }
 html.c #treepar,
@@ -3271,6 +3322,7 @@ html.a .opbox,
 html.a #path,
 html.a #srch_form,
 html.a .ghead {
+	background: #ccc;
 	background: var(--bg-u2);
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 0 .3em var(--bg-d3);
@@ -3532,7 +3584,6 @@ html.d #treepar {
 		padding-bottom: 5em;
 	}
 	.splitsub {
-		overflow-y: hidden;
 		padding-bottom: .5em;
 	}
 	.divider {
@@ -3552,7 +3603,7 @@ html.d #treepar {
 		border: .7em solid var(--bg-u3);
 		transform: rotate(-90deg);
 		position: fixed;
-		bottom: 4.3em;
+		bottom: 4em;
 		right: -.7em;
 		opacity: 0;
 		pointer-events: none;
@@ -3574,6 +3625,7 @@ html.d #treepar {
 	}
 	#s_nav .btn {
 		padding: .5em;
+		padding-right: 2em;
 	}
 }
 @media (min-width: 70em) {
@@ -3736,7 +3788,6 @@ html.ey {
   --white: #fff;
   --grey: grey;
   --silver: silver;
-  --transparent: transparent;
   --shadow-color-1: #0a0a0a;
   --shadow-color-2: #808080;
   --border-dashed-black: 1px dashed var(--black);
@@ -4386,12 +4437,14 @@ html.e #docul {
   border-left: 0 !important;
   margin-left: 0 !important;
 }
+html.e #tree_footer {
+	margin-left: 0.5em;
+}
 html.e #wrap {
   transform: translateX(calc((var(--negative-space) * 2) - .2em));
   padding-right: var(--negative-space);
   position: relative;
   margin-right: calc((var(--negative-space) * 2) - .1em);
-  margin-top: var(--negative-space);
   margin-left: 1.2em;
   /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
 }
@@ -4426,7 +4479,7 @@ html.e #wtico,
 html.e #zip1 {
   box-shadow: 0 0 !important;
 }
-html.e #wtgrid2 {
+html.e #wtc {
   top: 0.2em;
 }
 html.e #wfs,
@@ -4607,6 +4660,7 @@ html.e #detree {
 .popup {
 	visibility: hidden;
 	width: fit-content;
+	background: #000;
 	background: var(--bg-u2);
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 .5em 1em var(--txt-sh);
@@ -4619,7 +4673,10 @@ html.e #detree {
 	bottom: 2.5em;
 }
 .under {
-	inset: calc(100% + .2em) 0 auto 0;
+	top: calc(100% + .2em);
+	left: 0;
+	bottom: auto;
+	right: 0;
   	text-align: left;
 	width: auto;
 }
@@ -4630,7 +4687,7 @@ html.e #detree {
 	font-size: small;
 }
 
-#srchfolder_div:focus-within .popup{
+#srchfolder_div:focus-within .popup {
 	visibility: visible;
 	-webkit-animation: fadeIn 1s;
 	animation: fadeIn 1s;
@@ -4641,50 +4698,4 @@ html.e #detree {
 	margin: -.5em 0 0 .8em;
 	color: var(--fg);
 	text-shadow: -1px 1px 1px var(--bg-max);
-}
-
-.gridViewIcon, 
-.listViewIcon{
-	width: 1.7em;
-	height: 1.7em;
-	padding: .2em;
-	top: 0;
-}
-.gridViewIcon{
-	display: grid;
-  	grid-template-columns: auto auto;
-	grid-template-rows: auto auto;
-}
-.listViewIcon{
-	display: grid;
-	grid-template-rows: auto auto ;
-}
-.gridSquare{
-	margin: .1em;
-	background: var(--a);
-	border-radius: .1em;
-}
-.listRow{
-	margin: .3em .1em;
-	margin-left: .8em;
-	background: var(--a);
-	border-radius: .1em;
-	max-height: .15em;
-}
-.on div{
-	background: var(--btn-1h-fg);
-}
-
-.listRow::before{
-	position: absolute;
-	content: '';
-	margin-left: -.7em;
-	margin-top: -.2em;
-	width: .3em;
-	height: .3em;
-	border: var(--a) solid .15em;
-	border-radius: .1em;
-}
-.on ::before{
-	border-color: var(--btn-1h-fg);
 }

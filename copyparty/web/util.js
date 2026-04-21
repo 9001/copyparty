@@ -1552,7 +1552,7 @@ var tt = (function () {
     };
 
     r.parse = function(msg){
-        if(!(msg?.length > 0))
+        if(msg == null || msg.length == 0)
             return msg;
         if (msg.startsWith('`')) {
             var x = false;

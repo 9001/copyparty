@@ -18,7 +18,7 @@
 <body>
 	<div id="topBar">
 		<div id="headerArea">
-			<div href="#" id="treeToggleBtn" class="tgl btn"><div class="hamburger_line"></div><div class="hamburger_line"></div><div class="hamburger_line"></div></div>
+			<a href="#" id="treeToggleBtn" class="tgl btn"></a>
 			<a href="/" id="srv_name"><span id="favico_onpage"></span>{{ srv_name }}</a>
 		</div>
 		<div id="ops"></div>
@@ -38,7 +38,7 @@
 	<div id="op_bup" class="opview opbox {% if not ls0 %}act{% endif %}">
 		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="bput" />
-			<input type="file" name="f" multiple /><br />
+			<input id="bup_btn" type="file" name="f" multiple /><br />
 			<input type="submit" value="start upload">
 		</form>
 		<a id="bbsw" href="?b=u" rel="nofollow"><br />switch to basic browser</a>
@@ -102,6 +102,7 @@
 
 	<div id="pro" class="logue">{{ "" if sb_lg else logues[0] }}</div>
 
+	<div id="wtc"></div>
 	<table id="files">
 		<thead>
 			<tr>
@@ -160,9 +161,6 @@
 	</span>
 </div>
 	
-
-	<a id="gridicon_template" class="gridViewIcon tgl btn on"><div class="gridSquare"></div><div class="gridSquare"></div><div class="gridSquare"></div><div class="gridSquare"></div></div></a>
-	<a id="listicon_template" class="listViewIcon tgl btn"><div class="listRow"></div><div class="listRow"></div></div></a>
 
 	<div id="srv_info" style="display: none;"><span>{{ srv_info }}</span></div>
 

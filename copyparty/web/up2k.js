@@ -50,8 +50,21 @@ catch (ex) {
         up2k = up2k_init(false);
     }
     catch (ex) {
+        ebi('u2conf').style.display = 
+        ebi('u2btn_ct').style.display = 
+        ebi('u2c3t').style.display = 
+        ebi('up_info').style.display = 
+        ebi('opa_up').style.display = 
+            'none'
+
+        ebi('uq_up').onclick = function(){
+            modaltoggle('bup', true);
+            ebi('bup_btn').click();
+        }
+
         console.log('up2k init failed:', ex);
-        toast.err(10, 'could not initialize up2k\n\n' + basenames(ex));
+        toast.err(3, 'could not initialize up2k\n\n' + basenames(ex));
+
     }
 }
 treectl.onscroll();
@@ -1055,7 +1068,7 @@ function up2k_init(subtle) {
         return onovercmn(this, e, true);
     }
     function checkDropMode(){
-        if(ebi('fsearch')?.checked){
+        if(ebi('fsearch').checked){
             ebi('srch_zd').style.display = '';
             ebi('up_zd').style.display = 'none';
             ebi('srch_dz').style.display = '';

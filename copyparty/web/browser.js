@@ -754,6 +754,7 @@ modal.load();
 // toolbar
 ebi('ops').innerHTML = (
 	//'<a href="#" id="opa_x" data-dest="" tt="' + L.ot_close + '">--</a>' +
+	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
@@ -763,7 +764,6 @@ ebi('ops').innerHTML = (
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
 	'<a href="#" id="opa_acc" data-dest="acc" tt=""><div id="acc_pfp">👤</div></a>' +
-	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<div id="opdesc"></div>'
 );
 
@@ -809,7 +809,12 @@ function mktemp(is_dir) {
 		sendit(input.value);
 		// Chrome blurs elements when calling remove for some reason
 		input.onblur = null;
-		row.remove();
+		try{
+			row.remove();
+		}
+		catch(e){
+			console.log(e);
+		}
 	};
 	input.onkeydown = function(e) {
 		if (e.key == "Enter")
@@ -924,7 +929,7 @@ ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
 	'<div id="u2conf" tt="">' +
-	'<details><summary>' + L.options + '</summary>' +
+	'<details><summary id="sum_u2conf">' + (IE ? '>> ' : '') + L.options + (IE ? ' <<' : '') + '</summary>' +
 
 	'	<div class="setting">' +
 	'		<table id="u2conft">\n' +
@@ -1012,7 +1017,7 @@ ebi('op_up2k').innerHTML = (
 	'	</div>' +
 	'</div>' +
 
-	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write" tt="' + L.ot_bup + '"><summary>' + L.bup +'</summary></details>'
+	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write" tt="' + L.ot_bup + '"><summary id="sum_bup">' + (IE ? '>> ' : '') + L.bup + (IE ? ' <<' : '') + '</summary></details>'
 );
 
 
@@ -1048,6 +1053,9 @@ ebi('up_outside').onclick = ebi('c_up_btn').onclick = function(){
 	modaltoggle('up2k');
 }
 
+ebi('sum_u2conf').onclick = function(){
+	clmod(this.parentElement, 'open', 't');
+}
 
 ebi('wrap').insertBefore(mknod('div', 'lazy'), ebi('epi'));
 
@@ -1056,14 +1064,14 @@ x.parentNode.insertBefore(mknod('div', null,
 	'<input type="checkbox" id="uput" name="uput"><label for="uput">' + L.u_uput + '</label>'), x);
 
 var bup = ebi('op_bup');
-ebi('bup_tgl').after(bup);
-ebi('bup_tgl').onclick = function() {
+ebi('bup_tgl').appendChild(bup);
+ebi('sum_bup').onclick = function() {
 	var open = !clgot(bup, 'act');
 	if(open)
 		modaltoggle('bup', true);
 	else
 		modaltoggle('up2k', true);
-	this.open = !open;
+	ebi('bup_tgl').open = !open;
 };
 
 ebi('up_moreopts').onclick = function(){
@@ -1252,21 +1260,21 @@ ebi('op_cfg').innerHTML = (
 		h.id = ''
 		var subSettings = sections[i].children[1];
 
-		var section = `<div id="${sId}" class="s_section"><h3>${sName}</h3>`;
+		var section = '<div id="' + sId + '" class="s_section"><h3>' + sName + '</h3>';
 		for (var ii = 0; ii < subSettings.children.length; ii++){
 			var s = subSettings.children[ii];
 			var info = tt.parse(s.getAttribute('tt'));
 			s.removeAttribute('tt');
 			//s.href = '#' + sId;
-			section += `<div id="${subSettings.id}" class="setting">` +
+			section += '<div id="' + subSettings.id + '" class="setting">' +
 				s.outerHTML +
-				(info?.length > 0 ? `<p class="s_desc">${info}</p>` : '') + 
+				((info != null && info.length > 0) ? '<p class="s_desc">' + info + '</p>' : '') + 
 				'</div>';
 		}
 		section += '</div>'
 		ebi('s_list').innerHTML += section;
 		subSettings.innerHTML = '';
-		ebi('s_nav').innerHTML += `<a href="#${sId}" class="btn">${sName}</a>\n`;
+		ebi('s_nav').innerHTML += '<a href="#' + sId + '" class="btn">' + sName + '</a>\n';
 	}
 
 	ebi('s_outside').onclick = ebi('cs_btn').onclick = function(){
@@ -1276,7 +1284,7 @@ ebi('op_cfg').innerHTML = (
 
 // accent color
 function parseColor (strColor) {
-  const s = new Option().style;
+  var s = new Option().style;
   s.color = strColor;
   return s.color !== '' ? s.color : '';
 }
@@ -1314,7 +1322,7 @@ ebi('tree').innerHTML = (
 	'<ul class="ntree" id="treeul"></ul>\n' +
 	'<div id="thx_ff">&nbsp;</div>'
 );
-ebi('thx_ff').before(ebi('tree_footer'));
+ebi('tree').appendChild(ebi('tree_footer'));
 clmod(ebi('tree'), 'sbar', 1);
 ebi('goh').textContent = L.goh;
 QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
@@ -1370,13 +1378,15 @@ ebi('rcm').innerHTML = (
 		mktemp(true);
 	}
 
-	ebi('acc_pfp').before(ebi('op_acc'));
+	ebi('opa_acc').appendChild(ebi('op_acc'));
 	ebi('op_acc').onclick = function (e){
 		e.stopPropagation();
 	};
 })();
 
-function modaltoggle(dest, show = 't'){
+function modaltoggle(dest, show){
+	if(show == null)
+		show = 't';
 	if (show == false || show == 't' && QS('#' + dest + '.vis'))
 		dest = '';
 
@@ -1425,8 +1435,7 @@ function goto(dest) {
 		clmod(obj[a], 'vis');
 
 	if (dest) {
-		var rewritten = ['mkdir', 'new_md'];
-		if(rewritten.includes(dest))
+		if(dest == 'mkdir' || dest == 'new_md')
 			return;
 
 		var lnk = QS('#ops>a[data-dest=' + dest + ']'),
@@ -1443,11 +1452,14 @@ function goto(dest) {
 			return;
 
 		var modal = ebi(dest);
-		if(modal != null)
+		if(modal != null){
 			clmod(modal, 'vis', true);
+		}
 
-		var page = ebi('op_' + dest) ?? QS('#' + dest + ' .opview')
-		clmod(page, 'act', 1);
+		var opd = ebi('op_' + dest);
+		var page = opd != null ? opd : QS('#' + dest + ' .opview')
+		if(page != null)
+			clmod(page, 'act', 1);
 		clmod(lnk, 'act', 1);
 
 		if(dest == 'bup'){
@@ -1462,6 +1474,7 @@ function goto(dest) {
 	}
 
 	clmod(document.documentElement, 'op_open', dest);
+	clmod(document.documentElement, 'noscroll', QS('.modal.vis'));
 
 	if (treectl)
 		treectl.onscroll();
@@ -2347,25 +2360,18 @@ function canvas_cfg(can) {
 	return r;
 }
 
-
-function glossy_grad(can, h, s, l) {
-	var g = can.ctx.createLinearGradient(0, 0, 0, can.h),
-		p = [0, 0.49, 0.50, 1];
-
-	for (var a = 0; a < p.length; a++)
-		g.addColorStop(p[a], 'hsl(' + h + ',' + (Array.isArray(s) ? s[a] : s) + '%,' + (Array.isArray(l) ? l[a] : l) + '%)');
-
-	return g;
-}
-
-function auto_grad(can, color, color2 = '#000') {
+function auto_grad(can, color, color2) {
+	if(color2 == null)
+		color2 = '#000';
 	var g = can.ctx.createLinearGradient(0, 0, 0, can.h),
 		p = [0, 0.49, 0.50, 1],
 		mix = [70, 100, 90, 70];
 
 	for (var a = 0; a < p.length; a++){
-		var c = `color-mix(in xyz, ${color} ${mix[a]}%, ${color2} ${100 - mix[a]}%)`;
-		g.addColorStop(p[a], c);
+		var c = 'color-mix(in xyz, ' + color + ' ' + mix[a] + '%, ' + color2 + ' ' + (100 - mix[a]) + '%)';
+		var pc = parseColor(c);
+		if(pc)
+			g.addColorStop(p[a], parseColor(c));
 	}
 
 	return g;
@@ -2630,7 +2636,7 @@ var vbar = (function () {
 		if (gradh != gh) {
 			gradh = gh;
 			style1 = auto_grad(r.can, accent, accent);
-			style2 = light ? `color-mix(${bg} 85%, #000 15%` : `color-mix(${bg} 85%, #fff 15%`;
+			style2 = light ? 'color-mix(' + bg + ' 85%, #000 15%' : 'color-mix(' + bg + ' 85%, #fff 15%';
 		}
 		ctx.fillStyle = style2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = style1; ctx.fillRect(0, 0, w * mp.vol, h);
@@ -5846,16 +5852,17 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
-		'<a href="#" id="wtgrid" tt="' + L.wt_grid + '"></a>' +
+		'<a href="#" id="gridicon_template" class="grdbtn gb1 svgIcon tgl btn on"></a>' +
+		'<a href="#" id="listicon_template" class="grdbtn gb2 svgIcon tgl btn"></a>' +
 		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
 		'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
 		'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
 		'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
-		'<span>' + L.gt_zoom + ': ' +
+		'<span id="gridzoom">' + L.gt_zoom + ': ' +
 		'<a href="#" class="btn" z="-1.1" tt="Hotkey: shift-A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.1" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
+		'<a href="#" class="btn" z="1.1" tt="Hotkey: shift-D">+</a></span> <span id="gridchop">' + L.gt_chop + ': ' +
 		'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
-		'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a></span> <span>' + L.gt_sort + ': ' +
+		'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a></span> <span id="gridsort">' + L.gt_sort + ': ' +
 		'<a href="#" s="href">' + L.gt_name + '</a> ' +
 		'<a href="#" s="sz">' + L.gt_sz + '</a> ' +
 		'<a href="#" s="ts">' + L.gt_ts + '</a> ' +
@@ -5866,16 +5873,15 @@ var thegrid = (function () {
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
 	var ggrid = ebi('ggrid');
 
-	ebi('wtgrid').appendChild(ebi('gridicon_template'));
-	ebi('wtgrid').appendChild(ebi('listicon_template'));
+	var svg_grid = svg_box + '<rect x="4" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="4" y="13" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="13" width="7" height="7" rx="1" fill="currentColor"/></svg>'
+	var svg_list = svg_box + '<path fill-rule="evenodd" clip-rule="evenodd" d="M9 6C9 4.34315 7.65685 3 6 3H4C2.34315 3 1 4.34315 1 6V8C1 9.65685 2.34315 11 4 11H6C7.65685 11 9 9.65685 9 8V6ZM7 6C7 5.44772 6.55228 5 6 5H4C3.44772 5 3 5.44772 3 6V8C3 8.55228 3.44772 9 4 9H6C6.55228 9 7 8.55228 7 8V6Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9 16C9 14.3431 7.65685 13 6 13H4C2.34315 13 1 14.3431 1 16V18C1 19.6569 2.34315 21 4 21H6C7.65685 21 9 19.6569 9 18V16ZM7 16C7 15.4477 6.55228 15 6 15H4C3.44772 15 3 15.4477 3 16V18C3 18.5523 3.44772 19 4 19H6C6.55228 19 7 18.5523 7 18V16Z" fill="currentColor"/><path d="M11 7C11 6.44772 11.4477 6 12 6H22C22.5523 6 23 6.44772 23 7C23 7.55228 22.5523 8 22 8H12C11.4477 8 11 7.55228 11 7Z" fill="currentColor"/><path d="M11 17C11 16.4477 11.4477 16 12 16H22C22.5523 16 23 16.4477 23 17C23 17.5523 22.5523 18 22 18H12C11.4477 18 11 17.5523 11 17Z" fill="currentColor"/></svg>'
+	ebi('gridicon_template').innerHTML = svg_grid;
+	ebi('listicon_template').innerHTML = svg_list;
 
-	var clone = ebi('wtgrid').cloneNode(true);
-	clone.id = 'wtgrid2';
-	clone.childNodes.forEach((el)=>{
-		clmod(el, 'on', 't');
-	});
-
-	ebi('files').before(clone);
+	var g_tgl = mknod('a', 'wtgrid', ebi('gridicon_template').outerHTML + ebi('listicon_template').outerHTML);
+	for(var i = 0; i < g_tgl.childNodes.length; i++)
+		clmod(g_tgl.childNodes[i], 'on', 't');
+	ebi('wtc').appendChild(g_tgl);
 
 	var r = {
 		'sz': clamp(fcfg_get('gridsz', 10), 4, 80),
@@ -5888,7 +5894,13 @@ var thegrid = (function () {
 		ev(e);
 		var s = this.getAttribute('s'),
 			z = this.getAttribute('z'),
-			l = this.getAttribute('l');
+			l = this.getAttribute('l'),
+			grdbtn = clgot(this, 'grdbtn');
+
+		if(grdbtn) {
+			ebi('griden').click();
+			return;
+		}
 
 		if (z)
 			return setsz(z > 0 ? r.sz * z : r.sz / (-z));
@@ -5906,7 +5918,7 @@ var thegrid = (function () {
 		r.setdirty();
 	};
 
-	var links = QSA('#ghead a');
+	var links = QSA('#ghead a.btn');
 	for (var a = 0; a < links.length; a++)
 		links[a].onclick = btnclick;
 
@@ -5926,7 +5938,7 @@ var thegrid = (function () {
 		var vis = has(perms, "read");
 		gfiles.style.display = vis && r.en ? '' : 'none';
 		lfiles.style.display = vis && !r.en ? '' : 'none';
-		ebi('wtgrid2').style.display = lfiles.style.display;
+		ebi('wtc').style.display = lfiles.style.display;
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
 		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
@@ -6063,8 +6075,11 @@ var thegrid = (function () {
 		var ths = QSA('#ggrid>a');
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
-			var tr = ebi(ths[a].getAttribute('ref'))?.closest('tr'),
-				cl = tr?.className || '';
+			var _ref = ebi(ths[a].getAttribute('ref'));
+			if(_ref == null)
+				continue;
+			var tr = _ref.closest('tr'),
+				cl = tr.className || '';
 
 			if (noq_href(ths[a]).endsWith('/'))
 				cl += ' dir';
@@ -6339,9 +6354,11 @@ var thegrid = (function () {
 		pbar.onresize();
 		vbar.onresize();
 	});
-	ebi('wtgrid').onclick = ebi('griden').onclick;
-	ebi('wtgrid2').onclick = ebi('griden').onclick;
-	ebi('listicon_template').onclick = ebi('griden').onclick;
+	
+	ebi('wtgrid').onclick =
+	ebi('gridicon_template').onclick =
+	ebi('listicon_template').onclick =
+		ebi('griden').onclick;
 
 	return r;
 })();
@@ -6824,6 +6841,10 @@ var search_ui = (function () {
 		var path = decodeURI(get_evpath());
 		ebi('srch_pathv').value = path.slice(1);
 	}
+	if(IE)
+		folderSearch.onclick = function() {
+			clmod(ebi('srch_quickopts'), 'act', 't');
+		}
 	folderSearch.oninput = function(){
 		var v = unsmart(this.value)
 		var nsearch = ebi('srch_namev');
@@ -6895,6 +6916,10 @@ var search_ui = (function () {
 		srch_msg(false, (q == vq) ? '' : L.sm_prev + (vq ? vq : '(*)'));
 	}
 
+	function onlyUnique(value, index, array) {
+		return array.indexOf(value) == index && value.length > 0;
+	}
+
 	function encode_query() {
 		var recursive = ebi('srch_recursivec').checked;
 		var q = '';
@@ -6905,19 +6930,19 @@ var search_ui = (function () {
 					vs = unsmart(ebi('srch_' + k + 'v').value),
 					tvs = [];
 
-				if(k == 'path' && vs?.endsWith('/') && !vs?.includes('"')){
+				if(k == 'path' && vs.endsWith('/') && !vs.match('"')){
 					vs = vs.slice(0, -1);
-					vs = `"${vs}${(recursive ? '*' : '')}"`;
+					vs = '"' + vs + (recursive ? '*' : '') + '"';
 				}
 
-				function onlyUnique(value, index, array) {
-					return array.indexOf(value) === index && value?.length > 0;
-				}
-				var immune = vs.match(/\B("(?:[^"]|\\")*[^\\]")\B/g)?.filter(onlyUnique)
-				for(var i = 0; i < immune?.length; i++){
-					if(immune[i].length > 0){
-						tvs.push(immune[i]);
-						vs = vs.replace(immune[i], '')
+				var match = vs.match(/\B("(?:[^"]|\\")*[^\\]")\B/g);
+				if(match != null){
+					var immune = match.filter(onlyUnique)
+					for(var i = 0; i < immune.length; i++){
+						if(immune[i].length > 0){
+							tvs.push(immune[i]);
+							vs = vs.replace(immune[i], '')
+						}
 					}
 				}
 
@@ -6976,18 +7001,18 @@ var search_ui = (function () {
 						if (tv.slice(0, 1) == '^') {
 							tv = tv.slice(1);
 						}
-						else if (!(tv.includes(' ') || tv.startsWith('"'))){
+						else if (!(tv.match(' ') || tv.startsWith('"'))){
 							tv = '*' + tv;
 						}
 
 						if (tv.slice(-1) == '$') {
 							tv = tv.slice(0, -1);
 						}
-						else if(!(tv.includes(' ') || tv.endsWith('"'))){
+						else if(!(tv.match(' ') || tv.endsWith('"'))){
 							tv += '*';
 						}
 
-						if (tv.includes(' ') && !tv.includes('"')) {
+						if (tv.match(' ') && !tv.match('"')) {
 							tv = '"' + tv + '"';
 						}
 
@@ -7268,17 +7293,26 @@ function onwidgetresize(){
 	var pbarthinpos = ebi('pbarthinpos');
 	var width = widget.offsetWidth;
 
-	var thin = width < 800; //px
-	var gtc = `max-content max-content max-content ${thin ? '' : '20%'} auto max-content max-content max-content`;
+	var thin = IE || width < 800; //px
+	
+	var gtc = 'max-content max-content max-content ' + (thin ? '' : '20%') + ' auto max-content max-content max-content';
+	if(!thin && bar.children.length < gtc.split(' ').length){
+		try{
+			ebi('trackname').after(ebi('progbar'));
+			ebi('trackname').after(ebi('altprogbar'));
+			bar.style.paddingTop = '.3em';
+		}
+		catch (e) {
+			// unnacounted old browser fallback
+			console.log(e);
+			thin = true;
+		}
+	}
+	gtc = 'max-content max-content max-content ' + (thin ? '' : '20%') + ' auto max-content max-content max-content';
 	if(thin && bar.children.length > gtc.split(' ').length){
 		pbarthinpos.appendChild(ebi('progbar'));
 		pbarthinpos.appendChild(ebi('altprogbar'));
 		bar.style.paddingTop = '0';
-	}
-	else if(!thin && bar.children.length < gtc.split(' ').length){
-		ebi('trackname').after(ebi('progbar'));
-		ebi('trackname').after(ebi('altprogbar'));
-		bar.style.paddingTop = '.3em';
 	}
 	ebi('altprogbar').maxWidth = thin ? '' : '40vw'
 	bar.style.gridTemplateColumns = gtc;
@@ -8314,6 +8348,8 @@ var treectl = (function () {
 		onresize();
 	}
 	
+	var svg_hamburger = svg_box + '<g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g id="Menu"><rect id="Rectangle" fill-rule="nonzero" x="0" y="0" width="24" height="24"></rect><line x1="5" y1="7" x2="19" y2="7" id="Path" ' + svg_options + '></line><line x1="5" y1="17" x2="19" y2="17" id="Path" ' + svg_options + '></line><line x1="5" y1="12" x2="19" y2="12" id="Path" ' + svg_options + '></line></g></g></svg>'
+	ebi('treeToggleBtn').innerHTML = svg_hamburger;
 	ebi('treeToggleBtn').setAttribute('tt', L.tt_entree);
 	
 	ebi('treeToggleBtn').onclick = r.toggleTree;
@@ -8628,7 +8664,7 @@ var filecols = (function () {
 	r.uivis = function () {
 		var hcols = ebi('hcols');
 		var hcolDiv = hcols.parentElement.parentElement;
-		QS(`a[href='#${hcolDiv.id}']`).style.display = hcolDiv.style.display = ((!thegrid || !thegrid.en) && (hidden.length || MOBILE)) ? 'block' : 'none';
+		QS("a[href='#" + hcolDiv.id + "']").style.display = hcolDiv.style.display = ((!thegrid || !thegrid.en) && (hidden.length || MOBILE)) ? 'block' : 'none';
 	};
 
 	r.set_style = function (unhide) {
@@ -9553,7 +9589,7 @@ function show_md(md, name, div, url, depth) {
 		if (depth) {
 			clmod(div, 'raw', 1);
 			div.textContent = "--[ " + name + " ]---------\r\n" + md;
-			return toast.warn(10, errmsg + (WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
+			return toast.warn(3, errmsg + (WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
 		}
 
 		wfp_debounce.n--;
@@ -10234,24 +10270,24 @@ var rcm = (function () {
 		var vw = document.documentElement.clientWidth;
 
 		var maxh = Math.min(y, vh / 2);
-		menu.style.maxHeight = `calc(100vh - ${maxh}px - 2em)`;
+		menu.style.maxHeight = 'calc(100vh - ' + maxh + 'px - 2em)';
 		
 		if(y > vh / 2){
 			// low click => menu upwards
 			menu.style.top = '';
-			menu.style.bottom = `${vh - y}px`;
+			menu.style.bottom = (vh - y) + 'px';
 		}
 		else{
-			menu.style.top = `${y}px`;
+			menu.style.top = y + 'px';
 			menu.style.bottom = '';
 		}
 		if(x > vw / 2){
 			// far right click => menu leftwards
 			menu.style.left = '';
-			menu.style.right = `${vw - x}px`;
+			menu.style.right = (vw - x) + 'px';
 		}
 		else{
-			menu.style.left = `${x}px`;
+			menu.style.left = x + 'px';
 			menu.style.right = '';
 		}
 		menu.style.display = 'block';
