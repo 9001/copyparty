@@ -1155,6 +1155,9 @@ html.dz #flogout {
 	padding-bottom: 0;
 	height: 2em;
 }
+#widget.thin #pctl{
+	display: flex;
+}
 #widget.thin #pbarthinpos{
 	display: block;
 }
@@ -4616,6 +4619,7 @@ html.e #detree {
 }
 #tree_footer {
 	width: 0;
+	display: none;
 	position: fixed;
 	bottom: 0;
 	left: 0;
