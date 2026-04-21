@@ -592,6 +592,7 @@ html .ayjump:focus-visible {
 }
 #folder_search {
 	max-width: 12em;
+	margin-top: .3em;
 	height: 1.8em;
 	margin-bottom: 0 !important;
 }
