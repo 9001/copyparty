@@ -154,7 +154,7 @@ _ = (argparse, threading)
 
 USED4SEC = {"usedforsecurity": False} if sys.version_info > (3, 9) else {}
 
-ALL_COOKIES = "k304 no304 js idxh dots cppwd cppws".split()
+ALL_COOKIES = "cplng cppwd cppws dots idxh js k304 no304".split()
 
 BADXFF = " due to dangerous misconfiguration (the http-header specified by --xff-hdr was received from an untrusted reverse-proxy)"
 BADXFF2 = ". Some copyparty features are now disabled as a safety measure.\n\n\n"
@@ -1800,7 +1800,11 @@ class HttpCli(object):
         topdir = {"vp": "", "st": st}
         fgen: Iterable[dict[str, Any]] = []
 
-        depth = self.headers.get("depth", "infinity").lower()
+        if stat.S_ISDIR(st.st_mode):
+            depth = self.headers.get("depth", "infinity").lower()
+        else:
+            depth = "0"
+
         if depth == "infinity":
             # allow depth:0 from unmapped root, but require read-axs otherwise
             if not self.can_read and (self.vpath or self.asrv.vfs.realpath):
@@ -1808,12 +1812,6 @@ class HttpCli(object):
                 t = t % ("/" + self.vpath,)
                 self.log(t, 3)
                 raise Pebkac(401, t)
-
-            if not stat.S_ISDIR(topdir["st"].st_mode):
-                t = "depth:infinity can only be used on folders; %r is 0o%o"
-                t = t % ("/" + self.vpath, topdir["st"])
-                self.log(t, 3)
-                raise Pebkac(400, t)
 
             if not self.args.dav_inf:
                 self.log("client wants --dav-inf", 3)
@@ -1835,7 +1833,7 @@ class HttpCli(object):
                 wrap=False,
             )
 
-        elif depth == "0" or not stat.S_ISDIR(st.st_mode):
+        elif depth == "0":
             if depth == "0" and not self.vpath and not vn.realpath:
                 # rootless server; give dummy listing
                 self.can_read = True
@@ -3721,12 +3719,12 @@ class HttpCli(object):
 
                 fdir = fdir_base
                 fname = sanitize_fn(p_file or "")
-                abspath = os.path.join(fdir, fname)
                 suffix = "-%.6f-%s" % (time.time(), dip)
                 if p_file and not nullwrite:
                     if rnd:
                         fname = rand_name(fdir, fname, rnd)
 
+                    abspath = os.path.join(fdir, fname)
                     open_args = {"fdir": fdir, "suffix": suffix, "vf": vfs.flags}
 
                     if "replace" in self.uparam or "replace" in self.headers:
@@ -3744,7 +3742,7 @@ class HttpCli(object):
                     tnam = fname = os.devnull
                     fdir = abspath = ""
 
-                if xbu:
+                if xbu and abspath:
                     at = time.time() - lifetime
                     hr = runhook(
                         self.log,
@@ -3792,7 +3790,7 @@ class HttpCli(object):
                             else:
                                 open_args["fdir"] = fdir
 
-                if p_file and not nullwrite:
+                if abspath:
                     bos.makedirs(fdir, vf=vfs.flags)
 
                     # reserve destination filename
@@ -3830,6 +3828,14 @@ class HttpCli(object):
                     finally:
                         f.close()
 
+                    self.conn.nbyte += sz
+                    if not abspath:
+                        files.append(
+                            (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, "")
+                        )
+                        tabspath = ""
+                        continue
+
                     if lim:
                         lim.nup(self.ip)
                         lim.bup(self.ip, sz)
@@ -3840,15 +3846,12 @@ class HttpCli(object):
                             lim.chk_bup(self.ip)
                             lim.chk_nup(self.ip)
                         except:
-                            if not nullwrite:
-                                wunlink(self.log, tabspath, vfs.flags)
-                                wunlink(self.log, abspath, vfs.flags)
+                            wunlink(self.log, tabspath, vfs.flags)
+                            wunlink(self.log, abspath, vfs.flags)
                             fname = os.devnull
                             raise
 
-                    if not nullwrite:
-                        atomic_move(self.log, tabspath, abspath, vfs.flags)
-
+                    atomic_move(self.log, tabspath, abspath, vfs.flags)
                     tabspath = ""
 
                     at = time.time() - lifetime
@@ -3903,9 +3906,7 @@ class HttpCli(object):
                                 abspath = ap2
                         sz = bos.path.getsize(abspath)
 
-                    files.append(
-                        (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, abspath)
-                    )
+                    files.append((sz, sha_hex, sha_b64, p_file, fname, abspath))
                     dbv, vrem = vfs.get_dbv(rem)
                     self.conn.hsrv.broker.say(
                         "up2k.hash_file",
@@ -3919,7 +3920,6 @@ class HttpCli(object):
                         self.uname,
                         True,
                     )
-                    self.conn.nbyte += sz
 
                 except Pebkac:
                     self.parser.drop()

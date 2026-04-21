@@ -89,13 +89,15 @@ class SMB(object):
         smbserver.isInFileJail = self._is_in_file_jail
         self._disarm()
 
-        ip = next((x for x in self.args.smb_i if ":" not in x), None)
+        zs = " " if self.args.smb6 else ":"
+        ip = next((x for x in self.args.smb_i if zs not in x), None)
         if not ip:
-            self.log("smb", "IPv6 not supported for SMB; listening on 0.0.0.0", 3)
+            self.log("smb", "IPv6 not enabled with --smb6; listening on 0.0.0.0", 3)
             ip = "0.0.0.0"
 
         port = int(self.args.smb_port)
-        srv = smbserver.SimpleSMBServer(listenAddress=ip, listenPort=port)
+        kw = {"ipv6": True} if ":" in ip else {}
+        srv = smbserver.SimpleSMBServer(listenAddress=ip, listenPort=port, **kw)
         try:
             if self.accs:
                 srv.setAuthCallback(self._auth_cb)
@@ -121,6 +123,7 @@ class SMB(object):
 
         self.srv = srv
         self.stop = srv.stop
+        ip = "[%s]" % (ip,) if kw else ip
         self.log("smb", "listening @ {}:{}".format(ip, port))
 
     def nlog(self, msg: str, c: Union[int, str] = 0) -> None:

@@ -221,6 +221,7 @@ Ls.swe = {
 	"cl_hpick": "tryck på en kolumntitel för att dölja den i filvyn",
 	"cl_hcancel": "kolumndöljning avbruten",
 	"cl_rcm": "högerklicksmeny", //m
+	"cl_gauto": "auto田", //m
 
 	"ct_grid": '田 rutnätet',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tips',
@@ -275,6 +276,8 @@ Ls.swe = {
 	"tt_dynt": "väx vyn när trädet expanderar",
 	"tt_wrap": "automatisk radbrytning",
 	"tt_hover": "visa överlånga rader när muspekaren hovrar över dem$N( skrollhjulet fungerar ej såvida inte pekaren$Nstår till vänster )",
+	"tt_gauto": "visa som rutnät eller lista beroende på mappens innehåll", //m
+	"tt_gathr": "använd rutnät om denna andel filer är bilder/videor", //m
 
 	"ml_pmode": "vid mappens slut...",
 	"ml_btns": "komm.",

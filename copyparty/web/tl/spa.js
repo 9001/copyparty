@@ -220,6 +220,7 @@ Ls.spa = {
 	"cl_hpick": "toca en las cabeceras de columna para ocultarlas en la tabla de abajo",
 	"cl_hcancel": "ocultación de columna cancelada",
 	"cl_rcm": "menú contextual", //m
+	"cl_gauto": "auto田", //m
 
 	"ct_grid": '田 cuadrícula',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
@@ -274,6 +275,8 @@ Ls.spa = {
 	"tt_dynt": "crecimiento automático a medida que el árbol se expande",
 	"tt_wrap": "ajuste de línea",
 	"tt_hover": "revelar líneas que se desbordan al pasar el ratón$N( rompe el desplazamiento a menos que el $N&nbsp; cursor esté en el margen izquierdo )",
+	"tt_gauto": "mostrar como cuadrícula o lista según el contenido de la carpeta", //m
+	"tt_gathr": "usar cuadrícula si este porcentaje de archivos son imágenes/videos", //m
 
 	"ml_pmode": "al final de la carpeta...",
 	"ml_btns": "acciones",

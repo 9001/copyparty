@@ -1219,6 +1219,13 @@ class ThumbSrv(object):
         self.log("conv2 %s [%s]" % (container, enc), 6)
         benc = enc.encode("ascii").split(b" ")
 
+        ac = b"2"
+        try:
+            if tags["chs"][1] in ("mono", "1", "1.0"):
+                ac = b"1"
+        except:
+            pass
+
         # fmt: off
         cmd = [
             b"ffmpeg",
@@ -1228,6 +1235,7 @@ class ThumbSrv(object):
             b"-i", fsenc(abspath),
         ] + tagset + [
             b"-map", b"0:a:0",
+            b"-ac", ac,
         ] + benc + [
             b"-f", container,
             fsenc(tpath)
@@ -1268,6 +1276,7 @@ class ThumbSrv(object):
             b"-i", fsenc(abspath),
             b"-map_metadata", b"-1",
             b"-map", b"0:a:0",
+            b"-ac", b"2",
         ] + benc + [
             b"-f", b"opus",
             fsenc(tmp_opus)

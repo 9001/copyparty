@@ -221,6 +221,7 @@ Ls.fin = {
 	"cl_hpick": "napauta sarakeotsikoita piilottaaksesi alla olevassa taulukossa",
 	"cl_hcancel": "sarakkeiden piilotus peruttu",
 	"cl_rcm": "hiiren pikavalikko",
+	"cl_gauto": "auto田", //m
 
 	"ct_grid": '田 kuvanäkymä',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ vihjelaatikot',
@@ -275,6 +276,8 @@ Ls.fin = {
 	"tt_dynt": "kasvata automaattisesti hakemistosyvyyden kasvaessa",
 	"tt_wrap": "rivitys",
 	"tt_hover": "paljasta ylivuotavat rivit leijutettaessa$N( rikkoo vierityksen ellei hiiri $N&nbsp; ole vasemmassa marginaalissa )",
+	"tt_gauto": "näytä ruudukkona tai listana kansion sisällön mukaan", //m
+	"tt_gathr": "käytä ruudukkoa jos tämä prosentti tiedostoista on kuvia/videoita", //m
 
 	"ml_pmode": "hakemiston lopussa...",
 	"ml_btns": "komennot",

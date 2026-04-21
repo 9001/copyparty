@@ -22,7 +22,7 @@ from .__init__ import TYPE_CHECKING, EnvParams
 from .authsrv import AuthSrv  # typechk
 from .httpcli import HttpCli
 from .u2idx import U2idx
-from .util import HMaccas, NetMap, shut_socket
+from .util import HMaccas, NetMap, min_ex, shut_socket
 
 if True:  # pylint: disable=using-constant-test
     from typing import Optional, Pattern, Union
@@ -194,12 +194,12 @@ class HttpConn(object):
             except Exception as ex:
                 em = str(ex)
 
-                if "ALERT_CERTIFICATE_UNKNOWN" in em:
-                    # android-chrome keeps doing this
-                    pass
+                if "ALERT_" in em:
+                    self.log("client refused our TLS cert or config: " + em, c=6)
 
                 else:
-                    self.log("handshake\033[0m " + em, c=5)
+                    t = "https-handshake failed, probably due to client:\n"
+                    self.log(t + min_ex(), c=5)
 
                 return
 

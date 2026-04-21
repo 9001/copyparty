@@ -221,6 +221,7 @@ Ls.ita = {
 	"cl_hpick": "tocca le intestazioni delle colonne per nascondere nella tabella sottostante",
 	"cl_hcancel": "nascondere colonne annullato",
 	"cl_rcm": "menu contestuale", //m
+	"cl_gauto": "auto田", //m
 
 	"ct_grid": '田 griglia',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltip',
@@ -275,6 +276,8 @@ Ls.ita = {
 	"tt_dynt": "crescita automatica mentre l'albero si espande",
 	"tt_wrap": "a capo parola",
 	"tt_hover": "rivela righe che traboccano al passaggio del mouse$N( interrompe lo scorrimento a meno che il cursore $N&nbsp; del mouse non sia nella grondaia sinistra )",
+	"tt_gauto": "mostra come griglia o lista in base al contenuto della cartella", //m
+	"tt_gathr": "usa la griglia se questa percentuale di file sono immagini/video", //m
 
 	"ml_pmode": "alla fine della cartella...",
 	"ml_btns": "comandi",

@@ -222,6 +222,7 @@ Ls.hun = {
 	"cl_hpick": 'kattints az oszlopfejlécre az elrejtéshez',
 	"cl_hcancel": 'elrejtés megszakítva',
 	"cl_rcm": 'jobb-klikkes menü',
+	"cl_gauto": "auto田", //m
 
 	"ct_grid": '田 rács nézet',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ segítő szövegek',
@@ -276,6 +277,8 @@ Ls.hun = {
 	"tt_dynt": 'automatikus méretezés nyitáskor',
 	"tt_wrap": 'sortörés',
 	"tt_hover": 'túl hosszú sorok mutatása rámutatáskor',
+	"tt_gauto": "megjelenítés rácsban vagy listában a mappa tartalmától függően", //m
+	"tt_gathr": "rács használata, ha a fájlok ezen százaléka kép/videó", //m
 
 	"ml_pmode": 'mappa végén...',
 	"ml_btns": 'gombok',

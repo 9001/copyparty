@@ -221,6 +221,7 @@ Ls.nld = {
 	"cl_hpick": "Tik op de kolomkoppen om ze in de onderstaande tabel te verbergen",
 	"cl_hcancel": "Kolumn verbergen geannuleerd",
 	"cl_rcm": "Rechtermuisknopmenu", //m
+	"cl_gauto": "auto田", //m
 
 	"ct_grid": '田 grid',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
@@ -275,6 +276,8 @@ Ls.nld = {
 	"tt_dynt": "Automatisch groeien naarmate de directoryboom zich uitbreidt",
 	"tt_wrap": "Automatische terugloop",
 	"tt_hover": "Laat overlopenden lijnen zien bij zweven$N(stopt het scrollen tenzij de muis in de linker gedeelte van het scherm is)",
+	"tt_gauto": "weergeven als grid of lijst afhankelijk van mapinhoud", //m
+	"tt_gathr": "gebruik grid als dit percentage bestanden afbeeldingen/video's zijn", //m
 
 	"ml_pmode": "Aan het einde van de map...",
 	"ml_btns": "Cmds",

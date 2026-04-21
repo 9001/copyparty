@@ -221,6 +221,7 @@ Ls.deu = {
 	"cl_hpick": "zum Verstecken, tippe auf Spaltenüberschriften in der Tabelle unten",
 	"cl_hcancel": "Spaltenbearbeitung abgebrochen",
 	"cl_rcm": "Rechtsklick-Menü",
+	"cl_gauto": "auto-raster", //m
 
 	"ct_grid": '田 Das Raster&trade;',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ Tooltips',
@@ -275,6 +276,8 @@ Ls.deu = {
 	"tt_dynt": "autom. wachsen wenn Baum wächst",
 	"tt_wrap": "Zeilenumbruch",
 	"tt_hover": "Beim Hovern überlange Zeilen anzeigen$N(Scrollen funktioniert nicht ausser $N&nbsp; Cursor ist im linken Gutter)",
+	"tt_gauto": "je nach ordnerinhalt als raster oder liste anzeigen", //m
+	"tt_gathr": "raster verwenden, wenn dieser prozentsatz der dateien bilder/videos sind", //m
 
 	"ml_pmode": "am Ende des Ordners...",
 	"ml_btns": "cmds",

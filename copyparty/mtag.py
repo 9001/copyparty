@@ -17,6 +17,7 @@ from .util import (
     FFMPEG_URL,
     REKOBO_LKEY,
     VF_CAREFUL,
+    expand_osenv_c,
     fsenc,
     gzip,
     min_ex,
@@ -86,7 +87,7 @@ class MParser(object):
 
         while True:
             try:
-                bp = os.path.expanduser(args)
+                bp = os.path.expanduser(expand_osenv_c(args))
                 if WINDOWS:
                     bp = uncyg(bp)
 
@@ -216,6 +217,7 @@ def au_unpk(
 def ffprobe(
     abspath: str, timeout: int = 60
 ) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]], list[Any], dict[str, Any]]:
+    # ffprobe -hide_banner -show_streams -show_format --
     cmd = [
         b"ffprobe",
         b"-hide_banner",

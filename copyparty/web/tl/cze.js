@@ -225,6 +225,7 @@ Ls.cze = {
 	"cl_hpick": "klepněte na záhlaví sloupců pro skrytí v tabulce níže",
 	"cl_hcancel": "skrývání sloupců zrušeno",
 	"cl_rcm": "kontextová nabídka", //m
+	"cl_gauto": "auto mřížka", //m
 
 	"ct_grid": '田 mřížka',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ nápovědy',
@@ -279,6 +280,8 @@ Ls.cze = {
 	"tt_dynt": "automaticky rozrůstat jak se strom rozšiřuje",
 	"tt_wrap": "zalomení řádků",
 	"tt_hover": "odhalit přetékající řádky při najetí$N( ruší posun pokud kurzor myši $N&nbsp; není v levém okraji )",
+	"tt_gauto": "zobrazit jako mřížku nebo seznam podle obsahu složky", //m
+	"tt_gathr": "použít mřížku, pokud toto procento souborů tvoří obrázky/videa", //m
 
 	"ml_pmode": "na konci složky...",
 	"ml_btns": "příkazy",

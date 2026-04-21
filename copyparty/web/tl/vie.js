@@ -221,6 +221,7 @@ Ls.vie = {
 	"cl_hpick": "chạm vào tiêu đề cột để ẩn trong bảng bên dưới",
 	"cl_hcancel": "đã hủy việc ẩn cột",
 	"cl_rcm": "menu chuột phải", //m
+	"cl_gauto": "lưới tự động", //m
 
 	// settings / tuỳ chọn
 	"ct_grid": '田 chế độ lưới',
@@ -279,6 +280,8 @@ Ls.vie = {
 	"tt_dynt": "tự mở rộng khi cây mở rộng",
 	"tt_wrap": "ngắt dòng",
 	"tt_hover": "hiện thị dòng tràn khi rê chuột$N( không cuộn được nếu $N&nbsp; con trỏ chuột nằm ngoài cột trái )",
+	"tt_gauto": "hiển thị dạng lưới hoặc danh sách tùy theo nội dung thư mục", //m
+	"tt_gathr": "dùng lưới nếu tỷ lệ tệp này là ảnh/video", //m
 
 	"ml_pmode": "ở cuối thư mục...",
 	"ml_btns": "lệnh",

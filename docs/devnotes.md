@@ -359,6 +359,48 @@ for the `re`pack to work, first run one of the sfx'es once to unpack it
 **note:** you can also just download and run [/scripts/copyparty-repack.sh](https://github.com/9001/copyparty/blob/hovudstraum/scripts/copyparty-repack.sh) -- this will grab the latest copyparty release from github and do a few repacks; works on linux/macos (and windows with msys2 or WSL)
 
 
+# dependencies
+
+## vendored dependencies
+
+some third-party code has been vendored into the git repo; some for convenience, some because they have been lightly hacked to fit copyparty's usecase better:
+
+* inside the folder [/copyparty/stolen](https://github.com/9001/copyparty/tree/hovudstraum/copyparty/stolen) is python-libraries which runs on the serverside:
+  * `surrogateescape.py` (BSD2) can be removed; only needed for python2 support
+  * `qrcodegen.py` (MIT) can be removed and replaced with a systemwide install of the original [qrcodegen.py](https://github.com/nayuki/QR-Code-generator/blob/daa3114/python/qrcodegen.py);
+    * modifications: removed code/features that copyparty does not need/use
+  * `ifaddr` (BSD2) can be removed and replaced with a systemwide install of the original [ifaddr](https://github.com/ifaddr/ifaddr);
+    * modifications: support python2, support s390x / irix32 / graal
+  * `dnslib` (MIT) may be deleted and replaced with a systemwide install of the original [dnslib](https://github.com/paulc/dnslib/), HOWEVER:
+    * will cause problems for mDNS in some network environments; 6c1cf68bca7376c6291c3cfe710ebd5bd5ed3e6c + 94d1924fa97e5faaf1ebfd85cae73faebcb89fa1
+
+* inside the folder `/copyparty/web/deps` (only in distributed archives/builds) is [fuse.py](https://github.com/fusepy/fusepy/blob/master/fuse.py), to make it downloadable from the connect-page on the web-ui
+
+* inside the folder `/copyparty/web` (only in distributed archives/builds) is a collection of javascript libraries (produced by [deps-docker](https://github.com/9001/copyparty/tree/hovudstraum/scripts/deps-docker)) which are used clientside by the web-UI:
+  * [marked.js](https://github.com/markedjs/marked/releases) (MIT) powers the markdown editor, and has been [patched](https://github.com/9001/copyparty/blob/hovudstraum/scripts/deps-docker/marked-ln.patch) to include the line-numbers of each input line, to enable scroll-sync between the editor and the preview-pane. This patch is [not strictly necessary anymore](https://github.com/markedjs/marked/issues/2134) but I haven't gotten around to making the change yet
+  * [easyMDE](https://github.com/Ionaru/easy-markdown-editor/) (MIT), the alternative markdown editor, has the same [patch](https://github.com/9001/copyparty/blob/hovudstraum/scripts/deps-docker/easymde-ln.patch) to enable scroll-sync, and also some [size-golfing](https://github.com/9001/copyparty/blob/hovudstraum/scripts/deps-docker/easymde.patch)
+  * [codemirror5](https://github.com/codemirror/codemirror5/) (MIT) has no noteworthy changes, and has only been [size-golfed](https://github.com/9001/copyparty/blob/hovudstraum/scripts/deps-docker/codemirror.patch), could have been used as-is
+  * [DOMPurify](https://github.com/cure53/DOMPurify) (Apache2) is used as-is
+  * [hash-wasm](https://github.com/Daninet/hash-wasm/) (MIT) is used entirely as-is
+  * [asmcrypto.js](https://github.com/openpgpjs/asmcrypto.js/) (MIT) is abandoned software, and used almost as-is (slightly golfed for size); it is probably fine to exclude/remove this, since it will only break support for uploading from really old browsers (IE10/IE11) using up2k (the "fancy uploader")
+  * [prism.js](https://github.com/PrismJS/prism/) (MIT) is built with a [selection of languages](https://github.com/9001/copyparty/blob/hovudstraum/scripts/deps-docker/genprism.py); there is an assumption about the exact subset of languages elsewhere in copyparty, but there shouldn't be any big consequences of replacing it with a different build if that exists in Fedora
+  * an old version of [SourceCodePro](https://github.com/adobe-fonts/source-code-pro) (OFL-1.1), is size-reduced to [only the necessary characters](https://github.com/9001/copyparty/blob/41ed559faabdc180efc37fd027e7f1bb2d14d174/scripts/deps-docker/mini-fa.sh#L30-L31). There will be subtle layout issues if this is replaced with a newer version, because they changed some line-heights or something in later versions, but shouldn't be a big issue 
+  * an old version of [font-awesome](https://github.com/FortAwesome/Font-Awesome) (OFL-1.1), size-reduced to [only the necessary icons](https://github.com/9001/copyparty/blob/hovudstraum/scripts/deps-docker/mini-fa.sh). I believe a newer version should also work.
+
+## optional dependencies
+
+explained in the [main readme](https://github.com/9001/copyparty/tree/hovudstraum#optional-dependencies), but a quick recap:
+
+* recommended python libraries: `argon2-cffi paramiko pyftpdlib pyopenssl pillow rawpy pyzmq` [python-magic](https://pypi.org/project/python-magic/)
+  * only recommended on Windows: `psutil` (not very useful on Linux)
+  * NOT recommended: `impacket` because the feature it enables is a security nightmare
+  * NOT recommended: `mutagen` because ffmpeg produces better results (albeit slower)
+  * NOT recommended: `pyvips` because converting to jxl is extremely RAM-heavy
+  * NOT recommended: `pillow-heif` due to [legal reasons](https://github.com/9001/copyparty/blob/hovudstraum/docs/bad-codecs.md)
+* recommended programs: `ffmpeg ffprobe cfssl cfssljson cfssl-certinfo`
+  * FFmpeg powers audio transcoding, and thumbnails of formats not covered by pillow/pyvips
+
+
 # building
 
 ## dev env setup

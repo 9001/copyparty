@@ -56,7 +56,7 @@ if HAVE_SQLITE3:
 if True:  # pylint: disable=using-constant-test
     from collections.abc import Iterable
 
-    from typing import Any, Generator, Optional, Sequence, Union
+    from typing import Any, Callable, Generator, Optional, Sequence, Union
 
     from .util import NamedLogger, RootLogger
 
@@ -541,13 +541,11 @@ class VFS(object):
 
         hist = flags.get("hist")
         if hist and hist != "-":
-            zs = "{}/{}".format(hist.rstrip("/"), name)
-            flags["hist"] = os.path.expandvars(os.path.expanduser(zs))
+            flags["hist"] = "%s/%s" % (hist.rstrip("/"), name)
 
         dbp = flags.get("dbpath")
         if dbp and dbp != "-":
-            zs = "{}/{}".format(dbp.rstrip("/"), name)
-            flags["dbpath"] = os.path.expandvars(os.path.expanduser(zs))
+            flags["dbpath"] = "%s/%s" % (dbp.rstrip("/"), name)
 
         return flags
 
@@ -1279,7 +1277,7 @@ class AuthSrv(object):
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
     ) -> tuple[str, str]:
-        src = os.path.expandvars(os.path.expanduser(src))
+        src = os.path.expanduser(self.args.shenvexp(src))
         src = absreal(src)
         dst = dst.strip("/")
 
@@ -1372,7 +1370,7 @@ class AuthSrv(object):
     ) -> None:
         self.line_ctr = 0
 
-        expand_config_file(self.log, cfg_lines, fp, "")
+        expand_config_file(self.log, self.args.shenvexp, cfg_lines, fp, "")
         if self.args.vc:
             lns = ["{:4}: {}".format(n, s) for n, s in enumerate(cfg_lines, 1)]
             self.log("expanded config file (unprocessed):\n" + "\n".join(lns))
@@ -2174,7 +2172,7 @@ class AuthSrv(object):
             if vflag == "-":
                 pass
             elif vflag:
-                vflag = os.path.expandvars(os.path.expanduser(vflag))
+                vflag = os.path.expanduser(self.args.shenvexp(vflag))
                 vol.histpath = vol.dbpath = uncyg(vflag) if WINDOWS else vflag
             elif self.args.hist:
                 for nch in range(len(hid)):
@@ -2209,7 +2207,7 @@ class AuthSrv(object):
             if vflag == "-":
                 pass
             elif vflag:
-                vflag = os.path.expandvars(os.path.expanduser(vflag))
+                vflag = os.path.expanduser(self.args.shenvexp(vflag))
                 vol.dbpath = uncyg(vflag) if WINDOWS else vflag
             elif self.args.dbpath:
                 for nch in range(len(hid)):
@@ -3258,6 +3256,7 @@ class AuthSrv(object):
                 "idxh": int(self.args.ih),
                 "dutc": not self.args.localtime,
                 "dfszf": self.args.ui_filesz.strip("-"),
+                "dgauto": self.args.gauto,
                 "themes": self.args.themes,
                 "turbolvl": self.args.turbo,
                 "nosubtle": self.args.nosubtle,
@@ -3273,7 +3272,7 @@ class AuthSrv(object):
             for zs in zs.split():
                 if vf.get(zs):
                     js_htm[zs] = 1
-            zs = "notooltips"
+            zs = "glang notooltips"
             for zs in zs.split():
                 if getattr(self.args, zs, False):
                     js_htm[zs] = 1
@@ -3963,10 +3962,14 @@ def split_cfg_ln(ln: str) -> dict[str, Any]:
 
 
 def expand_config_file(
-    log: Optional["NamedLogger"], ret: list[str], fp: str, ipath: str
+    log: Optional["NamedLogger"],
+    shenvexp: "Callable[[str], str]",
+    ret: list[str],
+    fp: str,
+    ipath: str,
 ) -> None:
     """expand all % file includes"""
-    fp = absreal(fp)
+    fp = absreal(os.path.expanduser(shenvexp(fp)))
     if len(ipath.split(" -> ")) > 64:
         raise Exception("hit max depth of 64 includes")
 
@@ -3997,7 +4000,7 @@ def expand_config_file(
             if fp2 in ipath:
                 continue
 
-            expand_config_file(log, ret, fp2, ipath)
+            expand_config_file(log, shenvexp, ret, fp2, ipath)
 
         return
 
@@ -4022,7 +4025,7 @@ def expand_config_file(
                 fp2 = ln[1:].strip()
                 fp2 = os.path.join(os.path.dirname(fp), fp2)
                 ofs = len(ret)
-                expand_config_file(log, ret, fp2, ipath)
+                expand_config_file(log, shenvexp, ret, fp2, ipath)
                 for n in range(ofs, len(ret)):
                     ret[n] = pad + ret[n]
                 continue

@@ -218,6 +218,7 @@ Ls.nno = {
 	"cl_hpick": "klikk på overskrifta åt kolonnene du ønskjer å skjule i tabellen nedanfor",
 	"cl_hcancel": "kolonne-skjuling avbrote",
 	"cl_rcm": "høgreklikkmeny",
+	"cl_gauto": "auto田",
 
 	"ct_grid": '田 ikon',
 	"ct_ttips": 'vis hjelpetekst ved å holde musa over ting">ℹ️ tips',
@@ -272,6 +273,8 @@ Ls.nno = {
 	"tt_dynt": "øk bredda på panelet ettersom treet utvider seg",
 	"tt_wrap": "linjebryting",
 	"tt_hover": "vis heile mappenamnet når musepeikaren treff mappa$N( gjer diverre at scrollhjulet fusker dersom musepeikaren ikkje finn seg i grøfta )",
+	"tt_gauto": "byt visingsmodus (liste/ikon) avhengig av mappeinnhald",
+	"tt_gathr": "vis som ikon når denne prosentdelen er bilete/videoar",
 
 	"ml_pmode": "ved enden av mappa",
 	"ml_btns": "knapper",

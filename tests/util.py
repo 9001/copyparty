@@ -38,7 +38,7 @@ from copyparty.broker_thr import BrokerThr
 from copyparty.ico import Ico
 from copyparty.u2idx import U2idx
 from copyparty.up2k import Up2k
-from copyparty.util import FHC, CachedDict, Garda, Unrecv
+from copyparty.util import FHC, CachedDict, Garda, Unrecv, expand_osenv_c
 
 init_E(E)
 
@@ -78,8 +78,10 @@ def get_ramdisk():
         return ret
 
     for vol in ["/dev/shm", "/Volumes/cptd"]:  # nosec (singleton test)
-        if os.path.exists(vol):
+        try:
             return subdir(vol)
+        except:
+            pass
 
     if os.path.exists("/Volumes"):
         sck = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -161,7 +163,7 @@ class Cfg(Namespace):
         ex = "ac_convt au_vol dl_list du_iwho mtab_age reg_cap s_thead s_tbody tail_tmax tail_who th_convt th_qv th_qvx ups_who ver_iwho zip_who"
         ka.update(**{k: 9 for k in ex.split()})
 
-        ex = "ctl_re db_act forget_ip idp_cookie idp_store k304 loris no304 nosubtle qr_pin qr_wait re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo u2ow zipmaxn zipmaxs"
+        ex = "ctl_re db_act forget_ip gauto idp_cookie idp_store k304 loris no304 nosubtle qr_pin qr_wait re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo u2ow zipmaxn zipmaxs"
         ka.update(**{k: 0 for k in ex.split()})
 
         ex = "ah_alg bname chdir chmod_f chpw_db db_xattr doctitle df epilogues exit favico fika ipa ipar html_head html_head_d html_head_s idp_login idp_logout lg_sba lg_sbf log_date log_fk md_sba md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i opds_exts preadmes prologues readmes shr shr1 shr_site site smsg tcolor textfiles th_pregen txt_eol ufavico ufavico_h unlist up_site vc_url vname xff_src zipmaxt R RS SR"
@@ -193,6 +195,7 @@ class Cfg(Namespace):
             du_who="all",
             dk_salt="b" * 16,
             fk_salt="a" * 16,
+            env_expand=2,
             fsnt="lin",
             grp_all="acct",
             idp_gsep=re.compile("[|:;+,]"),
@@ -215,6 +218,7 @@ class Cfg(Namespace):
             rw_edit="md",
             s_rd_sz=256 * 1024,
             s_wr_sz=256 * 1024,
+            shenvexp=expand_osenv_c,
             shr_who="auth",
             sort="href",
             srch_hits=99999,

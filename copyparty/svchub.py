@@ -1133,17 +1133,23 @@ class SvcHub(object):
         al.th_coversd_set = set(al.th_coversd)
 
         for k in "c".split(" "):
+            if self.args.env_expand in (0, 2):
+                break
+
             vl = getattr(al, k)
             if not vl:
                 continue
 
-            vl = [os.path.expandvars(os.path.expanduser(x)) for x in vl]
+            vl = [os.path.expanduser(self.args.shenvexp(x)) for x in vl]
             setattr(al, k, vl)
 
         for k in "lo hist dbpath ssl_log".split(" "):
+            if self.args.env_expand in (0, 2):
+                break
+
             vs = getattr(al, k)
             if vs:
-                vs = os.path.expandvars(os.path.expanduser(vs))
+                vs = os.path.expanduser(self.args.shenvexp(vs))
                 setattr(al, k, vs)
 
         for k in "idp_adm stats_u".split(" "):

@@ -221,6 +221,7 @@ Ls.tur = {
 	"cl_hpick": "aşağıdaki tabloda gizlemek için sütun başlıklarına dokunun",
 	"cl_hcancel": "sütun gizleme iptal edildi",
 	"cl_rcm": "sağ tık menüsü", //m
+	"cl_gauto": "otomatik田", //m
 
 	"ct_grid": '田 ızgara',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ ipuçları',
@@ -275,6 +276,8 @@ Ls.tur = {
 	"tt_dynt": "ağaç genişledikçe otomatik büyüt",
 	"tt_wrap": "kelime sarma",
 	"tt_hover": "fare ile üzerine gelindiğinde taşan satırları göster$N( fare imleci sol kenarda değilse kaydırmayı bozar )",
+	"tt_gauto": "klasör içeriğine bağlı olarak ızgara veya liste olarak göster", //m
+	"tt_gathr": "dosyaların bu yüzdesi resim/video ise ızgara kullan", //m
 
 	"ml_pmode": "klasör sonunda...",
 	"ml_btns": "komutlar",

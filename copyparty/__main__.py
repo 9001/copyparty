@@ -65,6 +65,10 @@ from .util import (
     b64enc,
     ctypes,
     dedent,
+    expand_osenv_c,
+    expand_osenv_cs,
+    expand_osenv_noop,
+    expand_osenv_s,
     has_resource,
     load_resource,
     min_ex,
@@ -427,9 +431,22 @@ def configure_ssl_ciphers(al: argparse.Namespace) -> None:
         sys.exit(0)
 
 
+def expand_cvars(argv) -> list[str]:
+    n = 0
+    for v in argv:
+        if "=" in v:
+            a, b = v.split("=", 1)
+            v = "%s=%s" % (a, os.path.expanduser(expand_osenv_c(b)))
+        else:
+            v = os.path.expanduser(expand_osenv_c(v))
+        argv[n] = v
+        n += 1
+    return argv
+
+
 def args_from_cfg(cfg_path: str) -> list[str]:
     lines: list[str] = []
-    expand_config_file(None, lines, cfg_path, "")
+    expand_config_file(None, expand_osenv_c, lines, cfg_path, "")
     lines = upgrade_cfg_fmt(None, argparse.Namespace(vc=False), lines, "")
 
     ret: list[str] = []
@@ -453,10 +470,12 @@ def args_from_cfg(cfg_path: str) -> list[str]:
             else:
                 ret.append(prefix + k + "=" + v)
 
-    return ret
+    return expand_cvars(ret)
 
 
 def expand_cfg(argv) -> list[str]:
+    argv = expand_cvars(argv)
+
     if CFG_DEF:
         supp = args_from_cfg(CFG_DEF[0])
         argv = argv[:1] + supp + argv[1:]
@@ -1197,6 +1216,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--name-url", metavar="TXT", type=u, help="URL for server name hyperlink (displayed topleft in browser)")
     ap2.add_argument("--name-html", type=u, help=argparse.SUPPRESS)
     ap2.add_argument("--site", metavar="URL", type=u, default="", help="public URL to assume when creating links; example: [\033[32mhttps://example.com/\033[0m]")
+    ap2.add_argument("--env-expand", metavar="N", type=int, default=-1, help="syntax to expect for environment-variables to expand in config-files; [\033[32m0\033[0m]=disable, [\033[32m1\033[0m]=$VAR (old syntax (scary)), [\033[32m2\033[0m]=${VAR} (new syntax (recommended))")
     ap2.add_argument("--mime", metavar="EXT=MIME", type=u, action="append", help="\033[34mREPEATABLE:\033[0m map file \033[33mEXT\033[0mension to \033[33mMIME\033[0mtype, for example [\033[32mjpg=image/jpeg\033[0m]")
     ap2.add_argument("--mimes", action="store_true", help="list default mimetype mapping and exit")
     ap2.add_argument("--rmagic", action="store_true", help="do expensive analysis to improve accuracy of returned mimetypes; will make file-downloads, rss, and webdav slower (volflag=rmagic)")
@@ -1520,6 +1540,7 @@ def add_smb(ap):
     ap2.add_argument("--smb-nwa-1", action="store_true", help="truncate directory listings to 64kB (~400 files); avoids impacket-0.11 bug, fixes impacket-0.12 performance")
     ap2.add_argument("--smb-nwa-2", action="store_true", help="disable impacket workaround for filecopy globs")
     ap2.add_argument("--smba", action="store_true", help="small performance boost: disable per-account permissions, enables account coalescing instead (if one user has write/delete-access, then everyone does)")
+    ap2.add_argument("--smb6", action="store_true", help="enable IPv6")
     ap2.add_argument("--smbv", action="store_true", help="verbose")
     ap2.add_argument("--smbvv", action="store_true", help="verboser")
     ap2.add_argument("--smbvvv", action="store_true", help="verbosest")
@@ -1740,7 +1761,7 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-r-raw", metavar="T,T", type=u, default="3fr,arw,cr2,cr3,crw,dcr,dng,erf,k25,kdc,mdc,mef,mos,mrw,nef,nrw,orf,pef,raf,raw,sr2,srf,srw,x3f", help="image formats to decode using rawpy")
     ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,cbz,dds,dib,epub,fit,fits,fts,gif,hdr,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,qoi,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="3gp,asf,av1,avc,avi,flv,h264,h265,hevc,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,ts,vob,webm,wmv", help="video formats to decode using ffmpeg")
-    ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bonk,dfpwm,dts,flac,gsm,ilbc,it,itgz,itxz,itz,m4a,m4b,m4r,mdgz,mdxz,mdz,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,oga,ogg,okt,opus,ra,s3m,s3gz,s3xz,s3z,tak,tta,ulaw,wav,wma,wv,xm,xmgz,xmxz,xmz,xpk", help="audio formats to decode using ffmpeg")
+    ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bcstm,bfstm,brstm,bonk,dfpwm,dts,flac,gsm,ilbc,it,itgz,itxz,itz,m4a,m4b,m4r,mdgz,mdxz,mdz,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,oga,ogg,okt,opus,ra,s3m,s3gz,s3xz,s3z,tak,tta,ulaw,wav,wma,wv,xm,xmgz,xmxz,xmz,xpk", help="audio formats to decode using ffmpeg")
     ap2.add_argument("--th-spec-cnv", metavar="T", type=u, default="it,itgz,itxz,itz,mdgz,mdxz,mdz,mo3,mod,s3m,s3gz,s3xz,s3z,xm,xmgz,xmxz,xmz,xpk", help="audio formats which provoke https://trac.ffmpeg.org/ticket/10797 (huge ram usage for s3xmodit spectrograms)")
     ap2.add_argument("--au-unpk", metavar="E=F.C", type=u, default="mdz=mod.zip, mdgz=mod.gz, mdxz=mod.xz, s3z=s3m.zip, s3gz=s3m.gz, s3xz=s3m.xz, xmz=xm.zip, xmgz=xm.gz, xmxz=xm.xz, itz=it.zip, itgz=it.gz, itxz=it.xz, cbz=jpg.cbz, epub=jpg.epub", help="audio/image formats to decompress before passing to ffmpeg")
 
@@ -1868,8 +1889,10 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--gsel", action="store_true", help="select files in grid by ctrl-click (volflag=gsel)")
     ap2.add_argument("--localtime", action="store_true", help="default to local timezone instead of UTC")
     ap2.add_argument("--ui-filesz", metavar="FMT", type=u, default="4", help="default filesize format; one of these: 0, 1, 2, 2c, 3, 3c, 4, 4c, 5, 5c, fuzzy (see UI)")
+    ap2.add_argument("--gauto", metavar="PERCENT", type=int, default=0, help="switch to gridview if more than \033[33mPERCENT\033[0m of files are pics/vids; 0=disabled")
     ap2.add_argument("--rcm", metavar="TXT", default="yy", help="rightclick-menu; two yes/no options: 1st y/n is enable-custom-menu, 2nd y/n is enable-double")
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language, for example \033[32meng\033[0m / \033[32mnor\033[0m / ...")
+    ap2.add_argument("--glang", action="store_true", help="guess the browser's default language, otherwise fall back to \033[33m--lang\033[0m")
     ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use (0..%d)" % (THEMES - 1,))
     ap2.add_argument("--themes", metavar="NUM", type=int, default=THEMES, help="number of themes installed")
     ap2.add_argument("--au-vol", metavar="0-100", type=int, default=50, choices=range(0, 101), help="default audio/video volume percent")
@@ -2175,6 +2198,15 @@ def main(argv: Optional[list[str]] = None) -> None:
         sys.exit(1)
 
     quotecheck(al)
+
+    if al.env_expand == 2:
+        al.shenvexp = expand_osenv_c
+    elif al.env_expand == 1:
+        al.shenvexp = expand_osenv_s
+    elif al.env_expand == 0:
+        al.shenvexp = expand_osenv_noop
+    else:
+        al.shenvexp = expand_osenv_cs
 
     if al.chdir:
         os.chdir(al.chdir)

@@ -224,6 +224,7 @@ Ls.pol = {
 	"cl_hpick": "kliknij nagłówki kolumn, aby ukryć je w tabeli niżej",
 	"cl_hcancel": "ukrywanie kolumn przerwane",
 	"cl_rcm": "menu kontekstowe", //m
+	"cl_gauto": "auto田", //m
 
 	"ct_grid": '田 siatka',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ podpowiedzi',
@@ -278,6 +279,8 @@ Ls.pol = {
 	"tt_dynt": "rozszerzaj panel wraz z drzewem",
 	"tt_wrap": "zawijaj tekst",
 	"tt_hover": "pokazuj za długie linie po najechaniu kursorem$N( psuje przewijanie gdy $N&nbsp; kursor nie jest w lewym marginesie )",
+	"tt_gauto": "wyświetl jako siatkę lub listę w zależności od zawartości folderu", //m
+	"tt_gathr": "użyj siatki, jeśli ten procent plików to obrazy/wideo", //m
 
 	"ml_pmode": "na końcu folderu...",
 	"ml_btns": "komendy",

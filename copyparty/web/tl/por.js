@@ -221,6 +221,7 @@ Ls.por = {
 	"cl_hpick": "toque nos cabeçalhos das colunas para ocultá-los na tabela abaixo",
 	"cl_hcancel": "ocultar coluna abortado",
 	"cl_rcm": "menu de clique direito",
+	"cl_gauto": "auto田", //m
 
 	"ct_grid": '田 a grade',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ dicas de ferramentas',
@@ -275,6 +276,8 @@ Ls.por = {
 	"tt_dynt": "crescer automaticamente à medida que a árvore se expande",
 	"tt_wrap": "quebra de linha",
 	"tt_hover": "revelar linhas transbordando ao passar o mouse$N( quebra a rolagem a menos que o cursor do mouse $N&nbsp; esteja na margem esquerda )",
+	"tt_gauto": "exibir como grade ou lista dependendo do conteúdo da pasta", //m
+	"tt_gathr": "usar grade se esta porcentagem de arquivos for imagens/vídeos", //m
 
 	"ml_pmode": "ao final da pasta...",
 	"ml_btns": "comandos",

@@ -221,6 +221,7 @@ Ls.fra = {
 	"cl_hpick": "cliquez sur les en-têtes de colonnes pour les masquer dans le tableau ci-dessous",
 	"cl_hcancel": "masquage des colonnes annulé",
 	"cl_rcm": "menu contextuel", //m
+	"cl_gauto": "auto-grille", //m
 
 	"ct_grid": '田 grille',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ infobulles',
@@ -275,6 +276,8 @@ Ls.fra = {
 	"tt_dynt": "croissance automatique à mesure que l'arborescence s'étend",
 	"tt_wrap": "retour à la ligne",
 	"tt_hover": "révéler les lignes débordantes au survol$N( interrompt le défilement à moins que le curseur de la souris ne soit dans la gouttière gauche )",
+	"tt_gauto": "afficher en grille ou liste selon le contenu du dossier", //m
+	"tt_gathr": "utiliser la grille si ce pourcentage de fichiers sont des images/vidéos", //m
 
 	"ml_pmode": "à la fin du dossier…",
 	"ml_btns": "cmds",

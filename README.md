@@ -120,6 +120,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - `pacman -S copyparty` (in [arch linux extra](https://archlinux.org/packages/extra/any/copyparty/))
     * [fedora package](#fedora-package) - does not exist yet
+    * [gentoo ::guru package](#gentoo-guru-package) - `emerge www-servers/copyparty::guru` (in [::guru](https://wiki.gentoo.org/wiki/Project:GURU))
     * [homebrew formulae](#homebrew-formulae) - `brew install copyparty ffmpeg`
     * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
     * [nixos module](#nixos-module)
@@ -183,7 +184,7 @@ enable thumbnails (images/audio/video), media indexing, and audio transcoding by
 * **Alpine:** `apk add py3-pillow ffmpeg`
 * **Debian:** `apt install --no-install-recommends python3-pil ffmpeg`
 * **Fedora:** rpmfusion + `dnf install python3-pillow ffmpeg --allowerasing`
-* **FreeBSD:** `pkg install py39-sqlite3 py39-pillow ffmpeg`
+* **FreeBSD:** `pkg install py311-sqlite3 py311-pillow ffmpeg`
 * **MacOS:** `port install py-Pillow ffmpeg`
 * **MacOS** (alternative): `brew install pillow ffmpeg`
 * **Windows:** `python -m pip install --user -U Pillow`
@@ -607,9 +608,11 @@ and if you want to use config files instead of commandline args (good!) then her
 
 hiding specific subfolders  by mounting another volume on top of them
 
-for example `-v /mnt::r -v /var/empty:web/certs:r` mounts the server folder `/mnt` as the webroot, but another volume is mounted at `/web/certs` -- so visitors can only see the contents of `/mnt` and `/mnt/web` (at URLs `/` and `/web`), but not `/mnt/web/certs` because URL `/web/certs` is mapped to `/var/empty`
+for example `-v /mnt::r -v /var/empty:web/certs:` (note: no permissions) mounts the server folder `/mnt` as the webroot, but another volume is mounted at `/web/certs` -- so visitors can only see the contents of `/mnt` and `/mnt/web` (at URLs `/` and `/web`), but not `/mnt/web/certs` because URL `/web/certs` is mapped to `/var/empty`
 
 the example config file right above this section may explain this better; the first volume `/` is mapped to `/srv` which means http://127.0.0.1:3923/music would try to read `/srv/music` on the server filesystem, but since there's another volume at `/music` mapped to `/mnt/music` then it'll go to `/mnt/music` instead
+
+so, to shadow a file/folder, define a volume but leave out the `accs:` section
 
 > ℹ️ this also works for single files, because files can also be volumes
 
@@ -2539,6 +2542,7 @@ buggy feature? rip it out  by setting any of the following environment variables
 | -------------------- | ------------ |
 | `PRTY_NO_CTYPES`     | do not use features from external libraries such as kernel32 |
 | `PRTY_NO_DB_LOCK`    | do not lock session/shares-databases for exclusive access |
+| `PRTY_NO_ENVEXPAND`  | do not expand environment-variables in configs and args |
 | `PRTY_NO_IFADDR`     | disable ip/nic discovery by poking into your OS with ctypes |
 | `PRTY_NO_IMPRESO`    | do not try to load js/css files using `importlib.resources` |
 | `PRTY_NO_IPV6`       | disable some ipv6 support (should not be necessary since windows 2000) |
@@ -2583,6 +2587,23 @@ after installing, start either the system service or the user service and naviga
 ## fedora package
 
 does not exist yet;  there are rumours that it is being packaged! keep an eye on this space...
+
+
+## gentoo ::guru package
+
+`emerge www-servers/copyparty::guru` (in [::guru](https://wiki.gentoo.org/wiki/Project:GURU))
+
+but first enable the `::guru` repo;
+
+```bash
+emerge -an app-eselect/eselect-repository
+eselect repository enable guru
+emerge --sync guru
+```
+
+to start the service as a user:
+* OpenRC: `rc-service -U copyparty start && rc-update -U add copyparty default`
+* systemd: [todo]
 
 
 ## homebrew formulae
@@ -2729,6 +2750,12 @@ services.copyparty = {
   };
   # you may increase the open file limit for the process
   openFilesLimit = 8192;
+  
+  # override the package used by the module to add dependencies, e.g. for hooks
+  package = pkgs.copyparty.override {
+    # provides exiftool for bin/hooks/image-noexif.py
+    extraPackages = [ pkgs.exiftool ];
+  };
 };
 ```
 

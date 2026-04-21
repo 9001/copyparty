@@ -7,7 +7,7 @@ import socket
 import sys
 import time
 
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
+from .__init__ import ANYWIN, OPENBSD, PY2, TYPE_CHECKING, UNIX, unicode
 from .cert import gencert
 from .qrkode import QrCode, qr2png, qr2svg, qr2txt, qrgen
 from .util import (
@@ -21,6 +21,7 @@ from .util import (
     VF_CAREFUL,
     Netdev,
     atomic_move,
+    chkcmd,
     get_adapters,
     min_ex,
     sunpack,
@@ -510,6 +511,13 @@ class TcpSrv(object):
         return eps
 
     def _extdevs_nix(self) -> Generator[str, None, None]:
+        if UNIX:
+            so, _ = chkcmd(["netstat", "-nrf", "inet"])
+            for ln in so.split("\n"):
+                if not ln.startswith("default"):
+                    continue
+                yield ln.split()[7] if OPENBSD else ln.split()[3]
+            return
         with open("/proc/net/route", "rb") as f:
             next(f)
             for ln in f:
