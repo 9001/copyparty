@@ -6926,7 +6926,9 @@ var search_ui = (function () {
 			clmod(ebi('srch_quickopts'), 'act', 't');
 		}
 	folderSearch.oninput = function(){
-		var v = unsmart(this.value)
+		var v = unsmart(this.value);
+		if(IE && !v)
+			return;
 		var nsearch = ebi('srch_namev');
 		nsearch.value = v;
 		nsearch.oninput();
@@ -6953,6 +6955,7 @@ var search_ui = (function () {
 			is_txt = id.slice(-1) == 'v',
 			is_chk = id.slice(-1) == 'c';
 
+			console.log(id);
 		if (is_txt) {
 			var chk = ebi(id.slice(0, -1) + 'c');
 			chk.checked = ((v + '').length > 0);
