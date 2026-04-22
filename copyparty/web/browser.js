@@ -1364,8 +1364,8 @@ if(accent){
 // navpane
 ebi('tree').innerHTML = (
 	'<div id="treeh">\n' +
-	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
 	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
+	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
 	'	<a href="#" class="btn" id="visdir" tt="' + L.tt_visdir + '">🎯</a>\n' +
 	'	<a href="#" class="tgl btn" id="filetree" tt="' + L.tt_ftree + '">📃</a>\n' +
 	'	<a href="#" class="tgl btn" id="parpane" tt="' + L.tt_pdock + '">📌</a>\n' +
@@ -8431,7 +8431,7 @@ var treectl = (function () {
 		if (!isNum(treesz))
 			treesz = 16;
 
-		treesz = clamp(treesz, 2, 120);
+		treesz = clamp(treesz, 6, 120);
 		swrite('treesz', treesz);
 		onresize();
 	}
