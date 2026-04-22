@@ -1366,7 +1366,7 @@ ebi('accent').oninput = ebi('accent_picker').oninput = function () {
 	if(validcolor == accent) 
 		return;
 
-	setTimeout(() => {
+	setTimeout(function(){
 		setColor(validcolor);
 	}, 100); 
 }
