@@ -1630,6 +1630,7 @@ html.y #ops svg circle {
 #pathBar input[type=text],
 .opview select,
 .opview input[type=text],
+.opview input[type=color],
 .opview input[type=date] {
 	color: var(--fg);
 	background: var(--txt-bg);
