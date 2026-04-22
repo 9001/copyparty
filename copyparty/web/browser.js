@@ -1247,7 +1247,10 @@ ebi('op_cfg').innerHTML = (
 	'	<h3 id="h_theme">🎨 ' + L.cl_themes + '</h3>\n' +
 	'	<div>' +
 	'		<select id="themes"></select>' +
-	'		<input type="text" id="accent" placeholder="#color" tt="' + L.cl_accent +'"></input>' +
+	'		<div id="colordiv" tt="' + L.cl_accent +'">' +
+	'			<input type="text" id="accent" placeholder="#color"></input>' +
+	'			<input type="color" id="accent_picker"></input>' +
+	'		</div>' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -1344,19 +1347,30 @@ function parseColor (strColor) {
   s.color = strColor;
   return s.color !== '' ? s.color : '';
 }
+function setColor (color) {
 
-ebi('accent').oninput = function () {
-	var validcolor = parseColor(this.value);
-	clmod(ebi('accent'), 'invalid', this.value.length != 0 && validcolor.length == 0);
-	if(validcolor == accent) 
-		return;
-	accent = validcolor;
+	accent = color;
 	swrite('accent', accent);
 	var a = accent || '#fc0';
 	console.log('accent color set to: ' + a);
 	document.documentElement.style.setProperty('--a', a);
 }
-var accent = ebi('accent').value = sread('accent');
+ebi('accent').oninput = ebi('accent_picker').oninput = function () {
+	if(this == ebi('accent'))
+		ebi('accent_picker').value = this.value;
+	else if(this == ebi('accent_picker'))
+		ebi('accent').value = this.value;
+
+	var validcolor = parseColor(this.value);
+	clmod(ebi('accent'), 'invalid', this.value.length != 0 && validcolor.length == 0);
+	if(validcolor == accent) 
+		return;
+
+	setTimeout(() => {
+		setColor(validcolor);
+	}, 100); 
+}
+var accent = ebi('accent').value = ebi('accent_picker').value = sread('accent');
 if(accent){
 	document.documentElement.style.setProperty('--a', parseColor(accent));
 }
