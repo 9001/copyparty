@@ -7420,6 +7420,7 @@ function onwrapscroll () {
 
 	lastY = newY;
 }
+window.addEventListener('scroll', onwrapscroll);
 
 function onwidgetresize(){
 	var widget = ebi('widget');
@@ -7431,15 +7432,6 @@ function onwidgetresize(){
 	
 	clmod(ebi('pathBar'), 'thin', thin);
 	clmod(ebi('wrap'), 'thin', thin);
-
-	if(thin && !ows_active){
-		window.addEventListener('scroll', onwrapscroll);
-		ows_active = true;
-	}
-	else if (!thin && ows_active){
-		window.removeEventListener('scroll', onwrapscroll);
-		ows_active = false;
-	}
 
 	thin = thin || IE;
 
