@@ -1360,7 +1360,7 @@ ebi('accent').oninput = ebi('accent_picker').oninput = function () {
 	}
 	else if(this == ebi('accent_picker')){
 		if(this.value == '#000000')
-			validcolor = ''; // firefox submits the color picker value on browser startup
+			return; // firefox submits the color picker value on browser startup
 		ebi('accent').value = this.value;
 	}
 
