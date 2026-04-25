@@ -807,7 +807,7 @@ modal.load();
 
 // toolbar
 ebi('ops').innerHTML = (
-	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
+	//(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
@@ -7399,8 +7399,13 @@ function onwidgetresize(){
 	var pbarthinpos = ebi('pbarthinpos');
 	var width = widget.offsetWidth;
 
-	var thin = IE || width < 800; //px
+	var thin = width < 800; //px
 	
+	clmod(ebi('pathBar'), 'thin', thin);
+	clmod(ebi('wrap'), 'thin', thin);
+
+	thin = thin || IE;
+
 	var gtc = 'max-content max-content max-content ' + (thin ? '' : '20%') + ' auto max-content max-content max-content';
 	if(!thin && bar.children.length < gtc.split(' ').length){
 		try{
@@ -7426,8 +7431,6 @@ function onwidgetresize(){
 	bar.style.gridTemplateColumns = gtc;
 	
 	clmod(widget, 'thin', thin);
-	clmod(ebi('pathBar'), 'thin', thin);
-	clmod(ebi('wrap'), 'thin', thin);
 
 	pbar.onresize();
 
