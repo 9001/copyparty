@@ -3671,6 +3671,17 @@ html.e #wrap.thin {
 	.td_s {
 		width: calc(50vw - 5em);
 	}
+	#ghead::after {
+		content: "";
+		position: sticky;
+		right: -.5em;
+		background: linear-gradient(to left, var(--bg-u2), transparent);
+		width: 3em;
+		height: 3.5em;
+		display: inline-block;
+		margin: -1em;
+		pointer-events: none;
+	}
 }
 @media (max-width: 50em){
 	html:not(.e) body {
@@ -3715,18 +3726,6 @@ html.e #wrap.thin {
 	}
 	#ghead {
 		margin: 0 .5em 1em .5em;
-	}
-	#ghead::after {
-		box-shadow: inset -.5em 0 1em var(--bg-u2);
-		content: "";
-		position: sticky;
-		right: -.5em;
-		background: linear-gradient(to left, var(--bg-u2), transparent);
-		width: 3em;
-		height: 3.5em;
-		display: inline-block;
-		margin: -1em;
-		pointer-events: none;
 	}
 	.modalsplit {
 		display: block;
