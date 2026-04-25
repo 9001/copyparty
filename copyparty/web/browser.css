@@ -1569,7 +1569,7 @@ html.a #up_quick .btn.on {
 }
 .opview {
 	display: none;
-	margin-bottom: .5em;
+	margin-bottom: 1em;
 }
 .opview.act {
 	display: block;
@@ -2174,6 +2174,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 #hdoc,
 #ghead {
 	position: sticky;
+	margin-top: -.5em;
 	top: 3.7em;
 	z-index: 3;
 	transition: opacity .15s;
@@ -3713,7 +3714,7 @@ html.e #wrap.thin {
 		margin: 0em -0.5em;
 	}
 	#ghead {
-		margin: .5em;
+		margin: 0 .5em 1em .5em;
 	}
 	.modalsplit {
 		display: block;
@@ -4145,7 +4146,6 @@ html.e #acc_info {
 html.e #acc_info,
 html.e #ops,
 html.e #srv_info {
-  display: flex;
   align-items: center;
 }
 html.e .overlay_plus {
@@ -4216,17 +4216,22 @@ html.e #ops a {
   }
 }
 html.e #ops {
-	background: var(--ttlbar);
 	/*HC*/
-	box-shadow: inset 0-1px grey, inset 0-2px var(--shadow-color-1);
-	height: 2em;
 	gap: 0.6em;
-	padding: 0.2em;
-	margin-bottom: 1.2em;
-	width: 100%;
-	position: absolute;
-	justify-content: end;
 	font-size: larger;
+	padding: 0;
+}
+html.e #srchfolder_div {
+	left: 2em;
+	top: -.1em;
+	bottom: -.6em;
+}
+html.e #qs_btns {
+	right: 0.7em;
+  	top: .3em;
+}
+html.e .under {
+	border: var(--fg) solid 1px;
 }
 html.e #srch_form,
 html.e .opbox {

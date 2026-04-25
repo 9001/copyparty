@@ -6938,11 +6938,13 @@ var search_ui = (function () {
 	}
 	folderSearch.onkeydown = ev_search_keydown;
 
-	var expand = sread('s_ex');
-	function exp_search () {
-		clmod(ebi('op_search'), 'vis', expand);
+	var expand = sread('s_ex') == 'true';
+	exp_search(expand);
+	function exp_search (e) {
+		clmod(ebi('op_search'), 'vis', e);
+
 		var ms = ebi('moresearch');
-		if(expand){
+		if(e){
 			location.hash = '#';
 			ms.innerHTML = '▴'
 		}
@@ -6953,9 +6955,8 @@ var search_ui = (function () {
 	ebi('moresearch').onclick = function () {
 		expand = !expand;
 		swrite('s_ex', expand);
-		exp_search();
-	}
-	exp_search();
+		exp_search(expand);
+	};
 
 	ebi('closesearch').onclick = function (e) {
 		ebi('opa_srch').click();
@@ -7665,36 +7666,6 @@ var treectl = (function () {
 			y = (y - 3) + 'px';
 			if (parp.style.top != y)
 				parp.style.top = y;
-		}
-
-		return; // always fixed
-		if (wraptop === null)
-			return;
-
-		prev_atop = atop;
-		prev_winh = winh;
-
-		if (fixedpos && atop >= 0) {
-			tree.style.position = 'absolute';
-			tree.style.bottom = '';
-			fixedpos = false;
-		}
-		else if (!fixedpos && atop < 0) {
-			tree.style.position = 'fixed';
-			tree.style.height = 'auto';
-			fixedpos = true;
-		}
-
-		if (fixedpos) {
-			tree.style.top = Math.max(0, parseInt(atop)) + 'px';
-		}
-		else {
-			var top = Math.max(0, wraptop),
-				treeh = winh - atop;
-
-			tree.style.top = top + 'px';
-			// setting the height causes scrollbars to appear often because it's not exact most of the time
-			tree.style.height = winh - wraptop + Math.floor(yscroll()) - 2 + 'px'; //= treeh < 10 ? '' : Math.floor(treeh) + 'px';
 		}
 	}
 	timer.add(onscroll2, true);
