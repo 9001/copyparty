@@ -7420,7 +7420,8 @@ function onwrapscroll () {
 
 	lastY = newY;
 }
-window.addEventListener('scroll', onwrapscroll);
+if(!IE)
+	window.addEventListener('scroll', onwrapscroll);
 
 function onwidgetresize(){
 	var widget = ebi('widget');
