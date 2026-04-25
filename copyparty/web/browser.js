@@ -6339,17 +6339,26 @@ var ahotkeys = function (e) {
 		var sel = window.getSelection && window.getSelection() || {};
 		sel = sel && !sel.isCollapsed && sel.direction != 'none';
 
-		if (kl == 'x')
-			return fileman.cut(e);
+		if (kl == 'x') {
+			if (have_mv && has(perms, 'move'))
+				return fileman.cut(e);
+			return;
+		}
 
 		if (kl == 'c' && !sel)
 			return fileman.cpy(e);
 
-		if (kl == 'v')
-			return fileman.d_paste(e);
+		if (kl == 'v') {
+			if (have_mv && has(perms, 'write'))
+				return fileman.d_paste(e);
+			return;
+		}
 
-		if (kl == 'k')
-			return fileman.delete(e);
+		if (kl == 'k') {
+			if (have_del && has(perms, 'delete'))
+				return fileman.delete(e);
+			return;
+		}
 
 		return;
 	}
@@ -6409,8 +6418,11 @@ var ahotkeys = function (e) {
 	if (kl == 'v')
 		return ebi('filetree').click();
 
-	if (k == 'F2')
-		return fileman.rename();
+	if (k == 'F2') {
+		if (have_mv && has(perms, 'write') && has(perms, 'move'))
+			return fileman.rename();
+		return;
+	}
 
 	if (!treectl.hidden && (!sh || !thegrid.en)) {
 		if (kl == 'a')
@@ -8010,18 +8022,19 @@ function apply_perms(res) {
 		aclass = '>',
 		chk = ['read', 'write', 'move', 'delete', 'get', 'admin'];
 
+	have_mv = have_del = true;
+
 	if (konmai < 0) {
 		acct = 'Ted Faro';
 		srvinf = 'FAS Nexus</span> // <span>57.3 EiB free of 127 EiB';
 		res.shr_who = 'auth';
 		perms = res.perms = chk;
 		have_up2k_idx = have_tags_idx = 1;
-		have_mv = have_del = true;
 	}
 
 	var a = QS('#ops a[data-dest="up2k"]');
 	if (have_up2k_idx) {
-		a.removeAttribute('data-perm');
+		a.setAttribute('data-perm', 'write');
 		a.setAttribute('tt', L.ot_u2i);
 	}
 	else {
@@ -8030,7 +8043,6 @@ function apply_perms(res) {
 	}
 	clmod(ebi('srch_form'), 'tags', have_tags_idx);
 
-	a.style.display = '';
 	tt.att(QS('#ops'));
 
 	for (var a = 0; a < chk.length; a++)
@@ -9845,6 +9857,12 @@ var rcm = (function () {
 		var has_sel = msel.getsel().length;
 		var has_clip = fileman.clip.length;
 
+		var hcut = !has_sel || !(have_mv && has(perms, 'move')),
+			hdel = !has_sel || !(have_del && has(perms, 'delete')),
+			hpst = !has_clip || !(have_mv && has(perms, 'write')),
+			hren = !has_sel || !(have_mv && has(perms, 'write') && has(perms, 'move')),
+			hwrite = !has(perms, 'write');
+
 		clmod(ebi('ropn'), 'hide', !selFile.path);
 		clmod(ebi('rply'), 'hide', selFile.type != 'gf' && selFile.type != 'af');
 		clmod(ebi('rpla'), 'hide', selFile.type != 'gf');
@@ -9855,12 +9873,14 @@ var rcm = (function () {
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);
 		clmod(ebi('rs2'), 'hide', !has_sel);
-		clmod(ebi('rcut'), 'hide', !has_sel);
-		clmod(ebi('rdel'), 'hide', !has_sel);
+		clmod(ebi('rcut'), 'hide', hcut);
+		clmod(ebi('rdel'), 'hide', hdel);
 		clmod(ebi('rcpy'), 'hide', !has_sel);
-		clmod(ebi('rpst'), 'hide', !has_clip);
-		clmod(ebi('rrnm'), 'hide', !has_sel);
-		clmod(ebi('rs3'), 'hide', !has_sel);
+		clmod(ebi('rpst'), 'hide', hpst);
+		clmod(ebi('rrnm'), 'hide', hren);
+		clmod(ebi('rs3'), 'hide', !has_sel || (hcut && hdel && hren && !has_clip));
+		clmod(ebi('rnfo'), 'hide', hwrite);
+		clmod(ebi('rnfi'), 'hide', hwrite);
 		clmod(ebi('rs4'), 'hide', !has_sel && !has(perms, "write"));
 		var shr = ebi('rshr');
 		clmod(shr, 'hide', !can_shr || !get_evpath().indexOf(have_shr));

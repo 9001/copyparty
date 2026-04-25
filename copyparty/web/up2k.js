@@ -1164,6 +1164,10 @@ function up2k_init(subtle) {
             dz = e.clientY < window.innerHeight / 2 ? 'up_dz' : 'srch_dz';
 
         var err = this.getAttribute('err');
+        if (!err && dz == 'up_dz' && !has(perms, 'write'))
+            err = L.u_ewrite;
+        if (!err && dz == 'srch_dz' && !has(perms, 'read'))
+            err = L.u_eread;
         if (err)
             return modal.alert('sorry, ' + err);
 
