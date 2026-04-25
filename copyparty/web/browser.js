@@ -1347,7 +1347,7 @@ function parseColor (strColor) {
 function setColor (color) {
 	accent = color;
 	swrite('accent', accent);
-	var a = accent || '#fc5';
+	var a = accent || '';
 	console.log('accent color set to: ' + a);
 	document.documentElement.style.setProperty('--a', a);
 	pbar.drawbuf();
