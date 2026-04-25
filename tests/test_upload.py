@@ -232,6 +232,193 @@ class TestUpload(unittest.TestCase):
 
         self.conn.shutdown()
 
+    def test_upload_partial_file_cleanup_on_size_limit(self):
+        """Test that partial files are cleaned up when upload exceeds size limit"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::a"]
+        os.makedirs("up")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"], smax=50)
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        large_content = b"A" * 100
+        files = [("large.txt", large_content)]
+        h, body = self.bup("up", files)
+        
+        partial_files = [f for f in os.listdir("up") if "PARTIAL" in f]
+        self.assertEqual(len(partial_files), 0, "Partial files should be cleaned up on failure")
+        
+        self.assertFalse(os.path.exists("up/large.txt"))
+
+        self.conn.shutdown()
+
+    def test_upload_json_error_response(self):
+        """Test that upload failures return proper JSON error response"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["ro/::r"]
+        os.makedirs("ro")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        files = [("test.txt", "This should fail")]
+        h, body = self.bup("ro?j", files)
+        
+        self.assertIn("HTTP/1.1 403", h)
+        
+        self.assertFalse(os.path.exists("ro/test.txt"))
+
+        self.conn.shutdown()
+
+    def test_upload_reservation_file_creation(self):
+        """Test that reservation files are created before upload"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::a"]
+        os.makedirs("up")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        files = [("test.txt", "Content")]
+        h, body = self.bup("up", files)
+        
+        self.assertIn("HTTP/1.1 201", h)
+        
+        self.assertTrue(os.path.exists("up/test.txt"))
+        with open("up/test.txt", "r") as f:
+            self.assertEqual(f.read(), "Content")
+
+        self.conn.shutdown()
+
+    def test_upload_multiple_files_atomicity(self):
+        """Test that multi-file upload handles each file properly"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::a"]
+        os.makedirs("up")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        files = [
+            ("file1.txt", "Content 1"),
+            ("file2.txt", "Content 2"),
+        ]
+        h, body = self.bup("up?j", files)
+        
+        self.assertIn("HTTP/1.1 201", h)
+        
+        response = json.loads(body)
+        self.assertEqual(response["status"], "OK")
+        self.assertEqual(len(response["files"]), 2)
+        
+        self.assertTrue(os.path.exists("up/file1.txt"))
+        self.assertTrue(os.path.exists("up/file2.txt"))
+        
+        with open("up/file1.txt", "r") as f:
+            self.assertEqual(f.read(), "Content 1")
+        with open("up/file2.txt", "r") as f:
+            self.assertEqual(f.read(), "Content 2")
+
+        self.conn.shutdown()
+
+    def test_upload_empty_file(self):
+        """Test uploading an empty file"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::a"]
+        os.makedirs("up")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        files = [("empty.txt", "")]
+        h, body = self.bup("up?j", files)
+        
+        self.assertIn("HTTP/1.1 201", h)
+        
+        response = json.loads(body)
+        self.assertEqual(response["status"], "OK")
+        self.assertEqual(response["sz"], 0)
+        
+        self.assertTrue(os.path.exists("up/empty.txt"))
+        with open("up/empty.txt", "r") as f:
+            self.assertEqual(f.read(), "")
+
+        self.conn.shutdown()
+
+    def test_upload_with_hash_verification(self):
+        """Test upload with hash verification enabled"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::a"]
+        os.makedirs("up")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"], bup_ck="sha256")
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        content = "Test content for hash verification"
+        files = [("hash_test.txt", content)]
+        h, body = self.bup("up?j", files)
+        
+        self.assertIn("HTTP/1.1 201", h)
+        
+        response = json.loads(body)
+        self.assertEqual(response["status"], "OK")
+        self.assertIn("sha256", response["files"][0])
+        self.assertIn("sha_b64", response["files"][0])
+        
+        self.assertTrue(os.path.exists("up/hash_test.txt"))
+        with open("up/hash_test.txt", "r") as f:
+            self.assertEqual(f.read(), content)
+
+        self.conn.shutdown()
+
+    def test_upload_overwrite_protection_without_permission(self):
+        """Test that overwrite is prevented without delete permission"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::w"]
+        os.makedirs("up")
+        
+        with open("up/existing.txt", "w") as f:
+            f.write("original content")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        files = [("existing.txt", "new content")]
+        h, body = self.bup("up", files)
+        
+        with open("up/existing.txt", "r") as f:
+            self.assertEqual(f.read(), "original content")
+
+        self.conn.shutdown()
+
     def bup(self, url, files):
         """
         Perform a basic upload (bput) request.

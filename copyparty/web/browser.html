@@ -43,7 +43,9 @@
 				<div id="bup_bar" style="width:0%; height:100%; background:linear-gradient(90deg, #09d, #4b0); transition:width 0.1s;"></div>
 			</div>
 			<div id="bup_percent" style="text-align:center; margin-top:5px; font-size:0.9em;"></div>
-			<div id="bup_speed" style="text-align:center; margin-top:5px; font-size:0.9em; color:#888;"></div>
+			<div id="bup_stats" style="text-align:center; margin-top:5px; font-size:0.9em; color:#888;">
+				<span id="bup_speed"></span> | <span id="bup_eta"></span> | <span id="bup_remaining"></span>
+			</div>
 		</div>
 		<div id="bup_result" style="display:none; margin-top:10px; padding:10px; border-radius:5px;"></div>
 		<a id="bbsw" href="?b=u" rel="nofollow"><br />switch to basic browser</a>
@@ -175,23 +177,46 @@
 	</script>
 	<script>
 		(function() {
-			var MAX_RETRIES = 3,
-				RETRY_DELAY = 1000,
-				progressDiv = null,
-				progressBar = null,
-				progressPercent = null,
-				progressSpeed = null,
-				progressStatus = null,
-				progressFileinfo = null,
-				resultDiv = null,
-				form = null,
-				submitBtn = null,
-				fileInput = null,
-				uploadStartTime = 0,
-				currentRetry = 0,
-				currentFiles = [],
-				currentFileIndex = 0,
-				totalFilesSize = 0;
+			var CONFIG = {
+				MAX_RETRIES: 3,
+				RETRY_DELAY_BASE: 1000,
+				RETRY_HTTP_CODES: [0, 408, 500, 502, 503, 504],
+				SPEED_SMOOTHING_FACTOR: 0.3,
+				MIN_SPEED_SAMPLES: 3,
+				PROGRESS_UPDATE_MIN_INTERVAL: 50,
+				TIMEOUT: 300000
+			};
+
+			var UI = {
+				progressDiv: null,
+				progressBar: null,
+				progressPercent: null,
+				progressSpeed: null,
+				progressEta: null,
+				progressRemaining: null,
+				progressStatus: null,
+				progressFileinfo: null,
+				resultDiv: null,
+				form: null,
+				submitBtn: null,
+				fileInput: null
+			};
+
+			var uploadState = {
+				currentFiles: [],
+				currentFileIndex: 0,
+				totalFilesSize: 0,
+				isUploading: false,
+				shouldCancel: false
+			};
+
+			var progressTracker = {
+				lastUpdateTime: 0,
+				lastLoadedBytes: 0,
+				smoothedSpeed: 0,
+				speedSamples: [],
+				uploadStartTime: 0
+			};
 
 			function formatSize(bytes) {
 				if (bytes === 0) return '0 B';
@@ -209,191 +234,432 @@
 				return parseFloat((bytesPerSec / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 			}
 
+			function formatDuration(seconds) {
+				if (!isFinite(seconds) || seconds < 0) return '--:--';
+				
+				seconds = Math.ceil(seconds);
+				
+				if (seconds < 60) {
+					return seconds + 's';
+				} else if (seconds < 3600) {
+					var mins = Math.floor(seconds / 60);
+					var secs = seconds % 60;
+					return mins + 'm ' + secs + 's';
+				} else {
+					var hours = Math.floor(seconds / 3600);
+					var mins = Math.floor((seconds % 3600) / 60);
+					return hours + 'h ' + mins + 'm';
+				}
+			}
+
+			function initProgressTracker() {
+				progressTracker = {
+					lastUpdateTime: Date.now(),
+					lastLoadedBytes: 0,
+					smoothedSpeed: 0,
+					speedSamples: [],
+					uploadStartTime: Date.now()
+				};
+			}
+
+			function calculateSpeed(loadedBytes, totalBytes) {
+				var now = Date.now();
+				var timeDiff = (now - progressTracker.lastUpdateTime) / 1000;
+				
+				if (timeDiff <= 0) {
+					return progressTracker.smoothedSpeed;
+				}
+
+				var bytesDiff = loadedBytes - progressTracker.lastLoadedBytes;
+				var instantSpeed = bytesDiff / timeDiff;
+
+				progressTracker.speedSamples.push(instantSpeed);
+				if (progressTracker.speedSamples.length > 10) {
+					progressTracker.speedSamples.shift();
+				}
+
+				if (progressTracker.speedSamples.length >= CONFIG.MIN_SPEED_SAMPLES) {
+					var avgSpeed = progressTracker.speedSamples.reduce(function(a, b) { return a + b; }, 0) / 
+					               progressTracker.speedSamples.length;
+					
+					if (progressTracker.smoothedSpeed === 0) {
+						progressTracker.smoothedSpeed = avgSpeed;
+					} else {
+						progressTracker.smoothedSpeed = 
+							CONFIG.SPEED_SMOOTHING_FACTOR * avgSpeed + 
+							(1 - CONFIG.SPEED_SMOOTHING_FACTOR) * progressTracker.smoothedSpeed;
+					}
+				}
+
+				progressTracker.lastUpdateTime = now;
+				progressTracker.lastLoadedBytes = loadedBytes;
+
+				return progressTracker.smoothedSpeed;
+			}
+
+			function calculateETA(loadedBytes, totalBytes, speed) {
+				if (speed <= 0 || loadedBytes <= 0) {
+					return Infinity;
+				}
+				var remainingBytes = totalBytes - loadedBytes;
+				return remainingBytes / speed;
+			}
+
 			function showProgress(show) {
-				if (progressDiv) {
-					progressDiv.style.display = show ? 'block' : 'none';
+				if (UI.progressDiv) {
+					UI.progressDiv.style.display = show ? 'block' : 'none';
 				}
 			}
 
 			function showResult(success, message) {
-				if (resultDiv) {
-					resultDiv.style.display = 'block';
-					resultDiv.style.background = success ? '#050' : '#500';
-					resultDiv.style.color = '#fff';
-					resultDiv.innerHTML = message;
+				if (UI.resultDiv) {
+					UI.resultDiv.style.display = 'block';
+					UI.resultDiv.style.background = success ? '#050' : '#500';
+					UI.resultDiv.style.color = '#fff';
+					UI.resultDiv.innerHTML = message;
 				}
 			}
 
 			function hideResult() {
-				if (resultDiv) {
-					resultDiv.style.display = 'none';
+				if (UI.resultDiv) {
+					UI.resultDiv.style.display = 'none';
 				}
 			}
 
-			function updateProgress(loaded, total) {
-				if (!progressBar || !progressPercent) return;
+			function updateProgress(loaded, total, forceUpdate) {
+				if (!UI.progressBar || !UI.progressPercent) return;
 				
+				var now = Date.now();
+				if (!forceUpdate && now - progressTracker.lastUpdateTime < CONFIG.PROGRESS_UPDATE_MIN_INTERVAL) {
+					return;
+				}
+
 				var percent = total > 0 ? (loaded / total * 100) : 0;
-				progressBar.style.width = percent + '%';
-				progressPercent.textContent = percent.toFixed(1) + '%';
+				UI.progressBar.style.width = percent + '%';
+				UI.progressPercent.textContent = percent.toFixed(1) + '%';
 				
-				if (uploadStartTime > 0 && loaded > 0) {
-					var elapsed = (Date.now() - uploadStartTime) / 1000;
-					var speed = loaded / elapsed;
-					if (progressSpeed) {
-						progressSpeed.textContent = formatSpeed(speed);
-					}
+				var speed = calculateSpeed(loaded, total);
+				var eta = calculateETA(loaded, total, speed);
+				
+				if (UI.progressSpeed) {
+					UI.progressSpeed.textContent = formatSpeed(speed);
+				}
+				
+				if (UI.progressEta) {
+					UI.progressEta.textContent = 'ETA: ' + formatDuration(eta);
 				}
 			}
 
 			function setStatus(text) {
-				if (progressStatus) {
-					progressStatus.textContent = text;
+				if (UI.progressStatus) {
+					UI.progressStatus.textContent = text;
 				}
 			}
 
 			function setFileinfo(text) {
-				if (progressFileinfo) {
-					progressFileinfo.textContent = text;
+				if (UI.progressFileinfo) {
+					UI.progressFileinfo.textContent = text;
+				}
+			}
+
+			function updateRemainingFiles() {
+				if (UI.progressRemaining) {
+					var remaining = uploadState.currentFiles.length - uploadState.currentFileIndex - 1;
+					UI.progressRemaining.textContent = 
+						'File ' + (uploadState.currentFileIndex + 1) + 
+						'/' + uploadState.currentFiles.length + 
+						(remaining > 0 ? ' (' + remaining + ' remaining)' : '');
 				}
 			}
 
 			function setFormEnabled(enabled) {
-				if (submitBtn) {
-					submitBtn.disabled = !enabled;
+				if (UI.submitBtn) {
+					UI.submitBtn.disabled = !enabled;
+					UI.submitBtn.value = enabled ? 'start upload' : 'uploading...';
 				}
-				if (fileInput) {
-					fileInput.disabled = !enabled;
+				if (UI.fileInput) {
+					UI.fileInput.disabled = !enabled;
 				}
+			}
+
+			function isRetryableError(status, responseText) {
+				if (CONFIG.RETRY_HTTP_CODES.indexOf(status) !== -1) {
+					return true;
+				}
+				
+				if (status >= 500 && status < 600) {
+					return true;
+				}
+				
+				if (status === 200 && responseText) {
+					var lowerText = responseText.toLowerCase();
+					if (lowerText.indexOf('error') !== -1 || 
+					    lowerText.indexOf('timeout') !== -1 ||
+					    lowerText.indexOf('failed') !== -1) {
+						return true;
+					}
+				}
+				
+				return false;
+			}
+
+			function shouldRetryImmediately(status) {
+				return status === 0 || status === 408 || status === 503;
 			}
 
 			function uploadFile(file, formAction, callback) {
-				var xhr = new XMLHttpRequest();
-				var formData = new FormData();
-				
-				formData.append('act', 'bput');
-				formData.append('f', file);
-				
-				uploadStartTime = Date.now();
-				currentRetry = 0;
-				
-				setStatus('Uploading: ' + file.name);
-				setFileinfo('Size: ' + formatSize(file.size) + ' | Retry: ' + currentRetry + '/' + MAX_RETRIES);
-				updateProgress(0, file.size);
-				
+				var currentRetry = 0;
+				var isAborted = false;
+				var currentXhr = null;
+
+				function createFormData() {
+					var formData = new FormData();
+					formData.append('act', 'bput');
+					formData.append('f', file);
+					return formData;
+				}
+
 				function doUpload() {
-					xhr.open('POST', formAction, true);
-					
+					if (isAborted || uploadState.shouldCancel) {
+						callback(new Error('Upload cancelled'), null);
+						return;
+					}
+
+					var xhr = new XMLHttpRequest();
+					currentXhr = xhr;
+					var formData = createFormData();
+
+					initProgressTracker();
+
+					setStatus('Uploading: ' + file.name);
+					setFileinfo(
+						'Size: ' + formatSize(file.size) + 
+						' | Retry: ' + currentRetry + '/' + CONFIG.MAX_RETRIES
+					);
+					updateProgress(0, file.size, true);
+					updateRemainingFiles();
+
 					xhr.upload.onprogress = function(e) {
-						if (e.lengthComputable) {
+						if (e.lengthComputable && !isAborted) {
 							updateProgress(e.loaded, e.total);
 						}
 					};
-					
+
 					xhr.onload = function() {
-						if (xhr.status === 200) {
-							var responseText = xhr.responseText || '';
-							if (responseText.indexOf('error') === -1 && responseText.indexOf('ERR') === -1) {
+						if (isAborted) return;
+						
+						var status = xhr.status;
+						var responseText = xhr.responseText || '';
+						
+						if (status === 200) {
+							var lowerText = responseText.toLowerCase();
+							if (lowerText.indexOf('error') === -1 && 
+							    lowerText.indexOf('ERR') === -1 &&
+							    lowerText.indexOf('failed') === -1) {
+								updateProgress(file.size, file.size, true);
 								callback(null, xhr);
-							} else {
-								callback(new Error('Server error: ' + responseText), xhr);
+								return;
 							}
+						}
+						
+						if (isRetryableError(status, responseText) && currentRetry < CONFIG.MAX_RETRIES) {
+							currentRetry++;
+							var delay = shouldRetryImmediately(status) ? 0 : CONFIG.RETRY_DELAY_BASE * currentRetry;
+							
+							setFileinfo(
+								'Size: ' + formatSize(file.size) + 
+								' | Retry: ' + currentRetry + '/' + CONFIG.MAX_RETRIES +
+								' - ' + (delay > 0 ? 'retrying in ' + delay + 'ms...' : 'retrying now...')
+							);
+							
+							console.log('Retry ' + currentRetry + ' for file: ' + file.name + ', status: ' + status);
+							
+							setTimeout(function() {
+								doUpload();
+							}, delay);
 						} else {
-							callback(new Error('HTTP error: ' + xhr.status), xhr);
+							var errorMsg;
+							if (status === 0) {
+								errorMsg = 'Network error (connection lost)';
+							} else if (status === 403) {
+								errorMsg = 'Access denied (no permission to upload)';
+							} else if (status === 404) {
+								errorMsg = 'Target folder not found';
+							} else if (status >= 500) {
+								errorMsg = 'Server error (' + status + ')';
+							} else {
+								errorMsg = 'Upload failed (HTTP ' + status + ')';
+								if (responseText && responseText.length < 200) {
+									errorMsg += ': ' + responseText;
+								}
+							}
+							callback(new Error(errorMsg), xhr);
 						}
 					};
-					
+
 					xhr.onerror = function() {
-						if (currentRetry < MAX_RETRIES) {
+						if (isAborted) return;
+						
+						console.log('XHR error for file: ' + file.name);
+						
+						if (currentRetry < CONFIG.MAX_RETRIES) {
 							currentRetry++;
-							setFileinfo('Size: ' + formatSize(file.size) + ' | Retry: ' + currentRetry + '/' + MAX_RETRIES + ' - retrying...');
-							setTimeout(doUpload, RETRY_DELAY * currentRetry);
+							var delay = CONFIG.RETRY_DELAY_BASE * currentRetry;
+							
+							setFileinfo(
+								'Size: ' + formatSize(file.size) + 
+								' | Retry: ' + currentRetry + '/' + CONFIG.MAX_RETRIES +
+								' - network error, retrying in ' + delay + 'ms...'
+							);
+							
+							setTimeout(function() {
+								doUpload();
+							}, delay);
 						} else {
-							callback(new Error('Network error after ' + MAX_RETRIES + ' retries'), xhr);
+							callback(new Error('Network error after ' + CONFIG.MAX_RETRIES + ' retries'), xhr);
 						}
 					};
-					
+
 					xhr.ontimeout = function() {
-						if (currentRetry < MAX_RETRIES) {
+						if (isAborted) return;
+						
+						console.log('XHR timeout for file: ' + file.name);
+						
+						if (currentRetry < CONFIG.MAX_RETRIES) {
 							currentRetry++;
-							setFileinfo('Size: ' + formatSize(file.size) + ' | Retry: ' + currentRetry + '/' + MAX_RETRIES + ' - timeout, retrying...');
-							setTimeout(doUpload, RETRY_DELAY * currentRetry);
+							var delay = CONFIG.RETRY_DELAY_BASE * currentRetry;
+							
+							setFileinfo(
+								'Size: ' + formatSize(file.size) + 
+								' | Retry: ' + currentRetry + '/' + CONFIG.MAX_RETRIES +
+								' - timeout, retrying in ' + delay + 'ms...'
+							);
+							
+							setTimeout(function() {
+								doUpload();
+							}, delay);
 						} else {
-							callback(new Error('Timeout after ' + MAX_RETRIES + ' retries'), xhr);
+							callback(new Error('Timeout after ' + CONFIG.MAX_RETRIES + ' retries'), xhr);
 						}
 					};
-					
-					xhr.timeout = 300000;
+
+					xhr.open('POST', formAction, true);
+					xhr.timeout = CONFIG.TIMEOUT;
 					xhr.send(formData);
 				}
-				
+
 				doUpload();
+
+				return {
+					abort: function() {
+						isAborted = true;
+						if (currentXhr) {
+							currentXhr.abort();
+						}
+					}
+				};
 			}
 
 			function uploadNextFile(formAction) {
-				if (currentFileIndex >= currentFiles.length) {
+				if (uploadState.shouldCancel) {
 					showProgress(false);
-					showResult(true, 'All files uploaded successfully! (' + currentFiles.length + ' file(s), ' + formatSize(totalFilesSize) + ')');
+					showResult(false, 'Upload cancelled by user');
 					setFormEnabled(true);
+					uploadState.isUploading = false;
+					return;
+				}
+
+				if (uploadState.currentFileIndex >= uploadState.currentFiles.length) {
+					showProgress(false);
+					showResult(
+						true, 
+						'All files uploaded successfully! (' + 
+						uploadState.currentFiles.length + ' file(s), ' + 
+						formatSize(uploadState.totalFilesSize) + ')'
+					);
+					setFormEnabled(true);
+					uploadState.isUploading = false;
 					return;
 				}
 				
-				var file = currentFiles[currentFileIndex];
+				var file = uploadState.currentFiles[uploadState.currentFileIndex];
+				updateRemainingFiles();
 				
 				uploadFile(file, formAction, function(err, xhr) {
 					if (err) {
 						showProgress(false);
 						showResult(false, 'Upload failed for "' + file.name + '": ' + err.message);
 						setFormEnabled(true);
+						uploadState.isUploading = false;
 					} else {
-						currentFileIndex++;
+						uploadState.currentFileIndex++;
 						uploadNextFile(formAction);
 					}
 				});
 			}
 
+			function initUIElements() {
+				UI.form = document.getElementById('bup_form');
+				UI.submitBtn = document.getElementById('bup_submit');
+				UI.fileInput = document.getElementById('bup_files');
+				UI.progressDiv = document.getElementById('bup_progress');
+				UI.progressBar = document.getElementById('bup_bar');
+				UI.progressPercent = document.getElementById('bup_percent');
+				UI.progressSpeed = document.getElementById('bup_speed');
+				UI.progressEta = document.getElementById('bup_eta');
+				UI.progressRemaining = document.getElementById('bup_remaining');
+				UI.progressStatus = document.getElementById('bup_status');
+				UI.progressFileinfo = document.getElementById('bup_fileinfo');
+				UI.resultDiv = document.getElementById('bup_result');
+			}
+
 			function initBupUpload() {
-				form = document.getElementById('bup_form');
-				submitBtn = document.getElementById('bup_submit');
-				fileInput = document.getElementById('bup_files');
-				progressDiv = document.getElementById('bup_progress');
-				progressBar = document.getElementById('bup_bar');
-				progressPercent = document.getElementById('bup_percent');
-				progressSpeed = document.getElementById('bup_speed');
-				progressStatus = document.getElementById('bup_status');
-				progressFileinfo = document.getElementById('bup_fileinfo');
-				resultDiv = document.getElementById('bup_result');
+				initUIElements();
 				
-				if (!form || !submitBtn || !fileInput) {
+				if (!UI.form || !UI.submitBtn || !UI.fileInput) {
 					console.log('Basic upload form not found');
 					return;
 				}
 				
-				form.addEventListener('submit', function(e) {
+				UI.form.addEventListener('submit', function(e) {
 					e.preventDefault();
 					
-					if (!fileInput.files || fileInput.files.length === 0) {
+					if (!UI.fileInput.files || UI.fileInput.files.length === 0) {
 						showResult(false, 'Please select at least one file to upload.');
 						return;
 					}
+					
+					if (uploadState.isUploading) {
+						console.log('Upload already in progress');
+						return;
+					}
+					
+					uploadState.isUploading = true;
+					uploadState.shouldCancel = false;
 					
 					hideResult();
 					showProgress(true);
 					setFormEnabled(false);
 					
-					currentFiles = Array.from(fileInput.files);
-					currentFileIndex = 0;
-					totalFilesSize = 0;
+					uploadState.currentFiles = Array.from(UI.fileInput.files);
+					uploadState.currentFileIndex = 0;
+					uploadState.totalFilesSize = 0;
 					
-					for (var i = 0; i < currentFiles.length; i++) {
-						totalFilesSize += currentFiles[i].size;
+					for (var i = 0; i < uploadState.currentFiles.length; i++) {
+						uploadState.totalFilesSize += uploadState.currentFiles[i].size;
 					}
 					
 					setStatus('Preparing upload...');
-					setFileinfo('Total: ' + currentFiles.length + ' file(s), ' + formatSize(totalFilesSize));
+					setFileinfo(
+						'Total: ' + uploadState.currentFiles.length + ' file(s), ' + 
+						formatSize(uploadState.totalFilesSize)
+					);
 					
-					var formAction = form.action || window.location.href;
-					uploadNextFile(formAction);
+					var formAction = UI.form.action || window.location.href;
+					
+					setTimeout(function() {
+						uploadNextFile(formAction);
+					}, 100);
 				});
 			}
 
