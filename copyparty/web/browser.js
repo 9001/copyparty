@@ -6841,34 +6841,34 @@ var search_ui = (function () {
 	var sconf = [
 		[
 			L.s_fn,
-			["name", "name", L.s_f1, "15", ".exe$"]
+			["name", "name", L.s_f1, "td_s", ".exe$"]
 		],
 		[
 			L.s_rd,
-			["path", "path", L.s_r1, "30", "windows  -system32"]
+			["path", "path", L.s_r1, "td_w", "windows  -system32"]
 		],
 		[
 			L.s_sz,
-			["szl", "sz_min", L.s_s1, "14", ""],
-			["szu", "sz_max", L.s_s2, "14", ""]
+			["szl", "sz_min", L.s_s1, "td_s", ""],
+			["szu", "sz_max", L.s_s2, "td_s", ""]
 		],
 		[
 			L.s_dt,
-			["dtl", "dt_min", L.s_d1, "14", "1997-08-15, 01:00", "date"],
-			["dtu", "dt_max", L.s_d2, "14", "2020", "date"]
+			["dtl", "dt_min", L.s_d1, "td_s", "1997-08-15, 01:00", "date"],
+			["dtu", "dt_max", L.s_d2, "td_s", "2020", "date"]
 		],
 		[
 			L.s_ta,
-			["tags", "tags", L.s_t1, "30", "^irui$"]
+			["tags", "tags", L.s_t1, "td_w", "^irui$"]
 		],
 		[
 			L.s_ad,
-			["adv", "adv", L.s_a1, "30", "key>=1A  key<=2B  .bpm>165"]
+			["adv", "adv", L.s_a1, "td_w", "key>=1A  key<=2B  .bpm>165"]
 		],
 		[
 			L.s_ua,
-			["utl", "ut_min", L.s_u1, "14", "2007-04-08", "date"],
-			["utu", "ut_max", L.s_u2, "14", "2038-01-19", "date"]
+			["utl", "ut_min", L.s_u1, "td_s", "2007-04-08", "date"],
+			["utu", "ut_max", L.s_u2, "td_s", "2038-01-19", "date"]
 		]
 	];
 
@@ -6888,8 +6888,8 @@ var search_ui = (function () {
 			html.push(
 				'<td colspan="' + csp + '"><input id="' + hn + 'c" type="checkbox">\n' +
 				'<label for="' + hn + 'c">' + sconf[a][b][2] + '</label>\n' +
-				'<br /><input id="' + hn + 'v" type="' + type + '" style="width:' + sconf[a][b][3] +
-				'em" name="' + sconf[a][b][1] + '" placeholder="' + sconf[a][b][4] + '" /></td>');
+				'<br /><input id="' + hn + 'v" type="' + type + '" class="' + sconf[a][b][3] +
+				'" name="' + sconf[a][b][1] + '" placeholder="' + sconf[a][b][4] + '" /></td>');
 			if (csp == 2)
 				break;
 		}

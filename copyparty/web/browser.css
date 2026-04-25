@@ -651,6 +651,14 @@ html.y #path {
 	scroll-margin-top: 25vh;
 	scroll-margin-bottom: 20vh;
 }
+.td_w {
+	width: 30em;
+	max-width: 30em;
+}
+.td_s {
+	width: 14em;
+	max-width: 14em;
+}
 #files tbody div a {
 	color: var(--tab-alt);
 }
@@ -3640,6 +3648,14 @@ html:not(.e) #wrap.thin {
 html.e #wrap.thin {
 	#ghead {
 		top: 5.1em;
+	}
+}
+#wrap.thin {
+	.td_w {
+		width: calc(100vw - 8.5em);
+	}
+	.td_s {
+		width: calc(50vw - 5em);
 	}
 }
 @media (max-width: 50em){
