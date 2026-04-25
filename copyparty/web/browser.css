@@ -3403,7 +3403,7 @@ html.a #path,
 html.a #srch_form,
 html.a .ghead {
 	background: #ccc;
-	background: linear-gradient(-5deg, var(--btn-bg), color-mix(var(--a-gray) 20%, transparent 80%));
+	background: linear-gradient(-5deg, var(--btn-bg), color-mix(var(--a-gray) 30%, transparent));
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 0 .3em var(--bg-d3);
 	backdrop-filter: blur(10px);
