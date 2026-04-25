@@ -608,6 +608,7 @@ html .ayjump:focus-visible {
 	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
+	background: var(--bg);
 }
 #pathBar #folder_search {
 	margin: 0;
@@ -3409,9 +3410,14 @@ html.a #path,
 html.a #srch_form,
 html.a .ghead {
 	background: #ccc;
-	background: var(--bg-u2);
+	background: linear-gradient(-5deg, var(--btn-bg), color-mix(var(--a-gray) 20%, transparent 80%));
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 0 .3em var(--bg-d3);
+	backdrop-filter: blur(10px);
+}
+html.a .btn,
+html.c .btn {
+	backdrop-filter: blur(10px);
 }
 /* html.c #u2btn,
 html.a #u2btn {
