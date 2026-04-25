@@ -13,6 +13,10 @@
 	--a: #fc5;
 	accent-color: var(--a);
 	
+	/* accent color in everything */
+	--fg-max: color-mix(#fefefe 95%, var(--a) 5%);
+	--bg-max: color-mix(#010101 95%, var(--a) 5%);
+
 	/* mikudayo */
 	/* --fg-max: #d1d7e9;
 	--bg-max: #0a0b0e;
