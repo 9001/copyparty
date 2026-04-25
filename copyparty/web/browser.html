@@ -31,11 +31,21 @@
 
 	<div id="op_bup" class="opview opbox {% if not ls0 %}act{% endif %}">
 		<div id="u2err"></div>
-		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+		<form id="bup_form" method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
 			<input type="hidden" name="act" value="bput" />
-			<input type="file" name="f" multiple /><br />
-			<input type="submit" value="start upload">
+			<input type="file" id="bup_files" name="f" multiple /><br />
+			<input type="submit" id="bup_submit" value="start upload">
 		</form>
+		<div id="bup_progress" style="display:none; margin-top:10px;">
+			<div id="bup_status" style="margin-bottom:5px; font-weight:bold;"></div>
+			<div id="bup_fileinfo" style="margin-bottom:5px; font-size:0.9em;"></div>
+			<div style="width:100%; background:#333; height:20px; border-radius:10px; overflow:hidden;">
+				<div id="bup_bar" style="width:0%; height:100%; background:linear-gradient(90deg, #09d, #4b0); transition:width 0.1s;"></div>
+			</div>
+			<div id="bup_percent" style="text-align:center; margin-top:5px; font-size:0.9em;"></div>
+			<div id="bup_speed" style="text-align:center; margin-top:5px; font-size:0.9em; color:#888;"></div>
+		</div>
+		<div id="bup_result" style="display:none; margin-top:10px; padding:10px; border-radius:5px;"></div>
 		<a id="bbsw" href="?b=u" rel="nofollow"><br />switch to basic browser</a>
 	</div>
 
@@ -162,6 +172,237 @@
 		jsldp("J_BBX","baguettebox");
 		jsldp("J_BRW","browser");
 		jsldp("J_U2K","up2k");
+	</script>
+	<script>
+		(function() {
+			var MAX_RETRIES = 3,
+				RETRY_DELAY = 1000,
+				progressDiv = null,
+				progressBar = null,
+				progressPercent = null,
+				progressSpeed = null,
+				progressStatus = null,
+				progressFileinfo = null,
+				resultDiv = null,
+				form = null,
+				submitBtn = null,
+				fileInput = null,
+				uploadStartTime = 0,
+				currentRetry = 0,
+				currentFiles = [],
+				currentFileIndex = 0,
+				totalFilesSize = 0;
+
+			function formatSize(bytes) {
+				if (bytes === 0) return '0 B';
+				var k = 1024,
+					sizes = ['B', 'KB', 'MB', 'GB', 'TB'],
+					i = Math.floor(Math.log(bytes) / Math.log(k));
+				return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+			}
+
+			function formatSpeed(bytesPerSec) {
+				if (bytesPerSec === 0) return '0 B/s';
+				var k = 1024,
+					sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s'],
+					i = Math.floor(Math.log(bytesPerSec) / Math.log(k));
+				return parseFloat((bytesPerSec / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+			}
+
+			function showProgress(show) {
+				if (progressDiv) {
+					progressDiv.style.display = show ? 'block' : 'none';
+				}
+			}
+
+			function showResult(success, message) {
+				if (resultDiv) {
+					resultDiv.style.display = 'block';
+					resultDiv.style.background = success ? '#050' : '#500';
+					resultDiv.style.color = '#fff';
+					resultDiv.innerHTML = message;
+				}
+			}
+
+			function hideResult() {
+				if (resultDiv) {
+					resultDiv.style.display = 'none';
+				}
+			}
+
+			function updateProgress(loaded, total) {
+				if (!progressBar || !progressPercent) return;
+				
+				var percent = total > 0 ? (loaded / total * 100) : 0;
+				progressBar.style.width = percent + '%';
+				progressPercent.textContent = percent.toFixed(1) + '%';
+				
+				if (uploadStartTime > 0 && loaded > 0) {
+					var elapsed = (Date.now() - uploadStartTime) / 1000;
+					var speed = loaded / elapsed;
+					if (progressSpeed) {
+						progressSpeed.textContent = formatSpeed(speed);
+					}
+				}
+			}
+
+			function setStatus(text) {
+				if (progressStatus) {
+					progressStatus.textContent = text;
+				}
+			}
+
+			function setFileinfo(text) {
+				if (progressFileinfo) {
+					progressFileinfo.textContent = text;
+				}
+			}
+
+			function setFormEnabled(enabled) {
+				if (submitBtn) {
+					submitBtn.disabled = !enabled;
+				}
+				if (fileInput) {
+					fileInput.disabled = !enabled;
+				}
+			}
+
+			function uploadFile(file, formAction, callback) {
+				var xhr = new XMLHttpRequest();
+				var formData = new FormData();
+				
+				formData.append('act', 'bput');
+				formData.append('f', file);
+				
+				uploadStartTime = Date.now();
+				currentRetry = 0;
+				
+				setStatus('Uploading: ' + file.name);
+				setFileinfo('Size: ' + formatSize(file.size) + ' | Retry: ' + currentRetry + '/' + MAX_RETRIES);
+				updateProgress(0, file.size);
+				
+				function doUpload() {
+					xhr.open('POST', formAction, true);
+					
+					xhr.upload.onprogress = function(e) {
+						if (e.lengthComputable) {
+							updateProgress(e.loaded, e.total);
+						}
+					};
+					
+					xhr.onload = function() {
+						if (xhr.status === 200) {
+							var responseText = xhr.responseText || '';
+							if (responseText.indexOf('error') === -1 && responseText.indexOf('ERR') === -1) {
+								callback(null, xhr);
+							} else {
+								callback(new Error('Server error: ' + responseText), xhr);
+							}
+						} else {
+							callback(new Error('HTTP error: ' + xhr.status), xhr);
+						}
+					};
+					
+					xhr.onerror = function() {
+						if (currentRetry < MAX_RETRIES) {
+							currentRetry++;
+							setFileinfo('Size: ' + formatSize(file.size) + ' | Retry: ' + currentRetry + '/' + MAX_RETRIES + ' - retrying...');
+							setTimeout(doUpload, RETRY_DELAY * currentRetry);
+						} else {
+							callback(new Error('Network error after ' + MAX_RETRIES + ' retries'), xhr);
+						}
+					};
+					
+					xhr.ontimeout = function() {
+						if (currentRetry < MAX_RETRIES) {
+							currentRetry++;
+							setFileinfo('Size: ' + formatSize(file.size) + ' | Retry: ' + currentRetry + '/' + MAX_RETRIES + ' - timeout, retrying...');
+							setTimeout(doUpload, RETRY_DELAY * currentRetry);
+						} else {
+							callback(new Error('Timeout after ' + MAX_RETRIES + ' retries'), xhr);
+						}
+					};
+					
+					xhr.timeout = 300000;
+					xhr.send(formData);
+				}
+				
+				doUpload();
+			}
+
+			function uploadNextFile(formAction) {
+				if (currentFileIndex >= currentFiles.length) {
+					showProgress(false);
+					showResult(true, 'All files uploaded successfully! (' + currentFiles.length + ' file(s), ' + formatSize(totalFilesSize) + ')');
+					setFormEnabled(true);
+					return;
+				}
+				
+				var file = currentFiles[currentFileIndex];
+				
+				uploadFile(file, formAction, function(err, xhr) {
+					if (err) {
+						showProgress(false);
+						showResult(false, 'Upload failed for "' + file.name + '": ' + err.message);
+						setFormEnabled(true);
+					} else {
+						currentFileIndex++;
+						uploadNextFile(formAction);
+					}
+				});
+			}
+
+			function initBupUpload() {
+				form = document.getElementById('bup_form');
+				submitBtn = document.getElementById('bup_submit');
+				fileInput = document.getElementById('bup_files');
+				progressDiv = document.getElementById('bup_progress');
+				progressBar = document.getElementById('bup_bar');
+				progressPercent = document.getElementById('bup_percent');
+				progressSpeed = document.getElementById('bup_speed');
+				progressStatus = document.getElementById('bup_status');
+				progressFileinfo = document.getElementById('bup_fileinfo');
+				resultDiv = document.getElementById('bup_result');
+				
+				if (!form || !submitBtn || !fileInput) {
+					console.log('Basic upload form not found');
+					return;
+				}
+				
+				form.addEventListener('submit', function(e) {
+					e.preventDefault();
+					
+					if (!fileInput.files || fileInput.files.length === 0) {
+						showResult(false, 'Please select at least one file to upload.');
+						return;
+					}
+					
+					hideResult();
+					showProgress(true);
+					setFormEnabled(false);
+					
+					currentFiles = Array.from(fileInput.files);
+					currentFileIndex = 0;
+					totalFilesSize = 0;
+					
+					for (var i = 0; i < currentFiles.length; i++) {
+						totalFilesSize += currentFiles[i].size;
+					}
+					
+					setStatus('Preparing upload...');
+					setFileinfo('Total: ' + currentFiles.length + ' file(s), ' + formatSize(totalFilesSize));
+					
+					var formAction = form.action || window.location.href;
+					uploadNextFile(formAction);
+				});
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', initBupUpload);
+			} else {
+				initBupUpload();
+			}
+		})();
 	</script>
 </body>
 </html>
