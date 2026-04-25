@@ -1340,12 +1340,11 @@ ebi('op_cfg').innerHTML = (
 
 // accent color
 function parseColor (strColor) {
-  var s = new Option().style;
-  s.color = strColor;
-  return s.color !== '' ? s.color : '';
+	var s = new Option().style;
+	s.color = strColor;
+	return s.color !== '' ? s.color : '';
 }
 function setColor (color) {
-
 	accent = color;
 	swrite('accent', accent);
 	var a = accent || '#fc5';
@@ -1353,12 +1352,18 @@ function setColor (color) {
 	document.documentElement.style.setProperty('--a', a);
 }
 ebi('accent').oninput = ebi('accent_picker').oninput = function () {
-	if(this == ebi('accent'))
-		ebi('accent_picker').value = this.value;
-	else if(this == ebi('accent_picker'))
-		ebi('accent').value = this.value;
-
 	var validcolor = parseColor(this.value);
+	console.log(this.value);
+
+	if(this == ebi('accent')){
+		ebi('accent_picker').value = this.value;
+	}
+	else if(this == ebi('accent_picker')){
+		if(this.value == '#000000')
+			validcolor = ''; // firefox submits the color picker value on browser startup
+		ebi('accent').value = this.value;
+	}
+
 	clmod(ebi('accent'), 'invalid', this.value.length != 0 && validcolor.length == 0);
 	if(validcolor == accent) 
 		return;
@@ -1367,9 +1372,11 @@ ebi('accent').oninput = ebi('accent_picker').oninput = function () {
 		setColor(validcolor);
 	}, 100); 
 }
-var accent = ebi('accent').value = ebi('accent_picker').value = sread('accent');
-if(accent){
+var accent = sread('accent');
+if(accent && accent.length > 3){
+	console.log('read accent color from settings: ' + accent);
 	document.documentElement.style.setProperty('--a', parseColor(accent));
+	ebi('accent').value = ebi('accent_picker').value = accent;
 }
 
 // navpane
