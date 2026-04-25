@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.19"
-S_BUILD_DT = "2026-01-18"
+S_VERSION = "2.20"
+S_BUILD_DT = "2026-04-22"
 
 """
 u2c.py: upload to copyparty
@@ -1184,7 +1184,7 @@ class Ctl(object):
             handshake(self.ar, file, False)
 
     def cleanup_vt100(self):
-        if VT100:
+        if VT100 and not self.ar.ns:
             ss.scroll_region(None)
         else:
             eprint("\033]9;4;0\033\\")

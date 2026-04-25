@@ -282,7 +282,7 @@ function U2pvis(act, btns, uc, st) {
             nb = fo.bt * (++fo.nh / fo.cb.length),
             p = r.perc(nb, 0, fobj.size, fobj.t_hashing);
 
-        fo.hp = f2f(p[0], 2) + '%, ' + p[1] + ', ' + f2f(p[2], 2) + ' MB/s';
+        fo.hp = f2f(p[0], 2) + '%, ' + p[1] + ', ' + f2f(p[2], 2) + ' MiB/s';
         if (!r.is_act(fo.in))
             return;
 
@@ -302,7 +302,7 @@ function U2pvis(act, btns, uc, st) {
             return;
 
         var p = r.perc(fo.bd, fo.bd0, fo.bt, fobj.t_uploading);
-        fo.hp = f2f(p[0], 2) + '%, ' + p[1] + ', ' + f2f(p[2], 2) + ' MB/s';
+        fo.hp = f2f(p[0], 2) + '%, ' + p[1] + ', ' + f2f(p[2], 2) + ' MiB/s';
 
         if (!r.is_act(fo.in))
             return;
@@ -1664,7 +1664,7 @@ function up2k_init(subtle) {
         }
 
         if (!nhash) {
-            var h = L.u_etadone.format(humansize(st.bytes.hashed), pvis.ctr.ok + pvis.ctr.ng);
+            var h = L.u_etadone.format(humansize(st.bytes.hashed, 2), pvis.ctr.ok + pvis.ctr.ng);
             if (st.eta.h !== h) {
                 st.eta.h = ebi('u2etah').innerHTML = h;
                 console.log('{0} hash, {1} up, {2} busy'.format(
@@ -1675,7 +1675,7 @@ function up2k_init(subtle) {
         }
 
         if (!nsend && !nhash) {
-            var h = L.u_etadone.format(humansize(st.bytes.uploaded), pvis.ctr.ok + pvis.ctr.ng);
+            var h = L.u_etadone.format(humansize(st.bytes.uploaded, 2), pvis.ctr.ok + pvis.ctr.ng);
 
             if (st.eta.u !== h)
                 st.eta.u = ebi('u2etau').innerHTML = h;
@@ -1740,7 +1740,7 @@ function up2k_init(subtle) {
 
             donut.eta = eta;
             st.eta[eid] = '{0}, {1}/s, {2}'.format(
-                humansize(rem), humansize(bps, 1), humantime(eta));
+                humansize(rem, 2), humansize(bps, 1), humantime(eta));
 
             if (!etaskip)
                 ebi(hid).innerHTML = st.eta[eid];
@@ -2721,7 +2721,7 @@ function up2k_init(subtle) {
                     var spd1 = (t.size / ((t.t_hashed - t.t_hashing) / 1000.)) / (1024 * 1024.),
                         spd2 = (t.size / ((t.t_uploaded - t.t_uploading) / 1000.)) / (1024 * 1024.);
 
-                    pvis.seth(t.n, 2, 'hash {0}, up {1} MB/s'.format(
+                    pvis.seth(t.n, 2, 'hash {0}, up {1} MiB/s'.format(
                         f2f(spd1, 2), !isNum(spd2) ? '--' : f2f(spd2, 2)));
 
                     pvis.move(t.n, 'ok');

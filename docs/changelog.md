@@ -1,4 +1,75 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0323-0328  `v1.20.13`  dothidden
+
+## 🧪 new features
+
+* #1351 add [.hidden](https://github.com/9001/copyparty/#dothidden) support (thx @NecRaul!) beb634dc 134e378e
+  * cosmetic filter to exclude specific files from directory listings by adding their filenames to a textfile named `.hidden` similar to many linux desktop file managers
+  * the files are still easily available from various APIs; this is **not** a security feature, just a way to keep things neat and tidy
+* #1381 thumbnail pregeneration 7d6b037d
+  * usually/generally not a good idea; [readme explains it](https://github.com/9001/copyparty/#thumbnail-pregen)
+* shares: now possible to grant the `.` permission to see dotfiles 66f9c950
+
+## 🩹 bugfixes
+
+* #1372 #1333 no thumbnails if the server OS was too old to have JXL support and the webbrowser was asking for JXL 1afe48b8
+* #1363 new-version alert would only appear if the visitor had the Admin permission in the webroot specifically; now `A` in any volume is sufficient 6eb4f0ad
+* 66f1ef63 should have blocked mkdir too and now it does (thx @restriction!) ac60a1da
+* setting the `nohtml` or `noscript` volflags on the webroot would break the web-UI eb028c92
+* shares: the [-ed](https://copyparty.eu/cli/#g-ed) global-option did not make dotfiles visible in shares 66f9c950
+  * the `dots` volflag still doesn't, but that one is intentional
+
+## 🔧 other changes
+
+* tried to stop libvips from gobbling up ram while creating jxl thumbnails; didn't really work abdbd69a
+  * jxl support in libvips is now default-disabled unless the libc is musl and the allocator is mallocng, which means alpine linux
+    * in other words, libvips is still fully enabled in the `iv` and `dj` docker images if you do not enable mimalloc
+  * all other deployments will now have slightly slower jxl thumbnail generation by using ffmpeg instead (it's fine really)
+    * new global-option [--th-vips-jxl](https://copyparty.eu/cli/#g-th-vips-jxl) lets you force-enable it if you dare
+* volflags `nohtml` and `noscript` now available as global-options `--no-html` and `--no-script` 5f3b76c8
+  * and the `-ss` paranoia option now also enables `--no-html --no-readme --no-logues`
+* [--flo 2](https://copyparty.eu/cli/#g-flo) now removes colors from logfiles even if [-q](https://copyparty.eu/cli/#g-q) is not set 8c6d8a3c
+* update dompurify to 3.3.3 6a9e6da8
+* docs:
+  * #1360 versus.md: more readable headers (thx @eugenesvk!) e71e1900
+  * #1367 mention [--shr-who](https://copyparty.eu/cli/#g-shr-who) in the readme (thx @TWhiteShadow!) 4688410f
+
+## 🌠 fun facts
+
+* it is easter soon edc20175
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0311-0042  `v1.20.12`  fix shares in ftp/sftp
+
+## ⚠️ ATTN: this release fixes an ftp/sftp issue with shares
+
+* [GHSA-67rw-2x62-mqqm](https://github.com/9001/copyparty/security/advisories/GHSA-67rw-2x62-mqqm): when a share is created for just one or more files inside a folder, it was possible to use FTP or SFTP to access the other files inside that folder by guessing the filenames
+  * so ignore this issue if you did not enable [ftp](https://copyparty.eu/cli/#g-ftp) or [sftp](https://copyparty.eu/cli/#g-sftp) in the server config
+* it was not possible to descend into subdirectories in this manner; only the sibling files were accessible
+* NOTE: this does NOT affect filekeys; this is specifically regarding the [shr](https://copyparty.eu/cli/#g-shr) global-option
+* password-protected shares were not affected through SFTP, only FTP
+
+this release also fixes [GHSA-rcp6-88mm-9vgf](https://github.com/9001/copyparty/security/advisories/GHSA-rcp6-88mm-9vgf) but that one is nothing to worry about
+
+## 🧪 new features
+
+* features? in this econonmy?? ain't nobody got time for that
+
+## 🩹 bugfixes
+
+* 66f1ef63547a8c5f45dc2472801d2a973ff997cc [GHSA-67rw-2x62-mqqm](https://github.com/9001/copyparty/security/advisories/GHSA-67rw-2x62-mqqm) (shares)
+* 9f9d30f42c89d1d5fc79ae745f136a9d5f857192 [GHSA-rcp6-88mm-9vgf](https://github.com/9001/copyparty/security/advisories/GHSA-rcp6-88mm-9vgf) (the other thing)
+
+## 🌠 fun facts
+
+* the [first cve](https://github.com/9001/copyparty/security/advisories/GHSA-pxfv-7rr3-2qjg) is still by far the worst, none of the others even close... so at least that's nice
+  * if you saw the cve notification and got all worked up, here's some [comfy music to relax and upgrade copyparty to](https://www.youtube.com/watch?v=A4zlH2mzMHw&list=PLRKwPvvniAjauumQljdrWAImRQGF3mCRU&index=1)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0308-2106  `v1.20.11`  what? nohtml is evolving!
 
 ## ⚠️ ATTN: this release fixes a vulnerability

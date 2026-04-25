@@ -1227,16 +1227,20 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3 id="h_filesize">🔢 ' + L.cl_hfsz + '</h3>\n' +
 	'	<div><select id="fszfmt">\n' +
-	'		<option value="0">0 ┃ 1234567</option>\n' +
-	'		<option value="1">1 ┃ 1 234 567</option>\n' +
-	'		<option value="2">2- ┃ 1.18 M</option>\n' +
-	'		<option value="2c">2c ┃ 1.18 M</option>\n' +
-	'		<option value="3">3- ┃ 1.2 M</option>\n' +
-	'		<option value="3c">3c ┃ 1.2 M</option>\n' +
-	'		<option value="4">4- ┃ 1.18 MB</option>\n' +
-	'		<option value="4c">4c ┃ 1.18 MB</option>\n' +
-	'		<option value="5">5- ┃ 1.2 MB</option>\n' +
-	'		<option value="5c">5c ┃ 1.2 MB</option>\n' +
+	'		<option value="0">0 ┃ 2345678</option>\n' +
+	'		<option value="1">1 ┃ 2 345 678</option>\n' +
+	'		<option value="2">2- ┃ 2.24 M /1024</option>\n' +
+	'		<option value="2c">2c ┃ 2.24 M /1024</option>\n' +
+	'		<option value="3">3- ┃ 2.2 M /1024</option>\n' +
+	'		<option value="3c">3c ┃ 2.2 M /1024</option>\n' +
+	'		<option value="4">4- ┃ 2.24 Mi /1024</option>\n' +
+	'		<option value="4c">4c ┃ 2.24 Mi /1024</option>\n' +
+	'		<option value="5">5- ┃ 2.2 Mi /1024</option>\n' +
+	'		<option value="5c">5c ┃ 2.2 Mi /1024</option>\n' +
+	'		<option value="6">6- ┃ 2.35 MB /1000</option>\n' +
+	'		<option value="6c">6c ┃ 2.35 MB /1000</option>\n' +
+	'		<option value="7">7- ┃ 2.3 MB /1000</option>\n' +
+	'		<option value="7c">7c ┃ 2.3 MB /1000</option>\n' +
 	'		<option value="fuzzy">fuzzy</option>\n' +
 	'	</select></div>\n' +
 	'</div>\n' +

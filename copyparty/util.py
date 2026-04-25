@@ -62,6 +62,20 @@ def noop(*a, **ka):
     pass
 
 
+def lprint(*a: "Any", **ka: "Any") -> None:
+    eol = ka.pop("end", "\n")
+    txt = " ".join(unicode(x) for x in a) + eol
+    lprinted.append(txt)
+    if not VT100 and "\033" in txt:
+        txt = RE_ANSI.sub("", txt)
+
+    print(txt, end="", **ka)
+
+
+lprinted: list[str] = []
+LOG: list["Callable[..., None]"] = [lprint]
+
+
 try:
     from datetime import datetime, timezone
 
@@ -788,7 +802,7 @@ def read_utf8(log: Optional["NamedLogger"], ap: Union[str, bytes], strict: bool)
         if log:
             log(t, 3)
         else:
-            print(t)
+            LOG[0]("#", t)
         return buf.decode("utf-8", "replace")
 
     t = "ERROR: The file [%s] is not using the UTF-8 character encoding, and cannot be loaded. The first unreadable character was byte %r at offset %d. Please convert this file to UTF-8 by opening the file in your text-editor and saving it as UTF-8."
@@ -796,7 +810,7 @@ def read_utf8(log: Optional["NamedLogger"], ap: Union[str, bytes], strict: bool)
     if log:
         log(t, 3)
     else:
-        print(t)
+        LOG[0]("#", t)
     raise NotUTF8(t)
 
 
@@ -1573,12 +1587,18 @@ def _expand_osenv_c(txt) -> str:
     ret = zsl[0]
     for v in zsl[1:]:
         if "}" not in v:
-            raise Exception("missing '}' after %r in config-value %r" % (v, txt))
+            t = "missing '}' after %r in config-value %r" % (v, txt)
+            LOG[0]("ERROR:", t)
+            raise Exception(t)
         a, b = v.split("}", 1)
         try:
             ret += os.environ[a] + b
+            continue
         except:
-            raise Exception("env-var %r not defined; config-value %r" % (a, txt))
+            pass
+        t = "env-var %r not defined; config-value %r" % (a, txt)
+        LOG[0]("ERROR:", t)
+        raise Exception(t)
     return ret
 
 
@@ -1595,8 +1615,24 @@ def expand_osenv_cs(txt) -> str:
     b = expand_osenv_s(txt)
     if a == b:
         return a
-    t = "config-value %r is using the old syntax for environment-variables; choose one of the following options:\noption 1: update the config-value to the new syntax, ${VAR} instead of $VAR or %%VAR%%\noption 2: tell copyparty to allow the old syntax with global-option --env-expand 1 (risky)\noption 3: tell copyparty to only use the new syntax (and not expand this variable) with global-option --env-expand 2\noption 4: disable all environment-variable expansions with PRTY_NO_ENVEXPAND=1 or global-option --env-expand 0"
-    raise Exception(t % (txt,))
+
+    t = "config-value %r is using old syntax for environment-variables; choose one of the following:\noption 1: update the config-value to the new syntax; ${VAR} instead of $VAR or %%VAR%%\noption 2: allow and expand old-syntax with global-option --env-expand 1 (risky)\noption 3: ignore/disable expansion of old-syntax with global-option --env-expand 2\noption 4: disable all env-var expansions by setting env-var PRTY_NO_ENVEXPAND=1"
+    t = t % (txt,)
+    LOG[0]("WARNING:", t)
+
+    try:
+        _, _ = txt.split("$")
+        zs = r"\$(LOGS_DIRECTORY|XDG_[A-Z]+_HOME|XDG_[A-Z]+_DIR)\b"
+        txt = re.sub(zs, r"${\1}", txt)
+
+        a = expand_osenv_c(txt)
+        b = expand_osenv_s(txt)
+        if a == b:
+            return a
+    except:
+        pass
+
+    raise Exception(t)
 
 
 def rice_tid() -> str:
@@ -3140,6 +3176,31 @@ def list_ips() -> list[str]:
     return list(ret)
 
 
+def list_nics(alll: bool = False) -> dict[str, Netdev]:
+    nics = get_adapters(alll)
+    eps: dict[str, Netdev] = {}
+    for nic in nics:
+        name = nic.nice_name
+        try:
+            idx = socket.if_nametoindex(name)
+            if idx and idx != nic.index:
+                LOG[0]("#", "nic-idx mismatch; ifaddr=%r libc=%r" % (nic.index, idx), 3)
+        except:
+            idx = nic.index
+
+        for nip in nic.ips:
+            ipa = nip.ip[0] if ":" in str(nip.ip) else nip.ip
+            sip = "%s/%s" % (ipa, nip.network_prefix)
+            nd = Netdev(sip, idx or 0, name, "")
+            eps[sip] = nd
+
+        if alll and not nic.ips:
+            zs = "no-ip-%s" % (idx,)
+            eps[zs] = Netdev(zs, idx or 0, name, "")
+
+    return eps
+
+
 def build_netmap(csv: str, defer_mutex: bool = False):
     csv = csv.lower().strip()
 
@@ -4097,8 +4158,11 @@ def _runhook(
             "src": src,
         }
         if txt:
-            ja["txt"] = txt[0]
-            ja["body"] = txt[1]
+            if src in ("xm", "xban"):
+                ja["txt"] = txt[0]
+                ja["body"] = txt[1]
+            else:
+                ja["wark"] = txt[0]  # acshually the dwark but less confusing
         if imp:
             ja["log"] = log
             mod = loadpy(acmd[0], False)
@@ -4211,7 +4275,7 @@ def runhook(
                 else:
                     ret[k] = v
         except Exception as ex:
-            (log or print)("hook: %r, %s" % (ex, ex))
+            (log or print)("hook failed; %s:\n%s" % (ex, min_ex()))
             if ",c," in "," + cmd:
                 return {"rc": 1}
             break

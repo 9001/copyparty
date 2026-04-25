@@ -3357,7 +3357,7 @@ class Up2k(object):
                                 job["size"],
                                 job["addr"],
                                 job["at"],
-                                None,
+                                [dwark],
                             )
                             t = hr.get("rejectmsg") or ""
                             if t or hr.get("rc") != 0:
@@ -4069,7 +4069,7 @@ class Up2k(object):
                 sz,
                 ip,
                 at or time.time(),
-                None,
+                [dwark],
             )
             t = hr.get("rejectmsg") or ""
             if t or hr.get("rc") != 0:
@@ -5251,7 +5251,7 @@ class Up2k(object):
                 job["size"],
                 job["addr"],
                 job["t0"],
-                None,
+                [job["dwrk"]],
             )
             t = hr.get("rejectmsg") or ""
             if t or hr.get("rc") != 0:
@@ -5706,6 +5706,31 @@ def up2k_chunksize(filesize: int) -> int:
 
             chunksize += stepsize
             stepsize *= mul
+
+
+def up2k_hashlist_from_file(path: str) -> tuple[list[str], os.stat_result]:
+    """not used by copyparty itself, only by some hooks"""
+    st = bos.stat(path)
+    fsz = st.st_size
+    csz = up2k_chunksize(fsz)
+    ret = []
+    with open(fsenc(path), "rb", 256 * 1024) as f:
+        while fsz > 0:
+            hashobj = hashlib.sha512()
+            rem = min(csz, fsz)
+            fsz -= rem
+            while rem > 0:
+                buf = f.read(min(rem, 64 * 1024))
+                if not buf:
+                    raise Exception("EOF at " + str(f.tell()))
+
+                hashobj.update(buf)
+                rem -= len(buf)
+
+            digest = hashobj.digest()[:33]
+            ret.append(ub64enc(digest).decode("ascii"))
+
+    return ret, st
 
 
 def up2k_wark_from_hashlist(salt: str, filesize: int, hashes: list[str]) -> str:

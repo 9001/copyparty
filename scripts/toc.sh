@@ -27,7 +27,7 @@ cat $f | awk '
         sub(/\[/,"");
         sub(/\]\([^)]+\)/,"");
         bab=$0;
-        gsub(/ /,"-",bab);
+        gsub(/[ :]+/,"-",bab);
         gsub(/\./,"",bab);
         h=sprintf("%" ((lv-1)*4+1) "s [%s](#%s)", "*",$0,bab);
         next

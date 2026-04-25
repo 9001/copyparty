@@ -23,6 +23,7 @@ from .util import (
     atomic_move,
     chkcmd,
     get_adapters,
+    list_nics,
     min_ex,
     sunpack,
     termsize,
@@ -461,23 +462,7 @@ class TcpSrv(object):
     def detect_interfaces(self, listen_ips: list[str]) -> dict[str, Netdev]:
         listen_ips = [x for x in listen_ips if not x.startswith(("unix:", "fd:"))]
 
-        nics = get_adapters(True)
-        eps: dict[str, Netdev] = {}
-        for nic in nics:
-            for nip in nic.ips:
-                ipa = nip.ip[0] if ":" in str(nip.ip) else nip.ip
-                sip = "{}/{}".format(ipa, nip.network_prefix)
-                nd = Netdev(sip, nic.index or 0, nic.nice_name, "")
-                eps[sip] = nd
-                try:
-                    idx = socket.if_nametoindex(nd.name)
-                    if idx and idx != nd.idx:
-                        t = "netdev idx mismatch; ifaddr={} cpython={}"
-                        self.log("tcpsrv", t.format(nd.idx, idx), 3)
-                        nd.idx = idx
-                except:
-                    pass
-
+        eps = list_nics()
         netlist = str(sorted(eps.items()))
         if netlist == self.netlist and self.netdevs:
             return {}

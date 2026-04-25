@@ -51,9 +51,12 @@ def ensure_cert(log: "RootLogger", args) -> None:
         with open(args.cert, "wb") as f:
             f.write(cert_insec)
 
+    if args.certkey and not os.path.isfile(args.certkey):
+        raise Exception("certificate-key file does not exist: " + args.certkey)
+
     with open(args.cert, "rb") as f:
         buf = f.read()
-        o1 = buf.find(b" PRIVATE KEY-")
+        o1 = buf.find(b" PRIVATE KEY-") if not args.certkey else 0
         o2 = buf.find(b" CERTIFICATE-")
         m = "unsupported certificate format: "
         if o1 < 0:
@@ -252,7 +255,7 @@ def gencert(log: "RootLogger", args, netdevs: dict[str, Netdev]):
     if args.http_only:
         return
 
-    if args.no_crt or not HAVE_CFSSL:
+    if args.no_crt or args.certkey or not HAVE_CFSSL:
         ensure_cert(log, args)
         return
 

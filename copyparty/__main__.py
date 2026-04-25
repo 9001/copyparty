@@ -70,7 +70,10 @@ from .util import (
     expand_osenv_noop,
     expand_osenv_s,
     has_resource,
+    list_ips,
+    list_nics,
     load_resource,
+    lprint,
     min_ex,
     pybin,
     read_utf8,
@@ -98,7 +101,6 @@ except:
     HAVE_SSL = False
 
 u = unicode
-printed: list[str] = []
 zsid = uuid.uuid4().urn[4:]
 
 CFG_DEF = [os.environ.get("PRTY_CONFIG", "")]
@@ -172,16 +174,6 @@ class BasicDodge11874(
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         kwargs["width"] = 9003
         super(BasicDodge11874, self).__init__(*args, **kwargs)
-
-
-def lprint(*a: Any, **ka: Any) -> None:
-    eol = ka.pop("end", "\n")
-    txt: str = " ".join(unicode(x) for x in a) + eol
-    printed.append(txt)
-    if not VT100:
-        txt = RE_ANSI.sub("", txt)
-
-    print(txt, end="", **ka)
 
 
 def warn(msg: str) -> None:
@@ -644,6 +636,9 @@ def get_sects():
             \033[32m-i fd:\033[33m3\033[0m uses the socket passed to copyparty on file descriptor 3
 
             \033[33m-p\033[0m (tcp ports) is ignored for unix-sockets and FDs
+
+            \033[33m--list-nics\033[0m shows all network adapters (also offline ones);
+            \033[33m--list-ips\033[0m shows all LAN IPs
             """
             ),
         ],
@@ -969,6 +964,7 @@ def get_sects():
             values for --urlform:
               \033[36mstash\033[35m dumps the data to file and returns length + checksum
               \033[36msave,get\033[35m dumps to file and returns the page like a GET
+              \033[36mget\033[35m ignores the message and returns the page like a GET
               \033[36mprint    \033[35m prints the data to log and returns an error
               \033[36mprint,xm \033[35m prints the data to log and returns --xm output
               \033[36mprint,get\033[35m prints the data to log and returns GET\033[0m
@@ -1026,6 +1022,23 @@ def get_sects():
             documents into directory listings, and when accessing a ?doc=...
             link, but never otherwise, so if you click a -txt- link you'll
             have to refresh the page to apply expansion
+            """
+            ),
+        ],
+        [
+            "rlo",
+            "logrotate format",
+            dedent(
+                """
+            a logrotate-counter is added if the logfile filename is taken;
+            by default at the end, unless \033[32m%R\033[0m is somewhere in the \033[36m-lo\033[0m pattern,
+            for example:  -lo /var/log/cpp/%Y-%m-%d%R.txt
+
+            \033[36m--rlo\033[0m configures the logrotate format; examples:
+            .1   = when necessary, append a dot followed by a single digit
+            .1!  = counter is always added, even when not necessary
+            -3   = a hyphen followed by three-digit counter
+            (blank) = disable counter; overwrite existing logfile
             """
             ),
         ],
@@ -1216,7 +1229,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--name-url", metavar="TXT", type=u, help="URL for server name hyperlink (displayed topleft in browser)")
     ap2.add_argument("--name-html", type=u, help=argparse.SUPPRESS)
     ap2.add_argument("--site", metavar="URL", type=u, default="", help="public URL to assume when creating links; example: [\033[32mhttps://example.com/\033[0m]")
-    ap2.add_argument("--env-expand", metavar="N", type=int, default=-1, help="syntax to expect for environment-variables to expand in config-files; [\033[32m0\033[0m]=disable, [\033[32m1\033[0m]=$VAR (old syntax (scary)), [\033[32m2\033[0m]=${VAR} (new syntax (recommended))")
+    ap2.add_argument("--env-expand", metavar="N", type=int, default=-1, help="expand environment-variables in config-files? [\033[32m0\033[0m]=no, [\033[32m1\033[0m]=$VAR (old scary syntax), [\033[32m2\033[0m]=${VAR} (new recommended syntax); default is new-syntax with panic if old-syntax is seen")
     ap2.add_argument("--mime", metavar="EXT=MIME", type=u, action="append", help="\033[34mREPEATABLE:\033[0m map file \033[33mEXT\033[0mension to \033[33mMIME\033[0mtype, for example [\033[32mjpg=image/jpeg\033[0m]")
     ap2.add_argument("--mimes", action="store_true", help="list default mimetype mapping and exit")
     ap2.add_argument("--rmagic", action="store_true", help="do expensive analysis to improve accuracy of returned mimetypes; will make file-downloads, rss, and webdav slower (volflag=rmagic)")
@@ -1350,13 +1363,16 @@ def add_network(ap):
     ap2.add_argument("--s-wr-slp", metavar="SEC", type=float, default=0.0, help="debug: socket write delay in seconds")
     ap2.add_argument("--rsp-slp", metavar="SEC", type=float, default=0.0, help="debug: response delay in seconds")
     ap2.add_argument("--rsp-jtr", metavar="SEC", type=float, default=0.0, help="debug: response delay, random duration 0..\033[33mSEC\033[0m")
+    ap2.add_argument("--list-nics", action="store_true", help="debug: list detected network adapters")
+    ap2.add_argument("--list-ips", action="store_true", help="debug: list detected LAN IPs")
 
 
 def add_tls(ap, cert_path):
     ap2 = ap.add_argument_group("SSL/TLS options")
     ap2.add_argument("--http-only", action="store_true", help="disable ssl/tls -- force plaintext")
     ap2.add_argument("--https-only", action="store_true", help="disable plaintext -- force tls")
-    ap2.add_argument("--cert", metavar="PATH", type=u, default=cert_path, help="path to file containing a concatenation of TLS key and certificate chain")
+    ap2.add_argument("--cert", metavar="PATH", type=u, default=cert_path, help="path to file containing a concatenation of TLS key and certificate chain (if \033[33m--certkey\033[0m is not set), or just the certificate chain (if \033[33m--certkey\033[0m is set)")
+    ap2.add_argument("--certkey", metavar="PATH", type=u, default="", help="path to file containing just the certificate key; if this is set, then \033[33m--cert\033[0m should only contain the certificate chain")
     ap2.add_argument("--ssl-ver", metavar="LIST", type=u, default="", help="set allowed ssl/tls versions; [\033[32mhelp\033[0m] shows available versions; default is what your python version considers safe")
     ap2.add_argument("--ciphers", metavar="LIST", type=u, default="", help="set allowed ssl/tls ciphers; [\033[32mhelp\033[0m] shows available ciphers")
     ap2.add_argument("--ssl-dbg", action="store_true", help="dump some tls info")
@@ -1588,10 +1604,10 @@ def add_stats(ap):
 
 def add_yolo(ap):
     ap2 = ap.add_argument_group("yolo options")
-    ap2.add_argument("--allow-csrf", action="store_true", help="disable csrf protections; let other domains/sites impersonate you through cross-site requests")
+    ap2.add_argument("--allow-csrf", action="store_true", help="disable csrf protections; let other domains/sites impersonate you through cross-site requests; \033[1;31mDANGEROUS\033[0m / LAN-only")
     ap2.add_argument("--cookie-lax", action="store_true", help="allow cookies from other domains (if you follow a link from another website into your server, you will arrive logged-in); this reduces protection against CSRF")
     ap2.add_argument("--no-fnugg", action="store_true", help="disable the smoketest for caching-related issues in the web-UI")
-    ap2.add_argument("--getmod", action="store_true", help="permit ?move=[...] and ?delete as GET")
+    ap2.add_argument("--getmod", action="store_true", help="permit ?move=[...] and ?delete as GET -- \033[1;31mDANGEROUS\033[0m, removes csrf protection")
     ap2.add_argument("--wo-up-readme", action="store_true", help="allow users with write-only access to upload logues and readmes without adding the _wo_ filename prefix (volflag=wo_up_readme)")
     ap2.add_argument("--unsafe-state", action="store_true", help="when one of the emergency fallback locations are used for runtime state ($TMPDIR, /tmp), certain features will be force-disabled for security reasons by default. This option overrides that safeguard and allows unsafe storage of secrets")
 
@@ -1689,6 +1705,7 @@ def add_logging(ap):
     ap2.add_argument("-q", action="store_true", help="quiet; disable most STDOUT messages")
     ap2.add_argument("-lo", metavar="PATH", type=u, default="", help="logfile; use .txt for plaintext or .xz for compressed. Example: \033[32mcpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz\033[0m (NB: some errors may appear on STDOUT only)")
     ap2.add_argument("--flo", metavar="N", type=int, default=1, help="log format for \033[33m-lo\033[0m; [\033[32m1\033[0m]=classic/colors, [\033[32m2\033[0m]=no-color")
+    ap2.add_argument("--rlo", metavar="TXT", type=u, default=".1", help="logrotate counter format; see \033[33m--help-rlo\033[0m")
     ap2.add_argument("--no-ansi", action="store_true", default=not VT100, help="disable colors; same as environment-variable NO_COLOR")
     ap2.add_argument("--ansi", action="store_true", help="force colors; overrides environment-variable NO_COLOR")
     ap2.add_argument("--no-logflush", action="store_true", help="don't flush the logfile after each write; tiny bit faster")
@@ -1888,7 +1905,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--grid", action="store_true", default="true", help="show grid/thumbnails by default (volflag=grid)")
     ap2.add_argument("--gsel", action="store_true", default="true", help="select files in grid by ctrl-click (volflag=gsel)")
     ap2.add_argument("--localtime", action="store_true", help="default to local timezone instead of UTC")
-    ap2.add_argument("--ui-filesz", metavar="FMT", type=u, default="4", help="default filesize format; one of these: 0, 1, 2, 2c, 3, 3c, 4, 4c, 5, 5c, fuzzy (see UI)")
+    ap2.add_argument("--ui-filesz", metavar="FMT", type=u, default="4", help="default filesize format; one of these: 0, 1, 2, 2c, 3, 3c, 4, 4c, 5, 5c, 6, 6c, 7, 7c, fuzzy (see UI)")
     ap2.add_argument("--gauto", metavar="PERCENT", type=int, default=0, help="switch to gridview if more than \033[33mPERCENT\033[0m of files are pics/vids; 0=disabled")
     ap2.add_argument("--rcm", metavar="TXT", default="yy", help="rightclick-menu; two yes/no options: 1st y/n is enable-custom-menu, 2nd y/n is enable-double")
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language, for example \033[32meng\033[0m / \033[32mnor\033[0m / ...")
@@ -2114,6 +2131,14 @@ def main(argv: Optional[list[str]] = None) -> None:
         print("\n".join("%8s %s" % (k, v) for k, v in sorted(MIMES.items())))
         sys.exit(0)
 
+    if "--list-ips" in argv:
+        print("\n".join(str(x) for x in sorted(list_ips())))
+        sys.exit(0)
+
+    if "--list-nics" in argv:
+        print("\n".join(str(x) for x in sorted(list_nics(True).items())))
+        sys.exit(0)
+
     if EXE:
         print("pybin: {}\n".format(pybin), end="")
 
@@ -2301,7 +2326,7 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     # signal.signal(signal.SIGINT, sighandler)
 
-    SvcHub(al, dal, argv, "".join(printed)).run()
+    SvcHub(al, dal, argv).run()
 
 
 if __name__ == "__main__":

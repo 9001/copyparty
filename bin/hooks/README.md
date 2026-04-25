@@ -38,6 +38,10 @@ these are `--xiu` hooks; unlike `xbu` and `xau` (which get executed on every sin
   * this hook uses the `I` flag which makes it 140x faster, but if the plugin has a bug it may crash copyparty
 
 
+# more upload stuff
+* combine [reloc-by-wark-xbu.py](reloc-by-wark-xbu.py) and [reloc-by-wark-xau.py](reloc-by-wark-xau.py) to rename uploads to the checksum of the file contents
+
+
 # on message
 * [wget.py](wget.py) lets you download files by POSTing URLs to copyparty
   * [wget-i.py](wget-i.py) is an import-safe modification of this hook (starts 140x faster, but higher chance of bugs)

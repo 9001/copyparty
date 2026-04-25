@@ -264,6 +264,7 @@ sz=3321225472;   csz=16777216;
 sz=4394967296;   csz=25165824;
 sz=6509559808;   csz=33554432;
 sz=138438953472; csz=50331648;
+sz=85932900352;  csz=$((1024*1024*4));  # flippy bd
 f=csz-$csz; truncate -s $sz $f; sz=$((sz/16)); step=$((csz/16)); ofs=0; while [ $ofs -lt $sz ]; do dd if=/dev/urandom of=$f bs=16 count=2 seek=$ofs conv=notrunc iflag=fullblock; [ $ofs = 0 ] && ofs=$((ofs+step-1)) || ofs=$((ofs+step)); done
 
 # py2 on osx

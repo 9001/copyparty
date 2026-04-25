@@ -89,6 +89,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
     * [other flags](#other-flags)
     * [descript.ion](#description) - add a description to each file in a folder
     * [dothidden](#dothidden) - cosmetically hide specific files in a folder
+    * [thumbnail pregen](#thumbnail-pregen) - if you want to pre-generate everything on startup
     * [database location](#database-location) - in-volume (`.hist/up2k.db`, default) or somewhere else
     * [metadata from audio files](#metadata-from-audio-files) - set `-e2t` to index tags on upload
         * [metadata from xattrs](#metadata-from-xattrs) - unix extended file attributes
@@ -1360,6 +1361,7 @@ serverlog is sent to stdout by default  (but logging to a file is also possible)
 * [-q](https://copyparty.eu/cli/#g-q) disables logging to stdout, and may improve performance a little bit
   * combine it with `-lo logfolder/cpp-%Y-%m-%d.txt` to log to a file instead
   * the `%Y-%m-%d` makes it create a new logfile every day, with the date as filename
+  * global-option [--rlo](https://copyparty.eu/cli/#rlo-help-page) decides what happens if the filename is taken
 * `-lo whatever.txt` can be used without `-q` to log to both at the same time
   * by default, the logfile will have colors if the terminal does (usually the case)
   * use the [textfile-viewer](https://github.com/user-attachments/assets/8a828947-2fae-4df9-bd2a-3de46f42d478) or `less -R` in a terminal to see colors correctly
@@ -3127,9 +3129,10 @@ when generating hashes using `--ah-cli` for docker or systemd services, make sur
 
 ## https
 
-both HTTP and HTTPS are accepted  by default, but letting a [reverse proxy](#reverse-proxy) handle the https/tls/ssl would be better (probably more secure by default)
+both HTTP and HTTPS are accepted  by default, but please ignore copyparty's built-in https/tls support and instead use a [reverse proxy](#reverse-proxy) to handle https/tls/ssl
 
-copyparty doesn't speak HTTP/2 or QUIC, so using a reverse proxy would solve that as well -- but note that HTTP/1 is usually faster than both HTTP/2 and HTTP/3
+* reverseproxies do a better job following [best practices](https://cipherlist.eu/) meaning they are more secure, and probably also have higher performance
+* also, copyparty doesn't speak HTTP/2 or QUIC, so using a reverse proxy would solve that as well -- but note that HTTP/1 is usually faster than both HTTP/2 and HTTP/3
 
 if [cfssl](https://github.com/cloudflare/cfssl/releases/latest) is installed, copyparty will automatically create a CA and server-cert on startup
 * the certs are written to `--crt-dir` for distribution, see `--help` for the other `--crt` options
@@ -3140,6 +3143,11 @@ to install cfssl on windows:
 * [download](https://github.com/cloudflare/cfssl/releases/latest) `cfssl_windows_amd64.exe`, `cfssljson_windows_amd64.exe`, `cfssl-certinfo_windows_amd64.exe`
 * rename them to `cfssl.exe`, `cfssljson.exe`, `cfssl-certinfo.exe`
 * put them in PATH, for example inside `c:\windows\system32`
+
+if you really wanna give copyparty an existing TLS certificate then do one of the following:
+* `--no-crt --cert server.pem` where `server.pem` is a concatenation of key + cert + chain (in that order), or...
+* `--no-crt --cert server.crt --certkey server.key` where `server.key` is the key, and `server.crt` is a concatenation of cert + chain (in that order)
+* file-extensions don't matter, but all files are expected to be [PEM-style](https://github.com/9001/copyparty/blob/hovudstraum/copyparty/res/insecure.pem)
 
 
 # recovering from crashes

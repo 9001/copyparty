@@ -789,6 +789,10 @@ class ThumbSrv(object):
         if not ret:
             return
 
+        if "vc" not in ret and "ac" in ret:
+            # audio in a video trenchcoat
+            return self.conv_spec(abspath, tpath, fmt, vn)
+
         ext = abspath.rsplit(".")[-1].lower()
         if ext in ["h264", "h265"] or ext in self.fmt_ffi:
             seek: list[bytes] = []

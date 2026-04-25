@@ -21,6 +21,6 @@ echo zlib=$zlib ff=$ff
 
 [ "$1" ] && exit
 
-[ $zlib ] && { make zlib; cp -pv 1 2 ../cver/; }
-[ $ff ] &&   { make ff;   cp -pv 3 ../cver/; }
+[ $zlib ] && { make -C.. zlib; cp -pv 1 2 ../cver/; }
+[ $ff ] &&   { make -C.. ff;   cp -pv 3 ../cver/; }
 rm -rf cver2

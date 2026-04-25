@@ -157,7 +157,7 @@ class HttpConn(object):
             try:
                 assert ssl  # type: ignore  # !rm
                 ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-                ctx.load_cert_chain(self.args.cert)
+                ctx.load_cert_chain(self.args.cert, self.args.certkey)
                 if self.args.ssl_ver:
                     ctx.options &= ~self.args.ssl_flags_en
                     ctx.options |= self.args.ssl_flags_de

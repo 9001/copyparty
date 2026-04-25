@@ -4897,15 +4897,8 @@ class HttpCli(object):
                 dl_id,
             )
             sent = (eof - ofs) - remains
-            ofs = eof - remains
-            f.seek(ofs)
-
-            try:
-                st2 = os.stat(open_args[0])
-                if st.st_ino == st2.st_ino:
-                    st = st2  # for filesize
-            except:
-                pass
+            f.seek(eof - remains)
+            ofs = f.tell()
 
             gone = 0
             unsent = False
@@ -4925,6 +4918,7 @@ class HttpCli(object):
                     t_fd = t_ka = now
                     self.s.sendall(buf)
                     sent += len(buf)
+                    ofs += len(buf)
                     unsent = False
                     dls[dl_id] = (time.time(), sent)
                     continue
@@ -4935,14 +4929,9 @@ class HttpCli(object):
                     self.s.send(b"\x00")
                 if t_fd < now - sec_fd:
                     try:
-                        st2 = os.stat(open_args[0])
-                        szd = st2.st_size - st.st_size
-                        if (
-                            st2.st_ino != st.st_ino
-                            or st2.st_size < sent
-                            or szd < 0
-                            or unsent
-                        ):
+                        st2 = os.stat(abspath)
+                        szd = st2.st_size - ofs
+                        if st2.st_ino != st.st_ino or szd < 0 or unsent:
                             assert f  # !rm
                             # open new file before closing previous to avoid toctous (open may fail; cannot null f before)
                             f2 = open_nolock(*open_args)
@@ -4950,15 +4939,15 @@ class HttpCli(object):
                             f = f2
                             f.seek(0, os.SEEK_END)
                             eof = f.tell()
-                            if eof < sent:
-                                ofs = sent = 0  # shrunk; send from start
+                            if eof < ofs:
+                                ofs = 0  # shrunk; send from start
                                 zb = b"\n\n*** file size decreased -- rewinding to the start of the file ***\n\n"
                                 self.s.sendall(zb)
                                 if ofs0 < 0 and eof > -ofs0:
                                     ofs = eof + ofs0
-                            else:
-                                ofs = sent  # just new fd? resume from same ofs
+                            # else: probably just new fd; resume from same ofs
                             f.seek(ofs)
+                            ofs = f.tell()
                             self.log("reopened at byte %d: %r" % (ofs, abspath), 6)
                             unsent = False
                             gone = 0
@@ -5846,6 +5835,7 @@ class HttpCli(object):
             excl, target = (target.split("/", 1) + [""])[:2]
             sub = self.gen_tree("/".join([top, excl]).strip("/"), target, dk)
             ret["k" + quotep(excl)] = sub
+            dk = ""
 
         vfs = self.asrv.vfs
         dk_sz = False
@@ -5885,16 +5875,16 @@ class HttpCli(object):
             else:
                 dirs = exclude_dotfiles(dirs)
 
-        dirs = [quotep(x) for x in dirs if x != excl]
-
         if dk_sz and fsroot:
             kdirs = []
             fsroot_ = os.path.join(fsroot, "")
-            for dn in dirs:
+            for dn in [x for x in dirs if x != excl]:
                 ap = fsroot_ + dn
                 zs = self.gen_fk(2, self.args.dk_salt, ap, 0, 0)[:dk_sz]
-                kdirs.append(dn + "?k=" + zs)
+                kdirs.append(quotep(dn) + "?k=" + zs)
             dirs = kdirs
+        else:
+            dirs = [quotep(x) for x in dirs if x != excl]
 
         if vfs_virt:
             for x in vfs_virt:

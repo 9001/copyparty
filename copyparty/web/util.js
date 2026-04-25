@@ -979,17 +979,24 @@ function f2f(val, nd) {
 }
 
 
-var HSZ_U = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-function humansize(b, terse) {
+var HSZ_U = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+var HSZ_U2 = ['B', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi'];
+var HSZ_UD = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+function humansize(b, tersity) {
     var i = 0;
     while (b >= 1000 && i < 5) { b /= 1024; i += 1; }
     return (f2f(b, b >= 100 ? 0 : b >= 10 ? 1 : 2) +
-        ' ' + (terse ? HSZ_U[i].charAt(0) : HSZ_U[i]));
+        ' ' + (tersity ? HSZ_U[i].slice(0, tersity) : HSZ_U[i]));
 }
 function humansize_su(b) {
     var i = 0;
     while (b >= 1000 && i < 5) { b /= 1024; i += 1; }
-    return [b, HSZ_U[i]];
+    return [b, HSZ_U2[i]];
+}
+function humansize_sud(b) {
+    var i = 0;
+    while (b >= 1000 && i < 5) { b /= 1000; i += 1; }
+    return [b, HSZ_UD[i]];
 }
 function humansize_0(b) {
     return '' + b;
@@ -1013,6 +1020,14 @@ function humansize_5g(b) {
     var z = humansize_su(b), u = z[1]; b = z[0];
     return [parseFloat(b.toFixed(b >= 10 ? 0 : 1)) + ' ' + u, u.charAt(0)];
 }
+function humansize_6g(b) {
+    var z = humansize_sud(b), u = z[1]; b = z[0];
+    return [parseFloat(b.toFixed(b >= 100 ? 0 : b >= 10 ? 1 : 2)) + ' ' + u, u.charAt(0)];
+}
+function humansize_7g(b) {
+    var z = humansize_sud(b), u = z[1]; b = z[0];
+    return [parseFloat(b.toFixed(b >= 10 ? 0 : 1)) + ' ' + u, u.charAt(0)];
+}
 function humansize_2(b) {
     return humansize_2g(b)[0];
 }
@@ -1024,6 +1039,12 @@ function humansize_4(b) {
 }
 function humansize_5(b) {
     return humansize_5g(b)[0];
+}
+function humansize_6(b) {
+    return humansize_6g(b)[0];
+}
+function humansize_7(b) {
+    return humansize_7g(b)[0];
 }
 function humansize_2c(b) {
     var v = humansize_2g(b);
@@ -1039,6 +1060,14 @@ function humansize_4c(b) {
 }
 function humansize_5c(b) {
     var v = humansize_5g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_6c(b) {
+    var v = humansize_6g(b);
+    return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
+}
+function humansize_7c(b) {
+    var v = humansize_7g(b);
     return '<span class="fsz_' + v[1].charAt(0) + '">' + v[0] + '</span>';
 }
 function humansize_fuzzy(b) {
@@ -1063,7 +1092,7 @@ function humansize_fuzzy(b) {
 	if (b <= 50050000000) return "BD-DL";
 	return "LTO";
 }
-var humansize_fmts = ['0', '1', '2', '2c', '3', '3c', '4', '4c', '5', '5c', 'fuzzy'];
+var humansize_fmts = ['0', '1', '2', '2c', '3', '3c', '4', '4c', '5', '5c', '6', '6c', '7', '7c', 'fuzzy'];
 window.filesizefun = (function () {
     var v = sread('fszfmt', humansize_fmts);
     return window['humansize_' + (v || window.dfszf)] || humansize_1;

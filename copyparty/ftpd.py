@@ -616,6 +616,8 @@ class Ftpd(object):
                 print(t.format(pybin))
                 sys.exit(1)
 
+            if self.args.certkey:
+                h1.keyfile = self.args.certkey
             h1.certfile = self.args.cert
             h1.tls_control_required = True
             h1.tls_data_required = True
