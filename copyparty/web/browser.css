@@ -3659,11 +3659,6 @@ html:not(.e) #wrap.thin {
 		padding: .3em;
 	}
 }
-html.e #wrap.thin {
-	#ghead {
-		top: 5.1em;
-	}
-}
 #wrap.thin {
 	.td_w {
 		width: calc(100vw - 8.5em);
@@ -3671,6 +3666,8 @@ html.e #wrap.thin {
 	.td_s {
 		width: calc(50vw - 5em);
 	}
+}
+html:not(.e) #wrap.thin {
 	#ghead::after {
 		content: "";
 		position: sticky;
@@ -3681,6 +3678,11 @@ html.e #wrap.thin {
 		display: inline-block;
 		margin: -1em;
 		pointer-events: none;
+	}
+}
+html.e #wrap.thin {
+	#ghead {
+		top: 5.1em;
 	}
 }
 @media (max-width: 50em){
