@@ -3621,6 +3621,12 @@ html.d #treepar {
 		top: 0;
 		right: 0;
 	}
+	#ops a {
+		padding: 0 .15em;
+	}
+	#srchfolder_div {
+		left: 2.8em;
+	}
 }
 html.e #pathBar.thin #path {
 	margin: 0;
