@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" id="ht_perms">
+
+<head>
+	<meta charset="utf-8">
+	<title>{{ s_doctitle }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="theme-color" content="#{{ tcolor }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/ui.css?_={{ ts }}">
+{{ html_head }}
+</head>
+
+<body>
+	<div id="wrap">
+		<a href="{{ r }}/?perms">refresh</a>
+		<a href="{{ r }}/?shares">my shares</a>
+		<a href="{{ r }}/?h">control-panel</a>
+		<a href="{{ r }}/">browse</a>
+
+		<h2>User Role and Permissions Management</h2>
+
+		<div id="user-info">
+			<h3>Your Profile</h3>
+			<table>
+				<tr>
+					<th>Username</th>
+					<td>{{ uname }}</td>
+				</tr>
+				<tr>
+					<th>Role</th>
+					<td>{{ role or "default" }}</td>
+				</tr>
+				<tr>
+					<th>Permissions</th>
+					<td>{{ perms }}</td>
+				</tr>
+			</table>
+		</div>
+
+		<h3>Role Descriptions</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Role</th>
+					<th>Permissions</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>admin</td>
+					<td>r, w, m, d, g, G, h, a, .</td>
+					<td>Full access: can read, write, move, delete, and manage all files and permissions</td>
+				</tr>
+				<tr>
+					<td>editor</td>
+					<td>r, w, m, g, G, h</td>
+					<td>Can read, write, and move files, but cannot delete or manage permissions</td>
+				</tr>
+				<tr>
+					<td>guest</td>
+					<td>r, g</td>
+					<td>Can only view public files, cannot edit or share</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>Your Volumes</h3>
+		<table id="volumes">
+			<thead>
+				<tr>
+					<th>Volume</th>
+					<th>Read</th>
+					<th>Write</th>
+					<th>Move</th>
+					<th>Delete</th>
+					<th>Get</th>
+					<th>Admin</th>
+					<th>Shared</th>
+				</tr>
+			</thead>
+			<tbody>
+				{%- for vol in volumes %}
+				<tr>
+					<td><a href="{{ r }}/{{ vol.vpath|e }}">/{{ vol.vpath|e }}</a></td>
+					<td class="{{ 'yes' if vol.read else 'no' }}">{{ '✓' if vol.read else '✗' }}</td>
+					<td class="{{ 'yes' if vol.write else 'no' }}">{{ '✓' if vol.write else '✗' }}</td>
+					<td class="{{ 'yes' if vol.move else 'no' }}">{{ '✓' if vol.move else '✗' }}</td>
+					<td class="{{ 'yes' if vol.delete else 'no' }}">{{ '✓' if vol.delete else '✗' }}</td>
+					<td class="{{ 'yes' if vol.get else 'no' }}">{{ '✓' if vol.get else '✗' }}</td>
+					<td class="{{ 'yes' if vol.admin else 'no' }}">{{ '✓' if vol.admin else '✗' }}</td>
+					<td class="{{ 'yes' if vol.shared else 'no' }}">{{ '✓' if vol.shared else '✗' }}</td>
+				</tr>
+				{%- endfor %}
+			</tbody>
+		</table>
+
+		{%- if is_admin %}
+		<h3>All Users (Admin Only)</h3>
+		<table id="all-users">
+			<thead>
+				<tr>
+					<th>Username</th>
+					<th>Role</th>
+					<th>Permissions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{%- for user in users %}
+				<tr>
+					<td>{{ user.name|e }}</td>
+					<td>{{ user.role or "default" }}</td>
+					<td>{{ user.perms }}</td>
+				</tr>
+				{%- endfor %}
+			</tbody>
+		</table>
+		{%- endif %}
+
+		{%- if shares %}
+		<h3>Active Shares</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Share Key</th>
+					<th>Source</th>
+					<th>Permissions</th>
+					<th>Owner</th>
+					<th>Public</th>
+					<th>Expires</th>
+					<th>Visits</th>
+				</tr>
+			</thead>
+			<tbody>
+				{%- for share in shares %}
+				<tr>
+					<td><a href="{{ r }}{{ shr }}{{ share.k }}/">{{ share.k }}</a></td>
+					<td><a href="{{ r }}/{{ share.vp|e }}">/{{ share.vp|e }}</a></td>
+					<td>{{ share.pr }}</td>
+					<td>{{ share.un|e }}</td>
+					<td class="{{ 'yes' if share.pub else 'no' }}">{{ '✓' if share.pub else '✗' }}</td>
+					<td>{{ "never" if not share.t1 else "expired" if share.t1 < now else "in " ~ ((share.t1 - now) // 60) ~ " min" }}</td>
+					<td>{{ share.vc }}{% if share.mv %} / {{ share.mv }}{% endif %}</td>
+				</tr>
+				{%- endfor %}
+			</tbody>
+		</table>
+		{%- endif %}
+	</div>
+
+	<script>
+		var SR="{{ r }}",
+			lang="{{ lang }}",
+			dfavico="{{ favico }}";
+
+		var STG = window.localStorage;
+		document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme }}";
+	</script>
+	<script src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
+</body>
+</html>

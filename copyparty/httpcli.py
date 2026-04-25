@@ -32,7 +32,7 @@ except:
 
 from .__init__ import ANYWIN, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
-from .authsrv import LEELOO_DALLAS, VFS  # typechk
+from .authsrv import LEELOO_DALLAS, ROLE_PERMISSIONS, VFS  # typechk
 from .bos import bos
 from .qrkode import QrCode, qr2svg, qrgen
 from .star import StreamTar
@@ -1504,6 +1504,9 @@ class HttpCli(object):
 
             if "shares" in self.uparam:
                 return self.tx_shares()
+
+            if "perms" in self.uparam:
+                return self.tx_perms()
 
             if "dls" in self.uparam:
                 return self.tx_dls()
@@ -6336,6 +6339,95 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"), status=200)
         return True
 
+    def tx_perms(self) -> bool:
+        if self.uname == "*":
+            self.loud_reply("you're not logged in")
+            return True
+
+        user_role = self.asrv.roles.get(self.uname, "")
+        is_admin = user_role == "admin"
+
+        volumes = []
+        vfs = self.asrv.vfs
+        for vp, vol in vfs.all_vols.items():
+            if vp.startswith(self.args.shr.strip("/") + "/") if self.args.shr else False:
+                continue
+
+            uaxs = vol.uaxs.get(self.uname, (False, False, False, False, False, False, False, False, False))
+            
+            volumes.append({
+                "vpath": vp,
+                "read": uaxs[0],
+                "write": uaxs[1],
+                "move": uaxs[2],
+                "delete": uaxs[3],
+                "get": uaxs[4],
+                "admin": uaxs[7],
+                "shared": False,
+            })
+
+        for vol in volumes:
+            for share_vol in vfs.all_nodes.values():
+                if hasattr(share_vol, "shr_src") and share_vol.shr_src:
+                    svn, _ = share_vol.shr_src
+                    if svn.vpath == vol["vpath"]:
+                        vol["shared"] = True
+                        break
+
+        perms = self.asrv.get_perms("/", self.uname)
+
+        users = []
+        if is_admin:
+            acct = self.asrv.acct
+            for uname in sorted(acct.keys()):
+                if uname == "*":
+                    continue
+                role = self.asrv.roles.get(uname, "")
+                user_perms = self.asrv.get_perms("/", uname)
+                users.append({
+                    "name": uname,
+                    "role": role,
+                    "perms": user_perms,
+                })
+
+        shares = []
+        if self.args.shr:
+            idx = self.conn.get_u2idx()
+            if idx and hasattr(idx, "p_end"):
+                cur = idx.get_shr()
+                if cur:
+                    rows = cur.execute("select * from sh").fetchall()
+                    now = int(time.time())
+                    for row in rows:
+                        s_k, s_pw, s_vp, s_pr, s_nf, s_un, s_t0, s_t1, s_mv, s_vc, s_pub = row
+                        if is_admin or s_un == self.uname:
+                            shares.append({
+                                "k": s_k,
+                                "vp": s_vp,
+                                "pr": s_pr,
+                                "un": s_un,
+                                "pub": bool(s_pub),
+                                "t1": s_t1,
+                                "vc": s_vc,
+                                "mv": s_mv,
+                            })
+
+        html = self.j2s(
+            "perms",
+            this=self,
+            uname=self.uname,
+            role=user_role,
+            perms=perms,
+            is_admin=is_admin,
+            volumes=volumes,
+            users=users,
+            shares=shares,
+            shr=self.args.shr,
+            now=int(time.time()),
+        )
+        self.reply(html.encode("utf-8"), status=200)
+        return True
+
     def handle_eshare(self) -> bool:
         idx = self.conn.get_u2idx()
         if not idx or not hasattr(idx, "p_end"):
@@ -6458,7 +6550,11 @@ class HttpCli(object):
             raise Pebkac(400, "you dont have all the perms you tried to grant")
 
         zs = vfs.flags["shr_who"]
-        if zs == "auth" and self.uname != "*":
+        user_role = self.asrv.roles.get(self.uname)
+        
+        if user_role in ["admin", "editor"]:
+            pass
+        elif zs == "auth" and self.uname != "*":
             pass
         elif zs == "a" and self.uname in vfs.axs.uadmin:
             pass
@@ -6482,8 +6578,12 @@ class HttpCli(object):
         exp = now + exp * 60 if exp else 0
         pr = "".join(zc for zc, zb in zip("rwmdg.", s_axsd) if zb)
 
-        q = "insert into sh values (?,?,?,?,?,?,?,?)"
-        cur.execute(q, (skey, pw, vp, pr, len(fns), self.uname, now, exp))
+        max_visits = int(req.get("max_visits") or 0)
+        visit_count = 0
+        is_public = 1 if req.get("is_public") else 0
+
+        q = "insert into sh values (?,?,?,?,?,?,?,?,?,?,?)"
+        cur.execute(q, (skey, pw, vp, pr, len(fns), self.uname, now, exp, max_visits, visit_count, is_public))
 
         q = "insert into sf values (?,?)"
         for fn in fns:

@@ -109,7 +109,7 @@ else:
 
 VER_IDP_DB = 1
 VER_SESSION_DB = 1
-VER_SHARES_DB = 2
+VER_SHARES_DB = 3
 
 
 class SvcHub(object):
@@ -757,15 +757,14 @@ class SvcHub(object):
 
         sch1 = [
             r"create table kv (k text, v int)",
-            r"create table sh (k text, pw text, vp text, pr text, st int, un text, t0 int, t1 int)",
-            # sharekey, password, src, perms, numFiles, owner, created, expires
+            r"create table sh (k text, pw text, vp text, pr text, st int, un text, t0 int, t1 int, mv int, vc int, pub int)",
         ]
         sch2 = [
             r"create table sf (k text, vp text)",
             r"create index sf_k on sf(k)",
             r"create index sh_k on sh(k)",
             r"create index sh_t1 on sh(t1)",
-            r"insert into kv values ('sver', 2)",
+            r"insert into kv values ('sver', 3)",
         ]
 
         assert db  # type: ignore  # !rm
@@ -781,6 +780,13 @@ class SvcHub(object):
                 cur.execute(cmd)
             cur.execute("update sh set st = 0")
             self.log("root", "shares-db schema upgrade ok")
+
+        if sver == 2:
+            cur.execute("alter table sh add column mv int")
+            cur.execute("alter table sh add column vc int")
+            cur.execute("alter table sh add column pub int")
+            cur.execute("update sh set mv = 0, vc = 0, pub = 0")
+            self.log("root", "shares-db schema upgrade to v3 ok")
 
         if sver < VER_SHARES_DB:
             cur.execute("delete from kv where k='sver'")

@@ -74,6 +74,12 @@ if PY2:
 
 
 LEELOO_DALLAS = "leeloo_dallas"
+
+ROLE_PERMISSIONS = {
+    "admin": {"r", "w", "m", "d", "g", "G", "h", "a", "."},
+    "editor": {"r", "w", "m", "g", "G", "h"},
+    "guest": {"r", "g"},
+}
 ##
 ## you might be curious what Leeloo Dallas is doing here, so let me explain:
 ##
@@ -432,6 +438,10 @@ class VFS(object):
         self.shr_files: set[str] = set()  # filenames to include from shr_src
         self.shr_owner: str = ""  # uname
         self.shr_all_aps: list[tuple[str, list[VFS]]] = []
+        self.shr_is_public: bool = False
+        self.shr_max_visits: int = 0
+        self.shr_visit_count: int = 0
+        self.shr_key: str = ""
         self.aread: dict[str, list[str]] = {}
         self.awrite: dict[str, list[str]] = {}
         self.amove: dict[str, list[str]] = {}
@@ -1097,6 +1107,7 @@ class AuthSrv(object):
         self.sesa: dict[str, str] = {}  # session->uname
         self.defpw: dict[str, str] = {}
         self.grps: dict[str, list[str]] = {}
+        self.roles: dict[str, str] = {}
         self.re_pwd: Optional[re.Pattern] = None
         self.cfg_files_loaded: list[str] = []
         self.badcfg1 = False
@@ -1115,6 +1126,49 @@ class AuthSrv(object):
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         if self.log_func:
             self.log_func("auth", msg, c)
+
+    def _apply_role_permissions(self, vfs: "VFS", unames: list[str]) -> None:
+        """
+        Apply role-based permissions to users.
+        Roles: admin, editor, guest
+        """
+        perm_map = {
+            "r": "uread",
+            "w": "uwrite",
+            "m": "umove",
+            "d": "udel",
+            "g": "uget",
+            "G": "upget",
+            "h": "uhtml",
+            "a": "uadmin",
+            ".": "udot",
+        }
+
+        for uname in unames:
+            if uname == "*":
+                continue
+
+            role = self.roles.get(uname)
+            if not role:
+                continue
+
+            role_perms = ROLE_PERMISSIONS.get(role)
+            if not role_perms:
+                continue
+
+            if self.args.vc:
+                self._l("roles", 5, "applying role permissions for user [%s] with role [%s]" % (uname, role))
+
+            for vol in vfs.all_vols.values():
+                if vol.vpath.startswith(self.args.shr1) if self.args.shr else False:
+                    continue
+
+                for perm_char in role_perms:
+                    perm_attr = perm_map.get(perm_char)
+                    if perm_attr:
+                        perm_set = getattr(vol.axs, perm_attr)
+                        if uname not in perm_set:
+                            perm_set.add(uname)
 
     def laggy_iter(self, iterable: Iterable[Any]) -> Generator[Any, None, None]:
         """returns [value,isFinalValue]"""
@@ -1401,6 +1455,7 @@ class AuthSrv(object):
         catg = "[global]"
         cata = "[accounts]"
         catgrp = "[groups]"
+        catroles = "[roles]"
         catx = "accs:"
         catf = "flags:"
         ap: Optional[str] = None
@@ -1436,6 +1491,8 @@ class AuthSrv(object):
                     self._l(ln, 5, "begin user-accounts section")
                 elif ln == catgrp:
                     self._l(ln, 5, "begin user-groups section")
+                elif ln == catroles:
+                    self._l(ln, 5, "begin user-roles section")
                 elif ln.startswith("[/"):
                     vp = ln[1:-1].strip("/")
                     self._l(ln, 2, "define volume at URL [/{}]".format(vp))
@@ -1493,6 +1550,25 @@ class AuthSrv(object):
                         grps[gn] = uns
                 except:
                     t = 'lines inside the [groups] section must be "groupname: user1, user2, user..."'
+                    raise Exception(t + SBADCFG)
+                continue
+
+            if cat == catroles:
+                try:
+                    rn, zs1 = [zs.strip() for zs in ln.split(":", 1)]
+                    uns = [zs.strip() for zs in zs1.split(",")]
+                    rn = rn.lower()
+                    valid_roles = ["admin", "editor", "guest"]
+                    if rn not in valid_roles:
+                        t = 'invalid role name "%s", valid roles are: %s'
+                        raise Exception(t % (rn, ", ".join(valid_roles)))
+                    t = "role [%s] = " % (rn,)
+                    t += ", ".join("user [%s]" % (x,) for x in uns)
+                    self._l(ln, 5, t)
+                    for un in uns:
+                        self.roles[un] = rn
+                except:
+                    t = 'lines inside the [roles] section must be "rolename: user1, user2, user..."'
                     raise Exception(t + SBADCFG)
                 continue
 
@@ -1960,8 +2036,15 @@ class AuthSrv(object):
             cur2 = db.cursor()
             now = time.time()
             for row in cur.execute("select * from sh"):
-                s_k, s_pw, s_vp, s_pr, s_nf, s_un, s_t0, s_t1 = row
+                s_k, s_pw, s_vp, s_pr, s_nf, s_un, s_t0, s_t1 = row[:8]
+                s_mv = row[8] if len(row) > 8 else 0
+                s_vc = row[9] if len(row) > 9 else 0
+                s_pub = row[10] if len(row) > 10 else 0
+
                 if s_t1 and s_t1 < now:
+                    continue
+
+                if s_mv and s_vc >= s_mv:
                     continue
 
                 if self.args.shr_v:
@@ -1993,6 +2076,12 @@ class AuthSrv(object):
                 # still has the privs they granted, so nullmap it
                 vp = "%s/%s" % (shr, s_k)
                 shv.nodes[s_k] = VFS(self.log_func, "", vp, vp, s_axs, shv.flags.copy())
+                shn = shv.nodes[s_k]
+                shn.shr_key = s_k
+                shn.shr_is_public = bool(s_pub)
+                shn.shr_max_visits = s_mv
+                shn.shr_visit_count = s_vc
+                shn.shr_owner = s_un
 
             vfs.nodes[shr] = vfs.all_vols[shr] = shv
             for vol in shv.nodes.values():
@@ -2004,6 +2093,8 @@ class AuthSrv(object):
         zss.update(self.idp_accs)
         zss.discard("*")
         unames = ["*"] + list(sorted(zss))
+
+        self._apply_role_permissions(vfs, unames)
 
         for perm in "read write move del get pget html admin dot".split():
             axs_key = "u" + perm
