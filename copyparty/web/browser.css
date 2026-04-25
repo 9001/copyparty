@@ -3766,7 +3766,7 @@ html.e #wrap.thin {
 	}
 }
 
-@media (max-width: 30em) {
+@media (max-width: 32em) {
 	#wfp #gon,
 	#wfp #gop {
 		display: none;
