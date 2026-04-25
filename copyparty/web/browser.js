@@ -7393,6 +7393,34 @@ var filecolwidth = (function () {
 })();
 onresize100.add(filecolwidth, true);
 
+var ows_active = false;
+var lastY = 0;
+var trailingY0 = 0;
+function onwrapscroll () {
+	var newY = yscroll();
+	var down = newY > lastY;
+	var gh = ebi('ghead');
+	var pa = ebi('path');
+	var totalH = gh.offsetHeight + ebi('pathBar').offsetHeight;
+
+	if(newY > trailingY0 + totalH){
+		trailingY0 = newY - totalH;
+		clmod(gh, 'inv', true);
+	}
+	else if(newY < trailingY0)
+	{
+		trailingY0 = newY;
+		clmod(gh, 'inv', false);
+	}
+	else{
+		clmod(gh, 'inv', false);
+	}
+
+	document.documentElement.style.setProperty('--dyn-scrolloffset', (trailingY0 - newY) + 'px');
+
+	lastY = newY;
+}
+
 function onwidgetresize(){
 	var widget = ebi('widget');
 	var bar = ebi('pctl');
@@ -7403,6 +7431,15 @@ function onwidgetresize(){
 	
 	clmod(ebi('pathBar'), 'thin', thin);
 	clmod(ebi('wrap'), 'thin', thin);
+
+	if(thin && !ows_active){
+		window.addEventListener('scroll', onwrapscroll);
+		ows_active = true;
+	}
+	else if (!thin && ows_active){
+		window.removeEventListener('scroll', onwrapscroll);
+		ows_active = false;
+	}
 
 	thin = thin || IE;
 

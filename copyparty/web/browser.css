@@ -587,6 +587,10 @@ html .ayjump:focus-visible {
 	position: sticky;
   	top: .6em;
 	z-index: 4;
+	pointer-events: none;
+}
+#pathBar *:not(#wfp) {
+	pointer-events: all;
 }
 #wfp.shifted {
 	margin-left: 2em;
@@ -2174,6 +2178,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 	position: sticky;
 	top: 3.7em;
 	z-index: 3;
+	transition: opacity .15s;
 }
 .ghead .btn {
 	position: relative;
@@ -3618,12 +3623,19 @@ html.d #treepar {
 
 
 /* basically a mobile / phone layout */
+#ghead.inv {
+	opacity: 0;
+	pointer-events: none;
+}
 #pathBar.thin {
 	display: block;
 
 	#path {
+		position: relative;
 		height: 1.8em;
 		margin: .5em 0 0 0;
+		top: var(--dyn-scrolloffset);
+		z-index: -1;
 	}
 	#wfp.shifted {
 		margin-left: 2.5em;
@@ -3646,7 +3658,7 @@ html.e #pathBar.thin #path {
 }
 html:not(.e) #wrap.thin {
 	#ghead {
-		top: 7em;
+		top: calc(7.4em + var(--dyn-scrolloffset));
 	}
 }
 html.e #wrap.thin {
@@ -4021,6 +4033,7 @@ html.ez {
 
 html.e {
   text-shadow: none;
+  --dyn-scrolloffset: 0 !important;
 }
 html.e * {
   border-radius: 0 !important;
