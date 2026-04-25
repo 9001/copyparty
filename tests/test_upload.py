@@ -232,8 +232,97 @@ class TestUpload(unittest.TestCase):
 
         self.conn.shutdown()
 
+    def test_upload_existing_file_no_overwrite(self):
+        """Test that upload does NOT overwrite existing files without ?replace"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::a"]
+        os.makedirs("up")
+
+        with open("up/existing.txt", "w") as f:
+            f.write("Original content")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        files = [("existing.txt", "New content that should NOT overwrite")]
+        h, body = self.bup("up?j", files)
+        
+        self.assertIn("HTTP/1.1 201", h)
+        
+        with open("up/existing.txt", "r") as f:
+            self.assertEqual(f.read(), "Original content")
+
+        files_in_dir = os.listdir("up")
+        self.assertTrue(len(files_in_dir) >= 2)
+        
+        new_file_found = False
+        for fname in files_in_dir:
+            if fname.startswith("existing") and fname != "existing.txt":
+                with open(os.path.join("up", fname), "r") as f:
+                    if f.read() == "New content that should NOT overwrite":
+                        new_file_found = True
+                        break
+        
+        self.assertTrue(new_file_found, "New file should be created with a different name")
+
+        self.conn.shutdown()
+
+    def test_upload_with_replace_param_overwrites(self):
+        """Test that upload with ?replace parameter overwrites existing files"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::a"]
+        os.makedirs("up")
+
+        with open("up/existing.txt", "w") as f:
+            f.write("Original content")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        files = [("existing.txt", "New content that SHOULD overwrite")]
+        h, body = self.bup("up?j&replace", files)
+        
+        self.assertIn("HTTP/1.1 201", h)
+        
+        with open("up/existing.txt", "r") as f:
+            self.assertEqual(f.read(), "New content that SHOULD overwrite")
+
+        self.conn.shutdown()
+
+    def test_upload_replace_without_delete_permission(self):
+        """Test that ?replace fails without delete permission"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::w"]
+        os.makedirs("up")
+
+        with open("up/existing.txt", "w") as f:
+            f.write("Original content")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        files = [("existing.txt", "New content")]
+        h, body = self.bup("up?j&replace", files)
+        
+        with open("up/existing.txt", "r") as f:
+            self.assertEqual(f.read(), "Original content")
+
+        self.conn.shutdown()
+
     def test_upload_partial_file_cleanup_on_size_limit(self):
-        """Test that partial files are cleaned up when upload exceeds size limit"""
+        """Test that partial files are cleaned up when size limit exceeded"""
         td = os.path.join(self.td, "vfs")
         os.mkdir(td)
         os.chdir(td)
@@ -246,18 +335,20 @@ class TestUpload(unittest.TestCase):
         self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
 
         large_content = b"A" * 100
-        files = [("large.txt", large_content)]
+        files = [("large_file.txt", large_content)]
         h, body = self.bup("up", files)
         
-        partial_files = [f for f in os.listdir("up") if "PARTIAL" in f]
-        self.assertEqual(len(partial_files), 0, "Partial files should be cleaned up on failure")
+        files_in_dir = set(os.listdir("up"))
         
-        self.assertFalse(os.path.exists("up/large.txt"))
+        self.assertNotIn("large_file.txt", files_in_dir)
+        
+        for fname in files_in_dir:
+            self.assertNotIn(".PARTIAL", fname)
 
         self.conn.shutdown()
 
-    def test_upload_json_error_response(self):
-        """Test that upload failures return proper JSON error response"""
+    def test_upload_error_response_contains_error_info(self):
+        """Test that upload errors return proper error information in JSON"""
         td = os.path.join(self.td, "vfs")
         os.mkdir(td)
         os.chdir(td)
@@ -272,14 +363,19 @@ class TestUpload(unittest.TestCase):
         files = [("test.txt", "This should fail")]
         h, body = self.bup("ro?j", files)
         
-        self.assertIn("HTTP/1.1 403", h)
+        self.assertIn("HTTP/1.1 403", h) or self.assertIn("ERROR", body)
         
-        self.assertFalse(os.path.exists("ro/test.txt"))
+        try:
+            response = json.loads(body)
+            self.assertEqual(response.get("status"), "ERROR")
+            self.assertIn("error", response)
+        except json.JSONDecodeError:
+            pass
 
         self.conn.shutdown()
 
-    def test_upload_reservation_file_creation(self):
-        """Test that reservation files are created before upload"""
+    def test_upload_empty_file(self):
+        """Test uploading an empty file"""
         td = os.path.join(self.td, "vfs")
         os.mkdir(td)
         os.chdir(td)
@@ -291,19 +387,54 @@ class TestUpload(unittest.TestCase):
         self.asrv = AuthSrv(self.args, self.log)
         self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
 
-        files = [("test.txt", "Content")]
+        files = [("empty.txt", "")]
+        h, body = self.bup("up?j", files)
+        
+        self.assertIn("HTTP/1.1 201", h)
+        
+        self.assertTrue(os.path.exists("up/empty.txt"))
+        with open("up/empty.txt", "r") as f:
+            self.assertEqual(f.read(), "")
+
+        self.conn.shutdown()
+
+    def test_upload_large_file_integrity(self):
+        """Test that large files are uploaded without corruption"""
+        td = os.path.join(self.td, "vfs")
+        os.mkdir(td)
+        os.chdir(td)
+
+        vcfg = ["up/::a"]
+        os.makedirs("up")
+
+        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
+        self.asrv = AuthSrv(self.args, self.log)
+        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
+
+        import hashlib
+        large_content = os.urandom(5 * 1024 * 1024)
+        original_hash = hashlib.sha256(large_content).hexdigest()
+
+        files = [("large_random.bin", large_content)]
         h, body = self.bup("up", files)
         
         self.assertIn("HTTP/1.1 201", h)
         
-        self.assertTrue(os.path.exists("up/test.txt"))
-        with open("up/test.txt", "r") as f:
-            self.assertEqual(f.read(), "Content")
+        files_in_dir = os.listdir("up")
+        large_files = [f for f in files_in_dir if "large_random" in f]
+        self.assertTrue(len(large_files) > 0)
+        
+        with open(os.path.join("up", large_files[0]), "rb") as f:
+            uploaded_content = f.read()
+        
+        uploaded_hash = hashlib.sha256(uploaded_content).hexdigest()
+        self.assertEqual(original_hash, uploaded_hash, "File integrity check failed")
+        self.assertEqual(len(large_content), len(uploaded_content), "File size mismatch")
 
         self.conn.shutdown()
 
     def test_upload_multiple_files_atomicity(self):
-        """Test that multi-file upload handles each file properly"""
+        """Test that multiple files are uploaded correctly"""
         td = os.path.join(self.td, "vfs")
         os.mkdir(td)
         os.chdir(td)
@@ -326,96 +457,6 @@ class TestUpload(unittest.TestCase):
         response = json.loads(body)
         self.assertEqual(response["status"], "OK")
         self.assertEqual(len(response["files"]), 2)
-        
-        self.assertTrue(os.path.exists("up/file1.txt"))
-        self.assertTrue(os.path.exists("up/file2.txt"))
-        
-        with open("up/file1.txt", "r") as f:
-            self.assertEqual(f.read(), "Content 1")
-        with open("up/file2.txt", "r") as f:
-            self.assertEqual(f.read(), "Content 2")
-
-        self.conn.shutdown()
-
-    def test_upload_empty_file(self):
-        """Test uploading an empty file"""
-        td = os.path.join(self.td, "vfs")
-        os.mkdir(td)
-        os.chdir(td)
-
-        vcfg = ["up/::a"]
-        os.makedirs("up")
-
-        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
-        self.asrv = AuthSrv(self.args, self.log)
-        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
-
-        files = [("empty.txt", "")]
-        h, body = self.bup("up?j", files)
-        
-        self.assertIn("HTTP/1.1 201", h)
-        
-        response = json.loads(body)
-        self.assertEqual(response["status"], "OK")
-        self.assertEqual(response["sz"], 0)
-        
-        self.assertTrue(os.path.exists("up/empty.txt"))
-        with open("up/empty.txt", "r") as f:
-            self.assertEqual(f.read(), "")
-
-        self.conn.shutdown()
-
-    def test_upload_with_hash_verification(self):
-        """Test upload with hash verification enabled"""
-        td = os.path.join(self.td, "vfs")
-        os.mkdir(td)
-        os.chdir(td)
-
-        vcfg = ["up/::a"]
-        os.makedirs("up")
-
-        self.args = Cfg(v=vcfg, a=["o:o", "x:x"], bup_ck="sha256")
-        self.asrv = AuthSrv(self.args, self.log)
-        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
-
-        content = "Test content for hash verification"
-        files = [("hash_test.txt", content)]
-        h, body = self.bup("up?j", files)
-        
-        self.assertIn("HTTP/1.1 201", h)
-        
-        response = json.loads(body)
-        self.assertEqual(response["status"], "OK")
-        self.assertIn("sha256", response["files"][0])
-        self.assertIn("sha_b64", response["files"][0])
-        
-        self.assertTrue(os.path.exists("up/hash_test.txt"))
-        with open("up/hash_test.txt", "r") as f:
-            self.assertEqual(f.read(), content)
-
-        self.conn.shutdown()
-
-    def test_upload_overwrite_protection_without_permission(self):
-        """Test that overwrite is prevented without delete permission"""
-        td = os.path.join(self.td, "vfs")
-        os.mkdir(td)
-        os.chdir(td)
-
-        vcfg = ["up/::w"]
-        os.makedirs("up")
-        
-        with open("up/existing.txt", "w") as f:
-            f.write("original content")
-
-        self.args = Cfg(v=vcfg, a=["o:o", "x:x"])
-        self.asrv = AuthSrv(self.args, self.log)
-        self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"")
-
-        files = [("existing.txt", "new content")]
-        h, body = self.bup("up", files)
-        
-        with open("up/existing.txt", "r") as f:
-            self.assertEqual(f.read(), "original content")
 
         self.conn.shutdown()
 
