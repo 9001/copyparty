@@ -1350,6 +1350,9 @@ function setColor (color) {
 	var a = accent || '#fc5';
 	console.log('accent color set to: ' + a);
 	document.documentElement.style.setProperty('--a', a);
+	pbar.drawbuf();
+	pbar.drawpos();
+	vbar.draw();
 }
 ebi('accent').oninput = ebi('accent_picker').oninput = function () {
 	var validcolor = parseColor(this.value);
@@ -2522,12 +2525,12 @@ var pbar = (function () {
 
 		bau = mp.au;
 
+		var accent = getComputedStyle(document.body).getPropertyValue('--a');
+
 		var sm = bc.w * 1.0 / mp.au.duration,
-			gk = bc.h + '/' + themen,
+			gk = bc.h + '/' + themen + '/' + accent,
 			dz = themen == 'dz',
 			dy = themen == 'dy';
-
-		var accent = getComputedStyle(document.body).getPropertyValue('--a');
 
 		if (gradh != gk) {
 			gradh = gk;
@@ -2548,8 +2551,8 @@ var pbar = (function () {
 			bctx.globalAlpha = 1;
 		}
 
+		var step = sm > 1 ? 1 : sm > 0.4 ? 3 : sm > 0.05 ? 30 : 720;
 		if(false){
-			var step = sm > 1 ? 1 : sm > 0.4 ? 3 : sm > 0.05 ? 30 : 720;
 			bctx.fillStyle = light && !dy ? 'rgba(0,0,0,0.15)' : 'rgba(255, 255, 255, 0.15)';
 			for (var p = step, mins = adur / 10; p <= mins; p += step)
 				bctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
@@ -2572,7 +2575,7 @@ var pbar = (function () {
 			bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 	};
 
-	r.drawpos = function () {
+	r.drawpos = function (force) {
 		var bc = r.buf,
 			pc = r.pos,
 			pctx = pc.ctx,
@@ -2685,13 +2688,13 @@ var vbar = (function () {
 		if (!mp)
 			return;
 
-		var gh = h + '' + light,
-			dz = themen == 'dz',
-			dy = themen == 'dy';
-
 		var accent = getComputedStyle(document.body).getPropertyValue('--a');
 		var bg = getComputedStyle(document.body).getPropertyValue('--bg-u2');
 		
+		var gh = h + '' + light  + '/' + accent,
+			dz = themen == 'dz',
+			dy = themen == 'dy';
+
 		if (gradh != gh) {
 			gradh = gh;
 			style1 = auto_grad(r.can, accent, accent);
@@ -2700,20 +2703,18 @@ var vbar = (function () {
 		ctx.fillStyle = style2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = style1; ctx.fillRect(0, 0, w * mp.vol, h);
 		
-		if(false){
-			var vt = Math.floor(mp.vol * 100) + '%',
-				tw = ctx.measureText(vt).width,
-				x = w * mp.vol - tw - 8,
-				li = dy;
+		// var vt = Math.floor(mp.vol * 100) + '%',
+		// 	tw = ctx.measureText(vt).width,
+		// 	x = w * mp.vol - tw - 8,
+		// 	li = dy;
 
-			if (mp.vol < 0.5) {
-				x += tw + 16;
-				li = !li;
-			}
+		// if (mp.vol < 0.5) {
+		// 	x += tw + 16;
+		// 	li = !li;
+		// }
 
-			ctx.fillStyle = li ? '#fff' : '#210';
-			ctx.fillText(vt, x, h / 3 * 2);
-		}
+		// ctx.fillStyle = li ? '#fff' : '#210';
+		// ctx.fillText(vt, x, h / 3 * 2);
 
 		clearTimeout(untext);
 		untext = setTimeout(r.draw, 1000);
@@ -7400,36 +7401,6 @@ var filecolwidth = (function () {
 })();
 onresize100.add(filecolwidth, true);
 
-var ows_active = false;
-var lastY = 0;
-var trailingY0 = 0;
-function onwrapscroll () {
-	var newY = yscroll();
-	var down = newY > lastY;
-	var gh = ebi('ghead');
-	var pa = ebi('path');
-	var totalH = gh.offsetHeight + ebi('pathBar').offsetHeight;
-
-	if(newY > trailingY0 + totalH){
-		trailingY0 = newY - totalH;
-		clmod(gh, 'inv', true);
-	}
-	else if(newY < trailingY0)
-	{
-		trailingY0 = newY;
-		clmod(gh, 'inv', false);
-	}
-	else{
-		clmod(gh, 'inv', false);
-	}
-
-	document.documentElement.style.setProperty('--dyn-scrolloffset', (trailingY0 - newY) + 'px');
-
-	lastY = newY;
-}
-if(!IE)
-	window.addEventListener('scroll', onwrapscroll);
-
 function onwidgetresize(){
 	var widget = ebi('widget');
 	var bar = ebi('pctl');
@@ -10228,18 +10199,28 @@ ebi('path').onclick = function (e) {
 	return ev(e);
 };
 
-function scroll_v_to_h (e) {
+function scroll_v_to_h (e, o) {
   e.preventDefault(); 
   var delta = e.deltaY;
-  var maxScrollLeft = ebi('path').scrollWidth - ebi('path').clientWidth;
+  var maxScrollLeft = o.scrollWidth - o.clientWidth;
   
-  ebi('path').scrollLeft = Math.max(0, Math.min(maxScrollLeft, ebi('path').scrollLeft + delta));
+  o.scrollLeft = Math.max(0, Math.min(maxScrollLeft, o.scrollLeft + delta));
 }
 function keep_right (o) {
 	o.scrollLeft = o.scrollWidth - o.clientWidth;
 }
 
-ebi('path').addEventListener('wheel', scroll_v_to_h);
+ebi('path').addEventListener('wheel', function (e) {
+	scroll_v_to_h(e, this);
+});
+
+ebi('ghead').addEventListener('wheel', function (e) {
+	scroll_v_to_h(e, this);
+});
+
+ebi('treeh').addEventListener('wheel', function (e) {
+	scroll_v_to_h(e, this);
+});
 
 
 var scroll_y = -1;

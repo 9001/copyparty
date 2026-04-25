@@ -1542,7 +1542,6 @@ html.a #up_quick .btn.on {
 }
 #pvolbg {
 	height: 1.3em;
-	min-width: 1.5em;
 	padding: .3em;
 	cursor: pointer;
 	align-items: center;
@@ -1891,12 +1890,13 @@ html {
 	background: var(--tree-bg);
 }
 #treeh {
-	height: 2.2em;
 	line-height: 2.2em;
 	border-bottom: 1px solid var(--bg-d3);
-	overflow: auto;
   	display: block;
-	padding: .3em 0;
+	padding: .3em .5em;
+	text-wrap-mode: nowrap;
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 #treepar {
 	background: #fff;
@@ -3471,10 +3471,6 @@ html.ay #tree li,
 html.ay #treepar {
 	border-color: #f7f7f7 var(--bg-max) #ddd var(--bg-max);
 }
-html.ay #path {
-	background: #f7f7f7;
-	box-shadow: 0 0 .3em #bbb;
-}
 html.ay #treesuperh,
 html.ay #treepar {
 	background: #f7f7f7;
@@ -3629,10 +3625,6 @@ html.d #treepar {
 
 
 /* basically a mobile / phone layout */
-#ghead.inv {
-	opacity: 0;
-	pointer-events: none;
-}
 #pathBar.thin {
 	display: block;
 
@@ -3640,7 +3632,6 @@ html.d #treepar {
 		position: relative;
 		height: 1.8em;
 		margin: .5em 0 0 0;
-		top: var(--dyn-scrolloffset);
 		z-index: -1;
 	}
 	#wfp.shifted {
@@ -3664,7 +3655,11 @@ html.e #pathBar.thin #path {
 }
 html:not(.e) #wrap.thin {
 	#ghead {
-		top: calc(7.4em + var(--dyn-scrolloffset));
+		top: 7.4em;
+		text-wrap-mode: nowrap;
+		overflow-x: auto;
+		overflow-y: hidden;
+		padding: .3em;
 	}
 }
 html.e #wrap.thin {
@@ -3683,6 +3678,7 @@ html.e #wrap.thin {
 @media (max-width: 50em){
 	html:not(.e) body {
 		margin: 1em;
+		font-size: 1.1em;
 	}
 	html:not(.e) #treeToggleBtn {
 		margin: .8em 0 0 1.2em;
@@ -3695,7 +3691,7 @@ html.e #wrap.thin {
 		margin-left: 0 !important;
 	}
 	#widget {
-		font-size: 1.6em;
+		font-size: 1.4em;
 	}
 	#pathBar {
 		display: block;
@@ -3708,6 +3704,10 @@ html.e #wrap.thin {
 	}
 	#wfp {
 		margin-left: .1em;
+	}
+	#wfp #gon,
+	#wfp #gop {
+		display: none;
 	}
 	#ggrid {
 		margin: 0em -0.25em;
@@ -4039,7 +4039,6 @@ html.ez {
 
 html.e {
   text-shadow: none;
-  --dyn-scrolloffset: 0 !important;
 }
 html.e * {
   border-radius: 0 !important;
