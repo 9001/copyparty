@@ -3364,11 +3364,6 @@ html.c #path,
 html.a #path {
 	border-radius: .3em;
 }
-html.d #pctl,
-html.e #pctl,
-html.b #pctl {
-	margin-left: .5em;
-}
 html.dz .opview input.i {
 	width: calc(100% - 18em);
 }
@@ -3703,7 +3698,7 @@ html.e #wrap.thin {
 	#folder_search {
 		margin: .5em 1em 0 .2em;
 	}
-	#wrap {
+	html:not(.e) #wrap {
 		padding-left: 1em;
 		padding-right: 1em;
 	}
@@ -4504,6 +4499,7 @@ html.e #treeul {
   margin: 0 !important;
   min-height: 100%;
   height: max-content;
+  width: calc(100% - 1.1em);
 }
 html.e .ntree a:last-of-type:before {
   content: "📁";
@@ -4554,13 +4550,14 @@ html.e #docul {
 }
 html.e #tree_footer {
 	margin-left: 0.5em;
+	background: linear-gradient(to top, var(--inset-bg), transparent);
 }
 html.e #wrap {
   transform: translateX(calc((var(--negative-space) * 2) - .2em));
   padding-right: var(--negative-space);
   position: relative;
   margin-right: calc((var(--negative-space) * 2) - .1em);
-  margin-left: 4px;
+  margin-left: -6px;
   margin-top: 0;
   /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
 }
@@ -4568,11 +4565,14 @@ html.e #pathBar {
 	top: 0;
 	background: var(--ttlbar);
 }
+html.e   #pathBar.thin #actionsArea {
+	top: 0 !important;
+}
 html.e input[type="radio"] {
   accent-color: #232323;
 }
 html.e #pathBar {
-	margin: 0;
+	padding: 0;
 }
 html.e #path {
 	background: var(--bg-u2);
@@ -4594,11 +4594,6 @@ html.ez #hovertree:after {
   content: "BUGGY";
 }
 }*/
-html.e #widget {
-  box-shadow: 0 0;
-  border: 0 !important;
-  padding-left: .5em;
-}
 html.e #wtico,
 html.e #zip1 {
   box-shadow: 0 0 !important;
