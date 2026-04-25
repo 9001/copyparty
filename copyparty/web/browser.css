@@ -3622,7 +3622,8 @@ html.d #treepar {
 		right: 0;
 	}
 	#ops a {
-		padding: 0 .15em;
+		padding-left: .15em;
+		padding-right: .15em;
 	}
 	#srchfolder_div {
 		left: 2.8em;
