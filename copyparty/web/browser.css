@@ -581,16 +581,14 @@ html .ayjump:focus-visible {
 }
 #pathBar {
 	display: flex;
-	margin: 0 0 .5em 0;
+	margin: 0;
 	align-content: center;
 	justify-content: space-between;
 	position: sticky;
-  	top: .6em;
 	z-index: 4;
-	pointer-events: none;
-}
-#pathBar *:not(#wfp) {
-	pointer-events: all;
+	background: linear-gradient(to bottom, var(--bg), transparent);
+	padding: .6em 0;
+	top: 0;
 }
 #wfp.shifted {
 	margin-left: 2em;
@@ -1859,9 +1857,8 @@ input.ssconf_v {
 }
 
 #wrap {
-	margin: .6em 1em 0 .7em;
+	padding:  0 .6em 7em .6em;
 	min-height: 70vh;
-	padding-bottom: 7em;
 }
 #tree {
 	display: none;
@@ -3639,7 +3636,7 @@ html.d #treepar {
 	}
 	#actionsArea {
 		position: absolute;
-		top: 0;
+		top: .6em;
 		right: 0;
 	}
 	#ops a {
@@ -3677,11 +3674,10 @@ html.e #wrap.thin {
 }
 @media (max-width: 50em){
 	html:not(.e) body {
-		margin: 1em;
 		font-size: 1.1em;
 	}
 	html:not(.e) #treeToggleBtn {
-		margin: .8em 0 0 1.2em;
+		margin: .8em;
 	}
 	html:not(.e) #srv_name {
 		padding-top: .8em;
@@ -3695,12 +3691,21 @@ html.e #wrap.thin {
 	}
 	#pathBar {
 		display: block;
+		padding: .5em;
+		padding-top: 1em;
+		margin-left: -.5em;
+		margin-right: -.5em;
+	}
+	#pathBar.thin #actionsArea {
+		top: 1em;
+		right: .5em;
 	}
 	#folder_search {
 		margin: .5em 1em 0 .2em;
 	}
 	#wrap {
-		margin-right: 0;
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 	#wfp {
 		margin-left: .1em;
@@ -3709,8 +3714,8 @@ html.e #wrap.thin {
 	#wfp #gop {
 		display: none;
 	}
-	#ggrid {
-		margin: 0em -0.25em;
+	#gfiles {
+		margin: 0em -0.5em;
 	}
 	#ghead {
 		margin: .5em;
@@ -3758,12 +3763,9 @@ html.e #wrap.thin {
 		padding: .5em;
 		padding-right: 2em;
 	}
-	#pathBar{
-		margin: .5em;
-		top: 1em;
-	}
+	#pathBar.thin #wfp,
 	#pathBar.thin #wfp.shifted {
-		margin-left: 2.1em;
+		margin-left: 2em;
 	}
 	#wrap.thin {
 		#ghead {

@@ -7721,7 +7721,7 @@ var treectl = (function () {
 		ebi('tree').style.width = w;
 		ebi('tree_footer').style.width = (iw - 2) + 'em';
 		ebi('tree_footer').style.display = 'block';
-		ebi('wrap').style.marginLeft = w2;
+		ebi('wrap').style.marginLeft = w;
 		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
 		onwidgetresize();
 		onscroll();
