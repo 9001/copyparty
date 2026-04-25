@@ -507,7 +507,7 @@ if (1)
 		"gt_c2": "truncate filenames less (show more)",
 
 		"sm_w8": "searching...",
-		"sm_prev": "search results below are from a previous query:\n  ",
+		"sm_prev": "search results below are from a previous query:  ",
 		"sl_close": "close search results",
 		"sl_hits": "showing {0} hits",
 		"sl_moar": "load more",
@@ -807,14 +807,11 @@ modal.load();
 
 // toolbar
 ebi('ops').innerHTML = (
-	//'<a href="#" id="opa_x" data-dest="" tt="' + L.ot_close + '">--</a>' +
 	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
 	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
 	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
-	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '"><p class="overlay_plus">+</p>📂</a>' +
-	'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '"><div><p class="overlay_plus">+</p>📝</div></a>' +
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
 	'<a href="#" id="opa_acc" data-dest="acc" tt=""><div id="acc_pfp">👤</div></a>' +
@@ -927,9 +924,9 @@ ebi('widget').innerHTML = (
 	'<div id="widgeti">' +
 	'	<div id="pbarthinpos"></div>' +
 	'	<div id="pctl">' +
-	'		<a href="#" id="bprev" class="icon" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
-	'		<a href="#" id="bplay" class="icon" tt="' + L.wt_play + '">' + svg_play + '</a>' +
-	'		<a href="#" id="bnext" class="icon" tt="' + L.wt_next + '">' + svg_next + '</a>' +
+	'		<a href="#" id="bprev" class="icon btn on" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
+	'		<a href="#" id="bplay" class="icon btn on" tt="' + L.wt_play + '">' + svg_play + '</a>' +
+	'		<a href="#" id="bnext" class="icon btn on" tt="' + L.wt_next + '">' + svg_next + '</a>' +
 	'		<span id="trackname"></span>' +
 	'		<div id="progbar" style="position: relative; height: 80%;">' +
 	'			<canvas id="barbuf"></canvas>' +
@@ -1351,7 +1348,7 @@ function setColor (color) {
 
 	accent = color;
 	swrite('accent', accent);
-	var a = accent || '#fc0';
+	var a = accent || '#fc5';
 	console.log('accent color set to: ' + a);
 	document.documentElement.style.setProperty('--a', a);
 }
@@ -1376,25 +1373,16 @@ if(accent){
 }
 
 // navpane
-ebi('tree').innerHTML = (
-	'<div id="treeh">\n' +
-	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
-	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
-	'	<a href="#" class="btn" id="visdir" tt="' + L.tt_visdir + '">🎯</a>\n' +
-	'	<a href="#" class="tgl btn" id="filetree" tt="' + L.tt_ftree + '">📃</a>\n' +
-	'	<a href="#" class="tgl btn" id="parpane" tt="' + L.tt_pdock + '">📌</a>\n' +
-	'	<a href="#" class="tgl btn" id="dyntree" tt="' + L.tt_dynt + '">a</a>\n' +
-	'	<a href="#" class="tgl btn" id="wraptree" tt="' + L.tt_wrap + '">↵</a>\n' +
-	'	<a href="#" class="tgl btn" id="hovertree" tt="' + L.tt_hover + '">👀</a>\n' +
-	'</div>\n' +
-	'<ul id="docul"></ul>\n' +
-	'<ul class="ntree" id="treepar"></ul>\n' +
-	'<ul class="ntree" id="treeul"></ul>\n' +
-	'<div id="thx_ff">&nbsp;</div>'
+ebi('treeh').innerHTML += (
+	'<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
+	'<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
+	'<a href="#" class="btn" id="visdir" tt="' + L.tt_visdir + '">🎯</a>\n' +
+	'<a href="#" class="tgl btn" id="filetree" tt="' + L.tt_ftree + '">📃</a>\n' +
+	'<a href="#" class="tgl btn" id="parpane" tt="' + L.tt_pdock + '">📌</a>\n' +
+	'<a href="#" class="tgl btn" id="dyntree" tt="' + L.tt_dynt + '">a</a>\n' +
+	'<a href="#" class="tgl btn" id="wraptree" tt="' + L.tt_wrap + '">↵</a>\n' +
+	'<a href="#" class="tgl btn" id="hovertree" tt="' + L.tt_hover + '">👀</a>\n'
 );
-ebi('tree').appendChild(ebi('tree_footer'));
-clmod(ebi('tree'), 'sbar', 1);
-ebi('goh').textContent = L.goh;
 QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
 QS('#op_new_md input[type="submit"]').value = L.ab_mkdoc;
 QS('#op_msg input[type="submit"]').value = L.ab_msg;
@@ -1438,16 +1426,6 @@ ebi('rcm').innerHTML = (
 			ops[a].href = '#v=' + v;
 	}
 
-	// new file
-	ebi('opa_md').onclick = function(){
-		mktemp();
-	}
-
-	// new folder
-	ebi('opa_mkd').onclick = function(){
-		mktemp(true);
-	}
-
 	ebi('opa_acc').appendChild(ebi('op_acc'));
 	ebi('op_acc').onclick = function (e){
 		e.stopPropagation();
@@ -1484,6 +1462,8 @@ function opclick(e) {
 	goto(dest);
 
 	var input = QS('.opview.act input:not([type="hidden"])')
+	if(dest == 'search')
+		input = ebi('folder_search');
 	if (input && !TOUCH) {
 		tt.skip = true;
 		input.focus();
@@ -1543,6 +1523,8 @@ function goto(dest) {
 			fn();
 	}
 
+	ebi('srchfolder_div').style.display = dest == 'search' ? 'block' : 'none';
+		
 	clmod(document.documentElement, 'op_open', dest);
 	clmod(document.documentElement, 'noscroll', QS('.modal.vis'));
 
@@ -4020,7 +4002,6 @@ function eval_hash() {
 			d.setAttribute('href', '#');
 			d.setAttribute('class', 'ayjump');
 			d.innerHTML = a ? L.ay_path : L.ay_files;
-			document.body.insertBefore(d, ebi('topBar'));
 			d.onclick = function (e) {
 				ev(e);
 				if (a)
@@ -4039,9 +4020,9 @@ function eval_hash() {
 	var svg_up = svg_box + '<path d="M12 19V5M18 11L12 5L6 11" ' + svg_options +'/>';
 
 	ebi('wfp').innerHTML = (
-		'<a href="#" id="gop" tt="' + L.gop + '">' + svg_left + '</a>' +
-		'<a href="#" id="gon" tt="' + L.gon + '">' + svg_right + '</a>' +
-		'<a href="#" id="gou" tt="' + L.gou + '">' + svg_up + '</a>');
+		'<a href="#" id="gop" class="btn" tt="' + L.gop + '">' + svg_left + '</a>' +
+		'<a href="#" id="gon" class="btn" tt="' + L.gon + '">' + svg_right + '</a>' +
+		'<a href="#" id="gou" class="btn" tt="' + L.gou + '">' + svg_up + '</a>');
 	ebi('gop').onclick = function () { tree_neigh(-1); }
 	ebi('gon').onclick = function () { tree_neigh(1); }
 	ebi('gou').onclick = function () { tree_up(true); }
@@ -6929,7 +6910,7 @@ var search_ui = (function () {
 	}
 	
 	var folderSearch = ebi('folder_search');
-	folderSearch.placeholder = '🔎 ' + L.s_dir;
+	folderSearch.placeholder = L.s_dir;
 	folderSearch.onfocus = function(){
 		ebi('srch_pathc').checked = true;
 		var path = decodeURI(get_evpath());
@@ -6948,6 +6929,32 @@ var search_ui = (function () {
 		nsearch.oninput();
 	}
 	folderSearch.onkeydown = ev_search_keydown;
+
+	var expand = sread('s_ex');
+	function exp_search () {
+		clmod(ebi('op_search'), 'vis', expand);
+		var ms = ebi('moresearch');
+		if(expand){
+			location.hash = '#';
+			ms.innerHTML = '▴'
+		}
+		else{
+			ms.innerHTML = '▾'
+		}
+	}
+	ebi('moresearch').onclick = function () {
+		expand = !expand;
+		swrite('s_ex', expand);
+		exp_search();
+	}
+	exp_search();
+
+	ebi('closesearch').onclick = function (e) {
+		ebi('opa_srch').click();
+		folderSearch.value = '';
+		if(ebi('unsearch'))
+			ebi('unsearch').click();
+	}
 
 	var recur_c = ebi('srch_recursivec');
 	recur_c.oninput = ev_search_input;
@@ -7397,6 +7404,7 @@ function onwidgetresize(){
 	var gtc = 'max-content max-content max-content ' + (thin ? '' : '20%') + ' auto max-content max-content max-content';
 	if(!thin && bar.children.length < gtc.split(' ').length){
 		try{
+			//wide
 			ebi('trackname').after(ebi('progbar'));
 			ebi('trackname').after(ebi('altprogbar'));
 			bar.style.paddingTop = '.3em';
@@ -7409,6 +7417,7 @@ function onwidgetresize(){
 	}
 	gtc = 'max-content max-content max-content ' + (thin ? '' : '20%') + ' auto max-content max-content max-content';
 	if(thin && bar.children.length > gtc.split(' ').length){
+		//thin
 		pbarthinpos.appendChild(ebi('progbar'));
 		pbarthinpos.appendChild(ebi('altprogbar'));
 		bar.style.paddingTop = '0';
@@ -7417,8 +7426,13 @@ function onwidgetresize(){
 	bar.style.gridTemplateColumns = gtc;
 	
 	clmod(widget, 'thin', thin);
+	clmod(ebi('pathBar'), 'thin', thin);
+	clmod(ebi('wrap'), 'thin', thin);
 
 	pbar.onresize();
+
+	// keep path scrolled right
+	ebi('path').onresize = keep_right(ebi('path'));
 }
 window.addEventListener('resize', onwidgetresize);
 onwidgetresize();
@@ -7514,10 +7528,14 @@ var treectl = (function () {
 		}
 
 		ebi('tree').style.display = 'block';
+		ebi('tree').style.width = 0;
+		clmod(ebi('wfp'), 'shifted', false);
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
-		onresize();
-		aligngriditems();
+		setTimeout(function () {
+			onresize();
+			aligngriditems();
+		}, 150);
 	};
 
 	r.detree = function (e, nw) {
@@ -7545,9 +7563,13 @@ var treectl = (function () {
 	r.hide = function () {
 		r.hidden = true;
 		ebi('tree').style.width = ebi('tree_footer').style.width = '0';
+		setTimeout(function () {
+			ebi('tree').style.display = 'none'
+		}, 150);
 		ebi('tree_footer').style.display = 'none';
 		ebi('widget').style.marginLeft = '0';
 		ebi('wrap').style.marginLeft = '';
+		clmod(ebi('wfp'), 'shifted', true);
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
 		aligngriditems();
@@ -7634,6 +7656,7 @@ var treectl = (function () {
 				parp.style.top = y;
 		}
 
+		return; // always fixed
 		if (wraptop === null)
 			return;
 
@@ -10165,6 +10188,19 @@ ebi('path').onclick = function (e) {
 	return ev(e);
 };
 
+function scroll_v_to_h (e) {
+  e.preventDefault(); 
+  var delta = e.deltaY;
+  var maxScrollLeft = ebi('path').scrollWidth - ebi('path').clientWidth;
+  
+  ebi('path').scrollLeft = Math.max(0, Math.min(maxScrollLeft, ebi('path').scrollLeft + delta));
+}
+function keep_right (o) {
+	o.scrollLeft = o.scrollWidth - o.clientWidth;
+}
+
+ebi('path').addEventListener('wheel', scroll_v_to_h);
+
 
 var scroll_y = -1;
 var scroll_vp = '\n';
@@ -10559,6 +10595,10 @@ function reload_browser() {
 		ebi('path').appendChild(o);
 		drag.mktarget(o);
 	}
+
+	setTimeout(function () {
+		ebi('path').scrollLeft = ebi('path').scrollWidth - ebi('path').clientWidth;
+	}, 100);
 
 	reload_mp();
 	try { showsort(ftab); } catch (ex) { }
