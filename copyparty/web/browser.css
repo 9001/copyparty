@@ -1241,8 +1241,6 @@ html.dz #flogout {
 	width: 1.5em;
   	height: 1.5em;
 	padding: .1em;
-	display: inline-block;
-	vertical-align: bottom;
 }
 .btn.svgIcon.gb1 {
 	width: 1.7em;
@@ -1944,6 +1942,7 @@ html {
 	text-wrap-mode: wrap;
 	white-space-collapse: preserve;
 	position: relative;
+	vertical-align: top;
 }
 #wfp .btn {
 	font-size: 1em;
