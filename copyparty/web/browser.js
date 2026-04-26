@@ -814,7 +814,7 @@ ebi('ops').innerHTML = (
 	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
-	'<a href="#" id="opa_acc" data-dest="acc" tt=""><div id="acc_pfp">👤</div></a>' +
+	'<a href="#" id="opa_acc" data-dest="acc" tt=""><span id="acc_pfp">👤</span></a>' +
 	'<div id="opdesc"></div>'
 );
 

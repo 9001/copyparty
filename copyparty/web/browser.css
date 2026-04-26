@@ -3337,10 +3337,6 @@ summary:hover {
 	height: max-content;
 	margin-left: auto;
 }
-#opa_acc {
-	position: relative;
-	margin-left: .3em;
-}
 #srchfolder_div {
 	display: none;
 	position: absolute;
@@ -4843,15 +4839,8 @@ html.e #wtc {
 	padding-bottom: .2em;
 }
 
-.popup.act,
-.popup.show {
-	visibility: visible;
-	-webkit-animation: fadeIn 1s;
-	animation: fadeIn 1s;
-}
-
 .popup {
-	visibility: hidden;
+	display: none;
 	width: fit-content;
 	background: #000;
 	background: var(--bg-u2);
@@ -4861,7 +4850,6 @@ html.e #wtc {
 	border-radius: var(--radius);
 	padding: .5em;
 	position: absolute;
-	display: block;
 	z-index: 6;
 	bottom: 2.5em;
 }
@@ -4880,10 +4868,9 @@ html.e #wtc {
 	font-size: small;
 }
 
+.popup.act,
 #srchfolder_div:focus-within .popup {
-	visibility: visible;
-	-webkit-animation: fadeIn 1s;
-	animation: fadeIn 1s;
+	display: block;
 }
 
 .overlay_plus{
