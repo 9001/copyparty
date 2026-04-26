@@ -4084,6 +4084,12 @@ html.e #acc_pfp {
 	background: transparent;
 	color: var(--fg);
 }
+html.e .modalcontent {
+	border-color: var(--fg);
+}
+html.e .divider {
+	background: var(--fg);
+}
 html.e details[open] summary:hover,
 html.e #files,
 html.e #u2conf input[type="checkbox"]:hover + label,
