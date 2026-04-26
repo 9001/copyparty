@@ -2038,6 +2038,7 @@ html.a .btn {
 #tree ul a {
 	border-radius: var(--b-radius);
 	display: inline-block;
+	vertical-align: center;
 }
 .ntree a+a {
 	width: calc(100% - 2.2em);
@@ -2604,11 +2605,6 @@ html.y #bbox-overlay figcaption a {
 	opacity: 0;
 	top: -3.5em;
 	pointer-events: none;
-}
-@-moz-document url-prefix() {
-	#bbox-overlay.immersive #bbox-btns {
-		top: 0;
-	}
 }
 #bbox-overlay .btn {
 	cursor: pointer;
@@ -3690,6 +3686,12 @@ html.e #wrap.thin {
 	}
 }
 @media (max-width: 50em){
+	.ntree a + a {
+		line-height: 2em;
+	}
+	#files tbody a {
+		padding: .8em 0;
+	}
 	html:not(.e) body {
 		font-size: 1.1em;
 	}
@@ -4760,7 +4762,7 @@ html.e #detree {
 	padding: 1em;
 	pointer-events: none;
 	transition: width .15s;
-	background: linear-gradient(transparent, var(--bg-u2));
+	background: linear-gradient(to top, var(--bg-u2), transparent);
 }
 .popup_button {
 	border-radius: var(--b-radius);
