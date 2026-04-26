@@ -3668,18 +3668,17 @@ html:not(.e) #wrap.thin {
 		width: calc(50vw - 5em);
 	}
 }
-html:not(.e) #wrap.thin {
-	#ghead::after {
-		content: "";
-		position: sticky;
-		right: -.5em;
-		background: linear-gradient(to left, var(--bg-u2), transparent);
-		width: 3em;
-		height: 3.5em;
-		display: inline-block;
-		margin: -1em;
-		pointer-events: none;
-	}
+html:not(.e) #treeh:after,
+html:not(.e) #wrap.thin #ghead::after {
+	content: "";
+	position: sticky;
+	right: -.5em;
+	background: linear-gradient(to left, var(--bg-u2), transparent);
+	width: 3em;
+	height: 3.5em;
+	display: inline-block;
+	margin: -1em;
+	pointer-events: none;
 }
 html.e #wrap.thin {
 	#ghead {
