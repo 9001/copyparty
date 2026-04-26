@@ -7428,7 +7428,7 @@ function onwidgetresize(){
 			//wide
 			ebi('trackname').after(ebi('progbar'));
 			ebi('trackname').after(ebi('altprogbar'));
-			bar.style.paddingTop = '.3em';
+			bar.style.paddingTop = '0';
 		}
 		catch (e) {
 			// unnacounted old browser fallback
@@ -7441,7 +7441,7 @@ function onwidgetresize(){
 		//thin
 		pbarthinpos.appendChild(ebi('progbar'));
 		pbarthinpos.appendChild(ebi('altprogbar'));
-		bar.style.paddingTop = '0';
+		bar.style.paddingTop = '.3em';
 	}
 	ebi('altprogbar').maxWidth = thin ? '' : '40vw'
 	bar.style.gridTemplateColumns = gtc;
