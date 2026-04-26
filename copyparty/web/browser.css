@@ -2591,7 +2591,7 @@ html.y #bbox-overlay figcaption a {
 	line-height: 60px;
 }
 #bbox-btns {
-	transition: top .3s ease;
+	transition: top .3s ease, opacity .3s ease;
 }
 #bbox-btns .btn {
 	cursor: pointer;
@@ -2601,7 +2601,9 @@ html.y #bbox-overlay figcaption a {
 	opacity: 0;
 }
 #bbox-overlay.immersive #bbox-btns {
+	opacity: 0;
 	top: -3.5em;
+	pointer-events: none;
 }
 #bbox-overlay .btn {
 	cursor: pointer;
