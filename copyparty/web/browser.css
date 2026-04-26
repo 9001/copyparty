@@ -541,7 +541,7 @@ html,body,tr,th,td,#files,a,#blogout {
 	border: none;
 }
 body {
-	background: #222;
+	background: #e4edf8;
 }
 @supports (background: var(--bg)) {
 	body {
