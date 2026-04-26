@@ -1241,9 +1241,8 @@ html.dz #flogout {
 	width: 1.5em;
   	height: 1.5em;
 	padding: .1em;
-	margin: .1em;
 	display: inline-block;
-	vertical-align: center;
+	vertical-align: bottom;
 }
 .btn.svgIcon.gb1 {
 	width: 1.7em;
