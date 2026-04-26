@@ -234,6 +234,8 @@ html.b {
 	--g-g1: var(--bg);
 	--g-sh: rgba(0,0,0,0);
 
+	--txt-bg: --bg-u3;
+
 	--op-aa-bg: rgba(255,255,255,0.06);
 
 	--u2-sbtn-b1: #fc0;
@@ -259,12 +261,7 @@ html.bz {
 
 	--row-alt: #181a27;
 
-	--btn-bg: #202231;
-	--btn-h-bg: #2d2f45;
-	--btn-1-bg: #eb6;
-	--btn-1-fg: #000;
-	--btn-1h-fg: #000;
-	--btn-1h-bg: #ff9;
+	--a: #eebb66;
 	--txt-sh: a;
 
 	--u2-tab-b1: var(--bg-u5);
@@ -608,6 +605,7 @@ html .ayjump:focus-visible {
 	overflow-x: auto;
 	overflow-y: hidden;
 	background: var(--bg);
+	border-radius: var(--b-radius);
 }
 #pathBar #folder_search {
 	margin: 0;
@@ -3363,10 +3361,6 @@ summary:hover {
 
 
 
-html.c #path,
-html.a #path {
-	border-radius: var(--b-radius);
-}
 html.dz .opview input.i {
 	width: calc(100% - 18em);
 }
@@ -3514,7 +3508,7 @@ html.b #barpos {
 html.by #barpos {
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.2) inset;
 }
-html.b #ops a {
+html.b #pathBar {
 	background: var(--bg);
 }
 html.b #srch_q {
@@ -3540,10 +3534,23 @@ html.b #docul a,
 html.b .ntree a {
 	padding: .6em .2em;
 }
+html.b * {
+	box-shadow: none !important;
+	backdrop-filter: unset;
+}
+html.b #pctl .btn:not(:hover),
+html.b .btn:not(:hover):not(.on) {
+	background: color-mix(var(--bg-u5), transparent);
+}
 html.b #treepar {
 	margin-left: .63em;
 	width: calc(.1em + var(--nav-sz) - var(--sbw));
 	border-bottom: .2em solid var(--f-h-b1);
+}
+html.b #path i {
+	border-right: var(--fg) solid 2px;
+	height: 1.5em;
+  	margin: -.4em .3em -.4em -1.7em;
 }
 html.by .ghead,
 html.bz .ghead {
@@ -3684,7 +3691,7 @@ html.e #wrap.thin {
 }
 @media (max-width: 50em){
 	.ntree a + a {
-		line-height: 2em;
+		padding: .6em .2em;
 	}
 	#files tbody a {
 		padding: .8em 0;
