@@ -10594,9 +10594,8 @@ function reload_browser() {
 		o = mknod('a');
 		o.setAttribute('href', link2);
 		o.textContent = uricom_dec(parts[a]) || '🏠';
-		if(a > 0)
-			ebi('path').appendChild(mknod('i'));
 		ebi('path').appendChild(o);
+		ebi('path').appendChild(mknod('i'));
 		drag.mktarget(o);
 	}
 
