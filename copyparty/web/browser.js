@@ -5915,22 +5915,25 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
-		'<a href="#" id="gridicon_template" class="grdbtn gb1 svgIcon tgl btn on"></a>' +
-		'<a href="#" id="listicon_template" class="grdbtn gb2 svgIcon tgl btn"></a>' +
-		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
-		'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
-		'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
-		'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
-		'<span id="gridzoom">' + L.gt_zoom + ': ' +
-		'<a href="#" class="btn" z="-1.1" tt="Hotkey: shift-A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.1" tt="Hotkey: shift-D">+</a></span> <span id="gridchop">' + L.gt_chop + ': ' +
-		'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
-		'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a></span> <span id="gridsort">' + L.gt_sort + ': ' +
-		'<a href="#" s="href">' + L.gt_name + '</a> ' +
-		'<a href="#" s="sz">' + L.gt_sz + '</a> ' +
-		'<a href="#" s="ts">' + L.gt_ts + '</a> ' +
-		'<a href="#" s="ext">' + L.gt_ext + '</a>' +
-		'</span></div>' +
+			'<a href="#" id="gridicon_template" class="grdbtn gb1 svgIcon tgl btn on"></a>' +
+			'<a href="#" id="listicon_template" class="grdbtn gb2 svgIcon tgl btn"></a>' +
+			'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
+			'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
+			'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
+			'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
+			'<span id="gridzoom">' + L.gt_zoom + ': ' +
+				'<a href="#" class="btn" z="-1.1" tt="Hotkey: shift-A">&ndash;</a> ' +
+				'<a href="#" class="btn" z="1.1" tt="Hotkey: shift-D">+</a>' +
+			'</span> <span id="gridchop">' + L.gt_chop + ': ' +
+				'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
+				'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a>' +
+			'</span> <span id="gridsort">' + L.gt_sort + ': ' +
+				'<a href="#" s="href">' + L.gt_name + '</a> ' +
+				'<a href="#" s="sz">' + L.gt_sz + '</a> ' +
+				'<a href="#" s="ts">' + L.gt_ts + '</a> ' +
+				'<a href="#" s="ext">' + L.gt_ext + '</a>' +
+			'</span>' +
+		'</div>' +
 		'<div id="ggrid" tt=""></div>'
 	);
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
@@ -5981,7 +5984,7 @@ var thegrid = (function () {
 		r.setdirty();
 	};
 
-	var links = QSA('#ghead a.btn');
+	var links = QSA('#ghead a');
 	for (var a = 0; a < links.length; a++)
 		links[a].onclick = btnclick;
 
