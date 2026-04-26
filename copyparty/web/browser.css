@@ -864,8 +864,8 @@ html.y #path a:hover {
 	border-width: 0 .3em 0 .3em;
 	border-radius: var(--radius);
 	visibility: hidden;
-	margin: 0 -.3em;
-	width: 100%;
+	margin: 0 .3em;
+	width: calc(100% - 1em);
 	height: 0;
 }
 #doc>iframe.focus-visible,
@@ -895,13 +895,6 @@ html.y #path a:hover {
 .mdo>h2:first-child,
 .mdo>h3:first-child {
 	margin-top: 0.5rem;
-}
-.mdo {
-	max-width: 52em;
-}
-.mdo.sb,
-.logue.mdo>iframe {
-	max-width: 54em;
 }
 .mdo,
 .mdo * {
@@ -2307,13 +2300,15 @@ input[type="text"].invalid {
 	margin: -1em 0 .5em 0;
 	padding: 1em 0 1em 0;
 	border-radius: var(--radius);
+	overflow: auto;
+	box-shadow: 0 0 .3em var(--bg-d2);
+	background: var(--bg-u2);
 }
 #doc.wrap {
 	white-space: pre-wrap;
 }
-html.y #doc {
-	box-shadow: 0 0 .3em var(--bg-u5);
-	background: #f7f7f7;
+#bdoc {
+	margin-top: .3em;
 }
 #docul {
 	position: relative;
@@ -3634,7 +3629,7 @@ html.cy #path i {
 html.cy #up_quick_btn.on:not(:hover) {
 	background: #f00;
 }
-html.cy #ghead span {
+html.cy .ghead span {
 	color: #f00;
 }
 html.cy #s_list h3 {
@@ -3685,16 +3680,18 @@ html.e #pathBar.thin #path {
 	margin: 0;
 }
 html:not(.e) #wrap.thin {
-	#ghead {
+	.ghead {
 		top: 7.4em;
+		padding: .3em;
+	}
+	#ghead {
 		text-wrap-mode: nowrap;
 		overflow-x: auto;
 		overflow-y: hidden;
-		padding: .3em;
 	}
 }
-html.dy #wrap.thin #ghead,
-html.b #wrap.thin #ghead {
+html.dy #wrap.thin .ghead,
+html.b #wrap.thin .ghead {
 	top: 6.9em;
 }
 #wrap.thin {
@@ -3718,13 +3715,13 @@ html:not(.e) #wrap.thin #ghead:not(.noa)::after {
 	pointer-events: none;
 }
 html.e #wrap.thin {
-	#ghead {
+	.ghead {
 		top: 5.1em;
 	}
 }
 @media (max-width: 50em){
-	html.dy #wrap.thin #ghead,
-	html.b #wrap.thin #ghead {
+	html.dy #wrap.thin .ghead,
+	html.b #wrap.thin .ghead {
 		top: 7.2em;
 	}
 	.ntree a + a {
@@ -3825,7 +3822,7 @@ html.e #wrap.thin {
 		margin-left: 2em;
 	}
 	#wrap.thin {
-		#ghead {
+		.ghead {
 			top: 7.5em;
 		}
 	}
