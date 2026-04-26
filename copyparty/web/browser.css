@@ -833,6 +833,9 @@ html.y #files span.fsz_P { font-weight: bold }
 	border-right: var(--bg) solid 2px;
 	background: linear-gradient(70deg, transparent 40%, color-mix(var(--bg-max) 25%, transparent) 75%, color-mix(var(--bg-max) 35%, transparent));
 }
+html.a #path i {
+	border-right: var(--bg) solid 1px;
+}
 #path a:hover {
 	color: var(--fg-max);
 	background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
@@ -1292,7 +1295,7 @@ html.dz #flogout {
 	right: .4em;
 	font-size: xx-large;
 	font-weight: bold;
-	box-shadow: 0 0 .5em var(--mp-sh);
+	box-shadow: 0 0 .5em color-mix(var(--a) 20%, transparent);
 	transition: all .15s;
 	border-radius: calc(var(--radius) * 1.2);
 	text-align: right;
@@ -1335,7 +1338,7 @@ html.a #up_quick .btn {
 }
 html.a #up_quick .btn.on {
 	transform: rotate(-90deg);
-	box-shadow: -.05em .02em .3em color-mix(var(--a) 40%, transparent);
+	box-shadow: -.05em .02em .3em color-mix(var(--a) 20%, transparent);
 }
 #up_quick .btn .rotatable {
 	transition: all .20s;
@@ -2044,6 +2047,9 @@ html.a .btn {
 	border-radius: var(--radius);
 	display: inline-block;
 	vertical-align: center;
+}
+.ntree a {
+	padding: .3em .2em;
 }
 .ntree a+a {
 	width: calc(100% - 2.2em);
@@ -3717,7 +3723,7 @@ html:not(.e) #wrap.thin #ghead:not(.noa)::after {
 	width: 3em;
 	height: 3.5em;
 	display: inline-block;
-	margin: -1em;
+	margin: -1.4em;
 	pointer-events: none;
 }
 html.e #wrap.thin {
