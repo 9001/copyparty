@@ -305,19 +305,19 @@ window.baguetteBox = (function () {
             ctr.innerHTML = (
                 '<div id="bbox-overlay" role="dialog">' +
                 '<div id="bbox-slider"></div>' +
-                '<button id="bbox-prev" class="bbox-btn" type="button" aria-label="Previous">◀</button>' +
-                '<button id="bbox-next" class="bbox-btn" type="button" aria-label="Next">▶</button>' +
+                '<a id="bbox-prev" class="btn" aria-label="Previous">◀</a>' +
+                '<a id="bbox-next" class="btn" aria-label="Next">▶</a>' +
                 '<div id="bbox-btns">' +
-                '<button id="bbox-help" type="button">?</button>' +
-                '<button id="bbox-anim" type="button" tt="a">-</button>' +
-                '<button id="bbox-readdir" type="button" tt="a">ltr</button>' +
-                '<button id="bbox-rotl" type="button">↶</button>' +
-                '<button id="bbox-rotr" type="button">↷</button>' +
-                '<button id="bbox-tsel" type="button">☑️sel</button>' +
-                '<button id="bbox-full" type="button" tt="full-screen">⛶</button>' +
-                '<button id="bbzoom" type="button" tt="zoom/stretch smaller images to fill screen">↕</button>' +
-                '<button id="bbox-vmode" type="button" tt="a"></button>' +
-                '<button id="bbox-close" type="button" aria-label="Close">✕</button>' +
+                '<a id="bbox-help" class="btn">?</a>' +
+                '<a id="bbox-anim" class="btn" tt="a">-</a>' +
+                '<a id="bbox-readdir" class="btn" tt="a">ltr</a>' +
+                '<a id="bbox-rotl" class="btn">↶</a>' +
+                '<a id="bbox-rotr" class="btn">↷</a>' +
+                '<a id="bbox-tsel" class="tgl btn">☑️sel</a>' +
+                '<a id="bbox-full" class="btn" tt="full-screen">⛶</a>' +
+                '<a id="bbzoom" class="tgl btn" tt="zoom/stretch smaller images to fill screen">↕</a>' +
+                '<a id="bbox-vmode" class="btn" tt="a"></a>' +
+                '<a id="bbox-close" class="btn" aria-label="Close">✕</a>' +
                 '</div></div>'
             );
             overlay = ctr.firstChild;
@@ -576,18 +576,14 @@ window.baguetteBox = (function () {
             if (vsplit(files[a].vp)[1] == name)
                 sel = true;
 
-        ebi('bbox-overlay').style.background = sel ?
-            'rgba(153,85,34,0.7)' : '';
+        clmod(ebi('bbox-overlay'), 'sel', sel);
 
         img.style.borderRadius = sel ? '1em' : '';
         btnState(btnSel, sel);
     }
 
     function btnState(btn, sel) {
-        btn.style.color = sel ? '#fff' : '';
-        btn.style.background = sel ? '#d84' : '';
-        btn.style.textShadow = sel ? '1px 1px 0 #b83' : '';
-        btn.style.boxShadow = sel ? '.15em .15em 0 #520' : '';
+        clmod(btn, 'on', sel);
     }
 
     function keyUpHandler(e) {

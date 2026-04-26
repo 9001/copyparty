@@ -1931,7 +1931,7 @@ html {
 .btn {
 	color: var(--btn-fg);
 	background: #eee;
-	background: linear-gradient(-5deg, var(--btn-bg), color-mix(var(--a-gray) 20%, transparent 80%));
+	background: linear-gradient(-5deg, var(--btn-bg), color-mix(var(--a-gray) 30%, transparent));
 	box-shadow: var(--btn-bs);
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
@@ -2464,6 +2464,9 @@ html.noscroll .sbar::-webkit-scrollbar {
 #bbox-overlay.visible {
 	opacity: 1;
 }
+#bbox-overlay.sel {
+	background: color-mix(var(--a-dark) 70%, transparent);
+}
 .full-image {
 	display: inline-block;
 	position: relative;
@@ -2576,51 +2579,45 @@ html.y #bbox-overlay figcaption a {
 @keyframes eog {
 	0% {filter: brightness(1.5)}
 }
-#bbox-next,
-#bbox-prev {
+#bbox-overlay #bbox-next,
+#bbox-overlay #bbox-prev {
+	position: fixed;
 	top: 50%;
 	top: calc(50% - 30px);
-	width: 44px;
+	width: 30px;
 	height: 60px;
-	transition: background-color .3s ease, color .3s ease, opacity .3s ease;
-}
-#bbox-btns button {
-	transition: background-color .3s ease, color .3s ease;
+	transition: opacity .3s ease;
+	text-align: center;
+	line-height: 60px;
 }
 #bbox-btns {
 	transition: top .3s ease;
 }
-.bbox-btn {
-	position: fixed;
+#bbox-btns .btn {
+	cursor: pointer;
 }
 #bbox-overlay.immersive #bbox-next,
 #bbox-overlay.immersive #bbox-prev {
 	opacity: 0;
 }
 #bbox-overlay.immersive #bbox-btns {
-	top: -2.8em;
+	top: -3.5em;
 }
-#bbox-overlay button {
+#bbox-overlay .btn {
 	cursor: pointer;
-	outline: none;
 	padding: 0 .4em;
-	margin: 0 .2em;
-	border: 0;
-	border-radius: var(--b-radius);
-	background: rgba(50, 50, 50, 0.5);
-	color: rgba(255,255,255,0.7);
+	margin: 0 .1em;
 	font-size: 1.4em;
 	line-height: 2em;
 	vertical-align: top;
 	font-variant: small-caps;
+	color: var(--fg);
 }
-#bbox-overlay button:hover {
+#bbox-overlay .btn.on {
+	color: var(--bg);
+}
+#bbox-overlay .btn:hover {
 	opacity: 1 !important;
-}
-#bbox-overlay button:focus-visible,
-#bbox-overlay button:hover {
-	color: rgba(255,255,255,0.9);
-	background: rgba(50, 50, 50, 0.9);
 }
 #bbox-next {
 	right: 1%;
@@ -2630,7 +2627,7 @@ html.y #bbox-overlay figcaption a {
 }
 #bbox-btns {
 	top: .5em;
-	right: .5em;
+	right: .2em;
 	position: fixed;
 }
 #bbox-halp {
