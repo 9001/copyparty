@@ -12,6 +12,7 @@
 	--bg-max: #080808;
 	--a: #fc5;
 	accent-color: var(--a);
+	--b-radius: .3em;
 	
 	/* accent color in everything */
 	--fg-max: color-mix(#fefefe 95%, var(--a) 5%);
@@ -626,7 +627,7 @@ html .ayjump:focus-visible {
 	width: 1em;
 	display: inline-block;
 	text-align: center;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 }
 #qs_btns a:hover {
 	background: var(--bg);
@@ -765,11 +766,11 @@ html.y #files tr.fade a {
 	box-shadow: 1px 0 0 0 rgba(128,128,128,var(--f-sh1)) inset, 0 1px 0 rgba(0,0,0,var(--f-sh3)) inset, 0 -1px 0 rgba(0,0,0,var(--f-sh3)) inset;
 }
 #files td:first-child {
-	border-radius: .25em 0 0 .25em;
+	border-radius: var(--b-radius) 0 0 var(--b-radius);
 	white-space: nowrap;
 }
 #files td:last-child {
-	border-radius: 0 .25em .25em 0;
+	border-radius: 0 var(--b-radius) var(--b-radius) 0;
 }
 #files tbody td:nth-child(3) {
 	font-family: 'scp', monospace, monospace;
@@ -853,7 +854,7 @@ html.y #path a:hover {
 	background: var(--bgg);
 	border: 1px solid var(--bgg);
 	border-width: 0 .3em 0 .3em;
-	border-radius: .5em;
+	border-radius: var(--b-radius);
 	visibility: hidden;
 	margin: 0 -.3em;
 	width: 100%;
@@ -1002,7 +1003,7 @@ html.dz #flogout {
 	width: var(--grid-sz);
 	vertical-align: top;
 	overflow-wrap: break-word;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	padding: .3em;
 	margin: .5em;
 	color: var(--g-fg);
@@ -1020,7 +1021,7 @@ html.dz #flogout {
 }
 #ggrid>a img {
 	z-index: 1;
-	border-radius: .2em;
+	border-radius: calc(var(--b-radius) / 3 * 2);
 	max-width: 10em;
 	max-width: calc(var(--grid-sz) - 4px);
 	max-height: 8em;
@@ -1041,7 +1042,7 @@ html.dz #flogout {
 	display: flex;
 	overflow: hidden;
 	position: relative;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	box-sizing: border-box;
 	margin: -3px -2px;
 	padding: 4px 3px;
@@ -1086,7 +1087,7 @@ html.dz #flogout {
 	margin: -.4em;
 	text-shadow: 0 0 .1em var(--bg-max);
 	background: linear-gradient(135deg,rgba(255,255,255,0) 50%,rgba(255,255,255,0.2));
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	font-size: 2em;
 	transition: font-size .15s, margin .15s;
 }
@@ -1271,7 +1272,7 @@ html.dz #flogout {
 	text-align: center;
 	text-shadow: none;
 	box-shadow: 0 0 .5em var(--mp-sh);
-	border-radius: .3em 0 0 0;
+	border-radius: calc(var(--b-radius) * 0.7) 0 0 0;
 	padding: 0 0 0 .1em;
 	color: var(--fg-max);
 }
@@ -1291,7 +1292,7 @@ html.dz #flogout {
 	font-weight: bold;
 	box-shadow: 0 0 .5em var(--mp-sh);
 	transition: all .15s;
-	border-radius: .35em;
+	border-radius: calc(var(--b-radius) * 1.2);
 	text-align: right;
 }
 #up_quick_more {
@@ -1313,7 +1314,7 @@ html.dz #flogout {
 	display: ruby;
 	padding: .5em;
 	cursor: pointer;
-	border-radius: .5em;
+	border-radius: calc(var(--b-radius) * 1.6);
 }
 #up_quick .overlay_plus {
 	right: .3em;
@@ -1588,7 +1589,7 @@ html.a #up_quick .btn.on {
 #ops a {
 	/* fallback if emojis don't render */
 	border: #777 solid 1px;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 
 	border: var(--transparent) solid 1px;
 	color: var(--a);
@@ -1601,7 +1602,7 @@ html.a #up_quick .btn.on {
 	color: var(--op-aa-fg);
 	background: #000;
 	background: var(--op-aa-bg);
-	border-radius: 0 0 .2em .2em;
+	border-radius: 0 0 var(--b-radius) var(--b-radius);
 	border-bottom: .3em solid var(--a);
 	box-shadow: var(--op-aa-sh);
 	margin: -.2em 0 -.6em 0;
@@ -1638,7 +1639,7 @@ html.y #ops svg circle {
 	white-space: nowrap;
 	display: flex;
 	height: 2em;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 }
 #noie {
 	color: #b60;
@@ -1656,7 +1657,7 @@ html.y #ops svg circle {
 	color: var(--bg);
 
 	border: var(--btn-bg) solid 1px;
-	border-radius: .3em;  
+	border-radius: var(--b-radius);  
 	justify-content: center;
   	display: flex;
 	text-shadow: none;
@@ -1666,7 +1667,7 @@ html.y #ops svg circle {
 }
 .opbox {
 	padding: .5em;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	border-width: 1px;
 	max-width: 41em;
 }
@@ -1676,7 +1677,7 @@ html.y #ops svg circle {
 }
 #op_bup {
 	margin: 0;
-	border-radius: 0 0 .3em .3em;
+	border-radius: 0 0 var(--b-radius) var(--b-radius);
 }
 #op_cfg {
 	display: none;
@@ -1692,7 +1693,7 @@ html.y #ops svg circle {
 	box-shadow: 0 0 2px var(--txt-sh);
 	border-bottom: 1px solid #999;
 	border-color: var(--a);
-	border-radius: .2em;
+	border-radius: var(--b-radius);
 	padding: .2em .3em;
 	font-size: medium;
 	min-width: 3em;
@@ -1934,7 +1935,7 @@ html {
 	box-shadow: var(--btn-bs);
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	padding: .2em .4em;
 	font-size: 1.2em;
 	margin: .2em;
@@ -1950,7 +1951,7 @@ html {
 }
 html.c .btn,
 html.a .btn {
-	border-radius: .2em;
+	border-radius: var(--b-radius);
 }
 .btn:hover {
 	color: var(--btn-h-fg);
@@ -2035,7 +2036,7 @@ html.a .btn {
 	color: var(--fg-max);
 }
 #tree ul a {
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	display: inline-block;
 }
 .ntree a+a {
@@ -2096,7 +2097,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 #files th:hover .cfg {
 	display: block;
 	width: 1em;
-	border-radius: .2em;
+	border-radius: var(--b-radius);
 	margin: -1.2em auto 0 auto;
 	background: var(--bg-u5);
 }
@@ -2170,7 +2171,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 .ghead {
 	background: #fff;
 	background: var(--bg-u2);
-	border-radius: .3em;
+	border-radius: calc(var(--b-radius) * 1.3);
 	padding: 0 .2em;
 	line-height: 2.3em;
 	margin-bottom: 1.5em;
@@ -2302,7 +2303,7 @@ input[type="text"].invalid {
 	background: var(--bg);
 	margin: -1em 0 .5em 0;
 	padding: 1em 0 1em 0;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 }
 #doc.wrap {
 	white-space: pre-wrap;
@@ -2339,7 +2340,7 @@ html.y #doc {
 	line-height: 1.5em;
 }
 #doc .line-highlight {
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	box-shadow: 0 0 .5em rgba(128,128,128,0.2);
 	background: linear-gradient(90deg, var(--bg-d3), var(--bg));
 }
@@ -2531,7 +2532,7 @@ html.bb_fsc figcaption {
 }
 #bbox-overlay figcaption a {
 	background: rgba(0, 0, 0, 0.6);
-	border-radius: .4em;
+	border-radius: var(--b-radius);
 	padding: .3em .6em;
 }
 html.y #bbox-overlay figcaption a {
@@ -2605,7 +2606,7 @@ html.y #bbox-overlay figcaption a {
 	padding: 0 .4em;
 	margin: 0 .2em;
 	border: 0;
-	border-radius: 15%;
+	border-radius: var(--b-radius);
 	background: rgba(50, 50, 50, 0.5);
 	color: rgba(255,255,255,0.7);
 	font-size: 1.4em;
@@ -2707,7 +2708,7 @@ html.y #bbox-overlay figcaption a {
 	display: grid;
   	grid-template-rows: max-content auto;
 	margin: 5vh 5vw;
-	border-radius: .5em;
+	border-radius: calc(var(--b-radius) * 1.6);
 	border: var(--a) solid 1px;
 	background: #fff;
 	background: var(--bg);
@@ -2799,7 +2800,7 @@ html.c .modalcontent {
 }
 #s_list h3{
 	background-color: var(--bg-u5);
-	border-radius: .3em .3em 0 0;
+	border-radius: var(--b-radius) var(--b-radius) 0 0;
 	padding: .5em;
 	margin: 0 0 1.3em 0;
 }
@@ -2840,7 +2841,7 @@ html.c .modalcontent {
 	background: rgba(224, 224, 224, 0.2);
 	box-shadow: 0 0 0 #999;
 	border: .5em solid var(--ud-b1);
-	border-radius: .5em;
+	border-radius: calc(var(--b-radius) * 1.6);
 	border-width: 1vw;
 	color: #fff;
 	transition: all 0.12s;
@@ -2918,7 +2919,7 @@ html.c .modalcontent {
 	background: #490;
 	border-bottom: .3em solid #6d2;
 	text-shadow: 1px 1px 1px #000;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	padding: .4em .8em;
 	font-size: .4em;
 }
@@ -2955,7 +2956,7 @@ html.c .modalcontent {
 #u2btn {
 	line-height: 1.3em;
 	border: .15em dashed var(--u2-btn-b1);
-	border-radius: .4em;
+	border-radius: var(--b-radius);
 	text-align: center;
 	font-size: 1.3em;
 	padding: 1em 2em;
@@ -3094,15 +3095,15 @@ html.c .modalcontent {
 	border-width: 0 0 1px 0;
 }
 #u2cards a:first-child {
-	border-radius: .4em 0 0 0;
+	border-radius: var(--b-radius) 0 0 0;
 }
 #u2cards a:last-child {
-	border-radius: 0 .4em 0 0;
+	border-radius: 0 var(--b-radius) 0 0;
 }
 #u2cards a.act {
 	padding-bottom: .5em;
 	border-width: 1px 1px .1em 1px;
-	border-radius: .3em .3em 0 0;
+	border-radius: var(--b-radius) var(--b-radius) 0 0;
 	margin-left: -1px;
 	background: var(--u2-tab-1-bg);
 	box-shadow: 0 -.17em .67em var(--u2-tab-1-sh);
@@ -3125,7 +3126,7 @@ html.c .modalcontent {
 }
 #u2conf details[open] {
 	border-bottom: none;
-	border-radius: .3em .3em 0 0;
+	border-radius: var(--b-radius) var(--b-radius) 0 0;
 }
 #u2conf .setting {
 	margin: 0;
@@ -3182,7 +3183,7 @@ html.b #u2conf a.b:hover {
 	height: 1em;
 	padding: .4em 0;
 	display: block;
-	border-radius: .25em;
+	border-radius: var(--b-radius);
 }
 #u2conf input[type="checkbox"] {
 	position: absolute;
@@ -3286,7 +3287,7 @@ html.b #u2conf a.b:hover {
 #u2tab span.err {
 	color: #fff;
 	padding: .22em;
-	border-radius: .2em;
+	border-radius: var(--b-radius);
 	border: 2px solid #f0f;
 }
 #u2tab span.inf {
@@ -3317,7 +3318,7 @@ html.b #u2conf a.b:hover {
 }
 details {
 	border: var(--bg-u3) solid 1px;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	margin: .3em 0;
 }
 details:not(.open) .setting {
@@ -3329,7 +3330,7 @@ summary {
 	background: var(--bg-u1);
 	color: var(--a);
 	padding: .3em;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	font-size: large;
 }
 summary:hover {
@@ -3367,7 +3368,7 @@ summary:hover {
 
 html.c #path,
 html.a #path {
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 }
 html.dz .opview input.i {
 	width: calc(100% - 18em);
@@ -3448,7 +3449,7 @@ html.a #u2etas {
 	background: var(--bg-d1);
 	border: 1px solid var(--bg-u1);
 	border-width: 2px;
-	border-radius: .5em;
+	border-radius: calc(var(--b-radius) * 1.6);
 }
 html.c #u2foot:empty,
 html.a #u2foot:empty {
@@ -4670,7 +4671,7 @@ html.e #detree {
 	background: var(--bg-u2);
 	border: 1px solid var(--bg-u5);
 	outline: none;
-	border-radius: .3rem;
+	border-radius: var(--b-radius);
 	box-shadow: 0 0 .3rem var(--bg-d3);
 	z-index: 3;
 }
@@ -4710,7 +4711,7 @@ html.e #detree {
 	box-shadow: 0 0 2px var(--txt-sh);
 	border-bottom: 1px solid #999;
 	border-color: var(--a);
-	border-radius: .2em;
+	border-radius: var(--b-radius);
 	padding: .2em .3em;
 }
 
@@ -4738,7 +4739,7 @@ html.e #detree {
 }
 #spaceUsed_bar, #spaceTotal_bar{
 	height: .3em;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	background: var(--bg-u5);
 }
 #spaceUsed_bar{
@@ -4759,7 +4760,7 @@ html.e #detree {
 	background: linear-gradient(transparent, var(--bg-u2));
 }
 .popup_button {
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	margin: 0;
 	color: var(--btn-1-fg);
 	text-align: left;
@@ -4799,7 +4800,7 @@ html.e #detree {
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 .5em 1em var(--txt-sh);
 	text-align: center;
-	border-radius: .3em;
+	border-radius: var(--b-radius);
 	padding: .5em;
 	position: absolute;
 	display: block;
