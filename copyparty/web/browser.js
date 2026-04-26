@@ -10175,8 +10175,8 @@ ebi('path').onclick = function (e) {
 };
 
 function scroll_v_to_h (e, o) {
-  e.preventDefault(); 
-  var delta = e.deltaY;
+  ev(e);
+  var delta = e.deltaY || e.deltaX;
   var maxScrollLeft = o.scrollWidth - o.clientWidth;
   
   o.scrollLeft = Math.max(0, Math.min(maxScrollLeft, o.scrollLeft + delta));
