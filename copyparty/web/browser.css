@@ -821,12 +821,8 @@ html.y #files span.fsz_P { font-weight: bold }
 	margin: -1em .3em -1em -1.7em;
 	display: inline-block;
 	transform: skew(-25deg);
-	background: linear-gradient(70deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 75%, rgba(0,0,0,0.35));
-}
-html.y #path i {
-	background: none;
-	border-color: rgba(0,0,0,0.2);
-	border-width: .1em .1em 0 0;
+	border-right: var(--bg) solid 1px;
+	background: linear-gradient(70deg, transparent 40%, color-mix(var(--bg-max) 25%, transparent) 75%, color-mix(var(--bg-max) 35%, transparent));
 }
 #path a:hover {
 	color: var(--fg-max);
