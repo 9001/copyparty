@@ -1299,10 +1299,10 @@ html.dz #flogout {
 	min-width: 4em;
 	font-weight: normal;
 	margin-bottom: .2em;
+	text-wrap-mode: wrap;
 }
 #up_quick_more.vis {
 	display: block;
-	display: grid;
 }
 #up_quick_more a:hover {
 	background: var(--btn-h-bg);
@@ -1310,7 +1310,8 @@ html.dz #flogout {
 #up_quick_more a {
 	position: static;
 	font-size: large;
-	display: ruby;
+	display: block;
+	text-wrap-mode: nowrap;
 	padding: .5em;
 	cursor: pointer;
 	border-radius: calc(var(--b-radius) * 1.6);
