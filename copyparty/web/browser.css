@@ -1307,10 +1307,12 @@ html.dz #flogout {
 	font-size: xx-large;
 	font-weight: bold;
 	box-shadow: 0 0 .5em color-mix(var(--a) 20%, transparent);
-	transition: all .15s;
 	border-radius: 10px;
 	border-radius: calc(var(--radius) * 1.2);
 	text-align: right;
+}
+#up_quick.open {
+	box-shadow: 0 0 .5em color-mix(var(--mp-sh) 20%, transparent);
 }
 #up_quick_more {
 	display: none;
@@ -1321,7 +1323,6 @@ html.dz #flogout {
 }
 #up_quick_more.vis {
 	display: block;
-	box-shadow: 0 0 .5em color-mix(var(--mp-sh) 20%, transparent);
 }
 #up_quick_more a:hover {
 	background: var(--btn-h-bg);

@@ -960,6 +960,7 @@ ebi('up_quick').onclick = function(){
 	clmod(btn, 'on', 't');
 	var isOff = clgot(btn, 'on'); // button has inverted display logic
 	clmod(ebi('up_quick_more'), 'vis', !isOff)
+	clmod(ebi('up_quick'), 'open', !isOff)
 }
 ebi('uq_nd').onclick = function(){
 	mktemp(true);
