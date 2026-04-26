@@ -2059,15 +2059,6 @@ html.a .btn {
 	min-height: 1.4em;
 	white-space: nowrap;
 }
-#tree.nowrap .ntree a+a:hover {
-	background: rgba(16, 16, 16, 0.67);
-	min-width: calc(var(--nav-sz) - 2em);
-	width: auto;
-}
-html.y #tree.nowrap .ntree a+a:hover {
-	background: rgba(255, 255, 255, 0.67);
-	color: var(--fg-max);
-}
 #docul a:hover,
 #tree .ntree a + a:hover {
 	background: var(--btn-h-bg);
