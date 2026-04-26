@@ -3626,6 +3626,12 @@ html.cy #pvol {
 html.cy #path i {
 	background: transparent;
 }
+html.cy #up_quick_btn.on:not(:hover) {
+	background: #f00;
+}
+html.cy span {
+	color: #f00;
+}
 
 
 
