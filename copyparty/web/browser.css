@@ -592,7 +592,6 @@ html .ayjump:focus-visible {
 	display: flex;
 	margin: 0;
 	align-content: center;
-	justify-content: space-between;
 	position: sticky;
 	z-index: 4;
 	background: linear-gradient(to bottom, var(--bg), transparent);
@@ -607,8 +606,8 @@ html .ayjump:focus-visible {
 	text-shadow: 1px 1px 0 var(--bg-max);
 	font-weight: normal;
 	display: block;
-	margin: 0 .4em 0 0;
-	/* min-width: 10em; */
+	margin: 0 .5em 0 0;
+	width: calc(100% - .6em);
 	align-content: center;
 	padding: .2em;
 	font-size: 1.2em;
