@@ -1618,6 +1618,7 @@ html.y #ops svg circle {
 }
 #srv_name{
 	padding-top: .5em;
+	padding-bottom: .3em;
 	margin-left: 2.2em;
 	font-size: x-large;
 	text-wrap-mode: nowrap;
@@ -3699,7 +3700,8 @@ html.e #wrap.thin {
 		margin: .8em;
 	}
 	html:not(.e) #srv_name {
-		padding-top: .8em;
+		padding-top: 1em;
+		padding-bottom: .6em;
 		margin-left: 2.9em;
 	}
 	#widget, #wrap {
