@@ -2605,6 +2605,11 @@ html.y #bbox-overlay figcaption a {
 	top: -3.5em;
 	pointer-events: none;
 }
+@-moz-document url-prefix() {
+	#bbox-overlay.immersive #bbox-btns {
+		top: 0;
+	}
+}
 #bbox-overlay .btn {
 	cursor: pointer;
 	padding: 0 .4em;
