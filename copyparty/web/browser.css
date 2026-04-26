@@ -2211,6 +2211,11 @@ html.a .btn {
 	position: relative;
 	top: 0;
 }
+#gridchop a:first-child,
+#gridzoom a:first-child {
+  line-height: 1.1em;
+  padding-bottom: .3em;
+}
 .ghead>span {
 	white-space: pre;
 	padding-left: .3em;
