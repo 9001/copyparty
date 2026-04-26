@@ -4640,6 +4640,7 @@ html.e #pathBar {
 html.e #path {
 	background: var(--bg-u2);
 	margin-right: 0;
+	width: auto;
 }
 html.e #path i {
   border: 1px solid var(--w);
