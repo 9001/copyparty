@@ -10197,6 +10197,11 @@ ebi('treeh').addEventListener('wheel', function (e) {
 	scroll_v_to_h(e, this);
 });
 
+if(FIREFOX && MOBILE){
+	// disable glitchy ::after gradient (scrollhint) (2026-04-26)
+	clmod(ebi('ghead'), 'noa', true);
+	clmod(ebi('treeh'), 'noa', true);
+}
 
 var scroll_y = -1;
 var scroll_vp = '\n';

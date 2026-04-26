@@ -3672,8 +3672,8 @@ html:not(.e) #wrap.thin {
 		width: calc(50vw - 5em);
 	}
 }
-html:not(.e) #treeh:after,
-html:not(.e) #wrap.thin #ghead::after {
+html:not(.e) #treeh:not(.noa):after,
+html:not(.e) #wrap.thin #ghead:not(.noa)::after {
 	content: "";
 	position: sticky;
 	right: -.5em;
