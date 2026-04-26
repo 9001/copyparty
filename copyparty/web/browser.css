@@ -533,12 +533,20 @@ html.dy #pathBar {
 	text-shadow: none;
 }
 html,body,tr,th,td,#files,a,#blogout {
-	color: inherit;
+	/* color: inherit; */
 	background: none;
 	font-weight: inherit;
 	font-size: inherit;
 	padding: 0;
 	border: none;
+}
+body {
+	background: #222;
+}
+@supports (background: var(--bg)) {
+	body {
+		background: none;
+	}
 }
 #files {
 	margin-top: .2em;
@@ -615,6 +623,7 @@ html .ayjump:focus-visible {
 	overflow-x: auto;
 	overflow-y: hidden;
 	background: var(--bg-u2);
+	border-radius: 5px;
 	border-radius: var(--radius);
 }
 #pathBar #folder_search {
@@ -635,6 +644,7 @@ html .ayjump:focus-visible {
 	width: 1em;
 	display: inline-block;
 	text-align: center;
+	border-radius: 5px;
 	border-radius: var(--radius);
 }
 #qs_btns a:hover {
@@ -829,6 +839,7 @@ html.y #files span.fsz_P { font-weight: bold }
 	margin: -1em .3em -1em -1.7em;
 	display: inline-block;
 	transform: skew(-25deg);
+	border-right: #222 solid 2px;
 	border-right: var(--bg) solid 2px;
 	background: linear-gradient(70deg, transparent 40%, color-mix(var(--bg-max) 25%, transparent) 75%, color-mix(var(--bg-max) 35%, transparent));
 }
@@ -852,6 +863,8 @@ html.y #path a:hover {
 	display: none;
 }
 .logue.raw {
+	background: #ccc;
+	background: var(--transparent);
 	white-space: pre;
 	font-family: 'scp', 'consolas', monospace;
 	font-family: var(--font-mono), 'scp', 'consolas', monospace;
@@ -1003,6 +1016,7 @@ html.dz #flogout {
 	width: var(--grid-sz);
 	vertical-align: top;
 	overflow-wrap: break-word;
+	border-radius: 5px;
 	border-radius: var(--radius);
 	padding: .3em;
 	margin: .5em;
@@ -1021,6 +1035,7 @@ html.dz #flogout {
 }
 #ggrid>a img {
 	z-index: 1;
+	border-radius: 5px;
 	border-radius: calc(var(--radius) / 3 * 2);
 	max-width: 10em;
 	max-width: calc(var(--grid-sz) - 4px);
@@ -1042,6 +1057,7 @@ html.dz #flogout {
 	display: flex;
 	overflow: hidden;
 	position: relative;
+	border-radius: 5px;
 	border-radius: var(--radius);
 	box-sizing: border-box;
 	margin: -3px -2px;
@@ -1087,6 +1103,7 @@ html.dz #flogout {
 	margin: -.4em;
 	text-shadow: 0 0 .1em var(--bg-max);
 	background: linear-gradient(135deg,rgba(255,255,255,0) 50%,rgba(255,255,255,0.2));
+	border-radius: 5px;
 	border-radius: var(--radius);
 	font-size: 2em;
 	transition: font-size .15s, margin .15s;
@@ -1269,6 +1286,7 @@ html.dz #flogout {
 	text-align: center;
 	text-shadow: none;
 	box-shadow: 0 0 .5em var(--mp-sh);
+	border-radius: 5px 0 0 0;
 	border-radius: calc(var(--radius) * 0.7) 0 0 0;
 	padding: 0 0 0 .1em;
 	color: var(--fg-max);
@@ -1276,8 +1294,9 @@ html.dz #flogout {
 #up_quick,
 #wtoggle,
 #widgeti {
-	background: #ccc;
+	background: #cde;
 	background: var(--bg-u2);
+	border: 1px solid #222;
 	border: 1px solid var(--bg-u3);
 }
 #up_quick {
@@ -1289,6 +1308,7 @@ html.dz #flogout {
 	font-weight: bold;
 	box-shadow: 0 0 .5em color-mix(var(--a) 20%, transparent);
 	transition: all .15s;
+	border-radius: 10px;
 	border-radius: calc(var(--radius) * 1.2);
 	text-align: right;
 }
@@ -1301,6 +1321,7 @@ html.dz #flogout {
 }
 #up_quick_more.vis {
 	display: block;
+	box-shadow: 0 0 .5em color-mix(var(--mp-sh) 20%, transparent);
 }
 #up_quick_more a:hover {
 	background: var(--btn-h-bg);
@@ -1312,6 +1333,7 @@ html.dz #flogout {
 	text-wrap-mode: nowrap;
 	padding: .5em;
 	cursor: pointer;
+	border-radius: 10px;
 	border-radius: calc(var(--radius) * 1.6);
 }
 #up_quick .overlay_plus {
@@ -1587,7 +1609,7 @@ html.a #up_quick .btn.on {
 #ops a {
 	/* fallback if emojis don't render */
 	border: #777 solid 1px;
-	border-radius: var(--radius);
+	border-radius: 5px;
 
 	border: var(--transparent) solid 1px;
 	color: var(--a);
@@ -1598,8 +1620,9 @@ html.a #up_quick .btn.on {
 #ops a.act {
 	color: #fff;
 	color: var(--op-aa-fg);
-	background: #000;
+	background: rgb(85, 144, 255);
 	background: var(--op-aa-bg);
+	border-radius: 0 0 5px 5px;
 	border-radius: 0 0 var(--radius) var(--radius);
 	border-bottom: .3em solid var(--a);
 	box-shadow: var(--op-aa-sh);
@@ -1638,6 +1661,7 @@ html.y #ops svg circle {
 	white-space: nowrap;
 	display: flex;
 	height: 2em;
+	border-radius: 5px;
 	border-radius: var(--radius);
 	background: var(--bg-u2);
 }
@@ -1667,6 +1691,7 @@ html.y #ops svg circle {
 }
 .opbox {
 	padding: .5em;
+	border-radius: 5px;
 	border-radius: var(--radius);
 	border-width: 1px;
 	max-width: 41em;
@@ -1693,6 +1718,7 @@ html.y #ops svg circle {
 	box-shadow: 0 0 2px var(--txt-sh);
 	border-bottom: 1px solid #999;
 	border-color: var(--a);
+	border-radius: 5px;
 	border-radius: var(--radius);
 	padding: .2em .3em;
 	font-size: medium;
@@ -1911,8 +1937,8 @@ html {
 #treepar.off {
 	display: none;
 }
-.np_open #thx_ff {
-	padding: 4.5em 0;
+#thx_ff {
+	padding: 1em 0;
 	/* widget */
 }
 #tree::-webkit-scrollbar-track,
@@ -1934,6 +1960,7 @@ html {
 	box-shadow: var(--btn-bs);
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
+	border-radius: 5px;
 	border-radius: var(--radius);
 	padding: .2em .4em;
 	font-size: 1.2em;
@@ -1960,9 +1987,9 @@ html.a .btn {
 	border-bottom: var(--btn-h-bb);
 }
 .tgl.btn.on {
-	background: #000;
+	background: rgb(85, 144, 255);
 	background: var(--btn-1-bg);
-	color: #fff;
+	color: #222;
 	color: var(--btn-1-fg);
 	text-shadow: none;
 	box-shadow: var(--btn-1-bs);
@@ -2015,7 +2042,7 @@ html.a .btn {
 #tree ul a.hl {
 	color: #fff;
 	color: var(--btn-1-fg);
-	background: #000;
+	background: rgb(85, 144, 255);
 	background: var(--btn-1-bg);
 	box-shadow: var(--btn-1-bs);
 	text-shadow: none;
@@ -2166,6 +2193,7 @@ html.a .btn {
 .ghead {
 	background: #fff;
 	background: var(--bg-u2);
+	border-radius: 5px;
 	border-radius: calc(var(--radius) * 1.3);
 	padding: 0 .2em;
 	line-height: 2.3em;
@@ -2704,6 +2732,7 @@ html.y #bbox-overlay figcaption a {
 	display: grid;
   	grid-template-rows: max-content auto;
 	margin: 5vh 5vw;
+	border-radius: 10px;
 	border-radius: calc(var(--radius) * 1.6);
 	border: var(--a) solid 1px;
 	background: #fff;
@@ -2731,6 +2760,7 @@ html.c .modalcontent {
 }
 .close{
 	position: absolute;
+	cursor: pointer;
 	top: 0;
 	right: 0;
 	margin: .5em;
@@ -2796,6 +2826,7 @@ html.c .modalcontent {
 }
 #s_list h3{
 	background-color: var(--bg-u5);
+	border-radius: 5px 5px 0 0;
 	border-radius: var(--radius) var(--radius) 0 0;
 	padding: .5em;
 	margin: 0 0 1.3em 0;
@@ -2837,6 +2868,7 @@ html.c .modalcontent {
 	background: rgba(224, 224, 224, 0.2);
 	box-shadow: 0 0 0 #999;
 	border: .1em solid var(--ud-b1);
+	border-radius: 10px;
 	border-radius: calc(var(--radius) * 1.6);
 	border-width: 2px;
 	color: #fff;
@@ -3394,7 +3426,7 @@ html.a .opbox,
 html.a #path,
 html.a #srch_form,
 html.a .ghead {
-	background: #ccc;
+	background: #c1d1ed;
 	background: var(--btn-bg);
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
@@ -4781,27 +4813,32 @@ html.e #wtc {
 }
 
 #spaceFree, #rtt_latency {
-  color: var(--fg);
-  text-align: left;
-  padding: 2px;
-  font-size: small;
-  cursor: default;
-  pointer-events: all;
-  max-width: max-content;
+	color: var(--fg);
+	text-align: left;
+	padding: 2px;
+	font-size: small;
+	cursor: default;
+	pointer-events: all;
+	max-width: max-content;
+	background: #fff;
+	background: var(--transparent);
 }
 #rtt_latency {
 	opacity: .5;
 }
 #spaceUsed_bar, #spaceTotal_bar{
 	height: .3em;
+	border-radius: 5px;
 	border-radius: var(--radius);
-	background: var(--bg-u5);
 }
 #spaceUsed_bar{
+	background: rgb(85, 144, 255);
 	background: linear-gradient(to right, transparent, var(--a-dark), var(--a));
 }
 #spaceTotal_bar {
 	margin-bottom: .5em;
+	background: #ccc;
+	background: var(--bg-u5);
 }
 #tree_footer {
 	width: 0;
@@ -4843,11 +4880,12 @@ html.e #wtc {
 .popup {
 	display: none;
 	width: fit-content;
-	background: #000;
+	background: #222;
 	background: var(--bg-u2);
 	border: 1px solid var(--bg-u3);
 	box-shadow: 0 .5em 1em var(--txt-sh);
 	text-align: center;
+	border-radius: 5px;
 	border-radius: var(--radius);
 	padding: .5em;
 	position: absolute;
@@ -4869,8 +4907,11 @@ html.e #wtc {
 	font-size: small;
 }
 
-.popup.act,
 #srchfolder_div:focus-within .popup {
+	display: block;
+}
+/* has to be separate because IE will ignore the whole rule if it can't do focus within */
+.popup.act {
 	display: block;
 }
 

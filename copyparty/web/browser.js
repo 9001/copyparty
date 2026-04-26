@@ -2312,7 +2312,6 @@ var widget = (function () {
 		if (r.is_open == is_open)
 			return false;
 
-		clmod(document.documentElement, 'np_open', is_open);
 		clmod(widget, 'open', is_open);
 		bcfg_set('au_open', r.is_open = is_open);
 		if (vbar) {
@@ -2540,6 +2539,8 @@ var pbar = (function () {
 			gradh = gk;
 			grad = auto_grad(bc, accent);
 		}
+		if(IE)
+			grad = 'rgb(85, 144, 255)';
 		bctx.fillStyle = grad;
 		for (var a = 0; a < mp.au.buffered.length; a++) {
 			var x1 = sm * mp.au.buffered.start(a),
@@ -2703,6 +2704,10 @@ var vbar = (function () {
 			gradh = gh;
 			style1 = auto_grad(r.can, accent, accent);
 			style2 = light ? 'color-mix(' + bg + ' 85%, #000 15%' : 'color-mix(' + bg + ' 85%, #fff 15%';
+		}
+		if(IE){
+			style1 = 'rgb(85, 144, 255)';
+			style2 = 'rgb(174, 193, 214)'
 		}
 		ctx.fillStyle = style2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = style1; ctx.fillRect(0, 0, w * mp.vol, h);
