@@ -48,8 +48,10 @@
 	--a-gray: hsl(from var(--a) h 0 l);
 
 	--btn-fg: var(--a);
+	--btn-bg-a: rgba(128,128,128,0.15);
+	--btn-bg-a: color-mix(var(--bg-max) 85%, var(--fg-max) 20%);
 	--btn-bg: rgba(128,128,128,0.15);
-	--btn-bg: color-mix(var(--bg-max) 85%, var(--fg-max) 20%);
+	--btn-bg: linear-gradient(-5deg, var(--btn-bg-a), color-mix(var(--a-gray) 30%, transparent));
 	--btn-h-fg: var(--a-hil);
 	--btn-h-bg: hsl(from color-mix(var(--a-gray) 65%, var(--bg-max) 35%) h 0 l);
 	--btn-1-fg: var(--bg);
@@ -61,10 +63,11 @@
 	--btn-1h-fg: var(--btn-1-fg);
 	--btn-1h-bg: var(--a-hil);
 	--btn-1h-bs: var(--btn-1-bs);
+	--btn-bb: 1px solid var(--bg-u3);
 	--btn-1h-bb: var(--btn-1-bb);
 	--chk-fg: var(--tab-alt);
 	--txt-sh: var(--bg-d2);
-	--txt-bg: var(--btn-bg);
+	--txt-bg: var(--btn-bg-a);
 
 	--op-aa-fg: var(--a);
 	--op-aa-bg: var(--bg-d2);
@@ -213,7 +216,6 @@ html.a {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
 
 	--btn-bs: .1em .2em .1em var(--bg-half);
-	--btn-bb: 1px solid var(--bg-u3);
 }
 html.az {
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
@@ -300,7 +302,7 @@ html.c {
 	--fg-weak: #cef;
 	--bg-u5: #409;
 	--bg-u2: linear-gradient(-35deg, #fd7233, #cd27a0, #5d47a5 49.5%, #16e9fb 50%, #3b6cc8 50.4%, #0e51ac);
-	--bg: #37235d;
+	--bg: #376ac5;
 	--bg-u3: #407;
 
 	--a: #f9dc22;
@@ -310,7 +312,7 @@ html.c {
 	--row-alt: #47237d;
 
 	--btn-fg: #fff;
-	--btn-bg: #9019bf;
+	--btn-bg-a: #9019bf;
 	--btn-h-bg: #a039ff;
 	--chk-fg: #d90;
 
@@ -445,7 +447,7 @@ html.dy {
 	--bg: #fff;
 	--bg-u1: #fff;
 	--bg-u2: #fff;
-	--bg-u3: #fff;
+	--bg-u3: #000;
 	--bg-u5: #fff;
 	--bg-max: #fff;
 
@@ -457,6 +459,7 @@ html.dy {
 	--a-gray: #bbb;
 	--a-dark: #000;
 
+	--btn-bg: #fff;
 	--btn-fg: #000;
 	--btn-h-fg: #000;
 	--btn-h-bg: #fff;
@@ -512,6 +515,9 @@ html.dy {
 	--fm-off: a;
 	--mp-sh: a;
 	--mp-b-bg: #fff;
+}
+html.dy #spaceUsed_bar {
+	background: #000;
 }
 * {
 	line-height: 1.2em;
@@ -604,7 +610,7 @@ html .ayjump:focus-visible {
 	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background: var(--bg);
+	background: var(--bg-u2);
 	border-radius: var(--b-radius);
 }
 #pathBar #folder_search {
@@ -819,7 +825,7 @@ html.y #files span.fsz_P { font-weight: bold }
 	margin: -1em .3em -1em -1.7em;
 	display: inline-block;
 	transform: skew(-25deg);
-	border-right: var(--bg) solid 1px;
+	border-right: var(--bg) solid 2px;
 	background: linear-gradient(70deg, transparent 40%, color-mix(var(--bg-max) 25%, transparent) 75%, color-mix(var(--bg-max) 35%, transparent));
 }
 #path a:hover {
@@ -1635,6 +1641,7 @@ html.y #ops svg circle {
 	display: flex;
 	height: 2em;
 	border-radius: var(--b-radius);
+	background: var(--bg-u2);
 }
 #noie {
 	color: #b60;
@@ -1651,7 +1658,7 @@ html.y #ops svg circle {
 	box-shadow: var(--btn-1-bs);
 	color: var(--bg);
 
-	border: var(--btn-bg) solid 1px;
+	border: var(--btn-bg-a) solid 1px;
 	border-radius: var(--b-radius);  
 	justify-content: center;
   	display: flex;
@@ -1700,7 +1707,6 @@ input[type=color] {
 .opview select {
 	padding: .3em;
 	margin: .2em 0	;
-	background: var(--bg-u3);
 }
 .opview input.err {
 	color: var(--err-fg);
@@ -1926,7 +1932,7 @@ html {
 .btn {
 	color: var(--btn-fg);
 	background: #eee;
-	background: linear-gradient(-5deg, var(--btn-bg), color-mix(var(--a-gray) 30%, transparent));
+	background: var(--btn-bg);
 	box-shadow: var(--btn-bs);
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
@@ -3188,7 +3194,7 @@ html.b #u2conf a.b:hover {
 #u2conf input[type="checkbox"]:checked+label {
 	position: relative;
 	cursor: pointer;
-	background: var(--btn-bg);
+	background: var(--btn-bg-a);
 	box-shadow: var(--btn-bs);
 	border-bottom: var(--btn-bb);
 	text-shadow: 1px 1px 1px #000, 1px -1px 1px #000, -1px -1px 1px #000, -1px 1px 1px #000;
@@ -3389,7 +3395,6 @@ html.a .opbox h3 {
 html.c #ops,
 html.c .opbox,
 html.c #path,
-html.c #wfp,
 html.c #srch_form,
 html.c .ghead,
 
@@ -3399,14 +3404,18 @@ html.a #path,
 html.a #srch_form,
 html.a .ghead {
 	background: #ccc;
-	background: linear-gradient(-5deg, var(--btn-bg), color-mix(var(--a-gray) 30%, transparent));
+	background: var(--btn-bg);
 	border: 1px solid var(--bg-u3);
-	box-shadow: 0 0 .3em var(--bg-d3);
+	border-bottom: var(--btn-bb);
+	box-shadow: var(--btn-bs);
 	backdrop-filter: blur(10px);
 }
 html.a .btn,
 html.c .btn {
 	backdrop-filter: blur(10px);
+}
+html.c .setting:hover {
+	background: color-mix(var(--bg-u5) 30%, transparent);
 }
 /* html.c #u2btn,
 html.a #u2btn {
@@ -3534,10 +3543,14 @@ html.b #docul a,
 html.b .ntree a {
 	padding: .6em .2em;
 }
+html.dy *,
+html.cy *,
 html.b * {
 	box-shadow: none !important;
-	backdrop-filter: unset;
+	backdrop-filter: none !important;
 }
+html.b #path,
+html.b #ops,
 html.b #pctl .btn:not(:hover),
 html.b .btn:not(:hover):not(.on) {
 	background: color-mix(var(--bg-u5), transparent);
@@ -3612,6 +3625,9 @@ html.cy #barbuf {
 html.cy #pvol {
 	filter: hue-rotate(4deg) contrast(2.2);
 }
+html.cy #path i {
+	background: transparent;
+}
 
 
 
@@ -3664,6 +3680,9 @@ html:not(.e) #wrap.thin {
 		padding: .3em;
 	}
 }
+html.b #wrap.thin #ghead {
+	top: 7em;
+}
 #wrap.thin {
 	.td_w {
 		width: calc(100vw - 8.5em);
@@ -3690,6 +3709,9 @@ html.e #wrap.thin {
 	}
 }
 @media (max-width: 50em){
+	html.b #wrap.thin #ghead {
+		top: 7.3em;
+	}
 	.ntree a + a {
 		padding: .6em .2em;
 	}
@@ -4055,6 +4077,7 @@ html.ez {
 
 html.e {
   text-shadow: none;
+  --bg-u1: #0002;
 }
 html.e * {
   border-radius: 0 !important;
@@ -4083,6 +4106,10 @@ html.e input[type="submit"] {
   border-radius: var(--radius);
   background: var(--bg);
   border: 0;
+}
+html.e #ops,
+html.e #treesuperh {
+	background: transparent;
 }
 html.e details[open] summary,
 a.s0r,
