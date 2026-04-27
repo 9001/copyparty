@@ -2103,7 +2103,7 @@ html.a .btn {
 	font-family: 'scp', monospace, monospace;
 	font-family: var(--font-mono), 'scp', monospace, monospace;
 	font-size: 1.2em;
-	line-height: 0;
+	line-height: .7em;
 }
 .dumb_loader_thing {
 	display: block;
