@@ -7918,11 +7918,15 @@ var treectl = (function () {
 
 		this.style.top = y + 'px';
 		this.style.position = 'fixed';
+		this.style.width = 'auto';
+		this.style.minWidth = ebi('tree').offsetWidth + p.offsetLeft - 5 + 'px';
 		mentered = this;
 	}
 
 	function mleave(e) {
 		this.style.position = '';
+		this.style.minWidth = '';
+		this.style.width = '';
 		mentered = null;
 	}
 
