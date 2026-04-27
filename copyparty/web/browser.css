@@ -2613,6 +2613,24 @@ html.y #bbox-overlay figcaption a {
 #bbox-overlay #bbox-next,
 #bbox-overlay #bbox-prev {
 	position: fixed;
+	top: 0;
+	bottom: 0;
+	width: 70px;
+	left: 0;
+	cursor: pointer;
+}
+#bbox-overlay #bbox-next {
+	right: 0;
+	left: auto;
+}
+#bbox-overlay #bbox-next:hover a,
+#bbox-overlay #bbox-prev:hover a {
+	background: #fff2;
+	background: var(--btn-h-bg);
+}
+#bbox-overlay #bbox-next a,
+#bbox-overlay #bbox-prev a {
+	position: fixed;
 	top: 50%;
 	top: calc(50% - 30px);
 	width: 30px;
@@ -2627,8 +2645,8 @@ html.y #bbox-overlay figcaption a {
 #bbox-btns .btn {
 	cursor: pointer;
 }
-#bbox-overlay.immersive #bbox-next,
-#bbox-overlay.immersive #bbox-prev {
+#bbox-overlay.immersive #bbox-next a,
+#bbox-overlay.immersive #bbox-prev a {
 	opacity: 0;
 }
 #bbox-overlay.immersive #bbox-btns {
@@ -2652,10 +2670,10 @@ html.y #bbox-overlay figcaption a {
 #bbox-overlay .btn:hover {
 	opacity: 1 !important;
 }
-#bbox-next {
+#bbox-next a {
 	right: 1%;
 }
-#bbox-prev {
+#bbox-prev a {
 	left: 1%;
 }
 #bbox-btns {
@@ -3938,8 +3956,8 @@ html.e #wrap.thin {
 	.dropdesc>div>div {
 		transition: none;
 	}
-	#bbox-next,
-	#bbox-prev,
+	#bbox-next a,
+	#bbox-prev a,
 	#bbox-btns {
 		transition: background-color .3s ease, color .3s ease;
 	}

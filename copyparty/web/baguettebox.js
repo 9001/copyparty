@@ -305,8 +305,8 @@ window.baguetteBox = (function () {
             ctr.innerHTML = (
                 '<div id="bbox-overlay" role="dialog">' +
                 '<div id="bbox-slider"></div>' +
-                '<a id="bbox-prev" class="btn" aria-label="Previous">◀</a>' +
-                '<a id="bbox-next" class="btn" aria-label="Next">▶</a>' +
+                '<div id="bbox-prev"><a class="btn" aria-label="Previous">◀</a></div>' +
+                '<div id="bbox-next"><a class="btn" aria-label="Next">▶</a></div>' +
                 '<div id="bbox-btns">' +
                 '<a id="bbox-help" class="btn">?</a>' +
                 '<a id="bbox-anim" class="btn" tt="a">-</a>' +
