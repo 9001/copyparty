@@ -4825,7 +4825,7 @@ html.e #wtc {
 	outline: none;
 	border-radius: var(--radius);
 	box-shadow: 0 0 .3rem var(--bg-d3);
-	z-index: 3;
+	z-index: 5;
 }
 #rcm.large a {
 	padding: 1em;
