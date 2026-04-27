@@ -2791,6 +2791,18 @@ var vbar = (function () {
 		ebi('pvolbg').ontouchstart = can.ontouchstart = mousedown;
 		ebi('pvolbg').ontouchmove = can.ontouchmove = mousemove;
 	}
+	var mute = ebi('pvolbg').children[0];
+	mute.onclick = function (e) {
+		ev(e);
+		if(mp.vol > 0)
+			mp.setvol(0);
+		else
+			mp.setvol(1);
+		r.draw();
+	}
+	mute.onmousedown = function (e) {
+		ev(e);
+	}
 	return r;
 })();
 
