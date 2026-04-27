@@ -678,8 +678,7 @@ html.y #path {
 }
 #files tbody a {
 	display: block;
-	padding: .5em 0;
-	margin: -.3em 0;
+	padding: .5em;
 	scroll-margin-top: 45vh;
 }
 #files tr {
@@ -715,7 +714,7 @@ a:hover {
 }
 #files a:hover {
 	color: var(--fg-max);
-	background: var(--bg-d3);
+	background: color-mix(var(--a) 20%, transparent);
 	text-decoration: underline;
 }
 #files thead th {
@@ -749,8 +748,7 @@ a:hover {
 }
 #files tbody tr:hover td,
 #files tbody tr:hover td+td {
-	background: var(--bg-d1);
-	box-shadow: 0 1px 0 var(--bg-u5) inset, 0 -1px 0 var(--bg-u5) inset;
+	background: color-mix(var(--bg-max) 30%, transparent);
 }
 #files thead th {
 	padding: .3em;
@@ -773,6 +771,9 @@ html #files.hhpick thead th {
 	max-width: var(--file-td-w);
 	word-wrap: break-word;
 	overflow: hidden;
+}
+#files td:has(a) {
+	padding: 0;
 }
 #files tr.fade a {
 	color: #999;
