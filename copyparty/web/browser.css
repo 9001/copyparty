@@ -524,6 +524,15 @@ html.dy #barpos {
 html.dy #pathBar {
 	background: var(--bg);
 }
+html.dy #spaceTotal_bar,
+html.dy select,
+html.dy input {
+	border: #000 solid 1px !important;
+}
+html.dy h3 {
+	border-top: #000 solid 1px;
+	border-radius: 0 !important;
+}
 * {
 	line-height: 1.2em;
 }
@@ -3912,7 +3921,7 @@ html.e #wrap.thin {
 @supports (display: grid) and (gap: 1em) {
 	#ggrid {
 		display: grid;
-		margin: 0;
+		margin: 0 .5em;
 		padding: unset;
 		grid-template-columns: repeat(auto-fit,var(--grid-sz));
 		justify-content: center;
@@ -4195,8 +4204,7 @@ html.e input[type="submit"] {
   background: var(--bg);
   border: 0;
 }
-html.e #ops,
-html.e #treesuperh {
+html.e #ops {
 	background: transparent;
 }
 html.e details[open] summary,
@@ -4512,7 +4520,6 @@ html.e #ghead {
   justify-content: flex-end;
   gap: 0.4em;
   padding-top: .2em;
-  overflow: auto;
   top: 2.3em;
   border-radius: 0px;
 }
@@ -4587,6 +4594,7 @@ html.e #tree {
   background: var(--bg);
   /* padding-left: 0.4em; */
   padding-top: 0;
+  padding-bottom: 0;
   margin-left: var(--negative-space);
 }
 html.e.noscroll #tree {
@@ -4635,7 +4643,7 @@ html.e #treeul {
   border: 0 !important;
   position: static;
   margin: 0 !important;
-  min-height: 100%;
+  min-height: calc(100% - 3em);
   height: max-content;
   width: calc(100% - 1.1em);
 }
@@ -4686,9 +4694,11 @@ html.e #docul {
   border-left: 0 !important;
   margin-left: 0 !important;
 }
+html.e #spaceFree {
+	background: var(--inset-bg);
+}
 html.e #tree_footer {
-	/* margin-left: 0.5em; */
-	background: linear-gradient(to top, var(--inset-bg), transparent);
+	background: transparent;
 }
 html.e #wrap {
   transform: translateX(calc((var(--negative-space) * 2) - .2em));
