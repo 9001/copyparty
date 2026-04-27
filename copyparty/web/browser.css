@@ -2221,6 +2221,7 @@ html.a .btn {
 	position: relative;
 	top: 0;
 }
+#twig,
 #gridchop a:first-child,
 #gridzoom a:first-child {
   line-height: 1.1em;
@@ -2648,11 +2649,9 @@ html.y #bbox-overlay figcaption a {
 	text-align: center;
 	line-height: 60px;
 }
-#bbox-btns {
-	transition: top .3s ease, opacity .3s ease;
-}
 #bbox-btns .btn {
 	cursor: pointer;
+	direction: ltr;
 }
 #bbox-overlay.immersive #bbox-next a,
 #bbox-overlay.immersive #bbox-prev a {
@@ -2666,7 +2665,7 @@ html.y #bbox-overlay figcaption a {
 #bbox-overlay .btn {
 	cursor: pointer;
 	padding: 0 .4em;
-	margin: 0 .1em;
+	margin: 0 .1em .3em .1em;
 	font-size: 1.4em;
 	line-height: 2em;
 	vertical-align: top;
@@ -2689,6 +2688,8 @@ html.y #bbox-overlay figcaption a {
 	top: .5em;
 	right: .2em;
 	position: fixed;
+	direction: rtl;
+	transition: top .3s ease, opacity .3s ease;
 }
 #bbox-halp {
 	color: var(--fg-max);

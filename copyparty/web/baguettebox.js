@@ -308,16 +308,16 @@ window.baguetteBox = (function () {
                 '<div id="bbox-prev"><a class="btn" aria-label="Previous">◀</a></div>' +
                 '<div id="bbox-next"><a class="btn" aria-label="Next">▶</a></div>' +
                 '<div id="bbox-btns">' +
-                '<a id="bbox-help" class="btn">?</a>' +
-                '<a id="bbox-anim" class="btn" tt="a">-</a>' +
-                '<a id="bbox-readdir" class="btn" tt="a">ltr</a>' +
-                '<a id="bbox-rotl" class="btn">↶</a>' +
-                '<a id="bbox-rotr" class="btn">↷</a>' +
-                '<a id="bbox-tsel" class="tgl btn">☑️sel</a>' +
-                '<a id="bbox-full" class="btn" tt="full-screen">⛶</a>' +
-                '<a id="bbzoom" class="tgl btn" tt="zoom/stretch smaller images to fill screen">↕</a>' +
-                '<a id="bbox-vmode" class="btn" tt="a"></a>' +
-                '<a id="bbox-close" class="btn" aria-label="Close">✕</a>' +
+                    '<a id="bbox-close" class="btn" aria-label="Close">✕</a>' +
+                    '<a id="bbox-vmode" class="btn" tt="a"></a>' +
+                    '<a id="bbzoom" class="tgl btn" tt="zoom/stretch smaller images to fill screen">↕</a>' +
+                    '<a id="bbox-full" class="btn" tt="full-screen">⛶</a>' +
+                    '<a id="bbox-tsel" class="tgl btn">☑️sel</a>' +
+                    '<a id="bbox-rotr" class="btn">↷</a>' +
+                    '<a id="bbox-rotl" class="btn">↶</a>' +
+                    '<a id="bbox-readdir" class="btn" tt="a">ltr</a>' +
+                    '<a id="bbox-anim" class="btn" tt="a">-</a>' +
+                    '<a id="bbox-help" class="btn">?</a>' +
                 '</div></div>'
             );
             overlay = ctr.firstChild;
