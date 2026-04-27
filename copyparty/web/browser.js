@@ -975,7 +975,7 @@ ebi('up_header').innerHTML = '🚀 ' + L.cl_uopts;
 ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
-	'<div id="u2conf" tt="">' +
+	'<div id="u2conf">' +
 	'<details><summary id="sum_u2conf">' + (IE ? '>> ' : '') + L.options + (IE ? ' <<' : '') + '</summary>' +
 
 	'	<div class="setting">' +
@@ -5955,7 +5955,7 @@ var thegrid = (function () {
 				'<a href="#" s="ext">' + L.gt_ext + '</a>' +
 			'</span>' +
 		'</div>' +
-		'<div id="ggrid" tt=""></div>'
+		'<div id="ggrid"></div>'
 	);
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
 	var ggrid = ebi('ggrid');

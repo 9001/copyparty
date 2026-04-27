@@ -1640,6 +1640,11 @@ var tt = (function () {
 
     r.hide = function (e) {
         //ev(e);  // eats checkbox-label clicks
+
+        r.show.bind(null);
+        r.el = null;
+
+        console.log('hide');
         clearTimeout(tev);
         window.removeEventListener('scroll', r.hide);
 
