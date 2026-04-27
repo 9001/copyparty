@@ -3815,7 +3815,7 @@ html.e #wrap.thin {
 		padding: .6em .2em;
 	}
 	#files tbody a {
-		padding: .8em 0;
+		padding: .8em;
 	}
 	html:not(.e) body {
 		font-size: 1.1em;
