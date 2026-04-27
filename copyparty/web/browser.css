@@ -878,6 +878,9 @@ html.y #path a:hover {
 	font-family: 'scp', 'consolas', monospace;
 	font-family: var(--font-mono), 'scp', 'consolas', monospace;
 }
+.iframe {
+  background: none;
+}
 #doc>iframe,
 .logue>iframe {
 	background: var(--bgg);
