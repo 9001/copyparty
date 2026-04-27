@@ -3600,7 +3600,7 @@ html.b #treepar {
 	border-bottom: .2em solid var(--f-h-b1);
 }
 html.b #path i {
-	border-right: var(--fg) solid 2px;
+	border-right: var(--a) solid 2px;
 	height: 1.5em;
   	margin: -.4em .3em -.4em -1.7em;
 }
@@ -4673,6 +4673,7 @@ html.e #wrap {
   /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
 }
 html.e #pathBar {
+	padding: 0;
 	top: 0;
 	background: var(--ttlbar);
 }
@@ -4681,9 +4682,6 @@ html.e   #pathBar.thin #actionsArea {
 }
 html.e input[type="radio"] {
   accent-color: #232323;
-}
-html.e #pathBar {
-	padding: 0;
 }
 html.e #path {
 	background: var(--bg-u2);
@@ -4697,7 +4695,11 @@ html.e #path i {
   transform: none;
   width: 1.8em;
   box-shadow: inset -1px 0 var(--shadow-color-1), inset -2px 0 var(--grey);
-}/*
+}
+html.e #path *:last-child:is(i) {
+    display: none;
+}
+/*
 html.e #hovertree:after {
   color: red;
   content: "BUGGY";
