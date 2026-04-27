@@ -750,6 +750,13 @@ a:hover {
 #files tbody tr:hover td+td {
 	background: color-mix(var(--bg-max) 30%, transparent);
 }
+a.dir {
+	color: var(--a);
+}
+tr:has(a.dir) td:nth-child(2) a::before {
+	content: "📁";
+	margin: 0 .1em 0 -.2em;
+}
 #files thead th {
 	padding: .3em;
 	background: var(--bg);
