@@ -1095,7 +1095,7 @@ html.dz #flogout {
 		animation: rotate 10s linear infinite;
 	}
 }
-#ggrid>a.dir:before {
+html:not(.e) #ggrid>a.dir:before {
 	content: '📂';
 }
 #ggrid>a.dir>span {
@@ -1357,10 +1357,10 @@ html.dz #flogout {
 	cursor: pointer;
 	width: max-content;
 }
-html.a #up_quick .btn {
+html:not(.e):not(.d) #up_quick .btn {
 	transform: rotate(0deg);
 }
-html.a #up_quick .btn.on {
+html:not(.e):not(.d) #up_quick .btn.on {
 	transform: rotate(-90deg);
 	box-shadow: -.05em .02em .3em color-mix(var(--a) 20%, transparent);
 }
@@ -3636,6 +3636,7 @@ html.b #treepar {
 	width: calc(.1em + var(--nav-sz) - var(--sbw));
 	border-bottom: .2em solid var(--f-h-b1);
 }
+html.d #path i,
 html.b #path i {
 	border-right: var(--a) solid 2px;
 	height: 1.5em;
@@ -3782,8 +3783,8 @@ html.b #wrap.thin .ghead {
 		width: calc(50vw - 5em);
 	}
 }
-html:not(.a) #treeh:after,
-html:not(.a) #wrap.thin #ghead::after,
+html:not(.a):not(.e) #treeh:after,
+html:not(.a):not(.e) #wrap.thin #ghead::after,
 html.a #treeh:not(.noa):after,
 html.a #wrap.thin #ghead:not(.noa)::after {
 	content: "";
@@ -4738,6 +4739,9 @@ html.e #path i {
 }
 html.e #path *:last-child:is(i) {
     display: none;
+}
+html.e .dir span::before {
+  content: "📁";
 }
 /*
 html.e #hovertree:after {
