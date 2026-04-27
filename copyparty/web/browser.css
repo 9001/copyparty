@@ -2837,6 +2837,16 @@ html.c .modalcontent {
 	padding: .5em;
 	margin: 0 0 1.3em 0;
 }
+#s_nav .sub {
+	margin-left: 1em;
+}
+#s_list .sub_section h3 {
+	background: none;
+	border-top: var(--bg-u5) solid 1px;
+    border-radius: 0;
+    margin: 0 -.4em;
+    text-align: center;
+}
 
 
 

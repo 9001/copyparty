@@ -1142,7 +1142,9 @@ ebi('up_moreopts').onclick = function(){
 // config panel
 
 var musicSettings = (
-	'<div><h3 id="h_mpopts">🎵 ' + L.ot_mp + '</h3><div>' +
+	'<div class="sub_section"><h3 id="h_mp">🎵 ' + L.ot_mp + '</h3></div>' +
+
+	'<div class="sub"><h3 id="h_mpopts">✅ ' + L.cl_opts + '</h3><div>' +
 	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
 	'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
 	'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
@@ -1160,23 +1162,23 @@ var musicSettings = (
 	'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
 	'</div></div>' +
 
-	'<div><h3 id="h_cmds">▶️ ' + L.ml_btns + '</h3><div>' +
+	'<div class="sub"><h3 id="h_cmds">▶️ ' + L.ml_btns + '</h3><div>' +
 	'<a href="#" class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
 	'</div></div>' +
 
-	'<div><h3 id="h_pbmode">📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
+	'<div class="sub"><h3 id="h_pbmode">📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
 	'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '">🔁</a>' +
 	'<a href="#" class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
 	'<a href="#" class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
 	'</div></div>' +
 
 	(have_acode ? (
-		'<div><h3 id="h_transfrom">🏹 ' + L.ml_tcode + '</h3><div>' +
+		'<div class="sub"><h3 id="h_transfrom">🏹 ' + L.ml_tcode + '</h3><div>' +
 		'<a href="#" id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
 		'<a href="#" id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
 		'<a href="#" id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
 		'</div></div>' +
-		'<div><h3 id="h_transto">🎯 ' + L.ml_tcode2 + '</h3><div>' +
+		'<div class="sub"><h3 id="h_transto">🎯 ' + L.ml_tcode2 + '</h3><div>' +
 		'<a href="#" id="ac2opus" class="tgl btn" tt="' + L.mt_c2opus + '</a>' +
 		'<a href="#" id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
 		'<a href="#" id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
@@ -1186,13 +1188,13 @@ var musicSettings = (
 		'</div></div>'
 	) : '') +
 
-	'<div><h3 id="h_tint">🕶️ ' + L.ml_tint + '</h3><div>' +
+	'<div class="sub"><h3 id="h_tint">🕶️ ' + L.ml_tint + '</h3><div>' +
 	'<input type="text" id="pb_tint" value="0" ' + NOAC + ' style="width:2.4em" tt="' + L.mt_tint + '" />' +
 	'</div></div>' +
 
-	'<div><h3 id="h_drc">🐘 ' + L.ml_drc + '</h3><div><div id="audio_drc"></div></div></div>' +
-	'<div><h3 id="h_eq">📊 ' + L.ml_eq + '</h3><div><div id="audio_eq"></div></div></div>' +
-	'<div><h3 id="h_silence">🔇 ' + L.ml_ss + '</h3><div><div id="audio_ss"></div></div></div>' +
+	'<div class="sub"><h3 id="h_drc">🐘 ' + L.ml_drc + '</h3><div><div id="audio_drc"></div></div></div>' +
+	'<div class="sub"><h3 id="h_eq">📊 ' + L.ml_eq + '</h3><div><div id="audio_eq"></div></div></div>' +
+	'<div class="sub"><h3 id="h_silence">🔇 ' + L.ml_ss + '</h3><div><div id="audio_ss"></div></div></div>' +
 	'');
 
 ebi('op_cfg').innerHTML = (
@@ -1320,22 +1322,23 @@ ebi('op_cfg').innerHTML = (
 		var sId = h.id;
 		h.id = ''
 		var subSettings = sections[i].children[1];
-
-		var section = '<div id="' + sId + '" class="s_section"><h3>' + sName + '</h3>';
-		for (var ii = 0; ii < subSettings.children.length; ii++){
-			var s = subSettings.children[ii];
-			var info = tt.parse(s.getAttribute('tt'));
-			s.removeAttribute('tt');
-			//s.href = '#' + sId;
-			section += '<div id="' + subSettings.id + '" class="setting">' +
-				s.outerHTML +
-				((info != null && info.length > 0) ? '<p class="s_desc">' + info + '</p>' : '') + 
-				'</div>';
+		var section = '<div id="' + sId + '" class="s_section ' + sections[i].classList +'"><h3>' + sName + '</h3>';
+		if(subSettings != null){
+			for (var ii = 0; ii < subSettings.children.length; ii++){
+				var s = subSettings.children[ii];
+				var info = tt.parse(s.getAttribute('tt'));
+				s.removeAttribute('tt');
+				//s.href = '#' + sId;
+				section += '<div id="' + subSettings.id + '" class="setting">' +
+					s.outerHTML +
+					((info != null && info.length > 0) ? '<p class="s_desc">' + info + '</p>' : '') + 
+					'</div>';
+			}
+			subSettings.innerHTML = '';
 		}
 		section += '</div>'
 		ebi('s_list').innerHTML += section;
-		subSettings.innerHTML = '';
-		ebi('s_nav').innerHTML += '<a href="#' + sId + '" class="btn">' + sName + '</a>\n';
+		ebi('s_nav').innerHTML += '<a href="#' + sId + '" class="btn ' + sections[i].classList +'">' + sName + '</a>\n';
 	}
 
 	ebi('s_outside').onclick = ebi('cs_btn').onclick = function(){
