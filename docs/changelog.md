@@ -1,4 +1,51 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0428-0907 `v1.21.0` UI V2
+
+## 🧪 new features
+* drag n drop support within the browser window to move files or folders
+* custom accent color setting added
+* right click (long press) on mobile is now possible
+* the tree and path can be visible at the same time
+* settings and upload are now a popup/modal
+* settings can be navigated via sections and former tooltip info is now always visible
+* new floating [+] button in bottom right for quickly creating files / folders / uploading
+* searching folders / subfolders is now possible, and is the new default when clicking the search button. extended search options are accessible via down arrow in the search box
+* storage capacity progress bar at bottom of folder tree
+* account button with popup in the top right
+* search in "quotes with spaces" is now possible to find file names including spaces
+* new simpler audio progress bar slider added as option
+* quick setting for changing loop mode via bottom media player bar
+* mute toggle button
+* name of playing audio is now displayed
+* audio equalizer can be operated via sliders
+
+## 🩹 bugfixes
+
+* #1455 tooltips disappear more consistently when element is no longer hovered
+* scrollable tree header so all options are accessible independent of tree width
+
+## 🔧 other changes
+
+* media player settings have moved to the main settings modal
+* creating files / folders is now done via right click menu, or the plus button in the bottom right
+* grid view toggle is now in grid header
+* default file sizes in MB
+* control panel button now lives in the account popup in the top bar
+* searching for files via drag n drop is now only possible when the search mode is toggled in the up2k UI
+* bup is an optional dropdown in the up2k modal
+* many mobile layout usability issues
+* more consistent areas for clicking to navigate left / right in the image viewer (they don't depend on image fill mode anymore)
+* "folder up" / "next sibling" / "previous sibling" are now icon buttons at the top
+* new look for the login screen
+* file list makes it easier to identify folders via an added folder emoji to folder names. to disable this, add the following style: `tr:has(a.dir) td:nth-child(2) a::before { display: none; }`
+
+## 🌠 fun facts
+
+* all themes should keep working, even the Window95 ones
+* web UI verified for new 3DS
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0323-0328  `v1.20.13`  dothidden
 
 ## 🧪 new features
