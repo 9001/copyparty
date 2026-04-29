@@ -5,20 +5,53 @@
 	--font-serif: serif;
 	--font-mono: 'scp';
 
-	--fg: #ccc;
 	--fg-max: #fff;
-	--bg-u2: #2b2b2b;
-	--bg-u5: #444;
 	--bg-max: #080808;
+	--a: #fc5;
+	accent-color: var(--a);
+	--radius: .3em;
+	
+	/* accent color in everything */
+	--fg-max: color-mix(#fefefe 95%, var(--a) 5%);
+	--bg-max: color-mix(#010101 95%, var(--a) 5%);
+
+	--fg: color-mix(var(--fg-max) 90%, var(--bg-max) 10%);
+	--fg-weak: color-mix(var(--fg-max) 70%, var(--bg-max) 30%);
+
+	--bg: color-mix(var(--bg-max) 85%, var(--fg-max) 15%);
+	--bg-half: color-mix(var(--bg) 50%, transparent 50%);
+	--bg-u1: color-mix(var(--bg-max) 80%, var(--fg-max) 20%);
+	--bg-u2: color-mix(var(--bg-max) 75%, var(--fg-max) 25%);
+	--bg-u3: color-mix(var(--bg-max) 70%, var(--fg-max) 30%);
+	--bg-u5: color-mix(var(--bg-max) 65%, var(--fg-max) 35%);
+	--bgg: var(--bg);
+	--bg-d1: color-mix(var(--bg-max) 90%, var(--fg-max) 10%);
+	--bg-d2: color-mix(var(--bg-max) 92%, var(--fg-max) 8%);
+	--bg-d3: color-mix(var(--bg-max) 95%, var(--fg-max) 5%);
 }
 html.y {
 	color-scheme: light;
 
-	--fg: #222;
 	--fg-max: #000;
-	--bg-u2: #f7f7f7;
-	--bg-u5: #ccc;
 	--bg-max: #fff;
+	color-scheme: light;
+
+	--a: #07c;
+	
+	--bg-max: color-mix(#fefefe 95%, var(--a) 5%);
+	--fg-max: color-mix(#010101 95%, var(--a) 5%);
+	
+	--bg-u1: color-mix(var(--bg-max) 92%, var(--fg-max));
+	--bg-u2: color-mix(var(--bg-max) 95%, var(--fg-max));
+	--bg-u5: color-mix(var(--bg-max) 82%, var(--fg-max));
+	--bg: color-mix(var(--bg-max) 98%, var(--fg-max));
+
+	--chk-fg: var(--fg);
+	--txt-sh: #aaa;
+	--txt-bg: var(--bg-d1);
+	--mp-sh: #0002;
+
+	text-shadow: none;
 }
 @font-face {
 	font-family: 'scp';

@@ -8,35 +8,6 @@
 	--sbw: 0.5em;
 	--sbh: 0.5em;
 
-	--fg-max: #fff;
-	--bg-max: #080808;
-	--a: #fc5;
-	accent-color: var(--a);
-	--radius: .3em;
-	
-	/* accent color in everything */
-	--fg-max: color-mix(#fefefe 95%, var(--a) 5%);
-	--bg-max: color-mix(#010101 95%, var(--a) 5%);
-
-	/* mikudayo */
-	/* --fg-max: #d1d7e9;
-	--bg-max: #0a0b0e;
-	--a: #27efc9; */
-
-	--fg: color-mix(var(--fg-max) 90%, var(--bg-max) 10%);
-	--fg-weak: color-mix(var(--fg-max) 70%, var(--bg-max) 30%);
-
-	--bg: color-mix(var(--bg-max) 85%, var(--fg-max) 15%);
-	--bg-half: color-mix(var(--bg) 50%, transparent 50%);
-	--bg-u1: color-mix(var(--bg-max) 80%, var(--fg-max) 20%);
-	--bg-u2: color-mix(var(--bg-max) 75%, var(--fg-max) 25%);
-	--bg-u3: color-mix(var(--bg-max) 70%, var(--fg-max) 30%);
-	--bg-u5: color-mix(var(--bg-max) 65%, var(--fg-max) 35%);
-	--bgg: var(--bg);
-	--bg-d1: color-mix(var(--bg-max) 90%, var(--fg-max) 10%);
-	--bg-d2: color-mix(var(--bg-max) 92%, var(--fg-max) 8%);
-	--bg-d3: color-mix(var(--bg-max) 95%, var(--fg-max) 5%);
-
 	--tab-alt: var(--a);
 	--row-alt: var(--bg-u1);
 
@@ -153,65 +124,10 @@
 	--err-b1: #f00;
 	--err-ts: #500;
 }
-html.y {
-	color-scheme: light;
 
-	--fg-max: #000;
-	--fg: #222;
-	--fg-weak: #555;
-
-	--bg-max: #fff;
-	--bg-d3: #fff;
-	--bg-d2: #fff;
-	--bg-d1: #fff;
-	--bg: #eaeaea;
-	--bg-u1: #fff;
-	--bg-u2: #f7f7f7;
-	--bg-u3: #eaeaea;
-	--bg-u5: #ccc;
-
-	--a: #07c;
-	
-	--chk-fg: var(--fg);
-	--txt-sh: #aaa;
-	--txt-bg: rgba(255,255,255,0.6);
-
-	--op-a-sh: #fff;
-
-	--u2-tab-1-bg: inherit;
-	--ud-b1: #bbb;
-
-	--sz-b: #777;
-	--sz-k: #380;
-
-	--srv-1: #555;
-	--srv-2: #c83;
-	--srv-3: #c0a;
-
-	--g-bg: var(--bg-u2);
-	--g-b1: var(--bg-u5);
-	--g-b2: var(--bg-u5);
-	--g-g1: var(--bg-u2);
-	--g-g2: var(--bg-u5);
-	--g-f-bg: var(--bg-u3);
-	--g-f-b1: var(--bg-u5);
-	--g-sh: rgba(0,0,0,0.07);
-
-	--f-sh1: 0.3;
-	--f-sh2: 0.5;
-	--f-sh3: 0.02;
-
-	--f-sel-sh: #e80;
-
-	--fm-off: #c4a;
-	--mp-sh: #0002;
-	--mp-b-bg: transparent;
-
-	text-shadow: none;
-}
-html.y #pathBar #folder_search {
+/* html.y #pathBar #folder_search {
 	background: var(--bg);
-}
+} */
 html.a {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
 
@@ -221,9 +137,9 @@ html.az {
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
 }
 html.ay {
-	--op-aa-sh: 0 .1em .2em #ccc;
-	--op-aa-bg: var(--bg-max);
+	--btn-bg: linear-gradient(-5deg, var(--btn-bg-a), color-mix(var(--bg-u1) 50%, transparent));
 }
+
 html.b {
 	--btn-bs: 0 .05em 0 var(--bg-d3) inset;
 	--btn-1-bs: 0 .05em 0 var(--btn-1h-bg) inset;
@@ -235,8 +151,6 @@ html.b {
 	--g-b2: var(--bg);
 	--g-g1: var(--bg);
 	--g-sh: rgba(0,0,0,0);
-
-	--txt-bg: var(--bg-u3);
 
 	--op-aa-bg: rgba(255,255,255,0.06);
 
@@ -253,7 +167,7 @@ html.bz {
 	--a: #18cdaf;
 }
 html.by {
-	--a: #62c136;
+	--a: #117dc0;
 	--bg: var(--bg-u2);
 }
 html.c {
