@@ -1561,6 +1561,11 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	padding: .2em;
 	margin: .1em;
 }
+#favico_onpage svg {
+	margin: -1px 7px 0 0;
+    vertical-align: top;
+	height: 1.5em;
+}
 #pctl svg {
 	width: 1.5em;
 	height: 1.5em;
