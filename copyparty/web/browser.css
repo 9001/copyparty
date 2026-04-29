@@ -53,7 +53,7 @@
 	--btn-bg: rgba(128,128,128,0.15);
 	--btn-bg: linear-gradient(-5deg, var(--btn-bg-a), color-mix(var(--a-gray) 30%, transparent));
 	--btn-h-fg: var(--a-hil);
-	--btn-h-bg: hsl(from color-mix(var(--a-gray) 65%, var(--bg-max) 35%) h 0 l);
+	--btn-h-bg: hsl(from color-mix(var(--a-gray) 45%, var(--bg-max)) h 0 l);
 	--btn-1-fg: var(--bg);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
@@ -236,7 +236,7 @@ html.b {
 	--g-g1: var(--bg);
 	--g-sh: rgba(0,0,0,0);
 
-	--txt-bg: --bg-u3;
+	--txt-bg: var(--bg-u3);
 
 	--op-aa-bg: rgba(255,255,255,0.06);
 
@@ -253,7 +253,8 @@ html.bz {
 	--a: #18cdaf;
 }
 html.by {
-	--a: #1fa215;
+	--a: #62c136;
+	--bg: var(--bg-u2);
 }
 html.c {
 	font-weight: bold;
@@ -828,6 +829,10 @@ html.a #path i {
 	color: var(--fg-max);
 	background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
 }
+html.b #ggrid>a.dir:before,
+html.b #path i {
+	background: none;
+}
 html.y #path a:hover {
 	background: none;
 }
@@ -1225,7 +1230,7 @@ html:not(.e) #ggrid>a.dir:before {
 	margin-right: .3em;
 }
 #wtc {
-	margin-top: -.5em;
+	margin-top: -.2em;
 	font-size: 1.2em;
 }
 #wtgrid {
@@ -3627,8 +3632,8 @@ html.b .ghead {
 	border-bottom: var(--btn-bb);
 	border-radius: 0;
 }
-html.b #files td {
-	padding: .5em .7em;
+html.b #files tbody a {
+	padding: .7em;
 }
 html.b #op_up2k.srch sup {
 	color: #fc0;
