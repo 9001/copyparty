@@ -1643,6 +1643,9 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	padding: 0 .4em;
 	margin: 0;
 }
+.unfun #ops a {
+	font-size: 1.2em;
+}
 #ops a.act {
 	color: #fff;
 	color: var(--op-aa-fg);
@@ -1670,6 +1673,7 @@ html.y #ops svg circle {
 	font-size: x-large;
 	text-wrap-mode: nowrap;
 	display: block;
+	line-height: 1.5em;
 }
 #treeToggleBtn{
 	z-index: 6;
@@ -1695,9 +1699,9 @@ html.y #ops svg circle {
 	color: #b60;
 	margin: 0 0 0 .5em;
 }
-#acc_pfp {
-	aspect-ratio: 1 / 1;
-	width: 1.25em;
+.pfp {
+	/* aspect-ratio: 1 / 1; */
+	min-width: 1.25em;
 
 	background: #ccc;
 	color: #000;
@@ -1712,7 +1716,7 @@ html.y #ops svg circle {
   	display: flex;
 	text-shadow: none;
 }
-#acc_pfp.placeholder {
+.pfp.placeholder {
 	text-shadow: 1px 1px 0 var(--bg-half), 1px -1px 0 var(--bg-half), -1px -1px 0 var(--bg-half), -1px 1px 0 var(--bg-half);
 }
 .opbox {
@@ -4190,7 +4194,7 @@ html.e {
 html.e * {
   border-radius: 0 !important;
 }
-html.e #acc_pfp {
+html.e .pfp {
 	background: transparent;
 	color: var(--fg);
 }

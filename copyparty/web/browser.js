@@ -2,6 +2,15 @@
 
 var J_BRW = 1;
 
+var fun_tgl = sread('fun_tgl');
+if( fun_tgl == null)
+	swrite('fun_tgl', 1);
+fun_tgl = fun_tgl != 0;
+console.log('fun_tgl: ' + fun_tgl);
+if(!fun_tgl){
+	clmod(document.documentElement, 'unfun', true);
+}
+
 if (window.dgauto === undefined)
 	alert('FATAL ERROR: receiving stale data from the server; this may be due to a broken reverse-proxy (stuck cache). Try restarting copyparty and press CTRL-SHIFT-R in the browser');
 
@@ -219,6 +228,7 @@ if (1)
 		"cl_hfsz": "filesize",
 		"cl_themes": "theme",
 		"cl_accent": "accent color (keep empty for default)$Nsupports any css color, like rgba(255, 210, 0, 1)",
+		"cl_fun": "enables or disables the FUN 🎉🚀👽🐹🥳❗ (reload the page after changing this setting)",
 		"cl_langs": "language",
 		"cl_ziptype": "folder download",
 		"cl_uopts": "upload",
@@ -808,13 +818,13 @@ modal.load();
 // toolbar
 ebi('ops').innerHTML = (
 	//(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
-	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
-	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
-	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
-	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
-	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
-	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
-	'<a href="#" id="opa_acc" data-dest="acc" tt=""><span id="acc_pfp">👤</span></a>' +
+	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">' + (fun_tgl ? '🔎' : 'srch') + '</a>' +
+	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">' + (fun_tgl ? '🧯' : 'undo') + '</a>' : '') +
+	'<a href="#" id="opa_up" data-dest="up2k">' + (fun_tgl ? '🚀' : 'upload') + '</a>' +
+	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">' + (fun_tgl ? '🎈' : 'bup') + '</a>' +
+	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">' + (fun_tgl ? '📟' : 'msg') + '</a>' +
+	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">' + (fun_tgl ? '⚙️' : 'conf') + '</a>' +
+	'<a href="#" id="opa_acc" data-dest="acc" tt=""><span id="acc_pfp"' + (fun_tgl ? ' class="pfp"' : '') + '>' + (fun_tgl ? '👤' : 'acc') + '</span></a>' +
 	'<div id="opdesc"></div>'
 );
 
@@ -971,7 +981,7 @@ ebi('uq_nf').onclick = function(){
 
 
 // up2k ui
-ebi('up_header').innerHTML = '🚀 ' + L.cl_uopts;
+ebi('up_header').innerHTML = (fun_tgl ? '🚀 ' : '') + L.cl_uopts;
 ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
@@ -1255,6 +1265,7 @@ ebi('op_cfg').innerHTML = (
 	'			<input type="text" id="accent" placeholder="#color"></input>' +
 	'			<input type="color" id="accent_picker"></input>' +
 	'		</div>' +
+	'		<a id="fun_tgl" class="tgl btn" tt="' + L.cl_fun + '">🥳</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -1314,11 +1325,15 @@ ebi('op_cfg').innerHTML = (
 
 // modalize settings
 (function () {
-	ebi('s_header').innerHTML = '⚙️ ' + L.ot_cfg;
+	ebi('s_header').innerHTML = (fun_tgl ? '⚙️ ' : '') + L.ot_cfg;
 	var sections = ebi('op_cfg').children;
 	for (var i = 0; i < sections.length; i++){
 		var h = sections[i].children[0];
 		var sName = h.innerHTML;
+		if(!fun_tgl){
+			if(sName && sName.match(' ') && sName[0] != '<')
+				sName = sName.split(' ').slice(1).join(' ');
+		}
 		var sId = h.id;
 		h.id = ''
 		var subSettings = sections[i].children[1];
@@ -1389,6 +1404,9 @@ if(accent && accent.length > 3){
 	document.documentElement.style.setProperty('--a', parseColor(accent));
 	ebi('accent').value = ebi('accent_picker').value = accent;
 }
+
+// no fun allowed
+bcfg_bind(this, 'fun_tgl', 'fun_tgl');
 
 // navpane
 ebi('treeh').innerHTML += (
@@ -8637,7 +8655,7 @@ function apply_perms(res) {
 	else{
 		ebi('blogout').style.display = 'none';
 		ebi('acc_name').innerHTML = L.login;
-		ebi('acc_pfp').innerHTML = '👤';
+		ebi('acc_pfp').innerHTML = fun_tgl ? '👤' : 'acc';
 		ebi('acc_button').onclick = goHome;
 	}
 	clmod(ebi('acc_pfp'), 'placeholder', acct == '*');
@@ -10618,7 +10636,7 @@ function reload_browser() {
 
 		o = mknod('a');
 		o.setAttribute('href', link2);
-		o.textContent = uricom_dec(parts[a]) || '🏠';
+		o.textContent = uricom_dec(parts[a]) || (fun_tgl ? '🏠' : 'home');
 		ebi('path').appendChild(o);
 		ebi('path').appendChild(mknod('i'));
 		drag.mktarget(o);
