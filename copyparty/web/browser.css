@@ -1822,6 +1822,7 @@ input.ssconf_v {
 	z-index: 5;
 	padding-bottom: 3em;
 }
+#files,
 #wtoggle,
 #ghead,
 #tree,
