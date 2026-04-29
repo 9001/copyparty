@@ -2304,8 +2304,10 @@ var favico = (function () {
         }
         r.tag.href = 'data:image/svg+xml;base64,' + b64;
 
-        if(ebi('favico_onpage') != null)
-            ebi('favico_onpage').innerHTML = r.txt;
+        var fiop = ebi('favico_onpage');
+        if(fiop != null){
+            fiop.innerHTML = svg ? atob(b64) : gx(r.txt);
+        }
     };
 
     r.init = function () {
