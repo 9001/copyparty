@@ -18,9 +18,9 @@
 	--btn-bg-a: rgba(128,128,128,0.15);
 	--btn-bg-a: color-mix(var(--bg-max) 85%, var(--fg-max) 20%);
 	--btn-bg: rgba(128,128,128,0.15);
-	--btn-bg: linear-gradient(-5deg, var(--btn-bg-a), color-mix(var(--a-gray) 30%, transparent));
+	--btn-bg: linear-gradient(-5deg, color-mix(var(--btn-bg-a)70%, var(--a-gray)), color-mix(var(--btn-bg-a) 40%, transparent));
 	--btn-h-fg: var(--a-hil);
-	--btn-h-bg: hsl(from color-mix(var(--a-gray) 45%, var(--bg-max)) h 0 l);
+	--btn-h-bg: color-mix(var(--a-gray) 45%, var(--bg-max));
 	--btn-1-fg: var(--bg);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
@@ -112,8 +112,10 @@
 	--f-gray: #999;
 
 	--fm-off: var(--a-hil);
-	--mp-sh: var(--bg-d3);
+	--mp-sh: #1116;
 	--mp-b-bg: color-mix(var(--bg-max) 20%, transparent 80%);
+
+	--scrl-hint: var(--bg-u2);
 
 	--err-fg: #fff;
 	--err-bg: #a20;
@@ -121,19 +123,19 @@
 	--err-ts: #500;
 }
 
-/* html.y #pathBar #folder_search {
-	background: var(--bg);
-} */
+html.y {
+	--scrl-hint: var(--bg);
+}
 html.a {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
 
-	--btn-bs: .1em .2em .1em var(--bg-half);
+	--btn-bs: .1em .2em .1em var(--mp-sh);
 }
 html.az {
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
 }
 html.ay {
-	--btn-bg: linear-gradient(-5deg, var(--btn-bg-a), color-mix(var(--bg-u1) 50%, transparent));
+	--btn-bg: linear-gradient(-5deg, color-mix(var(--btn-bg-a) 50%, transparent), color-mix(var(--btn-bg-a)80%, var(--a)));
 }
 
 html.b {
@@ -1094,7 +1096,6 @@ html:not(.e) #ggrid>a.dir:before {
 	z-index: 3;
 	touch-action: none;
 	box-shadow: 0 0 .5em var(--mp-sh);
-	clip-path: inset(-100vh 0 0 0);
 }
 #widget.anim {
 	transition: margin-left 0; /* can't set this above 0 due to onwidgetresize */
@@ -1132,8 +1133,7 @@ html:not(.e) #ggrid>a.dir:before {
 	height: 0;
 }
 #fshr,
-#wtgrid,
-#wtico {
+#wtgrid {
 	position: relative;
 	font-size: .9em;
 	top: -.04em;
@@ -1161,9 +1161,6 @@ html:not(.e) #ggrid>a.dir:before {
 	padding: 0;
 }
 
-#wtico {
-	cursor: pointer;
-}
 @keyframes spin {
 	100% {transform: rotate(360deg)}
 }
@@ -1171,22 +1168,44 @@ html:not(.e) #ggrid>a.dir:before {
 	0% {opacity: 0}
 	100% {opacity: 1}
 }
-#wtoggle {
-	position: absolute;
-	white-space: nowrap;
-	top: -1em;
-	right: 0;
-	bottom: 0;
-	font-size: 2em;
-	line-height: 1em;
-	text-align: center;
-	text-shadow: none;
-	box-shadow: 0 0 .5em var(--mp-sh);
-	border-radius: 5px 0 0 0;
-	border-radius: calc(var(--radius) * 0.7) 0 0 0;
-	padding: 0 0 0 .1em;
-	color: var(--fg-max);
+#wtico {
+	display: inline-block;
+	cursor: pointer;
+	line-height: 1.2em;
+  	vertical-align: bottom;
+	padding: .05em .5em .1em .3em;
+	border-radius: calc(var(--radius) / 2) 0 0 0;
+	pointer-events: all;
 }
+#wstack {
+	display: block;
+	position: absolute;
+	text-wrap-mode: nowrap;
+	max-width: 100%;
+	bottom: 100%;
+	right: 0;
+	font-size: 2em;
+
+	text-align: right;
+	color: var(--fg-max);
+	pointer-events: none;
+}
+#wstack div {
+	pointer-events: all;
+	vertical-align: bottom;
+}
+#wtoggle {
+	display: inline-block;
+	text-wrap-mode: nowrap;
+	text-align: center;
+	max-width: calc(100% - 1.8em);
+	overflow-x: auto;
+	overflow-y: hidden;
+	margin: 0 .1em .1em .2em;
+	box-shadow: 0 0 .5em var(--mp-sh);
+	border-radius: calc(var(--radius) / 2);
+}
+#wtico,
 #up_quick,
 #wtoggle,
 #widgeti {
@@ -1256,6 +1275,10 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	transform: rotate(-45deg);
 
 	background: none;
+
+	font-size: 1.2em;
+	line-height: .9em;
+  	margin: -.05em 0 .05em 0;
 }
 #up_quick .btn.on .rotatable {
 	transform: none;
@@ -1264,10 +1287,9 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	display: none;
 }
 #wfs, #wzip, #wnp, #wm3u {
-	margin-right: .2em;
+	margin-left: .2em;
 	padding-right: .2em;
-	border: 1px solid var(--bg-u5);
-	border-width: 0 .1em 0 0;
+	border: 0 solid var(--bg-u5);
 }
 #wzip1 {
 	margin-right: 0em;
@@ -1282,7 +1304,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #wfm.act+#wzip1+#wzip+#wnp {
 	margin-left: .2em;
 	padding-left: .2em;
-	border-left-width: .1em;
+	border-left-width: 2px;
 }
 #wfs.act,
 #wfm.act {
@@ -1291,6 +1313,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #wtoggle,
 #wtoggle * {
 	line-height: 1em;
+	vertical-align: middle;
 }
 #wtoggle.sel #wzip,
 #wtoggle.m3u #wm3u,
@@ -1301,19 +1324,16 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #wtoggle.sel.np #wnp {
 	display: none;
 }
-#wfm a,
-#wnp a,
-#wm3u a,
-#zip1,
-#wzip a {
+#wtoggle a {
 	font-size: .5em;
-	padding: 0 .3em;
+	padding: .7em .5em;
 	margin: -.3em .1em;
-	position: relative;
 	display: inline-block;
 }
-#zip1 {
-	font-size: .38em;
+#wtoggle #zip1 {
+	padding: .5em;
+	margin: -.1em .1em;
+  	vertical-align: top;
 }
 #wm3u a {
 	margin: -.2em .1em;
@@ -1324,17 +1344,14 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	text-align: right;
 	line-height: 1.3em;
 	padding: 0 .3em 0 0;
-	border-width: 0 .25em 0 0;
+	border-width: 0 2px 0 0;
 }
 #wfm span,
 #wm3u span,
 #zip1 span,
 #wnp span {
-	font-size: .6em;
+	font-size: .7em;
 	display: block;
-}
-#zip1 span {
-	font-size: .9em;
 }
 #wnp span {
 	font-size: .7em;
@@ -1368,10 +1385,6 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #wzip a {
 	font-size: .4em;
 	margin: -.3em .1em;
-}
-#wtoggle.sel .l1 {
-	top: -.6em;
-	padding: .4em .3em;
 }
 #trackname {
 	font-size: small;
@@ -1809,6 +1822,7 @@ input.ssconf_v {
 	z-index: 5;
 	padding-bottom: 3em;
 }
+#wtoggle,
 #ghead,
 #tree,
 html {
@@ -2734,11 +2748,6 @@ html.c .modalcontent {
 	border: 1px solid var(--bg-u3);
 	color: var(--fg);
 }
-#s_nav .btn,
-#ghead .btn,
-#treeh.btn {
-	backdrop-filter: none;
-}
 #s_nav .btn:hover{
 	color: var(--a-hil);
 }
@@ -3383,11 +3392,18 @@ html.a .ghead {
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
 	box-shadow: var(--btn-bs);
-	backdrop-filter: blur(10px);
 }
-html.a .btn,
-html.c .btn {
-	backdrop-filter: blur(10px);
+html.a,
+html.cz {
+	.ghead,
+	#wfp .btn:not(:hover),
+	#ops,
+	#path,
+	#wtoggle,
+	#up_quick {
+		backdrop-filter: blur(10px);
+		background: var(--btn-bg);
+	}
 }
 html.c .setting:hover {
 	background: color-mix(var(--bg-u5) 30%, transparent);
@@ -3442,42 +3458,23 @@ html.ay #u2etas {
 }
 html.ay #tree li,
 html.ay #treepar {
-	border-color: #f7f7f7 var(--bg-max) #ddd var(--bg-max);
+	border-color: var(--bg) var(--bg-max) #ddd var(--bg-max);
 }
 html.ay #treesuperh,
 html.ay #treepar {
-	background: #f7f7f7;
+	background: var(--bg);
 	border-color: #ddd;
 }
 html.ay #tree {
 	border-color: #ddd;
 	box-shadow: 0 0 1em #ddd;
-	background: #f7f7f7;
+	background: var(--bg);
 }
 
 
 
 
 
-html.b.op_open #path {
-	margin-top: .2em;
-}
-html.b #srv_info {
-	display: none;
-}
-html.b #srv_info2 {
-	display: inline-block;
-}
-html.b #srv_info2:after {
-	content: '//';
-	margin: 0 .4em;
-}
-html.b #acc_info {
-	left: .5em;
-}
-html.b #wtoggle {
-	border-radius: .1em 0 0 0;
-}
 html.d #barpos,
 html.d #barbuf,
 html.d #pvol,
@@ -3682,17 +3679,17 @@ html.b #wrap.thin .ghead {
 	}
 }
 html:not(.a):not(.e) #treeh:after,
-html:not(.a):not(.e) #wrap.thin #ghead::after,
 html.a #treeh:not(.noa):after,
+html:not(.a):not(.e) #wrap.thin #ghead::after,
 html.a #wrap.thin #ghead:not(.noa)::after {
 	content: "";
 	position: sticky;
 	right: -.5em;
-	background: linear-gradient(to left, var(--bg-u2), transparent);
+	background: linear-gradient(to left, var(--scrl-hint), transparent);
 	width: 3em;
 	height: 3.5em;
 	display: inline-block;
-	margin: -1.4em;
+	margin: -1.4em -0.5em -1.6em -1.4em;;
 	pointer-events: none;
 }
 html.e #wrap.thin {
