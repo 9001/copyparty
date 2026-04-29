@@ -1830,9 +1830,6 @@ input.ssconf_v {
 	height: 1em;
 	overflow: hidden;
 }
-#ico1 {
-	cursor: pointer;
-}
 
 
 
@@ -1996,6 +1993,7 @@ html {
 	white-space-collapse: preserve;
 	position: relative;
 	vertical-align: top;
+	cursor: pointer;
 }
 #wfp .btn {
 	font-size: 1em;
@@ -2424,8 +2422,7 @@ a.btn,
 #rui label,
 #modal-ok,
 #modal-ng,
-#ops,
-#ico1 {
+#ops {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;

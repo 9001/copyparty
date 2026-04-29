@@ -1283,12 +1283,12 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3 id="h_favico"><span id="ico1">🎉</span> ' + L.cl_favico + '</h3>\n' +
+	'	<h3 id="h_favico">🎉 ' + L.cl_favico + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="icot" value="" ' + NOAC + ' style="width:1.3em" tt="' + L.cft_text + '" />' +
 	'		<input type="text" id="icof" value="" ' + NOAC + ' style="width:2em" tt="' + L.cft_fg + '" />' +
 	'		<input type="text" id="icob" value="" ' + NOAC + ' style="width:2em" tt="' + L.cft_bg + '" />' +
-	'		</td>\n' +
+	'		<a id="ico1" class="btn">🔄️</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +

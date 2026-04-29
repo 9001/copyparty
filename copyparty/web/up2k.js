@@ -3434,8 +3434,8 @@ function warn_uploader_busy(e) {
 tt.init();
 favico.init();
 ebi('ico1').onclick = function () {
-    var a = favico.txt == this.textContent;
-    swrite('icot', a ? 'c' : this.textContent);
+    var a = favico.txt == '🎉';
+    swrite('icot', a ? 'c' : '🎉');
     swrite('icof', a ? 'fc5' : '000');
     swrite('icob', a ? '222' : '');
     favico.init();
