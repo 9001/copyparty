@@ -18,7 +18,7 @@
 	--btn-bg-a: rgba(128,128,128,0.15);
 	--btn-bg-a: color-mix(var(--bg-max) 85%, var(--fg-max) 20%);
 	--btn-bg: rgba(128,128,128,0.15);
-	--btn-bg: linear-gradient(-5deg, color-mix(var(--btn-bg-a)70%, var(--a-gray)), color-mix(var(--btn-bg-a) 40%, transparent));
+	--btn-bg: linear-gradient(-5deg, color-mix(var(--btn-bg-a) 40%, transparent), color-mix(var(--btn-bg-a)70%, var(--a-gray)));
 	--btn-h-fg: var(--a-hil);
 	--btn-h-bg: color-mix(var(--a-gray) 45%, var(--bg-max));
 	--btn-1-fg: var(--bg);
@@ -135,7 +135,7 @@ html.az {
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
 }
 html.ay {
-	--btn-bg: linear-gradient(-5deg, color-mix(var(--btn-bg-a) 50%, transparent), color-mix(var(--btn-bg-a)80%, var(--a)));
+	--btn-bg: linear-gradient(-5deg, color-mix(var(--btn-bg-a)80%, var(--a)), color-mix(var(--btn-bg-a) 50%, transparent));
 }
 
 html.b {
