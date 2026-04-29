@@ -15,6 +15,10 @@
 	--fg-max: color-mix(#fefefe 95%, var(--a) 5%);
 	--bg-max: color-mix(#010101 95%, var(--a) 5%);
 
+	--a-hil: hsl(from color-mix(var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.2) l);
+	--a-dark: hsl(from color-mix(var(--a) 60%, var(--bg-max) 40%) h calc(s * 1.3) l); /* warning text etc */
+	--a-gray: hsl(from var(--a) h 0 l);
+
 	--fg: color-mix(var(--fg-max) 90%, var(--bg-max) 10%);
 	--fg-weak: color-mix(var(--fg-max) 70%, var(--bg-max) 30%);
 

@@ -14,10 +14,6 @@
 	--sel-fg: var(--bg-d1);
 	--sel-bg: var(--fg);
 
-	--a-hil: hsl(from color-mix(var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.2) l);
-	--a-dark: hsl(from color-mix(var(--a) 60%, var(--bg-max) 40%) h calc(s * 1.3) l); /* warning text etc */
-	--a-gray: hsl(from var(--a) h 0 l);
-
 	--btn-fg: var(--a);
 	--btn-bg-a: rgba(128,128,128,0.15);
 	--btn-bg-a: color-mix(var(--bg-max) 85%, var(--fg-max) 20%);
