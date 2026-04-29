@@ -204,7 +204,7 @@ html.y {
 	--f-sel-sh: #e80;
 
 	--fm-off: #c4a;
-	--mp-sh: #bbb;
+	--mp-sh: #0002;
 	--mp-b-bg: transparent;
 
 	text-shadow: none;
@@ -1893,7 +1893,7 @@ input.ssconf_v {
 	overflow-y: auto;
 	-ms-scroll-chaining: none;
 	overscroll-behavior-y: none;
-	box-shadow: 0 0 1em var(--bg-d2), 0 -1px 0 rgba(128,128,128,0.3);
+	box-shadow: 0 0 1em var(--mp-sh), 0 -1px 0 rgba(128,128,128,0.3);
 	border: 1px solid var(--bg-u3);
 	transition: width 0.15s;
 	z-index: 5;
@@ -2758,7 +2758,7 @@ html.y #bbox-overlay figcaption a {
 	max-width: 66.6em;
 	position: relative;
 	overflow: auto;
-	box-shadow: .1em .2em 1em var(--bg-d2);
+	box-shadow: .1em .2em 1em var(--mp-sh);
 }
 html.c .modalcontent {
 	background: var(--bg-u2);
@@ -2783,7 +2783,7 @@ html.c .modalcontent {
 	right: 0;
 	margin: .5em;
 	color: var(--fg);
-	box-shadow: 0 0 .3em var(--bg-d3);
+	box-shadow: 0 0 .3em var(--mp-sh);
 	border: 1px solid var(--bg-u3);
 }
 .closepane {
@@ -2823,6 +2823,11 @@ html.c .modalcontent {
 	padding-right: 2em;
 	border: 1px solid var(--bg-u3);
 	color: var(--fg);
+}
+#s_nav .btn,
+#ghead .btn,
+#treeh.btn {
+	backdrop-filter: none;
 }
 #s_nav .btn:hover{
 	color: var(--a-hil);
