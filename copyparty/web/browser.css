@@ -549,6 +549,8 @@ html.y #path {
 	top: -.3em;
 	border-spacing: 0;
 	position: relative;
+	margin: .2em -.5em;
+  	padding: 0 .5em;
 }
 #files tbody a {
 	display: block;
