@@ -963,6 +963,21 @@ html.dz #flogout {
 	margin: -3px -2px;
 	padding: 4px 3px;
 }
+.sel .gselchk,
+.imgcontainer:hover .gselchk {
+	display: block;
+}
+.gselchk {
+	position: absolute;
+	display: none;
+	top: .3em;
+	right: .3em;
+	z-index: 2;
+	font-size: 1.15em;
+	width: 1em;
+  	height: 1em;
+	opacity: .69;
+}
 
 @keyframes rotate {
 	100% {

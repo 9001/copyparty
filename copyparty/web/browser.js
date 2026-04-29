@@ -6117,6 +6117,16 @@ var thegrid = (function () {
 		return gclick.call(this, e, false);
 	}
 
+	function gselclick(e) {
+
+		var oth = ebi(this.closest('a').getAttribute('ref')),
+			td = oth.closest('td').nextSibling,
+			tr = td.parentNode;
+		td.onclick.call(td, e);
+		clmod(this, 'sel', clgot(tr, 'sel'));
+		this.checked = clgot(tr, 'sel');
+	}
+
 	function gclick2(e) {
 		if (ctrl(e) || !r.sel)
 			return true;
@@ -6337,7 +6347,7 @@ var thegrid = (function () {
 				ihref += "&raster";
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
-				'"' + ac + ' ttt="' + esc(name) + '"><div class="imgcontainer"><img style="height:' +
+				'"' + ac + ' ttt="' + esc(name) + '"><div class="imgcontainer"><input type="checkbox" class="gselchk"></input><img style="height:' +
 				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" src="' +
 				ihref + '" /></div><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
@@ -6356,6 +6366,11 @@ var thegrid = (function () {
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			ths[a].ondblclick = gclick2;
 			ths[a].onclick = gclick1;
+		}
+
+		var chks = QSA('.gselchk');
+		for (var a = 0, aa = chks.length; a < aa; a++) {
+			chks[a].onclick = gselclick;
 		}
 
 		r.dirty = false;
@@ -9403,7 +9418,7 @@ var msel = (function () {
 			delete r.hist[get_evpath()];
 	};
 	r.seltgl = function (e) {
-		ev(e);
+		e.stopPropagation();
 		var tr = this.parentNode,
 			id = tr2id(tr);
 
