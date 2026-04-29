@@ -5,6 +5,7 @@
 * drag n drop support within the browser window to move files or folders
 * custom accent color setting added. works best for light and dark themes (the first 4 in the list)
 * right click (long press) on mobile is now possible
+* selection checkboxes on items in grid view
 * the tree and path can be visible at the same time
 * settings and upload are now a popup/modal
 * settings can be navigated via sections and former tooltip info is now always visible
@@ -42,8 +43,7 @@
 
 ## 🌠 fun facts
 
-* all themes should keep working, even the Window95 ones
-* web UI verified for new 3DS
+* all themes should keep working, even the Windows95 ones
 
 ## 😔 unfun facts
 
