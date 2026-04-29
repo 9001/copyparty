@@ -1223,7 +1223,7 @@ html:not(.e) #ggrid>a.dir:before {
 	border-radius: calc(var(--radius) / 2);
 }
 #wtico,
-#up_quick,
+#up_quick.open,
 #wtoggle,
 #widgeti {
 	background: #cde;
