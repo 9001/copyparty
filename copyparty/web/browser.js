@@ -9111,7 +9111,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'evil blue'];
+			names = ['classic dark', 'classic light', 'flat dark', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'evil blue'];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));

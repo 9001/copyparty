@@ -20,9 +20,6 @@ html.y {
 	--bg-u5: #ccc;
 	--bg-max: #fff;
 }
-html.bz {
-	--bg-u2: #202231;
-}
 @font-face {
 	font-family: 'scp';
 	font-display: swap;

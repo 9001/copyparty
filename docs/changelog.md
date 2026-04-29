@@ -3,7 +3,7 @@
 
 ## 🧪 new features
 * drag n drop support within the browser window to move files or folders
-* custom accent color setting added
+* custom accent color setting added. works best for light and dark themes (the first 4 in the list)
 * right click (long press) on mobile is now possible
 * the tree and path can be visible at the same time
 * settings and upload are now a popup/modal
@@ -38,11 +38,16 @@
 * "folder up" / "next sibling" / "previous sibling" are now icon buttons at the top
 * new look for the login screen
 * file list makes it easier to identify folders via an added folder emoji to folder names. to disable this, add the following style: `tr:has(a.dir) td:nth-child(2) a::before { display: none; }`
+* pm-monokai theme has become "flat dark"
 
 ## 🌠 fun facts
 
 * all themes should keep working, even the Window95 ones
 * web UI verified for new 3DS
+
+## 😔 unfun facts
+
+* added a setting that gets rid of (most) emojis
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  

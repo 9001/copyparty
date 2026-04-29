@@ -250,49 +250,10 @@ html.b {
 	--mp-b-bg: transparent;
 }
 html.bz {
-	--fg: #cce;
-	--fg-weak: #bbd;
-
-	--bg-u5: #3b3f58;
-	--bg-u3: #1e2130;
-	--bg-u1: #1e2130;
-	--bg: #11121d;
-	--bg-d1: #232536;
-	--bg-d2: #34384e;
-	--bg-d3: #34384e;
-
-	--row-alt: #181a27;
-
-	--a: #eebb66;
-	--txt-sh: a;
-
-	--u2-tab-b1: var(--bg-u5);
-	--u2-tab-1-fg: var(--fg-max);
-	--u2-tab-1-bg: var(--bg);
-
-	--srv-1: #79b;
-
-	--g-sel-bg: #ba2959;
-	--g-fsel-bg: #e6336e;
-
-	--f-h-b1: #34384e;
-	--mp-sh: #11121d;
-	/*--mp-b-bg: #2c3044;*/
-	--f-play-bg: var(--btn-1-bg);
+	--a: #18cdaf;
 }
 html.by {
-	--bg: #f2f2f2;
-
-	--row-alt: #f9f9f9;
-
-	--a: #07a;
-
-	--op-aa-bg: #fff;
-
-	--u2-sbtn-b1: #c70;
-	--u2-tab-1-b1: #999;
-	--u2-tab-1-b2: #aaa;
-	--u2-b-fg: #444;
+	--a: #1fa215;
 }
 html.c {
 	font-weight: bold;
@@ -3641,7 +3602,6 @@ html.dy *,
 html.cy *,
 html.b * {
 	box-shadow: none !important;
-	backdrop-filter: none !important;
 }
 html.b #path,
 html.b #ops,
