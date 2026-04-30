@@ -107,7 +107,7 @@
 	--f-h-b1: rgba(128,128,128,0.7);
 
 	--f-play-bg: var(--a-dark);
-	--f-play-fg: var(--bg-max);
+	--f-play-fg: var(--fg-max);
 	--f-sel-sh: var(--a);
 	--f-gray: #999;
 
@@ -877,12 +877,21 @@ html.dz #flogout {
 #files a.doc.bri {
 	color: var(--tab-alt);
 }
-#files a.play {
+tr td:nth-child(1) a {
+	border-radius: var(--radius);
+}
+/* #files a.play {
 	color: var(--a-dark);
 	padding: .3em;
 	margin: -.3em;
+} */
+tr.play td:nth-child(2) a::before {
+  content: "▶";
 }
-#files tbody tr.play td,
+tr.play td:nth-child(1) a {
+  background: var(--a);
+}
+/* #files tbody tr.play td,
 #files tbody tr.play td+td,
 #files tbody tr.play div a {
 	background: var(--f-play-bg);
@@ -897,7 +906,7 @@ html.dz #flogout {
 	background: var(--btn-1h-bg);
 	box-shadow: var(--btn-1h-bs);
 	border-bottom: var(--btn-1h-bb);
-}
+} */
 #ggrid {
 	margin: -.2em -.5em;
 }
