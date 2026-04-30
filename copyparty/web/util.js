@@ -2266,7 +2266,7 @@ var favico = (function () {
 
     var gx = function (txt) {
         return (svg_decl +
-            '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">\n' +
+            '<svg version="1.1" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">\n' +
             (r.bg ? '<rect width="100%" height="100%" rx="16" fill="#' + r.bg + '" />\n' : '') +
             '<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"' +
             ' font-family="sans-serif" font-weight="bold" font-size="64px"' +
