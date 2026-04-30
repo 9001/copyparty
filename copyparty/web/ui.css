@@ -95,7 +95,7 @@ html {
 	right: -1em;
 	line-height: 1.5em;
 	padding: 1em 2em 1em 1em;
-	border-width: .4em 0;
+	border-width: 1px;
 	overflow-wrap: break-word;
 	transform: translateX(100%);
 	transition:
@@ -132,16 +132,15 @@ html {
 	position: absolute;
 	overflow: hidden;
 	right: 0;
-	top: -.1em;
+	top: 0;
 	opacity: 0;
 	padding: .3em 0;
-	margin: -.3em 0 0 0;
 	line-height: 1.3em;
 	color: #000;
 	border: none;
 	outline: none;
 	text-shadow: none;
-	border-radius: .5em;
+	border-radius: .4em;
 	transition: left .3s, width .3s, padding .3s, opacity .3s;
 }
 #toastb {
@@ -237,13 +236,13 @@ html {
 }
 #tt.show {
 	padding: 1em 1.3em;
-	border-width: .4em 0;
+	border-width: 1px;
 	height: auto;
 	opacity: 1;
 }
 #tt.show.b {
 	padding: 1.5em 2em;
-	border-width: .5em 0;
+	/* border-width: .5em 0; */
 }
 .logue code,
 #modalc code,
