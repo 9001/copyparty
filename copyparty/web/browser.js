@@ -6151,10 +6151,14 @@ var thegrid = (function () {
 			tr = td.parentNode;
 
 		if (!is_srch && ((r.sel && !dbl && !ctrl(e)) || (treectl.csel && (e.shiftKey || ctrl(e))))) {
+			ev(e);
 			td.onclick.call(td, e);
 			if (e.shiftKey)
 				return r.loadsel();
 			clmod(this, 'sel', clgot(tr, 'sel'));
+
+			var chk = this.getElementsByTagName('input')[0];
+			if(chk) chk.checked = clgot(tr, 'sel');
 		}
 		else if (in_tree && !have_sel)
 			in_tree.click();
@@ -6218,6 +6222,9 @@ var thegrid = (function () {
 				cl += ' dir';
 
 			ths[a].className = cl;
+
+			var chk = ths[a].getElementsByTagName('input')[0];
+			if(chk) chk.checked = cl.match(/\bsel\b/);
 		}
 
 		var sp = ['unsearch', 'moar'];
@@ -6347,7 +6354,10 @@ var thegrid = (function () {
 				ihref += "&raster";
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
-				'"' + ac + ' ttt="' + esc(name) + '"><div class="imgcontainer"><input type="checkbox" class="gselchk"></input><img style="height:' +
+				'"' + ac + ' ttt="' + esc(name) + '">' +
+				'<div class="imgcontainer">' +
+				'<input type="checkbox" class="gselchk"></input>' +
+				'<img style="height:' +
 				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" src="' +
 				ihref + '" /></div><span' + ac + '>' + ao.innerHTML + '</span></a>');
 		}
@@ -9419,6 +9429,7 @@ var msel = (function () {
 	};
 	r.seltgl = function (e) {
 		e.stopPropagation();
+		ev(e)
 		var tr = this.parentNode,
 			id = tr2id(tr);
 
@@ -10732,6 +10743,9 @@ function reload_browser() {
 			if (ehidden) {
 				var tr = ehidden.closest('tr');
 				if (tr) clmod(tr, 'sel', m);
+				
+				var chk = el.getElementsByTagName('input')[0];
+				if(chk) chk.checked = m;
 			}
 		}
 	}
