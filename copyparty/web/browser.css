@@ -1295,7 +1295,6 @@ html:not(.e):not(.d) #up_quick .btn.on {
 
 	font-size: 1.2em;
 	line-height: .9em;
-  	margin: -.05em 0 .05em 0;
 }
 #up_quick .btn.on .rotatable {
 	transform: none;
