@@ -7964,8 +7964,8 @@ var treectl = (function () {
 	function menter(e) {
 		var p = this.offsetParent,
 			pp = p.offsetParent,
-			ppy = pp.offsetTop,
-			y = this.offsetTop + p.offsetTop + ppy - p.scrollTop - pp.scrollTop - (ppy ? document.documentElement.scrollTop : 0);
+			ppy = pp ? pp.offsetTop : 0,
+			y = this.offsetTop + p.offsetTop + ppy - p.scrollTop - (pp ? pp.scrollTop : 0) - (ppy ? document.documentElement.scrollTop : 0);
 
 		this.style.top = y + 'px';
 		this.style.position = 'fixed';
