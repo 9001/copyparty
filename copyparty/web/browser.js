@@ -10489,7 +10489,7 @@ var rcm = (function () {
 		var vw = document.documentElement.clientWidth;
 
 		var maxh = Math.min(y, vh / 2);
-		menu.style.maxHeight = 'calc(100vh - ' + maxh + 'px - 2em)';
+		menu.style.maxHeight = 'calc(100% - ' + maxh + 'px - 2em)';
 		
 		if(y > vh / 2){
 			// low click => menu upwards
