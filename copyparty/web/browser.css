@@ -85,10 +85,10 @@
 	--g-sel-fg: var(--fg-max);
 	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 30%, var(--bg) 70%);
 	--g-sel-b1: var(--a-dark);
-	--g-sel-sh: hsl(from var(--a) h 105% 30%);
+	--g-sel-sh: hsl(from var(--a) h calc(s * 1.05) calc(l * .3));
 	--g-fsel-bg: color-mix(in xyz, var(--g-sel-b1) 70%, var(--bg-max) 30%);
 	--g-fsel-b1: var(--a);
-	--g-fsel-ts: hsl(from var(--a) h 105% 30%);
+	--g-fsel-ts: hsl(from var(--a) h calc(s * 1.05) calc(l * .3));
 	--g-dfg: #bbb;
 	--g-fg: var(--fg);
 	--g-bg: var(--bg-u2);
@@ -299,10 +299,6 @@ html.dz {
 
 	--tree-bg: #010;
 
-	--g-sel-b1: #c37;
-	--g-sel-sh: #b36;
-	--g-fsel-b1: #d48;
-
 	--f-h-b1: #3b3;
 
 	text-shadow: none;
@@ -367,6 +363,7 @@ html.dy {
 	--tree-bg: #fff;
 
 	--g-sel-bg: #000;
+	--g-sel-fg: #fff;
 	--g-fsel-bg: #444;
 	--g-fsel-ts: #000;
 	--g-fg: a;
@@ -388,6 +385,14 @@ html.dy {
 	--fm-off: a;
 	--mp-sh: a;
 	--mp-b-bg: #fff;
+}
+html.dy #files tr.sel a, 
+html.dy #files tr.sel a.play {
+	color: #fff;
+}
+html.dy tr.play td:nth-child(1) a {
+  background: #fff;
+  border: #000 solid 1px;
 }
 html.dy #spaceUsed_bar {
 	background: #000;
@@ -624,7 +629,7 @@ a:hover {
 }
 #files tbody tr:hover td,
 #files tbody tr:hover td+td {
-	background: color-mix(var(--bg-max) 30%, transparent);
+	background: color-mix(var(--a) 15%, transparent);
 }
 a.dir {
 	color: var(--a);
@@ -889,7 +894,9 @@ tr.play td:nth-child(2) a::before {
   content: "▶";
 }
 tr.play td:nth-child(1) a {
-  background: var(--a);
+  background: var(--btn-1-bg);
+  color:var(--btn-1-fg);
+  text-shadow: none;
 }
 /* #files tbody tr.play td,
 #files tbody tr.play td+td,
@@ -4109,6 +4116,10 @@ html.e #ggrid > a.sel {
 html.e #files tr.sel a, #files tr.sel a.play {
 	color: #fff;
 }
+html.e tr.play td:nth-child(1) a {
+  	background: var(--g-fsel-bg);
+	color: #fff;
+}
 html.e .pfp {
 	background: transparent;
 	color: var(--fg);
@@ -4205,9 +4216,6 @@ html.e #files thead th {
 }
 #files td {
   background: var(--w2);
-}
-html.e #files tr {
-  background-color: var(--black);
 }
 html.e #srv_info span,
 html.e label {
