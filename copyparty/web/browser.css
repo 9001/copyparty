@@ -4099,9 +4099,16 @@ html.ez {
 html.e {
   text-shadow: none;
   --bg-u1: #0002;
+  --g-sel-fg: #fff;
 }
 html.e * {
   border-radius: 0 !important;
+}
+html.e #ggrid > a.sel {
+	box-shadow: none;
+}
+html.e #files tr.sel a, #files tr.sel a.play {
+	color: #fff;
 }
 html.e .pfp {
 	background: transparent;
