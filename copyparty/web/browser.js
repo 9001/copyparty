@@ -6118,13 +6118,12 @@ var thegrid = (function () {
 	}
 
 	function gselclick(e) {
-
 		var oth = ebi(this.closest('a').getAttribute('ref')),
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
+		//this.checked = !this.checked;
 		td.onclick.call(td, e);
-		clmod(this, 'sel', clgot(tr, 'sel'));
-		this.checked = clgot(tr, 'sel');
+		// clmod(this, 'sel', clgot(tr, 'sel'));
 	}
 
 	function gclick2(e) {
@@ -9429,7 +9428,7 @@ var msel = (function () {
 	};
 	r.seltgl = function (e) {
 		e.stopPropagation();
-		ev(e)
+
 		var tr = this.parentNode,
 			id = tr2id(tr);
 
