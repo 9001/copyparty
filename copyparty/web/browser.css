@@ -3423,7 +3423,7 @@ html.a,
 html.cz {
 	.ghead,
 	#wfp .btn:not(:hover),
-	#treeToggleBtn,
+	#treeToggleBtn:not(:hover):not(.on),
 	#ops,
 	#path,
 	#wtoggle,
