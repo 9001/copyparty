@@ -3739,7 +3739,7 @@ html.e #wrap.thin {
 		margin: .8em;
 	}
 	html:not(.e) #srv_name {
-		padding-top: 1em;
+		padding-top: .9em;
 		padding-bottom: .6em;
 		margin-left: 2.9em;
 	}
