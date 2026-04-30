@@ -3822,6 +3822,11 @@ html.e #wrap.thin {
 			top: 7.5em;
 		}
 	}
+	.gselchk {
+		font-size: 1.4em;
+		top: 5px;
+		right: 5px;
+	}
 }
 
 @media (max-width: 32em) {
