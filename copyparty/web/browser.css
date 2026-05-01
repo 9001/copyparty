@@ -2814,11 +2814,18 @@ html.c .modalcontent {
 	top: -.4em;
 	bottom: -.1em;
 }
+.s_section {
+	border-radius: var(--radius);
+	margin-bottom: 1.5em;
+}
+.s_section .setting:last-child {
+	border-radius: 0 0 5px 5px;
+	border-radius: 0 0 var(--radius) var(--radius);
+}
 .setting{
 	padding: .5em;
 	border: var(--bg-u5) solid 1px;
 	border-top: 0;
-	margin: -1.5em 0 1.5em 0;
 	overflow-x: auto;
 }
 .modal .setting:hover{
@@ -2834,7 +2841,7 @@ html.c .modalcontent {
 	border-radius: 5px 5px 0 0;
 	border-radius: var(--radius) var(--radius) 0 0;
 	padding: .5em;
-	margin: 0 0 1.3em 0;
+	margin: 0;
 }
 #s_list .sub_section h3 {
 	background: none;
@@ -3169,7 +3176,6 @@ html.c .modalcontent {
 	border-radius: var(--radius) var(--radius) 0 0;
 }
 details .setting {
-	margin: 0;
 	border-left: none;
 	border-right: none;
 }
