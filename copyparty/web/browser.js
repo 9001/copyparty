@@ -1327,9 +1327,7 @@ ebi('op_cfg').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 	musicSettings +
-	'<div><h3 id="h_keytype">🎼 ' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	'<div><h3 id="h_hidden">👁️ ' + L.cl_hiddenc + ' &nbsp;</h3><div>' + 
-	(MOBILE ? '<a id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a id="hcolsr">' + L.cl_reset + '</a><div id="hcols"></div></div></div>'
+	'<div><h3 id="h_keytype">🎼 ' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n'
 );
 
 // modalize settings
@@ -5992,10 +5990,27 @@ var thegrid = (function () {
 	ebi('gridicon_template').innerHTML = svg_grid;
 	ebi('listicon_template').innerHTML = svg_list;
 
-	var g_tgl = mknod('a', 'wtgrid', ebi('gridicon_template').outerHTML + ebi('listicon_template').outerHTML);
-	for(var i = 0; i < g_tgl.childNodes.length; i++)
-		clmod(g_tgl.childNodes[i], 'on', 't');
-	ebi('wtc').appendChild(g_tgl);
+	var ico1 = ebi('gridicon_template').cloneNode(true);
+	var ico2 = ebi('listicon_template').cloneNode(true);
+	clmod(ico1, 'on', 't');
+	clmod(ico2, 'on', 't');
+	ebi('wtc').innerHTML = (
+		ico1.outerHTML +
+		ico2.outerHTML +
+		'<details id="hcol_dd">' +
+			'<summary id="h_hidden">' + L.cl_hiddenc + '</summary>' + 
+		'<div id="hcol_content" class="setting">' +
+			'<a class="btn tgl" href="#" id="hcolsh">' + L.cl_hidec + '</a>' +
+			'<a class="btn" id="hcolsr">' + L.cl_reset + '</a>' +
+			'<div class="divider_h"></div>' +
+			'<div id="hcols"></div>' +
+		'</div>' +
+		'</details>'
+	);
+
+	ebi('h_hidden').onclick = function () {
+		clmod(this.parentElement, 'open', 't');
+	}
 
 	var r = {
 		'sz': clamp(fcfg_get('gridsz', 10), 4, 80),
@@ -6061,9 +6076,6 @@ var thegrid = (function () {
 		qsr('#docname');
 		if (treectl)
 			treectl.textmode(false);
-
-		if (filecols)
-			filecols.uivis();
 
 		aligngriditems();
 		restore_scroll();
@@ -6514,10 +6526,9 @@ var thegrid = (function () {
 		swrite('ga_thresh', r.gathr = (isNum(n) ? n : 0) || 70);
 	};
 	
-	ebi('wtgrid').onclick =
-	ebi('gridicon_template').onclick =
-	ebi('listicon_template').onclick =
-		ebi('griden').onclick;
+	var gtgls = QSA('.grdbtn');
+	for(var a = 0; a < gtgls.length; a++)
+		gtgls[a].onclick = ebi('griden').onclick;
 
 	return r;
 })();
@@ -8851,12 +8862,6 @@ var filecols = (function () {
 		r.toggle(t.textContent);
 	}
 
-	r.uivis = function () {
-		var hcols = ebi('hcols');
-		var hcolDiv = hcols.parentElement.parentElement;
-		QS("a[href='#" + hcolDiv.id + "']").style.display = hcolDiv.style.display = ((!thegrid || !thegrid.en) && (hidden.length || MOBILE)) ? 'block' : 'none';
-	};
-
 	r.set_style = function (unhide) {
 		hidden.sort();
 
@@ -8874,7 +8879,6 @@ var filecols = (function () {
 		}
 		hcols.innerHTML = html.join('\n');
 		hcols.onclick = hcols_click;
-		r.uivis();
 		r.add_btns();
 
 		var ohidden = [],
@@ -8933,26 +8937,26 @@ var filecols = (function () {
 		r.reset(true);
 	};
 
-	if (MOBILE)
-		ebi('hcolsh').onclick = function (e) {
-			ev(e);
-			if (r.picking)
-				return r.unpick();
+	ebi('hcolsh').onclick = function (e) {
+		ev(e);
+		clmod(this, 'on', !r.picking)
+		if (r.picking)
+			return r.unpick();
 
-			var lbs = QSA('#files>thead th');
-			for (var a = 0; a < lbs.length; a++) {
-				lbs[a].onclick = function (e) {
-					ev(e);
-					if (toast.tag == 'pickhide')
-						toast.hide();
+		var lbs = QSA('#files>thead th');
+		for (var a = 0; a < lbs.length; a++) {
+			lbs[a].onclick = function (e) {
+				ev(e);
+				if (toast.tag == 'pickhide')
+					toast.hide();
 
-					r.hide(e.target.textContent);
-				};
+				r.hide(e.target.textContent);
 			};
-			r.picking = true;
-			clmod(ebi('files'), 'hhpick', 1);
-			toast.inf(0, L.cl_hpick, 'pickhide');
 		};
+		r.picking = true;
+		clmod(ebi('files'), 'hhpick', 1);
+		toast.inf(0, L.cl_hpick, 'pickhide');
+	};
 
 	r.unpick = function () {
 		r.picking = false;

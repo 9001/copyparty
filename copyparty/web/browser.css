@@ -141,6 +141,7 @@ html.ay {
 html.b {
 	--btn-bs: 0 .05em 0 var(--bg-d3) inset;
 	--btn-1-bs: 0 .05em 0 var(--btn-1h-bg) inset;
+	--btn-bg: color-mix(var(--bg-u5), transparent);
 
 	--tree-bg: var(--bg);
 
@@ -648,9 +649,10 @@ html.y #files thead th {
 	box-shadow: 0 1px 0 rgba(0,0,0,0.12);
 }
 html #files.hhpick thead th {
-	color: #f7d;
-	background: #000;
-	box-shadow: .1em .2em 0 #f6c inset, -.1em -.1em 0 #f6c inset;
+	color: rgb(0, 0, 0);
+	background: #df5555;
+	text-shadow: none;
+	border: red solid 2px;
 }
 #files td {
 	margin: 0;
@@ -1165,23 +1167,14 @@ html:not(.e) #ggrid>a.dir:before {
 #np_inf {
 	height: 0;
 }
-#fshr,
-#wtgrid {
+#fshr {
 	position: relative;
 	font-size: .9em;
 	top: -.04em;
 	margin-right: .3em;
 }
-#wtc {
-	margin-top: -.2em;
-	font-size: 1.2em;
-}
 #wtgrid {
-	display: inline-block;
-	position: relative;
-  	top: 0;
 	padding: 0;
-	margin: .2em;
 }
 .btn.svgIcon {
 	width: 1.5em;
@@ -2143,6 +2136,7 @@ html.a .btn {
 	display: none;
 }
 .ghead {
+	position: sticky;
 	background: #fff;
 	background: var(--bg-u2);
 	border-radius: 5px;
@@ -2150,13 +2144,9 @@ html.a .btn {
 	padding: 0 .2em;
 	line-height: 2.3em;
 	margin-bottom: 1.5em;
-}
-#hdoc,
-#ghead {
-	position: sticky;
+	z-index: 3;
 	margin-top: -.5em;
 	top: 3.7em;
-	z-index: 3;
 	transition: opacity .15s;
 }
 .ghead .btn {
@@ -2172,6 +2162,27 @@ html.a .btn {
 .ghead>span {
 	white-space: pre;
 	padding-left: .3em;
+}
+.ghead details {
+	display: inline-block;
+	background: transparent;
+	box-shadow: var(--btn-bs);
+}
+.ghead summary {
+	background: var(--btn-bg);
+}
+.ghead details .setting {
+	position: absolute;
+	background: var(--bg-u2);
+	border: 1px solid var(--bg-u3);
+  	border-bottom: var(--btn-bb);
+	border-radius: var(--radius);
+	max-width: 11em;
+	max-height: 30vh;
+	overflow-y: auto;
+}
+#hcol_content:has(#hcolsh.on) {
+  margin-top: 3.5em;
 }
 #tailbtns {
 	display: none;
@@ -2771,6 +2782,11 @@ html.c .modalcontent {
 	width: 1px;
 	margin: 1em 0;
 }
+.divider_h {
+	background: var(--bg);
+	height: 1px;
+	margin: .3em 0;
+}
 #s_nav .btn::after{
 	position: absolute;
 	content: ">";
@@ -2803,7 +2819,7 @@ html.c .modalcontent {
 	margin: -1.5em 0 1.5em 0;
 	overflow-x: auto;
 }
-.setting:hover{
+.modal .setting:hover{
 	background: var(--bg-u1);
 }
 .s_desc{
@@ -3150,7 +3166,7 @@ html.c .modalcontent {
 	border-bottom: none;
 	border-radius: var(--radius) var(--radius) 0 0;
 }
-#u2conf .setting {
+details .setting {
 	margin: 0;
 	border-left: none;
 	border-right: none;
@@ -3355,7 +3371,7 @@ summary {
 	border-radius: var(--radius);
 	font-size: large;
 }
-summary:hover {
+.modal summary:hover {
 	background: var(--bg-u3);
 }
 #actionsArea {
@@ -3439,31 +3455,15 @@ html.cz {
 		background: var(--btn-bg);
 	}
 }
-html.c .setting:hover {
+html.c .modal .setting:hover {
 	background: color-mix(var(--bg-u5) 30%, transparent);
 }
-/* html.c #u2btn,
-html.a #u2btn {
-	color: #eee;
-	background: var(--bg-u5);
-	background: -moz-linear-gradient(top, #367 0%, #489 50%, #38788a 51%, #367 100%);
-	background: -webkit-linear-gradient(top, #367 0%, #489 50%, #38788a 51%, #367 100%);
-	background: linear-gradient(to bottom, #367 0%, #489 50%, #38788a 51%, #367 100%);
-	box-shadow: .4em .4em 0 var(--bg-d3);
-	border: 1px solid #222;
-} */
 html.ay #u2btn {
 	box-shadow: .4em .4em 0 #ccc;
 }
 html.dz #u2btn {
 	letter-spacing: -.033em;
 }
-/* html.c #op_up2k.srch #u2btn,
-html.a #op_up2k.srch #u2btn {
-	background: linear-gradient(to bottom, #ca3 0%, #fd8 50%, #fc6 51%, #b92 100%);
-	text-shadow: 1px 1px 1px #fc6;
-	color: #333;
-} */
 html.c #u2conf #u2btn,
 html.a #u2conf #u2btn {
 	padding: .6em 0;
@@ -3555,9 +3555,7 @@ html.b * {
 	box-shadow: none !important;
 }
 html.b #path,
-html.b #ops,
-html.b #pctl .btn:not(:hover),
-html.b .btn:not(:hover):not(.on) {
+html.b #ops {
 	background: color-mix(var(--bg-u5), transparent);
 }
 html.b #treepar {
@@ -3691,7 +3689,7 @@ html.e #pathBar.thin #path {
 }
 html:not(.e) #wrap.thin {
 	.ghead {
-		top: 7.4em;
+		top: 7em;
 		padding: .3em;
 	}
 	#ghead {
@@ -3831,10 +3829,8 @@ html.e #wrap.thin {
 	#pathBar.thin #wfp.shifted {
 		margin-left: 2em;
 	}
-	#wrap.thin {
-		.ghead {
-			top: 7.5em;
-		}
+	html:not(.e) #wrap.thin .ghead {
+		top: 7.3em;
 	}
 	.gselchk {
 		font-size: 1.4em;
