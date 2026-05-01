@@ -37,7 +37,7 @@ Ls.hmn = {
 	"tt": "Hymmnos",
 
 	"cols": {
-		"c": "action buttons",
+		"!": "action buttons",
 		"dur": "duration",
 		"q": "quality / bitrate",
 		"Ac": "audio codec",
@@ -46,7 +46,7 @@ Ls.hmn = {
 		"Ahash": "audio checksum",
 		"Vhash": "video checksum",
 		"Res": "resolution",
-		"T": "filetype",
+		"Type": "filetype",
 		"aq": "audio quality / bitrate",
 		"vq": "video quality / bitrate",
 		"pixfmt": "subsampling / pixel structure",

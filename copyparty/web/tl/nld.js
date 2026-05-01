@@ -5,7 +5,7 @@ Ls.nld = {
 	"tt": "Nederlands",
 
 	"cols": {
-		"c": "Action knoppen",
+		"!": "Action knoppen",
 		"dur": "Duratie",
 		"q": "Kwaliteit / bitrate",
 		"Ac": "Audio codec",
@@ -14,7 +14,7 @@ Ls.nld = {
 		"Ahash": "Audio checksum",
 		"Vhash": "Video checksum",
 		"Res": "Resolution",
-		"T": "Bestandstype",
+		"Type": "Bestandstype",
 		"aq": "Audio kwaliteit / bitrate",
 		"vq": "Video kwaliteit / bitrate",
 		"pixfmt": "Subsampling / pixel structure",

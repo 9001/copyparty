@@ -5,7 +5,7 @@ Ls.tur = {
 	"tt": "Türkçe",
 
 	"cols": {
-		"c": "işlem butonları",
+		"!": "işlem butonları",
 		"dur": "süre",
 		"q": "kalite / bitrate",
 		"Ac": "ses kodlaması",
@@ -14,7 +14,7 @@ Ls.tur = {
 		"Ahash": "ses denetim toplamı",
 		"Vhash": "video denetim toplamı",
 		"Res": "çözünürlük",
-		"T": "dosya türü",
+		"Type": "dosya türü",
 		"aq": "ses kalitesi / bitrate",
 		"vq": "video kalitesi / bitrate",
 		"pixfmt": "subsampling / pixel yapısı",

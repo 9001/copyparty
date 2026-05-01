@@ -21,7 +21,7 @@ if (1)
 		"tt": "English",
 
 		"cols": {
-			"c": "action buttons",
+			"!": "action buttons",
 			"dur": "duration",
 			"q": "quality / bitrate",
 			"Ac": "audio codec",
@@ -30,7 +30,7 @@ if (1)
 			"Ahash": "audio checksum",
 			"Vhash": "video checksum",
 			"Res": "resolution",
-			"T": "filetype",
+			"Type": "filetype",
 			"aq": "audio quality / bitrate",
 			"vq": "video quality / bitrate",
 			"pixfmt": "subsampling / pixel structure",
@@ -8821,7 +8821,7 @@ function mk_files_header(taglist) {
 		html.push(tag + '</span></th>');
 	}
 	html = html.concat([
-		'<th name="ext"><span>T</span></th>',
+		'<th name="ext"><span>Type</span></th>',
 		'<th name="ts"><span>Date</span></th>',
 		'</tr></thead>',
 	]);

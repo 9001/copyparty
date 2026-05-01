@@ -5,7 +5,7 @@ Ls.fin = {
 	"tt": "Suomi",
 
 	"cols": {
-		"c": "toimintopainikkeet",
+		"!": "toimintopainikkeet",
 		"dur": "kesto",
 		"q": "laatu / bittinopeus",
 		"Ac": "äänikoodekki",
@@ -14,7 +14,7 @@ Ls.fin = {
 		"Ahash": "äänen tarkistussumma",
 		"Vhash": "videon tarkistussumma",
 		"Res": "resoluutio",
-		"T": "tiedostotyyppi",
+		"Type": "tiedostotyyppi",
 		"aq": "äänenlaatu / bittinopeus",
 		"vq": "kuvalaatu / bittinopeus",
 		"pixfmt": "alinäytteistys / pikselirakenne",

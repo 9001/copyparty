@@ -5,7 +5,7 @@ Ls.deu = {
 	"tt": "Deutsch",
 
 	"cols": {
-		"c": "Aktionen",
+		"!": "Aktionen",
 		"dur": "Dauer",
 		"q": "Qualität / Bitrate",
 		"Ac": "Audiocodec",
@@ -14,7 +14,7 @@ Ls.deu = {
 		"Ahash": "Audio Checksumme",
 		"Vhash": "Video Checksumme",
 		"Res": "Auflösung",
-		"T": "Dateityp",
+		"Type": "Dateityp",
 		"aq": "Audioqualität / Bitrate",
 		"vq": "Videoqualität / Bitrate",
 		"pixfmt": "Subsampling / Pixelstruktur",

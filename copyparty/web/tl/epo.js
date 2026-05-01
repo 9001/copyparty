@@ -5,7 +5,7 @@ Ls.epo = {
 	"tt": "Esperanto",
 
 	"cols": {
-		"c": "ago-butonoj",
+		"!": "ago-butonoj",
 		"dur": "daŭro",
 		"q": "kvalito / bitrapido",
 		"Ac": "sonkodeko",
@@ -14,7 +14,7 @@ Ls.epo = {
 		"Ahash": "kontrolsumo de aŭdio",
 		"Vhash": "kontrolsumo de video",
 		"Res": "distingivo",
-		"T": "dosiertipo",
+		"Type": "dosiertipo",
 		"aq": "kvalito / bitrapido de aŭdio",
 		"vq": "kvalito / bitrapido de video",
 		"pixfmt": "specimenado / strukturo de bilderoj",

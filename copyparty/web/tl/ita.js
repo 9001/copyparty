@@ -5,7 +5,7 @@ Ls.ita = {
 	"tt": "Italiano",
 
 	"cols": {
-		"c": "pulsanti azione",
+		"!": "pulsanti azione",
 		"dur": "durata",
 		"q": "qualità / bitrate",
 		"Ac": "codec audio",
@@ -14,7 +14,7 @@ Ls.ita = {
 		"Ahash": "checksum audio",
 		"Vhash": "checksum video",
 		"Res": "risoluzione",
-		"T": "tipo file",
+		"Type": "tipo file",
 		"aq": "qualità audio / bitrate",
 		"vq": "qualità video / bitrate",
 		"pixfmt": "subsampling / struttura pixel",

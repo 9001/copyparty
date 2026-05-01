@@ -140,7 +140,7 @@
 	<table id="files">
 		<thead>
 			<tr>
-				<th name="lead"><span>c</span></th>
+				<th name="lead"><span>!</span></th>
 				<th name="href"><span>File Name</span></th>
 				<th name="sz" sort="int"><span>Size</span></th>
 				{%- for k in taglist %}
@@ -150,7 +150,7 @@
 				<th name="tags/{{ k }}"><span>{{ k[0]|upper }}{{ k[1:] }}</span></th>
 					{%- endif %}
 				{%- endfor %}
-				<th name="ext"><span>T</span></th>
+				<th name="ext"><span>Type</span></th>
 				<th name="ts"><span>Date</span></th>
 			</tr>
 		</thead>

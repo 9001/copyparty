@@ -5,7 +5,7 @@ Ls.fra = {
 	"tt": "français",
 
 	"cols": {
-		"c": "bouton d'action",
+		"!": "bouton d'action",
 		"dur": "durée",
 		"q": "qualité / débit binaire",
 		"Ac": "codec audio",
@@ -14,7 +14,7 @@ Ls.fra = {
 		"Ahash": "somme de contrôle audio",
 		"Vhash": "somme de contrôle vidéo",
 		"Res": "résolution",
-		"T": "type de fichier",
+		"Type": "type de fichier",
 		"aq": "qualité audio / débit binaire",
 		"vq": "qualité vidéo / débit binaire",
 		"pixfmt": "sous-échantillonnage / structure de pixel",

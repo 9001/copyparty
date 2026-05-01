@@ -5,7 +5,7 @@ Ls.cze = {
 	"tt": "Čeština",
 
 	"cols": {
-		"c": "tlačítka akcí",
+		"!": "tlačítka akcí",
 		"dur": "doba trvání",
 		"q": "kvalita / bitrate",
 		"Ac": "audio kodek",
@@ -14,7 +14,7 @@ Ls.cze = {
 		"Ahash": "kontrolní součet audia",
 		"Vhash": "kontrolní součet videa",
 		"Res": "rozlišení",
-		"T": "typ souboru",
+		"Type": "typ souboru",
 		"aq": "kvalita zvuku / bitrate",
 		"vq": "kvalita videa / bitrate",
 		"pixfmt": "podvzorkování / struktura pixelů",

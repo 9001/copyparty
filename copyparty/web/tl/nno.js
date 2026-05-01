@@ -2,7 +2,7 @@ Ls.nno = {
 	"tt": "Nynorsk",
 
 	"cols": {
-		"c": "handlingsknappar",
+		"!": "handlingsknappar",
 		"dur": "varigheit",
 		"q": "kvalitet / bitrate",
 		"Ac": "lydformat",
@@ -11,7 +11,7 @@ Ls.nno = {
 		"Ahash": "lydkontrollsum",
 		"Vhash": "videokontrollsum",
 		"Res": "oppløysing",
-		"T": "filtype",
+		"Type": "filtype",
 		"aq": "lydkvalitet / bitrate",
 		"vq": "videokvalitet / bitrate",
 		"pixfmt": "fargekoding / detaljnivå",

@@ -2,7 +2,7 @@ Ls.hun = {
 	"tt": 'Magyar',
 
 	"cols": {
-		"c": 'műveletek',
+		"!": 'műveletek',
 		"dur": 'hossz',
 		"q": 'minőség / bitrate',
 		"Ac": 'audió kodek',
@@ -11,7 +11,7 @@ Ls.hun = {
 		"Ahash": 'audió hash',
 		"Vhash": 'videó hash',
 		"Res": 'felbontás',
-		"T": 'típus',
+		"Type": 'típus',
 		"aq": 'audió minőség / bitrate',
 		"vq": 'videó minőség / bitrate',
 		"pixfmt": 'színkódolás / pixel',

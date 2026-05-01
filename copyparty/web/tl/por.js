@@ -5,7 +5,7 @@ Ls.por = {
 	"tt": "Português",
 
 	"cols": {
-		"c": "botões de ação",
+		"!": "botões de ação",
 		"dur": "duração",
 		"q": "qualidade / bitrate",
 		"Ac": "codec de áudio",
@@ -14,7 +14,7 @@ Ls.por = {
 		"Ahash": "checksum de áudio",
 		"Vhash": "checksum de vídeo",
 		"Res": "resolução",
-		"T": "tipo de arquivo",
+		"Type": "tipo de arquivo",
 		"aq": "qualidade / bitrate de áudio",
 		"vq": "qualidade / bitrate de vídeo",
 		"pixfmt": "subamostragem / estrutura de pixel",

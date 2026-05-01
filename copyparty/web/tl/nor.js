@@ -2,7 +2,7 @@ Ls.nor = {
 	"tt": "Norsk",
 
 	"cols": {
-		"c": "handlingsknapper",
+		"!": "handlingsknapper",
 		"dur": "varighet",
 		"q": "kvalitet / bitrate",
 		"Ac": "lyd-format",
@@ -11,7 +11,7 @@ Ls.nor = {
 		"Ahash": "lyd-kontrollsum",
 		"Vhash": "video-kontrollsum",
 		"Res": "oppløsning",
-		"T": "filtype",
+		"Type": "filtype",
 		"aq": "lydkvalitet / bitrate",
 		"vq": "videokvalitet / bitrate",
 		"pixfmt": "fargekoding / detaljenivå",

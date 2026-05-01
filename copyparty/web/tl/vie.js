@@ -2,7 +2,7 @@ Ls.vie = {
 	"tt": "Tiếng Việt",
 
 	"cols": {
-		"c": "nút hành động",
+		"!": "nút hành động",
 		"dur": "thời lượng",
 		"q": "chất lượng / bitrate",
 		"Ac": "codec âm thanh",
@@ -11,7 +11,7 @@ Ls.vie = {
 		"Ahash": "checksum âm thanh",
 		"Vhash": "checksum video",
 		"Res": "độ phân giải",
-		"T": "loại tệp",
+		"Type": "loại tệp",
 		"aq": "chất lượng âm thanh / bitrate",
 		"vq": "chất lượng video / bitrate",
 		"pixfmt": "subsampling / pixel structure",

@@ -5,7 +5,7 @@ Ls.pol = {
 	"tt": "Polski",
 
 	"cols": {
-		"c": "przyciski akcji",
+		"!": "przyciski akcji",
 		"dur": "czas trwania",
 		"q": "jakość / bitrate",
 		"Ac": "kodek audio",
@@ -14,7 +14,7 @@ Ls.pol = {
 		"Ahash": "suma kontrolna audio",
 		"Vhash": "suma kontrolna wideo",
 		"Res": "rozdzielczość",
-		"T": "rodzaj pliku",
+		"Type": "rodzaj pliku",
 		"aq": "jakość / bitrate audio",
 		"vq": "jakość / bitrate wideo",
 		"pixfmt": "podpróbkowanie / struktura pikseli",

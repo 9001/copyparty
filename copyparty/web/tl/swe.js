@@ -5,7 +5,7 @@ Ls.swe = {
 	"tt": "Svenska",
 
 	"cols": {
-		"c": "aktion",
+		"!": "aktion",
 		"dur": "längd",
 		"q": "kvalitet / bitrate",
 		"Ac": "ljudkodek",
@@ -14,7 +14,7 @@ Ls.swe = {
 		"Ahash": "ljudchecksumma",
 		"Vhash": "videochecksumma",
 		"Res": "upplösning",
-		"T": "filtyp",
+		"Type": "filtyp",
 		"aq": "ljudkvalitet / bitrate",
 		"vq": "videokvalitet / bitrate",
 		"pixfmt": "subsampling / pixelstruktur",

@@ -5,7 +5,7 @@ Ls.spa = {
 	"tt": "Español",
 
 	"cols": {
-		"c": "acciones",
+		"!": "acciones",
 		"dur": "duración",
 		"q": "calidad / bitrate",
 		"Ac": "códec de audio",
@@ -14,7 +14,7 @@ Ls.spa = {
 		"Ahash": "checksum de audio",
 		"Vhash": "checksum de vídeo",
 		"Res": "resolución",
-		"T": "tipo de archivo",
+		"Type": "tipo de archivo",
 		"aq": "calidad de audio / bitrate",
 		"vq": "calidad de vídeo / bitrate",
 		"pixfmt": "submuestreo / estructura de píxel",
