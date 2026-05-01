@@ -2124,12 +2124,14 @@ html.a .btn {
 #u2tdate {
 	opacity: .3;
 }
-#griden.on+#thumbs,
-#au_preload.on+#au_prescan,
-#au_preload.on+#au_prescan+#au_fullpre,
-#au_os_ctl.on+#au_os_seek,
-#au_os_ctl.on+#au_os_seek+#au_osd_cv,
-#u2turbo.on+#u2tdate {
+.setting:has(#griden.on)+.setting #thumbs,
+.setting:has(#au_preload.on)+.setting #au_prescan,
+.setting:has(#au_preload.on)+.setting #au_prescan,
+.setting:has(#au_preload.on)~.setting #au_fullpre,
+.setting:has(#au_os_ctl.on)+.setting #au_os_seek,
+.setting:has(#au_os_ctl.on)+.setting #au_os_seek,
+.setting:has(#au_os_ctl.on)~.setting #au_osd_cv,
+.setting:has(#u2turbo.on)+.setting #u2tdate {
 	opacity: 1;
 }
 #wraptree.on+#hovertree {
