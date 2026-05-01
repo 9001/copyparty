@@ -14,7 +14,7 @@ Ls.tur = {
 		"Ahash": "ses denetim toplamı",
 		"Vhash": "video denetim toplamı",
 		"Res": "çözünürlük",
-		"Type": "dosya türü",
+		"Ext": "dosya türü",
 		"aq": "ses kalitesi / bitrate",
 		"vq": "video kalitesi / bitrate",
 		"pixfmt": "subsampling / pixel yapısı",

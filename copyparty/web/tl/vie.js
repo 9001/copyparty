@@ -11,7 +11,7 @@ Ls.vie = {
 		"Ahash": "checksum âm thanh",
 		"Vhash": "checksum video",
 		"Res": "độ phân giải",
-		"Type": "loại tệp",
+		"Ext": "loại tệp",
 		"aq": "chất lượng âm thanh / bitrate",
 		"vq": "chất lượng video / bitrate",
 		"pixfmt": "subsampling / pixel structure",

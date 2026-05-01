@@ -14,7 +14,7 @@ Ls.swe = {
 		"Ahash": "ljudchecksumma",
 		"Vhash": "videochecksumma",
 		"Res": "upplösning",
-		"Type": "filtyp",
+		"Ext": "filtyp",
 		"aq": "ljudkvalitet / bitrate",
 		"vq": "videokvalitet / bitrate",
 		"pixfmt": "subsampling / pixelstruktur",

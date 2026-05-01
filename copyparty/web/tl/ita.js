@@ -14,7 +14,7 @@ Ls.ita = {
 		"Ahash": "checksum audio",
 		"Vhash": "checksum video",
 		"Res": "risoluzione",
-		"Type": "tipo file",
+		"Ext": "tipo file",
 		"aq": "qualità audio / bitrate",
 		"vq": "qualità video / bitrate",
 		"pixfmt": "subsampling / struttura pixel",

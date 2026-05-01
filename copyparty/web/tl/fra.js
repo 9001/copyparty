@@ -14,7 +14,7 @@ Ls.fra = {
 		"Ahash": "somme de contrôle audio",
 		"Vhash": "somme de contrôle vidéo",
 		"Res": "résolution",
-		"Type": "type de fichier",
+		"Ext": "type de fichier",
 		"aq": "qualité audio / débit binaire",
 		"vq": "qualité vidéo / débit binaire",
 		"pixfmt": "sous-échantillonnage / structure de pixel",

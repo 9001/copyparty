@@ -46,7 +46,7 @@ Ls.hmn = {
 		"Ahash": "audio checksum",
 		"Vhash": "video checksum",
 		"Res": "resolution",
-		"Type": "filetype",
+		"Ext": "filetype",
 		"aq": "audio quality / bitrate",
 		"vq": "video quality / bitrate",
 		"pixfmt": "subsampling / pixel structure",

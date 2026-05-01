@@ -14,7 +14,7 @@ Ls.deu = {
 		"Ahash": "Audio Checksumme",
 		"Vhash": "Video Checksumme",
 		"Res": "Auflösung",
-		"Type": "Dateityp",
+		"Ext": "Dateityp",
 		"aq": "Audioqualität / Bitrate",
 		"vq": "Videoqualität / Bitrate",
 		"pixfmt": "Subsampling / Pixelstruktur",

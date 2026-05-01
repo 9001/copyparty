@@ -11,7 +11,7 @@ Ls.nno = {
 		"Ahash": "lydkontrollsum",
 		"Vhash": "videokontrollsum",
 		"Res": "oppløysing",
-		"Type": "filtype",
+		"Ext": "filtype",
 		"aq": "lydkvalitet / bitrate",
 		"vq": "videokvalitet / bitrate",
 		"pixfmt": "fargekoding / detaljnivå",

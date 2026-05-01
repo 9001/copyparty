@@ -14,7 +14,7 @@ Ls.por = {
 		"Ahash": "checksum de áudio",
 		"Vhash": "checksum de vídeo",
 		"Res": "resolução",
-		"Type": "tipo de arquivo",
+		"Ext": "tipo de arquivo",
 		"aq": "qualidade / bitrate de áudio",
 		"vq": "qualidade / bitrate de vídeo",
 		"pixfmt": "subamostragem / estrutura de pixel",

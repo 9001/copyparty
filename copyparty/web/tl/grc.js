@@ -14,7 +14,7 @@ Ls.grc = {
 		"Ahash": "checksum ήχου",
 		"Vhash": "checksum βίντεο",
 		"Res": "ανάλυση",
-		"Type": "τύπος αρχείου",
+		"Ext": "τύπος αρχείου",
 		"aq": "ποιότητα ήχου / bitrate",
 		"vq": "ποιότητα βίντεο / bitrate",
 		"pixfmt": "subsampling / δομή εικονοστοιχείων",

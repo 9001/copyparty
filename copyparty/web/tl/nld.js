@@ -14,7 +14,7 @@ Ls.nld = {
 		"Ahash": "Audio checksum",
 		"Vhash": "Video checksum",
 		"Res": "Resolution",
-		"Type": "Bestandstype",
+		"Ext": "Bestandstype",
 		"aq": "Audio kwaliteit / bitrate",
 		"vq": "Video kwaliteit / bitrate",
 		"pixfmt": "Subsampling / pixel structure",

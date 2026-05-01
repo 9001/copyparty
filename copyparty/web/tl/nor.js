@@ -11,7 +11,7 @@ Ls.nor = {
 		"Ahash": "lyd-kontrollsum",
 		"Vhash": "video-kontrollsum",
 		"Res": "oppløsning",
-		"Type": "filtype",
+		"Ext": "filtype",
 		"aq": "lydkvalitet / bitrate",
 		"vq": "videokvalitet / bitrate",
 		"pixfmt": "fargekoding / detaljenivå",

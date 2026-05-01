@@ -11,7 +11,7 @@ Ls.hun = {
 		"Ahash": 'audió hash',
 		"Vhash": 'videó hash',
 		"Res": 'felbontás',
-		"Type": 'típus',
+		"Ext": 'típus',
 		"aq": 'audió minőség / bitrate',
 		"vq": 'videó minőség / bitrate',
 		"pixfmt": 'színkódolás / pixel',

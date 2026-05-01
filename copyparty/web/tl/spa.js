@@ -14,7 +14,7 @@ Ls.spa = {
 		"Ahash": "checksum de audio",
 		"Vhash": "checksum de vídeo",
 		"Res": "resolución",
-		"Type": "tipo de archivo",
+		"Ext": "tipo de archivo",
 		"aq": "calidad de audio / bitrate",
 		"vq": "calidad de vídeo / bitrate",
 		"pixfmt": "submuestreo / estructura de píxel",

@@ -14,7 +14,7 @@ Ls.epo = {
 		"Ahash": "kontrolsumo de aŭdio",
 		"Vhash": "kontrolsumo de video",
 		"Res": "distingivo",
-		"Type": "dosiertipo",
+		"Ext": "dosiertipo",
 		"aq": "kvalito / bitrapido de aŭdio",
 		"vq": "kvalito / bitrapido de video",
 		"pixfmt": "specimenado / strukturo de bilderoj",

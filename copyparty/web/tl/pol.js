@@ -14,7 +14,7 @@ Ls.pol = {
 		"Ahash": "suma kontrolna audio",
 		"Vhash": "suma kontrolna wideo",
 		"Res": "rozdzielczość",
-		"Type": "rodzaj pliku",
+		"Ext": "rodzaj pliku",
 		"aq": "jakość / bitrate audio",
 		"vq": "jakość / bitrate wideo",
 		"pixfmt": "podpróbkowanie / struktura pikseli",

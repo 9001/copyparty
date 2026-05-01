@@ -14,7 +14,7 @@ Ls.fin = {
 		"Ahash": "äänen tarkistussumma",
 		"Vhash": "videon tarkistussumma",
 		"Res": "resoluutio",
-		"Type": "tiedostotyyppi",
+		"Ext": "tiedostotyyppi",
 		"aq": "äänenlaatu / bittinopeus",
 		"vq": "kuvalaatu / bittinopeus",
 		"pixfmt": "alinäytteistys / pikselirakenne",

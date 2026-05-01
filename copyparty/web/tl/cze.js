@@ -14,7 +14,7 @@ Ls.cze = {
 		"Ahash": "kontrolní součet audia",
 		"Vhash": "kontrolní součet videa",
 		"Res": "rozlišení",
-		"Type": "typ souboru",
+		"Ext": "typ souboru",
 		"aq": "kvalita zvuku / bitrate",
 		"vq": "kvalita videa / bitrate",
 		"pixfmt": "podvzorkování / struktura pixelů",
