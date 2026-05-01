@@ -1238,7 +1238,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
-	(!MOBILE ? '<div><h3 id="h_mouse">🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
+	'<div><h3 id="h_mouse">🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' +
 	'<div>\n' +
 	'	<h3 id="h_gauto">🅰️ ' + L.cl_gauto + '</h3>\n' +
 	'	<div>\n' +
