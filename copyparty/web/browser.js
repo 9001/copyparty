@@ -8949,7 +8949,10 @@ var filecols = (function () {
 				if (toast.tag == 'pickhide')
 					toast.hide();
 
-				r.hide(e.target.textContent);
+				if(e.target.lastChild)
+					r.hide(e.target.lastChild.textContent)
+				else
+					r.hide(e.target.textContent);
 			};
 		};
 		r.picking = true;
