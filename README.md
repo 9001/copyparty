@@ -2321,9 +2321,7 @@ if you want to change the fonts, see [./docs/rice/](./docs/rice/)
 
 become a *real* webserver  which people can access by just going to your IP or domain without specifying a port
 
-**if you're on windows,** then you just need to add the commandline argument `-p 80,443` and you're done! nice
-
-**if you're on macos,** sorry, I don't know
+**if you're on windows or macos,** then you just need to add the commandline argument `-p 80,443` and you're done! nice
 
 **if you're on Linux,** you have the following 4 options:
 
