@@ -636,7 +636,7 @@ a:hover {
 a.dir {
 	color: var(--a);
 }
-tr:has(a.dir) td:nth-child(2) a::before {
+tr.dir td:nth-child(2) a::before {
 	content: "📁";
 	margin: 0 .1em 0 -.2em;
 }

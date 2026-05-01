@@ -6232,10 +6232,6 @@ var thegrid = (function () {
 			if (!ref)
 				continue;
 			var cl = ebi(ref).closest('tr').className || '';
-
-			if (noq_href(ths[a]).endsWith('/'))
-				cl += ' dir';
-
 			ths[a].className = cl;
 
 			var chk = ths[a].getElementsByTagName('input')[0];
@@ -6315,8 +6311,8 @@ var thegrid = (function () {
 				ext0 = '',
 				name = uricom_dec(vsplit(href)[1]),
 				ref = ao.getAttribute('id'),
-				isdir = href.endsWith('/'),
-				ac = isdir ? ' class="dir"' : '',
+				isdir = clgot(ao.parentElement.parentElement, 'dir'),
+				ac = ao.parentElement.parentElement.classList,
 				ihref = ohref;
 
 			if (need_ext && href != "#") {
@@ -6369,12 +6365,12 @@ var thegrid = (function () {
 				ihref += "&raster";
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
-				'"' + ac + ' ttt="' + esc(name) + '">' +
+				'" class="' + ac + '" ttt="' + esc(name) + '">' +
 				'<div class="imgcontainer">' +
 				'<input type="checkbox" class="gselchk"></input>' +
 				'<img style="height:' +
 				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" src="' +
-				ihref + '" /></div><span' + ac + '>' + ao.innerHTML + '</span></a>');
+				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
 		clmod(ggrid, 'crop', r.crop);
@@ -8306,8 +8302,8 @@ var treectl = (function () {
 					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
-			var cl = /\.PARTIAL$/.exec(fname) ? ' class="fade"' : '',
-				ln = ['<tr' + cl + '><td>' + tn.lead + '</td><td><a href="' +
+			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade' : '') + tn.cls,
+				ln = ['<tr class="' + cl + '"><td>' + tn.lead + '</td><td><a href="' +
 					top + tn.href + '" id="' + id + '">' + hname +
 					'</a></td><td sortv="' + tn.sz + '">' + filesizefun(tn.sz)];
 
@@ -8808,7 +8804,7 @@ function find_file_col(txt) {
 function mk_files_header(taglist) {
 	var html = [
 		'<thead><tr>',
-		'<th name="lead"><span>c</span></th>',
+		'<th name="lead"><span>!</span></th>',
 		'<th name="href"><span>File Name</span></th>',
 		'<th name="sz" sort="int"><span>Size</span></th>'
 	];
@@ -9999,7 +9995,7 @@ if (sb_lg && logues.length) {
 			var td = tr[a].cells[1],
 				ao = td.firstChild,
 				href = noq_href(ao),
-				isdir = href.endsWith('/'),
+				isdir = clgot(tr[a], 'dir'),
 				txt = ao.textContent;
 
 			td.setAttribute('sortv', (isdir ? '\t' : '') + txt);
@@ -10607,7 +10603,7 @@ var drag = (function() {
 			for (var j = 0; j < links.length; j++)
 				links[j].draggable = false;
 
-			if (/(zip|DIR)/.test(f.firstChild.innerHTML)) // very cursed but it works
+			if (clgot(f, 'dir'))
 				r.mktarget(f);
 		}
 	};
@@ -10635,7 +10631,7 @@ var drag = (function() {
 				r.no_warn = false;
 			};
 
-			if (clgot(f, "dir"))
+			if (clgot(f, 'dir'))
 				r.mktarget(f);
 		}
 	};

@@ -7208,7 +7208,7 @@ class HttpCli(object):
             and vpath
         )
         for fn in ls_names:
-            base = ""
+            cls = base = ""
             href = fn
             if use_abs_url:
                 base = "/" + vpath + "/"
@@ -7228,6 +7228,7 @@ class HttpCli(object):
 
             is_dir = stat.S_ISDIR(inf.st_mode)
             if is_dir:
+                cls = "dir"
                 href += "/"
                 if no_zip:
                     margin = "DIR"
@@ -7297,6 +7298,7 @@ class HttpCli(object):
                 "ext": ext,
                 "dt": dt,
                 "ts": int(linf.st_mtime),
+                "cls": cls,
             }
             if is_dir:
                 dirs.append(item)
