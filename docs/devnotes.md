@@ -447,6 +447,12 @@ build the sfx using any of the following examples:
 ./scripts/make-sfx.sh gz no-cm  # gzip-compressed + no fancy markdown editor
 ```
 
+on macos, you need to download several GNU utilities before building:
+
+```zsh
+brew install gsed gnu-tar findutils coreutils
+```
+
 
 ## build from release tarball
 
