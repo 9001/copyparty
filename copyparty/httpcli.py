@@ -6642,7 +6642,7 @@ class HttpCli(object):
             {
                 "lead": "",
                 "href": "%s/" % (x,),
-                "ext": "---",
+                "ext": "",
                 "sz": 0,
                 "ts": 0,
                 "tags": e_d,
@@ -7263,7 +7263,7 @@ class HttpCli(object):
             )
 
             if is_dir:
-                ext = "---"
+                ext = ""
             elif "." in fn:
                 ext = ptn_hr.sub("@", fn.rsplit(".", 1)[1])
                 if len(ext) > 16:
