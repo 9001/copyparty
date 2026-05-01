@@ -8938,7 +8938,6 @@ var filecols = (function () {
 	};
 
 	ebi('hcolsh').onclick = function (e) {
-		ev(e);
 		clmod(this, 'on', !r.picking)
 		if (r.picking)
 			return r.unpick();
