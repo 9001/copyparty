@@ -544,6 +544,7 @@ html.y #path {
 }
 #path a.dtarget {
 	text-shadow: var(--f-sel-sh) 0 0 5px;
+	background: color-mix(var(--a), transparent);
 }
 #path #entree {
 	margin-left: -.7em;
@@ -721,6 +722,7 @@ html.y #files span.fsz_P { font-weight: bold }
 }
 #files tr.dtarget {
 	box-shadow: 0 0 5px 0 var(--f-sel-sh) inset;
+	background: color-mix(var(--a), transparent);
 }
 #files tr.dtarget td {
 	background: none;
@@ -1095,6 +1097,7 @@ html:not(.e) #ggrid>a.dir:before {
 }
 #ggrid a.dtarget {
 	box-shadow: 0 0 5px 0 var(--f-sel-sh);
+	background: color-mix(var(--a), transparent);
 }
 #files tr.sel a,
 #files tr.sel a.play {
@@ -1973,6 +1976,7 @@ html.a .btn {
 }
 #tree li a.dtarget {
 	box-shadow: 0 0 5px 0 var(--f-sel-sh) inset;
+	background: color-mix(var(--a) 30%, transparent);
 }
 #tree ul a.sel {
 	background: #000;

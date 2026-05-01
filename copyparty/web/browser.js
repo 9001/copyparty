@@ -10589,9 +10589,15 @@ var drag = (function() {
 			var f = files[i];
 			f.draggable = true;
 			f.ondragstart = function(e) {
-				current = e.target;
-				currLink = basenames(current.querySelector("td:nth-child(2) a").href.split("?"));
-				r.no_warn = true;
+				try{
+					currLink = basenames(e.target.querySelector("td:nth-child(2) a").href.split("?"));
+					current = e.target;
+					r.no_warn = true;
+				}
+				catch(ex){
+					console.log(e.target)
+					console.log(ex)
+				}
 			};
 			f.ondragend = function() {
 				r.no_warn = false;
@@ -10614,10 +10620,16 @@ var drag = (function() {
 			var f = files[i];
 			f.draggable = true;
 			f.ondragstart = function(e) {
-				var a = ebi(e.target.getAttribute("ref"));
-				current = a.closest("tr");
-				currLink = basenames(a.href.split("?"));
-				r.no_warn = true;
+				try{
+					var a = ebi(e.target.getAttribute("ref"));
+					current = a.closest("tr");
+					currLink = basenames(a.href.split("?"));
+					r.no_warn = true;
+				}
+				catch(ex){
+					console.log(e.target)
+					console.log(ex)
+				}
 			}
 			f.ondragend = function() {
 				r.no_warn = false;
