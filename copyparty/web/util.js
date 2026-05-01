@@ -1602,8 +1602,6 @@ var tt = (function () {
         if (!msg)
             return;
 
-        
-
         r.el = this;
         var pos = this.getBoundingClientRect(),
             dir = this.getAttribute('ttd') || '',
@@ -1644,7 +1642,6 @@ var tt = (function () {
         r.show.bind(null);
         r.el = null;
 
-        console.log('hide');
         clearTimeout(tev);
         window.removeEventListener('scroll', r.hide);
 
