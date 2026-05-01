@@ -6125,6 +6125,10 @@ var thegrid = (function () {
 	function gclick1(e) {
 		if (ctrl(e) && !treectl.csel && !r.sel)
 			return true;
+		else if (e.altKey){
+			ev(e);
+			return;
+		}
 
 		return gclick.call(this, e, false);
 	}
