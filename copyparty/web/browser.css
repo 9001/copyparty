@@ -4259,9 +4259,9 @@ html.e .overlay_plus {
 html.e #spaceUsed_bar {
 	background: var(--ttlbar);
 }
-html.e #up_header,
+html.e #h_up2k,
 html.e #up_status_h,
-html.e #s_header {
+html.e #h_cfg {
 	color: #fff;
 }
 html.e .modalheader:hover {

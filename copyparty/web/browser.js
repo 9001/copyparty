@@ -991,7 +991,7 @@ ebi('uq_nf').onclick = function(){
 
 
 // up2k ui
-ebi('up_header').innerHTML = (fun_tgl ? '🚀 ' : '') + L.cl_uopts;
+ebi('h_up2k').innerHTML = (fun_tgl ? '🚀 ' : '') + L.cl_uopts;
 ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
@@ -1084,7 +1084,7 @@ ebi('op_up2k').innerHTML = (
 	'	</div>' +
 	'</div>' +
 
-	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write" tt="' + L.ot_bup + '"><summary id="sum_bup">' + (IE ? '>> ' : '') + L.bup + (IE ? ' <<' : '') + '</summary></details>'
+	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write" tt="' + L.ot_bup + '"><summary id="h_bup">' + (IE ? '>> ' : '') + L.bup + (IE ? ' <<' : '') + '</summary></details>'
 );
 
 
@@ -1117,7 +1117,16 @@ ebi('up_info').innerHTML = (
 );
 
 ebi('up_outside').onclick = ebi('c_up_btn').onclick = function(){
+	location.hash = '#';
 	modaltoggle('up2k');
+}
+
+ebi('h_up2k').onclick = function(){
+	ebi('up_info').scrollTop = 
+	ebi('op_up2k').scrollTop = 
+	ebi('up_hor').scrollTop = 
+	ebi('up_content').scrollTop = 
+		0;
 }
 
 ebi('sum_u2conf').onclick = function(){
@@ -1132,18 +1141,13 @@ x.parentNode.insertBefore(mknod('div', null,
 
 var bup = ebi('op_bup');
 ebi('bup_tgl').appendChild(bup);
-ebi('sum_bup').onclick = function() {
+ebi('h_bup').onclick = function() {
 	var open = !clgot(bup, 'act');
 	if(open)
 		modaltoggle('bup', true);
 	else
 		modaltoggle('up2k', true);
 	ebi('bup_tgl').open = !open;
-};
-
-ebi('up_moreopts').onclick = function(){
-	modaltoggle('cfg', true);
-	location.hash = ebi('up_moreopts').href;
 };
 
 (function () {
@@ -1333,7 +1337,7 @@ ebi('op_cfg').innerHTML = (
 
 // modalize settings
 (function () {
-	ebi('s_header').innerHTML = (fun_tgl ? '⚙️ ' : '') + L.ot_cfg;
+	ebi('h_cfg').innerHTML = (fun_tgl ? '⚙️ ' : '') + L.ot_cfg;
 	var sections = ebi('op_cfg').children;
 	for (var i = 0; i < sections.length; i++){
 		var h = sections[i].children[0];
@@ -1364,7 +1368,16 @@ ebi('op_cfg').innerHTML = (
 	}
 
 	ebi('s_outside').onclick = ebi('cs_btn').onclick = function(){
+		location.hash = '#';
 		modaltoggle('cfg');
+	}
+
+	ebi('h_cfg').onclick = function(){
+		ebi('s_list').scrollTop = 
+		ebi('s_hor').scrollTop = 
+		ebi('s_nav').scrollTop = 
+		ebi('s_content').scrollTop = 
+			0;
 	}
 })();
 
@@ -1481,7 +1494,7 @@ function modaltoggle(dest, show){
 	if (show == false || show == 't' && QS('#' + dest + '.vis'))
 		dest = '';
 
-	swrite('opmode', dest || null);
+	//swrite('opmode', dest || null);
 
 	goto(dest);
 
@@ -1544,6 +1557,7 @@ function goto(dest) {
 		var modal = ebi(dest);
 		if(modal != null){
 			clmod(modal, 'vis', true);
+			location.hash = '#h_' + dest;
 		}
 
 		var opd = ebi('op_' + dest);
@@ -1554,6 +1568,7 @@ function goto(dest) {
 
 		if(dest == 'bup'){
 			clmod(ebi('up2k'), 'vis', true);
+			location.hash = '#h_bup';
 		}
 		if(dest == 'bup' || dest == 'up2k')
 			ebi('bup_tgl').open = dest == 'bup';
@@ -1571,6 +1586,27 @@ function goto(dest) {
 
 	if (treectl)
 		treectl.onscroll();
+}
+
+
+window.onhashchange = function() {
+	var a_modal = QS('.modal.vis');
+	if(location.hash.length <= 1 && a_modal){
+		modaltoggle(a_modal.id);
+	}
+	if(a_modal && location.hash == '#h_' + a_modal.id){
+		var m_header = QS('.modal.vis .modalheader');
+		if(m_header)
+			m_header.click();
+	}
+  	else if (location.hash.startsWith("#h_")){
+		var header = ebi(location.hash.slice(1));
+		var p_modal = header.closest('.modal');
+		console.log(p_modal)
+		if(!clgot(p_modal, 'vis'))
+			modaltoggle(p_modal.id);
+		ebi(location.hash.slice(1)).scrollIntoView();
+	}
 }
 
 
