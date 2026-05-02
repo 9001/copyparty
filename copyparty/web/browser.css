@@ -2756,7 +2756,7 @@ html.c .modalcontent {
 }
 .close{
 	position: absolute;
-	cursor: pointer;
+	cursor: default;
 	top: 0;
 	right: 0;
 	margin: .5em;
@@ -2766,6 +2766,7 @@ html.c .modalcontent {
 }
 .closepane {
 	position: absolute;
+	cursor: default;
 	top: 0;
 	left: 0;
 	bottom: 0;

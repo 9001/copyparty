@@ -1478,6 +1478,16 @@ ebi('rcm').innerHTML = (
 	};
 })();
 
+// fallback in case href change method somehow doesn't work
+var closebtns = QSA('.close');
+for(var a = 0; a < closebtns.length; a++){
+	closebtns[a].onclick = function(){
+		var modal = QS('.modal.vis');
+		if(modal)
+			modaltoggle(modal.id, false);
+	}
+}
+
 function modaltoggle(dest, show){
 	if(show == null)
 		show = 't';
@@ -1596,7 +1606,11 @@ window.onhashchange = function() {
 	}
   	else if (location.hash.startsWith("#h_")){
 		var header = ebi(location.hash.slice(1));
+		if(!header)
+			return;
 		var p_modal = header.closest('.modal');
+		if(!p_modal)
+			return;
 		console.log(p_modal)
 		if(!clgot(p_modal, 'vis')){
 			console.log('forcing modal open due to subheader hash');
