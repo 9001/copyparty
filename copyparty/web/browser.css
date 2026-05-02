@@ -1540,6 +1540,9 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	display: none;
 	margin-bottom: 1em;
 }
+.opview.splitsub {
+	margin-bottom: 0;
+}
 .opview.act {
 	display: block;
 }
@@ -2832,6 +2835,7 @@ html.c .modalcontent {
 	border: var(--bg-u5) solid 1px;
 	border-top: 0;
 	overflow-x: auto;
+	position: relative;
 }
 .modal .setting:hover{
 	background: var(--bg-u1);
