@@ -1494,7 +1494,7 @@ function modaltoggle(dest, show){
 	if (show == false || show == 't' && QS('#' + dest + '.vis'))
 		dest = '';
 
-	//swrite('opmode', dest || null);
+	swrite('opmode', dest || null);
 
 	goto(dest);
 
@@ -1590,6 +1590,7 @@ function goto(dest) {
 
 
 window.onhashchange = function() {
+	console.log('hash change: ' + location.hash)
 	var a_modal = QS('.modal.vis');
 	if(location.hash.length <= 1 && a_modal){
 		modaltoggle(a_modal.id);
