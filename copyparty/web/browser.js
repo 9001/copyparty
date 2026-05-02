@@ -1116,11 +1116,6 @@ ebi('up_info').innerHTML = (
 	'<div id="u2foot"></div>'
 );
 
-ebi('up_outside').onclick = ebi('c_up_btn').onclick = function(){
-	location.hash = '#';
-	modaltoggle('up2k');
-}
-
 ebi('h_up2k').onclick = function(){
 	ebi('up_info').scrollTop = 
 	ebi('op_up2k').scrollTop = 
@@ -1367,11 +1362,6 @@ ebi('op_cfg').innerHTML = (
 		ebi('s_nav').innerHTML += '<a href="#' + sId + '" class="btn ' + sections[i].classList +'">' + sName + '</a>\n';
 	}
 
-	ebi('s_outside').onclick = ebi('cs_btn').onclick = function(){
-		location.hash = '#';
-		modaltoggle('cfg');
-	}
-
 	ebi('h_cfg').onclick = function(){
 		ebi('s_list').scrollTop = 
 		ebi('s_hor').scrollTop = 
@@ -1557,7 +1547,8 @@ function goto(dest) {
 		var modal = ebi(dest);
 		if(modal != null){
 			clmod(modal, 'vis', true);
-			location.hash = '#h_' + dest;
+			if(location.hash.length <= 1)
+				location.hash = '#h_' + dest;
 		}
 
 		var opd = ebi('op_' + dest);
@@ -1594,18 +1585,23 @@ window.onhashchange = function() {
 	var a_modal = QS('.modal.vis');
 	if(location.hash.length <= 1 && a_modal){
 		modaltoggle(a_modal.id);
+		console.log('closing modal due to hash');
 	}
 	if(a_modal && location.hash == '#h_' + a_modal.id){
 		var m_header = QS('.modal.vis .modalheader');
-		if(m_header)
+		if(m_header){
 			m_header.click();
+			console.log('going to top of modal');
+		}
 	}
   	else if (location.hash.startsWith("#h_")){
 		var header = ebi(location.hash.slice(1));
 		var p_modal = header.closest('.modal');
 		console.log(p_modal)
-		if(!clgot(p_modal, 'vis'))
+		if(!clgot(p_modal, 'vis')){
+			console.log('forcing modal open due to subheader hash');
 			modaltoggle(p_modal.id);
+		}
 		ebi(location.hash.slice(1)).scrollIntoView();
 	}
 }
