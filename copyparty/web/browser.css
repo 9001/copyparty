@@ -1457,6 +1457,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 }
 #barbuf {
 	background: var(--mp-b-bg);
+	border: var(--a-dark) solid 1px;
 }
 #barpos {
 	box-shadow: -.03em -.03em .7em rgba(0,0,0,0.5) inset;
@@ -3710,6 +3711,9 @@ html:not(.e) #wrap.thin {
 		overflow-y: hidden;
 	}
 }
+html.cz #wrap.thin .ghead{
+	top: 7.4em;
+}
 html.dy #wrap.thin .ghead,
 html.b #wrap.thin .ghead {
 	top: 6.9em;
@@ -3841,8 +3845,15 @@ html.e #wrap.thin {
 	#pathBar.thin #wfp.shifted {
 		margin-left: 2em;
 	}
-	html:not(.e) #wrap.thin .ghead {
+	#wrap.thin .ghead {
+		top: 7em;
+	}
+	html.cy #wrap.thin .ghead,
+	html.a #wrap.thin .ghead {
 		top: 7.3em;
+	}
+	html.cz #wrap.thin .ghead {
+		top: 7.7em;
 	}
 	.gselchk {
 		font-size: 1.4em;
