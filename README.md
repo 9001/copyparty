@@ -659,11 +659,15 @@ the main tabs in the ui
 * `[🔎]` [search](#searching) by size, date, path/name, mp3-tags ...
 * `[🧯]` [unpost](#unpost): undo/delete accidental uploads
 * `[🚀]` and `[🎈]` are the [uploaders](#uploading)
+* `[📟]` send-msg: either to server-log or into textfiles if `--urlform save`
+* `[⚙️]` client config options
+
+
+## quick actions (+)
+
 * `[📂]` mkdir: create directories
 * `[📝]` new-file: create a new textfile
-* `[📟]` send-msg: either to server-log or into textfiles if `--urlform save`
-* `[🎺]` audio-player config options
-* `[⚙️]` general client config options
+* `[🚀]` upload: quick way to pick files for upload
 
 
 ## hotkeys
@@ -732,9 +736,9 @@ the browser has the following hotkeys  (always qwerty)
 
 ## navpane
 
-switching between breadcrumbs or navpane
+opening the navpane
 
-click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (default), or a navpane (tree-browser sidebar thing)
+clicking the `≡` or pressing the `B` hotkey toggles the navpane (tree-browser sidebar thing)
 
 * `[+]` and `[-]` (or hotkeys `A`/`D`) adjust the size
 * `[🎯]` jumps to the currently open folder
@@ -747,7 +751,7 @@ click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (
 
 ## thumbnails
 
-press `g` or `田` to toggle grid-view instead of the file listing  and `t` toggles icons / thumbnails
+press `g` or use the view mode buttons in the top left to toggle grid-view instead of the file listing  and `t` toggles icons / thumbnails
 * can be made default globally with `--grid` or per-volume with volflag `grid`
 * enable by adding `?imgs` to a link, or disable with `?imgs=0`
 
@@ -910,9 +914,7 @@ dropping files into the browser also lets you see if they exist on the server
 
 ![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/129635361-c79286f0-b8f1-440e-aaf4-6e929428fac9.png)
 
-when you drag/drop files into the browser, you will see two dropzones: `Upload` and `Search`
-
-> on a phone? toggle the `[🔎]` switch green before tapping the big yellow Search button to select your files
+toggle the `[🔎]` switch in the upload options to search for files instead of uploading
 
 the files will be hashed on the client-side, and each hash is sent to the server, which checks if that file exists somewhere
 
@@ -981,6 +983,8 @@ file selection: click somewhere on the line (not the link itself), then:
 * rename: `F2`
 
 you can copy/move files across browser tabs (cut/copy in one tab, paste in another)
+
+you can drag/drop selected files into other folders
 
 
 ## shares
@@ -1158,7 +1162,7 @@ some highlights:
 
 click the `play` link next to an audio file, or copy the link target to [share it](https://a.ocv.me/pub/demo/music/Ubiktune%20-%20SOUNDSHOCK%202%20-%20FM%20FUNK%20TERRROR!!/#af-1fbfba61&t=18) (optionally with a timestamp to start playing from, like that example does)
 
-open the `[🎺]` media-player-settings tab to configure it,
+open the `[⚙]` configuration options and go to the `[🎵]` media player section to configure it,
 * "switches":
   * `[🔁]` repeats one single song forever
   * `[🔀]` shuffles the files inside each folder
@@ -1210,7 +1214,7 @@ you can use foobar2000, deadbeef, just about any standalone player should work -
 
 alternatively, you can create the playlist using copyparty itself:
 
-* open the `[🎺]` media-player-settings tab and enable the `[📻]` create-playlist feature -- this adds two new buttons in the bottom-right tray, `[📻add]` and `[📻copy]` which appear when you listen to music, or when you select a few audiofiles
+* open the `[⚙]` configuration options, go to the `[🎵]` media player section and enable the `[📻]` create-playlist feature -- this adds two new buttons in the bottom-right tray, `[📻add]` and `[📻copy]` which appear when you listen to music, or when you select a few audiofiles
 
 * click the `📻add` button while a song is playing (or when you've selected some songs) and they'll be added to "the list" (you can't see it yet)
 
@@ -1298,6 +1302,12 @@ see [./srv/expand/](./srv/expand/) for usage and examples
 ## searching
 
 search by size, date, path/name, mp3-tags, ...
+
+by default, the `[🔍]` search button shows the folder search bar.
+
+search for files within a folder and optionally its subfolders.
+
+for extended search options, use the dropdown arrow to open the full search UI
 
 ![copyparty-search-fs8](https://user-images.githubusercontent.com/241032/129635365-c0ff2a9f-0ee5-4fc3-8bb6-006033cf67b8.png)
 
