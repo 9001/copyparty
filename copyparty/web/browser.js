@@ -9129,7 +9129,8 @@ var settheme = (function () {
 		'7':['▲', 'font-size:3em'], //cp437
 	};
 
-	theme = sread('cpp_thm') || 'a';
+	// set default theme to flat on firefox mobile to avoid glitchy gradients (2026-04-26)
+	theme = sread('cpp_thm') || (FIREFOX && MOBILE ? 'b' : 'a');
 	if (!/^[a-x][yz]/.exec(theme))
 		theme = dtheme;
 
