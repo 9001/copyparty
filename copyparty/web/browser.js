@@ -9120,10 +9120,13 @@ var settheme = (function () {
 		'7': ['▲', 'font-size:3em'], //cp437
 	};
 
-	// set default theme to flat on firefox mobile to avoid glitchy gradients (2026-04-26)
-	theme = sread('cpp_thm') || (FIREFOX && MOBILE ? 'b' : 'a');
-	if (!/^[a-x][yz]/.exec(theme))
+	theme = sread('cpp_thm') || 'a';
+	if (!/^[a-x][yz]/.exec(theme)){
 		theme = dtheme;
+		// set default theme to flat on firefox mobile to avoid glitchy gradients (2026-04-26)
+		if(FIREFOX && MOBILE)
+			theme = 'b';
+	}
 
 	themen = theme.split(/ /)[0];
 	light = !!(theme.indexOf('y') + 1);
