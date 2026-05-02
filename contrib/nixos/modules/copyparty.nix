@@ -1,4 +1,4 @@
-{
+v{
   config,
   pkgs,
   lib,
@@ -29,6 +29,7 @@ let
       (generators.mkValueStringDefault { } value);
 
   mkSectionName = value: "[" + (escape [ "[" "]" ] value) + "]";
+  
 
   mkSection = name: attrs: ''
     ${mkSectionName name}
@@ -57,6 +58,7 @@ let
     ${mkSection "groups" cfg.groups}
     ${concatStringsSep "\n" (mapAttrsToList mkVolume cfg.volumes)}
   '';
+  escapePath = p: lib.replaceStrings [" "]["\\x20"] (toString p);
 
   cfg = config.services.copyparty;
   configFile = pkgs.writeText "copyparty.conf" configStr;
@@ -323,8 +325,8 @@ in
           ] ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
           BindPaths =
             (if cfg.settings ? hist then [ cfg.settings.hist ] else [ ])
-            ++ [ externalStateDir ]
-            ++ (mapAttrsToList (k: v: v.path) volumesWithoutVariables);
+            ++ [ (escapePath externalStateDir) ]
+            ++ (mapAttrsToList (k: v: escapePath v.path) volumesWithoutVariables);
           # ProtectSystem = "strict";
           # Note that unlike what 'ro' implies,
           # this actually makes it impossible to read anything in the root FS,
