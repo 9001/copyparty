@@ -2,6 +2,7 @@
 
 var J_BRW = 1;
 
+// disables emojis
 var fun_tgl = sread('fun_tgl');
 if( fun_tgl == null)
 	swrite('fun_tgl', 1);
@@ -1350,7 +1351,6 @@ ebi('op_cfg').innerHTML = (
 				var s = subSettings.children[ii];
 				var info = tt.parse(s.getAttribute('tt'));
 				s.removeAttribute('tt');
-				//s.href = '#' + sId;
 				section += '<div id="' + subSettings.id + '" class="setting">' +
 					s.outerHTML +
 					((info != null && info.length > 0) ? '<p class="s_desc">' + info + '</p>' : '') + 
@@ -1528,9 +1528,6 @@ function goto(dest) {
 		clmod(obj[a], 'vis');
 
 	if (dest) {
-		if(dest == 'mkdir' || dest == 'new_md')
-			return;
-
 		var lnk = QS('#ops>a[data-dest=' + dest + ']'),
 			nps = lnk.getAttribute('data-perm');
 
@@ -1569,6 +1566,7 @@ function goto(dest) {
 	ebi('srchfolder_div').style.display = dest == 'search' ? 'block' : 'none';
 		
 	clmod(document.documentElement, 'op_open', dest);
+	// enables the use of keyboard page nav on modals
 	clmod(document.documentElement, 'noscroll', QS('.modal.vis'));
 
 	if (treectl)
@@ -2471,6 +2469,7 @@ function auto_grad(can, color, color2) {
 	return g;
 }
 
+
 // buffer/position bar
 var pbar = (function () {
 	var r = {},
@@ -2586,22 +2585,21 @@ var pbar = (function () {
 		}
 
 		var step = sm > 1 ? 1 : sm > 0.4 ? 3 : sm > 0.05 ? 30 : 720;
-		if(false){
-			bctx.fillStyle = light && !dy ? 'rgba(0,0,0,0.15)' : 'rgba(255, 255, 255, 0.15)';
-			for (var p = step, mins = adur / 10; p <= mins; p += step)
-				bctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
+		
+		//bctx.fillStyle = light && !dy ? 'rgba(0,0,0,0.15)' : 'rgba(255, 255, 255, 0.15)';
+		//for (var p = step, mins = adur / 10; p <= mins; p += step)
+		//	bctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
 
-			step = sm > 0.15 ? 1 : sm > 0.05 ? 10 : 360;
-			bctx.fillStyle = light && !dy ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)';
-			for (var p = step, mins = adur / 60; p <= mins; p += step)
-				bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
+		//step = sm > 0.15 ? 1 : sm > 0.05 ? 10 : 360;
+		//bctx.fillStyle = light && !dy ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)';
+		//for (var p = step, mins = adur / 60; p <= mins; p += step)
+		//	bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 
-			step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
-			bctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0, 0, 0, 0.9)' : 'rgb(255, 255, 255)';
-			for (var p = step, mins = adur / 60; p <= mins; p += step) {
-				bctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
-			}
-		}
+		//step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
+		//bctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0, 0, 0, 0.9)' : 'rgb(255, 255, 255)';
+		//for (var p = step, mins = adur / 60; p <= mins; p += step) {
+		//	bctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
+		//}
 
 		step = sm > 0.2 ? 10 : sm > 0.1 ? 30 : sm > 0.01 ? 60 : sm > 0.005 ? 720 : 1440;
 		bctx.fillStyle = light ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)';
@@ -5994,6 +5992,8 @@ var thegrid = (function () {
 	var ico2 = ebi('listicon_template').cloneNode(true);
 	clmod(ico1, 'on', 't');
 	clmod(ico2, 'on', 't');
+
+	// file list header
 	ebi('wtc').innerHTML = (
 		ico1.outerHTML +
 		ico2.outerHTML +
@@ -6026,10 +6026,8 @@ var thegrid = (function () {
 			l = this.getAttribute('l'),
 			grdbtn = clgot(this, 'grdbtn');
 
-		if(grdbtn) {
-			ebi('griden').click();
+		if(grdbtn)
 			return;
-		}
 
 		if (z)
 			return setsz(z > 0 ? r.sz * z : r.sz / (-z));
@@ -6135,11 +6133,8 @@ var thegrid = (function () {
 
 	function gselclick(e) {
 		var oth = ebi(this.closest('a').getAttribute('ref')),
-			td = oth.closest('td').nextSibling,
-			tr = td.parentNode;
-		//this.checked = !this.checked;
+			td = oth.closest('td').nextSibling;
 		td.onclick.call(td, e);
-		// clmod(this, 'sel', clgot(tr, 'sel'));
 	}
 
 	function gclick2(e) {
@@ -6171,9 +6166,6 @@ var thegrid = (function () {
 			if (e.shiftKey)
 				return r.loadsel();
 			clmod(this, 'sel', clgot(tr, 'sel'));
-
-			var chk = this.getElementsByTagName('input')[0];
-			if(chk) chk.checked = clgot(tr, 'sel');
 		}
 		else if (in_tree && !have_sel)
 			in_tree.click();
@@ -6337,7 +6329,7 @@ var thegrid = (function () {
 			}
 			else if (r.thumbs) {
 				ihref = addq(ihref, 'th=' + (
-					have_jxl  ? 'x' :
+					have_jxl ? 'x' :
 					have_webp ? 'w' :
 					'j'
 				));
@@ -6513,8 +6505,7 @@ var thegrid = (function () {
 		pbar.onresize();
 		vbar.onresize();
 	});
-	
-	bcfg_bind(r, 'gaen', 'gauto', !!dgauto, function(v) {
+	bcfg_bind(r, 'gaen', 'gauto', !!dgauto, function (v) {
 		if (r.en && sread("griden") != 1) {
 			r.en = false;
 			r.setvis(true);
@@ -6687,7 +6678,7 @@ function fselfunw(e, ae, d, rem) {
 	}
 	selfun();
 }
-var konmai = 0, konmak = (function() {
+var konmai = 0, konmak = (function () {
 	var u = "arrowup",
 		d = "arrowdown",
 		l = "arrowleft",
@@ -6719,7 +6710,7 @@ var ahotkeys = function (e) {
 	if (konmai < 0)
 		noop();
 	else if (konmak[konmai] != kl)
-		konmai = konmai && kl == konmak[0] ? (konmai<3?konmai:1):0;
+		konmai = konmai && kl == konmak[0] ? (konmai < 3 ? konmai : 1) : 0;
 	else if (++konmai >= konmak.length) {
 		konmai = -1;
 		document.documentElement.scrollTop = 0;
@@ -6727,7 +6718,7 @@ var ahotkeys = function (e) {
 		start_actx();
 		sfx_nice();
 		toast.inf(9, 'omega clearance granted', null, 'top');
-		setTimeout(function() {
+		setTimeout(function () {
 			apply_perms(treectl.lsc);
 			fileman.render();
 		}, 573);
@@ -7075,7 +7066,6 @@ var search_ui = (function () {
 			is_txt = id.slice(-1) == 'v',
 			is_chk = id.slice(-1) == 'c';
 
-			console.log(id);
 		if (is_txt) {
 			var chk = ebi(id.slice(0, -1) + 'c');
 			chk.checked = ((v + '').length > 0);
@@ -7391,7 +7381,7 @@ function render_m3u() {
 		dur = 1,
 		artist = '',
 		title = '',
-		ret = {'hits': [], 'tag_order': ['artist', 'title', '.dur'], 'trunc': false};
+		ret = { 'hits': [], 'tag_order': ['artist', 'title', '.dur'], 'trunc': false };
 
 	for (var a = 0; a < lines.length; a++) {
 		var ln = lines[a].trim();
@@ -7427,7 +7417,7 @@ function render_m3u() {
 			"ts": 946684800 + n,
 			"sz": 100000 + n,
 			"rp": url,
-			"tags": {".dur": dur, "artist": artist, "title": title}
+			"tags": { ".dur": dur, "artist": artist, "title": title }
 		});
 		dur = 1;
 		artist = title = '';
@@ -7619,7 +7609,7 @@ var treectl = (function () {
 		get_tree("", get_evpath(), true);
 		r.show();
 
-		ebi('treeToggleBtn').classList.add('on');
+		clmod(ebi('treeToggleBtn'), 'on', true)
 	}
 
 	r.show = function () {
@@ -7634,6 +7624,7 @@ var treectl = (function () {
 		clmod(ebi('wfp'), 'shifted', false);
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
+		// accounts for animation delay
 		setTimeout(function () {
 			onresize();
 			aligngriditems();
@@ -7650,7 +7641,7 @@ var treectl = (function () {
 		if (!nonav)
 			ebi('path').style.display = '';
 
-		ebi('treeToggleBtn').classList.remove('on');
+		clmod(ebi('treeToggleBtn'), 'on', false)
 	};
 
 	r.toggleTree = function (e, nostore) {
@@ -8184,7 +8175,7 @@ var treectl = (function () {
 		if (lg1 === Ls.eng.f_empty)
 			lg1 = L.f_empty;
 
-		sandbox(ebi('pro'), sb_lg, sba_lg,'', lg0);
+		sandbox(ebi('pro'), sb_lg, sba_lg, '', lg0);
 		if (dirchg)
 			sandbox(ebi('epi'), sb_lg, sba_lg, '', lg1);
 
@@ -9123,10 +9114,10 @@ var settheme = (function () {
 		chldr = !SPINNER_CSS && SPINNER == tre;
 
 	r.ldr = {
-		'4':['🌴'],
-		'5':['🌭', 'padding:0 0 .7em .7em;filter:saturate(3)'],
-		'6':['📞', 'padding:0;filter:brightness(2) sepia(1) saturate(3) hue-rotate(60deg)'],
-		'7':['▲', 'font-size:3em'], //cp437
+		'4': ['🌴'],
+		'5': ['🌭', 'padding:0 0 .7em .7em;filter:saturate(3)'],
+		'6': ['📞', 'padding:0;filter:brightness(2) sepia(1) saturate(3) hue-rotate(60deg)'],
+		'7': ['▲', 'font-size:3em'], //cp437
 	};
 
 	theme = sread('cpp_thm') || 'a';
@@ -9150,7 +9141,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'flat dark', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'evil blue'];
+			names = ['classic dark', 'classic light', 'flat dark', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));
@@ -9295,7 +9286,7 @@ var arcfmt = (function () {
 
 		QS('#zip1 span').textContent = fmt.split('_')[0];
 		ebi('zip1').setAttribute("href",
-			get_evpath() + (dk ? '?k=' + dk + '&': '?') + arg);
+			get_evpath() + (dk ? '?k=' + dk + '&' : '?') + arg);
 
 		if (!have_zip) {
 			ebi('zip1').style.display = 'none';
@@ -10354,8 +10345,9 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 		if (sz < 1024 * 1024 || showfile.taildoc)
 			fun();
 		else
-			modal.confirm(L.f_bigtxt.format(f2f(sz / 1024 / 1024, 1)), fun, function() {
-				modal.confirm(L.f_bigtxt2, tfun, null)});
+			modal.confirm(L.f_bigtxt.format(f2f(sz / 1024 / 1024, 1)), fun, function () {
+				modal.confirm(L.f_bigtxt2, tfun, null)
+			});
 
 		return ev(e);
 	}
@@ -10372,8 +10364,8 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 var rcm = (function () {
 	var r = {};
-	bcfg_bind(r, 'enabled', 'rcm_en', drcm.charAt(0)=='y');
-	bcfg_bind(r, 'double', 'rcm_db', drcm.charAt(1)=='y');
+	bcfg_bind(r, 'enabled', 'rcm_en', drcm.charAt(0) == 'y');
+	bcfg_bind(r, 'double', 'rcm_db', drcm.charAt(1) == 'y');
 
 	var menu = ebi('rcm');
 	var nsFile = {
@@ -10390,7 +10382,7 @@ var rcm = (function () {
 
 	var opts = QSA('#rcm a');
 	for (var i = 0; i < opts.length; i++) {
-		opts[i].onclick = function(e) {
+		opts[i].onclick = function (e) {
 			ev(e);
 			switch(e.target.id.slice(1)) {
 				case 'opn':
@@ -10403,7 +10395,7 @@ var rcm = (function () {
 				case 'pla': play('f-' + selFile.id); break;
 				case 'txt': showfile.show(selFile.name); break;
 				case 'md': location = selFile.path + (has(selFile.path, '?') ? '&v' : '?v'); break;
-				case 'cpl': cliptxt(selFile.url, function() {toast.ok(2, L.clipped)}); break;
+				case 'cpl': cliptxt(selFile.url, function () { toast.ok(2, L.clipped) }); break;
 				case 'dl': ebi('seldl').click(); break;
 				case 'zip': ebi('selzip').click(); break;
 				case 'del': fileman.delete(); break;
@@ -10516,7 +10508,7 @@ var rcm = (function () {
 		menu.focus();
 	}
 
-	r.hide = function(force) {
+	r.hide = function (force) {
 		if (!menu.style.display || (!force && menu.contains(document.activeElement)))
 			return;
 		if (selFile.elem && !selFile.no_dsel) {
@@ -10527,7 +10519,7 @@ var rcm = (function () {
 		menu.style.display = '';
 	}
 
-	ebi('wrap').oncontextmenu = function(e) {
+	ebi('wrap').oncontextmenu = function (e) {
 		if (!r.enabled || e.shiftKey || (r.double && menu.style.display) || /doc=/.exec(location.search)) {
 			r.hide(true);
 			return true;
@@ -10542,7 +10534,7 @@ var rcm = (function () {
 		show(e.clientX, e.clientY, gfile || e.target, gfile);
 		return false;
 	};
-	menu.onblur = function() {setTimeout(r.hide)};
+	menu.onblur = function () { setTimeout(r.hide) };
 
 	return r;
 })();
@@ -10715,7 +10707,7 @@ function reload_browser() {
 	msel.render();
 }
 
-(function() {
+(function () {
 	var is_selma = false;
 	var dragging = false;
 
@@ -10784,7 +10776,7 @@ function reload_browser() {
 		ttimer = null;
 		
 		if (e.type === 'touchstart') {
-			ttimer = setTimeout(function() {
+			ttimer = setTimeout(function () {
 				ttimer = null;
 				start_drag();
 			}, lpdelay);
@@ -10858,7 +10850,7 @@ function reload_browser() {
 		window.addEventListener('touchmove', sel_move, { passive: false });
 		window.addEventListener('touchend', sel_end, { passive: true });
 
-		window.addEventListener('dragstart', function(e) {
+		window.addEventListener('dragstart', function (e) {
 			if (treectl.dsel && (is_selma || dragging)) {
 				e.preventDefault();
 			}
@@ -10869,7 +10861,7 @@ function reload_browser() {
 })();
 
 
-var mpss = (function() {
+var mpss = (function () {
 	var r = {}, config, ssint, npaint = 0;
 
 	r.load = function () {
