@@ -45,7 +45,7 @@ html {
 }
 #wrap {
 	position: relative;
-	max-width: 40em;
+	max-width: 80vw;
 	margin: 1.5em 2em;
 	margin-bottom: 3em;
 	padding: 1.5em;
@@ -177,7 +177,9 @@ a.r:hover, a.r:focus-visible {
 	margin: 0;
 }
 table {
-	border-collapse: collapse;
+	overflow-x: auto;
+	display: block;
+	overflow-y: hidden;
 }
 .vols td,
 .vols th {
