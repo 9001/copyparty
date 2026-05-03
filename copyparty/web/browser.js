@@ -315,6 +315,7 @@ if (1)
 		"mt_one": "stop after one song\">1️⃣",
 		"mt_shuf": "shuffle the songs in each folder",
 		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
+		"mt_afade": "fade in / out when pausing / unpausing audio\">fade",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
@@ -1167,6 +1168,7 @@ var musicSettings = (
 	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
 	'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
 	'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
+	'<a href="#" class="tgl btn" id="au_afade" tt="' + L.mt_afade + '</a>' +
 	'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 	'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
 	'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
@@ -1780,6 +1782,7 @@ var mpl = (function () {
 		mp.read_order();  // don't bind
 	});
 	bcfg_bind(r, 'aplay', 'au_aplay', true);
+	bcfg_bind(r, 'afade', 'au_afade', true);
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
@@ -2218,11 +2221,23 @@ function MPlayer() {
 			r.ftid = r.au.tid;
 			r.au.play();
 			mpl.pp();
-			fader();
+			if(mpl.afade != false)
+				fader();
+			else{
+				// insta start
+				r.fvol = r.vol;
+				mpss.go();
+			}
 		}
 	};
 	r.fade_out = function () {
 		mpss.stop();
+		if(mpl.afade == false){
+			// insta stop
+			r.au.pause();
+			mpl.pp();
+			return;
+		}
 		r.fvol = r.vol;
 		r.fdir = -0.05 * r.vol * (CHROME ? 2 : 1);
 		r.ftid = r.au.tid;
