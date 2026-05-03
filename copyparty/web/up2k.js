@@ -839,6 +839,7 @@ function up2k_init(subtle) {
 
     var loading_deps = false;
     function init_deps() {
+        console.log('up2k init deps');
         if (!loading_deps && !got_deps()) {
             var fn = 'sha512.' + sha_js + '.js',
                 m = L.u_https1 + ' <a href="' + (location + '').replace(':', 's:') + '">' + L.u_https2 + '</a> ' + L.u_https3;
@@ -1201,9 +1202,8 @@ function up2k_init(subtle) {
         // if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
         //     tgl_fsearch();
 
-        //if (!QS('#op_up2k.act'))
         if(!uc.fsearch)
-            goto('up2k');
+            up2k.init_deps();
 
         var files,
             is_itemlist = false;

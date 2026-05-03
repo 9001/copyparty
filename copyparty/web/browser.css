@@ -2868,6 +2868,10 @@ html.c .modalcontent {
 		max-width: none;
 		margin: 0;
 	}
+	.closepane,
+	.close {
+		display: none;
+	}
 }
 
 
