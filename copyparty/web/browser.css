@@ -2862,7 +2862,7 @@ html.c .modalcontent {
     text-align: center;
 }
 .modal.unmodal {
-	position: fixed;
+	position: initial;
 	.modalcontent{
 		width: 100%;
 		max-width: none;
