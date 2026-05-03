@@ -725,7 +725,7 @@ window.baguetteBox = (function () {
         if (options.buttons === 'auto' && ('ontouchstart' in window || currentGallery.length === 1))
             options.buttons = false;
 
-        btnPrev.style.display = btnNext.style.display = (options.buttons ? '' : 'none');
+        QS('#bbox-next .btn').style.display = QS('#bbox-prev .btn').style.display = (options.buttons ? '' : 'none');
     }
 
     function showOverlay(chosenImageIndex) {
