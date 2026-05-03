@@ -1567,6 +1567,12 @@ html:not(.e):not(.d) #up_quick .btn.on {
 .unfun #ops a {
 	font-size: 1.2em;
 }
+#opa_mkd {
+	display: none;
+}
+#ops a.vis {
+	display: block;
+}
 #ops a.act {
 	color: #fff;
 	color: var(--op-aa-fg);

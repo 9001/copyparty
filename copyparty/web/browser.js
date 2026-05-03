@@ -824,6 +824,8 @@ ebi('ops').innerHTML = (
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">' + (fun_tgl ? '🧯' : 'undo') + '</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">' + (fun_tgl ? '🚀' : 'upload') + '</a>' +
 	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">' + (fun_tgl ? '🎈' : 'bup') + '</a>' +
+	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '"><p class="overlay_plus">+</p>📂</a>' +
+	//'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '"><p class="overlay_plus">+</p>📝</a>' +
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">' + (fun_tgl ? '📟' : 'msg') + '</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">' + (fun_tgl ? '⚙️' : 'conf') + '</a>' +
 	'<a href="#" id="opa_acc" data-dest="acc" tt=""><span id="acc_pfp"' + (fun_tgl ? ' class="pfp"' : '') + '>' + (fun_tgl ? '👤' : 'acc') + '</span></a>' +
@@ -832,6 +834,12 @@ ebi('ops').innerHTML = (
 
 // mkdir + md
 function mktemp(is_dir) {
+	if(!has(perms, 'read')){
+		if(is_dir)
+			goto('mkdir');
+		else
+			goto('new_md');
+	}
 	qsr('#rcm_tmp');
 	if (!thegrid.en) {
 		var row = mknod('tr', 'rcm_tmp',
@@ -8846,6 +8854,7 @@ function apply_perms(res) {
 	if (up_only)
 		goto('up2k');
 	clmod(ebi('up2k'), 'unmodal', up_only);
+	clmod(ebi('opa_mkd'), 'vis', up_only);
 }
 
 
