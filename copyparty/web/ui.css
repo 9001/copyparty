@@ -73,37 +73,37 @@ html.y {
 		--a-gray: hsl(from var(--a) h calc(s * 0.1) l);
 	}
 }
-@supports (background: color-mix(black, white)){
+@supports (background: color-mix(in oklab, black, white)){
 	:root, html.y {
 		/* accent color in everything */
-		--fg-max: color-mix(#fefefe 95%, var(--a) 5%);
-		--bg-max: color-mix(#010101 95%, var(--a) 5%);
+		--fg-max: color-mix(in oklab, #fefefe 95%, var(--a) 5%);
+		--bg-max: color-mix(in oklab, #010101 95%, var(--a) 5%);
 
-		--a-hil: hsl(from color-mix(var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.2) l);
-		--a-dark: hsl(from color-mix(var(--a) 60%, var(--bg-max) 40%) h calc(s * 1.3) l); /* warning text etc */
+		--a-hil: hsl(from color-mix(in oklab, var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.2) l);
+		--a-dark: hsl(from color-mix(in oklab, var(--a) 60%, var(--bg-max) 40%) h calc(s * 1.3) l); /* warning text etc */
 		--a-gray: hsl(from var(--a) h calc(s * 0.1) l);
 
-		--fg: color-mix(var(--fg-max) 90%, var(--bg-max) 10%);
-		--fg-weak: color-mix(var(--fg-max) 70%, var(--bg-max) 30%);
+		--fg: color-mix(in oklab, var(--fg-max) 90%, var(--bg-max) 10%);
+		--fg-weak: color-mix(in oklab, var(--fg-max) 70%, var(--bg-max) 30%);
 
-		--bg: color-mix(var(--bg-max) 85%, var(--fg-max) 15%);
-		--bg-half: color-mix(var(--bg) 50%, transparent 50%);
-		--bg-u1: color-mix(var(--bg-max) 80%, var(--fg-max) 20%);
-		--bg-u2: color-mix(var(--bg-max) 75%, var(--fg-max) 25%);
-		--bg-u3: color-mix(var(--bg-max) 70%, var(--fg-max) 30%);
-		--bg-u5: color-mix(var(--bg-max) 65%, var(--fg-max) 35%);
-		--bg-d1: color-mix(var(--bg-max) 90%, var(--fg-max) 10%);
-		--bg-d2: color-mix(var(--bg-max) 92%, var(--fg-max) 8%);
-		--bg-d3: color-mix(var(--bg-max) 95%, var(--fg-max) 5%);
+		--bg: color-mix(in oklab, var(--bg-max) 85%, var(--fg-max) 15%);
+		--bg-half: color-mix(in oklab, var(--bg) 50%, transparent 50%);
+		--bg-u1: color-mix(in oklab, var(--bg-max) 80%, var(--fg-max) 20%);
+		--bg-u2: color-mix(in oklab, var(--bg-max) 75%, var(--fg-max) 25%);
+		--bg-u3: color-mix(in oklab, var(--bg-max) 70%, var(--fg-max) 30%);
+		--bg-u5: color-mix(in oklab, var(--bg-max) 65%, var(--fg-max) 35%);
+		--bg-d1: color-mix(in oklab, var(--bg-max) 90%, var(--fg-max) 10%);
+		--bg-d2: color-mix(in oklab, var(--bg-max) 92%, var(--fg-max) 8%);
+		--bg-d3: color-mix(in oklab, var(--bg-max) 95%, var(--fg-max) 5%);
 	}
 	html.y {
-		--bg-max: color-mix(#fefefe 95%, var(--a) 5%);
-		--fg-max: color-mix(#010101 95%, var(--a) 5%);
+		--bg-max: color-mix(in oklab, #fefefe 95%, var(--a) 5%);
+		--fg-max: color-mix(in oklab, #010101 95%, var(--a) 5%);
 		
-		--bg-u1: color-mix(var(--bg-max) 92%, var(--fg-max));
-		--bg-u2: color-mix(var(--bg-max) 95%, var(--fg-max));
-		--bg-u5: color-mix(var(--bg-max) 82%, var(--fg-max));
-		--bg: color-mix(var(--bg-max) 98%, var(--fg-max));
+		--bg-u1: color-mix(in oklab, var(--bg-max) 92%, var(--fg-max));
+		--bg-u2: color-mix(in oklab, var(--bg-max) 95%, var(--fg-max));
+		--bg-u5: color-mix(in oklab, var(--bg-max) 82%, var(--fg-max));
+		--bg: color-mix(in oklab, var(--bg-max) 98%, var(--fg-max));
 	}
 }
 @font-face {

@@ -2793,7 +2793,7 @@ var vbar = (function () {
 		if (gradh != gh) {
 			gradh = gh;
 			style1 = auto_grad(r.can, accent, accent);
-			style2 = light ? 'color-mix(' + bg + ' 85%, #000 15%' : 'color-mix(' + bg + ' 85%, #fff 15%';
+			style2 = light ? 'color-mix(in oklab, ' + bg + ' 85%, #000 15%' : 'color-mix(in oklab, ' + bg + ' 85%, #fff 15%';
 		}
 		if(IE){
 			style1 = 'rgb(85, 144, 255)';

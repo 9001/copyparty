@@ -20,7 +20,7 @@ html {
 	border-bottom: 2px solid rgb(7, 130, 212);
 	position: fixed;
 	z-index: 10;
-	box-shadow: 0 0 1em color-mix(var(--bg-max) 60%, transparent 40%);
+	box-shadow: 0 0 1em color-mix(in oklab, var(--bg-max) 60%, transparent 40%);
 }
 #homebtn:hover, #homebtn:focus-visible {
 	background: var(--bg-u5);
@@ -51,13 +51,13 @@ html {
 	padding: 1.5em;
 	padding-bottom: 0em;
 	line-height: 1.3em;
-	background: color-mix(var(--a-gray) 27%, var(--bg-max));
+	background: color-mix(in oklab, var(--a-gray) 27%, var(--bg-max));
 	border-radius: .5em;
 	border: var(--bg-u5) solid 1px;
-	box-shadow: 0 0 2em color-mix(var(--bg-max) 60%, transparent 40%);
+	box-shadow: 0 0 2em color-mix(in oklab, var(--bg-max) 60%, transparent 40%);
 }
 html.y #wrap {
-	background: color-mix(var(--a-gray) 18%, var(--bg-max));
+	background: color-mix(in oklab, var(--a-gray) 18%, var(--bg-max));
 }
 #wrap.w {
 	max-width: 96%;
