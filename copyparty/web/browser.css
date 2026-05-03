@@ -2861,7 +2861,7 @@ html.c .modalcontent {
     margin: 0 -.4em;
     text-align: center;
 }
-.modal.unmodal {
+.modal.vis.unmodal {
 	position: initial;
 	.modalcontent{
 		width: 100%;
