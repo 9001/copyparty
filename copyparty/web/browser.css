@@ -2124,6 +2124,7 @@ html.a .btn {
 	margin: .8em 0 0 .6em;
 	padding: 0;
 }
+.disabled,
 #thumbs,
 #au_prescan,
 #au_fullpre,

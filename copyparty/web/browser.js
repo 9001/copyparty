@@ -977,6 +977,8 @@ ebi('wtoggle').addEventListener('wheel', function (e) {
 });
 
 ebi('up_quick').onclick = function(){
+	if(!has(perms, 'write'))
+		return;
 	var btn = ebi('up_quick_btn');
 	clmod(btn, 'on', 't');
 	var isOff = clgot(btn, 'on'); // button has inverted display logic
@@ -8761,14 +8763,21 @@ function apply_perms(res) {
 	var o = QSA('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++) {
 		var display = '';
+		var enabled = true;
 		var needed = o[a].getAttribute('data-perm').split(' ');
 		for (var b = 0; b < needed.length; b++) {
 			if (!has(perms, needed[b])) {
-				display = 'none';
+				if(needed[b] == 'write')
+					enabled = false;
+				else
+					display = 'none';
 			}
 		}
+		clmod(o[a], 'disabled', !enabled);
 		o[a].style.display = display;
 	}
+	clmod(ebi('up_quick'), 'disabled', !has(perms, 'write'));
+	ebi('bup_tgl').style.display = has(perms, 'write') ? '' : 'none';
 
 	var o = QSA('#ops>a[data-dep], #u2conf td[data-dep]');
 	for (var a = 0; a < o.length; a++)
