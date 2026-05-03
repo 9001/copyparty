@@ -1141,10 +1141,14 @@ var bup = ebi('op_bup');
 ebi('bup_tgl').appendChild(bup);
 ebi('h_bup').onclick = function() {
 	var open = !clgot(bup, 'act');
-	if(open)
+	if(open){
+		location.hash = '#h_bup';
 		modaltoggle('bup', true);
-	else
+	}
+	else{
+		location.hash = '#h_up2k';
 		modaltoggle('up2k', true);
+	}
 	ebi('bup_tgl').open = !open;
 };
 
@@ -1582,12 +1586,16 @@ function goto(dest) {
 		if (fn)
 			fn();
 	}
+	else{
+		if(location.hash.startsWith('#h_'))
+			location.hash = '#';
+	}
 
 	ebi('srchfolder_div').style.display = dest == 'search' ? 'block' : 'none';
 		
 	clmod(document.documentElement, 'op_open', dest);
 	// enables the use of keyboard page nav on modals
-	clmod(document.documentElement, 'noscroll', QS('.modal.vis'));
+	clmod(document.documentElement, 'noscroll', QS('.modal.vis') && QS('.modal.vis').style.position == 'fixed');
 
 	if (treectl)
 		treectl.onscroll();
@@ -1602,6 +1610,8 @@ window.onhashchange = function() {
 		console.log('closing modal due to hash');
 	}
 	if(a_modal && location.hash == '#h_' + a_modal.id){
+		if(a_modal.style.position != 'fixed')
+			return;
 		var m_header = QS('.modal.vis .modalheader');
 		if(m_header){
 			m_header.click();
@@ -1615,7 +1625,6 @@ window.onhashchange = function() {
 		var p_modal = header.closest('.modal');
 		if(!p_modal)
 			return;
-		console.log(p_modal)
 		if(!clgot(p_modal, 'vis')){
 			console.log('forcing modal open due to subheader hash');
 			modaltoggle(p_modal.id);
@@ -8767,9 +8776,8 @@ function apply_perms(res) {
 		var needed = o[a].getAttribute('data-perm').split(' ');
 		for (var b = 0; b < needed.length; b++) {
 			if (!has(perms, needed[b])) {
-				if(needed[b] == 'write')
-					enabled = false;
-				else
+				enabled = false;
+				if(needed[b] != 'write')
 					display = 'none';
 			}
 		}
@@ -8828,8 +8836,13 @@ function apply_perms(res) {
 
 	widget.setvis();
 	thegrid.setvis();
-	if (!have_read && have_write)
+	if (!have_read && have_write){
+		ebi('up2k').style.position = 'initial';
+		ebi('up_content').style.width = '100%';
+		ebi('up_content').style.margin = '0';
+
 		goto('up2k');
+	}
 }
 
 
