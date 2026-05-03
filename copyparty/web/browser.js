@@ -2227,21 +2227,22 @@ function MPlayer() {
 				// insta start
 				r.fvol = r.vol;
 				mpss.go();
+				r.au.volume = r.expvol(r.fvol);
 			}
 		}
 	};
 	r.fade_out = function () {
 		mpss.stop();
-		if(mpl.afade == false){
-			// insta stop
-			r.au.pause();
-			mpl.pp();
-			return;
-		}
 		r.fvol = r.vol;
 		r.fdir = -0.05 * r.vol * (CHROME ? 2 : 1);
 		r.ftid = r.au.tid;
-		fader();
+		if(mpl.afade != false)
+			fader();
+		else {
+			// insta stop
+			r.au.pause();
+			mpl.pp();
+		}
 	};
 	r.stopfade = function (hard) {
 		clearTimeout(r.ftimer);
