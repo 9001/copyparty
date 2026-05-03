@@ -2433,7 +2433,12 @@ var widget = (function () {
 		}
 	};
 	r.setvis = function () {
-		widget.style.display = !has(perms, "read") || showfile.abrt ? 'none' : '';
+		var display = !has(perms, "read") || showfile.abrt ? 'none' : '';
+		ebi('wtico').style.display =
+		ebi('wtoggle').style.display =
+		ebi('widgeti').style.display =
+		ebi('np_inf').style.display =
+			display;
 	};
 	wtico.onclick = function (e) {
 		if (!touchmode)
@@ -8836,13 +8841,11 @@ function apply_perms(res) {
 
 	widget.setvis();
 	thegrid.setvis();
-	if (!have_read && have_write){
-		ebi('up2k').style.position = 'initial';
-		ebi('up_content').style.width = '100%';
-		ebi('up_content').style.margin = '0';
 
+	var up_only = !have_read && have_write;
+	if (up_only)
 		goto('up2k');
-	}
+	clmod(ebi('up2k'), 'unmodal', up_only);
 }
 
 

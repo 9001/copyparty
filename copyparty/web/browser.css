@@ -2861,7 +2861,14 @@ html.c .modalcontent {
     margin: 0 -.4em;
     text-align: center;
 }
-
+.modal.unmodal {
+	position: fixed;
+	.modalcontent{
+		width: 100%;
+		max-width: none;
+		margin: 0;
+	}
+}
 
 
 /* upload.css */
