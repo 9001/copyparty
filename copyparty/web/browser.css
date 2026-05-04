@@ -1621,7 +1621,7 @@ html.y #ops svg circle {
 	padding: 0 .5em;
 	white-space: nowrap;
 	display: flex;
-	height: 2em;
+	height: 2.5em;
 	border-radius: 5px;
 	border-radius: var(--radius);
 	background: var(--bg-u2);
