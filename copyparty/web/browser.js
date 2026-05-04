@@ -1604,7 +1604,8 @@ function goto(dest) {
 		
 	clmod(document.documentElement, 'op_open', dest);
 	// enables the use of keyboard page nav on modals
-	clmod(document.documentElement, 'noscroll', QS('.modal.vis') && QS('.modal.vis').style.position == 'fixed');
+	var a_modal = QS('.modal.vis');
+	clmod(document.documentElement, 'noscroll', a_modal && window.getComputedStyle(a_modal).position == 'fixed');
 
 	if (treectl)
 		treectl.onscroll();

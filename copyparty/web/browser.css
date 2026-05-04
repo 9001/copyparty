@@ -4703,11 +4703,10 @@ html.e #tree_footer {
 	background: transparent;
 }
 html.e #wrap {
-  transform: translateX(calc((var(--negative-space) * 2) - .2em));
   padding-right: var(--negative-space);
   position: relative;
-  margin-right: calc((var(--negative-space) * 2) - .1em);
-  margin-left: -6px;
+  margin-right: 0;
+  margin-left: -10px;
   margin-top: 0;
   /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
 }
