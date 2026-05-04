@@ -2,11 +2,12 @@
 # 2026-0428-0907 `v1.21.0` UI V2
 
 ## 🧪 new features
-* drag n drop support within the browser window to move files or folders
+* [Add moving files into other folders by dragging](https://github.com/tilse/copyparty-uiV1.5/pull/1) within the browser window to move files or folders
 * custom accent color setting added. works best for light and dark themes (the first 4 in the list)
 * right click (long press) on mobile is now possible
 * selection checkboxes on items in grid view
 * the tree and path can be visible at the same time
+* #386 gallery view toggle for smaller margins / bigger image previews
 * settings and upload are now a popup/modal
 * settings can be navigated via sections and former tooltip info is now always visible
 * new floating [+] button in bottom right for quickly creating files / folders / uploading
@@ -24,6 +25,9 @@
 
 * #1455 tooltips disappear more consistently when element is no longer hovered
 * scrollable tree header so all options are accessible independent of tree width
+* #1378 improved mobile layout
+* media player has "fade" option now to disable fade in / fade out, which fixes play / pause on iOS lockscreens
+* #1002 proper overflow handling for text files or readmes (svg editor still overflows, but it doesn't break the page layout anymore)
 
 ## 🔧 other changes
 
@@ -47,7 +51,7 @@
 
 ## 😔 unfun facts
 
-* added a setting that gets rid of (most) emojis
+* #1209 (partially), #711 added a setting that gets rid of (most) emojis
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
