@@ -6223,12 +6223,6 @@ var thegrid = (function () {
 		return gclick.call(this, e, false);
 	}
 
-	function gselclick(e) {
-		var oth = ebi(this.closest('a').getAttribute('ref')),
-			td = oth.closest('td').nextSibling;
-		td.onclick.call(td, e);
-	}
-
 	function gclick2(e) {
 		if (ctrl(e) || !r.sel)
 			return true;
@@ -6475,7 +6469,14 @@ var thegrid = (function () {
 
 		var chks = QSA('.gselchk');
 		for (var a = 0, aa = chks.length; a < aa; a++) {
-			chks[a].onclick = gselclick;
+			chks[a].onclick = function (e) {
+				var oth = ebi(this.closest('a').getAttribute('ref')),
+					td = oth.closest('td').nextSibling;
+				if(td && td.onclick)
+					td.onclick.call(td, e);
+				else
+					rcm.show(e);
+			}
 		}
 
 		r.dirty = false;
@@ -10655,7 +10656,7 @@ var rcm = (function () {
 		menu.style.display = '';
 	}
 
-	ebi('wrap').oncontextmenu = function (e) {
+	r.show = function (e) {
 		if (!r.enabled || e.shiftKey || (r.double && menu.style.display) || /doc=/.exec(location.search)) {
 			r.hide(true);
 			return true;
@@ -10669,6 +10670,10 @@ var rcm = (function () {
 		var gfile = thegrid.en && e.target && e.target.closest('#ggrid > a');
 		show(e.clientX, e.clientY, gfile || e.target, gfile);
 		return false;
+	}
+
+	ebi('wrap').oncontextmenu = function (e) {
+		r.show(e);
 	};
 	menu.onblur = function () { setTimeout(r.hide) };
 
