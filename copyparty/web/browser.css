@@ -3922,11 +3922,6 @@ html.e #wrap.thin {
 		}
 	}
 
-	html.b #ggrid {
-		padding: 0 0 2em 0;
-		gap: 1em 1.5em;
-	}
-
 	#ggrid > a {
 		margin: unset;
 		padding: unset;
