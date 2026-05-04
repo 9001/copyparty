@@ -8417,7 +8417,7 @@ var treectl = (function () {
 					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
-			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade' : '') + tn.cls,
+			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade ' : '') + (img_re.exec(fname) ? 'img ' : '') + tn.cls,
 				ln = ['<tr class="' + cl + '"><td>' + tn.lead + '</td><td><a href="' +
 					top + tn.href + '" id="' + id + '">' + hname +
 					'</a></td><td sortv="' + tn.sz + '">' + filesizefun(tn.sz)];

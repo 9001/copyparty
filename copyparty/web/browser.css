@@ -3915,7 +3915,7 @@ html.e #wrap.thin {
 			padding: .1em 0;
 			margin: .3em;
 		}
-		a:not(.dir) {
+		a.img {
 			span {
 				display: none;
 			}
