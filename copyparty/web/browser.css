@@ -1184,7 +1184,8 @@ html:not(.e) #ggrid>a.dir:before {
   	height: 1.5em;
 	padding: .1em;
 }
-.btn.svgIcon.gb1 {
+.btn.svgIcon.gb_grd,
+.btn.svgIcon.gb_glr {
 	width: 1.7em;
   	height: 1.7em;
 	padding: 0;
@@ -2878,6 +2879,9 @@ html.c .modalcontent {
 	.close {
 		display: none;
 	}
+	.splitsub {
+		margin-bottom: .5em;
+	}
 }
 
 
@@ -3904,6 +3908,18 @@ html.e #wrap.thin {
 		grid-template-columns: repeat(auto-fit,var(--grid-sz));
 		justify-content: center;
 		gap: 1em;
+	}
+	#ggrid.gallery {
+		gap: 1px 2px;
+		a::before {
+			padding: .1em 0;
+			margin: .3em;
+		}
+		a:not(.dir) {
+			span {
+				display: none;
+			}
+		}
 	}
 
 	html.b #ggrid {

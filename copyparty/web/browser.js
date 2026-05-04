@@ -6046,8 +6046,9 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
-			'<a href="#" id="gridicon_template" class="grdbtn gb1 svgIcon tgl btn on"></a>' +
-			'<a href="#" id="listicon_template" class="grdbtn gb2 svgIcon tgl btn"></a>' +
+			'<a href="#" id="gridicon_template" class="grdbtn gb_grd svgIcon tgl btn on"></a>' +
+			'<a href="#" id="galleryicon_template" class="grdbtn gb_glr svgIcon tgl btn"></a>' +
+			'<a href="#" id="listicon_template" class="grdbtn gb_lst svgIcon tgl btn"></a>' +
 			'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
 			'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
 			'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
@@ -6071,19 +6072,24 @@ var thegrid = (function () {
 	var ggrid = ebi('ggrid');
 
 	var svg_grid = svg_box + '<rect x="4" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="4" y="13" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="13" width="7" height="7" rx="1" fill="currentColor"/></svg>'
+	var svg_gallery = svg_box + '<path d="M4 17L7.58959 13.7694C8.38025 13.0578 9.58958 13.0896 10.3417 13.8417L11.5 15L15.0858 11.4142C15.8668 10.6332 17.1332 10.6332 17.9142 11.4142L20 13.5M11 9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9C9 8.44772 9.44772 8 10 8C10.5523 8 11 8.44772 11 9ZM6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z"' + svg_options + '/></svg>'
 	var svg_list = svg_box + '<path fill-rule="evenodd" clip-rule="evenodd" d="M9 6C9 4.34315 7.65685 3 6 3H4C2.34315 3 1 4.34315 1 6V8C1 9.65685 2.34315 11 4 11H6C7.65685 11 9 9.65685 9 8V6ZM7 6C7 5.44772 6.55228 5 6 5H4C3.44772 5 3 5.44772 3 6V8C3 8.55228 3.44772 9 4 9H6C6.55228 9 7 8.55228 7 8V6Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9 16C9 14.3431 7.65685 13 6 13H4C2.34315 13 1 14.3431 1 16V18C1 19.6569 2.34315 21 4 21H6C7.65685 21 9 19.6569 9 18V16ZM7 16C7 15.4477 6.55228 15 6 15H4C3.44772 15 3 15.4477 3 16V18C3 18.5523 3.44772 19 4 19H6C6.55228 19 7 18.5523 7 18V16Z" fill="currentColor"/><path d="M11 7C11 6.44772 11.4477 6 12 6H22C22.5523 6 23 6.44772 23 7C23 7.55228 22.5523 8 22 8H12C11.4477 8 11 7.55228 11 7Z" fill="currentColor"/><path d="M11 17C11 16.4477 11.4477 16 12 16H22C22.5523 16 23 16.4477 23 17C23 17.5523 22.5523 18 22 18H12C11.4477 18 11 17.5523 11 17Z" fill="currentColor"/></svg>'
 	ebi('gridicon_template').innerHTML = svg_grid;
+	ebi('galleryicon_template').innerHTML = svg_gallery;
 	ebi('listicon_template').innerHTML = svg_list;
 
 	var ico1 = ebi('gridicon_template').cloneNode(true);
-	var ico2 = ebi('listicon_template').cloneNode(true);
-	clmod(ico1, 'on', 't');
-	clmod(ico2, 'on', 't');
+	//var ico2 = ebi('galleryicon_template').cloneNode(true);
+	var ico3 = ebi('listicon_template').cloneNode(true);
+	clmod(ico1, 'on', false);
+	//clmod(ico2, 'on', false);
+	clmod(ico3, 'on', true);
 
 	// file list header
 	ebi('wtc').innerHTML = (
 		ico1.outerHTML +
-		ico2.outerHTML +
+		//ico2.outerHTML +
+		ico3.outerHTML +
 		'<details id="hcol_dd">' +
 			'<summary id="h_hidden">' + L.cl_hiddenc + '</summary>' + 
 		'<div id="hcol_content" class="setting">' +
@@ -6155,6 +6161,7 @@ var thegrid = (function () {
 		ebi('wtc').style.display = lfiles.style.display;
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
+		clmod(ggrid, 'gallery', r.gallery);
 		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
@@ -6604,9 +6611,23 @@ var thegrid = (function () {
 		swrite('ga_thresh', r.gathr = (isNum(n) ? n : 0) || 70);
 	};
 	
-	var gtgls = QSA('.grdbtn');
-	for(var a = 0; a < gtgls.length; a++)
-		gtgls[a].onclick = ebi('griden').onclick;
+	var gbtn = QSA('.gb_grd');
+	for(var a = 0; a < gbtn.length; a++)
+		gbtn[a].onclick = function(){
+			if(!thegrid.en)
+				ebi('griden').click();
+		}
+
+	var lsbtn = QSA('.gb_lst');
+	for(var a = 0; a < lsbtn.length; a++)
+		lsbtn[a].onclick = function(){
+			if(thegrid.en)
+				ebi('griden').click();
+		}
+
+	bcfg_bind(r, 'gallery', 'galleryicon_template', false, function (v) {
+		clmod(ebi('ggrid'), 'gallery', v);
+	});
 
 	return r;
 })();
