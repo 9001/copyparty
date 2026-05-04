@@ -7404,7 +7404,7 @@ var search_ui = (function () {
 				ext = '%';
 
 			var links = linksplit(r.rp + '', null, id).join('<span>/</span>'),
-				nodes = ['<tr><td>-</td><td><div>' + links +
+				nodes = ['<tr class="' + (img_re.exec(r.rp) ? 'img ' : '') + '"><td>-</td><td><div>' + links +
 					'</div></td><td sortv="' + sz + '">' + hsz];
 
 			for (var b = 0; b < tagord.length; b++) {
