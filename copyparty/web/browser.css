@@ -3911,6 +3911,7 @@ html.e #wrap.thin {
 	}
 	#ggrid.gallery {
 		gap: 1px 2px;
+		margin: -.2em -.5em;
 		a::before {
 			padding: .1em 0;
 			margin: .3em;
