@@ -3934,6 +3934,7 @@ html.e #wrap.thin {
   	#ggrid>a>span {
 		text-align: center;
 		padding: .2em .2em .15em .2em;
+		user-select: text;
 	}
 }
 
