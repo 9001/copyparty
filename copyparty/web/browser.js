@@ -7256,12 +7256,17 @@ var search_ui = (function () {
 				if (!ebi(chk).checked)
 					continue;
 
+				if(q.length > 0)
+					q += ' and ';
+				
+				q += ' ( ';
 				for (var c = 0; c < tvs.length; c++) {
 					var tv = tvs[c];
 					if (!tv.length)
 						break;
 
-					q += ' and ';
+					if(c > 0)
+						q += ' or ';
 
 					if (k == 'adv') {
 						q += tv.replace(/ +/g, " and ").replace(/([=!><]=?)/, " $1 ");
@@ -7298,12 +7303,23 @@ var search_ui = (function () {
 							tv = '"' + tv + '"';
 						}
 
+						var quote = tv.match('"') ? '"' : '';
+						var match;
+						while ( (match = tv.match(/[^\*\"\s]\*[^\*\"\s]/)) && match[0]){
+							console.log(match)
+							tv = tv.replace(
+								match[0],
+								match[0].replace('*', '*' + quote + ' and ' + k + ' like ' + quote + '*')
+							)
+						}
+
 						q += not + k + ' like ' + tv;
 					}
 				}
+				q += ' ) ';
 			}
 		}
-		ebi('q_raw').value = q.slice(5);
+		ebi('q_raw').value = q.trim();
 	}
 
 	function do_search() {
