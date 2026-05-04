@@ -728,7 +728,7 @@ html.y #files span.fsz_P { font-weight: bold }
 	background: none;
 }
 #path a {
-	padding: 0 .35em;
+	padding: .35em;
 	position: relative;
 	z-index: 1;
 	/* ie: */
