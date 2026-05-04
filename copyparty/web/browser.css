@@ -987,6 +987,9 @@ tr.play td:nth-child(1) a {
 .imgcontainer:hover .gselchk {
 	display: block;
 }
+.srch_header .gselchk {
+	display: none !important;
+}
 .gselchk {
 	position: absolute;
 	display: none;
