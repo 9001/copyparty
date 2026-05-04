@@ -1565,7 +1565,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	border: var(--transparent) solid 1px;
 	color: var(--a);
 	font-size: 1.5em;
-	padding: 0 .4em;
+	padding: .15em .4em;
 	margin: 0;
 }
 .unfun #ops a {
@@ -1586,7 +1586,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	border-radius: 0 0 var(--radius) var(--radius);
 	border-bottom: .3em solid var(--a);
 	box-shadow: var(--op-aa-sh);
-	margin: -.2em 0 -.6em 0;
+	margin: -1px 0 -.35em 0;
 	padding-top: .2em;
 }
 #ops a svg {
@@ -1618,7 +1618,7 @@ html.y #ops svg circle {
 	vertical-align: bottom;
 }
 #ops {
-	padding: .25em .5em;
+	padding: 0 .5em;
 	white-space: nowrap;
 	display: flex;
 	height: 2em;
