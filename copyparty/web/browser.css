@@ -963,6 +963,8 @@ tr.play td:nth-child(1) a {
 	max-height: calc(var(--grid-sz)/1.25);
 	margin: 0 auto;
 	display: block;
+	width: 100%;
+	object-fit: cover;
 }
 #ggrid>a.dir img {
   max-width: calc(var(--grid-sz) - 20px);
