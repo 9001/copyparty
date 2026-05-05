@@ -3948,6 +3948,38 @@ html.e #wrap.thin {
 			}
 		}
 	}
+	#ggrid.gallery.nocrop {
+		text-align: center;
+		display: block;
+		margin: -.2em -.5em;
+		a::before {
+			padding: .1em 0;
+			margin: .3em;
+		}
+		a {
+			margin-bottom: .2em;
+		}
+		a.img, a.dir {
+			min-width: calc(var(--grid-sz) / 2);
+			width: auto;
+			img {
+				max-width: none;
+				height: calc(var(--grid-sz) - 2em);
+
+			}
+		}
+		a.dir {
+			img {
+				margin-left: 10px;
+				margin-right: 10px;
+			}
+		}
+		a.img {
+			span {
+				display: none;
+			}
+		}
+	}
 
 	#ggrid > a {
 		margin: unset;
