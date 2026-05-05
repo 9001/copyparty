@@ -20,6 +20,8 @@
 * mute toggle button
 * name of playing audio is now displayed
 * audio equalizer can be operated via sliders
+* image viewer has nearest neighbor scale mode toggle
+* toggle to scale up small grid thumbnails to fit
 
 ## 🩹 bugfixes
 
