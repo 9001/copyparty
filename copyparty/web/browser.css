@@ -3963,7 +3963,7 @@ html.e #wrap.thin {
 			min-width: calc(var(--grid-sz) / 2);
 			width: auto;
 			img {
-				max-width: none;
+				max-width: 100%;
 				height: calc(var(--grid-sz) - 2em);
 
 			}
