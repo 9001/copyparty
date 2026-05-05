@@ -7792,7 +7792,7 @@ var treectl = (function () {
 		// wait for animation to finish (.15s), then set display to none if width still 0
 		setTimeout(function () {
 			onresize();
-		}, 150);
+		}, 170);
 	};
 
 	function unmenter() {
@@ -7880,7 +7880,7 @@ var treectl = (function () {
 
 	function onresize(e) {
 		if (!entreed || r.hidden){
-			if(ebi('tree').style.width <= 0)
+			if(ebi('tree').style.width == '0px')
 				ebi('tree').style.display = 'none';
 			return;
 		}
