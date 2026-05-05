@@ -8888,8 +8888,10 @@ function apply_perms(res) {
 	thegrid.setvis();
 
 	var up_only = !have_read && have_write;
-	if (up_only)
+	if (up_only){
 		goto('up2k');
+		clmod(document.documentElement, 'noscroll', false);
+	}
 	clmod(ebi('up2k'), 'unmodal', up_only);
 	clmod(ebi('opa_mkd'), 'vis', up_only);
 }
