@@ -2521,6 +2521,17 @@ html.noscroll .sbar::-webkit-scrollbar {
     height: 100%;
     object-fit: contain;
 }
+#bbox-overlay:has(video) {
+	#bbox-next,
+	#bbox-prev {
+		height: 0;
+	}
+}
+#bbox-overlay.pixelated .full-image img,
+#bbox-overlay.pixelated .full-image video {
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: pixelated;
+}
 html.bb_fsc .full-image img,
 html.bb_fsc .full-image video {
 	max-height: 100%;
@@ -2538,6 +2549,12 @@ html.bb_fsc figcaption {
 }
 .full-image video {
 	background: #222;
+}
+#bbox-overlay figcaption {
+	pointer-events: none;
+}
+#bbox-overlay figcaption * {
+	pointer-events: all;
 }
 .full-image figcaption {
 	display: block;

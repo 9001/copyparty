@@ -28,7 +28,7 @@ window.baguetteBox = (function () {
             onChange: null,
             readDirRtl: false,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnVmode, btnReadDir, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnPixelated, btnVmode, btnReadDir, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -310,8 +310,9 @@ window.baguetteBox = (function () {
                 '<div id="bbox-btns">' +
                     '<a id="bbox-close" class="btn" aria-label="Close">✕</a>' +
                     '<a id="bbox-vmode" class="btn" tt="a"></a>' +
-                    '<a id="bbzoom" class="tgl btn" tt="zoom/stretch smaller images to fill screen">↕</a>' +
                     '<a id="bbox-full" class="btn" tt="full-screen">⛶</a>' +
+                    '<a id="bbzoom" class="tgl btn" tt="zoom/stretch smaller images to fill screen">↕</a>' +
+                    '<a id="bbpixelated" class="tgl btn" tt="pixelated rendering (good for pixel art)">👾</a>' +
                     '<a id="bbox-tsel" class="tgl btn">☑️sel</a>' +
                     '<a id="bbox-rotr" class="btn">↷</a>' +
                     '<a id="bbox-rotl" class="btn">↶</a>' +
@@ -335,10 +336,12 @@ window.baguetteBox = (function () {
         btnSel = ebi('bbox-tsel');
         btnFull = ebi('bbox-full');
         btnZoom = ebi('bbzoom');
+        btnPixelated = ebi('bbpixelated');
         btnVmode = ebi('bbox-vmode');
         btnClose = ebi('bbox-close');
 
         bcfg_bind(options, 'bbzoom', 'bbzoom', false, setzoom);
+        bcfg_bind(options, 'bbpixelated', 'bbpixelated', false, setpixelated);
         setzoom();
     }
 
@@ -356,6 +359,7 @@ window.baguetteBox = (function () {
             ['R', 'rotate (shift=ccw)'],
             ['F', 'toggle fullscreen'],
             ['Z', 'toggle zoom/stretch'],
+            ['X', 'toggle pixelated rendering'],
             ['S', 'toggle file selection'],
             ['space, P, K', 'video: play / pause'],
             ['U', 'video: seek 10sec back'],
@@ -440,6 +444,8 @@ window.baguetteBox = (function () {
             tglfull();
         else if (kl == "z")
             btnZoom.click();
+        else if (kl == "x")
+            btnPixelated.click();
         else if (kl == "s")
             tglsel();
         else if (kl == "r")
@@ -551,6 +557,12 @@ window.baguetteBox = (function () {
         var sel = clgot(btnZoom, 'on')
         clmod(ebi('bbox-overlay'), 'fill', sel);
         btnState(btnZoom, sel);
+    }
+
+    function setpixelated() {
+        var sel = clgot(btnPixelated, 'on')
+        clmod(ebi('bbox-overlay'), 'pixelated', sel);
+        btnState(btnPixelated, sel);
     }
 
     function tglsel() {
