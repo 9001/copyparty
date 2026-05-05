@@ -973,6 +973,7 @@ tr.play td:nth-child(1) a {
 #ggrid.nocrop>a img {
 	max-height: 20em;
 	max-height: calc(var(--grid-sz)*2);
+	object-fit: contain;
 }
 
 .imgcontainer {
