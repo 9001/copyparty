@@ -18,6 +18,7 @@ copyparty.egg-info/
 
 # ide
 *.sublime-workspace
+/.vs
 
 # winmerge
 *.bak
@@ -51,4 +52,3 @@ result-*
 
 # IDEA config
 .idea/
-/.vs
