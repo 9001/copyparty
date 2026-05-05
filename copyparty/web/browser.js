@@ -508,6 +508,7 @@ if (1)
 		"gt_vau": "don't show videos, just play the audio\">🎧",
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
 		"gt_crop": "center-crop thumbnails\">crop",
+		"gt_upscale": "scale up small image previews to fit",
 		"gt_3x": "hi-res thumbnails\">3x",
 		"gt_zoom": "zoom",
 		"gt_chop": "chop",
@@ -6054,6 +6055,7 @@ var thegrid = (function () {
 			'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
 			'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
 			'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
+			'<a href="#" class="tgl btn" id="gridupscale" tt="' + L.gt_upscale + '">↕</a> ' +
 			'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
 			'<span id="gridzoom">' + L.gt_zoom + ': ' +
 				'<a href="#" class="btn" z="-1.1" tt="Hotkey: shift-A">&ndash;</a> ' +
@@ -6161,6 +6163,7 @@ var thegrid = (function () {
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
 		clmod(ggrid, 'gallery', r.gallery);
+		clmod(ggrid, 'noupscale', !r.upscale);
 		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
@@ -6592,6 +6595,9 @@ var thegrid = (function () {
 	bcfg_bind(r, 'ihop', 'ihop', true);
 	bcfg_bind(r, 'vau', 'gridvau', false);
 	bcfg_bind(r, 'crop', 'gridcrop', !dcrop.endsWith('n'), r.set_crop);
+	bcfg_bind(r, 'upscale', 'gridupscale', true, function (v) {
+		clmod(ggrid, 'noupscale', !v)
+	});
 	bcfg_bind(r, 'x3', 'grid3x', dth3x.endsWith('y'), r.set_x3);
 	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
 	bcfg_bind(r, 'en', 'griden', dgrid, function (v) {
