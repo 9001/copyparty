@@ -7196,7 +7196,9 @@ class HttpCli(object):
             base = ""
             href = fn
             if use_abs_url:
-                base = "/" + vpath + "/"
+                base = self.args.SRS
+                if vpath:
+                    base += vpath + "/"
                 href = base + fn
 
             if fn in vfs_virt:
