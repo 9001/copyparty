@@ -969,6 +969,9 @@ tr.play td:nth-child(1) a {
 #ggrid.noupscale>a img {
 	width: auto;
 }
+#ggrid.noupscale.gallery.nocrop>a img {
+	object-fit: scale-down;
+}
 #ggrid>a.dir img {
   max-width: calc(var(--grid-sz) - 20px);
   margin: 10px auto 0 auto;
