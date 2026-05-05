@@ -7186,12 +7186,11 @@ class HttpCli(object):
         dirs = []
         files = []
         ptn_hr = RE_HR
-        use_abs_url = (
-            not is_opds
+        use_abs_url = is_opds or (
+            vpath
             and not is_ls
             and not is_js
             and not self.trailing_slash
-            and vpath
         )
         for fn in ls_names:
             base = ""
@@ -7527,17 +7526,20 @@ class HttpCli(object):
                 ]
 
             j2a["opds_osd"] = "%s%s?opds&osd" % (self.args.SRS, quotep(vpath))
-
+            j2a["opds_id"] = uuid.uuid5(uuid.NAMESPACE_URL, vpath + "/").urn
+            j2a["opds_title"] = (vpath.rsplit("/", 1)[-1] + '/') if vpath else self.args.bname
             for item in dirs:
                 href = item["href"]
                 href += ("&" if "?" in href else "?") + "opds"
                 item["href"] = href
+                item["opds_id"] = uuid.uuid5(uuid.NAMESPACE_URL, "%s/%s" % (vpath, item["name"])).urn
                 item["iso8601"] = "%sZ" % (item["dt"].replace(" ", "T"),)
 
             for item in files:
                 href = item["href"]
                 href += ("&" if "?" in href else "?") + "dl"
                 item["href"] = href
+                item["opds_id"] = uuid.uuid5(uuid.NAMESPACE_URL, "%s/%s" % (vpath, item["name"])).urn
                 item["iso8601"] = "%sZ" % (item["dt"].replace(" ", "T"),)
 
                 if "rmagic" in self.vn.flags:
