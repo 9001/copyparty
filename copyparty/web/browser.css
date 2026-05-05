@@ -16,11 +16,11 @@
 
 	--btn-fg: var(--a);
 	--btn-bg-a: rgba(128,128,128,0.15);
-	--btn-bg-a: color-mix(var(--bg-max) 85%, var(--fg-max) 20%);
+	--btn-bg-a: color-mix(in oklab, var(--bg-max) 85%, var(--fg-max) 20%);
 	--btn-bg: rgba(128,128,128,0.15);
-	--btn-bg: linear-gradient(-5deg, color-mix(var(--btn-bg-a) 40%, transparent), color-mix(var(--btn-bg-a)70%, var(--a-gray)));
+	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a) 40%, transparent), color-mix(in oklab, var(--btn-bg-a)70%, var(--a-gray)));
 	--btn-h-fg: var(--a-hil);
-	--btn-h-bg: color-mix(var(--a-gray) 45%, var(--bg-max));
+	--btn-h-bg: color-mix(in oklab, var(--a-gray) 45%, var(--bg-max));
 	--btn-1-fg: var(--bg);
 	--btn-1-bg: var(--a);
 	--btn-h-bs: var(--btn-bs);
@@ -38,7 +38,7 @@
 
 	--op-aa-fg: var(--a);
 	--op-aa-bg: var(--bg-d2);
-	--op-a-sh: color-mix(var(--bg-max) 50%, transparent 50%);
+	--op-a-sh: color-mix(in oklab, var(--bg-max) 50%, transparent 50%);
 
 	--u2-btn-b1: #999;
 	--u2-sbtn-b1: #999;
@@ -99,7 +99,7 @@
 	--g-f-bg: var(--bg-u3);
 	--g-f-b1: var(--bg-u5);
 	--g-f-fg: var(--fg-max);
-	--g-sh: color-mix(var(--bg-max) 30%, transparent 70%);
+	--g-sh: color-mix(in oklab, var(--bg-max) 30%, transparent 70%);
 
 	--f-sh1: 0.33;
 	--f-sh2: 0.02;
@@ -113,7 +113,7 @@
 
 	--fm-off: var(--a-hil);
 	--mp-sh: #1116;
-	--mp-b-bg: color-mix(var(--bg-max) 20%, transparent 80%);
+	--mp-b-bg: color-mix(in oklab, var(--bg-max) 20%, transparent 80%);
 
 	--scrl-hint: var(--bg-u2);
 
@@ -135,13 +135,13 @@ html.az {
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
 }
 html.ay {
-	--btn-bg: linear-gradient(-5deg, color-mix(var(--btn-bg-a)80%, var(--a)), color-mix(var(--btn-bg-a) 50%, transparent));
+	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a)80%, var(--a)), color-mix(in oklab, var(--btn-bg-a) 50%, transparent));
 }
 
 html.b {
 	--btn-bs: 0 .05em 0 var(--bg-d3) inset;
 	--btn-1-bs: 0 .05em 0 var(--btn-1h-bg) inset;
-	--btn-bg: color-mix(var(--bg-u5), transparent);
+	--btn-bg: color-mix(in oklab, var(--bg-u5), transparent);
 
 	--tree-bg: var(--bg);
 
@@ -529,7 +529,7 @@ html .ayjump:focus-visible {
 	cursor: pointer;
 }
 #qs_btns a {
-	background: color-mix(var(--txt-bg), transparent);
+	background: color-mix(in oklab, var(--txt-bg), transparent);
 	width: 1em;
 	display: inline-block;
 	text-align: center;
@@ -544,7 +544,7 @@ html.y #path {
 }
 #path a.dtarget {
 	text-shadow: var(--f-sel-sh) 0 0 5px;
-	background: color-mix(var(--a), transparent);
+	background: color-mix(in oklab, var(--a), transparent);
 }
 #path #entree {
 	margin-left: -.7em;
@@ -597,7 +597,7 @@ a:hover {
 }
 #files a:hover {
 	color: var(--fg-max);
-	background: color-mix(var(--a) 20%, transparent);
+	background: color-mix(in oklab, var(--a) 20%, transparent);
 	text-decoration: underline;
 }
 #files thead th {
@@ -631,7 +631,7 @@ a:hover {
 }
 #files tbody tr:hover td,
 #files tbody tr:hover td+td {
-	background: color-mix(var(--a) 15%, transparent);
+	background: color-mix(in oklab, var(--a) 15%, transparent);
 }
 a.dir {
 	color: var(--a);
@@ -722,13 +722,13 @@ html.y #files span.fsz_P { font-weight: bold }
 }
 #files tr.dtarget {
 	box-shadow: 0 0 5px 0 var(--f-sel-sh) inset;
-	background: color-mix(var(--a), transparent);
+	background: color-mix(in oklab, var(--a), transparent);
 }
 #files tr.dtarget td {
 	background: none;
 }
 #path a {
-	padding: 0 .35em;
+	padding: .5em .35em;
 	position: relative;
 	z-index: 1;
 	/* ie: */
@@ -743,7 +743,7 @@ html.y #files span.fsz_P { font-weight: bold }
 	transform: skew(-25deg);
 	border-right: #222 solid 2px;
 	border-right: var(--bg) solid 2px;
-	background: linear-gradient(70deg, transparent 40%, color-mix(var(--bg-max) 25%, transparent) 75%, color-mix(var(--bg-max) 35%, transparent));
+	background: linear-gradient(70deg, transparent 40%, color-mix(in oklab, var(--bg-max) 25%, transparent) 75%, color-mix(in oklab, var(--bg-max) 35%, transparent));
 }
 html.a #path i {
 	border-right: var(--bg) solid 1px;
@@ -987,6 +987,9 @@ tr.play td:nth-child(1) a {
 .imgcontainer:hover .gselchk {
 	display: block;
 }
+.srch_hdr .gselchk {
+	display: none !important;
+}
 .gselchk {
 	position: absolute;
 	display: none;
@@ -1097,7 +1100,7 @@ html:not(.e) #ggrid>a.dir:before {
 }
 #ggrid a.dtarget {
 	box-shadow: 0 0 5px 0 var(--f-sel-sh);
-	background: color-mix(var(--a), transparent);
+	background: color-mix(in oklab, var(--a), transparent);
 }
 #files tr.sel a,
 #files tr.sel a.play {
@@ -1184,7 +1187,8 @@ html:not(.e) #ggrid>a.dir:before {
   	height: 1.5em;
 	padding: .1em;
 }
-.btn.svgIcon.gb1 {
+.btn.svgIcon.gb_grd,
+.btn.svgIcon.gb_glr {
 	width: 1.7em;
   	height: 1.7em;
 	padding: 0;
@@ -1250,13 +1254,13 @@ html:not(.e) #ggrid>a.dir:before {
 	right: .4em;
 	font-size: xx-large;
 	font-weight: bold;
-	box-shadow: 0 0 .5em color-mix(var(--a) 20%, transparent);
+	box-shadow: 0 0 .5em color-mix(in oklab, var(--a) 20%, transparent);
 	border-radius: 10px;
 	border-radius: calc(var(--radius) * 1.2);
 	text-align: right;
 }
 #up_quick.open {
-	box-shadow: 0 0 .5em color-mix(var(--mp-sh) 20%, transparent);
+	box-shadow: 0 0 .5em color-mix(in oklab, var(--mp-sh) 20%, transparent);
 }
 #up_quick_more {
 	display: none;
@@ -1297,7 +1301,7 @@ html:not(.e):not(.d) #up_quick .btn {
 }
 html:not(.e):not(.d) #up_quick .btn.on {
 	transform: rotate(-90deg);
-	box-shadow: -.05em .02em .3em color-mix(var(--a) 20%, transparent);
+	box-shadow: -.05em .02em .3em color-mix(in oklab, var(--a) 20%, transparent);
 }
 #up_quick .btn .rotatable {
 	transition: all .20s;
@@ -1561,11 +1565,17 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	border: var(--transparent) solid 1px;
 	color: var(--a);
 	font-size: 1.5em;
-	padding: 0 .4em;
+	padding: .15em .4em;
 	margin: 0;
 }
 .unfun #ops a {
 	font-size: 1.2em;
+}
+#opa_mkd {
+	display: none;
+}
+#ops a.vis {
+	display: block;
 }
 #ops a.act {
 	color: #fff;
@@ -1576,7 +1586,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	border-radius: 0 0 var(--radius) var(--radius);
 	border-bottom: .3em solid var(--a);
 	box-shadow: var(--op-aa-sh);
-	margin: -.2em 0 -.6em 0;
+	margin: -1px 0 -.35em 0;
 	padding-top: .2em;
 }
 #ops a svg {
@@ -1608,10 +1618,10 @@ html.y #ops svg circle {
 	vertical-align: bottom;
 }
 #ops {
-	padding: .25em .5em;
+	padding: 0 .5em;
 	white-space: nowrap;
 	display: flex;
-	height: 2em;
+	height: 2.5em;
 	border-radius: 5px;
 	border-radius: var(--radius);
 	background: var(--bg-u2);
@@ -1980,7 +1990,7 @@ html.a .btn {
 }
 #tree li a.dtarget {
 	box-shadow: 0 0 5px 0 var(--f-sel-sh) inset;
-	background: color-mix(var(--a) 30%, transparent);
+	background: color-mix(in oklab, var(--a) 30%, transparent);
 }
 #tree ul a.sel {
 	background: #000;
@@ -2124,6 +2134,7 @@ html.a .btn {
 	margin: .8em 0 0 .6em;
 	padding: 0;
 }
+.disabled,
 #thumbs,
 #au_prescan,
 #au_fullpre,
@@ -2468,7 +2479,7 @@ html.noscroll .sbar::-webkit-scrollbar {
 	opacity: 1;
 }
 #bbox-overlay.sel {
-	background: color-mix(var(--a-dark) 70%, transparent);
+	background: color-mix(in oklab, var(--a-dark) 70%, transparent);
 }
 .full-image {
 	display: inline-block;
@@ -2860,7 +2871,21 @@ html.c .modalcontent {
     margin: 0 -.4em;
     text-align: center;
 }
-
+.modal.vis.unmodal {
+	position: initial;
+	.modalcontent{
+		width: 100%;
+		max-width: none;
+		margin: 0;
+	}
+	.closepane,
+	.close {
+		display: none;
+	}
+	.splitsub {
+		margin-bottom: .5em;
+	}
+}
 
 
 /* upload.css */
@@ -3024,7 +3049,7 @@ html.c .modalcontent {
 	font-size: 1.1em;
 }
 #u2btn:hover {
-	background: linear-gradient(var(--a) 0%, var(--a) 20%, color-mix(transparent 85%, var(--a) 15%));
+	background: linear-gradient(var(--a) 0%, var(--a) 20%, color-mix(in oklab, transparent 85%, var(--a) 15%));
 	border-color: var(--bg);
 	border-style: solid;
 	color: var(--fg-max);
@@ -3474,7 +3499,7 @@ html.cz {
 	}
 }
 html.c .modal .setting:hover {
-	background: color-mix(var(--bg-u5) 30%, transparent);
+	background: color-mix(in oklab, var(--bg-u5) 30%, transparent);
 }
 html.ay #u2btn {
 	box-shadow: .4em .4em 0 #ccc;
@@ -3574,7 +3599,7 @@ html.b * {
 }
 html.b #path,
 html.b #ops {
-	background: color-mix(var(--bg-u5), transparent);
+	background: color-mix(in oklab, var(--bg-u5), transparent);
 }
 html.b #treepar {
 	margin-left: .63em;
@@ -3887,10 +3912,18 @@ html.e #wrap.thin {
 		justify-content: center;
 		gap: 1em;
 	}
-
-	html.b #ggrid {
-		padding: 0 0 2em 0;
-		gap: 1em 1.5em;
+	#ggrid.gallery {
+		gap: 1px 2px;
+		margin: -.2em -.5em;
+		a::before {
+			padding: .1em 0;
+			margin: .3em;
+		}
+		a.img {
+			span {
+				display: none;
+			}
+		}
 	}
 
 	#ggrid > a {
@@ -3901,6 +3934,7 @@ html.e #wrap.thin {
   	#ggrid>a>span {
 		text-align: center;
 		padding: .2em .2em .15em .2em;
+		user-select: text;
 	}
 }
 
@@ -4669,11 +4703,10 @@ html.e #tree_footer {
 	background: transparent;
 }
 html.e #wrap {
-  transform: translateX(calc((var(--negative-space) * 2) - .2em));
   padding-right: var(--negative-space);
   position: relative;
-  margin-right: calc((var(--negative-space) * 2) - .1em);
-  margin-left: -6px;
+  margin-right: 0;
+  margin-left: -10px;
   margin-top: 0;
   /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
 }

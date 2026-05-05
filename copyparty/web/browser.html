@@ -136,6 +136,32 @@
 
 	<div id="pro" class="logue">{{ "" if sb_lg else logues[0] }}</div>
 
+	<div id="cfg" class="modal">
+		<a id="s_outside" class="closepane" href="#"></a>
+		<div id="s_content" class="modalcontent">
+			<a id="h_cfg" class="modalheader" href="#h_cfg"></a>
+			<div id="s_hor" class="modalsplit">
+				<div id="s_nav" class="splitsub"></div>
+				<div class="divider"></div>
+				<div id="s_list" class="opview splitsub"></div>
+			</div>
+			<a class="close btn" href="#">✕</a>
+		</div>
+	</div>
+
+	<div id="up2k" class="modal">
+		<a id="up_outside" class="closepane" href="#"></a>
+		<div id="up_content" class="modalcontent">
+			<a id="h_up2k" class="modalheader" href="#h_up2k">🚀 Upload</a>
+			<div id="up_hor" class="modalsplit">
+				<div id="op_up2k" class="opview splitsub"></div>
+				<div class="divider"></div>
+				<div id="up_info" class="splitsub"></div>
+			</div>
+			<a class="close btn" href="#">✕</a>
+		</div>
+	</div>
+
 	<div id="wtc" class="ghead"></div>
 	<table id="files">
 		<thead>
@@ -178,32 +204,6 @@
 
 	<div id="rcm" tabindex="0"></div>
 
-
-	<div id="cfg" class="modal">
-		<a id="s_outside" class="closepane" href="#"></a>
-		<div id="s_content" class="modalcontent">
-			<a id="h_cfg" class="modalheader" href="#h_cfg"></a>
-			<div id="s_hor" class="modalsplit">
-				<div id="s_nav" class="splitsub"></div>
-				<div class="divider"></div>
-				<div id="s_list" class="opview splitsub"></div>
-			</div>
-			<a class="close btn" href="#">✕</a>
-		</div>
-	</div>
-
-	<div id="up2k" class="modal">
-		<a id="up_outside" class="closepane" href="#"></a>
-		<div id="up_content" class="modalcontent">
-			<a id="h_up2k" class="modalheader" href="#h_up2k">🚀 Upload</a>
-			<div id="up_hor" class="modalsplit">
-				<div id="op_up2k" class="opview splitsub"></div>
-				<div class="divider"></div>
-				<div id="up_info" class="splitsub"></div>
-			</div>
-			<a class="close btn" href="#">✕</a>
-		</div>
-	</div>
 
 	<script>
 		var SR = "{{ r }}",

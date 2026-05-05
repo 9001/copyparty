@@ -168,6 +168,7 @@ if (1)
 		"wt_m3ua": "add to m3u playlist (click <code>📻copy</code> later)",
 		"wt_m3uc": "copy m3u playlist to clipboard",
 		"wt_grid": "toggle grid / list view$NHotkey: G",
+		"wt_gallery": "toggle gallery view with larger image previews",
 		"wt_prev": "previous track$NHotkey: J",
 		"wt_play": "play / pause$NHotkey: P",
 		"wt_next": "next track$NHotkey: L",
@@ -315,6 +316,7 @@ if (1)
 		"mt_one": "stop after one song\">1️⃣",
 		"mt_shuf": "shuffle the songs in each folder",
 		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
+		"mt_afade": "fade in / out when pausing / unpausing audio\">fade",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
@@ -823,6 +825,8 @@ ebi('ops').innerHTML = (
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">' + (fun_tgl ? '🧯' : 'undo') + '</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">' + (fun_tgl ? '🚀' : 'upload') + '</a>' +
 	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">' + (fun_tgl ? '🎈' : 'bup') + '</a>' +
+	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '"><p class="overlay_plus">+</p>📂</a>' +
+	//'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '"><p class="overlay_plus">+</p>📝</a>' +
 	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">' + (fun_tgl ? '📟' : 'msg') + '</a>' +
 	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">' + (fun_tgl ? '⚙️' : 'conf') + '</a>' +
 	'<a href="#" id="opa_acc" data-dest="acc" tt=""><span id="acc_pfp"' + (fun_tgl ? ' class="pfp"' : '') + '>' + (fun_tgl ? '👤' : 'acc') + '</span></a>' +
@@ -831,6 +835,12 @@ ebi('ops').innerHTML = (
 
 // mkdir + md
 function mktemp(is_dir) {
+	if(!has(perms, 'read')){
+		if(is_dir)
+			goto('mkdir');
+		else
+			goto('new_md');
+	}
 	qsr('#rcm_tmp');
 	if (!thegrid.en) {
 		var row = mknod('tr', 'rcm_tmp',
@@ -976,6 +986,8 @@ ebi('wtoggle').addEventListener('wheel', function (e) {
 });
 
 ebi('up_quick').onclick = function(){
+	if(!has(perms, 'write'))
+		return;
 	var btn = ebi('up_quick_btn');
 	clmod(btn, 'on', 't');
 	var isOff = clgot(btn, 'on'); // button has inverted display logic
@@ -1138,10 +1150,14 @@ var bup = ebi('op_bup');
 ebi('bup_tgl').appendChild(bup);
 ebi('h_bup').onclick = function() {
 	var open = !clgot(bup, 'act');
-	if(open)
+	if(open){
+		location.hash = '#h_bup';
 		modaltoggle('bup', true);
-	else
+	}
+	else{
+		location.hash = '#h_up2k';
 		modaltoggle('up2k', true);
+	}
 	ebi('bup_tgl').open = !open;
 };
 
@@ -1167,6 +1183,7 @@ var musicSettings = (
 	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
 	'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
 	'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
+	'<a href="#" class="tgl btn" id="au_afade" tt="' + L.mt_afade + '</a>' +
 	'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
 	'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
 	'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
@@ -1578,12 +1595,17 @@ function goto(dest) {
 		if (fn)
 			fn();
 	}
+	else{
+		if(location.hash.startsWith('#h_'))
+			location.hash = '#';
+	}
 
 	ebi('srchfolder_div').style.display = dest == 'search' ? 'block' : 'none';
 		
 	clmod(document.documentElement, 'op_open', dest);
 	// enables the use of keyboard page nav on modals
-	clmod(document.documentElement, 'noscroll', QS('.modal.vis'));
+	var a_modal = QS('.modal.vis');
+	clmod(document.documentElement, 'noscroll', a_modal && window.getComputedStyle(a_modal).position == 'fixed');
 
 	if (treectl)
 		treectl.onscroll();
@@ -1598,6 +1620,8 @@ window.onhashchange = function() {
 		console.log('closing modal due to hash');
 	}
 	if(a_modal && location.hash == '#h_' + a_modal.id){
+		if(a_modal.style.position != 'fixed')
+			return;
 		var m_header = QS('.modal.vis .modalheader');
 		if(m_header){
 			m_header.click();
@@ -1611,7 +1635,6 @@ window.onhashchange = function() {
 		var p_modal = header.closest('.modal');
 		if(!p_modal)
 			return;
-		console.log(p_modal)
 		if(!clgot(p_modal, 'vis')){
 			console.log('forcing modal open due to subheader hash');
 			modaltoggle(p_modal.id);
@@ -1780,6 +1803,7 @@ var mpl = (function () {
 		mp.read_order();  // don't bind
 	});
 	bcfg_bind(r, 'aplay', 'au_aplay', true);
+	bcfg_bind(r, 'afade', 'au_afade', true);
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
@@ -2218,7 +2242,14 @@ function MPlayer() {
 			r.ftid = r.au.tid;
 			r.au.play();
 			mpl.pp();
-			fader();
+			if(mpl.afade != false)
+				fader();
+			else{
+				// insta start
+				r.fvol = r.vol;
+				mpss.go();
+				r.au.volume = r.expvol(r.fvol);
+			}
 		}
 	};
 	r.fade_out = function () {
@@ -2226,7 +2257,13 @@ function MPlayer() {
 		r.fvol = r.vol;
 		r.fdir = -0.05 * r.vol * (CHROME ? 2 : 1);
 		r.ftid = r.au.tid;
-		fader();
+		if(mpl.afade != false)
+			fader();
+		else {
+			// insta stop
+			r.au.pause();
+			mpl.pp();
+		}
 	};
 	r.stopfade = function (hard) {
 		clearTimeout(r.ftimer);
@@ -2406,7 +2443,12 @@ var widget = (function () {
 		}
 	};
 	r.setvis = function () {
-		widget.style.display = !has(perms, "read") || showfile.abrt ? 'none' : '';
+		var display = !has(perms, "read") || showfile.abrt ? 'none' : '';
+		ebi('wtico').style.display =
+		ebi('wtoggle').style.display =
+		ebi('widgeti').style.display =
+		ebi('np_inf').style.display =
+			display;
 	};
 	wtico.onclick = function (e) {
 		if (!touchmode)
@@ -2777,7 +2819,7 @@ var vbar = (function () {
 		if (gradh != gh) {
 			gradh = gh;
 			style1 = auto_grad(r.can, accent, accent);
-			style2 = light ? 'color-mix(' + bg + ' 85%, #000 15%' : 'color-mix(' + bg + ' 85%, #fff 15%';
+			style2 = light ? 'color-mix(in oklab, ' + bg + ' 85%, #000 15%' : 'color-mix(in oklab, ' + bg + ' 85%, #fff 15%';
 		}
 		if(IE){
 			style1 = 'rgb(85, 144, 255)';
@@ -6006,8 +6048,9 @@ var thegrid = (function () {
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
 		'<div id="ghead" class="ghead">' +
-			'<a href="#" id="gridicon_template" class="grdbtn gb1 svgIcon tgl btn on"></a>' +
-			'<a href="#" id="listicon_template" class="grdbtn gb2 svgIcon tgl btn"></a>' +
+			'<a href="#" id="listicon_template" class="grdbtn gb_lst svgIcon tgl btn" tt="' + L.wt_grid + '"></a>' +
+			'<a href="#" id="gridicon_template" class="grdbtn gb_grd svgIcon tgl btn on" tt="' + L.wt_grid + '"></a>' +
+			'<a href="#" id="galleryicon_template" class="grdbtn gb_glr svgIcon tgl btn" tt="' + L.wt_gallery + '"></a>' +
 			'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
 			'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
 			'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
@@ -6030,15 +6073,17 @@ var thegrid = (function () {
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
 	var ggrid = ebi('ggrid');
 
-	var svg_grid = svg_box + '<rect x="4" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="4" y="13" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="13" width="7" height="7" rx="1" fill="currentColor"/></svg>'
 	var svg_list = svg_box + '<path fill-rule="evenodd" clip-rule="evenodd" d="M9 6C9 4.34315 7.65685 3 6 3H4C2.34315 3 1 4.34315 1 6V8C1 9.65685 2.34315 11 4 11H6C7.65685 11 9 9.65685 9 8V6ZM7 6C7 5.44772 6.55228 5 6 5H4C3.44772 5 3 5.44772 3 6V8C3 8.55228 3.44772 9 4 9H6C6.55228 9 7 8.55228 7 8V6Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9 16C9 14.3431 7.65685 13 6 13H4C2.34315 13 1 14.3431 1 16V18C1 19.6569 2.34315 21 4 21H6C7.65685 21 9 19.6569 9 18V16ZM7 16C7 15.4477 6.55228 15 6 15H4C3.44772 15 3 15.4477 3 16V18C3 18.5523 3.44772 19 4 19H6C6.55228 19 7 18.5523 7 18V16Z" fill="currentColor"/><path d="M11 7C11 6.44772 11.4477 6 12 6H22C22.5523 6 23 6.44772 23 7C23 7.55228 22.5523 8 22 8H12C11.4477 8 11 7.55228 11 7Z" fill="currentColor"/><path d="M11 17C11 16.4477 11.4477 16 12 16H22C22.5523 16 23 16.4477 23 17C23 17.5523 22.5523 18 22 18H12C11.4477 18 11 17.5523 11 17Z" fill="currentColor"/></svg>'
-	ebi('gridicon_template').innerHTML = svg_grid;
+	var svg_grid = svg_box + '<rect x="4" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="4" y="13" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="13" width="7" height="7" rx="1" fill="currentColor"/></svg>'
+	var svg_gallery = svg_box + '<path d="M4 17L7.58959 13.7694C8.38025 13.0578 9.58958 13.0896 10.3417 13.8417L11.5 15L15.0858 11.4142C15.8668 10.6332 17.1332 10.6332 17.9142 11.4142L20 13.5M11 9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9C9 8.44772 9.44772 8 10 8C10.5523 8 11 8.44772 11 9ZM6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z"' + svg_options + '/></svg>'
 	ebi('listicon_template').innerHTML = svg_list;
+	ebi('gridicon_template').innerHTML = svg_grid;
+	ebi('galleryicon_template').innerHTML = svg_gallery;
 
-	var ico1 = ebi('gridicon_template').cloneNode(true);
-	var ico2 = ebi('listicon_template').cloneNode(true);
-	clmod(ico1, 'on', 't');
-	clmod(ico2, 'on', 't');
+	var ico1 = ebi('listicon_template').cloneNode(true);
+	var ico2 = ebi('gridicon_template').cloneNode(true);
+	clmod(ico1, 'on', true);
+	clmod(ico2, 'on', false);
 
 	// file list header
 	ebi('wtc').innerHTML = (
@@ -6115,6 +6160,7 @@ var thegrid = (function () {
 		ebi('wtc').style.display = lfiles.style.display;
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
+		clmod(ggrid, 'gallery', r.gallery);
 		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
@@ -6176,12 +6222,6 @@ var thegrid = (function () {
 		}
 
 		return gclick.call(this, e, false);
-	}
-
-	function gselclick(e) {
-		var oth = ebi(this.closest('a').getAttribute('ref')),
-			td = oth.closest('td').nextSibling;
-		td.onclick.call(td, e);
 	}
 
 	function gclick2(e) {
@@ -6430,7 +6470,14 @@ var thegrid = (function () {
 
 		var chks = QSA('.gselchk');
 		for (var a = 0, aa = chks.length; a < aa; a++) {
-			chks[a].onclick = gselclick;
+			chks[a].onclick = function (e) {
+				var oth = ebi(this.closest('a').getAttribute('ref')),
+					td = oth.closest('td').nextSibling;
+				if(td && td.onclick)
+					td.onclick.call(td, e);
+				else
+					rcm.show(e);
+			}
 		}
 
 		r.dirty = false;
@@ -6564,9 +6611,23 @@ var thegrid = (function () {
 		swrite('ga_thresh', r.gathr = (isNum(n) ? n : 0) || 70);
 	};
 	
-	var gtgls = QSA('.grdbtn');
-	for(var a = 0; a < gtgls.length; a++)
-		gtgls[a].onclick = ebi('griden').onclick;
+	var gbtn = QSA('.gb_grd');
+	for(var a = 0; a < gbtn.length; a++)
+		gbtn[a].onclick = function(){
+			if(!thegrid.en)
+				ebi('griden').click();
+		}
+
+	var lsbtn = QSA('.gb_lst');
+	for(var a = 0; a < lsbtn.length; a++)
+		lsbtn[a].onclick = function(){
+			if(thegrid.en)
+				ebi('griden').click();
+		}
+
+	bcfg_bind(r, 'gallery', 'galleryicon_template', false, function (v) {
+		clmod(ebi('ggrid'), 'gallery', v);
+	});
 
 	return r;
 })();
@@ -7216,12 +7277,17 @@ var search_ui = (function () {
 				if (!ebi(chk).checked)
 					continue;
 
+				if(q.length > 0)
+					q += ' and ';
+				
+				q += ' ( ';
 				for (var c = 0; c < tvs.length; c++) {
 					var tv = tvs[c];
 					if (!tv.length)
 						break;
 
-					q += ' and ';
+					if(c > 0)
+						q += ' or ';
 
 					if (k == 'adv') {
 						q += tv.replace(/ +/g, " and ").replace(/([=!><]=?)/, " $1 ");
@@ -7258,12 +7324,23 @@ var search_ui = (function () {
 							tv = '"' + tv + '"';
 						}
 
+						var quote = tv.match('"') ? '"' : '';
+						var match;
+						while ( (match = tv.match(/[^\*\"\s]\*[^\*\"\s]/)) && match[0]){
+							console.log(match)
+							tv = tv.replace(
+								match[0],
+								match[0].replace('*', '*' + quote + ' and ' + k + ' like ' + quote + '*')
+							)
+						}
+
 						q += not + k + ' like ' + tv;
 					}
 				}
+				q += ' ) ';
 			}
 		}
-		ebi('q_raw').value = q.slice(5);
+		ebi('q_raw').value = q.trim();
 	}
 
 	function do_search() {
@@ -7329,7 +7406,7 @@ var search_ui = (function () {
 				ext = '%';
 
 			var links = linksplit(r.rp + '', null, id).join('<span>/</span>'),
-				nodes = ['<tr><td>-</td><td><div>' + links +
+				nodes = ['<tr class="' + (img_re.exec(r.rp) ? 'img ' : '') + '"><td>-</td><td><div>' + links +
 					'</div></td><td sortv="' + sz + '">' + hsz];
 
 			for (var b = 0; b < tagord.length; b++) {
@@ -8340,7 +8417,7 @@ var treectl = (function () {
 					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
-			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade' : '') + tn.cls,
+			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade ' : '') + (img_re.exec(fname) ? 'img ' : '') + tn.cls,
 				ln = ['<tr class="' + cl + '"><td>' + tn.lead + '</td><td><a href="' +
 					top + tn.href + '" id="' + id + '">' + hname +
 					'</a></td><td sortv="' + tn.sz + '">' + filesizefun(tn.sz)];
@@ -8745,14 +8822,20 @@ function apply_perms(res) {
 	var o = QSA('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++) {
 		var display = '';
+		var enabled = true;
 		var needed = o[a].getAttribute('data-perm').split(' ');
 		for (var b = 0; b < needed.length; b++) {
 			if (!has(perms, needed[b])) {
-				display = 'none';
+				enabled = false;
+				if(needed[b] != 'write')
+					display = 'none';
 			}
 		}
+		clmod(o[a], 'disabled', !enabled);
 		o[a].style.display = display;
 	}
+	clmod(ebi('up_quick'), 'disabled', !has(perms, 'write'));
+	ebi('bup_tgl').style.display = has(perms, 'write') ? '' : 'none';
 
 	var o = QSA('#ops>a[data-dep], #u2conf td[data-dep]');
 	for (var a = 0; a < o.length; a++)
@@ -8803,8 +8886,12 @@ function apply_perms(res) {
 
 	widget.setvis();
 	thegrid.setvis();
-	if (!have_read && have_write)
+
+	var up_only = !have_read && have_write;
+	if (up_only)
 		goto('up2k');
+	clmod(ebi('up2k'), 'unmodal', up_only);
+	clmod(ebi('opa_mkd'), 'vis', up_only);
 }
 
 
@@ -10570,7 +10657,7 @@ var rcm = (function () {
 		menu.style.display = '';
 	}
 
-	ebi('wrap').oncontextmenu = function (e) {
+	r.show = function (e) {
 		if (!r.enabled || e.shiftKey || (r.double && menu.style.display) || /doc=/.exec(location.search)) {
 			r.hide(true);
 			return true;
@@ -10584,6 +10671,10 @@ var rcm = (function () {
 		var gfile = thegrid.en && e.target && e.target.closest('#ggrid > a');
 		show(e.clientX, e.clientY, gfile || e.target, gfile);
 		return false;
+	}
+
+	ebi('wrap').oncontextmenu = function (e) {
+		r.show(e);
 	};
 	menu.onblur = function () { setTimeout(r.hide) };
 
