@@ -7748,11 +7748,12 @@ var treectl = (function () {
 		clmod(ebi('wfp'), 'shifted', false);
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
-		// accounts for animation delay
+		
+		// makes animation work by waiting for next frame
 		setTimeout(function () {
 			onresize();
 			aligngriditems();
-		}, 150);
+		}, 10);
 	};
 
 	r.detree = function (e, nw) {
@@ -7780,9 +7781,6 @@ var treectl = (function () {
 	r.hide = function () {
 		r.hidden = true;
 		ebi('tree').style.width = ebi('tree_footer').style.width = '0';
-		setTimeout(function () {
-			ebi('tree').style.display = 'none'
-		}, 150);
 		ebi('tree_footer').style.display = 'none';
 		ebi('widget').style.marginLeft = '0';
 		ebi('wrap').style.marginLeft = '';
@@ -7790,6 +7788,11 @@ var treectl = (function () {
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
 		aligngriditems();
+
+		// wait for animation to finish (.15s), then set display to none if width still 0
+		setTimeout(function () {
+			onresize();
+		}, 170);
 	};
 
 	function unmenter() {
@@ -7876,8 +7879,11 @@ var treectl = (function () {
 	timer.add(onscroll2, true);
 
 	function onresize(e) {
-		if (!entreed || r.hidden)
+		if (!entreed || r.hidden){
+			if(ebi('tree').style.width == '0px')
+				ebi('tree').style.display = 'none';
 			return;
+		}
 
 		var q = '#tree',
 			nq = -3;
@@ -8888,8 +8894,10 @@ function apply_perms(res) {
 	thegrid.setvis();
 
 	var up_only = !have_read && have_write;
-	if (up_only)
+	if (up_only){
 		goto('up2k');
+		clmod(document.documentElement, 'noscroll', false);
+	}
 	clmod(ebi('up2k'), 'unmodal', up_only);
 	clmod(ebi('opa_mkd'), 'vis', up_only);
 }
