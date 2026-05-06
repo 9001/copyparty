@@ -341,8 +341,9 @@ window.baguetteBox = (function () {
         btnClose = ebi('bbox-close');
 
         bcfg_bind(options, 'bbzoom', 'bbzoom', false, setzoom);
-        bcfg_bind(options, 'bbpixelated', 'bbpixelated', false, setpixelated);
         setzoom();
+        bcfg_bind(options, 'bbpixelated', 'bbpixelated', false, setpixelated);
+        setpixelated();
     }
 
     function halp() {
