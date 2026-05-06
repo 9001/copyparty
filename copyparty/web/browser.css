@@ -492,8 +492,9 @@ html .ayjump:focus-visible {
 	position: sticky;
 	z-index: 4;
 	background: linear-gradient(to bottom, var(--bg), transparent);
-	padding: .6em 0;
+	padding: .6em .5em;
 	top: 0;
+	margin: 0 -.5em;
 }
 #wfp.shifted {
 	margin-left: 2em;
@@ -3644,6 +3645,9 @@ html.b .ghead {
 	padding: .2em 0;
 	border-bottom: var(--btn-bb);
 	border-radius: 0;
+	margin: 0 -.5em;
+	padding-left: .5em;
+	padding-right: .5em;
 }
 html.b #files tbody a {
 	padding: .7em;
@@ -3743,7 +3747,7 @@ html.d #treepar {
 	#actionsArea {
 		position: absolute;
 		top: .6em;
-		right: 0;
+		right: .6em;
 	}
 	#ops a {
 		padding-left: .15em;
@@ -3773,6 +3777,8 @@ html.cz #wrap.thin .ghead{
 html.dy #wrap.thin .ghead,
 html.b #wrap.thin .ghead {
 	top: 6.9em;
+	margin-left: -.5em;
+	margin-right: -.5em;
 }
 #wrap.thin {
 	.td_w {
@@ -3803,6 +3809,7 @@ html.e #wrap.thin {
 	html.dy #wrap.thin .ghead,
 	html.b #wrap.thin .ghead {
 		top: 7.2em;
+		padding-left: 1em;
 	}
 	.ntree a + a {
 		padding: .6em .2em;
@@ -3829,14 +3836,14 @@ html.e #wrap.thin {
 	}
 	#pathBar {
 		display: block;
-		padding: .5em;
+		padding: .5em 1em;
 		padding-top: 1em;
-		margin-left: -.5em;
-		margin-right: -.5em;
+		margin-left: -1em;
+		margin-right: -1em;
 	}
 	#pathBar.thin #actionsArea {
 		top: 1em;
-		right: .5em;
+		right: 1em;
 	}
 	#folder_search {
 		margin: .5em 1em 0 .2em;
