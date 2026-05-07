@@ -4913,6 +4913,7 @@ html.e #wtc {
 
 #rcm_tmp {
 	min-height: 5em;
+	max-width: var(--grid-sz);
 }
 
 #tempname {
