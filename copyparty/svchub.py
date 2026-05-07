@@ -987,6 +987,10 @@ class SvcHub(object):
 
         Daemon(self.sd_notify, "sd-notify")
 
+        zb = os.environ.get("S6_NOTIFY_FD")
+        if zb:
+            Daemon(self.s6_notify, "s6-notify", (zb,))
+
     def _feature_test(self) -> None:
         fok = []
         fng = []
@@ -1896,6 +1900,17 @@ class SvcHub(object):
             sck.sendall(b"READY=1")
         except:
             self.log("sd_notify", min_ex())
+
+    def s6_notify(self, zb: bytes) -> None:
+        try:
+            fd = int(zb)
+            if fd < 3:
+                raise Exception("value < 3")
+            os.write(fd, b"\n")
+            os.close(fd)
+        except:
+            t = "S6_NOTIFY_FD=%s:\n%s"
+            self.log("s6-notify", t % (zb, min_ex()), 1)
 
     def log_stacks(self) -> None:
         td = time.time() - self.tstack
