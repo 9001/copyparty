@@ -3196,6 +3196,7 @@ html.c .modalcontent {
 #u2cards a {
 	padding: .2em 1em;
 	padding-bottom: .3em;
+	margin-top: .3em;
 	background: var(--u2-tab-bg);
 	border: 1px solid #999;
 	border-color: var(--u2-tab-b1);
