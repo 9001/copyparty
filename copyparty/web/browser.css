@@ -2820,11 +2820,7 @@ html.c .modalcontent {
 	min-height: 0;
 }
 .splitsub {
-	/* fallback */
 	display: block;
-
-	display: flex;
-	flex-direction: column;
 	overflow-y: auto;
 	padding: 0 .5em 5em .5em;
 }
@@ -2844,6 +2840,7 @@ html.c .modalcontent {
 	right: .5em;
 }
 #s_nav .btn{
+	display: block;
 	padding-right: 2em;
 	border: 1px solid var(--bg-u3);
 	color: var(--fg);
@@ -2860,7 +2857,7 @@ html.c .modalcontent {
 	background: var(--bg-u3);
 	position: absolute;
 	left: -.5em;
-	top: -.4em;
+	top: -.2em;
 	bottom: -.1em;
 }
 .s_section {
@@ -3191,8 +3188,6 @@ html.c .modalcontent {
 	width: 21em;
 }
 #u2cards {
-	padding: 1em 1em .4em .3em;
-	white-space: nowrap;
 	text-align: center;
 	overflow-y: hidden;
 	overflow-x: auto;
