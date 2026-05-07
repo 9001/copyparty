@@ -636,7 +636,7 @@ hr {
 		color: #fff;
 		background: #444;
 		font-weight: normal;
-		border-top: .4em solid #fb0;
+		border-top: .4em solid rgba(203, 203, 203, 0.634);
 		border-bottom: .4em solid #777;
 		border-radius: 0 1em 0 1em;
 		margin: 3em 0 1em 0;
@@ -682,7 +682,7 @@ hr {
 	}
 	html.z .mdo h1 {
 		background: #383838;
-		border-top: .4em solid #b80;
+		border-top: .4em solid rgba(203, 203, 203, 0.634);
 		border-bottom: .4em solid #4c4c4c;
 	}
 	html.bz .mdo h1 {

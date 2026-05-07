@@ -320,7 +320,7 @@ blink {
 	}
 	html.z #toc,
 	html.z #mw {
-		scrollbar-color: #b80 #282828;
+		scrollbar-color: rgba(203, 203, 203, 0.634) #282828;
 	}
 	html.z #toc::-webkit-scrollbar-track {
 		background: #282828;
