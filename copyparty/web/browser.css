@@ -965,10 +965,12 @@ tr.play td:nth-child(1) a {
 	margin: 0 auto;
 	display: block;
 	width: 100%;
+	height: 100%;
 	object-fit: cover;
 }
 #ggrid.noupscale>a img {
 	width: auto;
+	height: auto;
 }
 #ggrid.noupscale.gallery.nocrop>a img {
 	object-fit: scale-down;
@@ -3953,6 +3955,8 @@ html.e #wrap.thin {
 			margin: .3em;
 		}
 		a.img {
+			height: calc(var(--grid-sz) / 1.1 - 4px);
+			max-height: none;
 			span {
 				display: none;
 			}
@@ -3974,7 +3978,7 @@ html.e #wrap.thin {
 			width: auto;
 			img {
 				max-width: 100%;
-				height: calc(var(--grid-sz) - 2em);
+				height: calc(var(--grid-sz) - 1em);
 
 			}
 		}
