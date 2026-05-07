@@ -3952,7 +3952,7 @@ html.e #wrap.thin {
 			margin: .3em;
 		}
 		a.img {
-			height: calc(var(--grid-sz) / 1.1 - 4px);
+			height: calc(var(--grid-sz) - 1em);
 			max-height: none;
 			span {
 				display: none;
