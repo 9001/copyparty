@@ -5282,7 +5282,7 @@ class HttpCli(object):
         # chrome cannot handle more than ~2000 unique SVGs
         # so url-param "raster" returns a png/webp instead
         # (useragent-sniffing kinshi due to caching proxies)
-        mime, ico = self.conn.hsrv.ico.get(txt, not small, "raster" in self.uparam)
+        mime, ico = self.conn.hsrv.ico.get(txt, not small, "raster" in self.uparam, self.uparam.get('a'))
 
         lm = formatdate(self.E.t0)
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})

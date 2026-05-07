@@ -6447,6 +6447,9 @@ var thegrid = (function () {
 			if (CHROME)
 				ihref += "&raster";
 
+			var accent = getComputedStyle(document.body).getPropertyValue('--a');
+			ihref += '&a=' + accent;
+
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'" class="' + ac + '" ttt="' + esc(name) + '">' +
 				'<div class="imgcontainer">' +
