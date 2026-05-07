@@ -2744,6 +2744,7 @@ var pbar = (function () {
 
 		if (w && html_txt != t2) {
 			ebi('txtpos').innerHTML = ebi('np_pos').textContent = html_txt = t2;
+			ebi('txtsongend').innerHTML = t1;
 			if (mpl.os_ctl)
 				navigator.mediaSession.setPositionState({
 					'duration': adur,
@@ -2752,7 +2753,7 @@ var pbar = (function () {
 				});
 		}
 
-		if (!widget.is_open)
+		if (!widget.is_open || !r.waves)
 			return;
 
 		pctx.fillStyle = '#bbb'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
