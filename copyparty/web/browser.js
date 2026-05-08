@@ -6462,8 +6462,13 @@ var thegrid = (function () {
 				'" class="' + ac + '" ttt="' + esc(name) + '">' +
 				'<div class="imgcontainer">' +
 				'<input type="checkbox" class="gselchk"></input>' +
+				'<svg class="thumb" width="100%" height="100%" version="1.1"><use href="#' + 
+					(isdir ? 'folder' : 'file') + '-icon" color="#' + 
+					(ext == 'unk' || ext.startsWith('/') ? '0000' : intToRGB(hashCode(ext))) + '"/></svg>' +
+				(isdir || ext == 'unk' || ext.startsWith('/') ? '' : '<span class="th_ext" style="font-size:calc(var(--grid-sz) / 5 * ' + 
+					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')">' + ext + '</span>') +
 				'<img style="height:' +
-				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" src="' +
+				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" onerror="th_onerror(this)" src="' +
 				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
@@ -6501,6 +6506,21 @@ var thegrid = (function () {
 		aligngriditems();
 		setTimeout(r.tippen, 20);
 		drag.initgrid();
+	}
+
+	function hashCode (str) {
+		let hash = 0;
+		for(var i = 0; i < str.length; i++){
+			hash = str.charCodeAt(i) + 2026 * ((hash << 5) - hash);
+		}
+		return hash
+	}
+	function intToRGB(i){
+		var c = (i & 0x00FFFFFF)
+			.toString(16)
+			.toUpperCase();
+
+		return "00000".substring(0, 6 - c.length) + c;
 	}
 
 	r.bagit = function (isrc) {
@@ -6653,6 +6673,11 @@ var thegrid = (function () {
 
 function th_onload(el) {
 	el.style.height = '';
+}
+
+function th_onerror(el) {
+	el.style.opacity = '0'
+	el.style.pointerEvents = 'none'
 }
 
 

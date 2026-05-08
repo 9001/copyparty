@@ -35,7 +35,7 @@ class Ico(object):
             sw, sh = self.args.th_size.split("x")
             h = int(100.0 / (float(sw) / float(sh)))
 
-        if chrome:
+        if chrome & 0:
             # cannot handle more than ~2000 unique SVGs
             if HAVE_PILF:
                 # pillow 10.1 made this the default font;
