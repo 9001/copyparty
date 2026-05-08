@@ -6468,8 +6468,7 @@ var thegrid = (function () {
 				(isdir || ext == 'unk' || ext.startsWith('/') ? '' : 
 					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc(var(--grid-sz) / 5 * ' + 
 					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')">' + ext + '</span>') +
-				'<img style="height:' +
-				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" onerror="th_onerror(this)" src="' +
+				'<img loading="lazy" onload="th_onload(this)" onerror="th_onerror(this)" src="' +
 				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
