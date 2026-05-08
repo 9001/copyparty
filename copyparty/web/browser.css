@@ -967,7 +967,6 @@ tr.play td:nth-child(1) a {
 }
 #ggrid>a img {
 	z-index: 1;
-	opacity: 0;
 	border-radius: 5px;
 	border-radius: calc(var(--radius) / 3 * 2);
 	max-width: 10em;
@@ -3980,7 +3979,6 @@ html.e #wrap.thin {
 			margin: .3em;
 		}
 		a.img {
-			height: calc(var(--grid-sz) - 1em);
 			max-height: none;
 			span:not(.th_ext) {
 				display: none;
