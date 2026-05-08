@@ -6454,7 +6454,9 @@ var thegrid = (function () {
 				ihref += "&raster";
 
 			var accent = getComputedStyle(document.body).getPropertyValue('--a');
-			ihref += '&a=' + parseColor(accent).replaceAll(' ', '');
+			if (!accent)
+				accent = '#07c';
+			ihref += '&a=' + parseColor(accent).replace(/ /g, '');
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'" class="' + ac + '" ttt="' + esc(name) + '">' +
