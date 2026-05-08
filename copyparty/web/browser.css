@@ -2515,8 +2515,14 @@ html.noscroll .sbar::-webkit-scrollbar {
 	height: auto;
 	max-width: 100%;
 	max-height: 100%;
+	max-height: calc(100% - 1.4em);
+	margin-bottom: 1.4em;
 	vertical-align: middle;
 	transition: transform .23s, left .23s, top .23s, width .23s, height .23s;
+}
+.immersive .full-image video {
+	max-height: 100%;
+	margin-bottom: 0;
 }
 .full-image img.asap,
 .full-image video.asap {
@@ -2528,7 +2534,7 @@ html.noscroll .sbar::-webkit-scrollbar {
     height: 100%;
     object-fit: contain;
 }
-#bbox-overlay:has(video) {
+#bbox-overlay:has(video) { 	
 	#bbox-next,
 	#bbox-prev {
 		height: 0;
@@ -2557,11 +2563,9 @@ html.bb_fsc figcaption {
 .full-image video {
 	background: #222;
 }
-#bbox-overlay figcaption {
+#bbox-overlay.immersive figcaption {
+	opacity: 0;
 	pointer-events: none;
-}
-#bbox-overlay figcaption * {
-	pointer-events: all;
 }
 .full-image figcaption {
 	display: block;
@@ -2573,9 +2577,6 @@ html.bb_fsc figcaption {
 	color: var(--fg);
 	z-index: 1;
 	transition: opacity .15s;
-}
-#bbox-overlay.immersive figcaption {
-	opacity: 0;
 }
 #bbox-overlay figcaption a {
 	background: rgba(0, 0, 0, 0.6);
