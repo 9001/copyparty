@@ -6465,7 +6465,8 @@ var thegrid = (function () {
 				'<svg class="thumb" width="100%" height="100%" version="1.1"><use href="#' + 
 					(isdir ? 'folder' : 'file') + '-icon" color="#' + 
 					(ext == 'unk' || ext.startsWith('/') ? '0000' : intToRGB(hashCode(ext))) + '"/></svg>' +
-				(isdir || ext == 'unk' || ext.startsWith('/') ? '' : '<span class="th_ext" style="font-size:calc(var(--grid-sz) / 5 * ' + 
+				(isdir || ext == 'unk' || ext.startsWith('/') ? '' : 
+					'<span class="th_ext" style="fint-size: ' + (r.sz / 5) +'em; font-size:calc(var(--grid-sz) / 5 * ' + 
 					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')">' + ext + '</span>') +
 				'<img style="height:' +
 				(r.sz / 1.25) + 'em" loading="lazy" onload="th_onload(this)" onerror="th_onerror(this)" src="' +
