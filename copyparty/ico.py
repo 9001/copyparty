@@ -48,7 +48,7 @@ class Ico(object):
 
                     h = int(128.0 * h / w)
                     w = 128
-                    img = Image.new("RGB", (w, h), "#" + c[:6])
+                    img = Image.new("RGBA", (w, h), "#" + c[:6] + 'aa')
                     pb = ImageDraw.Draw(img)
                     _, _, tw, th = pb.textbbox((0, 0), ext2, font_size=16)
                     xy = (int((w - tw) / 2), int((h - th) / 2))
@@ -69,7 +69,7 @@ class Ico(object):
 
                 h = int(64.0 * h / w)
                 w = 64
-                img = Image.new("RGB", (w, h), "#" + c[:6])
+                img = Image.new("RGBA", (w, h), "#" + c[:6] + 'aa')
                 pb = ImageDraw.Draw(img)
                 try:
                     _, _, tw, th = pb.textbbox((0, 0), ext)
