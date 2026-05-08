@@ -6509,7 +6509,7 @@ var thegrid = (function () {
 	}
 
 	function hashCode (str) {
-		let hash = 0;
+		var hash = 0;
 		for(var i = 0; i < str.length; i++){
 			hash = str.charCodeAt(i) + 2026 * ((hash << 5) - hash);
 		}
