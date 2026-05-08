@@ -3977,16 +3977,16 @@ html.e #wrap.thin {
 			padding: .1em 0;
 			margin: .3em;
 		}
-		a.img {
+		a.img.thumbed {
 			max-height: none;
+			span:not(.th_ext) {
+				display: none;
+			}
 			.thumb,
 			img {
 				max-height: none;
 				height: calc(var(--grid-sz) - 8px);
 			}
-		}
-		a.img.thumbed span:not(.th_ext) {
-			display: none;
 		}
 	}
 	#ggrid.gallery.nocrop {
@@ -4004,7 +4004,7 @@ html.e #wrap.thin {
 				height: calc(var(--grid-sz) - 1.5em);
 			}
 		}
-		a.img {
+		a.img.thumbed {
 			min-width: calc(var(--grid-sz) / 2);
 			width: auto;
 			.thumb {
@@ -4014,6 +4014,9 @@ html.e #wrap.thin {
 				max-width: 100%;
 				height: var(--grid-sz);
 			}
+			span:not(.th_ext) {
+				display: none;
+			}
 		}
 		a.dir {
 			.thumb,
@@ -4022,9 +4025,6 @@ html.e #wrap.thin {
 				margin-left: 10px;
 				margin-right: 10px;
 			}
-		}
-		a.img.thumbed span:not(.th_ext) {
-			display: none;
 		}
 	}
 
