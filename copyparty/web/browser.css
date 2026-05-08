@@ -3981,7 +3981,7 @@ html.e #wrap.thin {
 		a.img {
 			height: calc(var(--grid-sz) - 1em);
 			max-height: none;
-			span {
+			span:not(.th_ext) {
 				display: none;
 			}
 		}

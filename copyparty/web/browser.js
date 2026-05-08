@@ -6673,6 +6673,9 @@ var thegrid = (function () {
 
 function th_onload(el) {
 	el.style.height = '';
+	el.previousSibling.style.display =
+	el.previousSibling.previousSibling.style.display = 
+		'none'
 }
 
 function th_onerror(el) {
