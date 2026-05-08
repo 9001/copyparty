@@ -2550,10 +2550,16 @@ function auto_grad(can, color, color2) {
 		mix = [70, 100, 90, 70];
 
 	for (var a = 0; a < p.length; a++){
-		var c = 'color-mix(in xyz, ' + color + ' ' + mix[a] + '%, ' + color2 + ' ' + (100 - mix[a]) + '%)';
+		var c = 'color-mix(in oklab, ' + color + ' ' + mix[a] + '%, ' + color2 + ' ' + (100 - mix[a]) + '%)';
 		var pc = parseColor(c);
-		if(pc)
-			g.addColorStop(p[a], parseColor(c));
+        if (pc) {
+            try {
+				g.addColorStop(p[a], pc);
+            } catch (e) {
+				console.log(e);
+				g.addColorStop(p[a], color2);
+			}
+		}
 	}
 
 	return g;
