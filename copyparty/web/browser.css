@@ -4013,7 +4013,7 @@ html.e #wrap.thin {
 			}
 		}
 		a.img {
-			span {
+			span:not(.th_ext) {
 				display: none;
 			}
 		}
