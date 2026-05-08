@@ -3979,14 +3979,14 @@ html.e #wrap.thin {
 		}
 		a.img {
 			max-height: none;
-			span:not(.th_ext) {
-				display: none;
-			}
 			.thumb,
 			img {
 				max-height: none;
 				height: calc(var(--grid-sz) - 8px);
 			}
+		}
+		a.img.thumbed span:not(.th_ext) {
+			display: none;
 		}
 	}
 	#ggrid.gallery.nocrop {
@@ -4023,10 +4023,8 @@ html.e #wrap.thin {
 				margin-right: 10px;
 			}
 		}
-		a.img {
-			span:not(.th_ext) {
-				display: none;
-			}
+		a.img.thumbed span:not(.th_ext) {
+			display: none;
 		}
 	}
 
