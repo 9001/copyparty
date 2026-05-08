@@ -109,7 +109,7 @@ class Ico(object):
         else:
             y = "55%"
 
-        svg = svg.format(h, c[:6], y, c[6:], txt)
+        #svg = svg.format(h, c[:6], y, c[6:], txt)
 
         if(len(ext) > 3):
             fontsz = 12 / len(ext) * 3
