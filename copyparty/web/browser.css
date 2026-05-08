@@ -1058,7 +1058,7 @@ tr.play td:nth-child(1) a {
 		animation: rotate 10s linear infinite;
 	}
 }
-html:not(.e) #ggrid>a:not(.nothumb).dir:before {
+html:not(.e) #ggrid>a.thumbed.dir:before {
 	content: '📂';
 }
 #ggrid>a.dir>span {
@@ -3978,7 +3978,7 @@ html.e #wrap.thin {
 			padding: .1em 0;
 			margin: .3em;
 		}
-		a.img:not(.nothumb) {
+		a.img.thumbed {
 			max-height: none;
 			span:not(.th_ext) {
 				display: none;
@@ -4005,7 +4005,7 @@ html.e #wrap.thin {
 				height: calc(var(--grid-sz) - 1.5em);
 			}
 		}
-		a.img:not(.nothumb) {
+		a.img.thumbed {
 			min-width: calc(var(--grid-sz) / 2);
 			width: auto;
 			.thumb {

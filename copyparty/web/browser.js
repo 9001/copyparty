@@ -6459,7 +6459,7 @@ var thegrid = (function () {
 				(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
 					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc(var(--grid-sz) / 5 * ' +
 					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')">' + ext + '</span>') +
-				'<img loading="lazy" onload="th_onload(this)" onerror="th_onerror(this)" src="' +
+				'<img loading="lazy" onload="th_onload(this)" src="' +
 				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
@@ -6477,6 +6477,12 @@ var thegrid = (function () {
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			ths[a].ondblclick = gclick2;
 			ths[a].onclick = gclick1;
+		}
+
+		var imgs = QSA('#ggrid>a img');
+		for (var a = 0, aa = imgs.length; a < aa; a++) {
+			if(imgs[a].complete)
+				clmod(imgs[a].parentElement.parentElement, 'thumbed', true)
 		}
 
 		var chks = QSA('.gselchk');
@@ -6659,15 +6665,13 @@ var thegrid = (function () {
 
 
 function th_onload(el) {
+	clmod(el.parentElement.parentElement, 'thumbed', true)
 	el.style.position = 'static'
 	el.style.opacity = '1'
 	el.style.height = '';
 	el.previousSibling.style.display =
 	el.previousSibling.previousSibling.style.display =
 		'none'
-}
-function th_onerror(el) {
-	clmod(el.parentElement.parentElement, 'nothumb', true)
 }
 
 
