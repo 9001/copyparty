@@ -15,7 +15,7 @@ class Ico(object):
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
 
-    def get(self, ext: str, as_thumb: bool, chrome: bool, accent: str) -> tuple[str, bytes]:
+    def get(self, ext: str, as_thumb: bool, png: bool, accent: str) -> tuple[str, bytes]:
         """placeholder to make thumbnails not break"""
 
         bext = ext.encode("ascii", "replace")
@@ -27,7 +27,10 @@ class Ico(object):
             sw, sh = self.args.th_size.split("x")
             h = int(100.0 / (float(sw) / float(sh)))
 
-        if chrome & 0:
+        # obsolete. 2000+ svgs slows chrome down massively, but no crash.
+        # further, unique svgs are only used for non-standard thumbnails,
+        # so it's unrealistic to see that many in use
+        if png & 0:
             # cannot handle more than ~2000 unique SVGs
             if HAVE_PILF:
                 # pillow 10.1 made this the default font;

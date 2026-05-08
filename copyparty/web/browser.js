@@ -6443,8 +6443,6 @@ var thegrid = (function () {
 
 			if(ihref){
 				ihref = addq(ihref, 'cache=i&_=' + ACB + TS);
-				if (CHROME)
-					ihref += "&raster";
 
 				var accent = getComputedStyle(document.body).getPropertyValue('--a');
 				if (!accent)
