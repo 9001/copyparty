@@ -5282,11 +5282,10 @@ class HttpCli(object):
         # chrome cannot handle more than ~2000 unique SVGs
         # so url-param "raster" returns a png/webp instead
         # (useragent-sniffing kinshi due to caching proxies)
-        # mime, ico = self.conn.hsrv.ico.get(txt, not small, "raster" in self.uparam, self.uparam.get('a'))
+        mime, ico = self.conn.hsrv.ico.get(txt, not small, "raster" in self.uparam, self.uparam.get('a'))
 
         lm = formatdate(self.E.t0)
-        # self.reply(ico, mime=mime, headers={"Last-Modified": lm})
-        self.reply('', headers={"Last-Modified": lm})
+        self.reply(ico, mime=mime, headers={"Last-Modified": lm})
         return True
 
     def tx_qr(self):
@@ -6852,7 +6851,7 @@ class HttpCli(object):
                                 pass
 
                     if is_dir:
-                        return self.tx_svg("folder")
+                        return '' # self.tx_svg("folder")
 
                 thp = None
                 if self.thumbcli and not nothumb:
@@ -6872,7 +6871,7 @@ class HttpCli(object):
                 elif th_fmt in ACODE2_FMT:
                     raise Pebkac(415)
 
-                return self.tx_ico(rem)
+                return '' # self.tx_ico(rem)
 
         elif self.can_write and th_fmt is not None:
             return self.tx_svg("upload\nonly")
