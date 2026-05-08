@@ -6463,8 +6463,8 @@ var thegrid = (function () {
 				'<div class="imgcontainer">' +
 				'<input type="checkbox" class="gselchk"></input>' +
 				'<svg class="thumb" width="100%" height="100%" version="1.1"><use href="#' + 
-					(isdir ? 'folder' : 'file') + '-icon" color="#' + 
-					(ext == 'unk' || ext.startsWith('/') ? '0000' : intToRGB(hashCode(ext))) + '"/></svg>' +
+					(isdir ? 'folder' : 'file') + '-icon" color="' + 
+					(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/></svg>' +
 				(isdir || ext == 'unk' || ext.startsWith('/') ? '' : 
 					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc(var(--grid-sz) / 5 * ' + 
 					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')">' + ext + '</span>') +
@@ -6512,16 +6512,12 @@ var thegrid = (function () {
 	function hashCode (str) {
 		var hash = 0;
 		for(var i = 0; i < str.length; i++){
-			hash = str.charCodeAt(i) + 2026 * ((hash << 5) - hash);
+			hash = str.charCodeAt(i) + 130 * ((hash << 5) - hash);
 		}
 		return hash
 	}
-	function intToRGB(i){
-		var c = (i & 0x00FFFFFF)
-			.toString(16)
-			.toUpperCase();
-
-		return "00000".substring(0, 6 - c.length) + c;
+	function intToHSL(i){
+		return 'hsl(' + i % 360 + 'deg 100% 50%)'
 	}
 
 	r.bagit = function (isrc) {
