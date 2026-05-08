@@ -3740,9 +3740,12 @@ html.d #treepar {
 
 	#path {
 		position: relative;
-		height: 1.8em;
+		height: 2.2em;
 		margin: .5em 0 0 0;
 		z-index: -1;
+	}
+	#path a {
+		padding-top: .45em;
 	}
 	#wfp.shifted {
 		margin-left: 2.5em;
