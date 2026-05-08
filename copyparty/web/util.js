@@ -2318,8 +2318,7 @@ var favico = (function () {
         scfg_bind(r, 'bg', 'icob', bg, r.upd);
         r.upd();
     };
-
-    r.to = setTimeout(r.init, 100);
+    r.init();
     return r;
 })();
 

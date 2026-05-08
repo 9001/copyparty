@@ -7768,12 +7768,12 @@ var treectl = (function () {
 			swrite('entreed', 'tree');
 
 		get_tree("", get_evpath(), true);
-		r.show();
+		r.show(nostore);
 
 		clmod(ebi('treeToggleBtn'), 'on', true)
 	}
 
-	r.show = function () {
+	r.show = function (instant) {
 		r.hidden = false;
 		if (!entreed) {
 			ebi('path').style.display = nonav ? 'none' : 'inline-block';
@@ -7786,11 +7786,17 @@ var treectl = (function () {
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
 
-		// makes animation work by waiting for next frame
-		setTimeout(function () {
+		if(!instant){
+			// makes animation work by waiting for next frame
+			setTimeout(function () {
+				onresize();
+				aligngriditems();
+			}, 10);
+		}
+		else {
 			onresize();
 			aligngriditems();
-		}, 10);
+		}
 	};
 
 	r.detree = function (e, nw) {
