@@ -955,37 +955,30 @@ tr.play td:nth-child(1) a {
 	border-color: var(--g-f-b1);
 	box-shadow: 0 .1em .3em var(--g-sh);
 }
-#ggrid>a svg {
-	position: absolute;
-	max-width: 10em;
-	max-width: calc(var(--grid-sz) - 4px);
-	max-height: 8em;
-	max-height: calc(var(--grid-sz)/1.25);
-	display: block;
-	width: 100%;
-	height: 100%;
-	height: calc(100% - 8px);
-	border-radius: calc(var(--radius) / 3 * 2);
-}
-#ggrid>a.play svg {
+#ggrid>a.play .thumb {
 	background: var(--bg-u2);
 }
+#ggrid>a .thumb,
 #ggrid>a img {
 	z-index: 1;
 	border-radius: 5px;
 	border-radius: calc(var(--radius) / 3 * 2);
 	max-width: 10em;
 	max-width: calc(var(--grid-sz) - 4px);
-	max-height: 8em;
-	max-height: calc(var(--grid-sz)/1.25);
 	margin: 0 auto;
 	display: block;
 	width: 100%;
 	height: calc(var(--grid-sz) - 2.5em);
 	object-fit: cover;
 }
+#ggrid>a img {
+	position: absolute;
+	opacity: 0;
+}
+#ggrid>a.dir .thumb,
 #ggrid>a.dir img {
-	max-height: calc(var(--grid-sz)/1.25 - 10px);
+	max-width: calc(var(--grid-sz) - 20px);
+	margin: 10px auto 0 auto;
 }
 #ggrid.noupscale>a img {
 	width: auto;
@@ -993,10 +986,6 @@ tr.play td:nth-child(1) a {
 }
 #ggrid.noupscale.gallery.nocrop>a img {
 	object-fit: scale-down;
-}
-#ggrid>a.dir img {
-  max-width: calc(var(--grid-sz) - 20px);
-  margin: 10px auto 0 auto;
 }
 #ggrid.nocrop>a img {
 	max-height: 20em;
@@ -3993,6 +3982,7 @@ html.e #wrap.thin {
 			span:not(.th_ext) {
 				display: none;
 			}
+			.thumb,
 			img {
 				max-height: none;
 				height: calc(var(--grid-sz) - 8px);
@@ -4009,6 +3999,7 @@ html.e #wrap.thin {
 		}
 		a {
 			margin-bottom: .2em;
+			.thumb,
 			img {
 				height: calc(var(--grid-sz) - 1.5em);
 			}
@@ -4016,12 +4007,14 @@ html.e #wrap.thin {
 		a.img {
 			min-width: calc(var(--grid-sz) / 2);
 			width: auto;
+			.thumb,
 			img {
 				max-width: 100%;
 				height: var(--grid-sz);
 			}
 		}
 		a.dir {
+			.thumb,
 			img {
 				height: calc(var(--grid-sz) - 1.5em - 10px);
 				margin-left: 10px;
