@@ -101,6 +101,6 @@ class Ico(object):
         else:
             y = "50%"
 
-        svg = svg.format(h, y, accent, txt)
+        svg = svg.format(h, y, accent or '#000', txt)
 
         return "image/svg+xml", svg.encode("utf-8")
