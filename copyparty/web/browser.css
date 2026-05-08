@@ -1007,6 +1007,7 @@ tr.play td:nth-child(1) a {
 	justify-content: center;
 }
 .th_ext {
+	z-index: 1;
 	position: absolute;
 	text-align: center;
 	width: 100%;
