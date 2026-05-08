@@ -6669,6 +6669,7 @@ var thegrid = (function () {
 
 
 function th_onload(el) {
+	el.style.opacity = '1'
 	el.style.height = '';
 	el.previousSibling.style.display =
 	el.previousSibling.previousSibling.style.display = 
