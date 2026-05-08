@@ -1881,7 +1881,7 @@ input.ssconf_v {
 }
 
 #wrap {
-	padding:  0 .6em 7em .6em;
+	padding:  0 .6em 10em .6em;
 	min-height: 70vh;
 }
 #tree {
@@ -3974,7 +3974,7 @@ html.e #wrap.thin {
 	}
 	#ggrid.gallery {
 		gap: 2px 3px;
-		margin: -.2em -.5em;
+		margin: .2em -.5em;
 		a::before {
 			padding: .1em 0;
 			margin: .3em;
@@ -3994,7 +3994,7 @@ html.e #wrap.thin {
 	#ggrid.gallery.nocrop {
 		text-align: center;
 		display: block;
-		margin: -.2em -.5em;
+		margin: .2em -.5em;
 		a::before {
 			padding: .1em 0;
 			margin: .3em;
