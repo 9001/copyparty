@@ -6668,6 +6668,7 @@ var thegrid = (function () {
 
 
 function th_onload(el) {
+	clmod(el.parentElement.parentElement, 'thumbed', true)
 	el.style.position = 'static'
 	el.style.opacity = '1'
 	el.style.height = '';

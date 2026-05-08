@@ -1057,7 +1057,7 @@ tr.play td:nth-child(1) a {
 		animation: rotate 10s linear infinite;
 	}
 }
-html:not(.e) #ggrid>a.dir:before {
+html:not(.e) #ggrid>a.thumbed.dir:before {
 	content: '📂';
 }
 #ggrid>a.dir>span {
