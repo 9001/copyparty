@@ -4007,7 +4007,9 @@ html.e #wrap.thin {
 		a.img {
 			min-width: calc(var(--grid-sz) / 2);
 			width: auto;
-			.thumb,
+			.thumb {
+				height: var(--grid-sz);
+			}
 			img {
 				max-width: 100%;
 				height: var(--grid-sz);
