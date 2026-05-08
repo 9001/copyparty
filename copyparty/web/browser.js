@@ -6437,27 +6437,20 @@ var thegrid = (function () {
 				if (href == "#")
 					ihref = SR + '/.cpr/ico/' + (ref == 'moar' ? '++' : 'exit');
 			}
-			else if (isdir) {
-				ihref = SR + '/.cpr/ico/folder';
-			}
 			else {
-				if (!svgs.has(ext)) {
-					if (svgs.size < max_svgs)
-						svgs.add(ext);
-					else
-						ext = "unk";
-				}
-				ihref = SR + '/.cpr/ico/' + ext;
+				ihref = '';
 			}
-			ihref = addq(ihref, 'cache=i&_=' + ACB + TS);
-			if (CHROME)
-				ihref += "&raster";
 
-			var accent = getComputedStyle(document.body).getPropertyValue('--a');
-			if (!accent)
-				accent = '#07c';
-			ihref += '&a=' + parseColor(accent).replace(/ /g, '');
+			if(ihref){
+				ihref = addq(ihref, 'cache=i&_=' + ACB + TS);
+				if (CHROME)
+					ihref += "&raster";
 
+				var accent = getComputedStyle(document.body).getPropertyValue('--a');
+				if (!accent)
+					accent = '#07c';
+				ihref += '&a=' + parseColor(accent).replace(/ /g, '');
+			}
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'" class="' + ac + '" ttt="' + esc(name) + '">' +
 				'<div class="imgcontainer">' +
@@ -6468,7 +6461,7 @@ var thegrid = (function () {
 				(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
 					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc(var(--grid-sz) / 5 * ' +
 					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')">' + ext + '</span>') +
-				'<img loading="lazy" onload="th_onload(this)" src="' +
+				'<img loading="lazy" onload="th_onload(this)" onerror="th_onerror(this)" src="' +
 				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
@@ -6668,13 +6661,15 @@ var thegrid = (function () {
 
 
 function th_onload(el) {
-	clmod(el.parentElement.parentElement, 'thumbed', true)
 	el.style.position = 'static'
 	el.style.opacity = '1'
 	el.style.height = '';
 	el.previousSibling.style.display =
 	el.previousSibling.previousSibling.style.display =
 		'none'
+}
+function th_onerror(el) {
+	clmod(el.parentElement.parentElement, 'nothumb', true)
 }
 
 

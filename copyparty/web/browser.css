@@ -955,7 +955,8 @@ tr.play td:nth-child(1) a {
 	border-color: var(--g-f-b1);
 	box-shadow: 0 .1em .3em var(--g-sh);
 }
-#ggrid>a.play .thumb {
+#ggrid>a.play .thumb,
+#ggrid>a.play img {
 	background: var(--bg-u2);
 }
 #ggrid>a .thumb,
@@ -1057,7 +1058,7 @@ tr.play td:nth-child(1) a {
 		animation: rotate 10s linear infinite;
 	}
 }
-html:not(.e) #ggrid>a.thumbed.dir:before {
+html:not(.e) #ggrid>a:not(.nothumb).dir:before {
 	content: '📂';
 }
 #ggrid>a.dir>span {
@@ -3977,7 +3978,7 @@ html.e #wrap.thin {
 			padding: .1em 0;
 			margin: .3em;
 		}
-		a.img.thumbed {
+		a.img:not(.nothumb) {
 			max-height: none;
 			span:not(.th_ext) {
 				display: none;
@@ -4004,7 +4005,7 @@ html.e #wrap.thin {
 				height: calc(var(--grid-sz) - 1.5em);
 			}
 		}
-		a.img.thumbed {
+		a.img:not(.nothumb) {
 			min-width: calc(var(--grid-sz) / 2);
 			width: auto;
 			.thumb {
