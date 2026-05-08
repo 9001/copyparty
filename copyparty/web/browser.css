@@ -506,8 +506,7 @@ html .ayjump:focus-visible {
 	display: block;
 	margin: 0 .5em 0 0;
 	width: calc(100% - .5em);
-	align-content: center;
-	padding: .2em;
+	padding: 0 .2em;
 	font-size: 1.2em;
 	white-space: nowrap;
 	overflow-x: auto;
@@ -729,8 +728,10 @@ html.y #files span.fsz_P { font-weight: bold }
 	background: none;
 }
 #path a {
-	padding: .5em .35em;
+	padding: .4em .35em;
 	position: relative;
+	display: inline-block;
+	height: 100%;
 	z-index: 1;
 	/* ie: */
 	border-bottom: .1em solid #777\9;
@@ -1379,6 +1380,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	padding: .5em;
 	margin: -.1em .1em;
   	vertical-align: top;
+	white-space: nowrap;
 }
 #wm3u a {
 	margin: -.2em .1em;
@@ -4431,6 +4433,7 @@ html.e #ops {
 	gap: 0.6em;
 	font-size: larger;
 	padding: 0;
+	height: 2em;
 }
 html.e #srchfolder_div {
 	left: 2em;
