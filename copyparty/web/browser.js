@@ -7793,8 +7793,9 @@ var treectl = (function () {
 			return;
 		}
 
-		ebi('tree').style.display = 'block';
-		ebi('tree').style.width = 0;
+		var tree = ebi('tree')
+		tree.style.display = 'block';
+		tree.style.width = 0;
 		clmod(ebi('wfp'), 'shifted', false);
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
@@ -7807,8 +7808,10 @@ var treectl = (function () {
 			}, 10);
 		}
 		else {
+			tree.style.transition = 'none';
 			onresize();
 			aligngriditems();
+			tree.style.transition = '';
 		}
 	};
 
