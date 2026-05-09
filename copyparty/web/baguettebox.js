@@ -1376,7 +1376,7 @@ window.baguetteBox = (function () {
 
 
 function init(){
-    if(thegrid != undefined && !thegrid.dirty){
+    if(thegrid != undefined && thegrid.dirty == false){
         thegrid.bagit();
     }
     else{
