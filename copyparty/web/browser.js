@@ -1837,6 +1837,12 @@ var mpl = (function () {
 		if (r.waves){
 			clmod(ebi('progbar'), 'vis', true)
 			clmod(ebi('altprogbar'), 'vis', false)
+			if(pbar){
+				pbar.unwave();
+				if (mpl.waves && mp && mp.au)
+					pbar.loadwaves(mp.au.src.replace(/\bth=(opus|mp3)&/, '') + '&th=p');
+				pbar.onresize();
+			}
 		}
 		else{
 			clmod(ebi('progbar'), 'vis', false)
@@ -2654,7 +2660,7 @@ var pbar = (function () {
 			bctx = bc.ctx,
 			apos, adur;
 
-		if (!widget.is_open)
+		if (!widget.is_open || mpl.waves == false)
 			return;
 
 		bctx.clearRect(0, 0, bc.w, bc.h);
@@ -2771,7 +2777,7 @@ var pbar = (function () {
 				});
 		}
 
-		if (!widget.is_open)
+		if (!widget.is_open || mpl.waves == false && !force)
 			return;
 
 		pctx.fillStyle = '#bbb'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
@@ -2812,7 +2818,7 @@ var vbar = (function () {
 		can, ctx, w, h, style1, style2;
 
 	r.onresize = function () {
-		if (!widget.is_open && r.can)
+		if (!widget.is_open && r.can )
 			return;
 
 		r.can = canvas_cfg(ebi('pvol'));
@@ -3892,14 +3898,11 @@ function play(tid, is_ev, seek) {
 		}
 		mpl.np = ft2dict(t_tr, { 'up_ip': 1 });
 
-		pbar.unwave();
-		if (mpl.waves)
-			pbar.loadwaves(url.replace(/\bth=(opus|mp3)&/, '') + '&th=p');
-		mpl.selectprogbar();
+		
 
 		mpss.go();
 		mpui.progress_updater();
-		pbar.onresize();
+		mpl.selectprogbar();
 		vbar.onresize();
 		mpl.announce();
 		return true;
