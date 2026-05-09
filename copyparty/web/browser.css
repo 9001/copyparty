@@ -1104,7 +1104,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 #ggrid>a.sel,
 #ggrid>a[tt].sel {
 	color: var(--g-sel-fg);
-	background: #f3c;
+	background: #8af;
 	background: var(--g-sel-bg);
 	border-color: var(--g-sel-b1);
 }
@@ -2202,7 +2202,7 @@ html.a .btn {
 	line-height: 2.3em;
 	margin-bottom: 1.5em;
 	z-index: 3;
-	margin-top: -.5em;
+	margin-top: 0;
 	top: 3.7em;
 	transition: opacity .15s;
 }
