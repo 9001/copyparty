@@ -1603,6 +1603,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	border-radius: 5px;
 
 	border: var(--transparent) solid 1px;
+	color: #07c;
 	color: var(--a);
 	font-size: 1.5em;
 	padding: .15em .4em;
@@ -1855,6 +1856,7 @@ input.ssconf_v {
 #wfp{
 	margin: 0 .3em 0 0;
 	white-space: nowrap;
+	display: flex;
 }
 #wfp a {
 	display: inline-block;

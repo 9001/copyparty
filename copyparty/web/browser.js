@@ -819,20 +819,32 @@ if (!Ls[lang])
 modal.load();
 
 
-// toolbar
-ebi('ops').innerHTML = (
-	//(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
-	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">' + (fun_tgl ? '🔎' : 'srch') + '</a>' +
-	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">' + (fun_tgl ? '🧯' : 'undo') + '</a>' : '') +
-	'<a href="#" id="opa_up" data-dest="up2k">' + (fun_tgl ? '🚀' : 'upload') + '</a>' +
-	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">' + (fun_tgl ? '🎈' : 'bup') + '</a>' +
-	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '"><p class="overlay_plus">+</p>📂</a>' +
-	//'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '"><p class="overlay_plus">+</p>📝</a>' +
-	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">' + (fun_tgl ? '📟' : 'msg') + '</a>' +
-	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">' + (fun_tgl ? '⚙️' : 'conf') + '</a>' +
-	'<a href="#" id="opa_acc" data-dest="acc" tt=""><span id="acc_pfp"' + (fun_tgl ? ' class="pfp"' : '') + '>' + (fun_tgl ? '👤' : 'acc') + '</span></a>' +
-	'<div id="opdesc"></div>'
-);
+var opa = QSA('#ops>a, #wfp>a')
+for(var i = 0; i <opa.length; i++)
+	get_tt(opa[i])
+
+function get_tt(el) {
+	var tlid = 'tt_' + el.id
+	if(!L[tlid] && el.getAttribute('data-dest'))
+		tlid = 'ot_' + el.getAttribute('data-dest')
+	if(!L[tlid])
+		tlid = el.id
+	if(L[tlid])
+		el.setAttribute('tt', L[tlid])
+}
+if(!have_del)
+	ebi('opa_del').style.display = 'none'
+
+if(!fun_tgl){
+	ebi('opa_srch').innerHTML = 'search'
+	ebi('opa_del').innerHTML = 'undo'
+	ebi('opa_up').innerHTML = 'upload'
+	ebi('opa_bup').innerHTML = 'bup'
+	ebi('opa_msg').innerHTML = 'message'
+	ebi('opa_cfg').innerHTML = 'settings'
+	ebi('opa_acc').innerHTML = 'account'
+	clmod(ebi('acc_pfp'), 'pfp', false)
+}
 
 // mkdir + md
 function mktemp(is_dir) {
@@ -4172,10 +4184,10 @@ function eval_hash() {
 	var svg_right = svg_box + '<path d="M13 6L19 12M19 12L13 18M19 12H5" ' + svg_options +'/>';
 	var svg_up = svg_box + '<path d="M12 19V5M18 11L12 5L6 11" ' + svg_options +'/>';
 
-	ebi('wfp').innerHTML = (
-		'<a href="#" id="gop" class="btn" tt="' + L.gop + '">' + svg_left + '</a>' +
-		'<a href="#" id="gon" class="btn" tt="' + L.gon + '">' + svg_right + '</a>' +
-		'<a href="#" id="gou" class="btn" tt="' + L.gou + '">' + svg_up + '</a>');
+	ebi('gop').innerHTML = svg_left;
+	ebi('gon').innerHTML = svg_right;
+	ebi('gou').innerHTML = svg_up;
+	
 	ebi('gop').onclick = function () { tree_neigh(-1); }
 	ebi('gon').onclick = function () { tree_neigh(1); }
 	ebi('gou').onclick = function () { tree_up(true); }
@@ -8800,7 +8812,7 @@ var wfp_debounce = (function () {
 			r.n = 1;
 			clearTimeout(r.t);
 			r.t = setTimeout(r.reset, 300);
-			ebi('wfp').style.opacity = 0.1;
+			//ebi('wfp').style.opacity = 0.1;
 		}
 	};
 	r.show = function () {

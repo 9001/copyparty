@@ -54,7 +54,11 @@
 	<div id="wrap">
 
 		<div id="pathBar">
-			<h2 id="wfp" class="shifted"></h2>
+			<h2 id="wfp" class="shifted">
+				<a href="#" id="gou" class="btn">⬆️</a>
+				<a href="#" id="gop" class="btn">⬅️</a>
+				<a href="#" id="gon" class="btn">➡️</a>
+			</h2>
 			<h1 id="path">
 				{%- for n in vpnodes %}
 				<a href="{{ r }}/{{ n[0] }}">{{ n[1] }}</a>
@@ -62,7 +66,17 @@
 			</h1>
 
 			<div id="actionsArea">
-				<div id="ops"></div>
+				<div id="ops">
+					<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search">🔎</a>
+					<a href="#" id="opa_del" data-perm="write" data-dest="unpost">🧯</a>
+					<a href="#" id="opa_up" data-dest="up2k">🚀</a>
+					<a href="#" id="opa_bup" data-perm="write" data-dest="bup">🎈</a>
+					<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir"><p class="overlay_plus">+</p>📂</a>
+					<a href="#" id="opa_msg" data-dest="msg">📟</a>
+					<a href="#" id="opa_cfg" data-dest="cfg">⚙️</a>
+					<a href="#" id="opa_acc" data-dest="acc"><span id="acc_pfp" class="pfp">👤</span></a>
+					<div id="opdesc"></div>
+				</div>
 
 				<div id="srchfolder_div">
 					<input id="folder_search" type="text" />
