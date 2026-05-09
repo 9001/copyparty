@@ -6296,8 +6296,6 @@ window.thegrid = (function () {
 
 		else {
 			if (!dbl){
-				// if(r.bbox && e.preventDefault)
-				// 	e.preventDefault();
 				return true;
 			}
 
@@ -6515,6 +6513,8 @@ window.thegrid = (function () {
 
 		r.dirty = false;
 		r.loadsel();
+		if(baguetteBox)
+			r.bagit('#ggrid');
 		aligngriditems();
 		setTimeout(r.tippen, 20);
 		drag.initgrid();
