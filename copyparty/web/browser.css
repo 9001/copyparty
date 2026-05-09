@@ -1334,6 +1334,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	border: none;
 	cursor: pointer;
 	width: max-content;
+	border: 1px solid var(--bg-u3);
 }
 html:not(.e):not(.d) #up_quick .btn {
 	transform: rotate(0deg);
