@@ -6190,7 +6190,7 @@ window.thegrid = (function () {
 		if (treectl)
 			treectl.textmode(false);
 
-		aligngriditems();
+		setTimeout(aligngriditems, 1);
 		restore_scroll();
 	};
 
@@ -6231,7 +6231,7 @@ window.thegrid = (function () {
 			setTimeout(r.tippen, 20);
 		}
 		setcvar('--grid-sz', r.sz + 'em');
-		aligngriditems();
+		setTimeout(aligngriditems, 1);
 	}
 	setsz();
 
@@ -6515,7 +6515,7 @@ window.thegrid = (function () {
 		r.loadsel();
 		if(window.baguetteBox != undefined)
 			r.bagit('#ggrid');
-		aligngriditems();
+		setTimeout(aligngriditems, 1);
 		setTimeout(r.tippen, 20);
 		drag.initgrid();
 	}
@@ -7624,7 +7624,6 @@ function render_m3u() {
 		el.click();
 }
 
-
 function aligngriditems() {
 	if (!treectl)
 		return;
@@ -7719,7 +7718,7 @@ function onwidgetresize(){
 	ebi('path').onresize = keep_right(ebi('path'));
 }
 window.addEventListener('resize', onwidgetresize);
-onwidgetresize();
+setTimeout(onwidgetresize, 1);
 
 var treectl = (function () {
 	var r = {
@@ -7828,8 +7827,10 @@ var treectl = (function () {
 		else {
 			tree.style.transition = 'none';
 			onresize();
-			aligngriditems();
-			tree.style.transition = '';
+			setTimeout(function(){
+				aligngriditems();
+				tree.style.transition = '';
+			}, 1)
 		}
 	};
 
@@ -7982,8 +7983,8 @@ var treectl = (function () {
 		ebi('tree_footer').style.display = 'block';
 		ebi('wrap').style.marginLeft = w;
 		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
-		onwidgetresize();
-		onscroll();
+		setTimeout(onwidgetresize, 1);
+		setTimeout(onscroll, 1);
 	}
 
 	r.find = function (txt) {
