@@ -7719,7 +7719,7 @@ function onwidgetresize(){
 	ebi('path').onresize = keep_right(ebi('path'));
 }
 window.addEventListener('resize', onwidgetresize);
-setTimeout(onwidgetresize, 1);
+onwidgetresize();
 
 var treectl = (function () {
 	var r = {
@@ -7984,7 +7984,7 @@ var treectl = (function () {
 		ebi('tree_footer').style.display = 'block';
 		ebi('wrap').style.marginLeft = w;
 		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
-		setTimeout(onwidgetresize, 1);
+		onwidgetresize();
 		setTimeout(onscroll, 1);
 	}
 

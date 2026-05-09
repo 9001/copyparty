@@ -3797,10 +3797,6 @@ html.d #treepar {
 		top: .6em;
 		right: .6em;
 	}
-	#ops a {
-		padding-left: .15em;
-		padding-right: .15em;
-	}
 	#srchfolder_div {
 		left: 2.8em;
 	}
@@ -3854,6 +3850,14 @@ html.e #wrap.thin {
 	}
 }
 @media (max-width: 50em){
+	#path {
+		position: relative;
+		height: 2.2em;
+		margin: .5em 0 0 0;
+		z-index: -1;
+	}
+	html.dy .ghead,
+	html.b .ghead,
 	html.dy #wrap.thin .ghead,
 	html.b #wrap.thin .ghead {
 		top: 7.2em;
@@ -3889,7 +3893,9 @@ html.e #wrap.thin {
 		margin-left: -1em;
 		margin-right: -1em;
 	}
+	#actionsArea,
 	#pathBar.thin #actionsArea {
+		position: absolute;
 		top: 1em;
 		right: 1em;
 	}
@@ -3952,6 +3958,8 @@ html.e #wrap.thin {
 		padding: .5em;
 		padding-right: 2em;
 	}
+	#wfp,
+	#wfp.shifted,
 	#pathBar.thin #wfp,
 	#pathBar.thin #wfp.shifted {
 		margin-left: 2em;
@@ -3959,10 +3967,13 @@ html.e #wrap.thin {
 	#wrap.thin .ghead {
 		top: 7em;
 	}
+	html.cy .ghead,
+	html.a .ghead,
 	html.cy #wrap.thin .ghead,
 	html.a #wrap.thin .ghead {
 		top: 7.3em;
 	}
+	html.cz .ghead,
 	html.cz #wrap.thin .ghead {
 		top: 7.7em;
 	}
@@ -3973,7 +3984,13 @@ html.e #wrap.thin {
 	}
 }
 
-@media (max-width: 32em) {
+@media (max-width: 40em) {
+	#ops a {
+		padding-left: .15em;
+		padding-right: .15em;
+	}
+}
+@media (max-width: 33em) {
 	#wfp #gon,
 	#wfp #gop {
 		display: none;
