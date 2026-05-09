@@ -842,7 +842,7 @@ if(!fun_tgl){
 	ebi('opa_bup').innerHTML = 'bup'
 	ebi('opa_msg').innerHTML = 'message'
 	ebi('opa_cfg').innerHTML = 'settings'
-	ebi('opa_acc').innerHTML = 'account'
+	ebi('acc_pfp').innerHTML = 'account'
 	clmod(ebi('acc_pfp'), 'pfp', false)
 }
 
@@ -8891,7 +8891,7 @@ function apply_perms(res) {
 	if(acct != '*'){
 		ebi('acc_name').innerHTML = acct;
 		ebi('acc_pfp').innerHTML = acct.substring(0, 1);
-		ebi('acessType').innerHTML = '<span' + aclass + axs + L.access + '</span>';
+		ebi('accessType').innerHTML = '<span' + aclass + axs + L.access + '</span>';
 		ebi('blogout').value = L.logout;
 		ebi('acc_button').onclick = function(){};
 	}

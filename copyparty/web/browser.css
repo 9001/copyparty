@@ -840,7 +840,7 @@ html.y #path a:hover {
 	left: 2em;
 	padding-right: .5em;
 }
-#acessType,
+#accessType,
 #acc_info,
 #srv_info span,
 #srv_info2 span {
@@ -1611,6 +1611,9 @@ html:not(.e):not(.d) #up_quick .btn.on {
 }
 .unfun #ops a {
 	font-size: 1.2em;
+}
+.unfun #srchfolder_div {
+	left: 5.2em;
 }
 #opa_mkd {
 	display: none;
@@ -5078,7 +5081,7 @@ html.e #wtc {
 #op_acc {
 	left: auto;
 }
-#acessType {
+#accessType {
 	font-size: small;
 }
 
