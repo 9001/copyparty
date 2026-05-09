@@ -1378,6 +1378,7 @@ window.baguetteBox = (function () {
 function init(){
     if(thegrid != undefined){
         thegrid.bagit();
+        thegrid.bag_loaded();
     }
     else{
         console.log('wait for grid init');
