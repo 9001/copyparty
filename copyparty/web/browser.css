@@ -1274,7 +1274,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	border-radius: calc(var(--radius) / 2);
 }
 #wtico,
-#up_quick.open,
+.open #up_quick_more,
 #wtoggle,
 #widgeti {
 	background: #cde;
@@ -1283,18 +1283,22 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	border: 1px solid var(--bg-u3);
 }
 #up_quick {
+	display: inline-block;
+	position: relative;
+	margin: 0 .2em .2em .1em;
+	font-size: .7em;
+}
+#up_quick_more {
 	position: absolute;
 	bottom: 100%;
-	bottom: calc(100% + .4em);
-	right: .4em;
-	font-size: .75em;
+	right: -2px;
 	font-weight: bold;
 	box-shadow: 0 0 .5em color-mix(in oklab, var(--a) 20%, transparent);
 	border-radius: 10px;
 	border-radius: calc(var(--radius) * 1.2);
 	text-align: right;
 }
-#up_quick.open {
+.open #up_quick_more {
 	box-shadow: 0 0 .5em color-mix(in oklab, var(--mp-sh) 20%, transparent);
 }
 #up_quick_more {
@@ -3544,7 +3548,8 @@ html.cz {
 	#ops,
 	#path,
 	#wtoggle,
-	#up_quick {
+	#up_quick_more,
+	#up_quick_btn:not(:hover):not(.on) {
 		backdrop-filter: blur(10px);
 		background: var(--btn-bg);
 	}

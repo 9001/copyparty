@@ -910,15 +910,6 @@ var svg_vol = svg_box + '<path d="M16.0004 9.00009C16.6281 9.83575 17 10.8745 17
 ebi('widget').innerHTML = (
 	'<div id="wstack">' +
 
-		'<div id="up_quick">' +
-		'	<div id="up_quick_more">' +
-		'		<a id="uq_nd">' + L.rc_nfo + ' <span><p class="overlay_plus">+</p>📂</span></a>\n' +
-		'		<a id="uq_nf">' + L.rc_nfi + ' <span><p class="overlay_plus">+</p>📝</span></a>\n' +
-		'		<a id="uq_up">' + L.cl_uopts + ' 🚀</a>\n' +
-		'	</div>' +
-		'	<a id="up_quick_btn" class="tgl btn on"><div class="rotatable">+</div></a>' +
-		'</div>' +
-
 		'<div id="wtoggle">' +
 		'<span id="wfs"></span>' +
 			'<span id="wfm"><a' +
@@ -942,6 +933,15 @@ ebi('widget').innerHTML = (
 				' href="#" id="m3ua" tt="' + L.wt_m3ua + '">📻<span>add</span></a><a' +
 				' href="#" id="m3uc" tt="' + L.wt_m3uc + '">📻<span>copy</span></a>' +
 			'</span>' +
+		'</div>' +
+
+		'<div id="up_quick">' +
+		'	<div id="up_quick_more">' +
+		'		<a id="uq_nd">' + L.rc_nfo + ' <span><p class="overlay_plus">+</p>📂</span></a>\n' +
+		'		<a id="uq_nf">' + L.rc_nfi + ' <span><p class="overlay_plus">+</p>📝</span></a>\n' +
+		'		<a id="uq_up">' + L.cl_uopts + ' 🚀</a>\n' +
+		'	</div>' +
+		'	<a id="up_quick_btn" class="tgl btn on"><div class="rotatable">+</div></a>' +
 		'</div>' +
 
 		'<a href="#" id="wtico">♫</a>' +
