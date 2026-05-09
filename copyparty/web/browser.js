@@ -1149,6 +1149,13 @@ ebi('h_up2k').onclick = function(){
 		0;
 }
 
+ebi('cl_up').onclick =
+ebi('up_outside').onclick =
+	function () {
+		hist_push('#')
+		modaltoggle('up2k', false);
+	}
+
 ebi('sum_u2conf').onclick = function(){
 	clmod(this.parentElement, 'open', 't');
 }
@@ -1399,6 +1406,13 @@ ebi('op_cfg').innerHTML = (
 		ebi('s_content').scrollTop =
 			0;
 	}
+
+	ebi('cl_cfg').onclick =
+	ebi('s_outside').onclick =
+	function () {
+			hist_push('#')
+			modaltoggle('cfg');
+		}
 })();
 
 // accent color
