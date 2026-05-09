@@ -1833,7 +1833,7 @@ var mpl = (function () {
 		if (!v) pbar.unwave();
 		r.selectprogbar();
 	});
-	r.selectprogbar =function(){
+	r.selectprogbar = function(){
 		if (r.waves){
 			clmod(ebi('progbar'), 'vis', true)
 			clmod(ebi('altprogbar'), 'vis', false)
@@ -2828,7 +2828,7 @@ var vbar = (function () {
 		ctx.fontVariantCaps = 'small-caps';
 		w = r.can.w;
 		h = r.can.h;
-		r.draw();
+		setTimeout(r.draw, 1);
 	}
 
 	r.draw = function () {
@@ -3897,8 +3897,6 @@ function play(tid, is_ev, seek) {
 			t_a.setAttribute('id', oid);
 		}
 		mpl.np = ft2dict(t_tr, { 'up_ip': 1 });
-
-		
 
 		mpss.go();
 		mpui.progress_updater();
