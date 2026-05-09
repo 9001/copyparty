@@ -51,182 +51,186 @@
 		</div>
 	</div>
 
-<div id="wrap">
+	<div id="wrap">
 
-	<div id="pathBar">
-		<h2 id="wfp" class="shifted"></h2>
-		<h1 id="path">
-			{%- for n in vpnodes %}
-			<a href="{{ r }}/{{ n[0] }}">{{ n[1] }}</a>
-			{%- endfor %}
-		</h1>
+		<div id="pathBar">
+			<h2 id="wfp" class="shifted"></h2>
+			<h1 id="path">
+				{%- for n in vpnodes %}
+				<a href="{{ r }}/{{ n[0] }}">{{ n[1] }}</a>
+				{%- endfor %}
+			</h1>
 
-		<div id="actionsArea">
-			<div id="ops"></div>
+			<div id="actionsArea">
+				<div id="ops"></div>
 
-			<div id="srchfolder_div">
-				<input id="folder_search" type="text"/>
-				<span id="srch_quickopts" class="popup under">
-					<input type="checkbox" id="srch_recursivec" checked="true">
-					<label for="srch_recursivec" id="srch_recursivelbl" tabindex="0"></label>
-				</span>
-				<div id="qs_btns">
-					<a id="moresearch">▾</a>
-					<a id="closesearch">✕</a>
+				<div id="srchfolder_div">
+					<input id="folder_search" type="text" />
+					<span id="srch_quickopts" class="popup under">
+						<input type="checkbox" id="srch_recursivec" checked="true">
+						<label for="srch_recursivec" id="srch_recursivelbl" tabindex="0"></label>
+					</span>
+					<div id="qs_btns">
+						<a id="moresearch">▾</a>
+						<a id="closesearch">✕</a>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
 
-	<div id="op_search" class="opview">
-		{%- if have_tags_idx %}
-		<div id="srch_form" class="tags opbox"></div>
+		<div id="op_search" class="opview">
+			{%- if have_tags_idx %}
+			<div id="srch_form" class="tags opbox"></div>
+			{%- else %}
+			<div id="srch_form" class="opbox"></div>
+			{%- endif %}
+			<div id="srch_q"></div>
+		</div>
+
+		<div id="op_player" class="opview opbox opwide"></div>
+
+		<div id="op_bup" class="opview opbox {% if not ls0 %}act{% endif %}">
+			<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+				<input type="hidden" name="act" value="bput" />
+				<input id="bup_btn" type="file" name="f" multiple /><br />
+				<input type="submit" value="start upload">
+			</form>
+			<a id="bbsw" href="?b=u" rel="nofollow"><br />switch to basic browser</a>
+		</div>
+
+		<div id="op_mkdir" class="opview opbox {% if not ls0 %}act{% endif %}">
+			<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+				<input type="hidden" name="act" value="mkdir" />
+				📂<input type="text" name="name" class="i" placeholder="awesome mix vol.1">
+				<input type="submit" value="make directory">
+			</form>
+		</div>
+
+		<div id="op_new_md" class="opview opbox">
+			<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
+				<input type="hidden" name="act" value="new_md" />
+				📝<input type="text" name="name" class="i" placeholder="weekend-plans">
+				<input type="submit" value="new file">
+			</form>
+			<span id="new_mdi"></span>
+		</div>
+
+		<div id="op_msg" class="opview opbox {% if not ls0 %}act{% endif %}">
+			<form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="{{ url_suf }}">
+				📟<input type="text" name="msg" class="i" placeholder="lorem ipsum dolor sit amet">
+				<input type="submit" value="send msg to srv log">
+			</form>
+		</div>
+
+		<div id="op_unpost" class="opview opbox"></div>
+
+		<div id="op_cfg" class="opview opbox opwide"></div>
+
+
+		{%- if doc %}
+		<div id="bdoc"><pre>{{ doc|e }}</pre></div>
 		{%- else %}
-		<div id="srch_form" class="opbox"></div>
+		<div id="bdoc"></div>
 		{%- endif %}
-		<div id="srch_q"></div>
-	</div>
 
-	<div id="op_player" class="opview opbox opwide"></div>
+		<div id="pro" class="logue">{{ "" if sb_lg else logues[0] }}</div>
 
-	<div id="op_bup" class="opview opbox {% if not ls0 %}act{% endif %}">
-		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
-			<input type="hidden" name="act" value="bput" />
-			<input id="bup_btn" type="file" name="f" multiple /><br />
-			<input type="submit" value="start upload">
-		</form>
-		<a id="bbsw" href="?b=u" rel="nofollow"><br />switch to basic browser</a>
-	</div>
-
-	<div id="op_mkdir" class="opview opbox {% if not ls0 %}act{% endif %}">
-		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
-			<input type="hidden" name="act" value="mkdir" />
-			📂<input type="text" name="name" class="i" placeholder="awesome mix vol.1">
-			<input type="submit" value="make directory">
-		</form>
-	</div>
-
-	<div id="op_new_md" class="opview opbox">
-		<form method="post" enctype="multipart/form-data" accept-charset="utf-8" action="{{ url_suf }}">
-			<input type="hidden" name="act" value="new_md" />
-			📝<input type="text" name="name" class="i" placeholder="weekend-plans">
-			<input type="submit" value="new file">
-		</form>
-		<span id="new_mdi"></span>
-	</div>
-
-	<div id="op_msg" class="opview opbox {% if not ls0 %}act{% endif %}">
-		<form method="post" enctype="application/x-www-form-urlencoded" accept-charset="utf-8" action="{{ url_suf }}">
-			📟<input type="text" name="msg" class="i" placeholder="lorem ipsum dolor sit amet">
-			<input type="submit" value="send msg to srv log">
-		</form>
-	</div>
-
-	<div id="op_unpost" class="opview opbox"></div>
-
-	<div id="op_cfg" class="opview opbox opwide"></div>
-
-
-	{%- if doc %}
-	<div id="bdoc"><pre>{{ doc|e }}</pre></div>
-	{%- else %}
-	<div id="bdoc"></div>
-	{%- endif %}
-
-	<div id="pro" class="logue">{{ "" if sb_lg else logues[0] }}</div>
-
-	<div id="cfg" class="modal">
-		<a id="s_outside" class="closepane" href="#"></a>
-		<div id="s_content" class="modalcontent">
-			<a id="h_cfg" class="modalheader" href="#h_cfg"></a>
-			<div id="s_hor" class="modalsplit">
-				<div id="s_nav" class="splitsub"></div>
-				<div class="divider"></div>
-				<div id="s_list" class="opview splitsub"></div>
+		<div id="cfg" class="modal">
+			<a id="s_outside" class="closepane" href="#"></a>
+			<div id="s_content" class="modalcontent">
+				<a id="h_cfg" class="modalheader" href="#h_cfg"></a>
+				<div id="s_hor" class="modalsplit">
+					<div id="s_nav" class="splitsub"></div>
+					<div class="divider"></div>
+					<div id="s_list" class="opview splitsub"></div>
+				</div>
+				<a class="close btn" href="#">✕</a>
 			</div>
-			<a class="close btn" href="#">✕</a>
 		</div>
-	</div>
 
-	<div id="up2k" class="modal">
-		<a id="up_outside" class="closepane" href="#"></a>
-		<div id="up_content" class="modalcontent">
-			<a id="h_up2k" class="modalheader" href="#h_up2k">🚀 Upload</a>
-			<div id="up_hor" class="modalsplit">
-				<div id="op_up2k" class="opview splitsub"></div>
-				<div class="divider"></div>
-				<div id="up_info" class="splitsub"></div>
+		<div id="up2k" class="modal">
+			<a id="up_outside" class="closepane" href="#"></a>
+			<div id="up_content" class="modalcontent">
+				<a id="h_up2k" class="modalheader" href="#h_up2k">🚀 Upload</a>
+				<div id="up_hor" class="modalsplit">
+					<div id="op_up2k" class="opview splitsub"></div>
+					<div class="divider"></div>
+					<div id="up_info" class="splitsub"></div>
+				</div>
+				<a class="close btn" href="#">✕</a>
 			</div>
-			<a class="close btn" href="#">✕</a>
 		</div>
-	</div>
 
-	<!-- define symbol in hidden svg document -->
-	<svg style="display: none" version="1.1">
-		<defs>
-			<symbol id="folder-icon" viewBox="0 0 24 24">
-				<path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 5.89543 3.89543 5 5 5L8.67157 5C9.20201 5 9.71071 5.21071 10.0858 5.58579L10.9142 6.41421C11.2893 6.78929 11.798 7 12.3284 7H19C20.1046 7 21 7.89543 21 9V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z" 
-					style="fill:#07c; fill:var(--a);"/>
-			</symbol>
-			<symbol id="file-icon" viewBox="0 0 48 48">
-				<path
-					fill="currentColor"
-					opacity=".7"
-					d="m 28.22643,4.6905246 0.0063,9.1096644 a 1.6331061,1.6331061 43.698111 0 0 1.649296,1.632007 l 9.339558,-0.09259 z"/>
-				<path
-					class="a"
-					d="M39.5,15.5h-9a2,2,0,0,1-2-2v-9h-18a2,2,0,0,0-2,2v35a2,2,0,0,0,2,2h27a2,2,0,0,0,2-2Z"
-					id="path1" 
-					style="stroke:#07c; stroke:var(--a);"
-					stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-				<line
-					class="a"
-					x1="28.5"
-					y1="4.5"
-					x2="39.5"
-					y2="15.5"
-					style="stroke:#07c; stroke:var(--a);"
-					stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-			</symbol>
-		</defs>
-	</svg>
+		<!-- define symbol in hidden svg document -->
+		<svg style="display: none" version="1.1">
+			<defs>
+				<symbol id="folder-icon" viewBox="0 0 24 24">
+					<path fill-rule="evenodd" clip-rule="evenodd" d="M3 7C3 5.89543 3.89543 5 5 5L8.67157 5C9.20201 5 9.71071 5.21071 10.0858 5.58579L10.9142 6.41421C11.2893 6.78929 11.798 7 12.3284 7H19C20.1046 7 21 7.89543 21 9V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7Z"
+						  style="fill:#07c; fill:var(--a);" />
+				</symbol>
+				<symbol id="file-icon" viewBox="0 0 48 48">
+					<path fill="currentColor"
+						  opacity=".7"
+						  d="m 28.22643,4.6905246 0.0063,9.1096644 a 1.6331061,1.6331061 43.698111 0 0 1.649296,1.632007 l 9.339558,-0.09259 z" />
+					<path class="a"
+						  d="M39.5,15.5h-9a2,2,0,0,1-2-2v-9h-18a2,2,0,0,0-2,2v35a2,2,0,0,0,2,2h27a2,2,0,0,0,2-2Z"
+						  id="path1"
+						  style="stroke:#07c; stroke:var(--a);"
+						  stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+					<line class="a"
+						  x1="28.5"
+						  y1="4.5"
+						  x2="39.5"
+						  y2="15.5"
+						  style="stroke:#07c; stroke:var(--a);"
+						  stroke-width="1" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+				</symbol>
+			</defs>
+		</svg>
 
-	<div id="wtc" class="ghead"></div>
-	<table id="files">
-		<thead>
-			<tr>
-				<th name="lead"><span>!</span></th>
-				<th name="href"><span>File Name</span></th>
-				<th name="sz" sort="int"><span>Size</span></th>
-				{%- for k in taglist %}
+		<div id="wtc" class="ghead"></div>
+		<table id="files">
+			<thead>
+				<tr>
+					<th name="lead"><span>!</span></th>
+					<th name="href"><span>File Name</span></th>
+					<th name="sz" sort="int"><span>Size</span></th>
+					{%- for k in taglist %}
 					{%- if k.startswith('.') %}
-				<th name="tags/{{ k }}" sort="int"><span>{{ k[1:] }}</span></th>
+					<th name="tags/{{ k }}" sort="int"><span>{{ k[1:] }}</span></th>
 					{%- else %}
-				<th name="tags/{{ k }}"><span>{{ k[0]|upper }}{{ k[1:] }}</span></th>
+					<th name="tags/{{ k }}"><span>{{ k[0]|upper }}{{ k[1:] }}</span></th>
 					{%- endif %}
+					{%- endfor %}
+					<th name="ext"><span>Ext</span></th>
+					<th name="ts"><span>Date</span></th>
+				</tr>
+			</thead>
+			<tbody>
+
+				{%- for f in files %}
+				<tr>
+					<td>{{ f.lead }}</td>
+					<td><a href="{{ f.href }}">{{ f.name|e }}</a></td>
+					<td>{{ f.sz }}</td>
+					{%- if f.tags is defined %}
+					{%- for k in taglist %}
+					<td>{{ f.tags[k]|e }}</td>{%- endfor %}
+					{%- endif %}
+					<td>{{ f.ext }}</td>
+					<td>{{ f.dt }}</td>
+				</tr>
 				{%- endfor %}
-				<th name="ext"><span>Ext</span></th>
-				<th name="ts"><span>Date</span></th>
-			</tr>
-		</thead>
-<tbody>
 
-{%- for f in files %}
-<tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td>
-{%- if f.tags is defined %}
-	{%- for k in taglist %}<td>{{ f.tags[k]|e }}</td>{%- endfor %}
-{%- endif %}<td>{{ f.ext }}</td><td>{{ f.dt }}</td></tr>
-{%- endfor %}
+			</tbody>
+		</table>
 
-		</tbody>
-	</table>
+		<div id="epi" class="logue">{{ "" if sb_lg else logues[1] }}</div>
 
-	<div id="epi" class="logue">{{ "" if sb_lg else logues[1] }}</div>
+		<a href="#" id="repl">π</a>
 
-	<a href="#" id="repl">π</a>
-
-</div>
+	</div>
 
 	<div id="srv_info" style="display: none;"><span>{{ srv_info }}</span></div>
 
@@ -254,6 +258,7 @@
 	{%- if lang != "eng" %}
 	<script src="{{ r }}/.cpr/w/tl/{{ lang }}.js?_={{ ts }}"></script>
 	{%- endif %}
+	<script src="{{ r }}/.cpr/w/baguettebox.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/w/browser.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/w/baguettebox.js?_={{ ts }}"></script>
 	<script src="{{ r }}/.cpr/w/up2k.js?_={{ ts }}"></script>
@@ -261,11 +266,11 @@
 	<script src="{{ js }}_={{ ts }}"></script>
 	{%- endif %}
 	<script>
-		Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
-		jsldp("J_UTL","util");
-		jsldp("J_BBX","baguettebox");
-		jsldp("J_BRW","browser");
-		jsldp("J_U2K","up2k");
+		Date.now(); function jsldp(a, b) { 2 != window[a] && alert("FATAL ERROR: cannot load " + b + ".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R") }
+		jsldp("J_UTL", "util");
+		jsldp("J_BBX", "baguettebox");
+		jsldp("J_BRW", "browser");
+		jsldp("J_U2K", "up2k");
 	</script>
 </body>
 </html>
