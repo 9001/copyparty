@@ -51,7 +51,7 @@ html {
 	padding: 1.5em;
 	padding-bottom: 0em;
 	line-height: 1.3em;
-	background: color-mix(in oklab, var(--a-gray) 27%, var(--bg-max));
+	background: #282827;
 	border-radius: .5em;
 	border: var(--bg-u5) solid 1px;
 	box-shadow: 0 0 2em color-mix(in oklab, var(--bg-max) 60%, transparent 40%);
@@ -326,6 +326,12 @@ input::placeholder {
 	letter-spacing: .04em;
 	opacity: 0.64;
 	color: #000;
+}
+input:autofill {
+  box-shadow: 0 0 0 40px #1f3b67 inset;
+}
+html.y input:autofill {
+  box-shadow: 0 0 0 40px #a2c9e6 inset;
 }
 html.z input::placeholder {
 	color: #fff;
