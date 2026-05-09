@@ -6481,8 +6481,9 @@ var thegrid = (function () {
 
 		var imgs = QSA('#ggrid>a img');
 		for (var a = 0, aa = imgs.length; a < aa; a++) {
-			if(imgs[a].complete)
-				clmod(imgs[a].parentElement.parentElement, 'thumbed', true)
+			if(imgs[a].complete){
+				set_loaded(imgs[a].parentElement.parentElement);
+			}
 		}
 
 		var chks = QSA('.gselchk');
@@ -6663,15 +6664,27 @@ var thegrid = (function () {
 	return r;
 })();
 
-
 function th_onload(el) {
-	clmod(el.parentElement.parentElement, 'thumbed', true)
+	set_loaded(el.parentElement.parentElement)
 	el.style.position = 'static'
 	el.style.opacity = '1'
-	el.style.height = '';
+	el.style.height = ''
 	el.previousSibling.style.display =
 	el.previousSibling.previousSibling.style.display =
 		'none'
+}
+
+function set_loaded(el) {
+	clmod(el, 'thumbed', true)
+	var a = el.getAttribute('ref')
+	if(a){
+		var b = ebi(a)
+		if(b){
+			var c = b.closest('tr')
+			if(c)
+				clmod(c, 'thumbed', true)
+		}
+	}
 }
 
 
