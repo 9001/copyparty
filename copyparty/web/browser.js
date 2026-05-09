@@ -6562,11 +6562,8 @@ window.thegrid = (function () {
 			}
 		});
 		r.bbox_opts = br[1];
-	};
-	
-	r.bag_loaded = function () {
 		r.bbox = true;
-	}
+	};
 
 	r.onhide = function () {
 		afilt.apply();

@@ -1376,9 +1376,8 @@ window.baguetteBox = (function () {
 
 
 function init(){
-    if(thegrid != undefined){
+    if(thegrid != undefined && !thegrid.dirty){
         thegrid.bagit();
-        thegrid.bag_loaded();
     }
     else{
         console.log('wait for grid init');
