@@ -3797,9 +3797,6 @@ html.d #treepar {
 		top: .6em;
 		right: .6em;
 	}
-	#srchfolder_div {
-		left: 2.8em;
-	}
 }
 html.e #pathBar.thin #path {
 	margin: 0;
@@ -3988,6 +3985,9 @@ html.e #wrap.thin {
 	#ops a {
 		padding-left: .15em;
 		padding-right: .15em;
+	}
+	#srchfolder_div {
+		left: 2.8em;
 	}
 }
 @media (max-width: 33em) {
