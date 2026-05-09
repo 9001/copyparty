@@ -1,7 +1,19 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0428-0907 `v1.21.0` UI V2
 
+## 😴 tl;dr
+
+* the web UI changed a LOT
+* nice mobile layout
+* try setting an accent color in the theme settings
+* drag n drop within copyparty
+* the used storage metric is now at the bottom of the folder tree
+* the account details and control panel link are now in the account popup (top right)
+* media player settings and normal settings have merged
+* new file / new folder have moved from the top bar to the [+] button / right click menu (also accessible via long press on mobile)
+
 ## 🧪 new features
+
 * [Add moving files into other folders by dragging](https://github.com/tilse/copyparty-uiV1.5/pull/1) within the browser window to move files or folders
 * custom accent color setting added. works best for light and dark themes (the first 4 in the list)
 * right click (long press) on mobile is now possible
