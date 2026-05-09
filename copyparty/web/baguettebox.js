@@ -1374,4 +1374,16 @@ window.baguetteBox = (function () {
     };
 })();
 
+
+function init(){
+    if(thegrid != undefined){
+        thegrid.bagit();
+    }
+    else{
+        console.log('loop');
+        setTimeout(init, 100)
+    }
+}
+init();
+
 J_BBX = 2;

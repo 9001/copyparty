@@ -6061,7 +6061,7 @@ var showfile = (function () {
 })();
 
 
-var thegrid = (function () {
+window.thegrid = (function () {
 	var lfiles = ebi('files'),
 		gfiles = mknod('div', 'gfiles');
 
@@ -6511,7 +6511,7 @@ var thegrid = (function () {
 		}
 
 		r.dirty = false;
-		r.bagit('#ggrid');
+		//r.bagit('#ggrid');
 		r.loadsel();
 		aligngriditems();
 		setTimeout(r.tippen, 20);
@@ -6530,12 +6530,15 @@ var thegrid = (function () {
 	}
 
 	r.bagit = function (isrc) {
+		console.log('init image viewer');
 		if (!window.baguetteBox)
 			return;
 
 		if (r.bbox)
 			baguetteBox.destroy();
 
+		if(!isrc)
+			isrc = thegrid.en ? '#ggrid' : '#files'
 		var br = baguetteBox.run(isrc, {
 			noScrollbars: true,
 			duringHide: r.onhide,
