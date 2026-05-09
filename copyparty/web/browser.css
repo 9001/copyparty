@@ -2183,6 +2183,9 @@ html.a .btn {
 #u2tdate {
 	opacity: .3;
 }
+#up_quick.disabled {
+	display: none;
+}
 .setting:has(#griden.on)+.setting #thumbs,
 .setting:has(#au_preload.on)+.setting #au_prescan,
 .setting:has(#au_preload.on)+.setting #au_prescan,
