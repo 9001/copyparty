@@ -1376,14 +1376,16 @@ window.baguetteBox = (function () {
 
 
 function init(){
-    if(thegrid != undefined && thegrid.dirty == false){
+    if(thegrid != undefined && thegrid.dirty == false && thegrid.bbox != true){
+        console.log('bbox load')
         thegrid.bagit();
     }
     else{
-        console.log('wait for grid init');
         setTimeout(init, 100)
     }
 }
+
+console.log('wait for grid init');
 init();
 
 J_BBX = 2;

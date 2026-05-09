@@ -4101,6 +4101,7 @@ function eval_hash() {
 
 	var media = scan_hash(v);
 	if (media) {
+		console.log('got media in hash')
 		var mtype = media[0],
 			id = media[1],
 			ts = media[2];
@@ -6514,7 +6515,7 @@ window.thegrid = (function () {
 		r.dirty = false;
 		r.loadsel();
 		if(window.baguetteBox != undefined)
-			r.bagit('#ggrid');
+			r.bagit();
 		setTimeout(aligngriditems, 1);
 		setTimeout(r.tippen, 20);
 		drag.initgrid();
@@ -6533,9 +6534,7 @@ window.thegrid = (function () {
 
 	r.bagit = function (isrc) {
 		console.log('init image viewer');
-		if (!window.baguetteBox)
-			return;
-
+		
 		if (r.bbox)
 			baguetteBox.destroy();
 
@@ -6563,6 +6562,7 @@ window.thegrid = (function () {
 		});
 		r.bbox_opts = br[1];
 		r.bbox = true;
+		eval_hash()
 	};
 
 	r.onhide = function () {
