@@ -1277,7 +1277,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	display: inline-block;
 	text-wrap-mode: nowrap;
 	text-align: center;
-	max-width: calc(100% - 1.8em);
+	max-width: calc(100% - 3.5em);
 	overflow-x: auto;
 	overflow-y: hidden;
 	margin: 0 .1em .1em .2em;
