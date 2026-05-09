@@ -1260,7 +1260,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	display: block;
 	position: absolute;
 	text-wrap-mode: nowrap;
-	max-width: 100%;
+	width: 100%;
 	bottom: 100%;
 	right: 0;
 	font-size: 2em;
