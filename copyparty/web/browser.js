@@ -6295,8 +6295,11 @@ window.thegrid = (function () {
 			window.open(qhref, '_blank');
 
 		else {
-			if (!dbl)
+			if (!dbl){
+				if(r.bbox && e.preventDefault)
+					e.preventDefault();
 				return true;
+			}
 
 			setTimeout(function () {
 				r.sel = true;
@@ -6511,7 +6514,6 @@ window.thegrid = (function () {
 		}
 
 		r.dirty = false;
-		//r.bagit('#ggrid');
 		r.loadsel();
 		aligngriditems();
 		setTimeout(r.tippen, 20);
@@ -6539,6 +6541,7 @@ window.thegrid = (function () {
 
 		if(!isrc)
 			isrc = thegrid.en ? '#ggrid' : '#files'
+
 		var br = baguetteBox.run(isrc, {
 			noScrollbars: true,
 			duringHide: r.onhide,
@@ -6558,8 +6561,8 @@ window.thegrid = (function () {
 				}
 			}
 		});
-		r.bbox = true;
 		r.bbox_opts = br[1];
+		r.bbox = true;
 	};
 
 	r.onhide = function () {
@@ -10986,9 +10989,15 @@ function reload_browser() {
 	}
 
 	function sel_start(e) {
-		if (e.button !== 0 && e.type !== 'touchstart') return;
-		if (!thegrid.en || !treectl.dsel) return;
-		if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a')) return;
+		try{
+			if (e.button !== 0 && e.type !== 'touchstart') return;
+			if (!thegrid.en || !treectl.dsel) return;
+			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a')) return;
+		}
+		catch(ex){
+			console.log(ex);
+			return;
+		}
 
 		if (e.target.closest('#gfiles'))
 			ebi('gfiles').style.userSelect = "none"

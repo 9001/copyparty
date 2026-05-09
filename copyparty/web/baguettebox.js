@@ -1380,7 +1380,7 @@ function init(){
         thegrid.bagit();
     }
     else{
-        console.log('loop');
+        console.log('wait for grid init');
         setTimeout(init, 100)
     }
 }
