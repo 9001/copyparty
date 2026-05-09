@@ -6296,8 +6296,8 @@ window.thegrid = (function () {
 
 		else {
 			if (!dbl){
-				if(r.bbox && e.preventDefault)
-					e.preventDefault();
+				// if(r.bbox && e.preventDefault)
+				// 	e.preventDefault();
 				return true;
 			}
 
