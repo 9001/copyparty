@@ -1432,6 +1432,27 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	font-size: .7em;
 	display: block;
 }
+.unfun {
+	#wfm span,
+	#wm3u span,
+	#zip1 span,
+	#wnp span {
+		font-size: 1em;
+	}
+
+	#wtoggle a {
+		font-size: .45em;
+	}
+
+	#up_quick_more a:after {
+		content: "+"
+	}
+
+	#up_quick_more a span,
+	#favico_onpage {
+		display: none;
+	}
+}
 #wnp span {
 	font-size: .7em;
 }

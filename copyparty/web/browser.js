@@ -932,7 +932,7 @@ ebi('widget').innerHTML = (
 				' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
 				' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
 			'</span><span id="wzip1"><a' +
-				' href="#" id="zip1" tt="' + L.wt_zip1 + '">⬇️📦<span>zip</span></a>' +
+				' href="#" id="zip1" tt="' + L.wt_zip1 + '">' + (fun_tgl ? '⬇️📦' : 'download') + '<span>zip</span></a>' +
 			'</span><span id="wzip"><a' +
 				' href="#" id="selall" tt="' + L.wt_selall + '">sel.<br />all</a><a' +
 				' href="#" id="selinv" tt="' + L.wt_selinv + '">sel.<br />inv.</a><a' +
@@ -951,7 +951,7 @@ ebi('widget').innerHTML = (
 		'	<div id="up_quick_more">' +
 		'		<a id="uq_nd">' + L.rc_nfo + ' <span><p class="overlay_plus">+</p>📂</span></a>\n' +
 		'		<a id="uq_nf">' + L.rc_nfi + ' <span><p class="overlay_plus">+</p>📝</span></a>\n' +
-		'		<a id="uq_up">' + L.cl_uopts + ' 🚀</a>\n' +
+		'		<a id="uq_up">' + L.cl_uopts + ' <span>🚀<span></a>\n' +
 		'	</div>' +
 		'	<a id="up_quick_btn" class="tgl btn on"><div class="rotatable">+</div></a>' +
 		'</div>' +
