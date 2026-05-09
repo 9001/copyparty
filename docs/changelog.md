@@ -7,6 +7,7 @@
 * right click (long press) on mobile is now possible
 * selection checkboxes on items in grid view
 * the tree and path can be visible at the same time
+* new design for placeholder thumbnails
 * #386 gallery view toggle for smaller margins / bigger image previews
 * settings and upload are now a popup/modal
 * settings can be navigated via sections and former tooltip info is now always visible
