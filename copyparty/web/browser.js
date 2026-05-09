@@ -2771,7 +2771,7 @@ var pbar = (function () {
 				});
 		}
 
-		if (!widget.is_open || !r.waves)
+		if (!widget.is_open)
 			return;
 
 		pctx.fillStyle = '#bbb'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
