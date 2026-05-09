@@ -954,6 +954,9 @@ tr.play td:nth-child(1) a {
 	background: var(--g-f-bg);
 	border-color: var(--g-f-b1);
 	box-shadow: 0 .1em .3em var(--g-sh);
+	.gselchk {
+		display: block;
+	}
 }
 #ggrid>a.play .thumb,
 #ggrid>a.play img {
@@ -1018,8 +1021,13 @@ tr.play td:nth-child(1) a {
 	text-shadow: none;
 	font-family: monospace;
 }
-.sel .gselchk,
-.imgcontainer:hover .gselchk {
+#ggrid>a.thumbed {
+	.thumb,
+	.th_ext {
+		display: none;
+	}
+}
+.sel .gselchk {
 	display: block;
 }
 .srch_hdr .gselchk {

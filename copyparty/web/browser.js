@@ -6206,6 +6206,11 @@ window.thegrid = (function () {
 		if (treectl)
 			treectl.textmode(false);
 
+		var imgs = QSA('#ggrid>a img');
+		for (var a = 0, aa = imgs.length; a < aa; a++) {
+			set_loaded(imgs[a], r.thumbs && imgs[a].complete, true);
+		}
+
 		setTimeout(aligngriditems, 1);
 		restore_scroll();
 	};
@@ -6510,9 +6515,7 @@ window.thegrid = (function () {
 
 		var imgs = QSA('#ggrid>a img');
 		for (var a = 0, aa = imgs.length; a < aa; a++) {
-			if(imgs[a].complete){
-				set_loaded(imgs[a].parentElement.parentElement);
-			}
+			set_loaded(imgs[a], r.thumbs && imgs[a].complete, true);
 		}
 
 		var chks = QSA('.gselchk');
@@ -6698,28 +6701,42 @@ window.thegrid = (function () {
 })();
 
 function th_onload(el) {
-	set_loaded(el.parentElement.parentElement)
+	set_loaded(el, true, false)
 	el.style.position = 'static'
 	el.style.opacity = '1'
 	el.style.height = ''
-	el.previousSibling.style.display =
-	el.previousSibling.previousSibling.style.display =
-		'none'
 }
 
-function set_loaded(el) {
-	clmod(el, 'thumbed', true)
-	var a = el.getAttribute('ref')
+function set_loaded(el, state, dblcheck) {
+	if(state && dblcheck) {
+		testImage(el)
+	}
+	var p = el.parentElement.parentElement
+	clmod(p, 'thumbed', state)
+	var a = p.getAttribute('ref')
 	if(a){
 		var b = ebi(a)
 		if(b){
 			var c = b.closest('tr')
 			if(c)
-				clmod(c, 'thumbed', true)
+				clmod(c, 'thumbed', state)
 		}
 	}
 }
 
+function testImage(el) {
+	var URL = el.src
+    var tester=new Image();
+    tester.onload=
+		function imageFound() {
+			set_loaded(el, true, false)
+		};
+    tester.onerror=
+		function imageFound() {
+			set_loaded(el, false, false)
+		};
+    tester.src=URL;
+}
 
 function tree_scrollto(e) {
 	ev(e);
