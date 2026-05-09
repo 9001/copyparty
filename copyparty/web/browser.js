@@ -6513,7 +6513,7 @@ window.thegrid = (function () {
 
 		r.dirty = false;
 		r.loadsel();
-		if(baguetteBox)
+		if(window.baguetteBox != undefined)
 			r.bagit('#ggrid');
 		aligngriditems();
 		setTimeout(r.tippen, 20);
