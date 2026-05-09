@@ -1339,7 +1339,7 @@ html:not(.e):not(.d) #up_quick .btn {
 	transform: rotate(0deg);
 }
 html:not(.e):not(.d) #up_quick .btn.on {
-	transform: rotate(-90deg);
+	/* transform: rotate(-90deg); */
 	box-shadow: -.05em .02em .3em color-mix(in oklab, var(--a) 20%, transparent);
 }
 #up_quick .btn .rotatable {
