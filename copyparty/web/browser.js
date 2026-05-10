@@ -1451,13 +1451,13 @@ ebi('radius').oninput = function () {
 	var r = parseFloat(this.value);
 
 	clmod(ebi('radius'), 'invalid', this.value.length != 0 && r.length == 0);
-	if(r == radius)
+	if(r === radius)
 		return;
 
 	if(isNaN(r))
 		r = ''
 	swrite('radius', r);
-	var setV = r == '' ? '' : (r + 'px');
+	var setV = this.value == '' ? '' : (r + 'px');
 	document.documentElement.style.setProperty('--radius', setV);
 	console.log(setV);
 }
