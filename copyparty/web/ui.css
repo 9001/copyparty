@@ -311,7 +311,7 @@ html {
 html.y #tt {
 	border-color: #888 #000 #777 #000;
 }
-html.bz #tt {
+html.az #tt {
 	border-color: #3b3f58;
 }
 html.y #tt,
@@ -685,7 +685,7 @@ hr {
 		border-top: .4em solid rgba(203, 203, 203, 0.634);
 		border-bottom: .4em solid #4c4c4c;
 	}
-	html.bz .mdo h1 {
+	html.az .mdo h1 {
 		background: #202231;
 		border: 1px solid #2d2f45;
 		border-width: 0 0 .4em 0;
@@ -694,8 +694,8 @@ hr {
 		background: #444;
 		border-bottom: .22em solid #555;
 	}
-	html.bz .mdo h2,
-	html.bz .mdo h3 {
+	html.az .mdo h2,
+	html.az .mdo h3 {
 		background: transparent;
 		border-color: #3b3f58;
 	}

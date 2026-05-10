@@ -126,19 +126,19 @@
 html.y {
 	--scrl-hint: var(--bg);
 }
-html.a {
+html.b {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
 
 	--btn-bs: .1em .2em .1em var(--mp-sh);
 }
-html.az {
+html.bz {
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
 }
-html.ay {
+html.by {
 	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a)80%, var(--a)), color-mix(in oklab, var(--btn-bg-a) 50%, transparent));
 }
 
-html.b {
+html.a {
 	--btn-bs: 0 .05em 0 var(--bg-d3) inset;
 	--btn-1-bs: 0 .05em 0 var(--btn-1h-bg) inset;
 	--btn-bg: color-mix(in oklab, var(--bg-u5), transparent);
@@ -165,7 +165,7 @@ html.b {
 html.bz {
 	--a: #fc5;
 }
-html.by {
+html.ay {
 	--a: #07c;
 	--bg: var(--bg-u2);
 }
@@ -747,15 +747,15 @@ html.y #files span.fsz_P { font-weight: bold }
 	border-right: var(--bg) solid 2px;
 	background: linear-gradient(70deg, transparent 40%, color-mix(in oklab, var(--bg-max) 25%, transparent) 75%, color-mix(in oklab, var(--bg-max) 35%, transparent));
 }
-html.a #path i {
+html.b #path i {
 	border-right: var(--bg) solid 1px;
 }
 #path a:hover {
 	color: var(--fg-max);
 	background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
 }
-html.b #ggrid>a.dir:before,
-html.b #path i {
+html.a #ggrid>a.dir:before,
+html.a #path i {
 	background: none;
 }
 html.y #path a:hover {
@@ -2020,7 +2020,7 @@ html {
 	margin: 0 .1em 0 0;
 }
 html.c .btn,
-html.a .btn {
+html.b .btn {
 	border-radius: var(--radius);
 }
 .btn:hover {
@@ -2617,11 +2617,11 @@ html.noscroll .sbar::-webkit-scrollbar {
 	-ms-interpolation-mode: nearest-neighbor;
 	image-rendering: pixelated;
 }
-html.bb_fsc .full-image img,
-html.bb_fsc .full-image video {
+html.ab_fsc .full-image img,
+html.ab_fsc .full-image video {
 	max-height: 100%;
 }
-html.bb_fsc figcaption {
+html.ab_fsc figcaption {
 	display: none;
 }
 .full-image img.nt,
@@ -3355,7 +3355,7 @@ details .setting {
 #u2conf input+a.b {
 	background: var(--u2-b2-bg);
 }
-html.b #u2conf a.b:hover {
+html.a #u2conf a.b:hover {
 	background: var(--btn-h-bg);
 }
 #u2conf .c label {
@@ -3552,20 +3552,20 @@ html.dz .opview input.i {
 	background: var(--bg-u2);
 }
 html.c #treepar,
-html.a #treepar {
+html.b #treepar {
 	background: var(--bg-u2);
 }
 html.c #tree li,
-html.a #tree li {
+html.b #tree li {
 	border-top: 1px solid var(--bg-u5);
 	border-bottom: 1px solid var(--bg-d3);
 }
 html.c #tree li:last-child,
-html.a #tree li:last-child {
+html.b #tree li:last-child {
 	border-bottom: none;
 }
 html.c .opbox h3,
-html.a .opbox h3 {
+html.b .opbox h3 {
 	border-bottom: 1px solid var(--bg-u5);
 }
 html.c #ops,
@@ -3574,18 +3574,18 @@ html.c #path,
 html.c #srch_form,
 html.c .ghead,
 
-html.a #ops,
-html.a .opbox,
-html.a #path,
-html.a #srch_form,
-html.a .ghead {
+html.b #ops,
+html.b .opbox,
+html.b #path,
+html.b #srch_form,
+html.b .ghead {
 	background: #c1d1ed;
 	background: var(--btn-bg);
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
 	box-shadow: var(--btn-bs);
 }
-html.a,
+html.b,
 html.cz {
 	.ghead,
 	#wfp .btn:not(:hover),
@@ -3602,48 +3602,48 @@ html.cz {
 html.c .modal .setting:hover {
 	background: color-mix(in oklab, var(--bg-u5) 30%, transparent);
 }
-html.ay #u2btn {
+html.by #u2btn {
 	box-shadow: .4em .4em 0 #ccc;
 }
 html.dz #u2btn {
 	letter-spacing: -.033em;
 }
 html.c #u2conf #u2btn,
-html.a #u2conf #u2btn {
+html.b #u2conf #u2btn {
 	padding: .6em 0;
 	margin-top: .2em;
 }
 html.c #u2etas,
-html.a #u2etas {
+html.b #u2etas {
 	background: var(--bg-d1);
 	border: 1px solid var(--bg-u1);
 	border-width: 2px;
 	border-radius: calc(var(--radius) * 1.6);
 }
 html.c #u2foot:empty,
-html.a #u2foot:empty {
+html.b #u2foot:empty {
 	margin-bottom: -1em;
 }
-html.ay #ops,
-html.ay .opbox,
-html.ay #path,
-html.ay #doc,
-html.ay #srch_form,
-html.ay .ghead,
-html.ay #u2etas {
+html.by #ops,
+html.by .opbox,
+html.by #path,
+html.by #doc,
+html.by #srch_form,
+html.by .ghead,
+html.by #u2etas {
 	border-color: var(--bg-u2);
 	box-shadow: 0 0 .3em var(--bg-u5);
 }
-html.ay #tree li,
-html.ay #treepar {
+html.by #tree li,
+html.by #treepar {
 	border-color: var(--bg) var(--bg-max) #ddd var(--bg-max);
 }
-html.ay #treesuperh,
-html.ay #treepar {
+html.by #treesuperh,
+html.by #treepar {
 	background: var(--bg);
 	border-color: #ddd;
 }
-html.ay #tree {
+html.by #tree {
 	border-color: #ddd;
 	box-shadow: 0 0 1em #ddd;
 	background: var(--bg);
@@ -3656,65 +3656,65 @@ html.ay #tree {
 html.d #barpos,
 html.d #barbuf,
 html.d #pvol,
-html.b #barpos,
-html.b #barbuf,
-html.b #pvol {
+html.a #barpos,
+html.a #barbuf,
+html.a #pvol {
 	border-radius: .2em;
 }
-html.b #barpos {
+html.a #barpos {
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
 }
-html.by #barpos {
+html.ay #barpos {
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.2) inset;
 }
-html.b #pathBar {
+html.a #pathBar {
 	background: var(--bg);
 }
-html.b #srch_q {
+html.a #srch_q {
 	margin: .2em 0 0 1.6em;
 }
-html.b #srch_q:empty {
+html.a #srch_q:empty {
 	margin-bottom: -1em;
 }
-html.b #tree {
+html.a #tree {
 	box-shadow: 0 -1px 0 rgba(128,128,128,0.4);
 }
-html.bz #tree {
+html.az #tree {
 	box-shadow: 0 -1px 0 var(--bg-d3);
 }
-html.b #treeh,
-html.b #tree li {
+html.a #treeh,
+html.a #tree li {
 	border: none;
 }
-html.b #tree li {
+html.a #tree li {
 	margin-left: .8em;
 }
-html.b #docul a,
-html.b .ntree a {
+html.a #docul a,
+html.a .ntree a {
 	padding: .6em .2em;
 }
 html.dy *,
 html.cy *,
-html.b * {
+html.a * {
 	box-shadow: none !important;
 }
-html.b #path,
-html.b #ops {
+html.a #path,
+html.a #ops {
 	background: color-mix(in oklab, var(--bg-u5), transparent);
 }
-html.b #treepar {
+html.a #treepar {
 	margin-left: .63em;
 	width: calc(.1em + var(--nav-sz) - var(--sbw));
 	border-bottom: .2em solid var(--f-h-b1);
 }
 html.d #path i,
-html.b #path i {
+html.a #path i {
 	border-right: var(--a) solid 2px;
 	height: 1.5em;
   	margin: -.4em .3em -.4em -1.7em;
 }
 html.dy .ghead,
-html.b .ghead {
+html.a .ghead {
 	background: var(--bg);
 	padding: .2em 0;
 	border-bottom: var(--btn-bb);
@@ -3723,31 +3723,31 @@ html.b .ghead {
 	padding-left: .5em;
 	padding-right: .5em;
 }
-html.b #files tbody a {
+html.a #files tbody a {
 	padding: .7em;
 }
-html.b #op_up2k.srch sup {
+html.a #op_up2k.srch sup {
 	color: #fc0;
 }
-html.by #u2btn sup {
+html.ay #u2btn sup {
 	color: #06b;
 }
-html.by #op_up2k.srch sup {
+html.ay #op_up2k.srch sup {
 	color: #b70;
 }
-html.bz #u2cards a.act {
+html.az #u2cards a.act {
 	box-shadow: 0 -.1em .2em var(--bg-d2);
 }
-html.b #u2conf {
+html.a #u2conf {
 	margin: 2em auto 0 auto;
 }
-html.b #u2conf .txtbox {
+html.a #u2conf .txtbox {
 	border: none;
 }
-html.b #u2conf a.b {
+html.a #u2conf a.b {
 	border-radius: .2em;
 }
-html.by #u2cards a.act {
+html.ay #u2cards a.act {
 	border-width: 2px;
 }
 
@@ -3845,7 +3845,7 @@ html.cz #wrap.thin .ghead{
 	top: 7.4em;
 }
 html.dy #wrap.thin .ghead,
-html.b #wrap.thin .ghead {
+html.a #wrap.thin .ghead {
 	top: 6.9em;
 	margin-left: -.5em;
 	margin-right: -.5em;
@@ -3883,9 +3883,9 @@ html.e #wrap.thin {
 		z-index: -1;
 	}
 	html.dy .ghead,
-	html.b .ghead,
+	html.a .ghead,
 	html.dy #wrap.thin .ghead,
-	html.b #wrap.thin .ghead {
+	html.a #wrap.thin .ghead {
 		top: 7.2em;
 		padding-left: 1em;
 	}
@@ -3994,9 +3994,9 @@ html.e #wrap.thin {
 		top: 7em;
 	}
 	html.cy .ghead,
-	html.a .ghead,
+	html.b .ghead,
 	html.cy #wrap.thin .ghead,
-	html.a #wrap.thin .ghead {
+	html.b #wrap.thin .ghead {
 		top: 7.3em;
 	}
 	html.cz .ghead,

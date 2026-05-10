@@ -9375,9 +9375,6 @@ var settheme = (function () {
 	theme = sread('cpp_thm') || 'a';
 	if (!/^[a-x][yz]/.exec(theme)){
 		theme = dtheme;
-		// set default theme to flat on firefox mobile to avoid glitchy gradients (2026-04-26)
-		if(FIREFOX && MOBILE)
-			theme = 'b';
 	}
 
 	themen = theme.split(/ /)[0];
@@ -9397,7 +9394,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'flat dark', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
+			names = ['flat dark', 'flat light', 'gradient dark', 'gradient light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));
