@@ -7244,7 +7244,7 @@ var search_ui = (function () {
 
 		var ms = ebi('moresearch');
 		if(e){
-			location.hash = '#';
+			window.scrollTo(0, 0)
 			ms.innerHTML = '▴'
 		}
 		else{
