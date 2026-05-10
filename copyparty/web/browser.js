@@ -231,6 +231,7 @@ if (1)
 		"cl_hfsz": "filesize",
 		"cl_themes": "theme",
 		"cl_accent": "accent color (keep empty for default)$Nsupports any css color, like rgba(255, 210, 0, 1)",
+		"cl_radius": "corner radius in pixels (keep empty for default)",
 		"cl_fun": "enables or disables the FUN 🎉🚀👽🐹🥳❗ (reload the page after changing this setting)",
 		"cl_langs": "language",
 		"cl_ziptype": "folder download",
@@ -1250,6 +1251,7 @@ ebi('op_cfg').innerHTML = (
 	'			<input type="text" id="accent" placeholder="#color"></input>' +
 	'			<input type="color" id="accent_picker"></input>' +
 	'		</div>' +
+'			<input tt="' + L.cl_radius +'" type="text" id="radius" placeholder="[0-inf]"></input>' +
 	'		<a id="fun_tgl" class="tgl btn" tt="' + L.cl_fun + '">🥳</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -1443,6 +1445,29 @@ if(accent && accent.length > 3){
 	document.documentElement.style.setProperty('--a', parseColor(accent));
 	ebi('accent').value = ebi('accent_picker').value = accent;
 }
+
+// corner radius
+ebi('radius').oninput = function () {
+	var r = parseFloat(this.value);
+
+	clmod(ebi('radius'), 'invalid', this.value.length != 0 && r.length == 0);
+	if(r == radius)
+		return;
+
+	if(isNaN(r))
+		r = ''
+	swrite('radius', r);
+	var setV = r == '' ? '' : (r + 'px');
+	document.documentElement.style.setProperty('--radius', setV);
+	console.log(setV);
+}
+var radius = sread('radius');
+if(radius){
+	console.log('read radius from settings: ' + radius);
+	document.documentElement.style.setProperty('--radius', parseFloat(radius) + 'px');
+	ebi('radius').value = radius;
+}
+
 
 // no fun allowed
 bcfg_bind(this, 'fun_tgl', 'fun_tgl');

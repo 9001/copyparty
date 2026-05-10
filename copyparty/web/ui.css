@@ -9,7 +9,7 @@
 	--bg-max: #080808;
 	--a: #fc5;
 	accent-color: var(--a);
-	--radius: .3em;
+	--radius: 7px;
 	
 	--fg-max: #fefefe;
 	--bg-max: #010101;

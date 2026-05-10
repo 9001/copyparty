@@ -965,7 +965,7 @@ tr.play td:nth-child(1) a {
 #ggrid>a img {
 	z-index: 1;
 	border-radius: 5px;
-	border-radius: calc(var(--radius) / 3 * 2);
+	border-radius: var(--radius);
 	max-width: 10em;
 	max-width: calc(var(--grid-sz) - 4px);
 	margin: 0 auto;
@@ -1259,7 +1259,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	line-height: 1.2em;
   	vertical-align: bottom;
 	padding: .05em .5em .1em .3em;
-	border-radius: calc(var(--radius) / 2) 0 0 0;
+	border-radius: var(--radius) 0 0 0;
 	pointer-events: all;
 	border-width: 1px 0 0 1px;
 }
@@ -1289,7 +1289,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	overflow-y: hidden;
 	margin: 0 .1em .1em .2em;
 	box-shadow: 0 0 .5em var(--mp-sh);
-	border-radius: calc(var(--radius) / 2);
+	border-radius: var(--radius);
 }
 #up_quick {
 	display: inline-block;
@@ -1297,7 +1297,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	margin: 0 .2em .2em .1em;
 	font-size: .7em;
 	border-radius: 10px;
-	border-radius: calc(var(--radius) * 1.2);
+	border-radius: var(--radius);
 	background: #cde;
     background: var(--bg-u2);
 }
@@ -1308,7 +1308,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	font-weight: bold;
 	box-shadow: 0 0 .5em color-mix(in oklab, var(--a) 20%, transparent);
 	border-radius: 10px;
-	border-radius: calc(var(--radius) * 1.2);
+	border-radius: var(--radius);
 	text-align: right;
 }
 .open #up_quick_more {
@@ -1335,7 +1335,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	padding: .5em;
 	cursor: pointer;
 	border-radius: 10px;
-	border-radius: calc(var(--radius) * 1.6);
+	border-radius: var(--radius);
 }
 #up_quick .overlay_plus {
 	right: .3em;
@@ -1528,7 +1528,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 }
 #barpos,
 #barbuf {
-	border-radius: 9em;
+	border-radius: var(--radius);
 	position: absolute;
 	top: 0;
 	height: 100%;
@@ -2244,7 +2244,7 @@ html.b .btn {
 	background: #fff;
 	background: var(--bg-u2);
 	border-radius: 5px;
-	border-radius: calc(var(--radius) * 1.3);
+	border-radius: var(--radius);
 	padding: 0 .2em;
 	line-height: 2.3em;
 	margin-bottom: 1.5em;
@@ -2841,7 +2841,7 @@ html.y #bbox-overlay figcaption a {
   	grid-template-rows: max-content auto;
 	margin: 5vh 5vw;
 	border-radius: 10px;
-	border-radius: calc(var(--radius) * 1.6);
+	border-radius: var(--radius);
 	border: var(--a) solid 1px;
 	background: #fff;
 	background: var(--bg);
@@ -3022,7 +3022,7 @@ html.c .modalcontent {
 	box-shadow: 0 0 0 #999;
 	border: .1em solid var(--ud-b1);
 	border-radius: 10px;
-	border-radius: calc(var(--radius) * 1.6);
+	border-radius: var(--radius);
 	border-width: 2px;
 	color: #fff;
 	transition: all 0.12s;
@@ -3528,7 +3528,7 @@ html.b #u2etas {
 	background: var(--bg-d1);
 	border: 1px solid var(--bg-u1);
 	border-width: 2px;
-	border-radius: calc(var(--radius) * 1.6);
+	border-radius: var(--radius);
 }
 html.c #u2foot:empty,
 html.b #u2foot:empty {
@@ -3563,13 +3563,10 @@ html.by #tree {
 
 
 
-html.d #barpos,
-html.d #barbuf,
-html.d #pvol,
-html.a #barpos,
-html.a #barbuf,
-html.a #pvol {
-	border-radius: .2em;
+html.b #barpos,
+html.b #barbuf,
+html.b #pvol {
+	border-radius: calc(var(--radius) * 3);
 }
 html.a #barpos {
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
@@ -3925,7 +3922,7 @@ html.e #wrap.thin {
 @supports (display: grid) and (gap: 1em) {
 	#ggrid {
 		display: grid;
-		margin: 0 .5em;
+		margin: .5em;
 		padding: unset;
 		grid-template-columns: repeat(auto-fit,var(--grid-sz));
 		justify-content: center;
