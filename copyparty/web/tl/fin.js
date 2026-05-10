@@ -157,7 +157,7 @@ Ls.fin = {
 	"ut_u2ts": "kopioi viimeksi muokattu aikaleima$Ntiedostojärjestelmästäsi palvelimelle\">📅",
 	"ut_ow": "korvaa olemassa olevat tiedostot palvelimella?$N🛡️: ei koskaan (luo sen sijaan uuden tiedostonimen)$N🕒: korvaa jos palvelintiedosto on vanhempi kuin omasi$N♻️: korvaa aina jos tiedostot ovat erilaisia$N⏭️: ohita kaikki olemassa olevat tiedostot ehdottomasti",
 	"ut_mt": "jatka muiden tiedostojen tiivisteiden laskemista latauksen aikana$N$Nkannattanee poistaa käytöstä, mikäli prosessori tai kovalevy on vanhempaa mallia",
-	"ut_ask": 'kysy vahvistusta ennen latauksen aloittamista">💭',
+	"ut_ask": 'kysy vahvistusta ennen latauksen aloittamista',
 	"ut_pot": "paranna latausnopeutta hitailla laitteilla$Nvähentämällä käyttöliittymän monimutkaisuutta",
 	"ut_srch": "lataamisen sijaan tarkista, ovatko tiedostot jo $N olemassa palvelimella (käy läpi kaikki hakemistot, joihin sinulla on read-oikeudet)",
 	"ut_par": "keskeytä lataukset asettamalla se nollaan$N$Nnosta, jos yhteytesi on hidas tai viive on suuri$N$Npidä se 1:ssä lähiverkossa tai jos palvelimen kovalevy on pullonkaula",

@@ -160,7 +160,7 @@ Ls.pol = {
 	"ut_u2ts": "kopiuj znacznik ostatniej modyfikacji$Nz twojego systemu plików na serwer\">📅",
 	"ut_ow": "nadpisywać istniejące pliki na serwerzę?$N🛡️: nigdy (wygeneruje nową nazwę)$N🕒: nadpisz jeśli pliki na serwerze są starsze niż przesyłane$N♻️: zawsze nadpisuj jeśli zawartość plików się różni$N⏭️: bezwarunkowo pomiń wszystkie istniejące pliki", //m
 	"ut_mt": "hashuj inne pliki podczas przesyłania$N$Nmożna wyłączyć w przypadku wystąpienia wąskiego gardła na CPU lub HDD",
-	"ut_ask": 'pytaj o potwierdzenie rozpoczęcia przesyłania">💭',
+	"ut_ask": 'pytaj o potwierdzenie rozpoczęcia przesyłania',
 	"ut_pot": "przyspiesz przesyłanie na słabszych urządzeniach,$Nupraszczając interfejs",
 	"ut_srch": "nie przesyłaj plików, jedynie sprawdź czy istnieją$Njuż na serwerze (przeskanuje wszystkie foldery dostępne do odczytu)",
 	"ut_par": "zatrzymuje przesyłanie jeśli wynosi 0$N$Nzwiększ w przypadku jeśli twoja sieć jest wolna / ma duże opóźnienia$N$Nustaw wartość 1 w sieci lokalnej lub w przypadku wolnego dysku serwerowego",

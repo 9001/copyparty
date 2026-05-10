@@ -154,7 +154,7 @@ Ls.nno = {
 	"ut_u2ts": "gje fila på serveren same$Ntidsstempel som lokalt hos deg\">📅",
 	"ut_ow": "overskrive eksisterande filer på serveren?$N🛡️: aldri (finn på eit nytt filnamn i staden for)$N🕒: overskriv viss fila åt serveren er eldre$N♻️: alltid, gitt at innhaldet er annleis$N⏭️: hopp over alle eksisterande filer",
 	"ut_mt": "fortsett å synfare køa mens opplasting føregår$N$Nskru denne av dersom du har ein$Ntreig prosessor eller harddisk",
-	"ut_ask": 'bekreft filutvalg før opplasting startar">💭',
+	"ut_ask": 'bekreft filutvalg før opplasting startar',
 	"ut_pot": "forbetre ytinga på treige einheiter ved å$Nforenkle brukergrensesnittet",
 	"ut_srch": "gjer eit søk i staden for å laste opp --$Nleitar gjennom alle mappane du har lov åt å sjå",
 	"ut_par": "sett åt 0 for å midlertidig stoppe opplasting$N$Nhøge verdier (4 eller 8) kan gje betre yting,$Nspesielt på treige internettlinjer$N$Nbør ikkje vere høgare enn 1 på LAN$Neller viss serveren sin harddisk er treig",

@@ -133,6 +133,7 @@ if (1)
 		"options": "options",
 		"more_options": "more options",
 		"bup": "basic uploader",
+		"up2k": "up2k",
 		"ot_close": "close submenu",
 		"ot_search": "`search for files by attributes, path / name, music tags, or any combination of those$N$N`foo bar` = must contain both «foo» and «bar»,$N`foo -bar` = must contain «foo» but not «bar»,$N`^yana .opus$` = start with «yana» and be an «opus» file$N`&quot;try unite&quot;` = contain exactly «try unite»$N$Nthe date format is iso-8601, like$N`2009-12-31` or `2020-09-12 23:30:00`",
 		"ot_unpost": "unpost: delete your recent uploads, or abort unfinished ones",
@@ -178,7 +179,7 @@ if (1)
 		"ut_u2ts": "copy the last-modified timestamp$Nfrom your filesystem to the server\">📅",
 		"ut_ow": "overwrite existing files on the server?$N🛡️: never (will generate a new filename instead)$N🕒: overwrite if server-file is older than yours$N♻️: always overwrite if the files are different$N⏭️: unconditionally skip all existing files",
 		"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
-		"ut_ask": 'ask for confirmation before upload starts">💭',
+		"ut_ask": 'ask for confirmation before upload starts',
 		"ut_pot": "improve upload speed on slow devices$Nby making the UI less complex",
 		"ut_srch": "don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)",
 		"ut_par": "pause uploads by setting it to 0$N$Nincrease if your connection is slow / high latency$N$Nkeep it 1 on LAN or if the server HDD is a bottleneck",
@@ -1020,73 +1021,7 @@ ebi('h_up2k').innerHTML = (fun_tgl ? '🚀 ' : '') + L.cl_uopts;
 ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data" onsubmit="return false;"></form>\n' +
 
-	'<div id="u2conf">' +
-	'<details><summary id="sum_u2conf">' + (IE ? '>> ' : '') + L.options + (IE ? ' <<' : '') + '</summary>' +
-
-	'	<div class="setting">' +
-	'		<table id="u2conft">\n' +
-	'			<tr>\n' +
-	'				<td class="c" data-perm="read">' + L.ul_par + '</td>\n' +
-	'			</tr>\n' +
-	'			<tr>\n' +
-	'				<td class="c" data-perm="read">\n' +
-	'					<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
-	'						class="txtbox" id="nthread" value=""/><a\n' +
-	'						href="#" class="b" id="nthread_add">+</a>&nbsp;\n' +
-	'				</td>\n' +
-	'			</tr>\n' +
-	'		</table>\n' +
-	'		<p class="s_desc">' + tt.parse(L.ut_par ) + '</p>\n' +
-	'	</div>\n' +
-
-	'	<div class="setting">' +
-	'		<div class="c">\n' +
-	'			<input type="checkbox" id="multitask" />\n' +
-	'			<label for="multitask">🏃</label>\n' +
-	'		</div>\n' +
-	'		<p class="s_desc">' + tt.parse(L.ut_mt ) + '</p>\n' +
-	'	</div>\n' +
-
-	'	<div class="setting">' +
-	'		<div class="c">\n' +
-	'			<input type="checkbox" id="potato" />\n' +
-	'			<label for="potato">🥔</label>\n' +
-	'		</div>\n' +
-	'		<p class="s_desc">' + tt.parse(L.ut_pot ) + '</p>\n' +
-	'	</div>\n' +
-
-	'	<div class="setting">' +
-	'		<div class="c">\n' +
-	'			<input type="checkbox" id="u2rand" />\n' +
-	'			<label for="u2rand">🎲</label>\n' +
-	'		</div>\n' +
-	'		<p class="s_desc">' + tt.parse(L.ut_rand ) + '</p>\n' +
-	'	</div>\n' +
-
-	'	<div class="setting">' +
-	'		<div class="c">\n' +
-	'			<input type="checkbox" id="u2ow" />\n' +
-	'			<label for="u2ow">?</a>\n' +
-	'		</div>\n' +
-	'		<p class="s_desc">' + tt.parse(L.ut_ow ) + '</p>\n' +
-	'	</div>\n' +
-
-	'	<div class="setting">' +
-	'		<div class="c" data-perm="read" data-dep="idx">\n' +
-	'			<input type="checkbox" id="fsearch" />\n' +
-	'			<label for="fsearch">🔎</label>\n' +
-	'		</div>\n' +
-	'		<p class="s_desc">' + tt.parse(L.ut_srch ) + '</p>\n' +
-	'	</div>\n' +
-
-	'	<div class="setting">' +
-	'		<a id="up_moreopts" class="btn" href="#h_upload">↗️ ' + L.more_options + '</a>\n' +
-	'	</div>\n' +
-
 	'	<div data-perm="read" rowspan="2" id="u2c3w"></div>\n' +
-
-	'</details>' +
-	'</div>' +
 
 	'<div id="u2notbtn"></div>\n' +
 
@@ -1095,6 +1030,15 @@ ebi('op_up2k').innerHTML = (
 	'		<span id="u2bm"></span>\n' + L.ul_btn +
 	'	</div>\n' +
 	'</div>\n' +
+
+	'	<div id="up2k_qs">' +
+	'		<label tabindex="0" for="fsearch" class="tgl btn" tt="' + L.ut_srch +'">🔎</label>\n' +
+	'		<label tabindex="0" for="u2ow" id="u2ow_copy" class="tgl btn on" tt="' + L.ut_ow +'"></label>\n' +
+	'		<label tabindex="0" for="ask_up" class="tgl btn" tt="' + L.ut_ask + '">💭</label>\n' +
+	'		<label tabindex="0" for="upnag" class="tgl btn" tt="' + L.cut_nag + '">🔔</label>\n' +
+	'		<label tabindex="0" for="upsfx" class="tgl btn" tt="' + L.cut_sfx + '">🔊</label>\n' +
+	'		<a id="up_moreopts" class="btn" href="#h_up2kcfg">↗️ ' + L.more_options + '</a>\n' +
+	'	</div>\n' +
 
 	'<div id="u2c3t">\n' +
 
@@ -1111,7 +1055,6 @@ ebi('op_up2k').innerHTML = (
 
 	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write" tt="' + L.ot_bup + '"><summary id="h_bup">' + (IE ? '>> ' : '') + L.bup + (IE ? ' <<' : '') + '</summary></details>'
 );
-
 
 ebi('up_info').innerHTML = (
 	'<h3 id="up_status_h">' + L.utl_stat + '</h3>' +
@@ -1155,10 +1098,6 @@ ebi('up_outside').onclick =
 		hist_push('#')
 		modaltoggle('up2k', false);
 	}
-
-ebi('sum_u2conf').onclick = function(){
-	clmod(this.parentElement, 'open', 't');
-}
 
 ebi('wrap').insertBefore(mknod('div', 'lazy'), ebi('epi'));
 
@@ -1321,10 +1260,56 @@ ebi('op_cfg').innerHTML = (
 	(have_zip ? (
 		'<div><h3 id="h_zip">⬇️ ' + L.cl_ziptype + '</h3><div><div id="arc_fmt"></div></div></div>\n'
 	) : '') +
-	'<div>\n' +
-	'	<h3 id="h_upload">🚀 ' + L.cl_uopts + '</h3>\n' +
+
+	'<div class="sub_section"><h3 id="h_up">☁️ ' + L.cl_uopts + '</h3></div>' +
+
+	'<div class="sub">\n' +
+	'	<h3 id="h_up2kcfg">🚀 ' + L.up2k + '</h3>\n' +
+	'	<div id="u2conf">\n' +
+	'		<div class="c" data-perm="read" data-dep="idx" tt="' + L.ut_srch +'">\n' +
+	'			<input type="checkbox" id="fsearch" />\n' +
+	'			<label class="btn" for="fsearch">🔎</label>\n' +
+	'		</div>\n' +
+
+	'		<div class="c" tt="' + L.ut_ow +'">\n' +
+	'			<input type="checkbox" id="u2ow" />\n' +
+	'			<label class="tgl btn on" for="u2ow">?</a>\n' +
+	'		</div>\n' +
+
+	'		<div id="u2conft" tt="' + L.ut_par +'">\n' +
+	'			<tr>\n' +
+	'				<span class="c" data-perm="read" style="display: block; margin-bottom: .5em;">' + L.ul_par + '</span>\n' +
+	'			</tr>\n' +
+	'			<tr>\n' +
+	'				<div class="c" data-perm="read">\n' +
+	'					<a href="#" class="b btn" id="nthread_sub">&ndash;</a><input\n' +
+	'						class="txtbox" type="text" id="nthread" style="width: 3em;" value=""/><a\n' +
+	'						href="#" class="b btn" id="nthread_add">+</a>&nbsp;\n' +
+	'				</div>\n' +
+	'			</tr>\n' +
+	'		</div>\n' +
+
+	'		<div class="c" tt="' + L.ut_mt +'">\n' +
+	'			<input type="checkbox" id="multitask" />\n' +
+	'			<label class="btn" for="multitask">🏃</label>\n' +
+	'		</div>\n' +
+
+	'		<div class="c" tt="' + L.ut_pot +'">\n' +
+	'			<input type="checkbox" id="potato" />\n' +
+	'			<label class="btn" for="potato">🥔</label>\n' +
+	'		</div>\n' +
+
+	'		<div class="c" tt="' + L.ut_rand +'">\n' +
+	'			<input type="checkbox" id="u2rand" />\n' +
+	'			<label class="btn" for="u2rand">🎲</label>\n' +
+	'		</div>\n' +
+	'	</div>\n' +
+	'</div>\n' +
+
+	'<div class="sub">\n' +
+	'	<h3 id="h_upload">🎈 ' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="ask_up" class="tgl btn" tt="' + L.ut_ask + '</a>\n' +
+	'		<div class="c" tt="' + L.ut_ask + '"><input type="checkbox" id="ask_up"></input><label for="ask_up" class="tgl btn">💭</label></div>\n' +
 	'		<a id="u2ts" class="tgl btn" tt="' + L.ut_u2ts + '</a>\n' +
 	'		<a id="umod" class="tgl btn" tt="' + L.cut_umod + '</a>\n' +
 	'		<a id="hashw" class="tgl btn" tt="' + L.cut_mt + '</a>\n' +
@@ -1334,11 +1319,11 @@ ebi('op_cfg').innerHTML = (
 	'		<input type="text" id="u2szg" value="" ' + NOAC + ' style="width:3em" tt="' + L.cut_u2sz + '" />' +
 	'		<a id="flag_en" class="tgl btn" tt="' + L.cut_flag + '">💤</a>\n' +
 	'		<a id="u2sort" class="tgl btn" tt="' + L.cut_az + '">az</a>\n' +
-	'		<a id="upnag" class="tgl btn" tt="' + L.cut_nag + '">🔔</a>\n' +
-	'		<a id="upsfx" class="tgl btn" tt="' + L.cut_sfx + '">🔊</a>\n' +
-	'		</td>\n' +
+	'		<div class="c" tt="' + L.cut_nag + '"><input type="checkbox" id="upnag"></input><label for="upnag" class="tgl btn">🔔</label></div>\n' +
+	'		<div class="c" tt="' + L.cut_sfx + '"><input type="checkbox" id="upsfx"></input><label for="upsfx" class="tgl btn">🔊</label></div>\n' +
 	'	</div>\n' +
 	'</div>\n' +
+
 	'<div>\n' +
 	'	<h3 id="h_favico">🎉 ' + L.cl_favico + '</h3>\n' +
 	'	<div>\n' +
@@ -1387,7 +1372,7 @@ ebi('op_cfg').innerHTML = (
 				var s = subSettings.children[ii];
 				var info = tt.parse(s.getAttribute('tt'));
 				s.removeAttribute('tt');
-				section += '<div id="' + subSettings.id + '" class="setting">' +
+				section += '<div class="setting">' +
 					s.outerHTML +
 					((info != null && info.length > 0) ? '<p class="s_desc">' + info + '</p>' : '') +
 					'</div>';
@@ -8953,7 +8938,7 @@ function apply_perms(res) {
 	clmod(ebi('up_quick'), 'disabled', !has(perms, 'write'));
 	ebi('bup_tgl').style.display = has(perms, 'write') ? '' : 'none';
 
-	var o = QSA('#ops>a[data-dep], #u2conf td[data-dep]');
+	var o = QSA('#ops>a[data-dep], #u2conf div[data-dep]');
 	for (var a = 0; a < o.length; a++)
 		o[a].style.display = (
 			o[a].getAttribute('data-dep') != 'idx' || have_up2k_idx
@@ -8971,7 +8956,7 @@ function apply_perms(res) {
 	var have_write = has(perms, "write"),
 		have_read = has(perms, "read"),
 		de = document.documentElement,
-		tds = QSA('#u2conf td');
+		tds = QSA('#u2conf div');
 
 	shr_who = res.shr_who || shr_who;
 	can_shr = acct != '*' && (have_read || have_write) && (

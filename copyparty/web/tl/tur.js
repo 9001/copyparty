@@ -157,7 +157,7 @@ Ls.tur = {
 	"ut_u2ts": "kendi dosyalarınızdan sunucuya$Nzaman damgasını kopyala\">📅",
 	"ut_ow": "sunucudaki mevcut dosyaları üzerine yazmak mı?$N🛡️: asla (yerine yeni bir dosya adı oluşturur)$N🕒: sunucu dosyası sizinkinden daha eskiyse üzerine yaz$N♻️: dosyalar farklıysa her zaman üzerine yaz$N⏭️: mevcut tüm dosyaları koşulsuz atla", //m
 	"ut_mt": "yükleme yaparken diğer dosyaların hash'lenmesini durdur$N$kötü bir CPU veya HDD'ye sahipseniz kullanabilirsiniz.",
-	"ut_ask": 'yüklemeye başlamadan önce doğrulama mesajı göster">💭',
+	"ut_ask": 'yüklemeye başlamadan önce doğrulama mesajı göster',
 	"ut_pot": "arayüzü daha az karmaşık hale getirerek$Nyükleme hızını yavaş cihazlarda artır",
 	"ut_srch": "gerçekten yükleme yapma, bunun yerine dosyaların $N sunucuda var olup olmadığını kontrol et (okuma izniniz olan tüm klasörleri tarar)",
 	"ut_par": "0'a ayarlayarak yüklemeleri durdur$N$Nbağlantınız yavaşsa değeri artırın$N$NLAN'daysanız veya sunucu HDD'si darboğaz yapıyorsa 1'de tutun",

@@ -154,7 +154,7 @@ Ls.vie = {
 	"ut_u2ts": "sao chép dấu thời gian chỉnh sửa cuối$Ntừ hệ thống tệp của bạn lên máy chủ\">📅",
 	"ut_ow": "ghi đè các tệp đã có trên máy chủ?$N🛡️: không bao giờ (sẽ tạo tên tệp mới)$N🕒: ghi đè nếu tệp trên máy chủ cũ hơn$N♻️: luôn ghi đè nếu hai tệp khác nhau$N⏭️: bỏ qua vô điều kiện tất cả các tệp hiện có", //m
 	"ut_mt": "tiếp tục hash các tệp khác trong khi tải lên$N$NCó thể tắt nếu CPU hoặc HDD của bạn bị nghẽn",
-	"ut_ask": 'yêu cầu xác nhận trước khi bắt đầu tải lên">💭',
+	"ut_ask": 'yêu cầu xác nhận trước khi bắt đầu tải lên',
 	"ut_pot": "cải thiện tốc độ tải lên trên các thiết bị chậm$Nbằng cách đơn giản hoá giao diện người dùng",
 	"ut_srch": "không tải lên, chỉ kiểm tra xem tệp$Nđã tồn tại trên máy chủ hay chưa (sẽ quét toàn bộ thư mục bạn có quyền đọc)",
 	"ut_par": "tạm dừng tải lên bằng cách đặt thành 0$N$NTăng lên nếu kết nối chậm hoặc độ trễ cao$N$NGiữ ở mức 1 khi dùng LAN hoặc nếu ổ cứng máy chủ bị nghẽn",

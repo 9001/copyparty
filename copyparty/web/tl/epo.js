@@ -157,7 +157,7 @@ Ls.epo = {
 	"ut_u2ts": "kopii la tempon de lasta modifo$Nel via dosiersistemo al la servilo\">📅",
 	"ut_ow": "ĉu anstataŭigi dosierojn ĉe la servilo?$N🛡️: neniam (dosiero estos alŝutita kun nova dosiernomo)$N🕒: anstataŭigi, se servila dosiero estas pli malnova ol via$N♻️: ĉiam anstataŭigi, se dosieroj estas malsamaj$N⏭️: senkondiĉe preterlasi ĉiujn ekzistantajn dosierojn",
 	"ut_mt": "daŭri kalkuladon de kontrolsumoj por aliaj dosieroj dum alŝutado$N$Nmalŝaltinda, se via procesoro aŭ disko ne estas sufiĉe rapidaj",
-	"ut_ask": 'peti konfirmon antaŭ komenco de alŝutado">💭',
+	"ut_ask": 'peti konfirmon antaŭ komenco de alŝutado',
 	"ut_pot": "plirapidigi alŝutadon por malrapidaj komputiloj$Nper malkomplikado de fasado",
 	"ut_srch": "ne alŝuti ion ajn, nur kontroli, ke la dosieroj $N jam ekzistas ĉe la servilo (ĉiuj dosierujoj, kiuj vi povas legi, estos skanitaj)",
 	"ut_par": "paŭzi alŝutadon per agordado kiel 0$N$Npligrandigi, se via konekto estas malrapida aŭ malfruema$N$Nagordi kiel 1, se la loka reto aŭ servila disko ne estas sufiĉe rapidaj",

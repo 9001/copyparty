@@ -161,7 +161,7 @@ Ls.cze = {
 	"ut_u2ts": "kopírovat časovou značku poslední změny$Nz vašeho souborového systému na server\">📅",
 	"ut_ow": "přepsat existující soubory na serveru?$N🛡️: nikdy (místo toho vytvoří nový název souboru)$N🕒: přepsat pokud je soubor na serveru starší než váš$N♻️: vždy přepsat pokud se soubory liší$N⏭️: bezpodmínečně přeskočit všechny existující soubory", //m
 	"ut_mt": "pokračovat v hashování ostatních souborů během nahrávání$N$Nmožná zakázat pokud je vaše CPU nebo HDD bottleneckem",
-	"ut_ask": 'požádat o potvrzení před zahájením nahrávání">💭',
+	"ut_ask": 'požádat o potvrzení před zahájením nahrávání',
 	"ut_pot": "zlepšit rychlost nahrávání na pomalých zařízeních$Nzjednodušením UI",
 	"ut_srch": "skutečně nenahrávat, místo toho zkontrolovat zda soubory již $N existují na serveru (prohledá všechny složky které můžete číst)",
 	"ut_par": "pozastavit nahrávání nastavením na 0$N$Nzvýšit pokud je vaše připojení pomalé / vysoká latence$N$Nponechat na 1 v LAN nebo pokud je HDD serveru bottleneckem",

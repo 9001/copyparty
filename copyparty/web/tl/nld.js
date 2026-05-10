@@ -157,7 +157,7 @@ Ls.nld = {
 	"ut_u2ts": "Kopieer de laatste-gewijzigde tijdstamp$Nvan je bestandsysteem naar de server\">📅",
 	"ut_ow": "Overschrijf bestaande bestanden op de server?$N🛡️: nooit (zal in plaats daarvan een nieuwe bestandsnaam genereren)$N🕒: overschrijven als de server-bestand ouder is dan het geüploade bestand$N♻️: altijd overschrijven als de bestanden verschillend zijn$N⏭️: alle bestaande bestanden onvoorwaardelijk overslaan", //m
 	"ut_mt": "Ga door met hashen van andere bestanden tijdens het uploaden$N$Moet je misschien uitschakelen als je CPU of HDD het niet aan kan",
-	"ut_ask": 'Vraag voor bevestiging voordat het uploaden start">💭',
+	"ut_ask": 'Vraag voor bevestiging voordat het uploaden start',
 	"ut_pot": "Verbeter de uploadsnelheid voor langzame apparaten$Ndoor de interface minder complex te maken",
 	"ut_srch": "Niet uploaden, maar check of de bestanden als op de server bestaan$N (checkt alle mappen die waar jij toegang op hebt)",
 	"ut_par": "Pauzeer bij zetten het op 0$N$Nverhoog als je verbinding traag is$N$Nhou het op 1 als je netwerk of server HDD het niet aankan",

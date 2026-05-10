@@ -50,7 +50,7 @@ catch (ex) {
         up2k = up2k_init(false);
     }
     catch (ex) {
-        ebi('u2conf').style.display = 
+        ebi('h_up2kcfg').style.display = 
         ebi('u2btn_ct').style.display = 
         ebi('u2c3t').style.display = 
         ebi('up_info').style.display = 
@@ -918,7 +918,9 @@ function up2k_init(subtle) {
     uc.ow = parseInt(sread('u2ow', ['0', '1', '2', '3']) || u2ow);
     uc.owt = ['🛡️', '🕒', '♻️', '⏭️'];
     function set_ow() {
-        QS('label[for="u2ow"]').innerHTML = uc.owt[uc.ow];
+        var lbls = QSA('label[for="u2ow"]');
+        for(var i=0; i<lbls.length; i++)
+            lbls[i].innerHTML = uc.owt[uc.ow];
         ebi('u2ow').checked  = true; //cosmetic
     }
     ebi('u2ow').onclick = function (e) {
@@ -3279,7 +3281,10 @@ function up2k_init(subtle) {
 
         try {
             clmod(ebi('u2c3w'), 's', !can_write);
-            QS('label[for="fsearch"]').style.display = QS('#fsearch').style.display = fixed ? 'none' : '';
+            QS('#fsearch').style.display = fixed ? 'none' : '';
+            var lbls = QSA('label[for="fsearch"]');
+            for(var i=0; i<lbls.length; i++)
+                lbls[i].style.display = fixed ? 'none' : '';
         }
         catch (ex) { }
 
@@ -3288,6 +3293,7 @@ function up2k_init(subtle) {
                 desc = uc.fsearch ? L.ul_btns : L.ul_btnu;
 
             clmod(ebi('op_up2k'), 'srch', uc.fsearch);
+            clmod(ebi('u2conf'), 'srch', uc.fsearch);
             ebi('u2bm').innerHTML = ico + '&nbsp; <sup>' + desc + '</sup>';
         }
         catch (ex) { }

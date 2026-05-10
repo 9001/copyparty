@@ -157,7 +157,7 @@ Ls.swe = {
 	"ut_u2ts": "bevara tidsstämpeln för senaste ändring$Nfrån ditt filsystem till servern\">📅",
 	"ut_ow": "skriv över existerande filer på servern?$N🛡️: aldrig (skapar ett nytt filnamn istället)$N🕒: skriv över om serverns fil är äldre än din$N♻️: skriv alltid över om filerna skiljer sig$N⏭️: hoppa ovillkorligen över alla befintliga filer", //m
 	"ut_mt": "fortsätt hasha filer under uppladdningens gång$N$Nstäng av om din CPU eller disk är en flaskhals",
-	"ut_ask": 'bekräfta innan uppladdningar påbörjas">💭',
+	"ut_ask": 'bekräfta innan uppladdningar påbörjas',
 	"ut_pot": "förbättra uppladdningshastigheten på långsamma enheter$Ngenom att förenkla användargränssnittet",
 	"ut_srch": "ladda inte upp; kolla istället om filerna redan existerar på $N servern (detta kommer att skanna alla mappar med läsrättighet)",
 	"ut_par": "du kan pausa all uppladdning genom att sätta detta till 0$N$Nöka denna om din uppkoppling är långsam eller har hög latens$N$Nsätt till 1 över lokala nätverk eller om serverns disk är en flaskhals",

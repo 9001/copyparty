@@ -157,7 +157,7 @@ Ls.spa = {
 	"ut_u2ts": 'copiar la fecha de última modificación$Nde tu sistema de archivos al servidor">📅',
 	"ut_ow": "sobrescribir archivos existentes en el servidor?$N🛡️: nunca (generará un nuevo nombre de archivo en su lugar)$N🕒: sobrescribir si el archivo del servidor es más antiguo que el tuyo$N♻️: siempre sobrescribir si los archivos son diferentes$N⏭️: omitir incondicionalmente todos los archivos existentes", //m
 	"ut_mt": "continuar generando hashes de otros archivos mientras se sube$N$Nquizás desactivar si tu CPU o HDD es un cuello de botella",
-	"ut_ask": 'pedir confirmación antes de iniciar la subida">💭',
+	"ut_ask": 'pedir confirmación antes de iniciar la subida',
 	"ut_pot": "mejorar la velocidad de subida en dispositivos lentos$Nsimplificando la interfaz de usuario",
 	"ut_srch": "no subir, en su lugar comprobar si los archivos ya $N existen en el servidor (escaneará todas las carpetas que puedas leer)",
 	"ut_par": "pausar subidas poniéndolo a 0$N$Naumentar si tu conexión es lenta / de alta latencia$N$Nmantener en 1 en LAN o si el HDD del servidor es un cuello de botella",

@@ -157,7 +157,7 @@ Ls.fra = {
 	"ut_u2ts": "copier l'horodatage de dernière modification$Nde votre système de fichiers vers le serveur\">📅",
 	"ut_ow": "écraser les fichiers existants sur le serveur?$N🛡️: jamais (générera un nouveau nom de fichier à la place)$N🕒: écraser si le fichier sur le serveur est plus ancien que le vôtre$N♻️: toujours écraser si les fichiers sont différents$N⏭️: ignorer systématiquement tous les fichiers existants", //m
 	"ut_mt": "continuer à calculer la somme de contrôle d'autres fichiers pendant le téléversement$N$Npeut-être désactiver si votre CPU ou HDD est la cause de perte de performances",
-	"ut_ask": 'demander confirmation avant le début du téléversement">💭',
+	"ut_ask": 'demander confirmation avant le début du téléversement',
 	"ut_pot": "améliorer la vitesse de téléversement sur les appareils lents$Nen simplifiant l'interface utilisateur",
 	"ut_srch": "ne pas réellement téléverser, mais vérifier si les fichiers existent déjà$N sur le serveur (scannera tous les dossiers que vous pouvez lire)",
 	"ut_par": "mettre en pause les téléversements en le réglant sur 0$N$Naugmenter si votre connexion est lente / à forte latence$N$Nle garder à 1 sur le LAN ou si le HDD du serveur est un goulot d'étranglement",

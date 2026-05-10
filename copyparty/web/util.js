@@ -1314,8 +1314,12 @@ function bcfg_upd_ui(name, val) {
     if (!o)
         return val;
 
-    if (o.getAttribute('type') == 'checkbox')
+    if (o.getAttribute('type') == 'checkbox'){
         o.checked = val;
+        var lbls = QSA('label[for="' + o.id +'"]');
+        for(var i=0; i<lbls.length; i++)
+            clmod(lbls[i], 'on', val);
+    }
     else if (o) {
         clmod(o, 'on', val);
     }

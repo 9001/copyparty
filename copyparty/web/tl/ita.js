@@ -157,7 +157,7 @@ Ls.ita = {
 	"ut_u2ts": "copia il timestamp di ultima modifica$Ndal tuo filesystem al server\">📅",
 	"ut_ow": "sovrascrivere file esistenti sul server?$N🛡️: mai (genererà un nuovo nome file)$N🕒: sovrascrivi se il file del server è più vecchio del tuo$N♻️: sovrascrivi sempre se i file sono diversi$N⏭️: ignora sempre tutti i file esistenti", //m
 	"ut_mt": "continua l'hashing di altri file durante il caricamento$N$NProva a disabilitare se la tua CPU o HDD è un collo di bottiglia",
-	"ut_ask": 'chiedi conferma prima che inizi il caricamento">💭',
+	"ut_ask": 'chiedi conferma prima che inizi il caricamento',
 	"ut_pot": "migliora la velocità di caricamento su dispositivi lenti$Nrendendo l'interfaccia meno complessa",
 	"ut_srch": "non caricare realmente, invece controlla se i file esistono già $N sul server (scansionerà tutte le cartelle che puoi leggere)",
 	"ut_par": "metti in pausa i caricamenti impostandolo a 0$N$NAumenta se la tua connessione è lenta / alta latenza$N$NMantienilo a 1 su LAN o se l'HDD del server è un collo di bottiglia",

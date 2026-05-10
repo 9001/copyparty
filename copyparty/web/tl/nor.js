@@ -154,7 +154,7 @@ Ls.nor = {
 	"ut_u2ts": "gi filen på serveren samme$Ntidsstempel som lokalt hos deg\">📅",
 	"ut_ow": "overskrive eksisterende filer på serveren?$N🛡️: aldri (finner på et nytt filnavn istedenfor)$N🕒: overskriv hvis serverens fil er eldre$N♻️: alltid, gitt at innholdet er forskjellig$N⏭️: hopp over alle eksisterende filer",
 	"ut_mt": "fortsett å befare køen mens opplastning foregår$N$Nskru denne av dersom du har en$Ntreg prosessor eller harddisk",
-	"ut_ask": 'bekreft filutvalg før opplastning starter">💭',
+	"ut_ask": 'bekreft filutvalg før opplastning starter',
 	"ut_pot": "forbedre ytelsen på trege enheter ved å$Nforenkle brukergrensesnittet",
 	"ut_srch": "utfør søk istedenfor å laste opp --$Nleter igjennom alle mappene du har lov til å se",
 	"ut_par": "sett til 0 for å midlertidig stanse opplastning$N$Nhøye verdier (4 eller 8) kan gi bedre ytelse,$Nspesielt på trege internettlinjer$N$Nbør ikke være høyere enn 1 på LAN$Neller hvis serveren sin harddisk er treg",

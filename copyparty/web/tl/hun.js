@@ -159,7 +159,7 @@ Ls.hun = {
 	"ut_u2ts": 'helyi dátumok$Nátvitele a szerverre">📅',
 	"ut_ow": 'felülírás?$N🛡️: soha (új nevet ad)$N🕒: csak ha a tiéd újabb$N♻️: mindig, ha más a tartalom$N⏭️: létezőket kihagy',
 	"ut_mt": 'háttérben hashelés feltöltés alatt$N$Nkapcsold ki, ha fagy a géped',
-	"ut_ask": 'megerősítés feltöltés előtt">💭',
+	"ut_ask": 'megerősítés feltöltés előtt',
 	"ut_pot": 'feltöltés gyorsítása (egyszerűbb UI)',
 	"ut_srch": 'csak létezés ellenőrzése$N(nem tölt fel semmit)',
 	"ut_par": '0 = szünet$N$Nnöveld, ha lassú a net$N$NHDD limit vagy LAN esetén hagyd 1-en',

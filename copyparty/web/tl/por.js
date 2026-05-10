@@ -157,7 +157,7 @@ Ls.por = {
 	"ut_u2ts": "copiar o carimbo de data/hora de última modificação$Ndo seu sistema de arquivos para o servidor\">📅",
 	"ut_ow": "substituir arquivos existentes no servidor?$N🛡️: nunca (irá gerar um novo nome de arquivo em vez disso)$N🕒: substituir se o arquivo no servidor for mais antigo que o seu$N♻️: sempre substituir se os arquivos forem diferentes$N⏭️: ignorar incondicionalmente todos os arquivos existentes",
 	"ut_mt": "continuar a fazer o hash de outros arquivos enquanto faz upload$N$Ntalvez desativar se sua CPU ou HDD for um gargalo",
-	"ut_ask": 'pedir confirmação antes do upload começar">💭',
+	"ut_ask": 'pedir confirmação antes do upload começar',
 	"ut_pot": "melhorar a velocidade de upload em dispositivos lentos$Ntornando a UI menos complexa",
 	"ut_srch": "não fazer upload, em vez disso verificar se os arquivos já$N existem no servidor (irá escanear todas as pastas que você pode ler)",
 	"ut_par": "pausar uploads definindo para 0$N$Naumentar se sua conexão for lenta / alta latência$N$Nmanter em 1 em LAN ou se o HDD do servidor for um gargalo",

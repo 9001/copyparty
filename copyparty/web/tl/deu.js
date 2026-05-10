@@ -157,7 +157,7 @@ Ls.deu = {
 	"ut_u2ts": "Zuletzt geändert-Zeitstempel von$Ndeinem Dateisystem auf den Server übertragen\">📅",
 	"ut_ow": "Existierende Dateien auf dem Server überschreiben?$N🛡️: Nie (generiert einen neuen Dateinamen)$N🕒: Überschreiben, wenn Server-Datei älter ist als meine$N♻️: Überschreiben, wenn der Dateiinhalt anders ist$N⏭️: Vorhandene Dateien immer überspringen",
 	"ut_mt": "Andere Dateien während des Uploads hashen$N$Nsolltest du deaktivieren, falls deine CPU oder Festplatte zum Flaschenhals werden könnte",
-	"ut_ask": 'Vor dem Upload nach Bestätigung fragen">💭',
+	"ut_ask": 'Vor dem Upload nach Bestätigung fragen',
 	"ut_pot": "Verbessert Upload-Geschwindigkeit$Nindem das UI weniger komplex gemacht wird",
 	"ut_srch": "nicht wirklich hochladen, stattdessen prüfen ob Datei bereits auf dem Server existiert (scannt alle Ordner, die du lesen kannst)",
 	"ut_par": "setze auf 0 zum Pausieren$N$Nerhöhe, wenn deine Verbindung langsam / instabil ist$N$lass auf 1 im LAN oder wenn die Festplatte auf dem Server ein Flaschenhals ist",

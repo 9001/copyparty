@@ -189,7 +189,7 @@ Ls.hmn = {
 	"ut_u2ts": "copy the last-modified timestamp$Nfrom your filesystem to the server\">📅",
 	"ut_ow": "overwrite existing files on the server?$N🛡️: never (will generate a new filename instead)$N🕒: overwrite if server-file is older than yours$N♻️: always overwrite if the files are different$N⏭️: unconditionally skip all existing files",
 	"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
-	"ut_ask": 'ask for confirmation before upload starts">💭',
+	"ut_ask": 'ask for confirmation before upload starts',
 	"ut_pot": "improve upload speed on slow devices$Nby making the UI less complex",
 	"ut_srch": "don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)",
 	"ut_par": "pause uploads by setting it to 0$N$Nincrease if your connection is slow / high latency$N$Nkeep it 1 on LAN or if the server HDD is a bottleneck",
