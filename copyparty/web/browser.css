@@ -1657,6 +1657,7 @@ html.b #music {
 #mu_th img {
 	opacity: 0;
 	margin: 0 auto;
+	position: absolute;
 }
 #mu_tn {
 	display: block;

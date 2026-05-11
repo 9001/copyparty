@@ -3888,7 +3888,7 @@ function play(tid, is_ev, seek) {
 	afilt.apply();
 
 	// popup player
-	ebi('mu_tn').innerHTML = tname.replace(/\..*$/, '');
+	ebi('mu_tn').innerHTML = tname.replace(/\.[0-9a-z]+$/i, '');
 	var m_ext = tname.match(/[^\.]*$/);
 	if(m_ext){
 		QS('#mu_th>svg').style.color = intToHSL(hashCode(m_ext[0]))
