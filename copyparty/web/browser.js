@@ -3918,7 +3918,7 @@ function play(tid, is_ev, seek) {
 
 	try{
 		var gridimg = QS('a[ref=' + t_tr.childNodes[1].firstChild.id + '] img')
-		set_loaded(gridimg, false);
+		set_loaded(ebi('mu_th'), false);
 		QS('#mu_th>img').setAttribute('src', gridimg.src.replace(/th=.*(&|$)/, 'th=wf3&'));
 	}
 	catch(ex){
