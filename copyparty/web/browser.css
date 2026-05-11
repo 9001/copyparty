@@ -1669,7 +1669,7 @@ html.b #music {
 }
 #mu_pbb {
 	height: 3em;
-	margin: .5em 0;
+	margin: .5em auto;
 	width: 80vw;
 	display: block;
 	position: relative;
