@@ -6454,13 +6454,11 @@ window.thegrid = (function () {
 
 				ar.reverse();
 				ext0 = ar[0];
-				if(ext0.length < 3)
-					for (var b = 0; b < Math.min(2, ar.length); b++) {
-						if (ar[b].length > 7)
-							break;
-
-						ext = ext ? (ar[b] + '.' + ext) : ar[b];
-					}
+				for (var b = 0; b < Math.min(2, ar.length); b++) {
+					ext = ext ? (ar[b] + '.' + ext) : ar[b];
+					if (ar[b].length > 2)
+						break;
+				}
 				if (!ext)
 					ext = 'unk';
 			}
