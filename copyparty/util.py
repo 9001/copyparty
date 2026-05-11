@@ -450,7 +450,10 @@ if ANYWIN:
     IMPLICATIONS.extend([["z", "zm4"]])
 
 
-UNPLICATIONS = [["no_dav", "daw"]]
+UNPLICATIONS = [
+    ["no_dav", "daw"],
+    ["no_gsel", "gsel"],
+]
 
 
 DAV_ALLPROP_L = [
