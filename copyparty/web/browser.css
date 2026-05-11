@@ -1967,6 +1967,8 @@ html {
 	overflow-y: hidden;
 }
 #treepar {
+	position: fixed;
+	z-index: 1;
 	background: #fff;
 	background: var(--tree-bg);
 	left: -.96em;

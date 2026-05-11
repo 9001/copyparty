@@ -7962,7 +7962,7 @@ var treectl = (function () {
 			compy();
 		}
 
-		if (!r.parpane || !r.pdir.length || y >= r.pdir.slice(-1)[0][0] || y <= r.pdir[0][0]) {
+		if (!r.parpane || !r.pdir.length) {
 			clmod(parp, 'off', 1);
 			r.pdirh = null;
 		}
@@ -7986,11 +7986,7 @@ var treectl = (function () {
 				for (var a = 0, aa = els.length; a < aa; a++)
 					els[a].onclick = bad_proxy;
 			}
-			y = ebi('treeh').offsetHeight;
-			if (!fixedpos)
-				y += tree.offsetTop - yscroll();
-
-			y = (y - 3) + 'px';
+			y = ebi('treesuperh').offsetHeight + 'px';
 			if (parp.style.top != y)
 				parp.style.top = y;
 		}
