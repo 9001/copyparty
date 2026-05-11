@@ -11,6 +11,9 @@ from .th_srv import HAVE_PIL, HAVE_PILF
 from .util import BytesIO, html_escape  # type: ignore
 
 
+RE_CSS_COLOR = re.compile(r"[^a-zA-Z0-9#()%.,/-]")
+
+
 class Ico(object):
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
@@ -26,6 +29,9 @@ class Ico(object):
         if as_thumb:
             sw, sh = self.args.th_size.split("x")
             h = int(100.0 / (float(sw) / float(sh)))
+
+        if accent:
+            accent = RE_CSS_COLOR.sub("", accent)
 
         # obsolete. 2000+ svgs slows chrome down massively, but no crash.
         # further, unique svgs are only used for non-standard thumbnails,

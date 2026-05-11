@@ -6851,7 +6851,7 @@ class HttpCli(object):
                                 pass
 
                     if is_dir:
-                        return '' # self.tx_svg("folder")
+                        return self.reply(b"(no thumbnail)")
 
                 thp = None
                 if self.thumbcli and not nothumb:
@@ -6871,7 +6871,7 @@ class HttpCli(object):
                 elif th_fmt in ACODE2_FMT:
                     raise Pebkac(415)
 
-                return '' # self.tx_ico(rem)
+                return self.reply(b"(no thumbnail)")
 
         elif self.can_write and th_fmt is not None:
             return self.tx_svg("upload\nonly")
@@ -7208,7 +7208,7 @@ class HttpCli(object):
             and vpath
         )
         for fn in ls_names:
-            cls = base = ""
+            base = ""
             href = fn
             if use_abs_url:
                 base = "/" + vpath + "/"
@@ -7228,7 +7228,6 @@ class HttpCli(object):
 
             is_dir = stat.S_ISDIR(inf.st_mode)
             if is_dir:
-                cls = "dir"
                 href += "/"
                 if no_zip:
                     margin = "DIR"
@@ -7298,7 +7297,6 @@ class HttpCli(object):
                 "ext": ext,
                 "dt": dt,
                 "ts": int(linf.st_mtime),
-                "cls": cls,
             }
             if is_dir:
                 dirs.append(item)

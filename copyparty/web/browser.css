@@ -1940,7 +1940,7 @@ input.ssconf_v {
 	overscroll-behavior-y: none;
 	box-shadow: 0 0 1em var(--mp-sh), 0 -1px 0 rgba(128,128,128,0.3);
 	border: 1px solid var(--bg-u3);
-	transition: width 0.15s;
+	transition: width .05s;
 	z-index: 5;
 	padding-bottom: 3em;
 }
@@ -2615,11 +2615,11 @@ html.noscroll .sbar::-webkit-scrollbar {
 	-ms-interpolation-mode: nearest-neighbor;
 	image-rendering: pixelated;
 }
-html.ab_fsc .full-image img,
-html.ab_fsc .full-image video {
+html.bb_fsc .full-image img,
+html.bb_fsc .full-image video {
 	max-height: 100%;
 }
-html.ab_fsc figcaption {
+html.bb_fsc figcaption {
 	display: none;
 }
 .full-image img.nt,
@@ -4950,9 +4950,19 @@ html.e #wtc {
 	background: linear-gradient(to right, transparent, var(--a-dark), var(--a));
 }
 #spaceTotal_bar {
+	position: relative;
 	margin-bottom: .5em;
 	background: #ccc;
-	background: var(--bg-u5);
+	background: var(--bg-u1);
+}
+#spaceMax {
+	position: absolute;
+	background: var(--a);
+	right: 0;
+	top: 0;
+	width: .3em;
+	height: .3em;
+	border-radius: var(--radius);
 }
 #tree_footer {
 	width: 0;
@@ -4962,7 +4972,7 @@ html.e #wtc {
 	left: 0;
 	padding: 1em;
 	pointer-events: none;
-	transition: width .15s;
+	transition: width .05s;
 	background: linear-gradient(to top, var(--bg-u2), transparent);
 }
 .popup_button {

@@ -1033,11 +1033,10 @@ ebi('op_up2k').innerHTML = (
 	'</div>\n' +
 
 	'	<div id="up2k_qs">' +
-	'		<label tabindex="0" for="fsearch" class="tgl btn" tt="' + L.ut_srch +'">🔎</label>\n' +
+	'		<label tabindex="0" for="fsearch" id="fsearch_copy" class="tgl btn" tt="' + L.ut_srch +'">🔎</label>\n' +
 	'		<label tabindex="0" for="u2ow" id="u2ow_copy" class="tgl btn on" tt="' + L.ut_ow +'"></label>\n' +
-	'		<label tabindex="0" for="ask_up" class="tgl btn" tt="' + L.ut_ask + '">💭</label>\n' +
-	'		<label tabindex="0" for="upnag" class="tgl btn" tt="' + L.cut_nag + '">🔔</label>\n' +
-	'		<label tabindex="0" for="upsfx" class="tgl btn" tt="' + L.cut_sfx + '">🔊</label>\n' +
+	'		<label tabindex="0" for="u2rand" id="u2rand_copy" class="tgl btn" tt="' + L.ut_rand +'">🎲</label>\n' +
+	'		<label tabindex="0" for="multitask" id="multitask_copy" class="tgl btn" tt="' + L.ut_mt +'">🏃</label>\n' +
 	'		<a id="up_moreopts" class="btn" href="#h_up2kcfg">↗️ ' + L.more_options + '</a>\n' +
 	'	</div>\n' +
 
@@ -1320,7 +1319,7 @@ ebi('op_cfg').innerHTML = (
 	'<div class="sub">\n' +
 	'	<h3 id="h_upload">🎈 ' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
-	'		<div class="c" tt="' + L.ut_ask + '"><input type="checkbox" id="ask_up"></input><label for="ask_up" class="tgl btn">💭</label></div>\n' +
+	'		<a id="ask_up" class="tgl btn" tt="' + L.ut_ask + '">💭</a>\n' +
 	'		<a id="u2ts" class="tgl btn" tt="' + L.ut_u2ts + '</a>\n' +
 	'		<a id="umod" class="tgl btn" tt="' + L.cut_umod + '</a>\n' +
 	'		<a id="hashw" class="tgl btn" tt="' + L.cut_mt + '</a>\n' +
@@ -1330,8 +1329,8 @@ ebi('op_cfg').innerHTML = (
 	'		<input type="text" id="u2szg" value="" ' + NOAC + ' style="width:3em" tt="' + L.cut_u2sz + '" />' +
 	'		<a id="flag_en" class="tgl btn" tt="' + L.cut_flag + '">💤</a>\n' +
 	'		<a id="u2sort" class="tgl btn" tt="' + L.cut_az + '">az</a>\n' +
-	'		<div class="c" tt="' + L.cut_nag + '"><input type="checkbox" id="upnag"></input><label for="upnag" class="tgl btn">🔔</label></div>\n' +
-	'		<div class="c" tt="' + L.cut_sfx + '"><input type="checkbox" id="upsfx"></input><label for="upsfx" class="tgl btn">🔊</label></div>\n' +
+	'		<a id="upnag" class="tgl btn" tt="' + L.cut_nag + '">🔔</a>\n' +
+	'		<a id="upsfx" class="tgl btn" tt="' + L.cut_sfx + '">🔊</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 
@@ -7244,11 +7243,11 @@ var search_ui = (function () {
 
 		var ms = ebi('moresearch');
 		if(e){
-			window.scrollTo(0, 0)
-			ms.innerHTML = '▴'
+			window.scrollTo(0, 0);
+			ms.innerHTML = '▴';
 		}
 		else{
-			ms.innerHTML = '▾'
+			ms.innerHTML = '▾';
 		}
 	}
 	ebi('moresearch').onclick = function () {
@@ -8476,6 +8475,9 @@ var treectl = (function () {
 
 	r.gentab = function (top, res) {
 		showfile.untail();
+		for (var a = 0; a < res.dirs.length; a++)
+			res.dirs[a].cls = 'dir';
+
 		var nodes = res.dirs.concat(res.files),
 			html = mk_files_header(res.taglist),
 			sel = msel.hist[top],
@@ -8543,7 +8545,7 @@ var treectl = (function () {
 					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
-			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade ' : '') + (img_re.exec(fname) ? 'img ' : '') + tn.cls,
+			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade ' : '') + (img_re.exec(fname) ? 'img ' : '') + (tn.cls || ''),
 				ln = ['<tr class="' + cl + '"><td>' + tn.lead + '</td><td><a href="' +
 					top + tn.href + '" id="' + id + '">' + hname +
 					'</a></td><td sortv="' + tn.sz + '">' + filesizefun(tn.sz)];
@@ -9404,7 +9406,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['flat dark', 'flat light', 'gradient dark', 'gradient light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
+			names = ['flat dark', 'flat light', 'fancy dark', 'fancy light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));
