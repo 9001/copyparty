@@ -452,7 +452,7 @@ html.y #tth {
 }
 *:focus-visible,
 *:focus-visible+label,
-#pctl *:focus-visible,
+.pctl *:focus-visible,
 .btn:focus-visible {
 	/* box-shadow: 0 .1em .2em #fc0 inset; */
 	outline: var(--a) solid .1em;

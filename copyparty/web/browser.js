@@ -964,11 +964,11 @@ ebi('widget').innerHTML = (
 
 	'<div id="widgeti">' +
 	'	<div id="pbarthinpos"></div>' +
-	'	<div id="pctl">' +
+	'	<div id="pctl" class="pctl">' +
 	'		<a href="#" id="bprev" class="icon btn on" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
 	'		<a href="#" id="bplay" class="icon btn on" tt="' + L.wt_play + '">' + svg_play + '</a>' +
 	'		<a href="#" id="bnext" class="icon btn on" tt="' + L.wt_next + '">' + svg_next + '</a>' +
-	'		<span id="trackname"></span>' +
+	'		<a id="trackname" href="#h_music"></a>' +
 	'		<div id="progbar" style="position: relative; height: 80%;">' +
 	'			<canvas id="barbuf"></canvas>' +
 	'			<canvas id="barpos"></canvas>' +
@@ -994,6 +994,12 @@ ebi('widget').innerHTML = (
 	'	<span id="np_pos"></span>' +
 	'	<span id="np_dur"></span>' +
 	'</div>'
+);
+
+ebi('mu_pbc').innerHTML = (
+	'<a href="#" id="bprev2" class="icon btn on" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
+	'<a href="#" id="bplay2" class="icon btn on" tt="' + L.wt_play + '">' + svg_play + '</a>' +
+	'<a href="#" id="bnext2" class="icon btn on" tt="' + L.wt_next + '">' + svg_next + '</a>'
 );
 
 ebi('wtoggle').addEventListener('wheel', function (e) {
@@ -1547,6 +1553,8 @@ function modaltoggle(dest, show){
 	if (show == false || show == 't' && QS('#' + dest + '.vis'))
 		dest = '';
 
+	var layoutchange = dest == 'music' || QS('#music.vis');
+
 	swrite('opmode', dest || null);
 
 	goto(dest);
@@ -1556,6 +1564,9 @@ function modaltoggle(dest, show){
 		tt.skip = true;
 		input.focus();
 	}
+
+	if(layoutchange)
+		onwidgetresize();
 }
 function opclick(e) {
 	var dest = this.getAttribute('data-dest');
@@ -1595,7 +1606,7 @@ function goto(dest) {
 
 	if (dest) {
 		var lnk = QS('#ops>a[data-dest=' + dest + ']'),
-			nps = lnk.getAttribute('data-perm');
+			nps = lnk && lnk.getAttribute('data-perm');
 
 		nps = nps && nps.length ? nps.split(' ') : [];
 
@@ -1673,7 +1684,7 @@ window.onhashchange = function() {
 			return;
 		if(!clgot(p_modal, 'vis')){
 			console.log('forcing modal open due to subheader hash');
-			modaltoggle(p_modal.id);
+			modaltoggle(p_modal.id, true);
 		}
 		ebi(location.hash.slice(1)).scrollIntoView();
 	}
@@ -2481,7 +2492,8 @@ var widget = (function () {
 	r.paused = function (paused) {
 		if (was_paused != paused) {
 			was_paused = paused;
-			ebi('bplay').innerHTML = paused ? svg_play : svg_pause;
+			ebi('bplay').innerHTML = ebi('bplay2').innerHTML = 
+				paused ? svg_play : svg_pause;
 		}
 	};
 	r.setvis = function () {
@@ -2812,7 +2824,7 @@ var pbar = (function () {
 		var m1 = pctx.measureText(t1),
 			m1b = pctx.measureText(t1 + ":88"),
 			m2 = pctx.measureText(t2),
-			yt = pc.h * 0.7,
+			yt = pc.h * 0.65,
 			xt1 = pc.w - (m1.width + 12),
 			xt2 = x < m1.width * 1.4 ? (x + 12) : (Math.min(pc.w - m1b.width, x - 12) - m2.width);
 
@@ -3118,9 +3130,9 @@ function mpause(e) {
 
 // hook up the widget buttons
 (function () {
-	ebi('bplay').onclick = playpause;
-	ebi('bprev').onclick = prev_song;
-	ebi('bnext').onclick = next_song;
+	ebi('bplay').onclick = ebi('bplay2').onclick = playpause;
+	ebi('bprev').onclick = ebi('bprev2').onclick = prev_song;
+	ebi('bnext').onclick = ebi('bnext2').onclick = next_song;
 
 	var bar = ebi('barpos');
 
@@ -3870,10 +3882,18 @@ function play(tid, is_ev, seek) {
 	}
 
 	mp.au.osrc = decodeURI(mp.tracks[tid].split('/').pop());
-	ebi('trackname').innerHTML = esc(uricom_dec(mp.au.osrc));
-	ebi('trackname').setAttribute('tt', ebi('trackname').innerHTML);
+	var tname = esc(uricom_dec(mp.au.osrc));
+	ebi('trackname').innerHTML = tname;
+	ebi('trackname').setAttribute('tt', tname);
 	afilt.apply();
 
+	// popup player
+	ebi('mu_tn').innerHTML = tname.replace(/\..*$/, '');
+	var m_ext = tname.match(/[^\.]*$/);
+	if(m_ext){
+		QS('#mu_th>svg').style.color = intToHSL(hashCode(m_ext[0]))
+		QS('#mu_th>span').innerHTML = m_ext[0];
+	}
 	setTimeout(function () {
 		mpl.unbuffer(url);
 	}, 500);
@@ -3895,6 +3915,15 @@ function play(tid, is_ev, seek) {
 	clmod(t_tr, 'play', 1);
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
 	clmod(ebi('wtoggle'), 'm3u', mpl.m3uen);
+
+	try{
+		var gridimg = QS('a[ref=' + t_tr.childNodes[1].firstChild.id + '] img')
+		QS('#mu_th>img').setAttribute('src', gridimg.src.replace(/th=.*(&|$)/, 'th=wf3&'));
+	}
+	catch(ex){
+		console.log(ex);
+	}
+
 	if (thegrid)
 		thegrid.loadsel();
 
@@ -6547,17 +6576,6 @@ window.thegrid = (function () {
 		drag.initgrid();
 	}
 
-	function hashCode (str) {
-		var hash = 0;
-		for(var i = 0; i < str.length; i++){
-			hash = str.charCodeAt(i) + 130 * ((hash << 5) - hash);
-		}
-		return hash
-	}
-	function intToHSL(i){
-		return 'hsl(' + i % 360 + 'deg 100% 50%)'
-	}
-
 	r.bagit = function (isrc) {
 		console.log('init image viewer');
 		
@@ -6744,6 +6762,17 @@ function testImage(el) {
 			set_loaded(el, false, false)
 		};
     tester.src=URL;
+}
+
+function hashCode (str) {
+	var hash = 0;
+	for(var i = 0; i < str.length; i++){
+		hash = str.charCodeAt(i) + 130 * ((hash << 5) - hash);
+	}
+	return hash
+}
+function intToHSL(i){
+	return 'hsl(' + i % 360 + 'deg 100% 50%)'
 }
 
 function tree_scrollto(e) {
@@ -7714,9 +7743,21 @@ var filecolwidth = (function () {
 onresize100.add(filecolwidth, true);
 
 function onwidgetresize(){
+	var mumodal = QS('#music.vis');
 	var widget = ebi('widget');
 	var bar = ebi('pctl');
 	var pbarthinpos = ebi('pbarthinpos');
+
+	if(mumodal){
+		var pb_container = ebi('mu_pbb');
+		pb_container.appendChild(ebi('progbar'));
+		pb_container.appendChild(ebi('altprogbar'));
+		ebi('altprogbar').maxWidth = '';
+		ebi('mu_vol').appendChild(ebi('pvolbg'));
+		pbar.onresize();
+		return;
+	}
+
 	var width = widget.offsetWidth;
 
 	var thin = width < 800; //px
@@ -7740,8 +7781,7 @@ function onwidgetresize(){
 			thin = true;
 		}
 	}
-	gtc = 'max-content max-content max-content ' + (thin ? '' : '20%') + ' auto max-content max-content max-content';
-	if(thin && bar.children.length > gtc.split(' ').length){
+	if(thin && pbarthinpos.children.length < 2){
 		//thin
 		pbarthinpos.appendChild(ebi('progbar'));
 		pbarthinpos.appendChild(ebi('altprogbar'));
@@ -7751,6 +7791,10 @@ function onwidgetresize(){
 	bar.style.gridTemplateColumns = gtc;
 
 	clmod(widget, 'thin', thin);
+
+	if(ebi('mu_vol').children.length > 0){
+		bar.appendChild(ebi('pvolbg'));
+	}
 
 	pbar.onresize();
 
