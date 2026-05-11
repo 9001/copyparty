@@ -1642,6 +1642,7 @@ var mpl = (function () {
 		navigator.mediaSession.setActionHandler('pause', mpause);
 		navigator.mediaSession.setActionHandler('seekbackward', r.os_seek ? function () { seek_au_rel(-10); } : null);
 		navigator.mediaSession.setActionHandler('seekforward', r.os_seek ? function () { seek_au_rel(10); } : null);
+		navigator.mediaSession.setActionHandler('seekto', function (details) { seek_au_sec(details.seekTime); });
 		navigator.mediaSession.setActionHandler('previoustrack', prev_song);
 		navigator.mediaSession.setActionHandler('nexttrack', next_song);
 		r.pp();
@@ -1656,7 +1657,7 @@ var mpl = (function () {
 		navigator.mediaSession.metadata = null;
 		navigator.mediaSession.playbackState = "paused";
 
-		var hs = 'play pause seekbackward seekforward previoustrack nexttrack'.split(/ /g);
+		var hs = 'play pause seekbackward seekforward seekto previoustrack nexttrack'.split(/ /g);
 		for (var a = 0; a < hs.length; a++)
 			navigator.mediaSession.setActionHandler(hs[a], null);
 
