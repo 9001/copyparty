@@ -1665,6 +1665,7 @@ html.b #music {
 	margin: 0 auto;
 	position: absolute;
 	max-width: 100%;
+	object-fit: scale-down;
 }
 #mu_tn {
 	display: block;
