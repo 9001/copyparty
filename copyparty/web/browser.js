@@ -1279,7 +1279,7 @@ ebi('op_cfg').innerHTML = (
 	'	<div id="u2conf">\n' +
 	'		<div class="c" data-perm="read" data-dep="idx" tt="' + L.ut_srch +'">\n' +
 	'			<input type="checkbox" id="fsearch" />\n' +
-	'			<label class="btn" for="fsearch">🔎</label>\n' +
+	'			<label class="tgl btn" for="fsearch">🔎</label>\n' +
 	'		</div>\n' +
 
 	'		<div class="c" tt="' + L.ut_ow +'">\n' +
@@ -1302,17 +1302,17 @@ ebi('op_cfg').innerHTML = (
 
 	'		<div class="c" tt="' + L.ut_mt +'">\n' +
 	'			<input type="checkbox" id="multitask" />\n' +
-	'			<label class="btn" for="multitask">🏃</label>\n' +
+	'			<label class="tgl btn" for="multitask">🏃</label>\n' +
 	'		</div>\n' +
 
 	'		<div class="c" tt="' + L.ut_pot +'">\n' +
 	'			<input type="checkbox" id="potato" />\n' +
-	'			<label class="btn" for="potato">🥔</label>\n' +
+	'			<label class="tgl btn" for="potato">🥔</label>\n' +
 	'		</div>\n' +
 
 	'		<div class="c" tt="' + L.ut_rand +'">\n' +
 	'			<input type="checkbox" id="u2rand" />\n' +
-	'			<label class="btn" for="u2rand">🎲</label>\n' +
+	'			<label class="tgl btn" for="u2rand">🎲</label>\n' +
 	'		</div>\n' +
 	'	</div>\n' +
 	'</div>\n' +
