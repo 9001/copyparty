@@ -6729,14 +6729,12 @@ window.thegrid = (function () {
 
 function th_onload(el) {
 	set_loaded(el, true, false)
-	el.style.position = 'static'
-	el.style.opacity = '1'
-	el.style.height = ''
 }
 
 function set_loaded(el, state, dblcheck) {
 	if(state && dblcheck) {
-		testImage(el)
+		testImage(el);
+		return;
 	}
 	var p = el.parentElement.parentElement
 	clmod(p, 'thumbed', state)

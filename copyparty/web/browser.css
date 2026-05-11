@@ -1026,6 +1026,10 @@ tr.play td:nth-child(1) a {
 	.th_ext {
 		display: none;
 	}
+	img {
+		position: static;
+		opacity: 1;
+	}
 }
 .sel .gselchk {
 	display: block;
