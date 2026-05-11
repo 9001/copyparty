@@ -1641,6 +1641,8 @@ html.b #music {
 #mu_inner {
 	align-content: center;
 	text-align: center;
+	position: relative;
+	width: 100%;
 }
 #mu_th {
 	cursor: default !important;
@@ -3943,6 +3945,11 @@ html.e #wrap.thin {
 		pointer-events: none;
 		box-shadow: 0 0 .5em var(--mp-sh);
 	}
+	#music #pvol {
+		position: absolute;
+		bottom: 3.5em;
+		right: -1.7em;
+	}
 	#pvolbg:hover #pvol {
 		display: block;
 		opacity: 1;
@@ -3978,6 +3985,15 @@ html.e #wrap.thin {
 		font-size: 1.4em;
 		top: 5px;
 		right: 5px;
+	}
+	#music {
+		padding: 1em;
+	}
+	#mu_pbb {
+		width: 100%;
+	}
+	#mu_inner {
+		margin: -.5em;
 	}
 }
 
