@@ -1922,7 +1922,7 @@ var mpl = (function () {
 	};
 
 	function draw_pb_mode() {
-		var btns = QSA('#pb_mode>a');
+		var btns = QSA('#h_pbmode a');
 		for (var a = 0, aa = btns.length; a < aa; a++) {
 			clmod(btns[a], 'on', btns[a].getAttribute("m") == r.pb_mode);
 			btns[a].onclick = set_pb_mode;
