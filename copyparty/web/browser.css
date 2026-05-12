@@ -1633,9 +1633,9 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #music a {
 	cursor: pointer;
 }
-html.b #music {
+html.b #mu_inner {
 	background: color-mix(in oklab, var(--bg-u2) 70%, transparent);
-	backdrop-filter: blur(50px);
+	backdrop-filter: blur(32px);
 }
 #h_music {
 	position: absolute;

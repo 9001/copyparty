@@ -2090,8 +2090,14 @@ var mpl = (function () {
 	r.set_mu_cv = function() {
 		var o = QS('#music.vis #mu_th>img');
 		if (o) {
+			var url = r.cover.slice(0, -1) + 'wf3';
+
 			set_loaded(o, false);
-			o.setAttribute('src', r.cover.slice(0, -1) + 'wf3');
+			o.setAttribute('src', url);
+
+			o = QS('html.b #music');
+			if (o)
+				o.style.background = "url('" + url + "') no-repeat center / cover";
 		}
 	}
 
