@@ -1145,47 +1145,47 @@ var musicSettings = (
 	'<div class="sub_section"><h3 id="h_mp">🎵 ' + L.ot_mp + '</h3></div>' +
 
 	'<div class="sub"><h3 id="h_mpopts">✅ ' + L.cl_opts + '</h3><div>' +
-	'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
-	'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
-	'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
-	'<a href="#" class="tgl btn" id="au_afade" tt="' + L.mt_afade + '</a>' +
-	'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
-	'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
-	'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
-	'<a href="#" class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
-	'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
-	'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
-	'<a href="#" class="tgl btn" id="au_m3u_c" tt="' + L.mt_m3u_c + '</a>' +
-	'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
-	'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
-	'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
-	'<a href="#" class="tgl btn" id="au_follow" tt="' + L.mt_follow + '</a>' +
-	'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
+	'<a class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
+	'<a class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
+	'<a class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
+	'<a class="tgl btn" id="au_afade" tt="' + L.mt_afade + '</a>' +
+	'<a class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
+	'<a class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
+	'<a class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
+	'<a class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
+	'<a class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
+	'<a class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
+	'<a class="tgl btn" id="au_m3u_c" tt="' + L.mt_m3u_c + '</a>' +
+	'<a class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
+	'<a class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
+	'<a class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
+	'<a class="tgl btn" id="au_follow" tt="' + L.mt_follow + '</a>' +
+	'<a class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
 	'</div></div>' +
 
 	'<div class="sub"><h3 id="h_cmds">▶️ ' + L.ml_btns + '</h3><div>' +
-	'<a href="#" class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
+	'<a class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
 	'</div></div>' +
 
 	'<div class="sub"><h3 id="h_pbmode">📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
-	'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '">🔁</a>' +
-	'<a href="#" class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
-	'<a href="#" class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
+	'<a class="tgl btn" m="loop" tt="' + L.mt_mloop + '">🔁</a>' +
+	'<a class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
+	'<a class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
 	'</div></div>' +
 
 	(have_acode ? (
 		'<div class="sub"><h3 id="h_transfrom">🏹 ' + L.ml_tcode + '</h3><div>' +
-		'<a href="#" id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
-		'<a href="#" id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
-		'<a href="#" id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
+		'<a id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
+		'<a id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
+		'<a id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
 		'</div></div>' +
 		'<div class="sub"><h3 id="h_transto">🎯 ' + L.ml_tcode2 + '</h3><div>' +
-		'<a href="#" id="ac2opus" class="tgl btn" tt="' + L.mt_c2opus + '</a>' +
-		'<a href="#" id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
-		'<a href="#" id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
-		'<a href="#" id="ac2mp3" class="tgl btn" tt="' + L.mt_c2mp3 + '</a>' +
-		'<a href="#" id="ac2flac" class="tgl btn" tt="' + L.mt_c2flac + '</a>' +
-		'<a href="#" id="ac2wav" class="tgl btn" tt="' + L.mt_c2wav + '</a>' +
+		'<a id="ac2opus" class="tgl btn" tt="' + L.mt_c2opus + '</a>' +
+		'<a id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
+		'<a id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
+		'<a id="ac2mp3" class="tgl btn" tt="' + L.mt_c2mp3 + '</a>' +
+		'<a id="ac2flac" class="tgl btn" tt="' + L.mt_c2flac + '</a>' +
+		'<a id="ac2wav" class="tgl btn" tt="' + L.mt_c2wav + '</a>' +
 		'</div></div>'
 	) : '') +
 
@@ -1224,7 +1224,7 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3 id="h_gauto">🅰️ ' + L.cl_gauto + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="gauto" class="tgl btn" href="#" tt="' + L.tt_gauto + '">' + L.enable + '</a>\n' +
+	'		<a id="gauto" class="tgl btn" tt="' + L.tt_gauto + '">' + L.enable + '</a>\n' +
 	'		<input type="text" id="ga_thresh" value="" ' + NOAC + ' style="width:1.5em" tt="' + L.tt_gathr + '" />' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -1298,9 +1298,9 @@ ebi('op_cfg').innerHTML = (
 	'			</tr>\n' +
 	'			<tr>\n' +
 	'				<div class="c" data-perm="read">\n' +
-	'					<a href="#" class="b btn" id="nthread_sub">&ndash;</a><input\n' +
+	'					<a class="b btn" id="nthread_sub">&ndash;</a><input\n' +
 	'						class="txtbox" type="text" id="nthread" style="width: 3em;" value=""/><a\n' +
-	'						href="#" class="b btn" id="nthread_add">+</a>&nbsp;\n' +
+	'						class="b btn" id="nthread_add">+</a>&nbsp;\n' +
 	'				</div>\n' +
 	'			</tr>\n' +
 	'		</div>\n' +
