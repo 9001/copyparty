@@ -1633,7 +1633,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #music a {
 	cursor: pointer;
 }
-html.b #mu_inner {
+html.b #mu_outer {
 	background: color-mix(in oklab, var(--bg-u2) 70%, transparent);
 	backdrop-filter: blur(32px);
 }
@@ -1641,6 +1641,11 @@ html.b #mu_inner {
 	position: absolute;
 	top: 0;
 	left: 0;
+}
+#mu_outer {
+	display: flex;
+  	justify-content: center;
+	width: 100%;
 }
 #mu_inner {
 	align-content: center;
@@ -3992,7 +3997,7 @@ html.e #wrap.thin {
 		top: 5px;
 		right: 5px;
 	}
-	#music {
+	#mu_outer {
 		padding: 1em;
 	}
 	#mu_pbb {
