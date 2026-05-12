@@ -1565,8 +1565,10 @@ function modaltoggle(dest, show){
 		input.focus();
 	}
 
-	if(layoutchange)
+	if(layoutchange) {
 		onwidgetresize();
+		mpl.set_mu_cv();
+	}
 }
 function opclick(e) {
 	var dest = this.getAttribute('data-dest');
@@ -2085,6 +2087,14 @@ var mpl = (function () {
 	}
 	setaufollow();
 
+	r.set_mu_cv = function() {
+		var o = QS('#music.vis #mu_th>img');
+		if (o) {
+			set_loaded(o, false);
+			o.setAttribute('src', r.cover.slice(0, -1) + 'wf3');
+		}
+	}
+
 	function announce() {
 		if (!r.os_ctl || !mp.au)
 			return;
@@ -2116,6 +2126,7 @@ var mpl = (function () {
 			cover = addq(cover || mp.au.osrc, 'th=j');
 			tags.artwork = [{ "src": cover, type: "image/jpeg" }];
 		}
+		r.cover = cover;
 
 		ebi('np_circle').textContent = np.circle || '';
 		ebi('np_album').textContent = np.album || '';
@@ -2137,6 +2148,7 @@ var mpl = (function () {
 		navigator.mediaSession.setActionHandler('previoustrack', prev_song);
 		navigator.mediaSession.setActionHandler('nexttrack', next_song);
 		r.pp();
+		r.set_mu_cv();
 	}
 	r.announce = announce;
 
@@ -3915,15 +3927,6 @@ function play(tid, is_ev, seek) {
 	clmod(t_tr, 'play', 1);
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
 	clmod(ebi('wtoggle'), 'm3u', mpl.m3uen);
-
-	try{
-		var gridimg = QS('a[ref=' + t_tr.childNodes[1].firstChild.id + '] img')
-		set_loaded(QS('#mu_th img'), false);
-		QS('#mu_th>img').setAttribute('src', gridimg.src.replace(/th=.*(&|$)/, 'th=wf3&'));
-	}
-	catch(ex){
-		console.log(ex);
-	}
 
 	if (thegrid)
 		thegrid.loadsel();
@@ -6987,6 +6990,9 @@ var ahotkeys = function (e) {
 
 		if (ebi('sh_abrt'))
 			return ebi('sh_abrt').click();
+
+		if (QS('#music.vis'))
+			return ebi('cl_mu').click();
 
 		if (QS('.opview.act'))
 			return QS('#ops>a').click();
