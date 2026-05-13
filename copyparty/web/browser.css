@@ -2510,8 +2510,9 @@ input[type="text"].invalid {
 	padding: .5em;
 }
 #docul li.bn span {
-	font-weight: bold;
-	color: var(--fg-max);
+	color: var(--fg-weak);
+	vertical-align: center;
+	text-shadow: none;
 }
 #doc.prism {
 	padding-left: 3em;
