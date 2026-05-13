@@ -2249,7 +2249,7 @@ html.b .btn {
 	white-space: nowrap;
 }
 #files th:hover .cfg {
-	display: block;
+	display: none;
 	width: 1em;
 	border-radius: var(--radius);
 	margin: -1.2em auto 0 auto;
@@ -3517,7 +3517,7 @@ details .setting {
 details {
 	border: var(--bg-u3) solid 1px;
 	border-radius: var(--radius);
-	margin: .3em 0;
+	margin: .3em;
 }
 details:not(.open) .setting {
 	display: none;

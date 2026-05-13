@@ -6186,6 +6186,10 @@ window.thegrid = (function () {
 
 	ebi('h_hidden').onclick = function () {
 		clmod(this.parentElement, 'open', 't');
+		if(!clgot(this.parentElement, 'open') && filecols.picking){
+			filecols.unpick();
+			clmod(ebi('hcolsh'), 'on', r.picking)
+		}
 	}
 
 	var r = {
