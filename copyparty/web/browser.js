@@ -1662,6 +1662,10 @@ function goto(dest) {
 
 window.onhashchange = function() {
 	console.log('hash change: ' + location.hash)
+	// keep it clean
+	if(location.hash == '')
+		hist_replace(location.pathname + location.search);
+
 	var a_modal = QS('.modal.vis');
 	if(location.hash.length <= 1 && a_modal){
 		modaltoggle(a_modal.id);
