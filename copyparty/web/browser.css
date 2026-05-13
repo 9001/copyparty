@@ -2519,7 +2519,7 @@ input[type="text"].invalid {
 }
 #docul li a {
 	display: inline;
-	padding: 0;
+	padding: 0 !important;
 }
 #doc.prism {
 	padding-left: 3em;
