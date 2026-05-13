@@ -37,18 +37,6 @@
 				<div id="spaceUsed_bar" style="width: {{ space_used_percent }}%;"></div>
 				<div id="spaceMax"></div>
 			</div>
-
-			<span id="op_acc" class="opview popup under">
-				<div id="acc_button" class="tgl btn on">
-					<p id="acc_name"></p>
-				</div>
-				<div id="accessType" style="display: block;"></div>
-				<a href="{{ r }}/?h" id="goh" style="display: block;">control-panel</a>
-				<form id="flogout" style="display: block;" method="post" enctype="multipart/form-data">
-					<input type="hidden" name="act" value="logout" />
-					<input id="blogout" type="submit" />
-				</form>
-			</span>
 		</div>
 	</div>
 
@@ -68,16 +56,31 @@
 
 			<div id="actionsArea">
 				<div id="ops">
-					<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search">🔎</a>
-					<a href="#" id="opa_del" data-perm="write" data-dest="unpost">🧯</a>
-					<a href="#" id="opa_up" data-dest="up2k">🚀</a>
-					<a href="#" id="opa_bup" data-perm="write" data-dest="bup">🎈</a>
-					<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir"><p class="overlay_plus">+</p>📂</a>
-					<a href="#" id="opa_msg" data-dest="msg">📟</a>
-					<a href="#" id="opa_cfg" data-dest="cfg">⚙️</a>
-					<a href="#" id="opa_acc" data-dest="acc"><span id="acc_pfp" class="pfp">👤</span></a>
-					<div id="opdesc"></div>
+					<a href="#" class="disabled" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search">🔎</a>
+					<a href="#" class="disabled" id="opa_del" data-perm="write" data-dest="unpost">🧯</a>
+					<a href="#" class="disabled" id="opa_up" data-dest="up2k">🚀</a>
+					<a href="#" class="disabled" id="opa_bup" data-perm="write" data-dest="bup">🎈</a>
+					<a href="#" class="disabled" id="opa_mkd" data-perm="write" data-dest="mkdir"><p class="overlay_plus">+</p>📂</a>
+					<a href="#" class="disabled" id="opa_msg" data-dest="msg">📟</a>
+					<a href="#" class="disabled" id="opa_cfg" data-dest="cfg">⚙️</a>
+					<a href="#" id="opa_acc" data-dest="acc">
+						<label for="acc_cbopen" id="acc_pfp" class="pfp">👤</label>
+					</a>
 				</div>
+
+				<input type="checkbox" id="acc_cbopen" style="display: none;" />
+				<span id="op_acc" class="opview popup under">
+					<a id="acc_button" class="tgl btn on" href="{{ r }}/?h">
+						<p id="acc_name">Login</p>
+					</a>
+					<div id="accessType" style="display: block;">{{ srv_info }}</div>
+					<a href="{{ r }}/?h" id="goh" style="display: block;">control-panel</a>
+					<form id="flogout" style="display: block;" method="post" enctype="multipart/form-data">
+						<input type="hidden" name="act" value="logout" />
+						<input id="blogout" type="submit" />
+					</form>
+				</span>
+				<div id="opdesc"></div>
 
 				<div id="srchfolder_div">
 					<input id="folder_search" type="text" />

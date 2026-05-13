@@ -18,7 +18,7 @@
 	--btn-bg-a: rgba(128,128,128,0.15);
 	--btn-bg-a: color-mix(in oklab, var(--bg-max) 85%, var(--fg-max) 20%);
 	--btn-bg: rgba(128,128,128,0.15);
-	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a) 40%, transparent), color-mix(in oklab, var(--btn-bg-a)70%, var(--a-gray)));
+	--btn-bg: color-mix(in oklab, var(--bg-u5), transparent);
 	--btn-h-fg: var(--a-hil);
 	--btn-h-bg: color-mix(in oklab, var(--a-gray) 45%, var(--bg-max));
 	--btn-1-fg: var(--bg);
@@ -129,6 +129,7 @@ html.y {
 html.b {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
 
+	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a) 40%, transparent), color-mix(in oklab, var(--btn-bg-a)70%, var(--a-gray)));
 	--btn-bs: .1em .2em .1em var(--mp-sh);
 }
 html.bz {
@@ -141,7 +142,6 @@ html.by {
 html.a {
 	--btn-bs: 0 .05em 0 var(--bg-d3) inset;
 	--btn-1-bs: 0 .05em 0 var(--btn-1h-bg) inset;
-	--btn-bg: color-mix(in oklab, var(--bg-u5), transparent);
 
 	--tree-bg: var(--bg);
 
@@ -1705,6 +1705,7 @@ html.b #mu_outer {
 .opview.splitsub {
 	margin-bottom: 0;
 }
+#acc_cbopen:checked+span,
 .opview.act {
 	display: block;
 }
@@ -1811,6 +1812,9 @@ html.y #ops svg circle {
 }
 .pfp.placeholder {
 	text-shadow: 1px 1px 0 var(--bg-half), 1px -1px 0 var(--bg-half), -1px -1px 0 var(--bg-half), -1px 1px 0 var(--bg-half);
+}
+#op_acc:not(.act) {
+	display: none;
 }
 .opbox {
 	padding: .5em;
@@ -2307,6 +2311,9 @@ html.b .btn {
 #au_osd_cv,
 #u2tdate {
 	opacity: .3;
+}
+.disabled {
+	cursor: default;
 }
 #up_quick.disabled {
 	display: none;
@@ -5077,6 +5084,9 @@ html.e #wtc {
 	font-size: medium;
 	margin-top: .3em;
 	text-align: right;
+}
+#opa_acc label {
+	cursor: pointer !important;
 }
 #ops input[type=submit],
 #ops #goh {
