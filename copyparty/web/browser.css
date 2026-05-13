@@ -5071,7 +5071,7 @@ html.e #wtc {
 	padding: 1em;
 	pointer-events: none;
 	transition: width .05s;
-	background: linear-gradient(to top, var(--bg-u2), transparent);
+	background: linear-gradient(to top, var(--bg-u2), color-mix(in oklab, var(--bg-u2) 80%, transparent), transparent);
 }
 .popup_button {
 	border-radius: var(--radius);
