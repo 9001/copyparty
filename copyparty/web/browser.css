@@ -2210,7 +2210,9 @@ html.b .btn {
 	min-height: 1.4em;
 	white-space: nowrap;
 }
-#docul a:hover,
+#docul a:hover {
+	color: var(--btn-h-fg);
+}
 #tree .ntree a + a:hover {
 	background: var(--btn-h-bg);
 	color: var(--btn-h-fg);
@@ -2508,11 +2510,15 @@ input[type="text"].invalid {
 #docul li.bn {
 	text-align: center;
 	padding: .5em;
+	white-space: normal;
 }
 #docul li.bn span {
 	color: var(--fg-weak);
 	vertical-align: center;
 	text-shadow: none;
+}
+#docul li a {
+	display: inline;
 }
 #doc.prism {
 	padding-left: 3em;
