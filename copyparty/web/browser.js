@@ -6345,7 +6345,7 @@ window.thegrid = (function () {
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
-		if (!is_srch && ((r.sel && !dbl && !ctrl(e)) || (treectl.csel && (e.shiftKey || ctrl(e))))) {
+		if (r.sel && !dbl && !ctrl(e) || treectl.csel && (e.shiftKey || ctrl(e))) {
 			ev(e);
 			td.onclick.call(td, e);
 			if (e.shiftKey)
@@ -6553,13 +6553,6 @@ window.thegrid = (function () {
 		ggrid.innerHTML = html.join('\n');
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
-
-		var srch = ebi('unsearch'),
-			gsel = ebi('gridsel');
-
-		gsel.style.display = srch ? 'none' : '';
-		if (srch && r.sel)
-			gsel.click();
 
 		var ths = QSA('#ggrid>a');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
@@ -9697,8 +9690,7 @@ var msel = (function () {
 			if (item.sel)
 				r.sel.push(item);
 
-			if (!is_srch)
-				links[a].closest('tr').setAttribute('tabindex', '0');
+			links[a].closest('tr').setAttribute('tabindex', '0');
 		}
 	};
 
@@ -9855,9 +9847,8 @@ var msel = (function () {
 		var tds = QSA('#files tbody td+td+td'),
 			is_srch = !!ebi('unsearch');
 
-		if (!is_srch)
-			for (var a = 0, aa = tds.length; a < aa; a++)
-				tds[a].onclick = r.seltgl;
+		for (var a = 0, aa = tds.length; a < aa; a++)
+			tds[a].onclick = r.seltgl;
 
 		r.selui(true);
 		arcfmt.render();
