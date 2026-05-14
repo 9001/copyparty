@@ -100,8 +100,10 @@ a {
 	padding: .2em .6em;
 	margin: 0 .3em;
 }
-#lo{
-	padding: .35em .6em;
+#lo {
+	padding: 0 .6em;
+	height: 1.6em;
+	border-width: 0 0 2px 0;
 }
 #lo:hover, #lo:focus-visible,
 a:hover, a:focus-visible {
