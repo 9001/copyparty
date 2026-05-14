@@ -3985,7 +3985,10 @@ html.e #wrap.thin {
 		pointer-events: all;
 	}
 	#up_quick_more a {
-		padding: .6em;
+		padding: 1em;
+	}
+	#up_quick .overlay_plus {
+		right: 1em;
 	}
 	#s_nav .btn {
 		padding: .5em;
