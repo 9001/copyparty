@@ -3872,6 +3872,9 @@ html:not(.e) #wrap.thin #ghead:not(.noa)::after {
 	margin: -1.4em -0.5em -1.6em -1.4em;;
 	pointer-events: none;
 }
+html.a #wrap.thin #ghead:not(.noa)::after {
+	background: linear-gradient(to left, var(--bg), transparent);
+}
 html.e #wrap.thin {
 	.ghead {
 		top: 5.1em;
