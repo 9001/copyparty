@@ -401,6 +401,7 @@ if (1)
 		"fd_eperm": 'cannot delete:\nyou do not have “delete” permission in this folder',
 		"fc_eperm": 'cannot cut:\nyou do not have “move” permission in this folder',
 		"fp_eperm": 'cannot paste:\nyou do not have “write” permission in this folder',
+		"fp_esrch": 'cannot paste:\npasting disabled in search results',
 		"fr_emore": "select at least one item to rename",
 		"fd_emore": "select at least one item to delete",
 		"fc_emore": "select at least one item to cut",
@@ -5404,6 +5405,9 @@ var fileman = (function () {
 	};
 
 	r.paste = function (justgo) {
+		if (ebi('unsearch'))
+			return toast.err(3, L.fp_esrch)
+
 		if (!r.clip.length)
 			return toast.err(5, L.fp_ecut);
 
