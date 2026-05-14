@@ -6134,7 +6134,7 @@ window.thegrid = (function () {
 
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
-		'<div id="ghead" class="ghead">' +
+		'<div id="ghead" class="ghead normalrcm">' +
 			'<a href="#" id="listicon_template" class="grdbtn gb_lst svgIcon tgl btn" tt="' + L.wt_grid + '"></a>' +
 			'<a href="#" id="gridicon_template" class="grdbtn gb_grd svgIcon tgl btn on" tt="' + L.wt_grid + '"></a>' +
 			'<a href="#" id="galleryicon_template" class="grdbtn gb_glr svgIcon tgl btn" tt="' + L.wt_gallery + '"></a>' +
@@ -10851,7 +10851,8 @@ var rcm = (function () {
 	}
 
 	ebi('wrap').oncontextmenu = function (e) {
-		r.show(e);
+		if (!e.target.closest('.normalrcm'))
+			r.show(e);
 	};
 	menu.onblur = function () { setTimeout(r.hide) };
 
@@ -11084,7 +11085,7 @@ function reload_browser() {
 		try{
 			if (e.button !== 0 && e.type !== 'touchstart') return;
 			if (!thegrid.en || !treectl.dsel) return;
-			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a')) return;
+			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a,.modal,.normalrcm')) return;
 		}
 		catch(ex){
 			console.log(ex);
