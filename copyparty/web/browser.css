@@ -1211,6 +1211,8 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 }
 #widget.thin #trackname {
 	margin-right: auto;
+	width: stretch;
+	width: -moz-available;
 }
 
 #np_inf {
@@ -1506,6 +1508,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	text-overflow: ellipsis;
 	margin-left: .3em;
 	padding: 1.2em 0;
+	min-height: 1em;
 }
 #progbar {
 	display: none;
