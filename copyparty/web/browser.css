@@ -18,7 +18,7 @@
 	--btn-bg-a: rgba(128,128,128,0.15);
 	--btn-bg-a: color-mix(in oklab, var(--bg-max) 85%, var(--fg-max) 20%);
 	--btn-bg: rgba(128,128,128,0.15);
-	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a) 40%, transparent), color-mix(in oklab, var(--btn-bg-a)70%, var(--a-gray)));
+	--btn-bg: color-mix(in oklab, var(--bg-u5), transparent);
 	--btn-h-fg: var(--a-hil);
 	--btn-h-bg: color-mix(in oklab, var(--a-gray) 45%, var(--bg-max));
 	--btn-1-fg: var(--bg);
@@ -129,6 +129,7 @@ html.y {
 html.b {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
 
+	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a) 40%, transparent), color-mix(in oklab, var(--btn-bg-a)70%, var(--a-gray)));
 	--btn-bs: .1em .2em .1em var(--mp-sh);
 }
 html.bz {
@@ -141,7 +142,6 @@ html.by {
 html.a {
 	--btn-bs: 0 .05em 0 var(--bg-d3) inset;
 	--btn-1-bs: 0 .05em 0 var(--btn-1h-bg) inset;
-	--btn-bg: color-mix(in oklab, var(--bg-u5), transparent);
 
 	--tree-bg: var(--bg);
 
@@ -1708,6 +1708,7 @@ html.b #mu_outer {
 .opview.splitsub {
 	margin-bottom: 0;
 }
+#acc_cbopen:checked+span,
 .opview.act {
 	display: block;
 }
@@ -1814,6 +1815,9 @@ html.y #ops svg circle {
 }
 .pfp.placeholder {
 	text-shadow: 1px 1px 0 var(--bg-half), 1px -1px 0 var(--bg-half), -1px -1px 0 var(--bg-half), -1px 1px 0 var(--bg-half);
+}
+#op_acc:not(.act) {
+	display: none;
 }
 .opbox {
 	padding: .5em;
@@ -2209,7 +2213,9 @@ html.b .btn {
 	min-height: 1.4em;
 	white-space: nowrap;
 }
-#docul a:hover,
+#docul a:hover {
+	color: var(--btn-h-fg);
+}
 #tree .ntree a + a:hover {
 	background: var(--btn-h-bg);
 	color: var(--btn-h-fg);
@@ -2248,7 +2254,7 @@ html.b .btn {
 	white-space: nowrap;
 }
 #files th:hover .cfg {
-	display: block;
+	display: none;
 	width: 1em;
 	border-radius: var(--radius);
 	margin: -1.2em auto 0 auto;
@@ -2310,6 +2316,9 @@ html.b .btn {
 #au_osd_cv,
 #u2tdate {
 	opacity: .3;
+}
+.disabled {
+	cursor: default;
 }
 #up_quick.disabled {
 	display: none;
@@ -2504,10 +2513,16 @@ input[type="text"].invalid {
 #docul li.bn {
 	text-align: center;
 	padding: .5em;
+	white-space: normal;
 }
 #docul li.bn span {
-	font-weight: bold;
-	color: var(--fg-max);
+	color: var(--fg-weak);
+	vertical-align: center;
+	text-shadow: none;
+}
+#docul li a {
+	display: inline;
+	padding: 0 !important;
 }
 #doc.prism {
 	padding-left: 3em;
@@ -3513,7 +3528,7 @@ details .setting {
 details {
 	border: var(--bg-u3) solid 1px;
 	border-radius: var(--radius);
-	margin: .3em 0;
+	margin: .3em;
 }
 details:not(.open) .setting {
 	display: none;
@@ -5059,7 +5074,7 @@ html.e #wtc {
 	padding: 1em;
 	pointer-events: none;
 	transition: width .05s;
-	background: linear-gradient(to top, var(--bg-u2), transparent);
+	background: linear-gradient(to top, var(--bg-u2), color-mix(in oklab, var(--bg-u2) 80%, transparent), transparent);
 }
 .popup_button {
 	border-radius: var(--radius);
@@ -5080,6 +5095,9 @@ html.e #wtc {
 	font-size: medium;
 	margin-top: .3em;
 	text-align: right;
+}
+#opa_acc label {
+	cursor: pointer !important;
 }
 #ops input[type=submit],
 #ops #goh {

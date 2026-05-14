@@ -32,6 +32,9 @@
 	--bg-d3: #0b0b0b;
 
 	--bgg: var(--bg);
+
+	background: var(--bg);
+    color: var(--fg);
 }
 html.y {
 	color-scheme: light;

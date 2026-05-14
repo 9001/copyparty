@@ -1531,7 +1531,6 @@ ebi('rcm').innerHTML = (
 			ops[a].href = '#v=' + v;
 	}
 
-	ebi('opa_acc').appendChild(ebi('op_acc'));
 	ebi('op_acc').onclick = function (e){
 		e.stopPropagation();
 	};
@@ -1663,6 +1662,10 @@ function goto(dest) {
 
 window.onhashchange = function() {
 	console.log('hash change: ' + location.hash)
+	// keep it clean
+	if(location.hash == '')
+		hist_replace(location.pathname + location.search);
+
 	var a_modal = QS('.modal.vis');
 	if(location.hash.length <= 1 && a_modal){
 		modaltoggle(a_modal.id);
@@ -6187,6 +6190,10 @@ window.thegrid = (function () {
 
 	ebi('h_hidden').onclick = function () {
 		clmod(this.parentElement, 'open', 't');
+		if(!clgot(this.parentElement, 'open') && filecols.picking){
+			filecols.unpick();
+			clmod(ebi('hcolsh'), 'on', r.picking)
+		}
 	}
 
 	var r = {
@@ -8987,18 +8994,20 @@ function apply_perms(res) {
 		ebi('acc_pfp').innerHTML = acct.substring(0, 1);
 		ebi('accessType').innerHTML = '<span' + aclass + axs + L.access + '</span>';
 		ebi('blogout').value = L.logout;
-		ebi('acc_button').onclick = function(){};
 	}
 	else{
 		ebi('blogout').style.display = 'none';
 		ebi('acc_name').innerHTML = L.login;
 		ebi('acc_pfp').innerHTML = fun_tgl ? '👤' : 'acc';
-		ebi('acc_button').onclick = goHome;
 	}
 	clmod(ebi('acc_pfp'), 'placeholder', acct == '*');
 
-	var o = QSA('#ops>a[data-perm]');
+	var o = QSA('#ops>a');
 	for (var a = 0; a < o.length; a++) {
+		if(!o[a].hasAttribute('data-perm')){
+			clmod(o[a], 'disabled', false);
+			continue;
+		}
 		var display = '';
 		var enabled = true;
 		var needed = o[a].getAttribute('data-perm').split(' ');
