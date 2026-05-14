@@ -6966,12 +6966,10 @@ class HttpCli(object):
             elif not self.can_write:
                 return self.tx_404(True)
 
-        srv_name = ""
         srv_info = []
 
         try:
             if not self.args.nih:
-                srv_name = self.args.name_html
                 srv_info.append(self.args.name_html)
         except:
             self.log("#wow #whoa")
@@ -7085,7 +7083,8 @@ class HttpCli(object):
             "url_suf": url_suf,
             "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
             "srv_info": srv_infot,
-            "srv_name": srv_name,
+            "srv_name": "" if self.args.nih else self.args.name,
+            "srv_url": self.args.name_url if self.args.name_url else "/",
             "space_used_percent": space_used_percent,
             "space_free": h1,
             "space_total": h2,
