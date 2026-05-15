@@ -590,7 +590,7 @@ a, #blogout, #files tbody div a:last-child {
 	margin: -.2em;
 	text-shadow: 1px 1px 0px var(--bg-max);
 }
-#ops input[type=submit]:hover,
+input[type=submit]:hover,
 #goh:hover,
 a:hover {
 	color: var(--a-hil);
