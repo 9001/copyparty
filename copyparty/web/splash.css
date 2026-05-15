@@ -102,7 +102,7 @@ a {
 }
 #lo {
 	padding: 0 .6em;
-	height: 1.6em;
+	line-height: 1.8em;
 	border-width: 0 0 2px 0;
 }
 #lo:hover, #lo:focus-visible,

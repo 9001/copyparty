@@ -3100,6 +3100,8 @@ html.c .modalcontent {
 }
 .modal.vis.unmodal {
 	position: initial;
+	max-height: 50vh;
+
 	.modalcontent{
 		width: 100%;
 		max-width: none;
