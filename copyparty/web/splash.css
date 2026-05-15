@@ -346,10 +346,6 @@ html.z .num {
 }
 
 
-html.bz {
-	color: #bbd;
-	background: #11121d;
-}
 html.bz .vols img {
 	filter: sepia(0.8) hue-rotate(180deg);
 }
