@@ -43,6 +43,10 @@ var wah = '',
     APPLE = IPHONE || MACOS,
     APPLEM = TOUCH && APPLE;
 
+window.onpointerdown = function (e) {
+    TOUCH = e.pointerType === "touch";
+}
+
 if (!window.WebAssembly || !WebAssembly.Memory)
     window.WebAssembly = false;
 

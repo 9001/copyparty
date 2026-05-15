@@ -1697,12 +1697,6 @@ window.onhashchange = function() {
 }
 
 
-window.onpointerdown = function (e) {
-	TOUCH = e.pointerType === "touch"
-	console.log(e)
-}
-
-
 var m = SPINNER.split(','),
 	SPINNER_CSS = SPINNER.slice(1 + m[0].length);
 SPINNER = m[0];
