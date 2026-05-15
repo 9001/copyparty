@@ -4410,6 +4410,9 @@ html.e #h_music {
 	right: 0;
 	color: #fff;
 }
+html.e #wfp {
+	padding-left: .3em;
+}
 html.e details[open] summary:hover,
 html.e #files,
 html.e .tgl.btn.on:hover,
@@ -4868,6 +4871,7 @@ html.e #treepar {
   border-bottom: var(--border-dashed-black);
   margin-left: calc(2.1em - (1em - var(--negative-space))) !important;
 }
+html.e #wtico,
 html.e #ghead,
 html.e #op_acc,
 html.e #path,
@@ -4894,15 +4898,11 @@ html.e #tree_footer {
 	background: transparent;
 }
 html.e #wrap {
-  padding-right: var(--negative-space);
-  position: relative;
-  margin-right: 0;
-  margin-left: -10px;
-  margin-top: 0;
-  /*overflow-x: auto; fix for OOB table when screen space is limited (mobile), but removes sticky header*/
+	padding: 0;
 }
 html.e #pathBar {
 	padding: 0;
+	margin: 0;
 	top: 0;
 	background: var(--ttlbar);
 }
@@ -4931,16 +4931,6 @@ html.e #path *:last-child:is(i) {
 html.e .dir span::before {
   content: "📁";
 }
-/*
-html.e #hovertree:after {
-  color: red;
-  content: "BUGGY";
-html.ez #hovertree:after {
-  color: rgb(255 98 98);
-  content: "BUGGY";
-}
-}*/
-html.e #wtico,
 html.e #zip1 {
   box-shadow: 0 0 !important;
 }
@@ -4972,7 +4962,7 @@ html.e #repl {
 html.e #epi {
   text-align: center;
   text-wrap-mode: nowrap;
-  margin: 0px;
+  margin: .5em;
 }
 
 html.e #epi.logue:not(.mdo) {
