@@ -3113,7 +3113,7 @@ class AuthSrv(object):
 
                 try:
                     s_vfs, s_rem = vfs.get(
-                        s_vp, s_un, "r" in s_pr, "w" in s_pr, "m" in s_pr, "d" in s_pr
+                        s_vp, s_un, "r" in s_pr, "w" in s_pr, "m" in s_pr, "d" in s_pr, "g" in s_pr,
                     )
                 except Exception as ex:
                     t = "removing share [%s] by [%s] to [%s] due to %r"
