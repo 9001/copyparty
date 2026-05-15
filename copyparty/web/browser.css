@@ -4032,16 +4032,16 @@ html.e #wrap.thin {
 	}
 }
 
-@media (max-width: 40em) {
+@media (max-width: 31em) {
 	#ops a {
-		padding-left: .15em;
-		padding-right: .15em;
+		padding-left: .25em;
+		padding-right: .25em;
 	}
 	#srchfolder_div {
-		left: 2.8em;
+		left: 3.2em;
 	}
 }
-@media (max-width: 33em) {
+@media (max-width: 37em) {
 	#wfp #gon,
 	#wfp #gop {
 		display: none;
