@@ -1663,7 +1663,8 @@ class AuthSrv(object):
             for alias, mapping in [
                 ("h", "gh"),
                 ("G", "gG"),
-                ("A", "rwmda.A"),
+                ("r", "g"),
+                ("A", "rgwmda.A"),
             ]:
                 expanded = ""
                 for ch in mapping:

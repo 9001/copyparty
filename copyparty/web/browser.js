@@ -8032,13 +8032,22 @@ function apply_perms(res) {
 
 	a.style.display = '';
 	tt.att(QS('#ops'));
+	// read implies get, no need to show it
+	var displayed_perms = perms.slice(0);
+	var have_read = has(displayed_perms, 'read')
+	if (have_read) {
+		var get_index = displayed_perms.indexOf('get');
+		if (get_index > -1) {
+			displayed_perms.splice(get_index, 1);
+		}
+	}
 
 	for (var a = 0; a < chk.length; a++)
-		if (has(perms, chk[a]))
+		if (has(displayed_perms, chk[a]))
 			axs.push(chk[a].slice(0, 1).toUpperCase() + chk[a].slice(1));
 
 	axs = axs.join('-');
-	if (perms.length == 1) {
+	if (displayed_perms.length == 1) {
 		aclass = ' class="warn">';
 		axs += '-Only';
 	}
@@ -8080,7 +8089,6 @@ function apply_perms(res) {
 	document.body.setAttribute('perms', perms.join(' '));
 
 	var have_write = has(perms, "write"),
-		have_read = has(perms, "read"),
 		de = document.documentElement,
 		tds = QSA('#u2conf td');
 

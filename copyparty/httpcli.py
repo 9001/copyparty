@@ -6443,6 +6443,7 @@ class HttpCli(object):
         s_wr = "write" in req["perms"]
         s_get = "get" in req["perms"]
         s_dot = "dot" in req["perms"]
+        # will_read, will_write, will_move, will_del, will_get
         s_axs = [s_rd, s_wr, False, False, s_get]
         s_axsd = s_axs + [s_dot]
 
