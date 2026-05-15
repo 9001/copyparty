@@ -6312,7 +6312,7 @@ window.thegrid = (function () {
 	setsz();
 
 	function gclick1(e) {
-		if (ctrl(e) && !treectl.csel && !r.sel)
+		if (ctrl(e) && !treectl.csel && !r.sel && !r.tempsel)
 			return true;
 		else if (e.altKey){
 			ev(e);
@@ -6323,7 +6323,7 @@ window.thegrid = (function () {
 	}
 
 	function gclick2(e) {
-		if (ctrl(e) || !r.sel)
+		if (ctrl(e) || !r.sel && !r.tempsel)
 			return true;
 
 		return gclick.call(this, e, true);
@@ -6345,7 +6345,7 @@ window.thegrid = (function () {
 			td = oth.closest('td').nextSibling,
 			tr = td.parentNode;
 
-		if (r.sel && !dbl && !ctrl(e) || treectl.csel && (e.shiftKey || ctrl(e))) {
+		if ((r.sel || r.tempsel) && !dbl && !ctrl(e) || treectl.csel && (e.shiftKey || ctrl(e))) {
 			ev(e);
 			td.onclick.call(td, e);
 			if (e.shiftKey)
@@ -6399,6 +6399,7 @@ window.thegrid = (function () {
 		baguetteBox.hide();
 	};
 
+	r.tempsel = false;
 	r.loadsel = function () {
 		if (r.dirty)
 			return;
@@ -6697,8 +6698,11 @@ window.thegrid = (function () {
 		clmod(ggrid, 'noupscale', !v)
 	});
 	bcfg_bind(r, 'x3', 'grid3x', dth3x.endsWith('y'), r.set_x3);
-	bcfg_bind(r, 'sel', 'gridsel', false, function () {
-		clmod(ebi('gridsel'), 'temp', false);
+	bcfg_bind(r, 'sel', 'gridsel', false, function (e) {
+		if (r.tempsel) {
+			r.tempsel = false;
+			clmod(ebi('gridsel'), 'temp', false);
+		}
 		r.loadsel();
 	});
 	bcfg_bind(r, 'en', 'griden', dgrid, function (v) {
@@ -9750,7 +9754,7 @@ var msel = (function () {
 		var tr = this.parentNode,
 			id = tr2id(tr);
 
-		if ((treectl.csel || !thegrid.en || thegrid.sel) && e.shiftKey && r.so && id && r.so != id) {
+		if ((treectl.csel || !thegrid.en || thegrid.sel || thegrid.tempsel) && e.shiftKey && r.so && id && r.so != id) {
 			var o1 = -1, o2 = -1;
 			for (a = 0; a < r.all.length; a++) {
 				var ai = r.all[a].id;
@@ -9787,8 +9791,8 @@ var msel = (function () {
 		}
 		r.selui();
 
-		if (TOUCH && thegrid.sel && msel.getsel().length == 0 && clgot(ebi('gridsel'), 'on') == false){
-			thegrid.sel = false;
+		if (thegrid.tempsel && msel.getsel().length == 0){
+			thegrid.tempsel = false;
 			clmod(ebi('gridsel'), 'temp', false);
 		}
 	};
@@ -10803,12 +10807,10 @@ var rcm = (function () {
 		shr.innerHTML = has_sel ? L.rc_shs : L.rc_shf;
 
 		clmod(menu, 'large', TOUCH);
-		if (TOUCH) {
-			if (target && !forceopen){
-				thegrid.sel = true;
-				clmod(ebi('gridsel'), 'temp', true);
-				return;
-			}
+		if (TOUCH && target && !forceopen && !thegrid.sel){
+			thegrid.tempsel = true;
+			clmod(ebi('gridsel'), 'temp', true);
+			return;
 		}
 		var vh = document.documentElement.clientHeight;
 		var vw = document.documentElement.clientWidth;
