@@ -251,6 +251,8 @@ html.cy {
 	--g-sel-fg: #fff;
 	--g-sel-bg: #aaa;
 	--g-fsel-bg: #aaa;
+
+	--scrl-hint: #f00;
 }
 html.dz {
 	--fg: #4d4;
@@ -3772,6 +3774,12 @@ html.ay #u2cards a.act {
 
 
 
+html.cy .pfp {
+	color: #f00;
+}
+html.cy #path a:hover {
+	color: #f00;
+}
 html.cy .mdo a {
 	background: #f00;
 }
@@ -3780,7 +3788,7 @@ html.cy #acc_info a,
 html.cy #files,
 html.cy #files a,
 html.cy #files tbody div a:last-child {
-	color: #000;
+	color: #f00;
 }
 html.cy #u2tab a,
 html.cy #u2cards a {
