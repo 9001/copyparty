@@ -10843,7 +10843,7 @@ var rcm = (function () {
 	r.hide = function (force) {
 		if (!menu.style.display || (!force && menu.contains(document.activeElement)))
 			return;
-		if (selFile.elem && !selFile.no_dsel) {
+		if (selFile.elem && !selFile.no_dsel && !thegrid.tempsel) {
 			clmod(selFile.elem, "sel", false);
 			msel.selui();
 		}
