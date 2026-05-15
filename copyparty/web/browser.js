@@ -6701,7 +6701,10 @@ window.thegrid = (function () {
 		clmod(ggrid, 'noupscale', !v)
 	});
 	bcfg_bind(r, 'x3', 'grid3x', dth3x.endsWith('y'), r.set_x3);
-	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
+	bcfg_bind(r, 'sel', 'gridsel', false, function () {
+		clmod(ebi('gridsel'), 'temp', false);
+		r.loadsel();
+	});
 	bcfg_bind(r, 'en', 'griden', dgrid, function (v) {
 		v ? loadgrid() : r.setvis(true);
 		pbar.onresize();
@@ -9699,6 +9702,8 @@ var msel = (function () {
 	};
 
 	r.loadsel = function (vp, sel) {
+		clmod(ebi('gridsel'), 'temp', false);
+
 		if (!sel || !r.so || !ebi(r.so))
 			r.so = r.pr = null;
 
@@ -9785,6 +9790,11 @@ var msel = (function () {
 			r.origin_tr(tr);
 		}
 		r.selui();
+
+		if (MOBILE && thegrid.sel && msel.getsel().length == 0 && clgot(ebi('gridsel'), 'on') == false){
+			thegrid.sel = false;
+			clmod(ebi('gridsel'), 'temp', false);
+		}
 	};
 	r.origin_tr = function (tr) {
 		r.so = tr2id(tr);
@@ -10796,8 +10806,13 @@ var rcm = (function () {
 		clmod(shr, 'hide', !can_shr || !get_evpath().indexOf(have_shr));
 		shr.innerHTML = has_sel ? L.rc_shs : L.rc_shf;
 
-		if(MOBILE){
+		if (MOBILE) {
 			clmod(menu, 'large', true);
+			if (target && !forceopen){
+				thegrid.sel = true;
+				clmod(ebi('gridsel'), 'temp', true);
+				return;
+			}
 		}
 		var vh = document.documentElement.clientHeight;
 		var vw = document.documentElement.clientWidth;
@@ -10838,19 +10853,24 @@ var rcm = (function () {
 		menu.style.display = '';
 	}
 
+	var forceopen;
 	r.show = function (e) {
 		if (!r.enabled || e.shiftKey || (r.double && menu.style.display) || /doc=/.exec(location.search)) {
 			r.hide(true);
 			return true;
 		}
+		var gfile = thegrid.en && e.target && e.target.closest('#ggrid > a');
+		var target = gfile || e.target;
+
 		r.hide(true);
+		if (MOBILE)
+			forceopen = !gfile || clgot(gfile, 'sel');
 		if (selFile.elem && !selFile.no_dsel) {
 			clmod(selFile.elem, "sel", false);
 			msel.selui();
 		}
 		ev(e);
-		var gfile = thegrid.en && e.target && e.target.closest('#ggrid > a');
-		show(e.clientX, e.clientY, gfile || e.target, gfile);
+		show(e.clientX, e.clientY, target, gfile);
 		return false;
 	}
 
