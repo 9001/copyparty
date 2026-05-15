@@ -1769,6 +1769,7 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-pre-rl", metavar="SEC", type=int, default=30, help="while pregen is running, ratelimit the thumbnailer logger to one message every \033[33mSEC\033[0m seconds (only works with \033[33m-j1\033[0m); set 0 to disable ratelimit")
     ap2.add_argument("--th-covers", metavar="N,N", type=u, default="folder.png,folder.jpg,cover.png,cover.jpg", help="folder thumbnails to stat/look for; enabling \033[33m-e2d\033[0m will make these case-insensitive, and try them as dotfiles (.folder.jpg), and also automatically select thumbnails for all folders that contain pics, even if none match this pattern")
     ap2.add_argument("--th-spec-p", metavar="N", type=u, default=1, help="for music, do spectrograms or embedded coverart? [\033[32m0\033[0m]=only-art, [\033[32m1\033[0m]=prefer-art, [\033[32m2\033[0m]=only-spec")
+    ap2.add_argument("--th-spec-fl", action="store_true", help="generate spectrograms with logarithmic frequency scale instead of linear")
     # https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
     # https://github.com/libvips/libvips
     # https://stackoverflow.com/a/47612661
