@@ -929,18 +929,18 @@ ebi('widget').innerHTML = (
 		'<span id="wfs"></span>' +
 			'<span id="wfm"><a' +
 				' href="#" id="fshr" tt="' + L.wt_shr + '">📨<span>share</span></a><a' +
-				' href="#" id="fren" tt="' + L.wt_ren + '">✎<span>name</span></a><a' +
+				' href="#" id="fren" tt="' + L.wt_ren + '">' + (fun_tgl ? '✏️' : '✎') + '<span>name</span></a><a' +
 				' href="#" id="fdel" tt="' + L.wt_del + '">🗑️<span>del.</span></a><a' +
-				' href="#" id="fcut" tt="' + L.wt_cut + '">✂<span>cut</span></a><a' +
+				' href="#" id="fcut" tt="' + L.wt_cut + '">' + (fun_tgl ? '✂️' : '✂') + '<span>cut</span></a><a' +
 				' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
 				' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
 			'</span><span id="wzip1"><a' +
 				' href="#" id="zip1" tt="' + L.wt_zip1 + '">' + (fun_tgl ? '⬇️📦' : 'download') + '<span>zip</span></a>' +
 			'</span><span id="wzip"><a' +
-				' href="#" id="selall" tt="' + L.wt_selall + '">sel.<br />all</a><a' +
-				' href="#" id="selinv" tt="' + L.wt_selinv + '">sel.<br />inv.</a><a' +
-				' href="#" id="selzip" class="l1" tt="' + L.wt_selzip + '">⬇️zip</a><a' +
-				' href="#" id="seldl" class="l1" tt="' + L.wt_seldl + '">⬇️files</a>' +
+				' href="#" id="selall" tt="' + L.wt_selall + '">' + (fun_tgl ? '✅<br/>sel. ' : 'sel.<br/>') + 'all</a><a' +
+				' href="#" id="selinv" tt="' + L.wt_selinv + '">' + (fun_tgl ? '🔛<br/>sel. ' : 'sel.<br/>') + 'inv.</a><a' +
+	' href="#" id="selzip" class="l1" tt="' + L.wt_selzip + '">' + (fun_tgl ? '📦<br/>' : '') + 'zip</a><a' +
+				' href="#" id="seldl" class="l1" tt="' + L.wt_seldl + '">' + (fun_tgl ? '⬇️<br/>' : '') + 'files</a>' +
 			'</span><span id="wnp"><a' +
 				' href="#" id="npirc" tt="' + L.wt_npirc + '">📋<span>irc</span></a><a' +
 				' href="#" id="nptxt" tt="' + L.wt_nptxt + '">📋<span>txt</span></a>' +
@@ -1495,31 +1495,31 @@ QS('#op_msg input[type="submit"]').value = L.ab_msg;
 
 // right-click menu
 ebi('rcm').innerHTML = (
-	'<a href="#" id="ropn">' + L.rc_opn + '</a>' +
-	'<a href="#" id="rply">' + L.rc_ply + '</a>' +
-	'<a href="#" id="rpla">' + L.rc_pla + '</a>' +
-	'<a href="#" id="rtxt">' + L.rc_txt + '</a>' +
-	'<a href="#" id="rmd">' + L.rc_md + '</a>' +
+	'<a href="#" id="ropn">' + (fun_tgl ? '↗️ ' : '') + L.rc_opn + '</a>' +
+	'<a href="#" id="rply">' + (fun_tgl ? '▶ ' : '') + L.rc_ply + '</a>' +
+	'<a href="#" id="rpla">' + (fun_tgl ? '🎧 ' : '') + L.rc_pla + '</a>' +
+	'<a href="#" id="rtxt">' + (fun_tgl ? '📄 ' : '') + L.rc_txt + '</a>' +
+	'<a href="#" id="rmd">' + (fun_tgl ? '📜 ' : '') + L.rc_md + '</a>' +
 	'<div id="rs1" class="sep"></div>' +
-	'<a href="#" id="rcpl">' + L.rc_cpl + '</a>' +
-	'<a href="#" id="rdl">' + L.rc_dl + '</a>' +
+	'<a href="#" id="rcpl">' + (fun_tgl ? '🔗 ' : '') + L.rc_cpl + '</a>' +
+	'<a href="#" id="rdl">' + (fun_tgl ? '⬇️ ' : '') + L.rc_dl + '</a>' +
 	(have_zip ?
-		'<a href="#" id="rzip">' + L.rc_zip + '</a>'
+		'<a href="#" id="rzip">' + (fun_tgl ? '📦 ' : '') + L.rc_zip + '</a>'
 	: '') +
 	'<div id="rs2" class="sep"></div>' +
-	(have_del ? '<a href="#" id="rdel">' + L.rc_del + '</a>' : '') +
-	(have_mv ? '<a href="#" id="rcut">' + L.rc_cut + '</a>' : '') +
-	'<a href="#" id="rcpy">' + L.rc_cpy + '</a>' +
+	(have_del ? '<a href="#" id="rdel">' + (fun_tgl ? '🗑️ ' : '') + L.rc_del + '</a>' : '') +
+	(have_mv ? '<a href="#" id="rcut">' + (fun_tgl ? '✂️ ' : '') + L.rc_cut + '</a>' : '') +
+	'<a href="#" id="rcpy">' + (fun_tgl ? '⧉ ' : '') + L.rc_cpy + '</a>' +
 	(has(perms, "write") ?
-		'<a href="#" id="rpst">' + L.rc_pst + '</a>' +
-		(have_mv ? '<a href="#" id="rrnm">' + L.rc_rnm + '</a>' : '') +
+		'<a href="#" id="rpst">' + (fun_tgl ? '📋 ' : '') + L.rc_pst + '</a>' +
+		(have_mv ? '<a href="#" id="rrnm">' + (fun_tgl ? '✏️ ' : '') + L.rc_rnm + '</a>' : '') +
 		'<div id="rs3" class="sep"></div>' +
-		'<a href="#" id="rnfo">' + L.rc_nfo + '</a>' +
-		'<a href="#" id="rnfi">' + L.rc_nfi + '</a>'
+		'<a href="#" id="rnfo">' + (fun_tgl ? '📁 ' : '') + L.rc_nfo + '</a>' +
+		'<a href="#" id="rnfi">' + (fun_tgl ? '📄 ' : '') + L.rc_nfi + '</a>'
 	: '') +
 	'<div id="rs4" class="sep"></div>' +
-	'<a href="#" id="rsal">' + L.rc_sal + '</a>' +
-	'<a href="#" id="rsin">' + L.rc_sin + '</a>' +
+	'<a href="#" id="rsal">' + (fun_tgl ? '✅ ' : '') + L.rc_sal + '</a>' +
+	'<a href="#" id="rsin">' + (fun_tgl ? '🔛 ' : '') + L.rc_sin + '</a>' +
 	'<a id="rshr" href="#"></a>'
 );
 
@@ -9602,7 +9602,7 @@ var arcfmt = (function () {
 			o.setAttribute("href", m[1] + arg + m[4]);
 			o.textContent = fmt.split('_')[0];
 		}
-		ebi('selzip').textContent = '⬇️' + fmt.split('_')[0];
+		ebi('selzip').innerHTML = (fun_tgl ? '📦<br />' : '') + fmt.split('_')[0];
 		ebi('selzip').setAttribute('fmt', arg);
 
 		QS('#zip1 span').textContent = fmt.split('_')[0];
