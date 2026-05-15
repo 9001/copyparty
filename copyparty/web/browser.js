@@ -4844,7 +4844,7 @@ var fileman = (function () {
 
 			var vsp = vsplit(vp);
 			if (base != vsp[0])
-				return toast.err(0, esc('bug:\n' + base + '\n' + vsp[0]));
+				return toast.err(0, esc('batch rename not allowed for differing file paths:\n' + base + '\n' + vsp[0]));
 
 			var vars = ft2dict(ebi(sel[a].id).closest('tr'));
 			mkeys = [".n.d", ".n.s"].concat(vars[1], vars[2]);
