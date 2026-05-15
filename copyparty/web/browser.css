@@ -2994,8 +2994,6 @@ html.c .modalcontent {
 	right: 0;
 	margin: .3em;
 	color: var(--fg);
-	box-shadow: 0 0 .3em var(--mp-sh);
-	border: 1px solid var(--bg-u3);
 	height: 1.8em;
 	aspect-ratio: 1 / 1;
 	text-align: center;
@@ -4404,6 +4402,13 @@ html.e .modalcontent {
 }
 html.e .divider {
 	background: var(--fg);
+}
+html.e #s_nav .sub::before {
+	background: var(--fg);
+}
+html.e #h_music {
+	right: 0;
+	color: #fff;
 }
 html.e details[open] summary:hover,
 html.e #files,
