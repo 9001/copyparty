@@ -1697,6 +1697,12 @@ window.onhashchange = function() {
 }
 
 
+window.onpointerdown = function (e) {
+	TOUCH = e.pointerType === "touch"
+	console.log(e)
+}
+
+
 var m = SPINNER.split(','),
 	SPINNER_CSS = SPINNER.slice(1 + m[0].length);
 SPINNER = m[0];
@@ -2982,10 +2988,8 @@ var vbar = (function () {
 		if (e.button === 0)
 			ebi('pvolbg').onmousemove = can.onmousemove = null;
 	};
-	if (TOUCH) {
-		ebi('pvolbg').ontouchstart = can.ontouchstart = mousedown;
-		ebi('pvolbg').ontouchmove = can.ontouchmove = mousemove;
-	}
+	ebi('pvolbg').ontouchstart = can.ontouchstart = mousedown;
+	ebi('pvolbg').ontouchmove = can.ontouchmove = mousemove;
 	var mute = ebi('pvolbg').children[0];
 	mute.onclick = function (e) {
 		ev(e);
@@ -3177,32 +3181,30 @@ function mpause(e) {
 		seek_au_mul(this.value);
 	}
 
-	if (!TOUCH) {
-		bar.onwheel = function (e) {
-			var dist = Math.sign(e.deltaY) * 10;
-			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
-				dist = e.deltaY;
+	bar.onwheel = function (e) {
+		var dist = Math.sign(e.deltaY) * 10;
+		if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
+			dist = e.deltaY;
 
-			if (!dist || !mp.au)
-				return true;
+		if (!dist || !mp.au)
+			return true;
 
-			seek_au_rel(dist);
-			ev(e);
-		};
-		ebi('pvolbg').onwheel = function (e) {
-			var dist = Math.sign(e.deltaY) * 10;
-			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
-				dist = e.deltaY;
+		seek_au_rel(dist);
+		ev(e);
+	};
+	ebi('pvolbg').onwheel = function (e) {
+		var dist = Math.sign(e.deltaY) * 10;
+		if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
+			dist = e.deltaY;
 
-			if (!dist)
-				return true;
+		if (!dist)
+			return true;
 
-			dist *= -1;
-			mp.setvol(Math.round((mp.vol + dist / 250) * 100) / 100 );
-			vbar.draw();
-			ev(e);
-		};
-	}
+		dist *= -1;
+		mp.setvol(Math.round((mp.vol + dist / 250) * 100) / 100 );
+		vbar.draw();
+		ev(e);
+	};
 })();
 
 
@@ -9791,7 +9793,7 @@ var msel = (function () {
 		}
 		r.selui();
 
-		if (MOBILE && thegrid.sel && msel.getsel().length == 0 && clgot(ebi('gridsel'), 'on') == false){
+		if (TOUCH && thegrid.sel && msel.getsel().length == 0 && clgot(ebi('gridsel'), 'on') == false){
 			thegrid.sel = false;
 			clmod(ebi('gridsel'), 'temp', false);
 		}
@@ -10806,8 +10808,8 @@ var rcm = (function () {
 		clmod(shr, 'hide', !can_shr || !get_evpath().indexOf(have_shr));
 		shr.innerHTML = has_sel ? L.rc_shs : L.rc_shf;
 
-		if (MOBILE) {
-			clmod(menu, 'large', true);
+		clmod(menu, 'large', TOUCH);
+		if (TOUCH) {
 			if (target && !forceopen){
 				thegrid.sel = true;
 				clmod(ebi('gridsel'), 'temp', true);
@@ -10863,7 +10865,7 @@ var rcm = (function () {
 		var target = gfile || e.target;
 
 		r.hide(true);
-		if (MOBILE)
+		if (TOUCH)
 			forceopen = !gfile || clgot(gfile, 'sel');
 		if (selFile.elem && !selFile.no_dsel) {
 			clmod(selFile.elem, "sel", false);
