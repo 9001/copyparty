@@ -5347,6 +5347,9 @@ html.fz {
 		opacity: .4;
     	filter: brightness(50%) contrast(300%) saturate(0);
 	}
+	#srv_name {
+		padding-top: .7em;
+	}
 }
 html.fy {
 	--a: #305797;
