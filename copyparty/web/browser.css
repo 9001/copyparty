@@ -1861,10 +1861,6 @@ html.y #ops svg circle {
 input[type=color] {
 	vertical-align: bottom;
 }
-.opview select {
-	padding: .3em;
-	margin: .2em 0	;
-}
 .opview input.err {
 	color: var(--err-fg);
 	background: var(--err-bg);
@@ -3935,6 +3931,11 @@ html.e #wrap.thin {
 		padding-top: .9em;
 		padding-bottom: .6em;
 		margin-left: 2.9em;
+	}
+	html.fz #srv_name {
+		padding-top: 1.1em !important;
+		padding-bottom: .6em;
+		margin-left: 3.2em !important;
 	}
 	#widget, #wrap {
 		margin-left: 0 !important;
