@@ -104,6 +104,7 @@ a {
 	padding: 0 .6em;
 	line-height: 1.8em;
 	border-width: 0 0 2px 0;
+	max-height: 30px;
 }
 #lo:hover, #lo:focus-visible,
 a:hover, a:focus-visible {
@@ -220,11 +221,11 @@ table {
 .agr br {
 	display: none;
 }
-#lo,
 .agr a,
 .agr form {
 	margin: 0 .5em 0 0;
-	line-height: 2.5em;
+	line-height: 1.3em;
+    display: inline-block;
 }
 .agr form,
 .agr input {
@@ -232,7 +233,6 @@ table {
 	padding: 0;
 	margin: 0;
 }
-#lo,
 .agr input {
 	line-height: 1em;
 	font-weight: normal;
