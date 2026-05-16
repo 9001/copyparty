@@ -5333,6 +5333,9 @@ html.f {
 	#widget:not(.thin) #pvol {
 		border-color: var(--a-dark);
 	}
+	#files tbody td:nth-child(3) {
+		font-size: .8em;
+	}
 }
 html.fz {
 	--bg: #2e258c;
