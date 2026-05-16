@@ -3919,7 +3919,7 @@ html.e #wrap.thin {
 		top: 7.2em;
 		padding-left: 1em;
 	}
-	.ntree a + a {
+	html:not(.f) .ntree a + a {
 		padding: .6em .2em;
 	}
 	#files tbody a {
@@ -3931,7 +3931,7 @@ html.e #wrap.thin {
 	html:not(.e) #treeToggleBtn {
 		margin: .8em;
 	}
-	html:not(.e) #srv_name {
+	html:not(.e):not(.f) #srv_name {
 		padding-top: .9em;
 		padding-bottom: .6em;
 		margin-left: 2.9em;
@@ -5293,12 +5293,12 @@ html.f {
 	}
 	.hl::after {
 		content: "";
-		left: calc(100% - 2.3em - 3px);
+		left: calc(100% - 2.7em);
 		margin-top: -.3em;
 		z-index: -1;
 		position: absolute;
 		border: solid;
-		border-width: 2em 2em 0 0;
+		border-width: 2em 2em 0 .2em;
   		border-color: var(--btn-1-bg) transparent transparent var(--btn-1-bg);
 	}
 	.hl:hover::after {
@@ -5416,6 +5416,7 @@ html.fy {
 	}
 	.close:hover {
 		background: rgb(207, 22, 28);
+		color: var(--fg);
 	}
 	#up2k,
 	#files {
