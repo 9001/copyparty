@@ -2099,7 +2099,7 @@ var mpl = (function () {
 			set_loaded(o, false);
 			o.setAttribute('src', url);
 
-			o = QS('html.b #music');
+			o = QS('html.b #music, html.f #music');
 			if (o)
 				o.style.background = "url('" + url + "') no-repeat center / cover";
 		}
@@ -9465,7 +9465,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['flat dark', 'flat light', 'fancy dark', 'fancy light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', ];
+			names = ['flat dark', 'flat light', 'fancy dark', 'fancy light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'poison', 'wing', ];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));

@@ -1900,7 +1900,7 @@ def add_og(ap):
 
 
 def add_ui(ap, retry: int):
-    THEMES = 10
+    THEMES = 12
     ap2 = ap.add_argument_group("ui options")
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
     ap2.add_argument("--no-gsel", action="store_true", help="ctrl-click in gridview will open-in-new-tab instead of select-file (volflag=-gsel)")
