@@ -5336,6 +5336,15 @@ html.f {
 	#files tbody td:nth-child(3) {
 		font-size: .8em;
 	}
+	#h_music {
+		right: 0;
+	}
+	#h_music::after {
+		right: 6em;
+	}
+	#cfg_mu {
+		margin: .1em;
+	}
 }
 html.fz {
 	--bg: #2e258c;
@@ -5352,6 +5361,11 @@ html.fz {
 	}
 	#srv_name {
 		padding-top: .7em;
+	}
+	#up_status_h {
+		color: var(--bg-u2);
+		text-shadow: none;
+    	font-size: large;
 	}
 }
 html.fy {
@@ -5390,6 +5404,10 @@ html.fy {
 	.modalheader {
 		border-bottom: #f3f3f3 solid 1px;
 		color: #f3f3f3;
+	}
+	#up_status_h {
+		border: none;
+    	font-size: large;
 	}
 	.close:not(:hover) {
 		background: none;
@@ -5510,9 +5528,15 @@ html.fy {
 		position: fixed;
 		z-index: -1;
 		right: 10px;
+		filter: blur(3px);
+		opacity: .9;
 	}
 	#qs_btns a {
 		color: var(--bg-u2);
+	}
+	#cfg_mu:not(:hover) {
+		background: none;
+		border-color: transparent;
 	}
 }
 html.f.unfun {
