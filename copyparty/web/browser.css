@@ -5296,7 +5296,7 @@ html.f {
 		line-height: 1.45em;
 	}
 	.hl {
-		width: calc(100% - 4.5em);
+		width: calc(100% - 4.7em);
 	}
 	.hl::after {
 		content: "";
@@ -5542,6 +5542,9 @@ html.fy {
 	#cfg_mu:not(:hover) {
 		background: none;
 		border-color: transparent;
+	}
+	#doc {
+		background: var(--bg);
 	}
 }
 html.f.unfun {

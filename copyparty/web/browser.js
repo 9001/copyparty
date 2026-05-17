@@ -6405,6 +6405,7 @@ window.thegrid = (function () {
 			return;
 
 		var ths = QSA('#ggrid>a');
+		var anysel = false;
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var ref = ths[a].getAttribute('ref');
@@ -6414,7 +6415,10 @@ window.thegrid = (function () {
 			ths[a].className = cl;
 
 			var chk = ths[a].getElementsByTagName('input')[0];
-			if(chk) chk.checked = cl.match(/\bsel\b/);
+			if(chk) {
+				chk.checked = cl.match(/\bsel\b/);
+				anysel = anysel || chk.checked;
+			}
 		}
 
 		var sp = ['unsearch', 'moar'];
@@ -6427,6 +6431,9 @@ window.thegrid = (function () {
 						ebi(sp[a]).click();
 					};
 			})(a);
+
+		r.tempsel = TOUCH && anysel;
+		clmod(ebi('gridsel'), 'temp', r.tempsel);
 	};
 
 	r.tippen = function () {
