@@ -3955,6 +3955,12 @@ html.e #wrap.thin {
 		top: 1em;
 		right: 1em;
 	}
+	html.fy {
+		#actionsArea,
+		#pathBar.thin #actionsArea {
+			right: 0;
+		}
+	}
 	#folder_search {
 		margin: .5em 1em 0 .2em;
 	}
@@ -5451,9 +5457,6 @@ html.fy {
 		padding: 0;
 		background: var(--bg-u2);
 		border-bottom: var(--btn-bb);
-	}
-	.thin #pathBar {
-		margin-right: -1.3em;
 	}
 	#ops,
 	#path,
