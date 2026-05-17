@@ -467,6 +467,11 @@ class ThumbSrv(object):
         zs = "th_dec th_no_webp th_no_jpg"
         for zs in zs.split(" "):
             ret.append("%s(%s)\n" % (zs, getattr(self.args, zs)))
+        zs = "th_spec_fl"
+        for zs in zs.split(" "):
+            v = getattr(self.args, zs)
+            if v:
+                ret.append("%s(%s)\n" % (zs, v))
         zs = "th_qv th_qvx thsize th_spec_p convt"
         for zs in zs.split(" "):
             ret.append("%s(%s)\n" % (zs, vn.flags.get(zs)))
