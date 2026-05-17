@@ -5546,6 +5546,9 @@ html.fy {
 	#doc {
 		background: var(--bg);
 	}
+	.logue {
+		color: var(--a);
+	}
 }
 html.f.unfun {
 	#ops a {

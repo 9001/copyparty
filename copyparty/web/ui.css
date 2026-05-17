@@ -486,11 +486,10 @@ textarea:focus {
 .mdo pre,
 .mdo code,
 .mdo a {
-	color: #480;
 	background: #f7f7f7;
 	border: .07em solid #ddd;
 	border-radius: .2em;
-	padding: .1em .3em;
+	padding: 0 .3em;
 	margin: 0 .1em;
 }
 .mdo pre,
@@ -593,8 +592,7 @@ html.y .mdo a>code {
 	line-height: 1.1em;
 }
 .mdo pre code:hover {
-	background: #fec;
-	color: #360;
+	background: #ddd;
 }
 .mdo table {
 	border-collapse: collapse;
@@ -666,7 +664,7 @@ hr {
 	}
 	html.z .mdo pre,
 	html.z .mdo code {
-		color: #8c0;
+		color: rgb(209, 209, 209);
 		background: #1a1a1a;
 		border: .07em solid #333;
 	}
