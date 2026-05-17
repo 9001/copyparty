@@ -9702,8 +9702,6 @@ var msel = (function () {
 	};
 
 	r.loadsel = function (vp, sel) {
-		clmod(ebi('gridsel'), 'temp', false);
-
 		if (!sel || !r.so || !ebi(r.so))
 			r.so = r.pr = null;
 
