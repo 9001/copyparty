@@ -4995,6 +4995,9 @@ html.e #detree {
 html.e #wtc {
 	margin: -.2em 0 -.5em .1em;
 }
+html.e #actionsArea {
+	margin-right: .5em;
+}
 
 #rcm {
 	position: fixed;
@@ -5352,6 +5355,12 @@ html.f {
 	#u2tab tbody tr:hover td {
 		background: transparent;
 	}
+	#op_unpost a {
+		border-bottom: solid 1px var(--a);
+	}
+	#op_unpost a:not(:hover) {
+		color: color-mix(in oklab, var(--a), var(--fg));
+	}
 }
 html.fz {
 	--bg: #2e258c;
@@ -5365,6 +5374,7 @@ html.fz {
 		background-image: url("data:image/svg+xml,%3C!-- svg: first layer --%3E%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 		opacity: .4;
     	filter: brightness(50%) contrast(300%) saturate(0);
+		z-index: -1;
 	}
 	#srv_name {
 		padding-top: .7em;
@@ -5454,11 +5464,13 @@ html.fy {
 	#srv_name {
 		line-height: 1.4em;
 	}
-	.opbox:not(#op_bup),
-	#pathBar {
-		padding: 0;
+	#pathBar,
+	.opbox:not(#op_bup) {
 		background: var(--bg-u2);
 		border-bottom: var(--btn-bb);
+	}
+	#pathBar {
+		padding: 0;
 	}
 	#ops,
 	#path,

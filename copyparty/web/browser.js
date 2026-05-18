@@ -846,7 +846,6 @@ if(!fun_tgl){
 	ebi('opa_msg').innerHTML = 'message'
 	ebi('opa_cfg').innerHTML = 'settings'
 	ebi('acc_pfp').innerHTML = 'account'
-	clmod(ebi('acc_pfp'), 'pfp', false)
 }
 
 // mkdir + md
