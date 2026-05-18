@@ -5361,6 +5361,15 @@ html.f {
 	#op_unpost a:not(:hover) {
 		color: color-mix(in oklab, var(--a), var(--fg));
 	}
+	#u2c3t span {
+		font-size: .8em;
+	}
+	#u2cards span {
+		font-size: .8em;
+	}
+	#goh {
+		font-size: 1.2em;
+	}
 }
 html.fz {
 	--bg: #2e258c;
@@ -5428,12 +5437,13 @@ html.fy {
 	}
 	.close:not(:hover) {
 		background: none;
-		border: none;
+		border-color: transparent;
 		font-weight: bolder;
+		color: #f3f3f3;
 	}
 	.close:hover {
 		background: rgb(207, 22, 28);
-		color: var(--fg);
+		color: #f3f3f3;
 	}
 	#up2k,
 	#files {
