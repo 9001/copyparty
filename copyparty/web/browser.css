@@ -5349,6 +5349,9 @@ html.f {
 	#cfg_mu {
 		margin: .1em;
 	}
+	#u2tab tbody tr:hover td {
+		background: transparent;
+	}
 }
 html.fz {
 	--bg: #2e258c;
