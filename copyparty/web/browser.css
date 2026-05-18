@@ -2015,7 +2015,7 @@ input.ssconf_v {
 
 #wrap {
 	padding:  0 .6em 10em .6em;
-	min-height: 70vh;
+	min-height: calc(100vh - 10em);
 }
 #tree {
 	display: none;
