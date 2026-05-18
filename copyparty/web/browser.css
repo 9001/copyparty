@@ -452,9 +452,6 @@ html, body {
 	margin: 0;
 	padding: 0;
 }
-.noscroll {
-	overflow: hidden;
-}
 pre, code, tt, #doc, #doc>code {
 	font-family: 'scp', monospace, monospace;
 	font-family: var(--font-mono), 'scp', monospace, monospace;
