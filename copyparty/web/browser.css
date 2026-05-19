@@ -584,9 +584,10 @@ a, #blogout, #files tbody div a:last-child {
 }
 #goh,
 #blogout {
-	margin: -.2em;
+	margin: -.1em;
 	text-shadow: 1px 1px 0px var(--bg-max);
 }
+#blogout:hover,
 input[type=submit]:hover,
 #goh:hover,
 a:hover {
@@ -3751,7 +3752,7 @@ html.a .ghead {
 	padding: .2em 0;
 	border-bottom: var(--btn-bb);
 	border-radius: 0;
-	margin: 0 -.5em;
+	margin: 0 -.5em 1.5em -.5em;
 	padding-left: .5em;
 	padding-right: .5em;
 }
