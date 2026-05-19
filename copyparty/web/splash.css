@@ -304,27 +304,12 @@ form {
 	flex-direction: column;
 	margin: auto;
 }
-#lp {
-	margin: 1em 0;
+input {
+	margin: 1em 0 0 0;
 	background: none;
 	padding: .5em;
-}
-#lp::placeholder {
-	font-size: medium;
-}
-#x,
-input {
-	color: #fff;
-	background: rgb(39, 130, 204);
 	border-color: rgb(72, 182, 255);
 	border-radius: .3em;
-	padding: .4em .6em;
-	margin: 0;
-	font-size: 1em;
-}
-#x:hover, #x:focus-visible,
-input:hover, input:focus-visible {
-	background: linear-gradient(-10deg,  rgb(10, 77, 145), rgb(39, 130, 204));
 }
 input::placeholder {
 	font-size: 1.2em;
@@ -340,6 +325,19 @@ html.y input:autofill {
 }
 html.z input::placeholder {
 	color: #fff;
+}
+#x,
+input[type=submit] {
+	color: #fff;
+	background: rgb(39, 130, 204);
+	border-color: rgb(72, 182, 255);
+	border-radius: .3em;
+	padding: .4em .6em;
+	font-size: 1em;
+}
+#x:hover, #x:focus-visible,
+input[type=submit]:hover, input[type=submit]:focus-visible {
+	background: linear-gradient(-10deg,  rgb(10, 77, 145), rgb(39, 130, 204));
 }
 html.z .num {
 	border-color: #777;
