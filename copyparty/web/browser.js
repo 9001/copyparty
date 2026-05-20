@@ -1105,6 +1105,16 @@ ebi('up_outside').onclick =
 		modaltoggle('up2k', false);
 	}
 
+var up2k_lgcy = false;
+ebi('reloc_up').onclick = function(){
+	up2k_lgcy = !up2k_lgcy;
+	this.innerHTML = up2k_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+	clmod(ebi('up2k'), 'unmodal', up2k_lgcy);
+	swrite('up2k_lgcy', up2k_lgcy);
+}
+if(sread('up2k_lgcy') == 'true')
+	ebi('reloc_up').click();
+
 ebi('wrap').insertBefore(mknod('div', 'lazy'), ebi('epi'));
 
 var x = ebi('bbsw');
@@ -1406,6 +1416,16 @@ ebi('op_cfg').innerHTML = (
 			modaltoggle('cfg');
 		}
 })();
+
+var cfg_lgcy = false;
+ebi('reloc_cfg').onclick = function(){
+	cfg_lgcy = !cfg_lgcy;
+	this.innerHTML = cfg_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+	clmod(ebi('cfg'), 'unmodal', cfg_lgcy);
+	swrite('cfg_lgcy', cfg_lgcy);
+}
+if(sread('cfg_lgcy') == 'true')
+	ebi('reloc_cfg').click();
 
 // accent color
 function parseColor (strColor) {
@@ -9085,7 +9105,8 @@ function apply_perms(res) {
 		goto('up2k');
 		clmod(document.documentElement, 'noscroll', false);
 	}
-	clmod(ebi('up2k'), 'unmodal', up_only);
+	if(up_only && !up2k_lgcy)
+		ebi('reloc_up').click();
 	clmod(ebi('opa_mkd'), 'vis', up_only);
 }
 

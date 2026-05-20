@@ -2981,7 +2981,7 @@ html.c .modalcontent {
 .modalheader:hover {
 	color: var(--fg);
 }
-#cfg_mu,
+.winbtn,
 .close{
 	position: absolute;
 	cursor: default;
@@ -2996,8 +2996,13 @@ html.c .modalcontent {
 	padding: 0;
 	align-content: center;
 }
-#cfg_mu {
+.winbtn {
 	right: 2.3em;
+	span {
+		font-family: initial;
+		font-size: small;
+    	vertical-align: center;
+	}
 }
 .closepane {
 	position: absolute;
@@ -3109,6 +3114,24 @@ html.c .modalcontent {
 	.splitsub {
 		margin-bottom: .5em;
 	}
+}
+#cfg.unmodal {
+	.sub_section,
+	#s_nav,
+	.divider,
+	.s_desc {
+		display: none;
+	}
+	.setting,
+	#s_list {
+		display: contents;
+	}
+	.s_section {
+		margin: 0 .3em;
+	}
+}
+.c {
+	display: inline-block;
 }
 
 
@@ -5325,6 +5348,8 @@ html.f {
 	}
 	.close {
 		margin: 1px;
+		font-family: initial;
+    	font-size: .9em;
 	}
 	.modalheader {
 		background: var(--a);
@@ -5346,10 +5371,7 @@ html.f {
 	#h_music {
 		right: 0;
 	}
-	#h_music::after {
-		right: 6em;
-	}
-	#cfg_mu {
+	.winbtn {
 		margin: .1em;
 	}
 	#u2tab tbody tr:hover td {
@@ -5435,6 +5457,9 @@ html.fy {
 		border: none;
     	font-size: large;
 	}
+	#reloc_up:not(:hover){
+		color: #f3f3f3;
+	}
 	.close:not(:hover) {
 		background: none;
 		border-color: transparent;
@@ -5519,7 +5544,7 @@ html.fy {
 		content: "";
 		width: 30%;
 		margin-bottom: -1.2em;
-		right: 2.7em;
+		right: 5.7em;
 	}
 	#ops {
 		height: auto;
@@ -5561,7 +5586,7 @@ html.fy {
 	#qs_btns a {
 		color: var(--bg-u2);
 	}
-	#cfg_mu:not(:hover) {
+	.winbtn:not(:hover) {
 		background: none;
 		border-color: transparent;
 	}
