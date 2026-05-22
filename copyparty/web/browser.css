@@ -2696,18 +2696,19 @@ html.noscroll .sbar::-webkit-scrollbar {
 	margin: 0;
 	height: 100%;
 }
-.full-image img,
-.full-image video {
-	display: inline-block;
-	outline: none;
-	width: auto;
-	height: auto;
-	max-width: 100%;
-	max-height: 100%;
-	max-height: calc(100% - 1.4em);
-	margin-bottom: 1.4em;
-	transition: transform .23s, left .23s, top .23s, width .23s, height .23s;
-}
+	.full-image img,
+	.full-image video {
+		display: inline-block;
+		outline: none;
+		width: auto;
+		height: auto;
+		max-width: 100%;
+		max-height: 100%;
+		max-height: calc(100% - 1.4em);
+		margin-bottom: 1.4em;
+		vertical-align: middle;
+		transition: transform .23s, left .23s, top .23s, width .23s, height .23s;
+	}
 .immersive .full-image img,
 .immersive .full-image video {
 	max-height: 100%;
