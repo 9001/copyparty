@@ -1529,8 +1529,9 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	display: grid;
 }
 #altprogbar span {
-	font-size: medium;
+	font-size: 16px;
 	font-family: monospace;
+	font-family: var(--font-mono);
 	color: var(--fg-weak);
 	margin: .3em;
 	align-self: center;
@@ -5256,13 +5257,17 @@ html.f {
 	}
 	#ggrid > a::before {
 		background: transparent;
-		margin: 0;
 		z-index: 3;
 	}
+	#ggrid > a::before,
 	#ggrid > a:focus-visible::before, 
 	#ggrid > a:hover::before {
-		font-size: 2em;
+		font-size: 1.7em;
+    	padding: .3em .2em;
 		margin: 0;
+	}
+	#ggrid > a.au::before {
+		padding: .4em .2em .4em .3em;
 	}
 	#ggrid > a:focus-visible .imgcontainer::before, 
 	#ggrid > a:hover .imgcontainer::before {
@@ -5599,6 +5604,7 @@ html.fy {
 	}
 	#up_quick {
 		margin: 0;
+		border-radius: 0;
 	}
 	#up_quick_btn {
 		border-radius: 0;
