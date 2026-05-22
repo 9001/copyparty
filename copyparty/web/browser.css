@@ -5224,9 +5224,9 @@ html.f {
 	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 70%, var(--bg-u2));
 	--bg-u1: color-mix(in srgb, var(--fg) 10%, transparent);
 
-	--font-main: "Orbitron", sans-serif;
-	--font-mono: "Orbitron", monospace;
-	font-family: "Orbitron", sans-serif;
+	--font-main: 'orbitron', sans-serif;
+	--font-mono: 'orbitron', monospace;
+	font-family: 'orbitron', sans-serif;
 	font-optical-sizing: auto;
 	letter-spacing: .05em;
 
