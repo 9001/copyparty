@@ -3959,9 +3959,9 @@ html.e #wrap.thin {
 		margin-left: 2.9em;
 	}
 	html.fz #srv_name {
-		padding-top: 1.1em !important;
+		padding-top: .9em !important;
 		padding-bottom: .6em;
-		margin-left: 3.2em !important;
+		margin-left: 3em !important;
 	}
 	#widget, #wrap {
 		margin-left: 0 !important;
@@ -5375,6 +5375,7 @@ html.f {
 	}
 	#treeToggleBtn {
 		z-index: 7;
+		padding: .07em;
 	}
 	#widget:not(.thin) #pvol {
 		border-color: var(--a-dark);
@@ -5452,7 +5453,7 @@ html.fz {
   		margin-left: -1px;
 	}
 	#wfp .btn {
-		padding: 0;
+		padding: .2em .4em;
 	}
 }
 html.fy {
