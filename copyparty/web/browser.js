@@ -9107,7 +9107,7 @@ function apply_perms(res) {
 	}
 	if(up_only && !up2k_lgcy){
 		up2k_lgcy = !up2k_lgcy;
-		this.innerHTML = up2k_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+		ebi('reloc_up').innerHTML = up2k_lgcy ? '<span>▲</span>' : '<span>▼</span>';
 		clmod(ebi('up2k'), 'unmodal', up2k_lgcy);
 	}
 	clmod(ebi('opa_mkd'), 'vis', up_only);
