@@ -5218,7 +5218,7 @@ html.f {
 	--a: #e3f903;
 	--bg-u2:#191919;
 
-	--radius: 0;
+	--radius: 4px;
 
 	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 70%, var(--bg-u2));
 	--bg-u1: color-mix(in srgb, var(--fg) 10%, transparent);
@@ -5410,9 +5410,10 @@ html.f {
     	padding: .3em;
 	}
 	.unmodal,
-	.opview {
+	#wrap>.opview {
 		margin-left: -.6em;
   		margin-right: -.6em;
+		border-radius: 0 0 var(--radius) var(--radius);
 	}
 }
 html.fz {
@@ -5436,6 +5437,17 @@ html.fz {
 		color: var(--bg-u2);
 		text-shadow: none;
     	font-size: large;
+	}
+	.ghead,
+	#path,
+	#ops {
+		border: var(--btn-bb);
+	}
+	.ghead {
+  		margin-left: -1px;
+	}
+	#wfp .btn {
+		padding: 0;
 	}
 }
 html.fy {
