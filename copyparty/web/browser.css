@@ -492,7 +492,7 @@ html .ayjump:focus-visible {
 	background: linear-gradient(to bottom, var(--bg), transparent);
 	padding: .6em .5em;
 	top: 0;
-	margin: 0 -.5em;
+	margin: 0 -.6em;
 }
 #wfp.shifted {
 	margin-left: 2em;
@@ -1018,6 +1018,7 @@ tr.play td:nth-child(1) a {
 	color: var(--a);
 	text-shadow: none;
 	font-family: monospace;
+	font-family: var(--font-mono);
 }
 .thumbed,
 #ggrid>a.thumbed {
@@ -1354,6 +1355,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	cursor: pointer;
 	width: max-content;
 	border: 1px solid var(--bg-u3);
+	font-family: initial;
 }
 html:not(.e):not(.d) #up_quick .btn {
 	transform: rotate(0deg);
@@ -1405,6 +1407,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #wtoggle * {
 	line-height: 1em;
 	vertical-align: middle;
+	vertical-align: center;
 }
 #wtoggle.sel #wzip,
 #wtoggle.m3u #wm3u,
@@ -1854,6 +1857,7 @@ html.y #ops svg circle {
 	font-size: medium;
 	min-width: 3em;
 	margin: .3em;
+	font-family: var(--font-main);
 }
 input[type=color] {
 	vertical-align: bottom;
@@ -2701,7 +2705,6 @@ html.noscroll .sbar::-webkit-scrollbar {
 	max-height: 100%;
 	max-height: calc(100% - 1.4em);
 	margin-bottom: 1.4em;
-	vertical-align: middle;
 	transition: transform .23s, left .23s, top .23s, width .23s, height .23s;
 }
 .immersive .full-image img,
@@ -3001,6 +3004,7 @@ html.c .modalcontent {
 	span {
 		font-family: initial;
 		font-size: small;
+    	vertical-align: middle;
     	vertical-align: center;
 	}
 }
@@ -3192,6 +3196,7 @@ html.c .modalcontent {
 .dropdesc>div {
 	display: table-cell;
 	vertical-align: middle;
+	vertical-align: center;
 	text-align: center;
 }
 .dropdesc>div>div {
@@ -5218,9 +5223,11 @@ html.f {
 	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 70%, var(--bg-u2));
 	--bg-u1: color-mix(in srgb, var(--fg) 10%, transparent);
 
-	letter-spacing: 2px;
-	font-family: monospace;
-	font-size: 1.2em;
+	--font-main: "Orbitron", sans-serif;
+	--font-mono: "Orbitron", monospace;
+	font-family: "Orbitron", sans-serif;
+	font-optical-sizing: auto;
+	letter-spacing: .05em;
 
 	#path i {
 		border-color: var(--a);
@@ -5239,7 +5246,7 @@ html.f {
 		font-size: .8em;
 	}
 	#srv_name {
-		margin-left: 2.7em;
+		padding-top: .3em;
 	}
 	#gridsel {
 		content: "m.-select";
@@ -5319,16 +5326,18 @@ html.f {
 		line-height: 1.45em;
 	}
 	.hl {
-		width: calc(100% - 4.7em);
+		width: calc(100% - 4.2em);
 	}
 	.hl::after {
 		content: "";
-		left: calc(100% - 2.7em);
+		right: .5em;
+		left: 0;
 		margin-top: -.3em;
+		margin-bottom: -2px;
 		z-index: -1;
 		position: absolute;
 		border: solid;
-		border-width: 2em 2em 0 .2em;
+		border-width: 2.08em 2.08em 0 0;
   		border-color: var(--btn-1-bg) transparent transparent var(--btn-1-bg);
 	}
 	.hl:hover::after {
@@ -5348,13 +5357,13 @@ html.f {
 	}
 	.close {
 		margin: 1px;
-		font-family: initial;
-    	font-size: .9em;
 	}
 	.modalheader {
 		background: var(--a);
 		text-shadow: none;
 		color: var(--bg-u2);
+		padding-top: .5em;
+		padding-bottom: .5em;
 	}
 	#tree {
 		z-index: 6;
@@ -5364,9 +5373,6 @@ html.f {
 	}
 	#widget:not(.thin) #pvol {
 		border-color: var(--a-dark);
-	}
-	#files tbody td:nth-child(3) {
-		font-size: .8em;
 	}
 	#h_music {
 		right: 0;
@@ -5392,6 +5398,22 @@ html.f {
 	#goh {
 		font-size: 1.2em;
 	}
+	#gridzoom a,
+	#gridchop a,
+	#twig, #twobytwo,
+	#nthread_sub, #nthread_add {
+		font-family: monospace;
+  		font-size: 1.6em;
+	}
+	#qs_btns a {
+		margin: .1em 0;
+    	padding: .3em;
+	}
+	.unmodal,
+	.opview {
+		margin-left: -.6em;
+  		margin-right: -.6em;
+	}
 }
 html.fz {
 	--bg: #2e258c;
@@ -5408,7 +5430,7 @@ html.fz {
 		z-index: -1;
 	}
 	#srv_name {
-		padding-top: .7em;
+		padding-top: .5em;
 	}
 	#up_status_h {
 		color: var(--bg-u2);
@@ -5561,12 +5583,19 @@ html.fy {
 	#wtoggle{
 		margin: 0;
 		border-bottom: none;
+		border-radius: var(--radius) 0 0 0;
 	}
 	#up_quick {
 		margin: 0;
 	}
+	#up_quick_btn {
+		border-radius: 0;
+		border-width: 1px 0 0 0;
+		margin: 0;
+	}
 	#wtico {
 		line-height: 1.09em;
+		border-radius: 0;
 	}
 	#wtoggle, #wtoggle * {
     	line-height: .99em;
