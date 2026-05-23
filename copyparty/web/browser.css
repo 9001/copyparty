@@ -2040,6 +2040,8 @@ input.ssconf_v {
 #wtoggle,
 #ghead,
 #tree,
+.splitsub,
+.modalsplit,
 html {
 	scrollbar-color: var(--a) var(--bg-u3);
 }
@@ -2618,6 +2620,11 @@ html.y #doc .line-highlight {
 	text-shadow: 1px 0 0 var(--fg), -1px 0 0 var(--fg), 0 -1px 0 var(--fg);
 }
 html.noscroll,
+html.noscroll .modalsplit,
+html.noscroll .splitsub,
+html.noscroll #treeh,
+html.noscroll .ghead,
+html.noscroll #wtoggle,
 html.noscroll .sbar {
 	scrollbar-width: none;
 }
@@ -5614,7 +5621,7 @@ html.fy {
 		margin: 0;
 	}
 	#wtico {
-		line-height: 1.09em;
+		line-height: 1.1em;
 		border-radius: 0;
 	}
 	#wtoggle, #wtoggle * {
