@@ -1,6 +1,7 @@
 :root {
 	color-scheme: dark;
   	--transparent: transparent;
+	--font-mono: monospace;
 
 	--grid-sz: 10em;
 	--grid-ln: 3;
@@ -5428,6 +5429,9 @@ html.f {
 		margin-left: -.6em;
   		margin-right: -.6em;
 		border-radius: 0 0 var(--radius) var(--radius);
+	}
+	.th_ext .inner {
+		font-size: .8em;
 	}
 }
 html.fz {

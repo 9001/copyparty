@@ -6572,8 +6572,8 @@ window.thegrid = (function () {
 					(isdir ? 'folder' : 'file') + '-icon" color="' +
 					(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/></svg>' +
 				(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
-					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc(var(--grid-sz) / 5 * ' +
-					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')">' + ext + '</span>') +
+					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' +
+					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')"><span class="inner">' + ext + '</span></span>') +
 				'<img loading="lazy" onload="th_onload(this)" src="' +
 				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
