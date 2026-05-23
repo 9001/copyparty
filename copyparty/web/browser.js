@@ -10077,7 +10077,9 @@ function reload_browser() {
 			return;
 		}
 		if (!dragging && dist > mvthresh && !window.getSelection().toString()) {
-			if (fwrap = e.target.closest('#wrap')) 
+			if (e.target instanceof Element)
+				fwrap = e.target.closest('#wrap');
+			if (fwrap) 
 				fwrap.style.userSelect = 'none';
 			else return;
 			start_drag();
