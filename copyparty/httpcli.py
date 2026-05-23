@@ -1413,6 +1413,8 @@ class HttpCli(object):
 
             self.tx_404()
             return False
+        elif self.vpath.startswith("wopi"):
+            return self.tx_wopi()
 
         if "cf_challenge" in self.uparam:
             self.reply(self.j2s("cf").encode("utf-8", "replace"))
@@ -1525,6 +1527,47 @@ class HttpCli(object):
             return self.tx_rss()
 
         return self.tx_browser()
+
+    def tx_wopi(self) -> bool:
+        path = self.vpath.split('/')
+        full_path = "/mnt/tmp/" + path[2]
+
+        if self.do_log:
+            self.log("WOPI GET %s" % (path[2]))
+
+        if path[1] == "files":
+            if len(path) > 3 and path[3] == "contents":
+                return self.tx_file("oh_f", full_path)
+            else:
+                file_info = {
+                    "BaseFileName": path[2],
+                    "OwnerId": self.uname,
+                    "Size": os.path.getsize(full_path),
+                    "UserId": self.uname,
+                    "UserFriendlyName": self.uname,
+                    "UserCanWrite": True,
+                    # "UserCanNotWriteRelative": False,
+                    # "PostMessageOrigin": ,
+                    # "HidePrintOption": ,
+                    # "DisablePrint": ,
+                    # "HideSaveOption": ,
+                    # "HideExportOption": ,
+                    # "HideRepairOption": ,
+                    # "DisableExport": ,
+                    # "DisableCopy": ,
+                    "EnableOwnerTermination": True,
+                    "LastModifiedTime":
+                        time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path))),
+                    # "IsUserLocked": ,
+                    # "IsUserRestricted": ,
+                    # "SupportsRename": True,
+                    # "UserCanRename": True,
+                }
+                ret = json.dumps(file_info).encode("utf-8", "replace")
+                self.reply(ret, 200, "application/json; charset=utf-8")
+                return True
+
+        return self.tx_404(True)
 
     def tx_rss(self) -> bool:
         if self.do_log:
@@ -3149,6 +3192,9 @@ class HttpCli(object):
         except:
             raise Pebkac(400, "you must supply a content-length for binary POST")
 
+        if self.vpath.startswith("wopi"):
+            return self.rx_wopi()
+
         try:
             chashes = self.headers["x-up2k-hash"].split(",")
             wark = self.headers["x-up2k-wark"]
@@ -3359,6 +3405,36 @@ class HttpCli(object):
 
         self.reply(b"thank")
         return True
+
+    def rx_wopi(self) -> bool:
+        path = self.vpath.split('/')
+        full_path = "/mnt/tmp/" + path[2]
+
+        if self.do_log:
+            self.log("WOPI POST %s" % (path[2]))
+
+        if path[1] == "files":
+            if len(path) > 3 and path[3] == "contents":
+                reader, _ = self.get_body_reader()
+                buf = b""
+                for rbuf in reader:
+                    buf += rbuf
+                    if not rbuf or len(buf) >= 32768:
+                        break
+
+                if buf:
+                    with open(full_path, "wb") as file:
+                        file.write(buf)
+
+                    mod_time = {
+                        "LastModifiedTime": 
+                            time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path)))
+                    }
+                    ret = json.dumps(mod_time).encode("utf-8", "replace")
+                    self.reply(ret, 200, "application/json; charset=utf-8")
+                    return True
+
+        return self.tx_404(True)
 
     def handle_chpw(self) -> bool:
         assert self.parser  # !rm

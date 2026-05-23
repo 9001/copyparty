@@ -7665,7 +7665,10 @@ var treectl = (function () {
 					tn.href = addq(tn.href, 'v');
 			}
 
-			if (tn.lead == '-')
+            if (["ods", "odt", "odp"].includes(tn.ext)) {
+				tn.lead = '<a href="https://192.168.1.11:9980/browser/4610258811/cool.html?WOPISrc=https://192.168.1.11:3923/wopi/files/' +
+                    bhref + '" rel="nofollow">📄</a>';
+            } else if (tn.lead == '-')
 				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +
 					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';

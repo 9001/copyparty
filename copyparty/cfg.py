@@ -240,6 +240,7 @@ flagcats = {
         "gz": "allows server-side gzip compression of uploads with ?gz",
         "xz": "allows server-side lzma compression of uploads with ?xz",
         "pk": "forces server-side compression, optional arg: xz,9",
+        "wopi": "enable WOPI support for integrating with online office suites",
     },
     "upload rules": {
         "apnd_who=dw": "who can append? (aw/dw/w/no)",

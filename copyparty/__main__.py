@@ -1568,6 +1568,12 @@ def add_opds(ap):
     ap2.add_argument("--opds-exts", metavar="T,T", type=u, default="epub,cbz,pdf", help="file formats to list in OPDS feeds; leave empty to show everything (volflag=opds_exts)")
 
 
+def add_wopi(ap):
+    ap2 = ap.add_argument_group("WOPI options")
+    ap2.add_argument("--wopi", action="store_true", help="enable WOPI -- allows for integrating with office suites (volflag=wopi)")
+    ap2.add_argument("--wopi-path", action="store_true", default="wopi", help="where to expose WOPI (needs to start with 'wopi'); defaults to <volname>/wopi/ (volflag=wopi-path)")
+
+
 def add_handlers(ap):
     ap2 = ap.add_argument_group("handlers (see --help-handlers)")
     ap2.add_argument("--on404", metavar="PY", type=u, action="append", help="\033[34mREPEATABLE:\033[0m handle 404s by executing \033[33mPY\033[0m file")
@@ -2045,6 +2051,7 @@ def run_argparse(
     add_tftp(ap)
     add_smb(ap)
     add_opds(ap)
+    add_wopi(ap)
     add_safety(ap)
     add_salt(ap, fk_salt, dk_salt, ah_salt)
     add_optouts(ap)
