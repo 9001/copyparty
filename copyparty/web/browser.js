@@ -10123,7 +10123,8 @@ function reload_browser() {
 
 		window.addEventListener('dragstart', function(e) {
 			if (treectl.dsel && (is_selma || dragging)) {
-				e.preventDefault();
+				if (!QS('body.bbox-open'))
+					ev(e);
 			}
 		});
 	}
