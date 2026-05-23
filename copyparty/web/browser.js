@@ -10036,7 +10036,7 @@ function reload_browser() {
 		if (e.target.closest('#widget,#ops,.opview,.doc')) return;
 
 		if (e.target.closest('#gfiles'))
-			ebi('gfiles').style.userSelect = "none"
+			ebi('gfiles').style.userSelect = "none";
 
 		var pos = getpp(e);
 		startx = pos.x;
