@@ -1408,7 +1408,6 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #wtoggle * {
 	line-height: 1em;
 	vertical-align: middle;
-	vertical-align: center;
 }
 #wtoggle.sel #wzip,
 #wtoggle.m3u #wm3u,
@@ -2205,7 +2204,7 @@ html.b .btn {
 #tree ul a {
 	border-radius: var(--radius);
 	display: inline-block;
-	vertical-align: center;
+	vertical-align: middle;
 }
 .ntree a {
 	padding: .3em .2em;
@@ -2537,7 +2536,7 @@ input[type="text"].invalid {
 }
 #docul li.bn span {
 	color: var(--fg-weak);
-	vertical-align: center;
+	vertical-align: middle;
 	text-shadow: none;
 }
 #docul li a {
@@ -3015,7 +3014,6 @@ html.c .modalcontent {
 		font-family: initial;
 		font-size: small;
     	vertical-align: middle;
-    	vertical-align: center;
 	}
 }
 .closepane {
@@ -3206,7 +3204,6 @@ html.c .modalcontent {
 .dropdesc>div {
 	display: table-cell;
 	vertical-align: middle;
-	vertical-align: center;
 	text-align: center;
 }
 .dropdesc>div>div {
@@ -5339,10 +5336,10 @@ html.f {
 	.ntree a + a {
 		line-height: 1.45em;
 	}
-	.hl {
+	#tree .hl {
 		width: calc(100% - 4.2em);
 	}
-	.hl::after {
+	#tree .hl::after {
 		content: "";
 		right: .5em;
 		left: 0;
@@ -5354,7 +5351,7 @@ html.f {
 		border-width: 2.08em 2.08em 0 0;
   		border-color: var(--btn-1-bg) transparent transparent var(--btn-1-bg);
 	}
-	.hl:hover::after {
+	#tree .hl:hover::after {
 		border-color: var(--btn-1h-bg) transparent transparent var(--btn-1h-bg);
 	}
 	#wrap:not(.thin) {
