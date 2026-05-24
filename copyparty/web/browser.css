@@ -489,7 +489,7 @@ html .ayjump:focus-visible {
 	margin: 0;
 	align-content: center;
 	position: sticky;
-	z-index: 4;
+	z-index: 11;
 	background: linear-gradient(to bottom, var(--bg), transparent);
 	padding: .6em .5em;
 	top: 0;
@@ -1009,7 +1009,7 @@ tr.play td:nth-child(1) a {
 	justify-content: center;
 }
 .th_ext {
-	z-index: 1;
+	z-index: 2;
 	position: absolute;
 	text-align: center;
 	width: 100%;
@@ -1043,7 +1043,7 @@ tr.play td:nth-child(1) a {
 	display: none;
 	top: .3em;
 	right: .3em;
-	z-index: 2;
+	z-index: 4;
 	font-size: 1.15em;
 	width: 1em;
   	height: 1em;
@@ -1082,7 +1082,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	content: '▶';
 }
 #ggrid>a:before {
-	z-index: 2;
+	z-index: 4;
 	display: block;
 	position: absolute;
 	padding: .3em 0;
@@ -1182,7 +1182,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: 3;
+	z-index: 11;
 	touch-action: none;
 	box-shadow: 0 0 .5em var(--mp-sh);
 }
@@ -1777,7 +1777,7 @@ html.y #ops svg circle {
 	line-height: 1.5em;
 }
 #treeToggleBtn{
-	z-index: 6;
+	z-index: 30;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -2032,7 +2032,7 @@ input.ssconf_v {
 	box-shadow: 0 0 1em var(--mp-sh), 0 -1px 0 rgba(128,128,128,0.3);
 	border: 1px solid var(--bg-u3);
 	transition: width .05s;
-	z-index: 5;
+	z-index: 20;
 	padding-bottom: 3em;
 	border-width: 0 1px 0 0;
 }
@@ -2244,7 +2244,7 @@ html.b .btn {
 	animation: 1s linear .15s infinite forwards spin, .2s ease .15s 1 forwards fadein;
 	position: fixed;
 	top: .3em;
-	z-index: 9;
+	z-index: 31;
 }
 #dlt_t {
 	left: 0;
@@ -2349,7 +2349,7 @@ html.b .btn {
 	padding: 0 .2em;
 	line-height: 2.3em;
 	margin-bottom: 1.5em;
-	z-index: 3;
+	z-index: 10;
 	margin-top: 0;
 	top: 3.7em;
 	transition: opacity .15s;
@@ -2680,7 +2680,7 @@ html.noscroll .sbar::-webkit-scrollbar {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 10;
+	z-index: 50;
 	background: rgba(0, 0, 0, 0.8);
 	transition: opacity .3s ease;
 }
@@ -2899,7 +2899,7 @@ html.y #bbox-overlay figcaption a {
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: 20;
+	z-index: 51;
 	padding: .4em;
 }
 #bbox-halp td {
@@ -3151,7 +3151,7 @@ html.c .modalcontent {
 
 .modal {
 	display: none;
-	z-index: 10;
+	z-index: 40;
 	background: rgba(48, 48, 48, 0.7);
 }
 .modal.vis,
@@ -4671,7 +4671,6 @@ html.e #ops a.act {
   border-top-right-radius: 3px;
   box-shadow: var(--shadow-inset-left), var(--shadow-inset-top),
     var(--shadow-inset-right);
-  z-index: 6;
 }
 html.e a:active {
   border: 0;
@@ -4687,7 +4686,6 @@ html.e .opbox {
   box-shadow: var(--shadow-inset-bottom), var(--shadow-inset-left),
     var(--shadow-inset-right);
   border-radius: var(--radius);
-  z-index: 5;
   background: var(--bg);
 }
 html.e #srch_form {
@@ -5044,7 +5042,7 @@ html.e #actionsArea {
 	outline: none;
 	border-radius: var(--radius);
 	box-shadow: 0 0 .3rem var(--bg-d3);
-	z-index: 5;
+	z-index: 60;
 }
 #rcm.large a {
 	padding: 1em;
@@ -5188,7 +5186,7 @@ html.e #actionsArea {
 	border-radius: var(--radius);
 	padding: .5em;
 	position: absolute;
-	z-index: 6;
+	z-index: 12;
 	bottom: 2.5em;
 }
 .under {
@@ -5258,12 +5256,8 @@ html.f {
 	#gridsel {
 		content: "m.-select";
 	}
-	.ghead {
-		z-index: 4;
-	}
 	#ggrid > a::before {
 		background: transparent;
-		z-index: 3;
 	}
 	#ggrid > a::before,
 	#ggrid > a:focus-visible::before, 
@@ -5290,7 +5284,7 @@ html.f {
 		position: absolute;
 		left: 0;
 		border: var(--bg-u2) solid;
-		z-index: 2;
+		z-index: 3;
 		border-width: 4em 4em 0 0;
 		border-color: var(--bg-u2) transparent transparent var(--bg-u2);
 		margin: 0 2px;
@@ -5325,9 +5319,6 @@ html.f {
 	}
 	#pctl {
 		margin-top: .1em;
-	}
-	#pathBar {
-		z-index: 5;
 	}
 	a {
 		/* text-decoration: underline; */
@@ -5376,11 +5367,7 @@ html.f {
 		padding-top: .5em;
 		padding-bottom: .5em;
 	}
-	#tree {
-		z-index: 6;
-	}
 	#treeToggleBtn {
-		z-index: 7;
 		padding: .07em;
 	}
 	#widget:not(.thin) #pvol {
