@@ -1778,6 +1778,14 @@ html.y #ops svg circle {
 	display: block;
 	line-height: 1.5em;
 }
+#favico_onpage {
+	display: none;
+}
+@supports (text-wrap: nowrap) {
+	#favico_onpage {
+		display: inline-block;
+	}
+}
 #treeToggleBtn{
 	z-index: 30;
 	position: fixed;
@@ -1989,10 +1997,13 @@ input.ssconf_v {
 	white-space: nowrap;
 	display: flex;
 }
-#wfp a {
-	display: inline-block;
+#wfp .btn {
+	min-width: 1.3em;
 	width: 1.3em;
 	height: 1.3em;
+	font-size: 1em;
+	padding: .15em;
+	margin: 0 .1em 0 0;
 }
 
 #files td div span {
@@ -2111,11 +2122,6 @@ html {
 	position: relative;
 	vertical-align: top;
 	cursor: pointer;
-}
-#wfp .btn {
-	font-size: 1em;
-	padding: .15em;
-	margin: 0 .1em 0 0;
 }
 html.c .btn,
 html.b .btn {
