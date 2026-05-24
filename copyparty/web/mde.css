@@ -18,7 +18,7 @@ html, body {
 	min-height: 100%;
 	font-family: sans-serif;
 	font-family: var(--font-main), sans-serif;
-	background: #f7f7f7;
+	background: #f8f8f8;
 	color: #333;
 }
 #toast {
@@ -44,7 +44,7 @@ html, body {
 #mn a {
 	color: #444;
 	margin: 0 0 0 -.2em;
-	padding: 0 0 0 .4em;
+	padding: .8em .4em .8em 0;
 	text-decoration: none;
 	/* ie: */
 	border-bottom: .1em solid #777\9;

@@ -150,7 +150,7 @@ blink {
 		color: #444;
 		background: none;
 		margin: 0 0 0 -.2em;
-		padding: .3em 0 .3em .4em;
+		padding: .8em .4em .8em 0;
 		text-decoration: none;
 		border: none;
 		/* ie: */
