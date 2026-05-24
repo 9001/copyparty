@@ -4134,7 +4134,7 @@ html.e #wrap.thin .ghead {
 }
 
 /* prevent load of new thumbnails */
-#ggrid.waiting a:not(.thumbed) img {
+#ggrid.waiting img {
 	display: none;
 }
 @supports (display: grid) and (gap: 1em) {
