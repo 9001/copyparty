@@ -4132,6 +4132,11 @@ html.e #wrap.thin .ghead {
 		display: none;
 	}
 }
+
+/* prevent load of new thumbnails */
+#ggrid.waiting a:not(.thumbed) img {
+	display: none;
+}
 @supports (display: grid) and (gap: 1em) {
 	#ggrid {
 		display: grid;

@@ -742,6 +742,8 @@ window.baguetteBox = (function () {
     }
 
     function showOverlay(chosenImageIndex) {
+        clmod(ebi('ggrid'), 'waiting', true);
+
         if (options.noScrollbars) {
             var a = document.documentElement.style.overflowY,
                 b = document.body.style.overflowY;
@@ -765,6 +767,7 @@ window.baguetteBox = (function () {
         loadImage(currentIndex, function () {
             preloadNext(currentIndex);
             preloadPrev(currentIndex);
+            clmod(ebi('ggrid'), 'waiting', false);
         });
 
         show_buttons(0);

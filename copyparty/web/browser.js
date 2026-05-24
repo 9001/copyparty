@@ -8762,6 +8762,10 @@ var treectl = (function () {
 		vbar.onresize();
 		showfile.addlinks();
 		drag.initfiles();
+			
+		var media = scan_hash(location.hash);
+		if(media && media[0] == 'g')
+			clmod(ebi('ggrid'), 'waiting', true);
 		setTimeout(eval_hash, 1);
 	};
 
