@@ -9117,8 +9117,9 @@ function apply_perms(res) {
 		ebi('u2rand').parentNode.style.display = 'none';
 
 	u2ts = res.u2ts;
-	if (up2k && up2k.set_fsearch)
-		up2k.set_fsearch();
+
+	if(up2k)
+		wait_set_fsearch();
 
 	if (res.cfg)
 		rw_edit = res.rw_edit;
@@ -9139,6 +9140,16 @@ function apply_perms(res) {
 		clmod(ebi('up2k'), 'unmodal', up2k_lgcy);
 	}
 	clmod(ebi('opa_mkd'), 'vis', up_only);
+}
+
+function wait_set_fsearch(){
+	var t = setInterval(function () {
+		if (!up2k || !up2k.set_fsearch)
+			return;
+
+		clearInterval(t);
+		up2k.set_fsearch();
+	}, 50);
 }
 
 
@@ -11098,8 +11109,8 @@ function reload_browser() {
 	for (var a = 0; a < ns.length; a++)
 		clmod(ebi(ns[a]), 'hidden', ebi('unsearch'));
 
-	if (up2k && up2k.set_fsearch)
-		up2k.set_fsearch();
+	if(up2k)
+		wait_set_fsearch();
 
 	thegrid.setdirty();
 	msel.render();
