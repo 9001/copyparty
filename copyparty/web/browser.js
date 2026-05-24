@@ -2,6 +2,34 @@
 
 var J_BRW = 1;
 
+
+// start DL of secondary JS
+// based on https://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
+function loadScript(name, id) {
+	var head = (document.getElementsByTagName("head")[0] || document.head)
+    var s = document.createElement('script');
+    s.src = window.SR + '/.cpr/w/' + name + '.js?_=' + window.TS;
+	var done = false;
+    s.onload = s.onreadystatechange = function() {
+		if (!done && (!this.readyState ||
+				this.readyState === "loaded" || this.readyState === "complete") ) {
+			done = true;
+
+			jsldp(id, name);
+
+			// Handle memory leak in IE
+			s.onload = s.onreadystatechange = null;
+			if ( head && s.parentNode ) {
+				head.removeChild(s);
+			}
+		}
+	};
+    head.appendChild(s);
+}
+loadScript('baguettebox', "J_BBX");
+loadScript('up2k', "J_U2K");
+
+
 // disables emojis
 var fun_tgl = sread('fun_tgl');
 if( fun_tgl == null)
@@ -9089,7 +9117,7 @@ function apply_perms(res) {
 		ebi('u2rand').parentNode.style.display = 'none';
 
 	u2ts = res.u2ts;
-	if (up2k)
+	if (up2k && up2k.set_fsearch)
 		up2k.set_fsearch();
 
 	if (res.cfg)
@@ -11070,7 +11098,7 @@ function reload_browser() {
 	for (var a = 0; a < ns.length; a++)
 		clmod(ebi(ns[a]), 'hidden', ebi('unsearch'));
 
-	if (up2k)
+	if (up2k && up2k.set_fsearch)
 		up2k.set_fsearch();
 
 	thegrid.setdirty();

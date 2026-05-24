@@ -304,8 +304,8 @@
 	<script src="{{ r }}/.cpr/w/tl/{{ lang }}.js?_={{ ts }}"></script>
 	{%- endif %}
 	<script src="{{ r }}/.cpr/w/browser.js?_={{ ts }}"></script>
-	<script src="{{ r }}/.cpr/w/baguettebox.js?_={{ ts }}"></script>
-	<script src="{{ r }}/.cpr/w/up2k.js?_={{ ts }}"></script>
+	<!-- <script src="{{ r }}/.cpr/w/baguettebox.js?_={{ ts }}"></script>
+	<script src="{{ r }}/.cpr/w/up2k.js?_={{ ts }}"></script> -->
 	{%- if js %}
 	<script src="{{ js }}_={{ ts }}"></script>
 	{%- endif %}
@@ -313,8 +313,8 @@
 		Date.now(); function jsldp(a, b) { 2 != window[a] && alert("FATAL ERROR: cannot load " + b + ".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R") }
 		jsldp("J_UTL", "util");
 		jsldp("J_BRW", "browser");
-		jsldp("J_BBX", "baguettebox");
-		jsldp("J_U2K", "up2k");
+		// jsldp("J_BBX", "baguettebox");
+		// jsldp("J_U2K", "up2k");
 	</script>
 </body>
 </html>
