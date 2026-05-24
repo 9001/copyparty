@@ -1154,7 +1154,7 @@ ebi('h_bup').onclick = function() {
 var musicSettings = (
 	'<div class="sub_section"><h3 id="h_mp">🎵 ' + L.ot_mp + '</h3></div>' +
 
-	'<div class="sub"><h3 id="h_mpopts">✅ ' + L.cl_opts + '</h3><div>' +
+	'<div class="sub"><h3 id="h_mpopts">🎧 ' + L.cl_opts + '</h3><div>' +
 	'<a class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
 	'<a class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
 	'<a class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +

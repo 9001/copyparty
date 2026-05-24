@@ -3096,7 +3096,7 @@ html.c .modalcontent {
 	background: var(--bg-u1);
 }
 .s_desc{
-	margin: 0 0 0 0;
+	margin: 0 .3em;
 	font-size: medium;
 	color: var(--fg-weak);
 }
@@ -3116,8 +3116,9 @@ html.c .modalcontent {
 }
 
 .modal.vis.unmodal {
-	position: initial;
+	position: static;
 	max-height: 50vh;
+	z-index: 1;
 }
 .modal.vis.unmodal .modalcontent {
 	width: 100%;
@@ -3141,7 +3142,9 @@ html.c .modalcontent {
 
 #cfg.unmodal .setting,
 #cfg.unmodal #s_list {
+	display: inline-block;
 	display: contents;
+	border: none;
 }
 
 #cfg.unmodal .s_section {
@@ -5416,8 +5419,8 @@ html.f #goh {
 }
 html.f #gridzoom a,
 html.f #gridchop a,
-html.f #twig, #twobytwo,
-html.f #nthread_sub, #nthread_add {
+html.f #twig, html.f #twobytwo,
+html.f #nthread_sub, html.f #nthread_add {
 	font-family: monospace;
 	font-size: 1.6em;
 }
