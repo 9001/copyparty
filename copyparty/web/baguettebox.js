@@ -691,7 +691,6 @@ window.baguetteBox = (function () {
         for (var i = 0, fullImage; i < gallery.length; i++) {
             fullImage = mknod('div', 'baguette-img-' + i);
             fullImage.className = 'full-image';
-            fullImage.fetchPriority = 'high';
             imagesElements.push(fullImage);
 
             imagesFiguresIds.push('bbox-figure-' + i);

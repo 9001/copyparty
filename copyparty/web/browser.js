@@ -6602,7 +6602,7 @@ window.thegrid = (function () {
 				(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
 					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' +
 					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')"><span class="inner">' + ext + '</span></span>') +
-				'<img loading="lazy" onload="th_onload(this)" src="' +
+				'<img loading="lazy" fetchPriority="low" onload="th_onload(this)" src="' +
 				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
