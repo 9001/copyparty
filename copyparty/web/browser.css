@@ -1730,7 +1730,7 @@ html.b #mu_outer {
 	border: #777 solid 1px;
 	border-radius: 5px;
 
-	border: var(--transparent) solid 1px;
+	border: var(--transparent) solid 0px;
 	color: #07c;
 	color: var(--a);
 	font-size: 1.5em;
