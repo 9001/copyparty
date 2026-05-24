@@ -1028,7 +1028,8 @@ tr.play td:nth-child(1) a {
 	display: none !important;
 }
 #ggrid > a.thumbed img,
-.thumbed img {
+.thumbed img,
+.thumbed #mu_th img {
 	position: static;
 	opacity: 1;
 }
@@ -4100,13 +4101,13 @@ html.e #wrap.thin .ghead {
 		top: 5px;
 		right: 5px;
 	}
-	#mu_outer {
+	html:not(.e):not(.f) #mu_outer {
 		padding: 1em;
 	}
 	#mu_pbb {
 		width: 100%;
 	}
-	#mu_inner {
+	html:not(.e):not(.f) #mu_inner {
 		margin: -.5em;
 	}
 }
