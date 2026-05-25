@@ -2182,7 +2182,7 @@ var mpl = (function () {
 				}
 			}
 
-			cover = addq(cover || mp.au.osrc, 'th=j');
+			cover = addq(cover || mp.au.src, 'th=j');
 			tags.artwork = [{ "src": cover, type: "image/jpeg" }];
 		}
 		r.cover = cover;
