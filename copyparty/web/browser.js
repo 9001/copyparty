@@ -2149,6 +2149,8 @@ var mpl = (function () {
 			o = QS('html.b #music, html.f #music');
 			if (o)
 				o.style.background = "url('" + url + "') no-repeat center / cover";
+			else
+				ebi('music').style.background = "";
 		}
 	}
 
