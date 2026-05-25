@@ -11178,7 +11178,7 @@ function reload_browser() {
 		try{
 			if (e.button !== 0 && e.type !== 'touchstart') return;
 			if (!thegrid.en || !treectl.dsel) return;
-			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a,.modal,.normalrcm')) return;
+			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a,.modal,.normalrcm,#tree')) return;
 		}
 		catch(ex){
 			console.log(ex);

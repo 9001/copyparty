@@ -303,7 +303,7 @@ window.baguetteBox = (function () {
         if (!overlay) {
             var ctr = mknod('div');
             ctr.innerHTML = (
-                '<div id="bbox-overlay" role="dialog">' +
+                '<div id="bbox-overlay" class="normalrcm" role="dialog">' +
                 '<div id="bbox-slider"></div>' +
                 '<div id="bbox-prev"><a class="btn" aria-label="Previous">◀</a></div>' +
                 '<div id="bbox-next"><a class="btn" aria-label="Next">▶</a></div>' +
