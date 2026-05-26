@@ -2153,6 +2153,8 @@ var mpl = (function () {
 			o = QS('html.b #music, html.f #music');
 			if (o)
 				o.style.background = "url('" + url + "') no-repeat center / cover";
+			else
+				ebi('music').style.background = "";
 		}
 	}
 
@@ -2184,7 +2186,7 @@ var mpl = (function () {
 				}
 			}
 
-			cover = addq(cover || mp.au.osrc, 'th=j');
+			cover = addq(cover || mp.au.src, 'th=j');
 			tags.artwork = [{ "src": cover, type: "image/jpeg" }];
 		}
 		r.cover = cover;
