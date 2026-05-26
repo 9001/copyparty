@@ -26,6 +26,10 @@ function loadScript(name, id) {
 	};
     head.appendChild(s);
 }
+// re-define this function to ensure it's available when needed
+function jsldp(a, b) {
+	2 != window[a] && alert("FATAL ERROR: cannot load " + b + ".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")
+}
 loadScript('baguettebox', "J_BBX");
 loadScript('up2k', "J_U2K");
 
