@@ -1315,6 +1315,7 @@ class HttpCli(object):
         if (
             self.args.pw_hdr in ih
             or re.sub(r"(:[0-9]{1,5})?/?$", "", origin) in good_origins
+            or f"{origin.split('://')[0]}://*" in good_origins
         ):
             good_origin = True
             bad_hdrs = ("",)
