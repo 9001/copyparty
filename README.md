@@ -245,7 +245,7 @@ you may also want these, especially on servers:
 because the following environment variables are commonly used in service-scripts, they are understood by copyparty:
 
 * `NOTIFY_SOCKET` as provided by systemd with service type=notify (see systemd/copyparty.service above)
-* `S6_NOTIFY_FD` for s6/dinit [`ready-notification = pipevar:S6_NOTIFY_FD`](https://skarnet.org/software/s6/notifywhenup.html)
+* `S6_NOTIFY_FD` for dinit [`ready-notification = pipevar:S6_NOTIFY_FD`](https://davmac.org/projects/dinit/man-pages-html/dinit-service.5.html#ready) and [s6 supervision suite notification](https://skarnet.org/software/s6/notifywhenup.html) support
 
 and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
 ```
