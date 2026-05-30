@@ -1413,8 +1413,6 @@ class HttpCli(object):
 
             self.tx_404()
             return False
-        elif self.vpath.startswith("wopi"):
-            return self.tx_wopi()
 
         if "cf_challenge" in self.uparam:
             self.reply(self.j2s("cf").encode("utf-8", "replace"))
@@ -1526,21 +1524,35 @@ class HttpCli(object):
         if "rss" in self.uparam:
             return self.tx_rss()
 
+        if "wopi" in self.uparam:
+            return self.tx_wopi()
+
         return self.tx_browser()
 
     def tx_wopi(self) -> bool:
+        self.log("%s" % self.uparam.get("wopi"))
+        return False
+        # https://' + location.hostname + ':9980/browser/4610258811/cool.html?WOPISrc=' + location.origin + '/wopi/files' + top + bhref +
         path = self.vpath.split('/')
-        full_path = "/mnt/tmp/" + path[2]
-
-        if self.do_log:
-            self.log("WOPI GET %s" % (path[2]))
 
         if path[1] == "files":
-            if len(path) > 3 and path[3] == "contents":
+            if path[-1] == "contents":
+                vfs, _ = self.asrv.vfs.get("/".join(path[2:-1]), self.uname, False, True)
+                full_path = vfs.realpath + "/" + "/".join(path[2:-1])
+
+                if self.do_log:
+                    self.log("WOPI GET 'contents': %s" % (full_path))
+
                 return self.tx_file("oh_f", full_path)
             else:
+                vfs, _ = self.asrv.vfs.get("/".join(path[2:]), self.uname, False, True)
+                full_path = vfs.realpath + "/" + "/".join(path[2:])
+
+                if self.do_log:
+                    self.log("WOPI GET 'file_info': %s" % (full_path))
+
                 file_info = {
-                    "BaseFileName": path[2],
+                    "BaseFileName": path[-1],
                     "OwnerId": self.uname,
                     "Size": os.path.getsize(full_path),
                     "UserId": self.uname,
@@ -1557,7 +1569,10 @@ class HttpCli(object):
                     # "DisableCopy": ,
                     "EnableOwnerTermination": True,
                     "LastModifiedTime":
-                        time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path))),
+                        time.strftime(
+                            "%Y-%m-%dT%H:%M:%SZ",
+                            time.gmtime(os.path.getmtime(full_path))
+                        ),
                     # "IsUserLocked": ,
                     # "IsUserRestricted": ,
                     # "SupportsRename": True,
@@ -3408,31 +3423,32 @@ class HttpCli(object):
 
     def rx_wopi(self) -> bool:
         path = self.vpath.split('/')
-        full_path = "/mnt/tmp/" + path[2]
 
-        if self.do_log:
-            self.log("WOPI POST %s" % (path[2]))
+        if path[1] == "files" and path[-1] == "contents":
+            vfs, _ = self.asrv.vfs.get("/".join(path[2:-1]), self.uname, False, True)
+            full_path = vfs.realpath + "/" + "/".join(path[2:-1])
 
-        if path[1] == "files":
-            if len(path) > 3 and path[3] == "contents":
-                reader, _ = self.get_body_reader()
-                buf = b""
-                for rbuf in reader:
-                    buf += rbuf
-                    if not rbuf or len(buf) >= 32768:
-                        break
+            if self.do_log:
+                self.log("WOPI POST 'contents': %s" % (full_path))
 
-                if buf:
-                    with open(full_path, "wb") as file:
-                        file.write(buf)
+            reader, _ = self.get_body_reader()
+            buf = b""
+            for rbuf in reader:
+                buf += rbuf
+                if not rbuf or len(buf) >= 32768:
+                    break
 
-                    mod_time = {
-                        "LastModifiedTime": 
-                            time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path)))
-                    }
-                    ret = json.dumps(mod_time).encode("utf-8", "replace")
-                    self.reply(ret, 200, "application/json; charset=utf-8")
-                    return True
+            if buf:
+                with open(full_path, "wb") as file:
+                    file.write(buf)
+
+                mod_time = {
+                    "LastModifiedTime": 
+                        time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path)))
+                }
+                ret = json.dumps(mod_time).encode("utf-8", "replace")
+                self.reply(ret, 200, "application/json; charset=utf-8")
+                return True
 
         return self.tx_404(True)
 

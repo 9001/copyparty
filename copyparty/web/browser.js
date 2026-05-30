@@ -7665,13 +7665,24 @@ var treectl = (function () {
 					tn.href = addq(tn.href, 'v');
 			}
 
-            if (["ods", "odt", "odp"].includes(tn.ext)) {
-				tn.lead = '<a href="https://192.168.1.11:9980/browser/4610258811/cool.html?WOPISrc=https://192.168.1.11:3923/wopi/files/' +
-                    bhref + '" rel="nofollow">📄</a>';
-            } else if (tn.lead == '-')
+            // https://en.wikipedia.org/wiki/OpenDocument
+            // https://help.collaboraoffice.com/latest/en-US/text/shared/guide/ms_user.html
+            var office_formats = [
+                "odt", "fodt", "doc", "docx",
+                "ods", "fods", "xls", "xlsx",
+                "odp", "fopd", "ppt", "pps", "pptx",
+                "odg", "fodg",
+                "odf",
+            ];
+
+            if (office_formats.includes(tn.ext)) {
+				tn.lead = '<a href="?wopi=' + bhref + '" id="t' + id +
+                    '" rel="nofollow" target="blank" name="' + hname + '">📄</a>';
+            } else if (tn.lead == '-') {
 				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +
 					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
+            }
 
 			var cl = /\.PARTIAL$/.exec(fname) ? ' class="fade"' : '',
 				ln = ['<tr' + cl + '><td>' + tn.lead + '</td><td><a href="' +
