@@ -104,7 +104,7 @@ ICV_EXTS = set(zsg.split(","))
 zsg = "3gp,asf,av1,avc,avi,flv,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,vob,webm,wmv"
 VCV_EXTS = set(zsg.split(","))
 
-zsg = "aif,aiff,alac,ape,flac,m4a,m4b,m4r,mka,mp3,oga,ogg,opus,tak,tta,wav,wma,wv,cbz,epub"
+zsg = "aif,aiff,alac,ape,flac,m4a,m4b,m4r,mka,mp3,oga,ogg,opus,tak,tta,wav,wma,wv,cbz,epub,pkg"
 ACV_EXTS = set(zsg.split(","))
 
 zsg = "nohash noidx xdev xvol"
