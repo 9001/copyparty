@@ -5151,6 +5151,9 @@ html.e #actionsArea {
 }
 #spaceUsed_bar{
 	background: rgb(85, 144, 255);
+	background: var(--a);
+}
+html.b #spaceUsed_bar {
 	background: linear-gradient(to right, transparent, var(--a-dark), var(--a));
 }
 #spaceTotal_bar {
@@ -5426,6 +5429,7 @@ html.f #u2c3t span {
 html.f #u2cards span {
 	font-size: .8em;
 }
+html.f #blogout,
 html.f #goh {
 	font-size: 1.2em;
 }
