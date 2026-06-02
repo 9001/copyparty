@@ -2,6 +2,38 @@
 
 var J_BRW = 1;
 
+
+// start DL of secondary JS
+// based on https://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
+function loadScript(name, id) {
+	var head = (document.getElementsByTagName("head")[0] || document.head)
+    var s = document.createElement('script');
+    s.src = window.SR + '/.cpr/w/' + name + '.js?_=' + window.TS;
+	var done = false;
+    s.onload = s.onreadystatechange = function() {
+		if (!done && (!this.readyState ||
+				this.readyState === "loaded" || this.readyState === "complete") ) {
+			done = true;
+
+			jsldp(id, name);
+
+			// Handle memory leak in IE
+			s.onload = s.onreadystatechange = null;
+			if ( head && s.parentNode ) {
+				head.removeChild(s);
+			}
+		}
+	};
+    head.appendChild(s);
+}
+// re-define this function to ensure it's available when needed
+function jsldp(a, b) {
+	2 != window[a] && alert("FATAL ERROR: cannot load " + b + ".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")
+}
+loadScript('baguettebox', "J_BBX");
+loadScript('up2k', "J_U2K");
+
+
 // disables emojis
 var fun_tgl = sread('fun_tgl');
 if( fun_tgl == null)
@@ -1105,6 +1137,16 @@ ebi('up_outside').onclick =
 		modaltoggle('up2k', false);
 	}
 
+var up2k_lgcy = false;
+ebi('reloc_up').onclick = function(){
+	up2k_lgcy = !up2k_lgcy;
+	this.innerHTML = up2k_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+	clmod(ebi('up2k'), 'unmodal', up2k_lgcy);
+	swrite('up2k_lgcy', up2k_lgcy);
+}
+if(sread('up2k_lgcy') == 'true')
+	ebi('reloc_up').click();
+
 ebi('wrap').insertBefore(mknod('div', 'lazy'), ebi('epi'));
 
 var x = ebi('bbsw');
@@ -1144,7 +1186,7 @@ ebi('h_bup').onclick = function() {
 var musicSettings = (
 	'<div class="sub_section"><h3 id="h_mp">🎵 ' + L.ot_mp + '</h3></div>' +
 
-	'<div class="sub"><h3 id="h_mpopts">✅ ' + L.cl_opts + '</h3><div>' +
+	'<div class="sub"><h3 id="h_mpopts">🎧 ' + L.cl_opts + '</h3><div>' +
 	'<a class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
 	'<a class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
 	'<a class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
@@ -1406,6 +1448,16 @@ ebi('op_cfg').innerHTML = (
 			modaltoggle('cfg');
 		}
 })();
+
+var cfg_lgcy = false;
+ebi('reloc_cfg').onclick = function(){
+	cfg_lgcy = !cfg_lgcy;
+	this.innerHTML = cfg_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+	clmod(ebi('cfg'), 'unmodal', cfg_lgcy);
+	swrite('cfg_lgcy', cfg_lgcy);
+}
+if(sread('cfg_lgcy') == 'true')
+	ebi('reloc_cfg').click();
 
 // accent color
 function parseColor (strColor) {
@@ -2101,6 +2153,8 @@ var mpl = (function () {
 			o = QS('html.b #music, html.f #music');
 			if (o)
 				o.style.background = "url('" + url + "') no-repeat center / cover";
+			else
+				ebi('music').style.background = "";
 		}
 	}
 
@@ -2132,7 +2186,7 @@ var mpl = (function () {
 				}
 			}
 
-			cover = addq(cover || mp.au.osrc, 'th=j');
+			cover = addq(cover || mp.au.src, 'th=j');
 			tags.artwork = [{ "src": cover, type: "image/jpeg" }];
 		}
 		r.cover = cover;
@@ -6552,9 +6606,9 @@ window.thegrid = (function () {
 					(isdir ? 'folder' : 'file') + '-icon" color="' +
 					(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/></svg>' +
 				(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
-					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc(var(--grid-sz) / 5 * ' +
-					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')">' + ext + '</span>') +
-				'<img loading="lazy" onload="th_onload(this)" src="' +
+					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' +
+					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')"><span class="inner">' + ext + '</span></span>') +
+				'<img loading="lazy" fetchPriority="low" onload="th_onload(this)" src="' +
 				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
@@ -8714,6 +8768,10 @@ var treectl = (function () {
 		vbar.onresize();
 		showfile.addlinks();
 		drag.initfiles();
+			
+		var media = scan_hash(location.hash);
+		if(media && media[0] == 'g')
+			clmod(ebi('ggrid'), 'waiting', true);
 		setTimeout(eval_hash, 1);
 	};
 
@@ -9069,8 +9127,9 @@ function apply_perms(res) {
 		ebi('u2rand').parentNode.style.display = 'none';
 
 	u2ts = res.u2ts;
-	if (up2k)
-		up2k.set_fsearch();
+
+	if(up2k)
+		wait_set_fsearch();
 
 	if (res.cfg)
 		rw_edit = res.rw_edit;
@@ -9085,8 +9144,22 @@ function apply_perms(res) {
 		goto('up2k');
 		clmod(document.documentElement, 'noscroll', false);
 	}
-	clmod(ebi('up2k'), 'unmodal', up_only);
+	if(up_only && !up2k_lgcy){
+		up2k_lgcy = !up2k_lgcy;
+		ebi('reloc_up').innerHTML = up2k_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+		clmod(ebi('up2k'), 'unmodal', up2k_lgcy);
+	}
 	clmod(ebi('opa_mkd'), 'vis', up_only);
+}
+
+function wait_set_fsearch(){
+	var t = setInterval(function () {
+		if (!up2k || !up2k.set_fsearch)
+			return;
+
+		clearInterval(t);
+		up2k.set_fsearch();
+	}, 50);
 }
 
 
@@ -11046,8 +11119,8 @@ function reload_browser() {
 	for (var a = 0; a < ns.length; a++)
 		clmod(ebi(ns[a]), 'hidden', ebi('unsearch'));
 
-	if (up2k)
-		up2k.set_fsearch();
+	if(up2k)
+		wait_set_fsearch();
 
 	thegrid.setdirty();
 	msel.render();
@@ -11111,7 +11184,7 @@ function reload_browser() {
 		try{
 			if (e.button !== 0 && e.type !== 'touchstart') return;
 			if (!thegrid.en || !treectl.dsel) return;
-			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a,.modal,.normalrcm')) return;
+			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a,.modal,.normalrcm,#tree')) return;
 		}
 		catch(ex){
 			console.log(ex);

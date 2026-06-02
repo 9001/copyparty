@@ -140,17 +140,18 @@ blink {
 		margin-bottom: 6em;
 	}
 	#mn {
-		padding: 1.3em 0 .7em 1em;
+		padding: .8em 0 .2em 1em;
 		border-bottom: 1px solid #ccc;
 		background: #eee;
 		z-index: 10;
 		width: calc(100% - 1em);
 	}
 	#mn a {
+		display: inline-block;
 		color: #444;
 		background: none;
 		margin: 0 0 0 -.2em;
-		padding: .3em 0 .3em .4em;
+		padding: .5em .4em .5em 0;
 		text-decoration: none;
 		border: none;
 		/* ie: */

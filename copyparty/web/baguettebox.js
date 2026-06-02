@@ -303,7 +303,7 @@ window.baguetteBox = (function () {
         if (!overlay) {
             var ctr = mknod('div');
             ctr.innerHTML = (
-                '<div id="bbox-overlay" role="dialog">' +
+                '<div id="bbox-overlay" class="normalrcm" role="dialog">' +
                 '<div id="bbox-slider"></div>' +
                 '<div id="bbox-prev"><a class="btn" aria-label="Previous">◀</a></div>' +
                 '<div id="bbox-next"><a class="btn" aria-label="Next">▶</a></div>' +
@@ -742,6 +742,8 @@ window.baguetteBox = (function () {
     }
 
     function showOverlay(chosenImageIndex) {
+        clmod(ebi('ggrid'), 'waiting', true);
+
         if (options.noScrollbars) {
             var a = document.documentElement.style.overflowY,
                 b = document.body.style.overflowY;
@@ -765,6 +767,7 @@ window.baguetteBox = (function () {
         loadImage(currentIndex, function () {
             preloadNext(currentIndex);
             preloadPrev(currentIndex);
+            clmod(ebi('ggrid'), 'waiting', false);
         });
 
         show_buttons(0);
