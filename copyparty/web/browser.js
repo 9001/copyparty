@@ -10994,19 +10994,18 @@ var drag = (function() {
 				currLink = e.dataTransfer.getData("text/plain");
 				console.log("elem.ondrop: " + currLink);
 				fileman.clip = currLink.split("\n");
+
+				fileman.cut();
+				msel.evsel();
+
+				if (fileman.clip.length) {
+					r.is_dragging = true;
+					(elem.tagName == "TR" ? elem.querySelector("a[id]") : elem).click();
+				}
 			}
 			else{
-				clmod(elem, "dtarget");
-				clmod(current, "sel", true);
-				msel.selui();
-				fileman.clip = [];
-			}
-			fileman.cut();
-			msel.evsel();
-
-			if (fileman.clip.length) {
-				r.is_dragging = true;
-				(elem.tagName == "TR" ? elem.querySelector("a[id]") : elem).click();
+				// wrong source location
+				return
 			}
 		};
 	}
