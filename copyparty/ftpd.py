@@ -629,7 +629,7 @@ class Ftpd(object):
             FtpHandler.hub = h2.hub = hub
             FtpHandler.args = h2.args = hub.args
             FtpHandler.authorizer = h2.authorizer = FtpAuth(hub)
-
+            FtpHandler.banner = self.args.ftp_banner
             if self.args.ftp_pr:
                 p1, p2 = [int(x) for x in self.args.ftp_pr.split("-")]
                 if self.args.ftp and self.args.ftps:
