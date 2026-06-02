@@ -1085,6 +1085,9 @@ function up2k_init(subtle) {
         }
     }
     function onovercmn(self, e, btn) {
+        if(e.dataTransfer.getData("text/plain") && e.dataTransfer.getData("text/plain").startsWith(window.location.origin)){
+            return;
+        }
         try {
             var ok = false, dt = e.dataTransfer.types;
             for (var a = 0; a < dt.length; a++)
@@ -1146,6 +1149,8 @@ function up2k_init(subtle) {
     document.body.ondrop = gotfile;
     ebi('u2btn').ondrop = gotfile;
     ebi('u2btn').ondragover = onoverbtn;
+    ebi('wrap').ondrop = gotfile;
+    ebi('wrap').ondragover = onoverbtn;
 
     var drops = [ebi('up_dz'), ebi('srch_dz')];
     for (var a = 0; a < 2; a++) {
@@ -1188,6 +1193,19 @@ function up2k_init(subtle) {
 
     function gotfile(e) {
         ev(e);
+
+        console.log(e.dataTransfer.getData("text/plain"))
+		if(e.dataTransfer && e.dataTransfer.getData("text/plain").startsWith(window.location.origin)){
+			var currLink = e.dataTransfer.getData("text/plain");
+			console.log(currLink);
+			fileman.clip = currLink.split("\n");
+			
+			fileman.cut();
+			msel.evsel();
+            fileman.paste(true);
+            return
+		}
+
         nenters = 0;
         offdrag.call(this);
         // var dz = this && this.getAttribute('id');

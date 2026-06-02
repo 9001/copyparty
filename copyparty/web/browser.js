@@ -5274,43 +5274,53 @@ var fileman = (function () {
 	};
 
 	r.cut = function (e) {
+		var useClip = r.clip.length > 0;
+
 		var sel = msel.getsel(),
 			stamp = Date.now(),
 			vps = [stamp];
 
-		if (!sel.length)
+		if (!useClip && !sel.length)
 			return toast.err(3, L.fc_emore);
 
 		ev(e);
 
-		if (clgot(bcut, 'hide'))
+		if (!useClip && clgot(bcut, 'hide'))
 			return toast.err(3, L.fc_eperm);
 
-		var els = [], griden = thegrid.en;
-		for (var a = 0; a < sel.length; a++) {
-			vps.push(sel[a].vp);
-			if (sel.length < 100)
-				try {
-					if (griden)
-						els.push(QS('#ggrid>a[ref="' + sel[a].id + '"]'));
-					else
-						els.push(ebi(sel[a].id).closest('tr'));
+		if(!useClip){
+			var els = [], griden = thegrid.en;
+			for (var a = 0; a < sel.length; a++) {
+				vps.push(sel[a].vp);
+				if (sel.length < 100)
+					try {
+						if (griden)
+							els.push(QS('#ggrid>a[ref="' + sel[a].id + '"]'));
+						else
+							els.push(ebi(sel[a].id).closest('tr'));
 
-					clmod(els[a], 'fcut');
+						clmod(els[a], 'fcut');
+					}
+					catch (ex) { }
+			}
+
+			setTimeout(function () {
+				try {
+					for (var a = 0; a < els.length; a++)
+						clmod(els[a], 'fcut', 1);
 				}
 				catch (ex) { }
+			}, 1);
+
+			r.clip = vps.slice(1);
+		}
+		else {
+			for (var a = 0; a < r.clip.length; a++) {
+				vps.push(r.clip[a]);
+			}
 		}
 
-		setTimeout(function () {
-			try {
-				for (var a = 0; a < els.length; a++)
-					clmod(els[a], 'fcut', 1);
-			}
-			catch (ex) { }
-		}, 1);
-
 		r.ccp = false;
-		r.clip = vps.slice(1);
 
 		try {
 			vps = JSON.stringify(vps);
@@ -5642,6 +5652,8 @@ var fileman = (function () {
 				}
 			}
 			r.render();
+			if(('' + msg).startsWith(window.location.origin))
+				msg = msg.replace(window.location.origin, "");
 			if (msg == get_evpath())
 				treectl.goto(msg);
 		};
@@ -10976,11 +10988,19 @@ var drag = (function() {
 		};
 
 		elem.ondrop = function(e) {
+			if (!r.enabled) return;
 			ev(e);
-			clmod(elem, "dtarget");
-			clmod(current, "sel", true);
-			msel.selui();
-			fileman.clip = [];
+			if(e.dataTransfer && e.dataTransfer.getData("text/plain").startsWith(window.location.origin)){
+				currLink = e.dataTransfer.getData("text/plain");
+				console.log(currLink);
+				fileman.clip = currLink.split("\n");
+			}
+			else{
+				clmod(elem, "dtarget");
+				clmod(current, "sel", true);
+				msel.selui();
+				fileman.clip = [];
+			}
 			fileman.cut();
 			msel.evsel();
 
@@ -11003,6 +11023,11 @@ var drag = (function() {
 					currLink = basenames(e.target.querySelector("td:nth-child(2) a").href.split("?"));
 					current = e.target;
 					r.no_warn = true;
+
+					clmod(current, "sel", true);
+					msel.selui();
+
+					e.dataTransfer.setData("text/plain", r.getFilesString());
 				}
 				catch(ex){
 					console.log(e.target)
@@ -11035,6 +11060,18 @@ var drag = (function() {
 					current = a.closest("tr");
 					currLink = basenames(a.href.split("?"));
 					r.no_warn = true;
+
+					if(!clgot(current, "sel"))
+					{
+						msel.so = msel.pr = null;
+						var trs = QSA('#files tbody tr');
+						for (var a = 0, aa = trs.length; a < aa; a++)
+							clmod(trs[a], 'sel', fun);
+						clmod(current, "sel", true);
+						msel.selui();
+					}
+
+					e.dataTransfer.setData("text/plain", r.getFilesString());
 				}
 				catch(ex){
 					console.log(e.target)
@@ -11048,6 +11085,19 @@ var drag = (function() {
 			if (clgot(f, 'dir'))
 				r.mktarget(f);
 		}
+	};
+	r.getFilesString = function(){
+		var sel = msel.getsel(),
+			vps = [];
+		
+		for (var a = 0; a < sel.length; a++) {
+			var link = sel[a].vp;
+			if(!link.startsWith(window.location.origin))
+				link = window.location.origin + link;
+			vps.push(link);
+		}
+
+		return vps.join("\n");
 	};
 
 	return r;
