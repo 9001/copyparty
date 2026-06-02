@@ -10992,7 +10992,7 @@ var drag = (function() {
 			ev(e);
 			if(e.dataTransfer && e.dataTransfer.getData("text/plain").startsWith(window.location.origin)){
 				currLink = e.dataTransfer.getData("text/plain");
-				console.log(currLink);
+				console.log("elem.ondrop: " + currLink);
 				fileman.clip = currLink.split("\n");
 			}
 			else{
@@ -11066,7 +11066,7 @@ var drag = (function() {
 						msel.so = msel.pr = null;
 						var trs = QSA('#files tbody tr');
 						for (var a = 0, aa = trs.length; a < aa; a++)
-							clmod(trs[a], 'sel', fun);
+							clmod(trs[a], 'sel', false);
 						clmod(current, "sel", true);
 						msel.selui();
 					}

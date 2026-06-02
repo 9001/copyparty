@@ -1197,7 +1197,7 @@ function up2k_init(subtle) {
         console.log(e.dataTransfer.getData("text/plain"))
 		if(e.dataTransfer && e.dataTransfer.getData("text/plain").startsWith(window.location.origin)){
 			var currLink = e.dataTransfer.getData("text/plain");
-			console.log(currLink);
+			console.log("wrap.ondrop: " + currLink);
 			fileman.clip = currLink.split("\n");
 			
 			fileman.cut();
