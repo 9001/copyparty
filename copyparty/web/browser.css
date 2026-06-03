@@ -2117,6 +2117,7 @@ html {
 	opacity: 0;
 	background: #8888;
 	cursor: ew-resize;
+	touch-action: none;
 }
 #reszbar:hover{
 	opacity: .6;

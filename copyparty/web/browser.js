@@ -11252,7 +11252,8 @@ function reload_browser() {
 				}
 				resizing = true;
 				clmod(ebi('tree'), 'resz', true);
-				ev(e);
+				if(e.cancelable)
+					ev(e);
 				return;
 			}
 			if (e.button !== 0 && e.type !== 'touchstart') return;
@@ -11293,13 +11294,13 @@ function reload_browser() {
 	}
 
 	function sel_move(e) {
-		var pos = getpp(e);
 		if(resizing){
 			var em2px = parseFloat(getComputedStyle(document.body).fontSize);
-			treectl.settreesize(e.clientX / em2px);
+			treectl.settreesize(getpp(e).x / em2px);
 			return;
 		}
 		if (!is_selma) return;
+		var pos = getpp(e);
 		var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
 
 		if (e.type === 'touchmove' && ttimer) {
