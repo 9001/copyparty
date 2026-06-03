@@ -1635,6 +1635,16 @@ def expand_osenv_cs(txt) -> str:
     raise Exception(t)
 
 
+def signame2int(txt: str) -> int:
+    try:
+        return int(txt)
+    except:
+        txt = txt.upper()
+        if not txt.startswith("SIG"):
+            txt = "SIG" + txt
+        return int(getattr(signal, txt))
+
+
 def rice_tid() -> str:
     tid = threading.current_thread().ident
     c = sunpack(b"B" * 5, spack(b">Q", tid)[-5:])

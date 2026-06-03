@@ -627,6 +627,9 @@ class VFS(object):
                     t = "%s has no %s in %r => %r => %r"
                     self.log("vfs", t % (uname, msg, vpath, cvpath, ap), 6)
 
+                if not err:
+                    return None
+
                 t = "you don't have %s-access in %r or below %r"
                 raise Pebkac(err, t % (msg, "/" + cvpath, "/" + vn.vpath))
 
@@ -858,7 +861,7 @@ class VFS(object):
             for le in vfs_ls:
                 ap = absreal(os.path.join(fsroot, le[0]))
                 vn2 = self.chk_ap(ap)
-                if not vn2 or not vn2.get("", uname, True, False):
+                if not vn2 or not vn2.get("", uname, True, False, err=0):
                     rm1.append(le)
             _ = [vfs_ls.remove(x) for x in rm1]  # type: ignore
 
@@ -900,20 +903,14 @@ class VFS(object):
 
     def zipgen(
         self,
-        vpath: str,
+        folder: str,
         vrem: str,
         flt: set[str],
         uname: str,
         dirs: bool,
         dots: int,
         scandir: bool,
-        wrap: bool = True,
     ) -> Generator[dict[str, Any], None, None]:
-
-        # if multiselect: add all items to archive root
-        # if single folder: the folder itself is the top-level item
-        folder = "" if flt or not wrap else (vpath.split("/")[-1].lstrip(".") or "top")
-
         g = self.walk(folder, vrem, [], uname, [[True, False]], dots, scandir, False)
         for _, _, vpath, apath, files, rd, vd in g:
             if flt:
@@ -3082,10 +3079,10 @@ class AuthSrv(object):
             pwds.extend([x.split(":", 1)[1] for x in pwds if ":" in x])
         if pwds:
             if self.ah.on:
-                zs = r"(\[H\] %s:.*|[?&]%s=)([^&]+)"
+                zs = r"(\[[HO]\] %s:.*|[?&]%s=)([^&]+)"
                 zs = zs % (self.args.pw_hdr, self.args.pw_urlp)
             else:
-                zs = r"(\[H\] %s:.*|=)(" % (self.args.pw_hdr,)
+                zs = r"(\[[HO]\] %s:.*|=)(" % (self.args.pw_hdr,)
                 zs += "|".join(pwds) + r")([]&; ]|$)"
 
             self.re_pwd = re.compile(zs)

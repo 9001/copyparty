@@ -302,7 +302,7 @@ also see [comparison to similar software](./docs/versus.md)
     * ☑ realtime streaming of growing files (logfiles and such)
   * ☑ [thumbnails](#thumbnails)
     * ☑ ...of images using Pillow, pyvips, or FFmpeg
-    * ☑ ...of RAW images using rawpy
+    * ☑ ...of RAW images using libraw-dcraw_emu or rawpy
     * ☑ ...of videos using FFmpeg
     * ☑ ...of audio (spectrograms) using FFmpeg
     * ☑ cache eviction (max-age; maybe max-size eventually)
@@ -836,6 +836,7 @@ you can also zip a selection of files or folders by clicking them in the browser
 
 cool trick: download a folder by appending url-params `?tar&opus` or `?tar&mp3` to transcode all audio files (except aac|m4a|mp3|ogg|opus|wma) to opus/mp3 before they're added to the archive
 * super useful if you're 5 minutes away from takeoff and realize you don't have any music on your phone but your server only has flac files and downloading those will burn through all your data + there wouldn't be enough time anyways
+* and url-param `&name=foo` changes the name of the toplevel folder in the archive to `foo`, and just `&name` removes the folder entirely
 * and url-param `&nodot` skips dotfiles/dotfolders; they are included by default if your account has permission to see them
 * and url-params `&j` / `&w` produce jpeg/webm thumbnails/spectrograms instead of the original audio/video/images (`&p` for audio waveforms)
   * can also be used to pregenerate thumbnails; combine with `--th-maxage=9999999` or `--th-clean=0`
@@ -1336,9 +1337,15 @@ using arguments or config files, or a mix of both:
 
 sleep better at night  by telling copyparty to periodically check whether your version has a [known vulnerability](https://github.com/9001/copyparty/security/advisories)
 
-this feature can be enabled by setting the global-option `--vc-url` to one of the following URLs; all of them provide the same information, so which one you choose is whatever
-* `https://api.copyparty.eu/advisories`
-* `https://api.github.com/repos/9001/copyparty/security-advisories?per_page=9`
+this feature can be enabled by setting the global-option `--vc-url` to one of the following URLs; choose what severity level you want to be notified for:
+* `https://api.copyparty.eu/advisories-panic` -- only really bad stuff, the "UPGRADE NOW" kind
+* `https://api.copyparty.eu/advisories` -- everything important / noteworthy, "upgrade when you can"
+* `https://api.copyparty.eu/advisories-all` -- *everything*, including stuff that's unlikely to affect anyone
+* `https://api.github.com/repos/9001/copyparty/security-advisories?per_page=9` -- same as `advisories-all`
+
+note that `https://api.copyparty.eu/advisories` may (for example) skip some advisories rated `High` but include some `Low`; that's because an easily-reachable `Low` in a default-enabled feature is more severe than a `High` which is a theoretical bug in a contrived use of a fringe feature, but the CVE calculator would still classify that as `High`
+
+if you want to use the github advisory feed but only care about advisories rated `medium`/`moderate` or higher, then global-option `--vc-sev medium` does that, but see previous paragraph
 
 > to see what happens when a bad version is detected, try `--vc-url https://api.copyparty.eu/advisories-test`
 
@@ -1354,6 +1361,7 @@ config file example:
   vc-url: https://api.copyparty.eu/advisories
   vc-age: 3  # how many hours to wait between each check
   vc-exit    # emergency-exit if current version is vulnerable
+  vc-sev: medium  # only care about severity 'Medium'/'Moderate' or higher (github-only; don't use this with api.copyparty.eu)
 ```
 
 
@@ -1762,7 +1770,7 @@ avoid traversing into other filesystems  using `--xdev` / volflag `:c,xdev`, ski
 
 and/or you can `--xvol` / `:c,xvol` to ignore all symlinks leaving the volume's top directory, but still allow bind-mounts pointing elsewhere
 
-* symlinks are permitted with `xvol` if they point into another volume where the user has the same level of access
+* symlinks are permitted with `xvol` if they point into another volume where the user also has some sort of access, keeping permissions from outer/initial volume
 
 these options will reduce performance; unlikely worst-case estimates are 14% reduction for directory listings, 35% for download-as-tar
 
@@ -3206,7 +3214,7 @@ enable [thumbnails](#thumbnails) of...
 * **HEIF pictures:** `pyvips` or `ffmpeg` or `pillow-heif`
 * **AVIF pictures:** `pyvips` or `ffmpeg` or `pillow-avif-plugin` or pillow v11.3+
 * **JPEG XL pictures:** `pyvips` or `ffmpeg`
-* **RAW images:** `rawpy`, plus one of `pyvips` or `Pillow` (for some formats)
+* **RAW photos:** either `libraw dcraw_emu` or `rawpy`, plus either `pyvips` or `Pillow`
 
 enable sending [zeromq messages](#zeromq) from event-hooks: `pyzmq`
 
@@ -3217,6 +3225,8 @@ enable [smb](#smb-server) support (**not** recommended): `impacket==0.13.0`
 * to install `pyvips` on windows: `pip install --user -U "pyvips[binary]"`
 
 to install FFmpeg on Windows, grab [a recent build](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z) -- you need `ffmpeg.exe` and `ffprobe.exe` from inside the `bin` folder; copy them into `C:\Windows\System32` or any other folder that's in your `%PATH%`
+
+if your ffmpeg/ffprobe binaries have nonstandard names -- such as `ffmpeg8` (macports) -- set environment variables `PRTY_FFMPEG_BIN` and `PRTY_FFPROBE_BIN` to the corret name (or full path)
 
 
 ### dependency chickenbits
@@ -3232,6 +3242,7 @@ set any of the following environment variables to disable its associated optiona
 | -------------------- | ------------ |
 | `PRTY_NO_ARGON2`     | disable argon2-cffi password hashing |
 | `PRTY_NO_CFSSL`      | never attempt to generate self-signed certificates using [cfssl](https://github.com/cloudflare/cfssl) |
+| `PRTY_NO_DCRAW`      | disable all [libraw](https://www.libraw.org/homepage)-based thumbnail support for RAW images |
 | `PRTY_NO_FFMPEG`     | **audio transcoding** goes byebye, **thumbnailing** must be handled by Pillow/libvips |
 | `PRTY_NO_FFPROBE`    | **audio transcoding** goes byebye, **thumbnailing** must be handled by Pillow/libvips, **metadata-scanning** must be handled by mutagen |
 | `PRTY_NO_MAGIC`      | do not use [magic](https://pypi.org/project/python-magic/) for filetype detection |
@@ -3246,7 +3257,8 @@ set any of the following environment variables to disable its associated optiona
 | `PRTY_NO_PIL_WEBP`   | disable use of native webp support in Pillow |
 | `PRTY_NO_PSUTIL`     | do not use [psutil](https://pypi.org/project/psutil/) for reaping stuck hooks and plugins on Windows |
 | `PRTY_NO_PYFTPD`     | disable ftp(s) server ([pyftpdlib](https://pypi.org/project/pyftpdlib/)-based) |
-| `PRTY_NO_RAW`        | disable all [rawpy](https://pypi.org/project/rawpy/)-based thumbnail support for RAW images |
+| `PRTY_NO_RAW`        | same as `PRTY_NO_DCRAW` plus `PRTY_NO_RAWPY` |
+| `PRTY_NO_RAWPY`      | disable all [rawpy](https://pypi.org/project/rawpy/)-based thumbnail support for RAW images |
 | `PRTY_NO_VIPS`       | disable all [libvips](https://pypi.org/project/pyvips/)-based thumbnail support; will fallback to Pillow or ffmpeg |
 
 example: `PRTY_NO_PIL=1 python3 copyparty-sfx.py`

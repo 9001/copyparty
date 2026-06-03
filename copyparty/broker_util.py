@@ -16,6 +16,7 @@ if True:  # pylint: disable=using-constant-test
 
 if TYPE_CHECKING:
     from .httpsrv import HttpSrv
+    from .svchub import SvcHub
 
 
 class ExceptionalQueue(Queue, object):
@@ -50,6 +51,7 @@ class BrokerCli(object):
     for example resolving httpconn.* in httpcli -- see lines tagged #mypy404
     """
 
+    hub: "SvcHub"
     log: "RootLogger"
     args: argparse.Namespace
     asrv: AuthSrv

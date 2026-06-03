@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 20, 14)
+VERSION = (1, 20, 16)
 CODENAME = "sftp is fine too"
-BUILD_DT = (2026, 4, 24)
+BUILD_DT = (2026, 5, 26)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)

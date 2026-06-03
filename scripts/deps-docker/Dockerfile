@@ -2,7 +2,7 @@ FROM    alpine:3.23
 WORKDIR /z
 ENV     ver_hashwasm=4.12.0 \
         ver_marked=4.3.0 \
-        ver_dompf=3.4.1 \
+        ver_dompf=3.4.6 \
         ver_mde=2.18.0 \
         ver_codemirror=5.65.18 \
         ver_fontawesome=5.13.0 \
@@ -156,6 +156,7 @@ COPY    uncomment.py unhint.py /z
 RUN     mv /z/mfusepy-3.1.1/mfusepy.py /z/dist/ \
         && cd /z/dist \
         && python3 /z/unhint.py \
+        && rm -f uh \
         && mv mfusepy.py f1 \
         && python3 /z/uncomment.py f1 \
         && sed -ri '/self.__critical_exception/d; /^from (typing|collections.abc) import/d' f1 \

@@ -16,7 +16,7 @@ imgs="dj iv min im ac"
 dhub_order="iv dj min im ac"
 ghcr_order="ac im min dj iv"
 ngs=(
-    iv-{ppc64le,s390x}
+    iv-{ppc64le,s390x,arm}
     dj-{ppc64le,s390x,arm}
 )
 

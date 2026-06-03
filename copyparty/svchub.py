@@ -41,10 +41,11 @@ from .th_srv import (
     H_PIL_AVIF,
     H_PIL_HEIF,
     H_PIL_WEBP,
+    HAVE_DCRAW,
     HAVE_FFMPEG,
     HAVE_FFPROBE,
     HAVE_PIL,
-    HAVE_RAW,
+    HAVE_RAWPY,
     HAVE_VIPS,
     ThumbSrv,
 )
@@ -81,6 +82,7 @@ from .util import (
     odfusion,
     pybin,
     read_utf8,
+    signame2int,
     start_log_thrs,
     start_stackmon,
     termsize,
@@ -106,10 +108,18 @@ if PY2:
 else:
     from urllib.request import Request, urlopen
 
+try:
+    from queue import SimpleQueue
+except:
+    # yuul b. alwright
+    from queue import Queue as SimpleQueue
+
 
 VER_IDP_DB = 1
 VER_SESSION_DB = 1
 VER_SHARES_DB = 2
+
+CVE_SEVS = {"low": 1, "medium": 2, "moderate": 2, "high": 3, "critical": 4}
 
 
 class SvcHub(object):
@@ -139,13 +149,9 @@ class SvcHub(object):
         self.logf: Optional[typing.TextIO] = None
         self.logf_base_fn = ""
         self.is_dut = False  # running in unittest; always False
-        self.stop_req = False
         self.stopping = False
         self.stopped = False
-        self.reload_req = False
         self.reload_mutex = threading.Lock()
-        self.stop_cond = threading.Condition()
-        self.nsigs = 3
         self.retcode = 0
         self.httpsrv_up = 0
         self.qr_tsz = None
@@ -154,6 +160,12 @@ class SvcHub(object):
         self.cday = 0
         self.cmon = 0
         self.tstack = 0.0
+
+        self.sig_logrot = -999
+        self.sig_reload = -999
+        self.sig_stack = -999
+        self.nsigs = 7
+        self.sig = SimpleQueue()
 
         self.iphash = HMaccas(os.path.join(self.E.cfg, "iphash"), 8)
 
@@ -288,6 +300,9 @@ class SvcHub(object):
                 self.log("root", "vc-age too low for copyparty.eu; will use 3 hours")
             args.vc_age = zi
 
+        if args.vc_sev and args.vc_sev not in CVE_SEVS:
+            self.log("root", "vc-sev %r invalid; will use 'low'" % (args.vc_sev,), 3)
+
         zs = ""
         if args.th_ram_max < 0.22:
             zs = "generate thumbnails"
@@ -398,7 +413,7 @@ class SvcHub(object):
             decs.pop("vips", None)
         if not HAVE_PIL:
             decs.pop("pil", None)
-        if not HAVE_RAW:
+        if not HAVE_RAWPY and not HAVE_DCRAW:
             decs.pop("raw", None)
         if not HAVE_FFMPEG or not HAVE_FFPROBE:
             decs.pop("ff", None)
@@ -1009,7 +1024,8 @@ class SvcHub(object):
             (HAVE_ZMQ, "pyzmq", "send zeromq messages from event-hooks"),
             (H_PIL_HEIF, "pillow-heif", "read .heif pics with pillow (rarely useful)"),
             (H_PIL_AVIF, "pillow-avif", "read .avif pics with pillow (rarely useful)"),
-            (HAVE_RAW, "rawpy", "read RAW images"),
+            (HAVE_RAWPY, "rawpy", "read RAW images"),
+            (HAVE_DCRAW, "libraw", "read RAW images"),
         ]
         if ANYWIN:
             to_check += [
@@ -1449,31 +1465,42 @@ class SvcHub(object):
 
         sigs = [signal.SIGINT, signal.SIGTERM]
         if not ANYWIN:
-            sigs.append(signal.SIGUSR1)
+            sigs.append(signal.SIGHUP)
+
+        for (opt, mem) in (
+            ("logrot_sig", "sig_logrot"),
+            ("reload_sig", "sig_reload"),
+            ("stack_sig", "sig_stack"),
+        ):
+            zs = getattr(self.args, opt)
+            if not zs:
+                continue
+            zi = signame2int(zs)
+            setattr(self, mem, zi)
+            try:
+                sigs.append(signal.Signals(zi))
+            except:
+                t = "using unknown signal %r as %s"
+                self.log("root", t % (zi, mem), 3)
+                sigs.append(zi)
 
         for sig in sigs:
             signal.signal(sig, self.signal_handler)
 
-        # macos hangs after shutdown on sigterm with while-sleep,
-        # windows cannot ^c stop_cond (and win10 does the macos thing but winxp is fine??)
-        # linux is fine with both,
-        # never lucky
-        if ANYWIN:
-            # msys-python probably fine but >msys-python
-            Daemon(self.stop_thr, "svchub-sig")
+        if self.args.sig_thr:
+            Daemon(self._signal_thr, "svchub-sig")
 
             try:
-                while not self.stop_req:
+                while not self.stopping:
                     time.sleep(1)
             except:
                 pass
 
-            self.shutdown()
             # cant join; eats signals on win10
             while not self.stopped:
                 time.sleep(0.1)
         else:
-            self.stop_thr()
+            self._signal_thr()
 
     def start_zeroconf(self) -> None:
         self.zc_ngen += 1
@@ -1531,17 +1558,6 @@ class SvcHub(object):
             self.asrv.load_sessions(True)
         self.broker.reload_sessions()
 
-    def stop_thr(self) -> None:
-        while not self.stop_req:
-            with self.stop_cond:
-                self.stop_cond.wait(9001)
-
-            if self.reload_req:
-                self.reload_req = False
-                self.reload(True, True)
-
-        self.shutdown()
-
     def kill9(self, delay: float = 0.0) -> None:
         if delay > 0.01:
             time.sleep(delay)
@@ -1554,26 +1570,42 @@ class SvcHub(object):
             os.kill(os.getpid(), signal.SIGKILL)
 
     def signal_handler(self, sig: int, frame: Optional[FrameType]) -> None:
-        if self.stopping:
-            if self.nsigs <= 0:
+        if sig in (signal.SIGINT, signal.SIGTERM):
+            self.nsigs -= 1
+
+            if self.nsigs == 0:
                 try:
                     threading.Thread(target=self.pr, args=("OMBO BREAKER",)).start()
                     time.sleep(0.1)
                 except:
                     pass
 
+            if self.nsigs <= 0:
                 self.kill9()
-            else:
-                self.nsigs -= 1
-                return
 
-        if not ANYWIN and sig == signal.SIGUSR1:
-            self.reload_req = True
+        self.sig.put(sig)
+
+    def _signal_thr(self) -> None:
+        while not self.stopping:
+            sig = self.sig.get()
+            self._signal_handler(sig)
+
+    def _signal_handler(self, sig: int) -> None:
+        if sig == self.sig_logrot:
+            self.log("root", "signal: logrotate")
+            dt = datetime.now(self.tz)
+            self.logf_base_fn = "\t"
+            self._set_next_day(dt)
+
+        elif sig == self.sig_reload:
+            self.log("root", "signal: reload")
+            self.reload(True, True)
+
+        elif sig == self.sig_stack:
+            self.log("root", "signal: stack%s" % (alltrace(),))
+
         else:
-            self.stop_req = True
-
-        with self.stop_cond:
-            self.stop_cond.notify_all()
+            self.shutdown()
 
     def shutdown(self) -> None:
         if self.stopping:
@@ -1581,10 +1613,8 @@ class SvcHub(object):
 
         # start_log_thrs(print, 0.1, 1)
 
+        self.nsigs = 3
         self.stopping = True
-        self.stop_req = True
-        with self.stop_cond:
-            self.stop_cond.notify_all()
 
         ret = 1
         try:
@@ -1928,6 +1958,7 @@ class SvcHub(object):
         next_chk = 0
         # self.args.vc_age = 2 / 60
         fpath = os.path.join(self.E.cfg, "vuln_advisory.json")
+        minsev = CVE_SEVS.get(self.args.vc_sev, 0)
         while not self.stopping:
             now = time.time()
             if now < next_chk:
@@ -1971,9 +2002,12 @@ class SvcHub(object):
                 continue
 
             try:
+                sver = "0.1"
                 advisories = json.loads(jtxt)
                 for adv in advisories:
                     if adv.get("state") == "closed":
+                        continue
+                    if CVE_SEVS.get(adv.get("severity"), 9) < minsev:
                         continue
                     vuln = {}
                     for x in adv["vulnerabilities"]:
@@ -1992,9 +2026,8 @@ class SvcHub(object):
                         if self.args.vc_exit:
                             self.sigterm()
                         return
-                    else:
-                        t = "%sok; v%s and newer is safe"
-                        self.log("ver-chk", t % (src, sver), 2)
+                t = "%sok; v%s and newer is safe"
+                self.log("ver-chk", t % (src, sver), 2)
                 next_chk = time.time() + self.args.vc_age * 3600 - age
             except Exception as e:
                 t = "failed to process vulnerability advisory; %s"

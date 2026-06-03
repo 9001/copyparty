@@ -46,24 +46,34 @@ except:
     HAVE_MUTAGEN = False
 
 
-def have_ff(scmd: str) -> bool:
-    if ANYWIN:
+def have_ff(name: str) -> bytes:
+    uname = name.upper()
+    if os.environ.get("PRTY_NO_" + uname):
+        return b""
+
+    ebin = os.environ.get("PRTY_%s_BIN" % (uname,))
+    try:
+        scmd = (ebin or name).decode("utf-8")
+    except:
+        scmd: str = ebin or name
+
+    if ANYWIN and not ebin:
         scmd += ".exe"
 
     if PY2:
-        print("# checking {}".format(scmd))
-        acmd = (scmd + " -version").encode("ascii").split(b" ")
+        print("# checking %s" % (scmd,))
+        bcmd = scmd.encode("utf-8")
         try:
-            sp.Popen(acmd, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
-            return True
+            sp.Popen([bcmd, b"-version"], stdout=sp.PIPE, stderr=sp.PIPE).communicate()
+            return bcmd
         except:
-            return False
+            return b""
     else:
-        return bool(shutil.which(scmd))
+        return (shutil.which(scmd) or "").encode("utf-8")
 
 
-HAVE_FFMPEG = not os.environ.get("PRTY_NO_FFMPEG") and have_ff("ffmpeg")
-HAVE_FFPROBE = not os.environ.get("PRTY_NO_FFPROBE") and have_ff("ffprobe")
+HAVE_FFMPEG = have_ff("ffmpeg")
+HAVE_FFPROBE = have_ff("ffprobe")
 
 CBZ_PICS = set("png jpg jpeg gif bmp tga tif tiff webp avif jxl".split())
 CBZ_01 = re.compile(r"(^|[^0-9v])0+[01]\b")
@@ -219,7 +229,7 @@ def ffprobe(
 ) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]], list[Any], dict[str, Any]]:
     # ffprobe -hide_banner -show_streams -show_format --
     cmd = [
-        b"ffprobe",
+        HAVE_FFPROBE,
         b"-hide_banner",
         b"-show_streams",
         b"-show_format",

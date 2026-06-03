@@ -3077,7 +3077,7 @@ class Up2k(object):
                 )
 
             zi = cj["lmod"]
-            bad_mt = zi <= 0 or zi > 0xAAAAAAAA
+            bad_mt = zi <= 0 or zi > (2 << 36)
             if bad_mt or vfs.flags.get("up_ts", "") == "fu":
                 # force upload time rather than last-modified
                 cj["lmod"] = int(time.time())

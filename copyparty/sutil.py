@@ -61,6 +61,7 @@ def gfilter(
     thumbcli: ThumbCli,
     uname: str,
     vtop: str,
+    vname: str,
     fmt: str,
 ) -> Generator[dict[str, Any], None, None]:
     from concurrent.futures import ThreadPoolExecutor
@@ -70,7 +71,7 @@ def gfilter(
         _pools[tp] = 1
         try:
             for f in fgen:
-                task = tp.submit(enthumb, thumbcli, uname, vtop, f, fmt)
+                task = tp.submit(enthumb, thumbcli, uname, vtop, vname, f, fmt)
                 pend.append((task, f))
                 if pend[0][0].done() or len(pend) > CORES * 4:
                     task, f = pend.pop(0)
@@ -130,7 +131,7 @@ def gfilter2(
                     try:
                         f = {"vp": vp, "st": fi[1]}
                         task = tp.submit(
-                            enthumb, hsrv.thumbcli, LEELOO_DALLAS, vtop, f, fmt
+                            enthumb, hsrv.thumbcli, LEELOO_DALLAS, vtop, "", f, fmt
                         )
                         pend.append((task, f))
                         if pend[0][0].done() or len(pend) > CORES * 4:
@@ -152,14 +153,17 @@ def gfilter2(
 
 
 def enthumb(
-    thumbcli: ThumbCli, uname: str, vtop: str, f: dict[str, Any], fmt: str
+    thumbcli: ThumbCli, uname: str, vtop: str, vname: str, f: dict[str, Any], fmt: str
 ) -> dict[str, Any]:
     rem = f["vp"]
     ext = rem.rsplit(".", 1)[-1].lower()
     if (fmt == "mp3" and ext == "mp3") or (fmt == "opus" and ext in TAR_NO_OPUS):
         raise Exception()
 
-    vp = vjoin(vtop, rem.split("/", 1)[1])
+    if vname:
+        vp = vjoin(vtop, rem.split("/", 1)[1])
+    else:
+        vp = vjoin(vtop, rem)
     vn, rem = thumbcli.asrv.vfs.get(vp, uname, True, False)
     dbv, vrem = vn.get_dbv(rem)
     thp = thumbcli.get(dbv, vrem, f["st"].st_mtime, fmt)

@@ -35,6 +35,7 @@ scripts/docker/base/test-aac/
 scripts/docker/base/whl/
 scripts/docker/i/
 scripts/deps-docker/uncomment.py
+scripts/deps-docker/unhint.py
 contrib/package/arch/pkg/
 contrib/package/arch/src/
 
