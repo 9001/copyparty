@@ -11252,8 +11252,6 @@ function reload_browser() {
 				}
 				resizing = true;
 				clmod(ebi('tree'), 'resz', true);
-				if(e.cancelable)
-					ev(e);
 				return;
 			}
 			if (e.button !== 0 && e.type !== 'touchstart') return;
