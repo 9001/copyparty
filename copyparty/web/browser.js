@@ -9073,7 +9073,7 @@ function apply_perms(res) {
 
 	if(acct != '*'){
 		ebi('acc_name').innerHTML = acct;
-		ebi('acc_pfp').innerHTML = acct.substring(0, 1);
+		ebi('acc_pfp').innerHTML = acct.substring(0, 1).toUpperCase();
 		ebi('accessType').innerHTML = '<span' + aclass + axs + L.access + '</span>';
 		ebi('blogout').value = L.logout;
 	}
