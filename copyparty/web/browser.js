@@ -928,7 +928,8 @@ function mktemp(is_dir) {
 		sendit(input.value);
 		// Chrome blurs elements when calling remove for some reason
 		input.onblur = null;
-		row.remove();
+		if(row)
+			row.remove();
 	};
 	input.onkeydown = function(e) {
 		if (e.key == "Enter")
