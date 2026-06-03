@@ -11023,8 +11023,15 @@ var drag = (function() {
 					current = e.target;
 					r.no_warn = true;
 
-					clmod(current, "sel", true);
-					msel.selui();
+					if(!clgot(current, "sel"))
+					{
+						msel.so = msel.pr = null;
+						var trs = QSA('#files tbody tr');
+						for (var a = 0, aa = trs.length; a < aa; a++)
+							clmod(trs[a], 'sel', false);
+						clmod(current, "sel", true);
+						msel.selui();
+					}
 
 					e.dataTransfer.setData("text/plain", r.getFilesString());
 				}
