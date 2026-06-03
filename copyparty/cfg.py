@@ -240,7 +240,6 @@ flagcats = {
         "gz": "allows server-side gzip compression of uploads with ?gz",
         "xz": "allows server-side lzma compression of uploads with ?xz",
         "pk": "forces server-side compression, optional arg: xz,9",
-        "wopi": "enable WOPI support for integrating with online office suites",
     },
     "upload rules": {
         "apnd_who=dw": "who can append? (aw/dw/w/no)",
@@ -394,6 +393,11 @@ flagcats = {
         "og_tpl": "custom html; see --og-tpl in --help",
         "og_no_head": "you want to add tags manually with og_tpl",
         "og_ua": "if defined: only send OG html if useragent matches this regex",
+    },
+    "wopi": {
+        "wopi": "enable WOPI support for integrating with online office suites",
+        "wopi-client": "address of WOPI client, e.g. Collabora Online",
+        "wopi-self-signed": "disable certificate verification of the WOPI client, only use with local use"
     },
     "opds": {
         "opds": "enable OPDS",

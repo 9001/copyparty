@@ -1570,8 +1570,9 @@ def add_opds(ap):
 
 def add_wopi(ap):
     ap2 = ap.add_argument_group("WOPI options")
-    ap2.add_argument("--wopi", action="store_true", help="enable WOPI -- allows for integrating with office suites (volflag=wopi)")
-    ap2.add_argument("--wopi-path", action="store_true", default="wopi", help="where to expose WOPI (needs to start with 'wopi'); defaults to <volname>/wopi/ (volflag=wopi-path)")
+    ap2.add_argument("--wopi", action="store_true", help="allows for integrating with office suites using WOPI (volflag=wopi)")
+    ap2.add_argument("--wopi-client", type=u, default="https://localhost:9980", help="where to find your WOPI client, this is what actually hosts e.g. Collabora Online")
+    ap2.add_argument("--wopi-self-signed", action="store_true", help="disable certificate verification of the WOPI client, only use with local use")
 
 
 def add_handlers(ap):

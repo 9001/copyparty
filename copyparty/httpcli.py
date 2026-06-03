@@ -16,6 +16,10 @@ import sys
 import threading  # typechk
 import time
 import uuid
+import urllib.request
+import urllib.parse
+import ssl
+import xml.etree.ElementTree as ET
 from datetime import datetime
 from operator import itemgetter
 
@@ -1524,35 +1528,34 @@ class HttpCli(object):
         if "rss" in self.uparam:
             return self.tx_rss()
 
-        if "wopi" in self.uparam:
-            return self.tx_wopi()
+        if self.args.wopi:
+            if "wopi" in self.uparam:
+                return self.tx_wopi()
+
+            if self.vpath.startswith("wopi"):
+                return self.tx_wopi_api()
 
         return self.tx_browser()
 
-    def tx_wopi(self) -> bool:
-        self.log("%s" % self.uparam.get("wopi"))
-        return False
-        # https://' + location.hostname + ':9980/browser/4610258811/cool.html?WOPISrc=' + location.origin + '/wopi/files' + top + bhref +
+    def tx_wopi_api(self) -> bool:
         path = self.vpath.split('/')
 
-        if path[1] == "files":
-            if path[-1] == "contents":
-                vfs, _ = self.asrv.vfs.get("/".join(path[2:-1]), self.uname, False, True)
-                full_path = vfs.realpath + "/" + "/".join(path[2:-1])
+        if "files" in path:
+            real_path = self.conn.hsrv.wopi_files[path[2]]
+            vfs, _ = self.asrv.vfs.get(real_path, self.uname, False, True)
+            full_path = vfs.realpath + "/" + real_path
 
+            if "contents" in path:
                 if self.do_log:
                     self.log("WOPI GET 'contents': %s" % (full_path))
 
                 return self.tx_file("oh_f", full_path)
             else:
-                vfs, _ = self.asrv.vfs.get("/".join(path[2:]), self.uname, False, True)
-                full_path = vfs.realpath + "/" + "/".join(path[2:])
-
                 if self.do_log:
                     self.log("WOPI GET 'file_info': %s" % (full_path))
 
                 file_info = {
-                    "BaseFileName": path[-1],
+                    "BaseFileName": real_path.split("/")[-1],
                     "OwnerId": self.uname,
                     "Size": os.path.getsize(full_path),
                     "UserId": self.uname,
@@ -1567,7 +1570,7 @@ class HttpCli(object):
                     # "HideRepairOption": ,
                     # "DisableExport": ,
                     # "DisableCopy": ,
-                    "EnableOwnerTermination": True,
+                    # "EnableOwnerTermination": True,
                     "LastModifiedTime":
                         time.strftime(
                             "%Y-%m-%dT%H:%M:%SZ",
@@ -1582,7 +1585,61 @@ class HttpCli(object):
                 self.reply(ret, 200, "application/json; charset=utf-8")
                 return True
 
-        return self.tx_404(True)
+        return self.tx_404()
+
+    def tx_wopi(self) -> bool:
+        path = self.vpath + "/" + str(self.uparam["wopi"])
+        file_key = self.gen_fk(2, self.args.fk_salt, path, 0, 0)
+        self.conn.hsrv.wopi_files[file_key] = path
+
+        try:
+            ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+            ctx.verify_mode = ssl.CERT_NONE if self.args.wopi_self_signed else ssl.CERT_REQUIRED
+            discovery = urllib.request.urlopen(self.args.wopi_client + "/hosting/discovery", context=ctx)
+            response = ET.fromstring(discovery.read())
+            ext = path.split('.')[-1]
+            wopi_url = response.find(".//action[@ext='%s'][@urlsrc]" % ext).get("urlsrc")
+            favicon_url = response.find(".//action[@ext='%s'].." % ext).get("favIconUrl")
+            url = wopi_url + "WOPISrc=https://" + self.host + "/wopi/files/" + file_key
+        except Exception as error:
+            self.log("Couldn't get urls from WOPI client: %s" % error)
+            return False
+
+
+        ret = [
+                """\
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="icon" href="%s" />
+    <title>Load Collabora Online</title>
+    <style>
+        body {
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%%;
+            height: 100%%;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="%s" />
+</body>
+</html>
+"""
+            % (favicon_url, url)
+        ]
+
+        bret = "".join(ret).encode("utf-8", "replace")
+        self.reply(bret, 200, "text/html; charset=utf-8")
+        return True
 
     def tx_rss(self) -> bool:
         if self.do_log:
@@ -3207,7 +3264,7 @@ class HttpCli(object):
         except:
             raise Pebkac(400, "you must supply a content-length for binary POST")
 
-        if self.vpath.startswith("wopi"):
+        if self.args.wopi and self.vpath.startswith("wopi"):
             return self.rx_wopi()
 
         try:
@@ -3424,9 +3481,10 @@ class HttpCli(object):
     def rx_wopi(self) -> bool:
         path = self.vpath.split('/')
 
-        if path[1] == "files" and path[-1] == "contents":
-            vfs, _ = self.asrv.vfs.get("/".join(path[2:-1]), self.uname, False, True)
-            full_path = vfs.realpath + "/" + "/".join(path[2:-1])
+        if "files" in path and "contents" in path:
+            real_path = self.conn.hsrv.wopi_files[path[2]]
+            vfs, _ = self.asrv.vfs.get(real_path, self.uname, False, True)
+            full_path = vfs.realpath + "/" + real_path
 
             if self.do_log:
                 self.log("WOPI POST 'contents': %s" % (full_path))
