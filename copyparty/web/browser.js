@@ -908,8 +908,8 @@ function mktemp(is_dir) {
 		if (!name)
 			return;
 		var data = new FormData();
-		data.set("act", is_dir ? "mkdir" : "new_md");
-		data.set("name", name);
+		data.append("act", is_dir ? "mkdir" : "new_md");
+		data.append("name", name);
 
 		var req = new XHR();
 		req.open("POST", get_evpath());
@@ -928,15 +928,20 @@ function mktemp(is_dir) {
 		sendit(input.value);
 		// Chrome blurs elements when calling remove for some reason
 		input.onblur = null;
-		if(row)
+		if(row.remove)
 			row.remove();
+		else
+			row.style.display = 'none';
 	};
 	input.onkeydown = function(e) {
 		if (e.key == "Enter")
 			sendit(input.value);
 		if (e.key == "Enter" || e.key == "Escape") {
 			input.onblur = null;
+			if(row.remove)
 			row.remove();
+			else
+				row.style.display = 'none';
 			ev(e);
 		}
 	};
