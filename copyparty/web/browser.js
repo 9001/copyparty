@@ -11251,6 +11251,7 @@ function reload_browser() {
 					return;
 				}
 				resizing = true;
+				clmod(ebi('tree'), 'resz', true);
 				ev(e);
 				return;
 			}
@@ -11329,7 +11330,10 @@ function reload_browser() {
 	}
 
 	function sel_end(e) {
-		resizing = false;
+		if(resizing){
+			resizing = false;
+			clmod(ebi('tree'), 'resz', false);
+		}
 		clearTimeout(ttimer);
 		if (dragging && selbox) {
 			var sbrect = selbox.getBoundingClientRect();

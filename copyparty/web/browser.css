@@ -2121,6 +2121,10 @@ html {
 #reszbar:hover{
 	opacity: .6;
 }
+.resz,
+.resz * {
+	transition: none !important;
+}
 .btn {
 	color: var(--btn-fg);
 	background: #eee;
