@@ -242,7 +242,8 @@ class HttpSrv(object):
         if (HAVE_PIL or HAVE_VIPS or HAVE_FFMPEG) and not self.args.no_thumb:
             Daemon(self.post_init, "hsrv-init2")
 
-        self.wopi_files: dict[str, str] = {}
+        if self.args.wopi:
+            self.wopi_files: dict[str, str] = {}
 
     def post_init(self) -> None:
         try:
