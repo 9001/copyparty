@@ -8156,6 +8156,7 @@ var treectl = (function () {
 		ebi('tree_footer').style.width = (iw - 2) + 'em';
 		ebi('tree_footer').style.display = 'block';
 		ebi('wrap').style.marginLeft = w;
+		ebi('reszbar').style.left = w;
 		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
 		onwidgetresize();
 		setTimeout(onscroll, 1);

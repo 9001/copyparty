@@ -39,7 +39,6 @@ html {
 }
 #middle {
 	display: flex;
-	flex-direction: column;
 	margin: auto;
 	justify-content: center;
 }

@@ -1,5 +1,6 @@
 :root {
 	color-scheme: dark;
+	color: #b9bdc1;
   	--transparent: transparent;
 	--font-mono: monospace;
 
@@ -432,7 +433,7 @@ html,body,tr,th,td,#files,a,#blogout {
 	border: none;
 }
 body {
-	background: #e4edf8;
+	background: #1a1c20;
 }
 @supports (background: var(--bg)) {
 	body {
@@ -510,6 +511,7 @@ html .ayjump:focus-visible {
 	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
+	background: #3a3d41;
 	background: var(--bg-u2);
 	border-radius: 5px;
 	border-radius: var(--radius);
@@ -579,6 +581,7 @@ html.y #path {
 	color: var(--tab-alt);
 }
 a, #blogout, #files tbody div a:last-child {
+	color: #d7dbe0;
 	color: var(--fg);
 	padding: .2em;
 	text-decoration: none;
@@ -634,6 +637,7 @@ a:hover {
 	background: color-mix(in oklab, var(--a) 15%, transparent);
 }
 a.dir {
+	color: #3584e4;
 	color: var(--a);
 }
 tr.dir td:nth-child(2) a::before {
@@ -676,6 +680,7 @@ html.y #files tr.fade a {
 	color: rgba(0, 0, 0, 0.4);
 }
 #files tr:nth-child(2n) td {
+	background: #24272b;
 	background: var(--row-alt);
 }
 #files td+td {
@@ -685,10 +690,12 @@ html.y #files tr.fade a {
 	box-shadow: 1px 0 0 0 rgba(128,128,128,var(--f-sh1)) inset, 0 1px 0 rgba(0,0,0,var(--f-sh3)) inset, 0 -1px 0 rgba(0,0,0,var(--f-sh3)) inset;
 }
 #files td:first-child {
+	border-radius: 5px 0 0 5px;
 	border-radius: var(--radius) 0 0 var(--radius);
 	white-space: nowrap;
 }
 #files td:last-child {
+	border-radius: 0 5px 5px 0;
 	border-radius: 0 var(--radius) var(--radius) 0;
 }
 #files tbody td:nth-child(3) {
@@ -771,7 +778,7 @@ html.y #path a:hover {
 	display: none;
 }
 .logue.raw {
-	background: #ccc;
+	background: #1a1c20;
 	background: var(--transparent);
 	white-space: pre;
 	font-family: 'scp', 'consolas', monospace;
@@ -934,7 +941,7 @@ tr.play td:nth-child(1) a {
 }
 #ggrid>a {
 	display: inline-block;
-	width: 10em;
+	width: 9em;
 	width: var(--grid-sz);
 	vertical-align: top;
 	overflow-wrap: break-word;
@@ -954,9 +961,16 @@ tr.play td:nth-child(1) a {
 	background: var(--g-f-bg);
 	border-color: var(--g-f-b1);
 	box-shadow: 0 .1em .3em var(--g-sh);
-	.gselchk {
-		display: block;
-	}
+}
+#ggrid>a:hover {
+	background: #303337;
+}
+#ggrid>a:focus-visible .gselchk{
+	display: block;
+}
+#ggrid>a:hover .gselchk {
+	/* separate to allow IE to only use this rule */
+	display: block;
 }
 #ggrid>a.play .thumb,
 #ggrid>a.play img {
@@ -1117,7 +1131,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 #ggrid>a.sel,
 #ggrid>a[tt].sel {
 	color: var(--g-sel-fg);
-	background: #8af;
+	background: #172e55;
 	background: var(--g-sel-bg);
 	border-color: var(--g-sel-b1);
 }
@@ -1251,9 +1265,9 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 .open #up_quick_more,
 #wtoggle,
 #widgeti {
-	background: #cde;
+	background: #2f3236;
 	background: var(--bg-u2);
-	border: 1px solid #222;
+	border: 1px solid #3a3d41;
 	border: 1px solid var(--bg-u3);
 }
 #widgeti {
@@ -1267,6 +1281,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	line-height: 1.2em;
   	vertical-align: bottom;
 	padding: .05em .5em .1em .3em;
+	border-radius: 5px 0 0 0;
 	border-radius: var(--radius) 0 0 0;
 	pointer-events: all;
 	border-width: 1px 0 0 1px;
@@ -1298,6 +1313,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	overflow-y: hidden;
 	margin: 0 .1em .1em .2em;
 	box-shadow: 0 0 .5em var(--mp-sh);
+	border-radius: 5px;
 	border-radius: var(--radius);
 }
 #up_quick {
@@ -1544,6 +1560,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 }
 #barpos,
 #barbuf {
+	border-radius: 10px;
 	border-radius: var(--radius);
 	position: absolute;
 	top: 0;
@@ -1728,8 +1745,9 @@ html.b #mu_outer {
 #ops input[type=submit],
 #ops a {
 	/* fallback if emojis don't render */
-	border: #777 solid 1px;
+	border: #3a3e42 solid 1px;
 	border-radius: 5px;
+	min-width: 1em;
 
 	border: var(--transparent) solid 0px;
 	color: #07c;
@@ -1816,7 +1834,7 @@ html.y #ops svg circle {
 	/* aspect-ratio: 1 / 1; */
 	min-width: 1.25em;
 
-	background: #ccc;
+	background: #3584e4;
 	color: #000;
 
 	background: var(--btn-1-bg);
@@ -1824,6 +1842,7 @@ html.y #ops svg circle {
 	color: var(--bg);
 
 	border: var(--btn-bg-a) solid 1px;
+	border-radius: 5px;  
 	border-radius: var(--radius);  
 	justify-content: center;
   	display: flex;
@@ -1859,10 +1878,11 @@ html.y #ops svg circle {
 .opview input[type=color],
 .opview input[type=date] {
 	color: var(--fg);
+	background: #222529;
 	background: var(--txt-bg);
 	border: none;
 	box-shadow: 0 0 2px var(--txt-sh);
-	border-bottom: 1px solid #999;
+	border-bottom: 1px solid #3584e4;
 	border-color: var(--a);
 	border-radius: 5px;
 	border-radius: var(--radius);
@@ -2111,28 +2131,29 @@ html {
 	z-index: 25;
 	top: 0;
 	bottom: 0;
-	left: - 5px;
-	left: calc(var(--nav-sz) - 5px);
+	margin-left: -5px;
 	width: 10px;
 	opacity: 0;
-	background: #8888;
+	background: #888;
 	cursor: ew-resize;
 	touch-action: none;
 	user-select: none;
 	transition: opacity .1s;
 }
 #reszbar:hover{
-	opacity: .6;
+	opacity: .3;
 }
 .resz,
 .resz * {
 	transition: none !important;
 }
 .btn {
+	color: #3584e4;
 	color: var(--btn-fg);
-	background: #eee;
+	background: rgba(70, 73, 77, 0.5);
 	background: var(--btn-bg);
 	box-shadow: var(--btn-bs);
+	border: 1px solid #3a3d41;
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
 	border-radius: 5px;
@@ -2235,6 +2256,7 @@ html.b .btn {
 	color: var(--fg-max);
 }
 #tree ul a {
+	border-radius: 5px;
 	border-radius: var(--radius);
 	display: inline-block;
 	vertical-align: middle;
@@ -2375,7 +2397,7 @@ html.b .btn {
 }
 .ghead {
 	position: sticky;
-	background: #fff;
+	background: #1a1c20;
 	background: var(--bg-u2);
 	border-radius: 5px;
 	border-radius: var(--radius);
@@ -2426,13 +2448,16 @@ html.b .btn {
 }
 .ghead details .setting {
 	position: absolute;
+	background: #2f3236;
 	background: var(--bg-u2);
 	border: 1px solid var(--bg-u3);
   	border-bottom: var(--btn-bb);
+	border-radius: 5px;
 	border-radius: var(--radius);
 	max-width: 11em;
 	max-height: 30vh;
 	overflow-y: auto;
+	z-index: 11;
 }
 #hcol_content:has(#hcolsh.on) {
   margin-top: 3.5em;
@@ -3003,7 +3028,7 @@ html.y #bbox-overlay figcaption a {
 	border-radius: 10px;
 	border-radius: var(--radius);
 	border: var(--a) solid 1px;
-	background: #fff;
+	background: #1a1c20;
 	background: var(--bg);
 	max-width: 66.6em;
 	position: relative;
@@ -3029,13 +3054,13 @@ html.c .modalcontent {
 .winbtn,
 .close{
 	position: absolute;
-	cursor: default;
+	cursor: pointer;
 	top: 0;
 	right: 0;
 	margin: .3em;
 	color: var(--fg);
 	height: 1.8em;
-	aspect-ratio: 1 / 1;
+	width: 1.8em;
 	text-align: center;
 	display: block;
 	padding: 0;
@@ -3621,10 +3646,12 @@ details:not(.open) .setting {
 }
 summary {
 	cursor: pointer;
-	background: #ccc;
+	background: #303337;
 	background: var(--bg-u1);
+	color: #3584e4;
 	color: var(--a);
 	padding: .3em;
+	border-radius: 5px;
 	border-radius: var(--radius);
 	font-size: large;
 }
@@ -3662,7 +3689,7 @@ html.dz .opview input.i {
 }
 #tree,
 #treesuperh {
-	background: #fff;
+	background: #2f3236;
 	background: var(--bg-u2);
 }
 html.c #treepar,
@@ -3814,6 +3841,7 @@ html.a * {
 }
 html.a #path,
 html.a #ops {
+	background: #2f3236;
 	background: color-mix(in oklab, var(--bg-u5), transparent);
 }
 html.a #treepar {
@@ -3823,6 +3851,7 @@ html.a #treepar {
 }
 html.d #path i,
 html.a #path i {
+	border-right: #3584e4 solid 2px;
 	border-right: var(--a) solid 2px;
 	height: 1.5em;
   	margin: -.4em .3em -.4em -1.7em;
@@ -3831,6 +3860,7 @@ html.dy .ghead,
 html.a .ghead {
 	background: var(--bg);
 	padding: .2em 0;
+	border-bottom: #303337 solid 1px;
 	border-bottom: var(--btn-bb);
 	border-radius: 0;
 	margin: 0 -.5em 1.5em -.5em;
@@ -5161,7 +5191,7 @@ html.e #actionsArea {
 	cursor: default;
 	pointer-events: all;
 	max-width: max-content;
-	background: #fff;
+	background: #2f3236;
 	background: var(--transparent);
 }
 #rtt_latency {
@@ -5182,7 +5212,7 @@ html.b #spaceUsed_bar {
 #spaceTotal_bar {
 	position: relative;
 	margin-bottom: .5em;
-	background: #ccc;
+	background: #24272b;
 	background: var(--bg-u1);
 }
 #spaceMax {
