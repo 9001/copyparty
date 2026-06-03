@@ -2106,6 +2106,21 @@ html {
 	left: -2.2em;
 	width: calc(100% + 2em);
 }
+#reszbar {
+	position: absolute;
+	z-index: 25;
+	top: 0;
+	bottom: 0;
+	left: - 5px;
+	left: calc(var(--nav-sz) - 5px);
+	width: 10px;
+	opacity: 0;
+	background: #8888;
+	cursor: ew-resize;
+}
+#reszbar:hover{
+	opacity: .6;
+}
 .btn {
 	color: var(--btn-fg);
 	background: #eee;

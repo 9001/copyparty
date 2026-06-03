@@ -8130,6 +8130,7 @@ var treectl = (function () {
 		if (!entreed || r.hidden){
 			if(ebi('tree').style.width == '0px')
 				ebi('tree').style.display = 'none';
+			setcvar('--nav-sz', 0);
 			return;
 		}
 
@@ -8917,6 +8918,11 @@ var treectl = (function () {
 	function scaletree(e) {
 		ev(e);
 		treesz += parseInt(this.getAttribute("step"));
+		r.settreesize(treesz);
+	}
+
+	r.settreesize = function(width){
+		treesz = width;
 		if (!isNum(treesz))
 			treesz = 16;
 
@@ -11236,8 +11242,18 @@ function reload_browser() {
 				 b1.bottom < b2.top || b1.top > b2.bottom);
 	}
 
+	var resizing = false;
 	function sel_start(e) {
 		try{
+			if(e.target.id == "reszbar"){
+				if(sread('entreed') != "tree"){
+					treectl.entree();
+					return;
+				}
+				resizing = true;
+				ev(e);
+				return;
+			}
 			if (e.button !== 0 && e.type !== 'touchstart') return;
 			if (!thegrid.en || !treectl.dsel) return;
 			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a,.modal,.normalrcm,#tree')) return;
@@ -11276,8 +11292,13 @@ function reload_browser() {
 	}
 
 	function sel_move(e) {
-		if (!is_selma) return;
 		var pos = getpp(e);
+		if(resizing){
+			var em2px = parseFloat(getComputedStyle(document.body).fontSize);
+			treectl.settreesize(e.clientX / em2px);
+			return;
+		}
+		if (!is_selma) return;
 		var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
 
 		if (e.type === 'touchmove' && ttimer) {
@@ -11308,6 +11329,7 @@ function reload_browser() {
 	}
 
 	function sel_end(e) {
+		resizing = false;
 		clearTimeout(ttimer);
 		if (dragging && selbox) {
 			var sbrect = selbox.getBoundingClientRect();
