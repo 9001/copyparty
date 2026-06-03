@@ -6367,11 +6367,11 @@ var ahotkeys = function (e) {
 			return showfile.ppj(e) || true;
 	}
 
-        if (kl == 'n' && sh)
-            return up2k.up('dir')
+	if (kl == 'n' && sh)
+		return up2k.up('dir')
 
 	if (kl == 'n')
-            return up2k.up('file')
+		return up2k.up('file')
 
 	if (sh && kl != 'a' && kl != 'd')
 		return;
