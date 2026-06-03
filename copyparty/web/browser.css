@@ -532,13 +532,22 @@ html .ayjump:focus-visible {
 #qs_btns a {
 	background: color-mix(in oklab, var(--txt-bg), transparent);
 	width: 1em;
+	height: 1.2em;
 	display: inline-block;
 	text-align: center;
 	border-radius: 5px;
 	border-radius: var(--radius);
+	vertical-align: center;
 }
 #qs_btns a:hover {
 	background: var(--bg);
+}
+#qs_btns a .x {
+	line-height: .75em;
+}
+#moresearch span {
+	font-size: .6em;
+  	vertical-align: center;
 }
 html.y #path {
 	text-shadow: none;
@@ -613,12 +622,14 @@ a:hover {
 }
 .s0:after,
 .s1:after {
-	content: '▴';
+	content: '▲';
+	font-size: .7em;
 	/* margin-left: -.15em; */
 }
 .s0r:after,
 .s1r:after {
-	content: '▾';
+	content: '▼';
+	font-size: .7em;
 	/* margin-left: -.15em; */
 }
 .s0:after,
@@ -978,6 +989,7 @@ tr.play td:nth-child(1) a {
 }
 #ggrid>a .thumb,
 #ggrid>a img {
+	color: #3584e4;
 	z-index: 1;
 	border-radius: 5px;
 	border-radius: var(--radius);
@@ -1756,6 +1768,9 @@ html.b #mu_outer {
 	padding: .15em .4em;
 	margin: 0;
 }
+#ops a:first-child {
+  margin-left: auto;
+}
 .unfun #ops a {
 	font-size: 1.2em;
 }
@@ -1877,6 +1892,7 @@ html.y #ops svg circle {
 .opview input[type=text],
 .opview input[type=color],
 .opview input[type=date] {
+	color: #fff;
 	color: var(--fg);
 	background: #222529;
 	background: var(--txt-bg);
@@ -3673,8 +3689,9 @@ summary {
 	padding: .2em;
 	margin-left: .3em;
 }
-
-
+.x {
+	font-size: 1.5em;
+}
 
 
 
@@ -3945,7 +3962,6 @@ html.d #treepar {
 	position: relative;
 	height: 2.2em;
 	margin: .5em 0 0 0;
-	z-index: -1;
 }
 #pathBar.thin #path a {
 	padding-top: .45em;
@@ -3954,9 +3970,15 @@ html.d #treepar {
 	margin-left: 2.5em;
 }
 #pathBar.thin #actionsArea {
-	position: absolute;
+	position: fixed;
 	top: .6em;
 	right: .6em;
+	z-index: 11;
+	max-width: 80%;
+	overflow-x: auto;
+}
+#pathBar.thin .popup {
+	position: relative;
 }
 html.e #pathBar.thin #path {
 	margin: 0;
@@ -4009,7 +4031,6 @@ html.e #wrap.thin .ghead {
 		position: relative;
 		height: 2.2em;
 		margin: .5em 0 0 0;
-		z-index: -1;
 	}
 	html.dy .ghead,
 	html.a .ghead,
@@ -4055,9 +4076,16 @@ html.e #wrap.thin .ghead {
 	}
 	#actionsArea,
 	#pathBar.thin #actionsArea {
-		position: absolute;
+		position: fixed;
 		top: 1em;
 		right: 1em;
+		z-index: 11;
+		max-width: 80%;
+		overflow-x: auto;
+	}
+	.popup,
+	#pathBar.thin .popup {
+		position: relative;
 	}
 	html.fy #actionsArea,
 	html.fy #pathBar.thin #actionsArea {

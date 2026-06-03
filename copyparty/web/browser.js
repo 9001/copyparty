@@ -879,6 +879,15 @@ if(!fun_tgl){
 	ebi('opa_cfg').innerHTML = 'settings'
 	ebi('acc_pfp').innerHTML = 'account'
 }
+else if(!EMOJI){
+	ebi('opa_srch').innerHTML = 's?'
+	ebi('opa_del').innerHTML = 'un'
+	ebi('opa_up').innerHTML = 'u▲'
+	ebi('opa_bup').innerHTML = 'b▲'
+	ebi('opa_msg').innerHTML = 'msg'
+	ebi('opa_cfg').innerHTML = '★'
+	ebi('acc_pfp').innerHTML = 'acc'
+}
 
 // mkdir + md
 function mktemp(is_dir) {
@@ -939,7 +948,7 @@ function mktemp(is_dir) {
 		if (e.key == "Enter" || e.key == "Escape") {
 			input.onblur = null;
 			if(row.remove)
-			row.remove();
+				row.remove();
 			else
 				row.style.display = 'none';
 			ev(e);
@@ -996,7 +1005,7 @@ ebi('widget').innerHTML = (
 		'	<a id="up_quick_btn" class="tgl btn on"><div class="rotatable">+</div></a>' +
 		'</div>' +
 
-		'<a href="#" id="wtico">♫</a>' +
+		'<a href="#" id="wtico">' + (EMOJI ? '♫' : '♪') + '</a>' +
 
 	'</div>' +
 
@@ -6616,13 +6625,24 @@ window.thegrid = (function () {
 					accent = '#07c';
 				ihref += '&a=' + parseColor(accent).replace(/ /g, '');
 			}
+
+			var svg = ''
+			if(ebi('folder-icon').innerHTML != undefined){
+				svg = '<use href="#' +
+					(isdir ? 'folder' : 'file') + '-icon" color="' +
+					(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/>'
+				svg = '<svg class="thumb" width="100%" height="100%">' + svg + '</svg>';
+			}
+			else{
+				// 3DS / unsupported: use fallback
+				svg = '<span class="thumb">' + (isdir ? '📁[FOLDER]' : '📄[FILE:' + ext +']') + '</span>';
+			}
+
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'" class="' + ac + '" ttt="' + esc(name) + '">' +
 				'<div class="imgcontainer">' +
 				'<input type="checkbox" class="gselchk"></input>' +
-				'<svg class="thumb" width="100%" height="100%" version="1.1"><use href="#' +
-					(isdir ? 'folder' : 'file') + '-icon" color="' +
-					(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/></svg>' +
+				svg +
 				(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
 					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' +
 					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')"><span class="inner">' + ext + '</span></span>') +
@@ -7370,10 +7390,10 @@ var search_ui = (function () {
 		var ms = ebi('moresearch');
 		if(e){
 			window.scrollTo(0, 0);
-			ms.innerHTML = '▴';
+			ms.innerHTML = '<span>▲</span>';
 		}
 		else{
-			ms.innerHTML = '▾';
+			ms.innerHTML = '<span>▼</span>';
 		}
 	}
 	ebi('moresearch').onclick = function () {
@@ -8138,6 +8158,7 @@ var treectl = (function () {
 		if (!entreed || r.hidden){
 			if(ebi('tree').style.width == '0px')
 				ebi('tree').style.display = 'none';
+			ebi('reszbar').style.left = '2px';
 			setcvar('--nav-sz', 0);
 			return;
 		}
@@ -9090,7 +9111,7 @@ function apply_perms(res) {
 	else{
 		ebi('blogout').style.display = 'none';
 		ebi('acc_name').innerHTML = L.login;
-		ebi('acc_pfp').innerHTML = fun_tgl ? '👤' : 'acc';
+		ebi('acc_pfp').innerHTML = fun_tgl && EMOJI ? '👤' : 'acc';
 	}
 	clmod(ebi('acc_pfp'), 'placeholder', acct == '*');
 
@@ -9177,7 +9198,8 @@ function apply_perms(res) {
 		ebi('reloc_up').innerHTML = up2k_lgcy ? '<span>▲</span>' : '<span>▼</span>';
 		clmod(ebi('up2k'), 'unmodal', up2k_lgcy);
 	}
-	clmod(ebi('opa_mkd'), 'vis', up_only);
+	if(EMOJI)
+		clmod(ebi('opa_mkd'), 'vis', up_only);
 }
 
 function wait_set_fsearch(){
@@ -11168,7 +11190,7 @@ function reload_browser() {
 
 		o = mknod('a');
 		o.setAttribute('href', link2);
-		o.textContent = uricom_dec(parts[a]) || (fun_tgl ? '🏠' : 'home');
+		o.textContent = uricom_dec(parts[a]) || (fun_tgl && EMOJI ? '🏠' : 'home');
 		ebi('path').appendChild(o);
 		ebi('path').appendChild(mknod('i'));
 		drag.mktarget(o);

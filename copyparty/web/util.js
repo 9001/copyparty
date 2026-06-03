@@ -20,6 +20,13 @@ if (window.CGV)
     Object.assign(window, window.CGV);
 
 
+function supportsEmoji() {
+    var ctx = document.createElement('canvas').getContext('2d');
+    ctx.canvas.width = ctx.canvas.height = 1;
+    ctx.fillText('🎉', -4, 4);
+    return ctx.getImageData(0, 0, 1, 1).data[3] > 0; // Checks if pixels were drawn
+}
+
 var wah = '',
     STG = null,
     NOAC = 'autocorrect="off" autocapitalize="off"',
@@ -35,6 +42,7 @@ var wah = '',
     VCHROME = CHROME ? 1 : 0,
     UA = '' + navigator.userAgent,
     IE = !!document.documentMode,
+    EMOJI = supportsEmoji(),
     FIREFOX = ('netscape' in window) && / rv:/.test(UA),
     IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(UA),
     LINUX = /Linux/.test(UA),
@@ -1823,7 +1831,7 @@ var toast = (function () {
             setcvar('--tmstep', Math.floor(sec * 20));
             html += '<div id="toastt"></div>';
         }
-        obj.innerHTML = html + '<a href="#" id="toastc">✕</a><div id="toastb">' + lf2br(txt) + '</div>';
+        obj.innerHTML = html + '<a href="#" id="toastc"><span class="x">×</span></a><div id="toastb">' + lf2br(txt) + '</div>';
         obj.className = cl;
         sec += obj.offsetWidth;
         obj.className += ' vis';

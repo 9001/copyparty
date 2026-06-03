@@ -308,7 +308,7 @@ window.baguetteBox = (function () {
                 '<div id="bbox-prev"><a class="btn" aria-label="Previous">◀</a></div>' +
                 '<div id="bbox-next"><a class="btn" aria-label="Next">▶</a></div>' +
                 '<div id="bbox-btns">' +
-                    '<a id="bbox-close" class="btn" aria-label="Close">✕</a>' +
+                    '<a id="bbox-close" class="btn" aria-label="Close"><span class="x">×</span></a>' +
                     '<a id="bbox-vmode" class="btn" tt="a"></a>' +
                     '<a id="bbox-full" class="btn" tt="full-screen">⛶</a>' +
                     '<a id="bbzoom" class="tgl btn" tt="zoom/stretch smaller images to fill screen">↕</a>' +
