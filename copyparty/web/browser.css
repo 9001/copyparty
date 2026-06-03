@@ -2107,7 +2107,7 @@ html {
 	width: calc(100% + 2em);
 }
 #reszbar {
-	position: absolute;
+	position: fixed;
 	z-index: 25;
 	top: 0;
 	bottom: 0;
@@ -2119,6 +2119,7 @@ html {
 	cursor: ew-resize;
 	touch-action: none;
 	user-select: none;
+	transition: opacity .1s;
 }
 #reszbar:hover{
 	opacity: .6;

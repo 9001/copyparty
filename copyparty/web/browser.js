@@ -6824,6 +6824,8 @@ function set_loaded(el, state, dblcheck) {
 		testImage(el);
 		return;
 	}
+	if(el.parentElement == null || el.parentElement.parentElement == null)
+		return;
 	var p = el.parentElement.parentElement
 	clmod(p, 'thumbed', state)
 	var a = p.getAttribute('ref')
@@ -10996,8 +10998,8 @@ var drag = (function() {
 		elem.ondrop = function(e) {
 			if (!r.enabled) return;
 			ev(e);
-			if(e.dataTransfer && e.dataTransfer.getData("text/plain").startsWith(window.location.origin)){
-				currLink = e.dataTransfer.getData("text/plain");
+			if(e.dataTransfer && e.dataTransfer.getData("text").startsWith(window.location.origin)){
+				currLink = e.dataTransfer.getData("text");
 				console.log("elem.ondrop: " + currLink);
 				fileman.clip = currLink.split("\n");
 
@@ -11039,7 +11041,7 @@ var drag = (function() {
 						msel.selui();
 					}
 
-					e.dataTransfer.setData("text/plain", r.getFilesString());
+					e.dataTransfer.setData("text", r.getFilesString());
 				}
 				catch(ex){
 					console.log(e.target)
@@ -11083,7 +11085,7 @@ var drag = (function() {
 						msel.selui();
 					}
 
-					e.dataTransfer.setData("text/plain", r.getFilesString());
+					e.dataTransfer.setData("text", r.getFilesString());
 				}
 				catch(ex){
 					console.log(e.target)
