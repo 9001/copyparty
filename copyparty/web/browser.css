@@ -1321,9 +1321,9 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	position: relative;
 	margin: 0 .2em .2em .1em;
 	font-size: .7em;
-	border-radius: 10px;
+	border-radius: 5px;
 	border-radius: var(--radius);
-	background: #cde;
+	background: #2f3236;
     background: var(--bg-u2);
 }
 #up_quick_more {
