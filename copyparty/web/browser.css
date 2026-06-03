@@ -5587,6 +5587,9 @@ html.fy #wfs,
 html.fy #tree ul a.par {
 	color: var(--fg);
 }
+html.fy #tree li {
+	border-top: 1px solid color-mix(var(--bg-u5) 25%, transparent);
+}
 html.fy #treeToggleBtn {
 	padding: .2em;
 	margin: 0 !important;
