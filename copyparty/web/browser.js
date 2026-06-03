@@ -7920,7 +7920,7 @@ var treectl = (function () {
 	};
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
-	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
+	bcfg_bind(r, 'dyn', 'dyntree', false, onresize); // dyntree size offset needs to be considered when drag-resizing before considering to re-enable this default
 	bcfg_bind(r, 'csel', 'csel', dgsel);
 	bcfg_bind(r, 'dsel', 'dsel', !MOBILE);
 	bcfg_bind(r, 'dlni', 'dlni', dlni, resort);
