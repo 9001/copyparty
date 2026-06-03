@@ -2078,7 +2078,14 @@ input.ssconf_v {
 .splitsub,
 .modalsplit,
 html {
-	scrollbar-color: var(--a) var(--bg-u3);
+	scrollbar-face-color: #3584e4;
+	scrollbar-face-color: var(--a);
+	scrollbar-highlight-color: #1a1c20;
+	scrollbar-track-color: #2f3236;
+	scrollbar-arrow-color: #3584e4;
+	scrollbar-shadow-color: #1a1c20;
+
+	scrollbar-color: var(--a) color-mix(in oklab, var(--bg-u3), transparent);
 }
 #treesuperh {
 	position: sticky;
@@ -2113,13 +2120,6 @@ html {
 #thx_ff {
 	padding: 1em 0;
 	/* widget */
-}
-#tree::-webkit-scrollbar-track,
-#tree::-webkit-scrollbar {
-	background: var(--bg-u3);
-}
-#tree::-webkit-scrollbar-thumb {
-	background: var(--a);
 }
 #treeul {
 	position: relative;
