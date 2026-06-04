@@ -172,11 +172,13 @@ a.r:hover, a.r:focus-visible {
 #pb {
 	opacity: .5;
 	position: fixed;
+	white-space: nowrap;
 	bottom: .5em;
 	right: .5em;
 }
 #pb span {
 	opacity: .6;
+	pointer-events: none;
 }
 #pb a {
 	margin: 0;

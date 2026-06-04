@@ -974,6 +974,7 @@ ebi('widget').innerHTML = (
 		'<div id="wtoggle">' +
 		'<span id="wfs"></span>' +
 			'<span id="wfm"><a' +
+				' href="#" id="fclr"><span class="x">×</span><span>cancel</span></a><a' +
 				' href="#" id="fshr" tt="' + L.wt_shr + '">📨<span>share</span></a><a' +
 				' href="#" id="fren" tt="' + L.wt_ren + '">' + (fun_tgl ? '✏️' : '✎') + '<span>name</span></a><a' +
 				' href="#" id="fdel" tt="' + L.wt_del + '">🗑️<span>del.</span></a><a' +
@@ -4600,6 +4601,7 @@ var fileman = (function () {
 		bcpy = ebi('fcpy'),
 		bpst = ebi('fpst'),
 		bshr = ebi('fshr'),
+		bclr = ebi('fclr'),
 		t_paste,
 		r = {};
 
@@ -4630,7 +4632,8 @@ var fileman = (function () {
 			hdel = !(have_del && has(perms, 'delete')),
 			hcut = !(have_mv && has(perms, 'move')),
 			hpst = !(have_mv && has(perms, 'write')),
-			hshr = !can_shr || !get_evpath().indexOf(have_shr);
+			hshr = !can_shr || !get_evpath().indexOf(have_shr),
+			enclr = enpst || nsel;
 
 		if (!(enren || endel || encut || enpst))
 			hren = hdel = hcut = hpst = true;
@@ -4641,12 +4644,14 @@ var fileman = (function () {
 		clmod(bcpy, 'en', encpy);
 		clmod(bpst, 'en', enpst);
 		clmod(bshr, 'en', 1);
+		clmod(bclr, 'en', 1);
 
 		clmod(bren, 'hide', hren);
 		clmod(bdel, 'hide', hdel);
 		clmod(bcut, 'hide', hcut);
 		clmod(bpst, 'hide', hpst);
 		clmod(bshr, 'hide', hshr);
+		clmod(bclr, 'hide', !enclr);
 
 		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
 		clmod(ebi('wtoggle'), 'm3u', mpl.m3uen && (nsel || (mp && mp.au)));
@@ -4696,6 +4701,15 @@ var fileman = (function () {
 
 		return ret;
 	};
+
+	r.clear = function (e) {
+		ev(e);
+		var stamp = Date.now();
+		msel.evsel();
+		jwrite('fman_clip', [stamp]);
+		r.clip = [];
+		r.tx(stamp);
+	}
 
 	r.share = function (e) {
 		ev(e);
@@ -5696,6 +5710,7 @@ var fileman = (function () {
 	bcpy.onclick = r.cpy;
 	bpst.onclick = r.paste;
 	bshr.onclick = r.share;
+	bclr.onclick = r.clear;
 
 	return r;
 })();
@@ -7054,7 +7069,8 @@ var ahotkeys = function (e) {
 	var k = (e.key || e.code) + '', pos = -1, n,
 		sh = e.shiftKey,
 		ae = document.activeElement,
-		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
+		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '',
+		aett = aet ? ae.type : '';
 
 	if (k.startsWith('Key'))
 		k = k.slice(3);
@@ -7125,7 +7141,7 @@ var ahotkeys = function (e) {
 			return ebi('griden').click();
 	}
 
-	if (aet == 'input')
+	if (aet == 'input' && aett != 'checkbox')
 		return;
 
 	var in_ftab = (aet == 'tr' || aet == 'td') && ae.closest('#files');
@@ -7178,7 +7194,7 @@ var ahotkeys = function (e) {
 	if (k.endsWith('Enter') && ae && (ae.onclick || ae.hasAttribute('tabIndex')))
 		return ev(e) && ae.click() || true;
 
-	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre')
+	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre' && aett != 'checkbox')
 		return;
 
 	if (k == '?')
@@ -10869,6 +10885,7 @@ var rcm = (function () {
 					break;
 				case 'sin': msel.evsel(null, 't'); break;
 				case 'shr': fileman.share(); break;
+				case 'shr': fileman.cancel(); break;
 			}
 			r.hide(true);
 		};
