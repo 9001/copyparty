@@ -11027,7 +11027,7 @@ var drag = (function() {
 		elem.ondrop = function(e) {
 			if (!r.enabled) return;
 			ev(e);
-			if(e.dataTransfer && e.dataTransfer.getData("text").startsWith(window.location.origin)){
+			if (e.dataTransfer && e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
 				currLink = e.dataTransfer.getData("text");
 				console.log("elem.ondrop: " + currLink);
 				fileman.clip = currLink.split("\n");

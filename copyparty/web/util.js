@@ -1752,6 +1752,8 @@ var toast = (function () {
         scrolling = false,
         obj = mknod('div', 'toast');
 
+    clmod(obj, 'hide', true);
+
     document.body.appendChild(obj);
     r.visible = false;
     r.txt = null;

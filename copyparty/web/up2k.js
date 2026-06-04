@@ -1085,7 +1085,7 @@ function up2k_init(subtle) {
         }
     }
     function onovercmn(self, e, btn) {
-        if(e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
+        if(e.dataTransfer && e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
             return;
         }
         try {
@@ -1195,7 +1195,7 @@ function up2k_init(subtle) {
         ev(e);
 
         console.log(e.dataTransfer.getData("text"))
-		if(e.dataTransfer && e.dataTransfer.getData("text").startsWith(window.location.origin)){
+        if (e.dataTransfer && e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
 			var currLink = e.dataTransfer.getData("text");
 			console.log("wrap.ondrop: " + currLink);
 			fileman.clip = currLink.split("\n");
