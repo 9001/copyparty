@@ -1040,9 +1040,12 @@ tr.play td:nth-child(1) a {
 	position: absolute;
 	text-align: center;
 	width: 100%;
-	width: calc(100% - 8px);;
+	width: calc(100% - 8px);
+	left: 4px;
+	right: 4px;
 	top: 50%;
 	top: calc(55% - .5em);
+	color: #07c;
 	color: var(--a);
 	text-shadow: none;
 	font-family: monospace;
@@ -1303,6 +1306,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	position: absolute;
 	text-wrap-mode: nowrap;
 	text-wrap: nowrap;
+	white-space: nowrap;
 	width: 100%;
 	bottom: 100%;
 	right: 0;
@@ -1319,7 +1323,9 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	display: inline-block;
 	text-wrap-mode: nowrap;
 	text-wrap: nowrap;
+	white-space: nowrap;
 	text-align: center;
+	max-width: 79vw;
 	max-width: calc(100% - 3.5em);
 	overflow-x: auto;
 	overflow-y: hidden;
@@ -1327,6 +1333,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	box-shadow: 0 0 .5em var(--mp-sh);
 	border-radius: 5px;
 	border-radius: var(--radius);
+	overflow-x: auto;
 }
 #up_quick {
 	display: inline-block;
@@ -1358,6 +1365,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	margin-bottom: .2em;
 	text-wrap-mode: wrap;
 	text-wrap: nowrap;
+	white-space: nowrap;
 }
 #up_quick_more.vis {
 	display: block;
@@ -1365,17 +1373,18 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 #up_quick_more a:hover {
 	background: var(--btn-h-bg);
 }
-#up_quick_more a {
-	position: static;
-	font-size: large;
-	display: block;
-	text-wrap-mode: nowrap;
-	text-wrap: nowrap;
-	padding: .5em;
-	cursor: pointer;
-	border-radius: 10px;
-	border-radius: var(--radius);
-}
+	#up_quick_more a {
+		position: static;
+		font-size: large;
+		display: block;
+		text-wrap-mode: nowrap;
+		text-wrap: nowrap;
+		white-space: nowrap;
+		padding: .5em;
+		cursor: pointer;
+		border-radius: 10px;
+		border-radius: var(--radius);
+	}
 #up_quick .overlay_plus {
 	right: .3em;
 	margin-top: -1.5em;
@@ -1810,6 +1819,7 @@ html.y #ops svg circle {
 	font-size: x-large;
 	text-wrap-mode: nowrap;
 	text-wrap: nowrap;
+	white-space: nowrap;
 	display: block;
 	line-height: 1.5em;
 }
@@ -2116,6 +2126,7 @@ html {
 	padding: .3em .5em;
 	text-wrap-mode: nowrap;
 	text-wrap: nowrap;
+	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
 }
@@ -2166,7 +2177,7 @@ html {
 .btn {
 	color: #3584e4;
 	color: var(--btn-fg);
-	background: rgba(70, 73, 77, 0.5);
+	background: #2f3236;
 	background: var(--btn-bg);
 	box-shadow: var(--btn-bs);
 	border: 1px solid #3a3d41;
@@ -3990,6 +4001,7 @@ html:not(.e) #wrap.thin .ghead {
 html:not(.e) #wrap.thin #ghead {
 	text-wrap-mode: nowrap;
 	text-wrap: nowrap;
+	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
 }

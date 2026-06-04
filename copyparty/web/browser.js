@@ -6626,16 +6626,15 @@ window.thegrid = (function () {
 				ihref += '&a=' + parseColor(accent).replace(/ /g, '');
 			}
 
-			var svg = ''
-			if(ebi('folder-icon').innerHTML != undefined){
-				svg = '<use href="#' +
-					(isdir ? 'folder' : 'file') + '-icon" color="' +
-					(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/>'
-				svg = '<svg class="thumb" width="100%" height="100%">' + svg + '</svg>';
-			}
-			else{
+			var svg = '<use href="#' +
+				(isdir ? 'folder' : 'file') + '-icon" color="' +
+				(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/>';
+			svg = '<svg class="thumb" width="100%" height="100%">' + svg + '</svg>';
+
+			if (N3DS){
 				// 3DS / unsupported: use fallback
-				svg = '<span class="thumb">' + (isdir ? '📁[FOLDER]' : '📄[FILE:' + ext +']') + '</span>';
+				svg = '<span class="thumb">' + (isdir ? '📁[FOLDER]' : '📄[FILE:' + ext + ']') + '</span>';
+				ext = 'unk';
 			}
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
@@ -7961,7 +7960,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'nsort', 'nsort', dnsort, resort);
 	bcfg_bind(r, 'dir1st', 'dir1st', true, resort);
 	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
-	setwrap(bcfg_bind(r, 'parpane', 'parpane', true, onscroll));
+	setwrap(bcfg_bind(r, 'parpane', 'parpane', !N3DS, onscroll));
 	bcfg_bind(r, 'htree', 'hovertree', false, reload_tree);
 	bcfg_bind(r, 'ask', 'bd_ask', MOBILE && FIREFOX);
 	ebi('bd_lim').value = r.lim = icfg_get('bd_lim');
