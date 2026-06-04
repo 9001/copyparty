@@ -5168,10 +5168,12 @@ html.e #actionsArea {
 	position: fixed;
 	overflow-y: auto;
 	display: none;
-	background: #fff;
+	background: #2f3236;
 	background: var(--bg-u2);
+	border: 1px solid #46494d;
 	border: 1px solid var(--bg-u5);
 	outline: none;
+	border-radius: 5px;
 	border-radius: var(--radius);
 	box-shadow: 0 0 .3rem var(--bg-d3);
 	z-index: 60;
@@ -5198,6 +5200,7 @@ html.e #actionsArea {
 
 #rcm > .sep {
 	margin: 0 .2rem;
+	border-bottom: 1px solid #46494d;
 	border-bottom: 1px solid var(--bg-u5);
 }
 
