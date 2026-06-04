@@ -243,7 +243,7 @@ class HttpSrv(object):
             Daemon(self.post_init, "hsrv-init2")
 
         if self.args.wopi:
-            self.wopi_files: dict[str, str] = {}
+            self.wopi_files: dict[str, dict[str, str]] = {}
 
     def post_init(self) -> None:
         try:

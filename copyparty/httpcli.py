@@ -801,6 +801,12 @@ class HttpCli(object):
                 else:
                     self.log("unknown username: %r" % (idp_usr,), 1)
 
+        try:
+            if self.args.wopi:
+                self.uname = self.conn.hsrv.wopi_files.get(self.uparam.get("access_token")).get("uname")
+        except:
+            pass
+
         if self.args.have_ipu_or_ipr:
             if self.args.ipu and (self.uname == "*" or self.args.ao_ipu_wins):
                 self.uname = self.conn.ipu_iu[self.conn.ipu_nm.map(self.ip)]
@@ -1540,8 +1546,8 @@ class HttpCli(object):
     def tx_wopi_api(self) -> bool:
         path = self.vpath.split('/')
 
-        if "files" in path:
-            real_path = self.conn.hsrv.wopi_files[path[2]]
+        if "files" in path and self.conn.hsrv.wopi_files[self.uparam["access_token"]]["file_key"] in path:
+            real_path = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["path"]
             vfs, _ = self.asrv.vfs.get(real_path, self.uname, False, True)
             full_path = vfs.realpath + "/" + real_path
 
@@ -1589,22 +1595,28 @@ class HttpCli(object):
 
     def tx_wopi(self) -> bool:
         path = self.vpath + "/" + str(self.uparam["wopi"])
+        session_salt = ub64enc(os.urandom(64)).decode("utf-8")
+        session_key = self.gen_fk(2, session_salt, self.uname, 0, 0)
         file_key = self.gen_fk(2, self.args.fk_salt, path, 0, 0)
-        self.conn.hsrv.wopi_files[file_key] = path
+        self.conn.hsrv.wopi_files[session_key] = {
+            "uname": self.uname,
+            "file_key": file_key,
+            "path": path,
+        }
 
         try:
-            ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False if self.args.wopi_self_signed else True
             ctx.verify_mode = ssl.CERT_NONE if self.args.wopi_self_signed else ssl.CERT_REQUIRED
             discovery = urllib.request.urlopen(self.args.wopi_client + "/hosting/discovery", context=ctx)
             response = ET.fromstring(discovery.read())
             ext = path.split('.')[-1]
             wopi_url = response.find(".//action[@ext='%s'][@urlsrc]" % ext).get("urlsrc")
             favicon_url = response.find(".//action[@ext='%s'].." % ext).get("favIconUrl")
-            url = wopi_url + "WOPISrc=https://" + self.host + "/wopi/files/" + file_key
+            url = wopi_url + urllib.parse.quote("WOPISrc=https://" + self.host + "/wopi/files/" + file_key, safe="=")
         except Exception as error:
             self.log("Couldn't get urls from WOPI client: %s" % error)
             return False
-
 
         ret = [
                 """\
@@ -1614,7 +1626,7 @@ class HttpCli(object):
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="icon" href="%s" />
-    <title>Load Collabora Online</title>
+    <title>Loading...</title>
     <style>
         body {
             margin: 0;
@@ -1622,7 +1634,7 @@ class HttpCli(object):
             height: 100vh;
             overflow: hidden;
         }
-        iframe {
+        #viewer {
             width: 100%%;
             height: 100%%;
             border: 0;
@@ -1630,11 +1642,22 @@ class HttpCli(object):
     </style>
 </head>
 <body>
-    <iframe src="%s" />
+    <div style="display: none">
+        <form action="%s" enctype="multipart/form-data" method="post" target="viewer" id="submit-form">
+            <input name="access_token" value="%s" type="hidden" id="access-token"/>
+            <input type="submit" value="" />
+        </form>
+    </div>
+
+    <iframe id="viewer" name="viewer" allow="clipboard-read *; clipboard-write *; fullscreen *"></iframe>
+
+    <script>
+        document.getElementById("submit-form").submit();
+    </script>
 </body>
 </html>
 """
-            % (favicon_url, url)
+            % (favicon_url, url, session_key)
         ]
 
         bret = "".join(ret).encode("utf-8", "replace")
@@ -3480,8 +3503,12 @@ class HttpCli(object):
     def rx_wopi(self) -> bool:
         path = self.vpath.split('/')
 
-        if "files" in path and "contents" in path:
-            real_path = self.conn.hsrv.wopi_files[path[2]]
+        if (
+            "files" in path and
+            "contents" in path and
+            self.conn.hsrv.wopi_files[self.uparam["access_token"]]["file_key"] in path
+        ):
+            real_path = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["path"]
             vfs, _ = self.asrv.vfs.get(real_path, self.uname, False, True)
             full_path = vfs.realpath + "/" + real_path
 
