@@ -966,15 +966,15 @@ tr.play td:nth-child(1) a {
 	border-top: 1px solid var(--g-b2);
 	box-shadow: 0 .1em .3em var(--g-sh);
 }
+#ggrid>a:hover {
+	background: #303337;
+}
 #ggrid>a:focus-visible,
 #ggrid>a:hover {
 	color: var(--g-f-fg);
 	background: var(--g-f-bg);
 	border-color: var(--g-f-b1);
 	box-shadow: 0 .1em .3em var(--g-sh);
-}
-#ggrid>a:hover {
-	background: #303337;
 }
 #ggrid>a:focus-visible .gselchk{
 	display: block;
