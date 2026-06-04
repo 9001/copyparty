@@ -7054,7 +7054,8 @@ var ahotkeys = function (e) {
 	var k = (e.key || e.code) + '', pos = -1, n,
 		sh = e.shiftKey,
 		ae = document.activeElement,
-		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
+		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '',
+		aett = aet ? ae.type : '';
 
 	if (k.startsWith('Key'))
 		k = k.slice(3);
@@ -7125,7 +7126,7 @@ var ahotkeys = function (e) {
 			return ebi('griden').click();
 	}
 
-	if (aet == 'input')
+	if (aet == 'input' && aett != 'checkbox')
 		return;
 
 	var in_ftab = (aet == 'tr' || aet == 'td') && ae.closest('#files');
@@ -7178,7 +7179,7 @@ var ahotkeys = function (e) {
 	if (k.endsWith('Enter') && ae && (ae.onclick || ae.hasAttribute('tabIndex')))
 		return ev(e) && ae.click() || true;
 
-	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre')
+	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre' && aett != 'checkbox')
 		return;
 
 	if (k == '?')
