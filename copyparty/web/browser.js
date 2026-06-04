@@ -11086,8 +11086,7 @@ var drag = (function() {
 						clmod(current, "sel", true);
 						msel.selui();
 					}
-
-					e.dataTransfer.setData("text", r.getFilesString());
+					r.setDataForTransfer(e);
 				}
 				catch(ex){
 					console.log(e.target)
@@ -11130,8 +11129,7 @@ var drag = (function() {
 						clmod(current, "sel", true);
 						msel.selui();
 					}
-
-					e.dataTransfer.setData("text", r.getFilesString());
+					r.setDataForTransfer(e);
 				}
 				catch(ex){
 					console.log(e.target)
@@ -11146,10 +11144,10 @@ var drag = (function() {
 				r.mktarget(f);
 		}
 	};
-	r.getFilesString = function(){
+	r.setDataForTransfer = function(e){
 		var sel = msel.getsel(),
 			vps = [];
-		
+
 		for (var a = 0; a < sel.length; a++) {
 			var link = sel[a].vp;
 			if(!link.startsWith(window.location.origin))
@@ -11157,8 +11155,11 @@ var drag = (function() {
 			vps.push(link);
 		}
 
-		return vps.join("\n");
-	};
+		var payload = vps.join('\n')
+		e.dataTransfer.setData("text", payload);
+		e.dataTransfer.setData("text/plain", payload);
+		e.dataTransfer.setData("text/uri-list", payload);
+	}
 
 	return r;
 })();
