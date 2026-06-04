@@ -305,7 +305,8 @@ form {
 }
 input {
 	margin: 1em 0 0 0;
-	background: none;
+	background: #ccc;
+	background: var(--transparent);
 	padding: .5em;
 	border-color: rgb(72, 182, 255);
 	border-radius: .3em;
