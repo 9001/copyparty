@@ -1404,7 +1404,7 @@ function hist_replace(url) {
 
 function sethash(hv) {
     if (window.history && history.replaceState) {
-        hist_replace(location.pathname + location.search + '#' + hv);
+        hist_replace(location.pathname + location.search + (hv ? '#' : '') + hv);
     }
     else {
         location.hash = hv;
