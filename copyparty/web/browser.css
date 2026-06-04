@@ -1444,6 +1444,10 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #wfm.act {
 	display: inline-block;
 }
+#wfm .x {
+	font-size: 1.5em;
+	line-height: .65em;
+}
 #wtoggle,
 #wtoggle * {
 	line-height: 1em;
