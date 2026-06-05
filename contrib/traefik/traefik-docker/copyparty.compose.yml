@@ -1,0 +1,36 @@
+# docker-compose.yml for copyparty
+services:
+  copyparty:
+    image: copyparty/ac:latest
+    container_name: copyparty
+    user: "1000:1000"
+    volumes:
+      - ./:/cfg:z
+      - /path/to/your/fileshare/top/folder:/w:z
+  
+    environment:
+      LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE
+      # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
+
+      PYTHONUNBUFFERED: 1
+      # ensures log-messages are not delayed (but can reduce speed a tiny bit)
+
+    stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
+    healthcheck:
+      # hide it from logs with "/._" so it matches the default --lf-url filter 
+      test: ["CMD-SHELL", "wget --spider -q 127.0.0.1:3923/?reset=/._"]
+      interval: 1m
+      timeout: 2s
+      retries: 5
+      start_period: 15s
+    networks:
+      - traefik_default
+    labels:
+      - traefik.http.routers.copyparty.rule=Host(`<DOMAIN>`)
+      - traefik.http.services.copyparty.loadbalancer.server.port=3923
+      - traefik.http.routers.copyparty.tls.certresolver=le
+      - traefik.http.routers.copyparty.entrypoints=websecure
+  
+networks:
+  traefik_default:
+    external: true
