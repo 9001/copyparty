@@ -187,7 +187,6 @@ html.c {
 
 	--btn-fg: #fff;
 	--btn-bg-a: #9019bf;
-	--btn-h-bg: #a039ff;
 	--chk-fg: #d90;
 
 	--op-aa-bg: #f9dd22;
@@ -205,6 +204,7 @@ html.cz {
 	--btn-bs: 0 .1em .6em rgba(255,0,185,0.5);
 	--btn-1-bb: .2em solid #e90;
 	--btn-1-bs: 0 .1em .8em rgba(255,205,0,0.9);
+	--btn-h-bg: #a039ff;
 
 	--sz-b: #ddd;
 	--sz-k: #c9f;
@@ -230,7 +230,7 @@ html.cy {
 
 	--sel-bg: #f77;
 
-	--a-hil: #fff;
+	--a-hil: var(--b);
 	--a-h-bg: #000;
 
 	--tab-alt: var(--b);
@@ -238,9 +238,9 @@ html.cy {
 
 	--btn-bg: #000;
 	--btn-fg: var(--a);
-	--btn-h-fg: #fff;
 	--btn-1-bg: var(--a);
 	--btn-1-fg: #000;
+	--btn-h-bg: var(--a);
 	--btn-bs: 0 .25em 0 var(--b);
 	--chk-fg: #fd0;
 
@@ -1554,6 +1554,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 }
 #barbuf {
 	background: var(--mp-b-bg);
+	filter: contrast(1) saturate(1.1) brightness(1.1);
 }
 #barpos {
 	box-shadow: -.03em -.03em .7em rgba(0,0,0,0.5) inset;
@@ -3895,9 +3896,6 @@ html.cy #u2cards a {
 }
 html.cy #unpost a {
 	color: var(--a);
-}
-html.cy #barbuf {
-	filter: hue-rotate(267deg) brightness(0.8) contrast(4);
 }
 html.cy #path i {
 	background: transparent;
