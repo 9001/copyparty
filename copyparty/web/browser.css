@@ -1446,7 +1446,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 }
 #wfm .x {
 	font-size: 1.5em;
-	line-height: .65em;
+	line-height: .68em !important;
 }
 #wtoggle,
 #wtoggle * {
@@ -3706,6 +3706,7 @@ summary {
 }
 .x {
 	font-size: 1.5em;
+	font-family: initial;
 }
 
 
@@ -3990,7 +3991,7 @@ html.d #treepar {
 	right: .6em;
 	z-index: 11;
 	max-width: 80%;
-	overflow-x: auto;
+	/*overflow-x: auto;*/
 }
 #pathBar.thin .popup {
 	position: relative;
