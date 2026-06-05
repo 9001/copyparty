@@ -4098,7 +4098,7 @@ html.e #wrap.thin .ghead {
 		right: 1em;
 		z-index: 11;
 		max-width: 80%;
-		overflow-x: auto;
+		/*overflow-x: auto;*/
 	}
 	.popup,
 	#pathBar.thin .popup {
