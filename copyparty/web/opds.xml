@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
+    <id>{{ opds_id }}</id>
+    <title>{{ opds_title | e }}</title>
     <link rel="search"
     href="{{ opds_osd | e }}"
     type="application/opensearchdescription+xml"/>
     {%- for d in dirs %}
     <entry>
+        <id>{{ d.opds_id }}</id>
         <title>{{ d.name | e }}</title>
         <link rel="subsection"
         href="{{ d.href | e }}"
@@ -14,6 +17,7 @@
     {%- endfor %}
     {%- for f in files %}
     <entry>
+        <id>{{ f.opds_id }}</id>
         <title>{{ f.name | e }}</title>
         <updated>{{ f.iso8601 }}</updated>
         <link rel="http://opds-spec.org/acquisition"

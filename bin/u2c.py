@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.20"
-S_BUILD_DT = "2026-04-22"
+S_VERSION = "2.21"
+S_BUILD_DT = "2026-05-25"
 
 """
 u2c.py: upload to copyparty
@@ -1311,7 +1311,8 @@ class Ctl(object):
                 if self.ar.jw:
                     print("%s  %s" % (wark, vp))
                 else:
-                    zd = datetime.datetime.fromtimestamp(max(0, file.lmod), UTC)
+                    tsdt = datetime.datetime.fromtimestamp
+                    zd = tsdt(max(0, min(2 << 36, file.lmod)), UTC)
                     dt = "%04d-%02d-%02d %02d:%02d:%02d" % (
                         zd.year,
                         zd.month,

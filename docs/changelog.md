@@ -1,12 +1,12 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
-# 2026-0428-0907 `v1.21.0` UI V2
+# 2026-0428-0907 `v1.21.0` UI V1.5
 
 ## 😴 tl;dr
 
 * the web UI changed a LOT
 * nice mobile layout
 * try setting an accent color in the theme settings
-* drag n drop within copyparty
+* drag n drop within copyparty and between browser windows of same server
 * the used storage metric is now at the bottom of the folder tree
 * the account details and control panel link are now in the account popup (top right)
 * media player settings and normal settings have merged
@@ -15,22 +15,27 @@
 ## 🧪 new features
 
 * [Add moving files into other folders by dragging](https://github.com/tilse/copyparty-uiV1.5/pull/1) within the browser window to move files or folders
+* extend drag n drop logic to work between browser windows
 * custom accent color setting added. works best for light and dark themes (the first 4 in the list)
-* right click (long press) on mobile is now possible
+* custom corner rounding in settings
+* added 2 new themes: poison // wing
+* long press on mobile selects the element in grid view by default
+* long pressing selected items brings up the context menu
 * selection checkboxes on items in grid view
 * the tree and path can be visible at the same time
+* resize drag handle at the edge of the folder tree
 * new design for placeholder thumbnails
 * #386 gallery view toggle for smaller margins / bigger image previews
-* settings and upload are now a popup/modal
+* settings and upload are now a popup/modal by default (can be moved)
 * settings can be navigated via sections and former tooltip info is now always visible
 * new floating [+] button in bottom right for quickly creating files / folders / uploading
-* searching folders / subfolders is now possible, and is the new default when clicking the search button. extended search options are accessible via down arrow in the search box
+* searching folders / subfolders is now possible, and is the new default when clicking the search button. old-school extended search options are accessible via down arrow in the search box
 * storage capacity progress bar at bottom of folder tree
 * account button with popup in the top right
 * search in "quotes with spaces" is now possible to find file names including spaces
 * new simpler audio progress bar slider added as option
 * quick setting for changing loop mode via bottom media player bar
-* mute toggle button
+* a volume icon that works as a mute toggle
 * name of playing audio is now displayed
 * audio equalizer can be operated via sliders
 * image viewer has nearest neighbor scale mode toggle
@@ -53,7 +58,7 @@
 * control panel button now lives in the account popup in the top bar
 * searching for files via drag n drop is now only possible when the search mode is toggled in the up2k UI
 * bup is an optional dropdown in the up2k modal
-* many mobile layout usability issues
+* many mobile layout usability improvements
 * more consistent areas for clicking to navigate left / right in the image viewer (they don't depend on image fill mode anymore)
 * "folder up" / "next sibling" / "previous sibling" are now icon buttons at the top
 * new look for the login screen
@@ -62,11 +67,71 @@
 
 ## 🌠 fun facts
 
-* all themes should keep working, even the Windows95 ones
+* full support for the new 3DS, except some emoji rendering issues
+* it was a lot of work to keep all themes intact
+* some UI elements have gained IDs, so it should be easier to style them
 
 ## 😔 unfun facts
 
 * #1209 (partially), #711 added a setting that gets rid of (most) emojis
+
+
+# 2026-0424-2222  `v1.20.14`  autolocalization
+
+## 🧪 new features
+
+* #1410 #376 #1224 new option `--glang` to autoselect UI-translation based on webbrowser's language (thx @stackxp!) ec3e0e7e
+* #1407 #1384 option to automatically switch between list-view and grid-view depending on folder contents (thx @icxes!) 822fa718 660ed7a9 961a2737
+* #1447 audioplayer can now play bcstm / bfstm / brstm files (nintendo 3ds/wii bgm) 3a9ff67a 
+* #1389 add 1000-based filesize-units in addition to 1024-based 43773f2c
+* #1395 [reloc-by-wark](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks#more-upload-stuff), a pair of hooks to rename incoming uploads to a hash of the file contents 1e7de5d1
+* option [--rlo](https://copyparty.eu/cli/#rlo-help-page) to change the logrotate-counter for [-lo](https://copyparty.eu/cli/#g-lo) 8b986888
+* add `--certkey` to specify certificate and key as separate files 8c7cdf85
+  * but the built-in HTTPS server should [still not be trusted](https://github.com/9001/copyparty/#https)
+* config-files can now use OS environment-variables anywhere in the `[global]` config section cbd82b65 e52bbed8
+  * by default, only the syntax `${VAR}` is supported, not `$VAR` or `%VAR%`
+  * previously, a small handful of global-options already supported this (`c lo hist dbpath ssl_log`), but they also supported the `$VAR` syntax, which is no longer the case
+  * if the old `$VAR` syntax is detected, copyparty will crash on startup, suggesting the following remedies (choose one!) in the log:
+    1. update the config-value to the new `${VAR}` syntax (recommended)
+    2. allow the old syntax with global-option `--env-expand 1` (risky)
+    3. ignore the old syntax and only expand the new syntax with global-option `--env-expand 2`
+    4. disable all environment-variable expansions with `PRTY_NO_ENVEXPAND=1`
+
+## 🩹 bugfixes
+
+* #1437 webdav clients can now PROPFIND a file with `depth: infinite` which at least [webdav4](https://github.com/skshetry/webdav4) does e00f2b46
+* #1392 navigating into a subfolder using a `dks` [dirkey](https://github.com/9001/copyparty/#dirkeys) (default-disabled) could fail 228c3dfa
+* #1446 #1330 #1362 fix some small edgecases with the rightclick-menu (thx @icxes!) 874e0e7a
+* #1403 #1396 audioplayer: fix ui-crash when folder contains an m3u-file and sort-order is changed during playback (thx @icxes!) 198f631a
+* #1428 #1427 when `--magic` was enabled, nameless uploads of textfiles would get the file-extension `.ssa` instead of `.txt` (thx @Scotsguy!) ed516ddc
+* #1449 on some filesystems, the tail/follow function would spam the log with `reopened at byte XXX` 81730189
+* #1401 on windows, a spec-violating basic-upload could delay that upload by a few seconds 6fb1287e
+* on macOS, u2c would clear the terminal on exit, even with `-ns` 238887c7
+* audio-files in a videofile trenchcoat did not thumbnail correctly 1066dc39
+
+## 🔧 other changes
+
+* #1387 added gentoo packaging (thx @mid-kid!) fb5384f4
+* #1425 improved FreeBSD / OpenBSD support (thx @chilledfrogs!) f5613187 745d82fa
+* #1352 new handler: [fail2ban](https://github.com/9001/copyparty/blob/hovudstraum/bin/handlers/404-to-fail2ban.py) (thx @Lomaiin!) 26e663d1
+* improve errormessage when the server's OS-HDD blips out of existence d1517d0c
+* #1439 improve IPv6 autoban IP-range (thx @SnowSquire!) f6dc1e29
+* ensure opus transcodes will at most have 2 audio channels (stereo) b31f2902
+* #1417 smb-server: probably add IPv6 support a5d859d2
+* `--list-nics` and `--list-ips` to show autodetected network-adapters and IPs 8d4363d1
+* docs:
+  * nixos module-override example (thx @Scotsguy!) 0b16e875
+  * make it even more obvious that `--allow-csrf` is a bad idea 9a724b01
+  * mention `--urlform get` to disable message-to-serverlog ac05b4f1
+  * readme: improve [shadowing](https://github.com/9001/copyparty#shadowing) phrasing 003c68d0
+  * [devnotes](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#dependencies): explain the vendored dependencies 971f8ef9
+
+## 🌠 fun facts
+
+* this release includes [code](https://github.com/9001/copyparty/commit/cbd82b65) written at [abs(unit)](https://a.ocv.me/pub/g/nerd-stuff/abs-unit.jpg)
+  * btw that pdp had an IPv6 lease and browsed the internet :^)
+    * hasn't connected to copyparty though (yet...)
+* this release was powered by [一体いつから (TaKo Hardcore bootleg)](https://soundcloud.com/takomusiccc/tako-hardcore-bootleg) followed by [Fighting My Way (YUPPUN Hardcore Remix)](https://soundcloud.com/yuppun/fightingmyway) (shd is a good dj)
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  

@@ -1,0 +1,64 @@
+FS=/home/ed/Pictures/rawsamples-ch  # https://rawsamples.ch/index.php/en/ (the 7z)
+
+find $FS -type f | sed -r 's/(.*)\.(.*)/\2                     \1.\2/' | sort | tr '[:upper:]' '[:lower:]' | uniq -cw16 | sort -n | awk '{printf"%s ",$2}'
+FMTS="dcr erf mdc mef ppm sr2 srf mos pdf 3fr tiff nrw kdc tif srw x3f mrw pef dng raw raf arw crw orf nef cr2 rw2 jpg"
+
+for w in $FMTS ; do grep -E "th-r-.*\b$w\b" ~/dev/copyparty/copyparty/__main__.py || echo "$w"; done 
+missing rw2;
+FMTS_CPP=3fr,arw,cr2,cr3,crw,dcr,dng,erf,k25,kdc,mdc,mef,mos,mrw,nef,nrw,orf,pef,raf,raw,sr2,srf,srw,x3f,rw2 
+
+rm -rf $FS/.hist
+time podman run --rm -it -v $FS:/w copyparty/iv -v /w::r --exit=thgen --th-pregen=j 
+find $FS/.hist/th/ -iname '*.jpg' | wc -l
+
+371 0m5.200s 3s
+458 0m5.512s 3s with --th-r-raw=$FMTS_CPP
+443 0m3.967s 2s with --th-r-raw=$FMTS_CPP --th-dec=raw
+
+t0=$(date +%s); for f in $FMTS ; do rm -rf $FS/.hist
+podman run --rm -it -v $FS:/w copyparty/iv -v /w::r --exit=thgen --th-pregen=j --th-dec=raw --th-r-raw=$f -q >/dev/null 2>&1
+printf '%s ' $(find $FS/.hist/th/ -size +0 -iname '*.jpg' | wc -l)
+done;t=$(date +%s);echo $((t-t0))
+
+ 95f 55s --th-dec=ff 
+397f 51s --th-dec=raw (rawpy)
+153f 51s --th-dec=vips (no-magick)
+
+# swithc to persistent for messingaround
+podman run --rm -it -v $FS:/w --entrypoint /bin/ash copyparty/iv 
+apk update
+apk upgrade -lai
+
+t0=$(date +%s); for f in $FMTS ; do rm -rf $FS/.hist
+podman exec -it d171470581ab python3 -m copyparty -v /w::r --exit=thgen --th-pregen=j --th-dec=vips --th-r-vips=$f -q >/dev/null 2>&1
+printf '%s ' $(find $FS/.hist/th/ -size +0 -iname '*.jpg' | wc -l)
+done;t=$(date +%s);echo $((t-t0))
+# equivalent results
+
+apk add imagemagick; t0=$(date +%s); rm -rf /w/.hist/ ; for f in $FMTS ; do rm -f /*.jpg; n=0; find /w -type f -iname "*.$f" | while IFS= read -r x; do magick "$x" -scale 320x /$n.jpg >/dev/null 2>&1 ; [ -s /$n.jpg ] || rm -f /$n.jpg; n=$((n+1)); done; echo -n "$(ls -1 / | grep -F .jpg | wc -l) "; done; t=$(date +%s); echo $((t-t0))
+
+apk add libraw-tools; t0=$(date +%s); rm -rf /w/.hist/ ; for f in $FMTS ; do rm -f /*.jpg; n=0; find /w -type f -iname "*.$f" | while IFS= read -r x; do [ $(dcraw_emu -h -o 1 -s 0 -Z - "$x" 2>/dev/null | wc -c) -gt 1024 ] && touch /$n.jpg; n=$((n+1)); done; echo -n "$(ls -1 / | grep -F .jpg | wc -l) "; done; t=$(date +%s); echo $((t-t0))
+
+dcr erf mdc mef ppm sr2 srf mos pdf 3fr tiff nrw kdc tif srw x3f mrw pef dng raw raf arw crw orf nef cr2 rw2 jpg
+d e m m p s s m p 3 t n k t s x m  p  d  r  r  a  c  o  n  c  r j
+c r d e p r r o d f i r d i r 3 r  e  n  a  a  r  r  r  e  r  w p
+r f c f m 2 f s f r f w c f w f w  f  g  w  f  w  w  f  f  2  2 g
+-----------------------------------------------------------------
+0 0 0 0 1 1 0 0 0 0 3 0 2 6 0 0 0  6 17  0  0  0  0  0 54  0  0 5 = 95,  55s --th-dec=ff
+1 1 0 1 0 1 1 2 0 3 0 4 5 6 7 0 8 17 16  2 30 31 17 45 56 56 87 0 =397,  51s --th-dec=raw  ## rawpy
+1 1 1 1 0 1 1 2 0 3 0 4 5 6 6 0 9 17 18 24 30 31 34 45 56 57 87 0 =440,  87s dcraw_emu
+1 1 1 1 1 1 1 2 0 3 6 4 5 6 6 0 9 17 18 24 30 31 34 45 56 57 87 5 =452, 226s magick-cmd
+0 1 0 1 1 0 0 0 2 3 3 0 3 6 0 0 0  0 17  0  0  0  0  0 56 55  0 5 =153,  51s --th-dec=vips  ## stock
+0 1 0 1 1 1 1 0 2 3 3 4 5 6 6 0 8  0 18 11 30 30 18 39 56 55 87 5 =391, 151s vips + apk add imagemagick imagemagick-raw
+0 1 0 1 1 0 0 0 2 3 3 0 3 6 0 0 8  0 17 11 30  0 18 39 56 55 87 5 =346, 128s vips + apk del imagemagick  (just imagemagick-raw)
+
+xsel -o | tr ' ' '\n' | awk '!$0{next} {t+=$1} END{print t}'
+
+apk add time
+rm -rf /w/.hist; time python3 -m copyparty -v /w::r --exit=thgen --th-pregen=j --th-dec=raw --th-r-raw=$FMTS_CPP ; find /w/.hist/ -iname '*.jpg' -size +0 | wc -l
+
+391f, 0:03.77elapsed  227264maxresident  # rawpy+vips    with-embedded-thumbs
+391f, 0:04.79elapsed  467036maxresident  # rawpy+pillow  with-embedded-thumbs
+434f, 0:29.67elapsed  307724maxresident  # dcraw+vips
+434f, 0:29.34elapsed  327980maxresident  # dcraw+pillow
+374f, 1:49.70elapsed 4574768maxresident  # vips+imagemagick lol lmao

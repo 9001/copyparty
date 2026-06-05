@@ -700,7 +700,7 @@ class HttpSrv(object):
             if not fmts:
                 continue
             log("starting for volume /%s" % (vn.vpath,), 6)
-            g = vn.walk("x", "/", [], LEELOO_DALLAS, [[True]], 2, scandir, False, False)
+            g = vn.walk("", "/", [], LEELOO_DALLAS, [[True]], 2, scandir, False, False)
             g = gfilter2(g, self, vn.vpath, fmts.split(","))
             for f in g:
                 nfiles += 1

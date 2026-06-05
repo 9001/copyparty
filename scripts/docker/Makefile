@@ -41,7 +41,7 @@ hclean:
 purge:
 	-docker kill `docker ps -q`
 	-docker rm   `docker ps -qa`
-	-docker rmi  `docker images -qa`
+	-docker rmi  `docker images -qa` -f
 
 sh:
 	@printf "\n\033[1;31mopening a shell in the most recently created docker image\033[0m\n"

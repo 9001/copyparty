@@ -114,12 +114,14 @@ diff -wNarU2 codemirror-5.65.1-orig/src/input/ContentEditableInput.js codemirror
 +  /*
    let order = getOrder(line, cm.doc.direction), side = "left"
    if (order) {
-@@ -405,4 +406,5 @@
+@@ -405,5 +406,6 @@
      side = partPos % 2 ? "right" : "left"
    }
+-  let result = nodeAndOffsetInLineMap(info.map, pos.ch, side)
 +  */
-   let result = nodeAndOffsetInLineMap(info.map, pos.ch, side)
++  let result = nodeAndOffsetInLineMap(info.map, pos.ch, "left")
    result.offset = result.collapse == "right" ? result.end : result.start
+   return result
 diff -wNarU2 codemirror-5.65.1-orig/src/input/movement.js codemirror-5.65.1/src/input/movement.js
 --- codemirror-5.65.1-orig/src/input/movement.js	2022-01-20 13:06:23.000000000 +0100
 +++ codemirror-5.65.1/src/input/movement.js	2022-02-09 22:50:18.145862052 +0100

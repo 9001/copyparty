@@ -374,7 +374,7 @@ some third-party code has been vendored into the git repo; some for convenience,
   * `dnslib` (MIT) may be deleted and replaced with a systemwide install of the original [dnslib](https://github.com/paulc/dnslib/), HOWEVER:
     * will cause problems for mDNS in some network environments; 6c1cf68bca7376c6291c3cfe710ebd5bd5ed3e6c + 94d1924fa97e5faaf1ebfd85cae73faebcb89fa1
 
-* inside the folder `/copyparty/web/deps` (only in distributed archives/builds) is [fuse.py](https://github.com/fusepy/fusepy/blob/master/fuse.py), to make it downloadable from the connect-page on the web-ui
+* inside the folder `/copyparty/web/deps` (only in distributed archives/builds) is [mfusepy.py](https://github.com/mxmlnkn/mfusepy/blob/master/mfusepy.py) (sizegolfed, no important changes), to make it downloadable from the connect-page on the web-ui
 
 * inside the folder `/copyparty/web` (only in distributed archives/builds) is a collection of javascript libraries (produced by [deps-docker](https://github.com/9001/copyparty/tree/hovudstraum/scripts/deps-docker)) which are used clientside by the web-UI:
   * [marked.js](https://github.com/markedjs/marked/releases) (MIT) powers the markdown editor, and has been [patched](https://github.com/9001/copyparty/blob/hovudstraum/scripts/deps-docker/marked-ln.patch) to include the line-numbers of each input line, to enable scroll-sync between the editor and the preview-pane. This patch is [not strictly necessary anymore](https://github.com/markedjs/marked/issues/2134) but I haven't gotten around to making the change yet
@@ -445,6 +445,12 @@ build the sfx using any of the following examples:
 ./scripts/make-sfx.sh           # regular edition
 ./scripts/make-sfx.sh fast      # build faster (worse js/css compression)
 ./scripts/make-sfx.sh gz no-cm  # gzip-compressed + no fancy markdown editor
+```
+
+on macos, you need to download several GNU utilities before building:
+
+```zsh
+brew install gsed gnu-tar findutils coreutils
 ```
 
 

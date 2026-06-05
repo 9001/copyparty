@@ -21,7 +21,7 @@ usage:
   python partyfuse.py http://192.168.1.69:3923/  ./music
 
 dependencies:
-  python3 -m pip install --user fusepy  # or grab it from the connect page
+  python3 -m pip install --user mfusepy  # or grab it from the connect page
   + on Linux: sudo apk add fuse
   + on Macos: https://osxfuse.github.io/
   + on Windows: https://github.com/billziss-gh/winfsp/releases/latest
@@ -92,8 +92,13 @@ is_dbg = False
 
 
 try:
-    from fuse import FUSE, FuseOSError, Operations
+    from mfusepy import FUSE, FuseOSError, Operations
 except:
+    try:
+        from fuse import FUSE, FuseOSError, Operations
+    except:
+        FUSE = None
+
     if WINDOWS:
         libfuse = "install https://github.com/billziss-gh/winfsp/releases/latest"
     elif MACOS:
@@ -102,12 +107,13 @@ except:
         libfuse = "apt install libfuse2\n    modprobe fuse"
 
     m = """\033[33m
-  could not import fuse; these may help:
-    {} -m pip install --user fusepy
+  could not import mfusepy; these may help:
+    {} -m pip install --user mfusepy
     {}
 \033[0m"""
-    print(m.format(sys.executable, libfuse))
-    raise
+    if not FUSE:
+        print(m.format(sys.executable, libfuse))
+        raise
 
 
 def termsafe(txt):
@@ -143,10 +149,10 @@ def fancy_log(fmt, *a):
 
 
 def register_wtf8():
-    def wtf8_enc(text):
+    def wtf8_enc(text, errors=""):
         return str(text).encode("utf-8", "surrogateescape"), len(text)
 
-    def wtf8_dec(binary):
+    def wtf8_dec(binary, errors=""):
         return bytes(binary).decode("utf-8", "surrogateescape"), len(binary)
 
     def wtf8_search(encoding_name):

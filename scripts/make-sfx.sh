@@ -520,6 +520,7 @@ unhelpg() {
 [ $no_hl ] &&
 	rm -rf copyparty/web/deps/prism*
 
+rm -f copyparty/web/deps/orbitron.woff2  # todo:uiv15
 [ $no_fnt ] && {
 	rm -f copyparty/web/deps/scp.woff2
 	f=copyparty/web/ui.css

@@ -5,6 +5,7 @@ vend := $(self)/../../copyparty/web/deps
 
 all:
 	cp -pv ../uncomment.py .
+	cp -pv ../strip_hints/a.py unhint.py
 
 	docker build -t build-copyparty-deps .
 

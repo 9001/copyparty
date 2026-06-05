@@ -15,22 +15,20 @@ RUN     apk add -U !pyc ${ADD_PKG} \
             tzdata wget mimalloc2 mimalloc2-insecure \
             py3-jinja2 py3-argon2-cffi py3-pyzmq \
             py3-openssl py3-paramiko py3-pillow \
-            py3-pip py3-cffi \
+            py3-pip \
             py3-magic \
             vips-jxl vips-poppler vips-magick \
             py3-numpy fftw libsndfile \
             vamp-sdk vamp-sdk-libs keyfinder-cli \
-            libraw py3-numpy \
+            libraw-tools \
         && apk add -t .bd \
             bash wget gcc g++ make cmake patchelf \
             ffmpeg ffmpeg-dev \
             python3-dev fftw-dev libsndfile-dev \
-            py3-wheel py3-numpy-dev libffi-dev \
+            py3-wheel py3-numpy-dev \
             vamp-sdk-dev \
-            libraw-dev py3-numpy-dev cython \
         && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
-        && python3 -m pip install pyvips \
-        && python3 -m pip install --no-binary rawpy rawpy \
+        && python3 -m pip install pyvips --no-build-isolation \
         && bash install-deps.sh \
         && apk del py3-pip .bd \
         && chmod 777 /root \

@@ -1823,14 +1823,13 @@ class HttpCli(object):
             # because lstat=true would not recurse into subfolders
             # and this is a rare case where we actually want that
             fgen = vn.zipgen(
-                rem,
+                "",
                 rem,
                 set(),
                 self.uname,
                 True,
                 1,
                 not self.args.no_scandir,
-                wrap=False,
             )
 
         elif depth == "0":
@@ -5163,6 +5162,16 @@ class HttpCli(object):
         if items:
             fn = "sel-" + fn
 
+        if "name" in self.ouparam:
+            # user-selected name for toplevel folder, or blank for none
+            vpath = undot(self.ouparam["name"])
+        elif items:
+            # multiselect; add all items to archive root
+            vpath = ""
+        else:
+            # single folder; the folder itself is the top-level item
+            vpath = vpath.split("/")[-1].lstrip(".") or "top"
+
         if vn.flags.get("zipmax") and not (
             vn.flags.get("zipmaxu") and self.uname != "*"
         ):
@@ -5209,7 +5218,7 @@ class HttpCli(object):
 
             if cfmt:
                 self.log("transcoding to [{}]".format(cfmt))
-                fgen = gfilter(fgen, self.thumbcli, self.uname, vpath, cfmt)
+                fgen = gfilter(fgen, self.thumbcli, self.uname, self.vpath, vpath, cfmt)
 
         now = time.time()
         self.dl_id = "%s:%s" % (self.ip, self.addr[1])
@@ -6443,6 +6452,7 @@ class HttpCli(object):
         s_wr = "write" in req["perms"]
         s_get = "get" in req["perms"]
         s_dot = "dot" in req["perms"]
+        # will_read, will_write, will_move, will_del, will_get
         s_axs = [s_rd, s_wr, False, False, s_get]
         s_axsd = s_axs + [s_dot]
 
@@ -7199,18 +7209,19 @@ class HttpCli(object):
         dirs = []
         files = []
         ptn_hr = RE_HR
-        use_abs_url = (
-            not is_opds
-            and not is_ls
-            and not is_js
-            and not self.trailing_slash
-            and vpath
+        use_abs_url = is_opds or (
+            vpath and not is_ls and not is_js and not self.trailing_slash
         )
         for fn in ls_names:
             base = ""
             href = fn
             if use_abs_url:
-                base = "/" + vpath + "/"
+                if is_opds:
+                    base = self.args.SRS
+                    if vpath:
+                        base += vpath + "/"
+                else:
+                    base = "/" + vpath + "/"
                 href = base + fn
 
             if fn in vfs_virt:
@@ -7250,7 +7261,7 @@ class HttpCli(object):
                 margin = "-"
 
             sz = inf.st_size
-            zd = datetime.fromtimestamp(max(0, linf.st_mtime), UTC)
+            zd = datetime.fromtimestamp(max(0, min(2 << 36, linf.st_mtime)), UTC)
             dt = "%04d-%02d-%02d %02d:%02d:%02d" % (
                 zd.year,
                 zd.month,
@@ -7540,17 +7551,26 @@ class HttpCli(object):
                 ]
 
             j2a["opds_osd"] = "%s%s?opds&osd" % (self.args.SRS, quotep(vpath))
-
+            j2a["opds_id"] = uuid.uuid5(uuid.NAMESPACE_URL, vpath + "/").urn
+            j2a["opds_title"] = (
+                (vpath.rsplit("/", 1)[-1] + "/") if vpath else self.args.bname
+            )
             for item in dirs:
                 href = item["href"]
                 href += ("&" if "?" in href else "?") + "opds"
                 item["href"] = href
+                item["opds_id"] = uuid.uuid5(
+                    uuid.NAMESPACE_URL, "%s/%s" % (vpath, item["name"])
+                ).urn
                 item["iso8601"] = "%sZ" % (item["dt"].replace(" ", "T"),)
 
             for item in files:
                 href = item["href"]
                 href += ("&" if "?" in href else "?") + "dl"
                 item["href"] = href
+                item["opds_id"] = uuid.uuid5(
+                    uuid.NAMESPACE_URL, "%s/%s" % (vpath, item["name"])
+                ).urn
                 item["iso8601"] = "%sZ" % (item["dt"].replace(" ", "T"),)
 
                 if "rmagic" in self.vn.flags:
