@@ -2974,8 +2974,8 @@ var vbar = (function () {
 			style2 = light ? 'color-mix(in oklab, ' + bg + ' 85%, #000 15%' : 'color-mix(in oklab, ' + bg + ' 85%, #fff 15%';
 		}
 		if(IE){
-			style1 = 'rgb(85, 144, 255)';
-			style2 = 'rgb(174, 193, 214)'
+			style1 = 'rgb(60, 126, 248)';
+			style2 = 'rgb(75, 78, 82)'
 		}
 		ctx.fillStyle = style2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = style1; ctx.fillRect(0, 0, w * mp.vol, h);
