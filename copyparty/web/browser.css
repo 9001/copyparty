@@ -225,7 +225,6 @@ html.cy {
 	--bg-u2: var(--b);
 	--bg-u3: var(--b);
 	--bg-u5: #999;
-	--bg-d3: #f77;
 	--bg-d2: var(--a);
 
 	--sel-bg: #f77;
@@ -3523,7 +3522,7 @@ details .setting {
 	border-left: none;
 	border-right: none;
 }
-.c input[type=checkbox] {
+.c>input[type=checkbox] {
 	position: absolute;
   	opacity: 0;
 }
