@@ -34,6 +34,7 @@
 	--bgg: var(--bg);
 
 	background: var(--bg);
+	color: #b9bdc1;
     color: var(--fg);
 }
 html.y {
