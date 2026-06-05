@@ -259,53 +259,11 @@ html.cy {
 	--scrl-hint: var(--b);
 }
 html.dz {
-	--fg: #4d4;
-	--fg-weak: #2a2;
+	--a: #32fe32;
+	--fg-max: rgb(14, 233, 14);
+	--fg-max: var(--a);
 
-	--bg-u5: #050;
-	--bg-u3: #020;
-	--bg-u2: #020;
-	--bg-u1: #020;
-	--bg: #010;
-	--bg-d1: #000;
-	--bg-d2: #020;
-	--bg-d3: #000;
-
-	--tab-alt: #6f6;
-	--row-alt: #030;
-
-	--a: #9f9;
-	--a-hil: #cfc;
-	--a-dark: #afa;
-	--a-gray: #2a2;
-
-	--btn-bg: rgba(64,128,64,0.15);
-	--btn-h-bg: #050;
-	--btn-1-fg: #000;
-	--btn-1-bg: #4f4;
-	--btn-1h-bg: #3f3;
-	--btn-bs: 0 0 0 .1em #080 inset;
-	--btn-1-bs: a;
-
-	--u2-btn-b1: var(--fg-weak);
-	--u2-sbtn-b1: var(--fg-weak);
-	--u2-tab-b1: var(--fg-weak);
-	--u2-tab-1-fg: #fff;
-	--u2-tab-1-bg: linear-gradient(to bottom, #151, var(--bg) 80%);
-	--u2-b1-bg: #3a3;
-	--u2-b2-bg: #3a3;
-
-	--sort-1: #fff;
-	--sort-2: #3f3;
-
-	--srv-1: #3e3;
-	--srv-2: #1a1;
-	--srv-3: #0f0;
-	--srv-3b: #070;
-
-	--tree-bg: #010;
-
-	--f-h-b1: #3b3;
+	--radius: 0;
 
 	text-shadow: none;
 	font-family: 'scp', monospace, monospace;
@@ -3959,8 +3917,10 @@ html.cy #s_list h3 {
 
 
 
-html.dz * {
-	border-radius: 0 !important;
+html.dz #s_nav .btn,
+html.dz .btn {
+	border-width: .1em;
+	border-color: var(--bg-u5);
 }
 html.d #treepar {
 	border-bottom: .2em solid var(--f-h-b1);
