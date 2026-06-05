@@ -215,45 +215,48 @@ html.cz {
 	--u2-tab-1-bg: a;
 }
 html.cy {
+	--a: #ff0;
+	--b: #f00;
+	--b: hsl(from var(--a) calc(h - 60) s l);
+
 	--fg: #fff;
 	--fg-weak: #fff;
-	--bg: #ff0;
-	--bg-u2: #f00;
-	--bg-u3: #f00;
+	--bg: var(--a);
+	--bg-u2: var(--b);
+	--bg-u3: var(--b);
 	--bg-u5: #999;
 	--bg-d3: #f77;
-	--bg-d2: #ff0;
+	--bg-d2: var(--a);
 
 	--sel-bg: #f77;
 
-	--a: #fff;
 	--a-hil: #fff;
 	--a-h-bg: #000;
 
-	--tab-alt: #f00;
+	--tab-alt: var(--b);
 	--row-alt: #fff;
 
 	--btn-bg: #000;
-	--btn-fg: #ff0;
+	--btn-fg: var(--a);
 	--btn-h-fg: #fff;
-	--btn-1-bg: #ff0;
+	--btn-1-bg: var(--a);
 	--btn-1-fg: #000;
-	--btn-bs: 0 .25em 0 #f00;
+	--btn-bs: 0 .25em 0 var(--b);
 	--chk-fg: #fd0;
 
 	--txt-bg: #000;
-	--srv-1: #f00;
+	--srv-1: var(--b);
 	--srv-3: #fff;
 	--op-aa-bg: #fff;
 
-	--u2-b1-bg: #f00;
-	--u2-b2-bg: #f00;
+	--u2-b1-bg: var(--b);
+	--u2-b2-bg: var(--b);
 
 	--g-sel-fg: #fff;
 	--g-sel-bg: #aaa;
 	--g-fsel-bg: #aaa;
 
-	--scrl-hint: #f00;
+	--scrl-hint: var(--b);
 }
 html.dz {
 	--fg: #4d4;
@@ -3766,7 +3769,7 @@ html.b #ops,
 html.b #path,
 html.b #wtoggle,
 html.b #up_quick_more,
-html.b #up_quick_btn:not(:hover):not(.on)
+html.b #up_quick_btn:not(:hover):not(.on),
 
 html.cz .ghead,
 html.cz #wfp .btn:not(:hover),
@@ -3914,45 +3917,41 @@ html.ay #u2cards a.act {
 
 
 html.cy .pfp {
-	color: #f00;
+	color: var(--b);
 }
 html.cy #path a:hover {
-	color: #f00;
+	color: var(--b);
 }
 html.cy .mdo a {
-	background: #f00;
+	background: var(--b);
 }
-html.cy #wrap,
 html.cy #acc_info a,
 html.cy #files,
 html.cy #files a,
 html.cy #files tbody div a:last-child {
-	color: #f00;
+	color: var(--b);
 }
 html.cy #u2tab a,
 html.cy #u2cards a {
-	color: #f00;
+	color: var(--b);
 }
 html.cy #unpost a {
-	color: #ff0;
+	color: var(--a);
 }
 html.cy #barbuf {
 	filter: hue-rotate(267deg) brightness(0.8) contrast(4);
-}
-html.cy #pvol {
-	filter: hue-rotate(4deg) contrast(2.2);
 }
 html.cy #path i {
 	background: transparent;
 }
 html.cy #up_quick_btn.on:not(:hover) {
-	background: #f00;
+	background: var(--b);
 }
 html.cy .ghead span {
-	color: #f00;
+	color: var(--b);
 }
 html.cy #s_list h3 {
-	background: #ff0;
+	background: var(--a);
 	color: #000;
 }
 
@@ -4122,6 +4121,9 @@ html.e #wrap.thin .ghead {
 	}
 	#ghead {
 		margin: 0 .5em 1em .5em;
+	}
+	.modalheader {
+		padding: .8em 3em .8em .7em;
 	}
 	.modalsplit {
 		display: block;
