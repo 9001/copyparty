@@ -10907,7 +10907,7 @@ var rcm = (function () {
 			}
 			var fa = file && file.children[1].querySelector('a[id]');
 			if (fa && fa.id != 'unsearch') {
-				selFile.no_dsel = clgot(file, "sel");
+				selFile.no_dsel = TOUCH || clgot(file, "sel");
 				clmod(file, "sel", true);
 				selFile.elem = file;
 				selFile.url = fa.href;
