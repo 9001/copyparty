@@ -4628,10 +4628,10 @@ var fileman = (function () {
 			encut = nsel,
 			encpy = nsel,
 			enpst = r.clip && r.clip.length,
-			hren = !(have_mv && has(perms, 'write') && has(perms, 'move')),
-			hdel = !(have_del && has(perms, 'delete')),
-			hcut = !(have_mv && has(perms, 'move')),
-			hpst = !(have_mv && has(perms, 'write')),
+			hren = !(have_mv && has(perms, 'write') && has(perms, 'move')) || !nsel,
+			hdel = !(have_del && has(perms, 'delete')) || !nsel,
+			hcut = !(have_mv && has(perms, 'move')) || !nsel,
+			hpst = !(have_mv && has(perms, 'write')) || !enpst,
 			hshr = !can_shr || !get_evpath().indexOf(have_shr),
 			enclr = enpst || nsel;
 
@@ -4649,7 +4649,8 @@ var fileman = (function () {
 		clmod(bren, 'hide', hren);
 		clmod(bdel, 'hide', hdel);
 		clmod(bcut, 'hide', hcut);
-		clmod(bpst, 'hide', hpst);
+		clmod(bcpy, 'hide', !encpy);
+		clmod(bpst, 'hide', !enpst);
 		clmod(bshr, 'hide', hshr);
 		clmod(bclr, 'hide', !enclr);
 
