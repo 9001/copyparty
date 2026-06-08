@@ -7131,6 +7131,9 @@ var ahotkeys = function (e) {
 		if (QS('#music.vis'))
 			return ebi('cl_mu').click();
 
+		if (!clgot(ebi('fclr'), 'hide'))
+			return fileman.clear();
+
 		if (QS('.opview.act'))
 			return QS('#ops>a').click();
 
