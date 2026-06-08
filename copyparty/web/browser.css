@@ -158,6 +158,8 @@ html.by {
 		-5deg, 
 		color-mix(in oklab, var(--btn-bg-a) 30%, var(--a) 20%), 
 		color-mix(in oklab, var(--btn-bg-a) 30%, transparent));
+	
+  	text-shadow: 0px 0px 4px rgb(255, 255, 255);
 }
 html.by #s_list h3,
 html.by #wtico,
