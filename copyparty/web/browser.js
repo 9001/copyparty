@@ -4628,10 +4628,10 @@ var fileman = (function () {
 			encut = nsel,
 			encpy = nsel,
 			enpst = r.clip && r.clip.length,
-			hren = !(have_mv && has(perms, 'write') && has(perms, 'move')),
-			hdel = !(have_del && has(perms, 'delete')),
-			hcut = !(have_mv && has(perms, 'move')),
-			hpst = !(have_mv && has(perms, 'write')),
+			hren = !(have_mv && has(perms, 'write') && has(perms, 'move')) || !nsel,
+			hdel = !(have_del && has(perms, 'delete')) || !nsel,
+			hcut = !(have_mv && has(perms, 'move')) || !nsel,
+			hpst = !(have_mv && has(perms, 'write')) || !enpst,
 			hshr = !can_shr || !get_evpath().indexOf(have_shr),
 			enclr = enpst || nsel;
 
@@ -4649,7 +4649,8 @@ var fileman = (function () {
 		clmod(bren, 'hide', hren);
 		clmod(bdel, 'hide', hdel);
 		clmod(bcut, 'hide', hcut);
-		clmod(bpst, 'hide', hpst);
+		clmod(bcpy, 'hide', !encpy);
+		clmod(bpst, 'hide', !enpst);
 		clmod(bshr, 'hide', hshr);
 		clmod(bclr, 'hide', !enclr);
 
@@ -5366,6 +5367,9 @@ var fileman = (function () {
 		catch (ex) {
 			toast.warn(30, L.fc_warn.format(sel.length));
 		}
+
+		if(thegrid.tempsel)
+			msel.evsel();
 	};
 
 	r.cpy = function (e) {
@@ -5426,6 +5430,9 @@ var fileman = (function () {
 		catch (ex) {
 			toast.warn(30, L.fcc_warn.format(sel.length));
 		}
+
+		if(thegrid.tempsel)
+			msel.evsel();
 	};
 
 	document.onpaste = function (e) {
@@ -6449,7 +6456,7 @@ window.thegrid = (function () {
 				return r.loadsel();
 			clmod(this, 'sel', clgot(tr, 'sel'));
 		}
-		else if (in_tree && !have_sel)
+		else if (in_tree)
 			in_tree.click();
 
 		else if (oth.hasAttribute('download'))
@@ -6458,14 +6465,14 @@ window.thegrid = (function () {
 		else if (aplay && (r.vau || !is_img))
 			aplay.click();
 
-		else if (is_dir && !have_sel)
+		else if (is_dir)
 			treectl.reqls(qhref, true);
 
 		else if (is_txt && !has(['md', 'htm', 'html'], is_txt))
 			atext.click();
 
-		else if (!is_img && have_sel)
-			window.open(qhref, '_blank');
+		// else if (!is_img && have_sel)
+		// 	window.open(qhref, '_blank');
 
 		else {
 			if (!dbl){
@@ -7123,6 +7130,9 @@ var ahotkeys = function (e) {
 
 		if (QS('#music.vis'))
 			return ebi('cl_mu').click();
+
+		if (!clgot(ebi('fclr'), 'hide'))
+			return fileman.clear();
 
 		if (QS('.opview.act'))
 			return QS('#ops>a').click();
