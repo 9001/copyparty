@@ -5367,6 +5367,9 @@ var fileman = (function () {
 		catch (ex) {
 			toast.warn(30, L.fc_warn.format(sel.length));
 		}
+
+		if(thegrid.tempsel)
+			msel.evsel();
 	};
 
 	r.cpy = function (e) {
@@ -5427,6 +5430,9 @@ var fileman = (function () {
 		catch (ex) {
 			toast.warn(30, L.fcc_warn.format(sel.length));
 		}
+
+		if(thegrid.tempsel)
+			msel.evsel();
 	};
 
 	document.onpaste = function (e) {
