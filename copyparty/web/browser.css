@@ -256,8 +256,8 @@ html.by #spaceMax {
 html.by #spaceFree {
 	position: absolute;
     z-index: 1;
-    bottom: 2em;
-	max-width: stretch;
+    bottom: 2.1em;
+	max-width: initial;
     width: calc(100% - 3em);
     text-align: center;
 }
