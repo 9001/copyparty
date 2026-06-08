@@ -137,7 +137,118 @@ html.bz {
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
 }
 html.by {
-	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a)80%, var(--a)), color-mix(in oklab, var(--btn-bg-a) 50%, transparent));
+	--radius: 15px;
+	--a-dark: hsl(from color-mix(in oklab, var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.5) l);
+	--g-fsel-ts: transparent;
+	--scrl-hint: transparent;
+	--glow-intensity: 0.7;
+	--bottom-glow: radial-gradient(
+		farthest-corner at bottom center,
+		color-mix(in srgb, var(--a-hil) 10%, rgba(255, 255, 255, var(--glow-intensity))),
+		transparent
+	);
+	--btn-bg: linear-gradient(
+		-5deg, 
+		color-mix(in oklab, var(--btn-bg-a) 30%, var(--a) 20%), 
+		color-mix(in oklab, var(--btn-bg-a) 30%, transparent));
+}
+html.by #wtico,
+html.by #wtoggle,
+html.by #ggrid>a,
+html.by #ops a,
+html.by #tree ul a.hl,
+html.by .btn {
+	/* OKLCH Color System for accurate colors */
+	--hue: 140;
+	--sat: 0.2;
+	transition: all .15s;
+	backdrop-filter: blur(10px);
+
+	/* Color Variables */
+	--fg: oklch(15% calc(var(--sat) * 0.5) var(--hue));
+	--bg: oklch(75% var(--sat) var(--hue) / 0.8);
+	--bg-dark: oklch(45% var(--sat) var(--hue) / 0.75);
+
+	background: var(--bottom-glow), var(--btn-bg);
+	border-radius: var(--radius);
+
+	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4) !important;
+}
+html.by #wtico {
+	border-radius: var(--radius) 0 0 0;
+}
+html.by #ggrid>a:hover,
+html.by #ops a:hover,
+html.by .btn:hover {
+	background: var(--bottom-glow), 
+	linear-gradient(
+		to bottom, 
+		color-mix(in oklab, transparent, var(--a-dark)),
+		color-mix(in oklab, transparent, var(--a)));
+}
+html.by #ggrid>a:active,
+html.by .btn:active {
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+	transform: translateY(2px);
+}
+html.by,
+html.by #ops a.act,
+html.by #ggrid>a.sel,
+html.by #tree ul a.hl:hover,
+html.by #tree ul a.hl,
+html.by .tgl.btn.on {
+	background-color: var(--a);
+	background:
+		var(--bottom-glow),
+		linear-gradient(to bottom, var(--a-dark), var(--a));
+
+}
+html.by #wtoggle a {
+	position: relative;
+}
+html.by #spaceUsed_bar::after,
+html.by #wtoggle a:after,
+html.by a:not(.play) .imgcontainer::before,
+html.by #ops a:after,
+html.by #path:after,
+html.by #tree ul a.hl:after,
+html.by .btn::after {
+  content: "" !important;
+  position: absolute;
+  z-index: 2;
+  top: 4%;
+  left: 5px;
+  width: calc(100% - 10px);
+  height: 40%;
+  background: linear-gradient(
+    -165deg,
+    rgba(255, 255, 255, 0.7),
+    rgba(255, 255, 255, 0.1)
+  );
+  border-radius: var(--radius) var(--radius) calc(var(--radius) / 2) calc(var(--radius) / 2);
+  transition: background 400ms ease;
+  pointer-events: none;
+}
+html.by #ops a {
+	backdrop-filter: blur(10px);
+	margin-left: 2px;
+	margin-right: 2px;
+}
+html.by #srchfolder_div {
+	left: 3em;
+}
+html.by #spaceUsed_bar, html.by #spaceTotal_bar {
+	height: 1.6em;
+	border: var(--a) solid 1px;
+}
+html.by #spaceMax {
+	display: none;
+}
+html.by #spaceFree {
+	position: absolute;
+    z-index: 1;
+    bottom: 2em;
+    justify-self: center;
 }
 
 html.a {
@@ -2247,6 +2358,7 @@ html.b .btn {
 	color: var(--fg-max);
 }
 #tree ul a {
+	position: relative;
 	border-radius: 5px;
 	border-radius: var(--radius);
 	display: inline-block;
@@ -3721,11 +3833,10 @@ html.b .ghead {
 }
 
 html.b .ghead,
-html.b #wfp .btn:not(:hover),
 html.b #treeToggleBtn:not(:hover):not(.on),
 html.b #ops,
 html.b #path,
-html.b #wtoggle,
+html.bz #wtoggle,
 html.b #up_quick_more,
 html.b #up_quick_btn:not(:hover):not(.on),
 
@@ -3739,6 +3850,10 @@ html.cz #up_quick_more,
 html.cz #up_quick_btn:not(:hover):not(.on) {
 	backdrop-filter: blur(10px);
 	background: var(--btn-bg);
+}
+
+html.bz #wfp .btn:not(:hover){
+	backdrop-filter: blur(10px);
 }
 
 html.c .modal .setting:hover {
@@ -3761,7 +3876,15 @@ html.c #u2foot:empty,
 html.b #u2foot:empty {
 	margin-bottom: -1em;
 }
-html.by #ops,
+html.by #ops{
+	background: none;
+	backdrop-filter: none;
+	border: none;
+	box-shadow: none;
+	margin: 0 -2px;
+	padding-left: 0;
+	padding-right: 0;
+}
 html.by .opbox,
 html.by #path,
 html.by #doc,
@@ -3769,7 +3892,8 @@ html.by #srch_form,
 html.by .ghead,
 html.by #u2etas {
 	border-color: var(--bg-u2);
-	box-shadow: 0 0 .3em var(--bg-u5);
+	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
+	background: var(--bottom-glow), var(--btn-bg);
 }
 html.by #tree li,
 html.by #treepar {
@@ -3777,13 +3901,14 @@ html.by #treepar {
 }
 html.by #treesuperh,
 html.by #treepar {
-	background: var(--bg);
+	backdrop-filter: blur(10px);
+	background: color-mix(in srgb, var(--bg) 40%, transparent);
 	border-color: #ddd;
 }
 html.by #tree {
 	border-color: #ddd;
 	box-shadow: 0 0 1em #ddd;
-	background: var(--bg);
+	background: color-mix(in srgb, var(--bg) 40%, transparent);
 }
 
 
