@@ -138,8 +138,10 @@ html.bz {
 }
 html.by {
 	--a: #139cf1;
+	--b: color-mix(in srgb, var(--bg) 20%, var(--a));
 	--radius: 15px;
 	--a-dark: hsl(from color-mix(in oklab, var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.5) l);
+	--bg-u3: color-mix(in oklab, var(--bg-max) 70%, var(--b) 30%);
 	--g-fsel-ts: transparent;
 	--scrl-hint: transparent;
 	--bg-u1: color-mix(in oklab, transparent 92%, var(--fg-max));
@@ -157,10 +159,11 @@ html.by {
 	--btn-bg: linear-gradient(
 		-5deg, 
 		color-mix(in oklab, var(--btn-bg-a) 30%, var(--a) 20%), 
-		color-mix(in oklab, var(--btn-bg-a) 30%, transparent));
+		color-mix(in oklab, var(--btn-bg-a) 30%, var(--b)));
 	
   	text-shadow: 0px 0px 4px rgb(255, 255, 255);
 }
+html.by #spaceTotal_bar,
 html.by #s_list h3,
 html.by #wtico,
 html.by #wtoggle,
@@ -168,19 +171,9 @@ html.by #ggrid>a,
 html.by #ops a,
 html.by #tree ul a.hl,
 html.by .btn {
-	/* OKLCH Color System for accurate colors */
-	--hue: 140;
-	--sat: 0.2;
 	transition: all .15s;
-
-	/* Color Variables */
-	--fg: oklch(15% calc(var(--sat) * 0.5) var(--hue));
-	--bg: oklch(75% var(--sat) var(--hue) / 0.8);
-	--bg-dark: oklch(45% var(--sat) var(--hue) / 0.75);
-
 	background: var(--bottom-glow), var(--btn-bg);
 	border-radius: var(--radius);
-
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4) !important;
 }
 html.by #files thead th {
@@ -207,6 +200,15 @@ html.by #ggrid>a:active,
 html.by .btn:active {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 	transform: translateY(2px);
+}
+html.by #widgeti {
+	background: color-mix(in srgb, var(--bg) 40%, var(--a));
+}
+html.by #mu_outer {
+	background: color-mix(in oklab, var(--b) 50%, transparent);
+}
+html.by .divider {
+	display: none;
 }
 html.by summary {
 	color: var(--fg);
@@ -238,7 +240,6 @@ html.by #tree ul a.hl:after,
 html.by .btn::after {
   content: "" !important;
   position: absolute;
-  z-index: 2;
   top: 4%;
   left: 5px;
   width: calc(100% - 10px);
@@ -252,22 +253,20 @@ html.by .btn::after {
   transition: background 400ms ease;
   pointer-events: none;
 }
+html.by a:not(.play) .imgcontainer::before{
+  	z-index: 2;
+}
 html.by #ops a {
-	backdrop-filter: blur(10px);
+	position: relative;
 	margin-left: 2px;
 	margin-right: 2px;
 }
 html.by #srchfolder_div {
 	left: 3em;
 }
+html.by #spaceTotal_bar,
 html.by #spaceUsed_bar{
 	height: 1.6em;
-} 
-html.by #spaceTotal_bar {
-	height: 1.6em;
-	border: var(--a) solid 1px;
-	background: transparent;
-	backdrop-filter: blur(10px);
 }
 html.by #files tbody tr:hover td, 
 html.by #files tbody tr:hover td+td {
@@ -2623,6 +2622,12 @@ html.b .btn {
 #unpost td:nth-child(4) {
 	text-align: right;
 }
+#unpost table {
+	overflow-x: auto;
+	display: block;
+	margin: 0 -1em;
+	padding: 0 1em;
+}
 #shui,
 #rui {
 	background: #fff;
@@ -3918,7 +3923,7 @@ html.by #ops{
 	backdrop-filter: none;
 	border: none;
 	box-shadow: none;
-	margin: 0 -2px;
+	margin: 0;
 	padding-left: 0;
 	padding-right: 0;
 }
@@ -3928,9 +3933,13 @@ html.by #doc,
 html.by #srch_form,
 html.by .ghead,
 html.by #u2etas {
-	border-color: var(--bg-u2);
+	border-color: var(--bg-u3);
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
 	background: var(--bottom-glow), var(--btn-bg);
+}
+html.by #spaceTotal_bar,
+html.by #ops>a {
+	border: var(--bg-u3) solid 1px;
 }
 html.by #tree li,
 html.by #treepar {
@@ -3945,7 +3954,10 @@ html.by #treepar {
 html.by #tree {
 	border-color: #ddd;
 	box-shadow: 0 0 1em #ddd;
-	background: color-mix(in srgb, var(--bg) 10%, var(--a));
+	background: var(--b);
+}
+html.by #tree_footer {
+	 background: linear-gradient(to top, var(--b), color-mix(in oklab, var(--b) 80%, transparent), transparent);
 }
 
 
@@ -5374,8 +5386,11 @@ html.e #actionsArea {
 	background: rgb(85, 144, 255);
 	background: var(--a);
 }
-html.b #spaceUsed_bar {
+html.bz #spaceUsed_bar {
 	background: linear-gradient(to right, transparent, var(--a-dark), var(--a));
+}
+html.by #spaceUsed_bar {
+  	background: linear-gradient(to right, var(--a), var(--a-dark));
 }
 #spaceTotal_bar {
 	position: relative;
