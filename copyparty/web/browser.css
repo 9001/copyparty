@@ -163,6 +163,7 @@ html.by {
 	
   	text-shadow: 0px 0px 4px rgb(255, 255, 255);
 }
+html.by #srchfolder_div,
 html.by #up_quick_more a,
 html.by #spaceTotal_bar,
 html.by #s_list h3,
@@ -219,6 +220,7 @@ html.by summary {
 html.by #pvolbg {
 	color: var(--bg);
 }
+html.by #srchfolder_div,
 html.by .modalcontent,
 html.by,
 html.by #ops a.act,
@@ -243,6 +245,7 @@ html.by #up_quick_more{
 	background: none;
 	border: none;
 }
+html.by #srchfolder_div::after,
 html.by #up_quick_more a::after,
 html.by #wtico::after,
 html.by #s_list h3::after,
@@ -278,7 +281,7 @@ html.by #ops a {
 	margin-right: 2px;
 }
 html.by #srchfolder_div {
-	left: 3em;
+	left: 3.2em;
 }
 html.by #spaceTotal_bar,
 html.by #spaceUsed_bar{
@@ -299,8 +302,10 @@ html.by #spaceFree {
     width: calc(100% - 3em);
     text-align: center;
 }
-html.by .under {
-	top: auto;
+html.by #ops a.act {
+	margin-top: -.15em;
+	margin-bottom: -.15em;
+	padding-top: .3em;
 }
 
 html.a {
@@ -463,7 +468,7 @@ html.dy {
 	--btn-1h-bg: #555;
 	--chk-fg: a;
 	--txt-sh: a;
-	--txt-bg: a;
+	--txt-bg: #fff;
 
 	--op-a-sh: a;
 
@@ -622,6 +627,7 @@ html .ayjump:focus-visible {
 	margin-left: 2em;
 }
 #path {
+	position: relative;
 	color: var(--fg);
 	text-shadow: 1px 1px 0 var(--bg-max);
 	font-weight: normal;
@@ -640,21 +646,26 @@ html .ayjump:focus-visible {
 }
 #pathBar #folder_search {
 	margin: 0;
-	height: calc(100% - .5em);
-	width: calc(100% - .6em);
-	right: 0;
+	display: block;
+	position: absolute;
+	right: .2em;
+	left: .2em;
+	top: .2em;
+	bottom: .2em;
 }
 #qs_btns {
 	position: absolute;
 	right: .2em;
-	top: .1em;
+	top: .2em;
 	font-size: 1.3em;
 	cursor: pointer;
+	display: flex;
 }
 #qs_btns a {
 	background: color-mix(in oklab, var(--txt-bg), transparent);
 	width: 1em;
-	height: 1.2em;
+	height: 1em;
+	line-height: 1em;
 	display: inline-block;
 	text-align: center;
 	border-radius: 5px;
@@ -665,7 +676,8 @@ html .ayjump:focus-visible {
 	background: var(--bg);
 }
 #qs_btns a .x {
-	line-height: .75em;
+	line-height: .6em;
+	vertical-align: center;
 }
 #moresearch span {
 	font-size: .6em;
@@ -1677,6 +1689,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	margin-left: .3em;
 	padding: 1.2em 0;
 	min-height: 1em;
+  	border-radius: var(--radius);
 }
 #progbar {
 	display: none;
@@ -1897,6 +1910,7 @@ html.b #mu_outer {
 	border-radius: 5px;
 	min-width: 1em;
 
+	border-radius: var(--radius);
 	border: var(--transparent) solid 0px;
 	color: #07c;
 	color: var(--a);
@@ -1928,8 +1942,8 @@ html.b #mu_outer {
 	border-radius: 0 0 var(--radius) var(--radius);
 	border-bottom: .3em solid var(--a);
 	box-shadow: var(--op-aa-sh);
-	margin: -1px 0 -.35em 0;
-	padding-top: .2em;
+	margin: 0 0 -.35em 0;
+	padding-top: calc(.2em - 1px);
 }
 #ops a svg {
 	width: 1.75em;
@@ -3827,11 +3841,10 @@ summary {
 #srchfolder_div {
 	display: none;
 	position: absolute;
-	left: 3.8em;
+	left: 3.5em;
 	top: 0;
 	right: 0;
 	bottom: 0;
-	padding: .2em;
 	margin-left: .3em;
 }
 .x {
@@ -4365,7 +4378,10 @@ html.e #wrap.thin .ghead {
 		padding-right: .25em;
 	}
 	#srchfolder_div {
-		left: 3.2em;
+		left: 3em;
+	}
+	html.by #srchfolder_div {
+		left: 2.8em;
 	}
 }
 @media (max-width: 37em) {
@@ -4703,10 +4719,7 @@ html.e {
   text-shadow: none;
   --bg-u1: #0002;
   --g-sel-fg: #fff;
-}
-html.e * {
   --radius: 0;
-  border-radius: 0 !important;
 }
 html.e #ggrid > a.sel {
 	box-shadow: none;
@@ -4852,13 +4865,11 @@ html.e #acc_info span.warn,
 html.e #acc_info a {
   color: var(--white);
 }
-html.e #flogout:before {
-  padding-left: 0.2em;
-  padding-right: 0.4em;
-  content: " | ";
+html.e #accessType {
+	color: var(--fg);
 }
 html.e #blogout {
-  color: var(--w);
+  color: var(--fg);
   box-shadow: none;
   background: transparent;
 }
@@ -4905,14 +4916,10 @@ html.e #ops {
 html.e #srchfolder_div {
 	left: 2em;
 	top: -.1em;
-	bottom: -.6em;
+	bottom: 0;
 }
 html.e #qs_btns {
-	right: 0.7em;
   	top: .3em;
-}
-html.e .under {
-	border: var(--fg) solid 1px;
 }
 html.e #srch_form,
 html.e .opbox {
@@ -4948,7 +4955,7 @@ html.e #blogout:hover {
 
 html.e #ops a.act {
   border-bottom: 0;
-  margin-top: -.6em;
+  margin-top: -.4em;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   box-shadow: var(--shadow-inset-left), var(--shadow-inset-top),
@@ -5047,6 +5054,7 @@ html.e #ghead {
 }
 html.e #ghead a {
   margin: 0;
+  border-radius: var(--radius);
 }
 html.e #treeToggleBtn {
 	margin: 0;
@@ -5194,6 +5202,8 @@ html.e #treepar {
   border-bottom: var(--border-dashed-black);
   margin-left: calc(2.1em - (1em - var(--negative-space))) !important;
 }
+html.e .under,
+html.e #up_quick_more,
 html.e #wtico,
 html.e #ghead,
 html.e #op_acc,
@@ -5879,6 +5889,10 @@ html.fy .modalheader::after {
 }
 html.fy #ops {
 	height: auto;
+	margin-right: .3em;
+}
+html.fy #srchfolder_div {
+	right: .5em;
 }
 html.fy #ops a {
 	padding: .29em .4em;
