@@ -8414,6 +8414,7 @@ var treectl = (function () {
 	}
 
 	function mleave(e) {
+		this.style.top = '';
 		this.style.position = '';
 		this.style.minWidth = '';
 		this.style.width = '';
