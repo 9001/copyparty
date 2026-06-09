@@ -172,7 +172,6 @@ html.by .btn {
 	--hue: 140;
 	--sat: 0.2;
 	transition: all .15s;
-	backdrop-filter: blur(10px);
 
 	/* Color Variables */
 	--fg: oklch(15% calc(var(--sat) * 0.5) var(--hue));
@@ -189,9 +188,11 @@ html.by #files thead th {
 }
 html.by #s_list h3{
 	border-radius: var(--radius) var(--radius) 0 0;
+	position: relative;
 }
 html.by #wtico {
 	border-radius: var(--radius) 0 0 0;
+	position: relative;
 }
 html.by #ggrid>a:hover,
 html.by #ops a:hover,
@@ -282,6 +283,9 @@ html.by #spaceFree {
 	max-width: initial;
     width: calc(100% - 3em);
     text-align: center;
+}
+html.by .under {
+	top: auto;
 }
 
 html.a {
@@ -3941,7 +3945,7 @@ html.by #treepar {
 html.by #tree {
 	border-color: #ddd;
 	box-shadow: 0 0 1em #ddd;
-	background: color-mix(in srgb, var(--bg) 40%, transparent);
+	background: #88c8f3;
 }
 
 
