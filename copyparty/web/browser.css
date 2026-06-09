@@ -3945,7 +3945,7 @@ html.by #treepar {
 html.by #tree {
 	border-color: #ddd;
 	box-shadow: 0 0 1em #ddd;
-	background: #88c8f3;
+	background: color-mix(in srgb, var(--bg) 10%, var(--a));
 }
 
 
