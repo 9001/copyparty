@@ -5631,8 +5631,8 @@ html.f #tree .hl {
 }
 html.f #tree .hl::after {
 	content: "";
-	right: .5em;
-	left: 0;
+	right: -2.2em;
+	left: -1.2em;
 	margin-top: -.3em;
 	margin-bottom: -2px;
 	z-index: -1;
