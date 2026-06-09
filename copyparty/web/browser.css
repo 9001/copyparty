@@ -264,7 +264,8 @@ html.by .btn::after {
     rgba(255, 255, 255, 0.7),
     rgba(255, 255, 255, 0.1)
   );
-  border-radius: var(--radius) var(--radius) calc(var(--radius) / 2) calc(var(--radius) / 2);
+  --r2: calc(var(--radius) - 3px);
+  border-radius: var(--r2) var(--r2) calc(var(--r2) / 2) calc(var(--r2) / 2);
   transition: background 400ms ease;
   pointer-events: none;
 }
@@ -1113,7 +1114,7 @@ tr.play td:nth-child(1) a {
 	color: #3584e4;
 	z-index: 1;
 	border-radius: 5px;
-	border-radius: var(--radius);
+	border-radius: calc(var(--radius) - 2px);
 	max-width: 10em;
 	max-width: calc(var(--grid-sz) - 4px);
 	margin: 0 auto;
