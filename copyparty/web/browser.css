@@ -3874,13 +3874,13 @@ html.b .ghead {
 	box-shadow: var(--btn-bs);
 }
 
-html.b .ghead,
-html.b #treeToggleBtn:not(:hover):not(.on),
-html.b #ops,
-html.b #path,
+html.bz .ghead,
+html.bz #treeToggleBtn:not(:hover):not(.on),
+html.bz #ops,
+html.bz #path,
 html.bz #wtoggle,
-html.b #up_quick_more,
-html.b #up_quick_btn:not(:hover):not(.on),
+html.bz #up_quick_more,
+html.bz #up_quick_btn:not(:hover):not(.on),
 
 html.cz .ghead,
 html.cz #wfp .btn:not(:hover),
