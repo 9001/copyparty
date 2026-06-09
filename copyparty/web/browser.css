@@ -163,6 +163,7 @@ html.by {
 	
   	text-shadow: 0px 0px 4px rgb(255, 255, 255);
 }
+html.by #up_quick_more a,
 html.by #spaceTotal_bar,
 html.by #s_list h3,
 html.by #wtico,
@@ -187,6 +188,7 @@ html.by #wtico {
 	border-radius: var(--radius) 0 0 0;
 	position: relative;
 }
+html.by #up_quick_more a:hover,
 html.by #ggrid>a:hover,
 html.by #ops a:hover,
 html.by .btn:hover {
@@ -196,6 +198,7 @@ html.by .btn:hover {
 		color-mix(in oklab, transparent, var(--a-dark)),
 		color-mix(in oklab, transparent, var(--a)));
 }
+html.by #up_quick_more a:active,
 html.by #ggrid>a:active,
 html.by .btn:active {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
@@ -213,6 +216,9 @@ html.by .divider {
 html.by summary {
 	color: var(--fg);
 }
+html.by #pvolbg {
+	color: var(--bg);
+}
 html.by .modalcontent,
 html.by,
 html.by #ops a.act,
@@ -229,6 +235,15 @@ html.by .tgl.btn.on {
 html.by #wtoggle a {
 	position: relative;
 }
+html.by #up_quick_more a{
+	position: relative;
+	margin: .5em 0;
+}
+html.by #up_quick_more{
+	background: none;
+	border: none;
+}
+html.by #up_quick_more a::after,
 html.by #wtico::after,
 html.by #s_list h3::after,
 html.by #spaceUsed_bar::after,
@@ -1575,8 +1590,8 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	display: inline-block;
 }
 #wtoggle #zip1 {
-	padding: .5em;
-	margin: -.1em .1em;
+	padding: .4em;
+	margin: 0 .2em;
   	vertical-align: top;
 	white-space: nowrap;
 }
@@ -3937,6 +3952,7 @@ html.by #u2etas {
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
 	background: var(--bottom-glow), var(--btn-bg);
 }
+html.by #up_quick_more a,
 html.by #spaceTotal_bar,
 html.by #ops>a {
 	border: var(--bg-u3) solid 1px;
