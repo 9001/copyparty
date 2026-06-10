@@ -2040,6 +2040,7 @@ html.y #ops svg circle {
 }
 #pathBar input[type=text],
 .opview select,
+.opview input[type=number],
 .opview input[type=text],
 .opview input[type=color],
 .opview input[type=date] {

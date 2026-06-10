@@ -1314,7 +1314,7 @@ ebi('op_cfg').innerHTML = (
 	'			<input type="text" id="accent" placeholder="#color"></input>' +
 	'			<input type="color" id="accent_picker"></input>' +
 	'		</div>' +
-'			<input tt="' + L.cl_radius +'" type="text" id="radius" placeholder="[0-inf]"></input>' +
+'			<input tt="' + L.cl_radius +'" type="number" id="radius" min="-1" placeholder="[0-inf]"></input>' +
 	'		<a id="fun_tgl" class="tgl btn" tt="' + L.cl_fun + '">🥳</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
@@ -1527,10 +1527,9 @@ ebi('radius').oninput = function () {
 	if(r === radius)
 		return;
 
-	if(isNaN(r))
-		r = ''
-	swrite('radius', r);
-	var setV = this.value == '' ? '' : (r + 'px');
+	var usefallback = isNaN(r) || r < 0 || r === '';
+	var setV = usefallback ? '' : (r + 'px');
+	swrite('radius', !usefallback && r);
 	document.documentElement.style.setProperty('--radius', setV);
 	console.log(setV);
 }
