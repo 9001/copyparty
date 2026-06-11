@@ -287,8 +287,8 @@ html.by #spaceTotal_bar,
 html.by #spaceUsed_bar{
 	height: 1.6em;
 }
-html.by #files tbody tr:hover td, 
-html.by #files tbody tr:hover td+td {
+html.by #files tbody tr:not(.sel):hover td, 
+html.by #files tbody tr:not(.sel):hover td+td {
 	background: rgba(255, 255, 255, 0.6);
 }
 html.by #spaceMax {
@@ -675,6 +675,7 @@ html .ayjump:focus-visible {
 #qs_btns a:hover {
 	background: var(--bg);
 }
+#bbox-btns .x,
 #qs_btns a .x {
 	line-height: .6em;
 	vertical-align: center;
@@ -2304,13 +2305,16 @@ html {
 	width: 10px;
 	opacity: 0;
 	background: #888;
+	background: var(--a);
+	border: var(--bg) solid 1px;
+	border-width: 0 1px;
 	cursor: ew-resize;
 	touch-action: none;
 	user-select: none;
 	transition: opacity .1s;
 }
 #reszbar:hover{
-	opacity: .3;
+	opacity: .6;
 }
 .resz,
 .resz * {
@@ -3983,12 +3987,13 @@ html.by #treepar {
 	border-color: #ddd;
 }
 html.by #tree {
-	border-color: #ddd;
-	box-shadow: 0 0 1em #ddd;
 	background: var(--b);
 }
 html.by #tree_footer {
 	 background: linear-gradient(to top, var(--b), color-mix(in oklab, var(--b) 80%, transparent), transparent);
+}
+html.by #pathBar {
+	background: linear-gradient(to bottom, var(--a), transparent);
 }
 
 
@@ -5568,6 +5573,7 @@ html.f #ggrid > a:hover::before {
 }
 html.f #ggrid > a.au::before {
 	padding: .4em .2em .4em .3em;
+	margin: 0;
 }
 html.f #ggrid > a:focus-visible .imgcontainer::before,
 html.f #ggrid > a:hover .imgcontainer::before {
