@@ -288,7 +288,7 @@ window.baguetteBox = (function () {
         var galleries = data[selector].galleries;
         [].forEach.call(galleries, function (gallery) {
             [].forEach.call(gallery, function (imageItem) {
-                unbind(imageItem.imageElement, 'click', imageItem.eventHandler);
+                //unbind(imageItem.imageElement, 'click', imageItem.eventHandler);
             });
 
             if (currentGallery === gallery)
@@ -1379,16 +1379,16 @@ window.baguetteBox = (function () {
 
 
 function init(){
-    if(thegrid != undefined && thegrid.dirty == false && thegrid.bbox != true){
+    if(msel != undefined && msel.bbox != true){
         console.log('bbox load')
-        thegrid.bagit();
+        msel.bagit();
     }
     else{
         setTimeout(init, 100)
     }
 }
 
-console.log('wait for grid init');
+console.log('wait for file list init');
 init();
 
 J_BBX = 2;

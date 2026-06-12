@@ -6414,86 +6414,15 @@ window.thegrid = (function () {
 	}
 	setsz();
 
-	function gclick1(e) {
-		if (ctrl(e) && !treectl.csel && !r.sel && !r.tempsel)
-			return true;
-		else if (e.altKey){
-			ev(e);
-			return;
-		}
-
-		return gclick.call(this, e, false);
-	}
-
 	function gclick2(e) {
 		if (ctrl(e) || !r.sel && !r.tempsel)
 			return true;
 
-		return gclick.call(this, e, true);
-	}
-
-	function gclick(e, dbl) {
-		var oth = ebi(this.getAttribute('ref')),
-			qhref = this.getAttribute('href'),
-			href = qhref.split('?')[0],
-			fid = oth.getAttribute('id'),
-			aplay = ebi('a' + fid),
-			atext = ebi('t' + fid),
-			is_txt = atext && !/\.ts$/.test(href) && showfile.getlang(href),
-			is_img = img_re.test(href),
-			is_dir = href.endsWith('/'),
-			is_srch = !!ebi('unsearch'),
-			in_tree = is_dir && treectl.find(oth.textContent.slice(0, -1)),
-			have_sel = QS('#files tr.sel'),
-			td = oth.closest('td').nextSibling,
-			tr = td.parentNode;
-
-		if ((r.sel || r.tempsel) && !dbl && !ctrl(e) || treectl.csel && (e.shiftKey || ctrl(e))) {
-			ev(e);
-			td.onclick.call(td, e);
-			if (e.shiftKey)
-				return r.loadsel();
-			clmod(this, 'sel', clgot(tr, 'sel'));
-		}
-		else if (in_tree)
-			in_tree.click();
-
-		else if (oth.hasAttribute('download'))
-			oth.click();
-
-		else if (aplay && (r.vau || !is_img))
-			aplay.click();
-
-		else if (is_dir)
-			treectl.reqls(qhref, true);
-
-		else if (is_txt && !has(['md', 'htm', 'html'], is_txt))
-			atext.click();
-
-		else if (!is_img && !is_dir && have_sel)
-			window.open(qhref, '_blank');
-
-		else {
-			if (!dbl){
-				return true;
-			}
-
-			setTimeout(function () {
-				r.sel = true;
-			}, 1);
-			r.sel = false;
-			this.click();
-		}
-		ev(e);
+		return fclick.call(this, e, true);
 	}
 
 	r.imshow = function (url) {
-		var sel = '#ggrid>a'
-		if (!thegrid.en) {
-			thegrid.bagit('#files');
-			sel = '#files a[id]';
-		}
-		var ims = QSA(sel);
+		var ims = QSA('#files a[id]');
 		for (var a = 0, aa = ims.length; a < aa; a++) {
 			var iu = ims[a].getAttribute('href').split('?')[0].split('/').slice(-1)[0];
 			if (iu == url)
@@ -6678,7 +6607,7 @@ window.thegrid = (function () {
 		var ths = QSA('#ggrid>a');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			ths[a].ondblclick = gclick2;
-			ths[a].onclick = gclick1;
+			ths[a].onclick = fclick1;
 		}
 
 		var imgs = QSA('#ggrid>a img');
@@ -6700,45 +6629,10 @@ window.thegrid = (function () {
 
 		r.dirty = false;
 		r.loadsel();
-		if(window.baguetteBox != undefined)
-			r.bagit();
 		setTimeout(aligngriditems, 1);
 		setTimeout(r.tippen, 20);
 		drag.initgrid();
 	}
-
-	r.bagit = function (isrc) {
-		console.log('init image viewer');
-		
-		if (r.bbox)
-			baguetteBox.destroy();
-
-		if(!isrc)
-			isrc = thegrid.en ? '#ggrid' : '#files'
-
-		var br = baguetteBox.run(isrc, {
-			noScrollbars: true,
-			duringHide: r.onhide,
-			afterShow: function () {
-				r.bbox_opts.refocus = true;
-			},
-			captions: function (g, idx) {
-				var h = '' + g;
-
-				return '<a download href="' + h +
-					'">' + (idx + 1) + ' / ' + this.length + ' -- ' +
-					esc(uricom_dec(h.split('/').pop())) + '</a>';
-			},
-			onChange: function (i, maxIdx) {
-				if (this[i].imageElement) {
-					sethash('g' + this[i].imageElement.getAttribute('ref') + getsort());
-				}
-			}
-		});
-		r.bbox_opts = br[1];
-		r.bbox = true;
-		eval_hash()
-	};
 
 	r.onhide = function () {
 		afilt.apply();
@@ -10022,6 +9916,13 @@ var msel = (function () {
 		for (var a = 0, aa = tds.length; a < aa; a++)
 			tds[a].onclick = r.seltgl;
 
+		var links = QSA('#files a[id]')
+		for (var a = 0, aa = links.length; a < aa; a++)
+			links[a].onclick = fclick;
+
+		if(window.baguetteBox != undefined)
+			r.bagit();
+		
 		r.selui(true);
 		arcfmt.render();
 		fileman.render();
@@ -10030,8 +9931,128 @@ var msel = (function () {
 		ebi('selzip').style.display = zipvis;
 		ebi('zip1').style.display = zipvis;
 	}
+
+	r.bagit = function (isrc) {
+		console.log('init image viewer');
+		
+		if (r.bbox)
+			baguetteBox.destroy();
+
+		if(!isrc)
+			isrc = '#files'
+
+		var br = baguetteBox.run(isrc, {
+			noScrollbars: true,
+			duringHide: r.onhide,
+			afterShow: function () {
+				r.bbox_opts.refocus = true;
+			},
+			captions: function (g, idx) {
+				var h = '' + g;
+
+				return '<a download href="' + h +
+					'">' + (idx + 1) + ' / ' + this.length + ' -- ' +
+					esc(uricom_dec(h.split('/').pop())) + '</a>';
+			},
+			onChange: function (i, maxIdx) {
+				if (this[i].imageElement) {
+					sethash('g' + this[i].imageElement.getAttribute('ref') + getsort());
+				}
+			}
+		});
+		r.bbox_opts = br[1];
+		r.bbox = true;
+		eval_hash()
+	};
+
+	if(window.baguetteBox != undefined)
+		r.bagit();
+	
 	return r;
 })();
+
+function fclick1(e) {
+	if (ctrl(e) && !treectl.csel && !r.sel && !r.tempsel)
+		return true;
+
+	e.preventDefault ? e.preventDefault() : e.returnValue = false;
+
+	// pass copy of click event to list entry (can trigger bbox handler)
+	var link = ebi(this.getAttribute('ref'));
+	link.dispatchEvent(new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        clientX: e.clientX,
+        clientY: e.clientY,
+		ctrlKey: e.ctrlKey,
+        shiftKey: e.shiftKey,
+        altKey: e.altKey,
+        metaKey: e.metaKey,
+    }));
+}
+
+function fclick(e, dbl) {
+	if (e.altKey){
+		ev(e);
+		return;
+	}
+	var isInGrid = this.hasAttribute('ref'),
+		link = this;
+	if(isInGrid){
+		// get table row with file link
+		link = ebi(this.getAttribute('ref'))
+	}
+	var qhref = link.getAttribute('href'),
+		href = qhref.split('?')[0],
+		fid = link.getAttribute('id'),
+		aplay = ebi('a' + fid),
+		atext = ebi('t' + fid),
+		is_txt = atext && !/\.ts$/.test(href) && showfile.getlang(href),
+		is_img = img_re.test(href),
+		is_dir = href.endsWith('/'),
+		is_srch = !!ebi('unsearch'),
+		in_tree = is_dir && treectl.find(link.textContent.slice(0, -1)),
+		have_sel = QS('#files tr.sel'),
+		td = link.closest('td').nextSibling,
+		tr = td.parentNode;
+
+	if ( thegrid.en && (thegrid.sel || thegrid.tempsel) && !dbl && !ctrl(e) || treectl.csel && (e.shiftKey || ctrl(e))) {
+		ev(e);
+		msel.seltgl.call(td, e);
+		if (e.shiftKey)
+			return thegrid.loadsel();
+		clmod(this, 'sel', clgot(tr, 'sel'));
+	}
+	else if (in_tree)
+		in_tree.click();
+
+	else if (link.hasAttribute('download'))
+		link.click();
+
+	else if (thegrid.en && aplay && (thegrid.vau || !is_img))
+		aplay.click();
+
+	else if (is_dir)
+		treectl.reqls(qhref, true);
+
+	else if (is_txt && !has(['md', 'htm', 'html'], is_txt))
+		atext.click();
+
+	else if (!is_img && !is_dir && have_sel)
+		window.open(qhref, '_blank');
+
+	else {
+		if (!dbl)
+			return true;
+
+		setTimeout(function () {
+			thegrid.sel = true;
+		}, 1);
+		thegrid.sel = false;
+		link.click();
+	}
+	ev(e);
+}
 
 
 (function () {
