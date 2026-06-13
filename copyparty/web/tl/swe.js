@@ -225,7 +225,7 @@ Ls.swe = {
 
 	"ct_grid": '田 rutnätet',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tips',
-	"ct_thumb": 'växla mellan miniatyrer och ikoner i rutnätsvyn$NSnabbtangent: T">🖼️ miniatyrer',
+	"ct_thumb": 'växla mellan miniatyrer och ikoner$NSnabbtangent: T">🖼️ miniatyrer',
 	"ct_csel": 'använd CTRL och SKIFT för urval av filer i rutnätsvyn">val',
 	"ct_dsel": 'använd dra-urval i rutnätsvyn">dra', //m
 	"ct_dl": 'tvinga nedladdning (visa inte inline) när en fil klickas">dl', //m

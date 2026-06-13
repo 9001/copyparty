@@ -228,7 +228,7 @@ Ls.pol = {
 
 	"ct_grid": '田 siatka',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ podpowiedzi',
-	"ct_thumb": 'w widoku siatki, przełącz ikony i miniaturki$NSkrót: T">🖼️ miniaturki',
+	"ct_thumb": 'przełącz ikony i miniaturki$NSkrót: T">🖼️ miniaturki',
 	"ct_csel": 'użyj CTRL i SHIFT do wybierania plików w widoku siatki">wybierz',
 	"ct_dsel": 'użyj zaznaczania przez przeciąganie w widoku siatki">przeciągnij', //m
 	"ct_dl": 'wymuś pobieranie (nie wyświetlaj inline) po kliknięciu pliku">dl', //m

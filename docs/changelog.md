@@ -62,7 +62,6 @@
 * more consistent areas for clicking to navigate left / right in the image viewer (they don't depend on image fill mode anymore)
 * "folder up" / "next sibling" / "previous sibling" are now icon buttons at the top
 * new look for the login screen
-* file list makes it easier to identify folders via an added folder emoji to folder names. to disable this, add the following style: `tr:has(a.dir) td:nth-child(2) a::before { display: none; }`
 * pm-monokai theme has become "flat dark"
 
 ## 🌠 fun facts

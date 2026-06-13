@@ -282,7 +282,7 @@ if (1)
 
 		"ct_grid": '田 the grid',
 		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
-		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
+		"ct_thumb": 'toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
 		"ct_dsel": 'use drag-selection in grid-view">dsel',
 		"ct_den": 'use dragging to move files into other folders">mvd',
@@ -1261,8 +1261,8 @@ ebi('op_cfg').innerHTML = (
 	'	<h3 id="h_general">✅ ' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" tt="' + L.ct_ttips + '</a>\n' +
-	'		<a id="griden" class="tgl btn" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
 	'		<a id="thumbs" class="tgl btn" tt="' + L.ct_thumb + '</a>\n' +
+	'		<a id="griden" class="tgl btn" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
 	'		<a id="csel" class="tgl btn" tt="' + L.ct_csel + '</a>\n' +
 	'		<a id="dsel" class="tgl btn" tt="' + L.ct_dsel + '</a>\n' +
 	'		<a id="den" class="tgl btn" tt="' + L.ct_den + '</a>\n' +
@@ -2191,7 +2191,7 @@ var mpl = (function () {
 			tags.album = np.album;
 
 		if (r.osd_cv) {
-			var files = QSA("#files tr>td:nth-child(2)>a[id]"),
+			var files = QSA("#files tr>td:nth-child(3)>a[id]"),
 				cover = null;
 
 			for (var a = 0, aa = files.length; a < aa; a++) {
@@ -2304,7 +2304,7 @@ function MPlayer() {
 
 	for (var a = 0, aa = trs.length; a < aa; a++) {
 		var tds = trs[a].getElementsByTagName('td'),
-			link = tds[1].getElementsByTagName('a');
+			link = tds[2].getElementsByTagName('a');
 
 		link = link[link.length - 1];
 		var url = link.getAttribute('href'),
@@ -4245,16 +4245,13 @@ function eval_hash() {
 		}
 
 		if (mtype == 'g') {
-			if (!thegrid.en)
-				ebi('griden').click();
-
 			var t = setInterval(function () {
-				if (!thegrid.bbox)
+				if (!msel.bbox || !msel.ready)
 					return;
 
 				clearInterval(t);
 				baguetteBox.urltime(ts);
-				var im = QS('#ggrid a[ref="' + id + '"]');
+				var im = ebi(id);
 				if (!im)
 					return toast.warn(10, L.im_hnf);
 
@@ -5526,7 +5523,7 @@ var fileman = (function () {
 			f = [],
 			indir = [],
 			srcdir = vsplit(r.clip[0])[0],
-			links = QSA('#files tbody td:nth-child(2) a');
+			links = QSA('#files tbody td:nth-child(3) a');
 
 		r.f = f;
 
@@ -6517,88 +6514,21 @@ window.thegrid = (function () {
 		var html = [],
 			svgs = new Set(),
 			max_svgs = CHROME ? 500 : 5000,
-			need_ext = !r.thumbs || !!ext_th,
-			use_ext_th = r.thumbs && ext_th,
-			files = QSA('#files>tbody>tr>td:nth-child(2) a[id]');
+			files = QSA('#files>tbody>tr>td:nth-child(3) a[id]');
 
 		for (var a = 0, aa = files.length; a < aa; a++) {
 			var ao = files[a],
 				ohref = esc(ao.getAttribute('href')),
 				href = ohref.split('?')[0],
-				ext = '',
-				ext0 = '',
 				name = uricom_dec(vsplit(href)[1]),
 				ref = ao.getAttribute('id'),
 				isdir = clgot(ao.parentElement.parentElement, 'dir'),
-				ac = ao.parentElement.parentElement.classList,
-				ihref = ohref;
-
-			if (need_ext && href != "#") {
-				var ar = href.split('.');
-				if (ar.length > 1)
-					ar.shift();
-
-				ar.reverse();
-				ext0 = ar[0];
-				for (var b = 0; b < Math.min(2, ar.length); b++) {
-					ext = ext ? (ar[b] + '.' + ext) : ar[b];
-					if (ar[b].length > 2)
-						break;
-				}
-				if (!ext)
-					ext = 'unk';
-			}
-
-			if (use_ext_th && (ext_th[ext] || ext_th[ext0])) {
-				ihref = ext_th[ext] || ext_th[ext0];
-			}
-			else if (r.thumbs) {
-				ihref = addq(ihref, 'th=' + (
-					have_jxl ? 'x' :
-					have_webp ? 'w' :
-					'j'
-				));
-				if (!r.crop)
-					ihref += 'f';
-				if (r.x3)
-					ihref += '3';
-				if (href == "#")
-					ihref = SR + '/.cpr/ico/' + (ref == 'moar' ? '++' : 'exit');
-			}
-			else {
-				ihref = '';
-			}
-
-			if(ihref){
-				ihref = addq(ihref, 'cache=i&_=' + ACB + TS);
-
-				var accent = getComputedStyle(document.body).getPropertyValue('--a');
-				if (!accent)
-					accent = '#07c';
-				ihref += '&a=' + parseColor(accent).replace(/ /g, '');
-			}
-
-			var svg = '<use href="#' +
-				(isdir ? 'folder' : 'file') + '-icon" color="' +
-				(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/>';
-			svg = '<svg class="thumb" width="100%" height="100%">' + svg + '</svg>';
-
-			if (N3DS){
-				// 3DS / unsupported: use fallback
-				svg = '<span class="thumb">' + (isdir ? '📁[FOLDER]' : '📄[FILE:' + ext + ']') + '</span>';
-				ext = 'unk';
-			}
+				ac = ao.parentElement.parentElement.classList;
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
 				'" class="' + ac + '" ttt="' + esc(name) + '">' +
-				'<div class="imgcontainer">' +
-				'<input type="checkbox" class="gselchk"></input>' +
-				svg +
-				(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
-					'<span class="th_ext" style="font-size: ' + (r.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' +
-					(ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')"><span class="inner">' + ext + '</span></span>') +
-				'<img loading="lazy" fetchPriority="low" onload="th_onload(this)" src="' +
-				ihref + '" /></div><span class="' + ac + '">' + ao.innerHTML + '</span></a>');
+				get_thumb(ohref, ref, isdir, true) +
+				'<span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
 		clmod(ggrid, 'crop', r.crop);
@@ -6704,7 +6634,10 @@ window.thegrid = (function () {
 			swrite('thumbs', 1);
 	}
 
-	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
+	bcfg_bind(r, 'thumbs', 'thumbs', true, function(e){
+		r.setdirty(); 
+		msel.render();
+	});
 	bcfg_bind(r, 'ihop', 'ihop', true);
 	bcfg_bind(r, 'vau', 'gridvau', false);
 	bcfg_bind(r, 'crop', 'gridcrop', !dcrop.endsWith('n'), r.set_crop);
@@ -6756,6 +6689,85 @@ window.thegrid = (function () {
 
 	return r;
 })();
+
+function get_thumb(ohref, ref, isdir, grid){
+	var href = ohref.split('?')[0],
+		ext = '',
+		ext0 = '',
+		name = uricom_dec(vsplit(href)[1]),
+		need_ext = !thegrid.thumbs || !!ext_th,
+		use_ext_th = thegrid.thumbs && ext_th,
+		ihref = ohref;
+
+	if (need_ext && href != "#") {
+		var ar = href.split('.');
+		if (ar.length > 1)
+			ar.shift();
+
+		ar.reverse();
+		ext0 = ar[0];
+		for (var b = 0; b < Math.min(2, ar.length); b++) {
+			ext = ext ? (ar[b] + '.' + ext) : ar[b];
+			if (ar[b].length > 2)
+				break;
+		}
+		if (!ext)
+			ext = 'unk';
+	}
+
+	if (use_ext_th && (ext_th[ext] || ext_th[ext0])) {
+		ihref = ext_th[ext] || ext_th[ext0];
+	}
+	else if (thegrid.thumbs) {
+		ihref = addq(ihref, 'th=' + (
+			have_jxl ? 'x' :
+			have_webp ? 'w' :
+			'j'
+		));
+		if (grid && !thegrid.crop)
+			ihref += 'f';
+		if (grid && thegrid.x3)
+			ihref += '3';
+		if (href == "#")
+			ihref = SR + '/.cpr/ico/' + (ref == 'moar' ? '++' : 'exit');
+	}
+	else {
+		ihref = '';
+	}
+
+	if(ihref){
+		ihref = addq(ihref, 'cache=i&_=' + ACB + TS);
+
+		var accent = getComputedStyle(document.body).getPropertyValue('--a');
+		if (!accent)
+			accent = '#07c';
+		ihref += '&a=' + parseColor(accent).replace(/ /g, '');
+	}
+
+	var svg = '<use href="#' +
+		(isdir ? 'folder' : 'file') + '-icon" color="' +
+		(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/>';
+	svg = '<svg class="thumb" width="100%" height="100%">' + svg + '</svg>';
+
+	if (N3DS){
+		// 3DS / unsupported: use fallback
+		svg = '<span class="thumb">' + (isdir ? '📁[FOLDER]' : '📄[FILE:' + ext + ']') + '</span>';
+		ext = 'unk';
+	}
+
+	var container = '<div class="imgcontainer" ref="' + ref + '">' +
+		(grid ? '<input type="checkbox" class="gselchk"></input>' : '') +
+		svg +
+		(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
+			'<span class="th_ext" style="font-size: ' + 
+			(grid ? 
+				(thegrid.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' + (ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')' :
+				'.8em') + 
+			'"><span class="inner">' + ext + '</span></span>') +
+		'<img loading="lazy" fetchPriority="low" onload="th_onload(this)" src="' +
+		ihref + '" /></div>'
+	return container;
+}
 
 function th_onload(el) {
 	set_loaded(el, true, false)
@@ -8628,8 +8640,9 @@ var treectl = (function () {
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
 			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade ' : '') + (img_re.exec(fname) ? 'img ' : '') + (tn.cls || ''),
-				ln = ['<tr class="' + cl + '"><td>' + tn.lead + '</td><td><a href="' +
-					top + tn.href + '" id="' + id + '">' + hname +
+				ln = ['<tr class="' + cl + '"><td>' + tn.lead + '</td><td>' + 
+					get_thumb(tn.href, id, (/\bdir\b/i).test(cl), false) + 
+					'</td><td><a href="' + top + tn.href + '" id="' + id + '">' + hname +
 					'</a></td><td sortv="' + tn.sz + '">' + filesizefun(tn.sz)];
 
 			for (var b = 0; b < res.taglist.length; b++) {
@@ -8736,7 +8749,7 @@ var treectl = (function () {
 			
 		var media = scan_hash(location.hash);
 		if(media && media[0] == 'g')
-			clmod(ebi('ggrid'), 'waiting', true);
+			clmod(ebi('wrap'), 'waiting', true);
 		setTimeout(eval_hash, 1);
 	};
 
@@ -9173,6 +9186,7 @@ function mk_files_header(taglist) {
 	var html = [
 		'<thead><tr>',
 		'<th name="lead"><span>!</span></th>',
+		'<th name="thumb"><span>th</span></th>',
 		'<th name="href"><span>File Name</span></th>',
 		'<th name="sz" sort="int"><span>Size</span></th>'
 	];
@@ -9724,7 +9738,7 @@ var msel = (function () {
 		}
 
 		r.all = [];
-		var links = QSA('#files tbody td:nth-child(2) a:last-child'),
+		var links = QSA('#files tbody td:nth-child(3) a:last-child'),
 			is_srch = !!ebi('unsearch'),
 			vbase = get_evpath();
 
@@ -9910,15 +9924,24 @@ var msel = (function () {
 				dl_file(sel[a].vp + sel[a].q);
 	};
 	r.render = function () {
-		var tds = QSA('#files tbody td+td+td'),
+		var tds = QSA('#files tbody td+td+td+td'),
 			is_srch = !!ebi('unsearch');
 
 		for (var a = 0, aa = tds.length; a < aa; a++)
 			tds[a].onclick = r.seltgl;
 
-		var links = QSA('#files a[id]')
+		var links = QSA('#files td:nth-child(3) a[id]')
 		for (var a = 0, aa = links.length; a < aa; a++)
 			links[a].onclick = fclick;
+
+		var thumbs = QSA('#files .imgcontainer')
+		for (var a = 0, aa = thumbs.length; a < aa; a++)
+			thumbs[a].onclick = fclick1;
+
+		var imgs = QSA('#files img');
+		for (var a = 0, aa = imgs.length; a < aa; a++) {
+			set_loaded(imgs[a], thegrid.thumbs && imgs[a].complete, true);
+		}
 
 		if(window.baguetteBox != undefined)
 			r.bagit();
@@ -9930,6 +9953,8 @@ var msel = (function () {
 		var zipvis = (is_srch || !have_zip) ? 'none' : '';
 		ebi('selzip').style.display = zipvis;
 		ebi('zip1').style.display = zipvis;
+
+		r.ready = true;
 	}
 
 	r.bagit = function (isrc) {
@@ -9956,30 +9981,23 @@ var msel = (function () {
 			},
 			onChange: function (i, maxIdx) {
 				if (this[i].imageElement) {
-					sethash('g' + this[i].imageElement.getAttribute('ref') + getsort());
+					sethash('g' + this[i].imageElement.getAttribute('id') + getsort());
 				}
 			}
 		});
 		r.bbox_opts = br[1];
 		r.bbox = true;
-		eval_hash()
 	};
 
-	if(window.baguetteBox != undefined)
-		r.bagit();
-	
 	return r;
 })();
 
 function fclick1(e) {
-	if (ctrl(e) && !treectl.csel && !r.sel && !r.tempsel)
-		return true;
-
 	e.preventDefault ? e.preventDefault() : e.returnValue = false;
 
 	// pass copy of click event to list entry (can trigger bbox handler)
-	var link = ebi(this.getAttribute('ref'));
-	link.dispatchEvent(new MouseEvent('click', {
+	var td = ebi(this.getAttribute('ref'));
+	td.dispatchEvent(new MouseEvent('click', {
         bubbles: true,
         cancelable: true,
         clientX: e.clientX,
@@ -9996,27 +10014,21 @@ function fclick(e, dbl) {
 		ev(e);
 		return;
 	}
-	var isInGrid = this.hasAttribute('ref'),
-		link = this;
-	if(isInGrid){
-		// get table row with file link
-		link = ebi(this.getAttribute('ref'))
-	}
-	var qhref = link.getAttribute('href'),
+	var qhref = this.getAttribute('href'),
 		href = qhref.split('?')[0],
-		fid = link.getAttribute('id'),
+		fid = this.getAttribute('id'),
 		aplay = ebi('a' + fid),
 		atext = ebi('t' + fid),
 		is_txt = atext && !/\.ts$/.test(href) && showfile.getlang(href),
 		is_img = img_re.test(href),
 		is_dir = href.endsWith('/'),
 		is_srch = !!ebi('unsearch'),
-		in_tree = is_dir && treectl.find(link.textContent.slice(0, -1)),
+		in_tree = is_dir && treectl.find(this.textContent.slice(0, -1)),
 		have_sel = QS('#files tr.sel'),
-		td = link.closest('td').nextSibling,
+		td = this.closest('td').nextSibling,
 		tr = td.parentNode;
 
-	if ( thegrid.en && (thegrid.sel || thegrid.tempsel) && !dbl && !ctrl(e) || treectl.csel && (e.shiftKey || ctrl(e))) {
+	if (thegrid.en && (thegrid.sel || thegrid.tempsel) && !dbl && !ctrl(e) || treectl.csel && (e.shiftKey || ctrl(e))) {
 		ev(e);
 		msel.seltgl.call(td, e);
 		if (e.shiftKey)
@@ -10026,10 +10038,10 @@ function fclick(e, dbl) {
 	else if (in_tree)
 		in_tree.click();
 
-	else if (link.hasAttribute('download'))
-		link.click();
+	else if (this.hasAttribute('download'))
+		this.click();
 
-	else if (thegrid.en && aplay && (thegrid.vau || !is_img))
+	else if (aplay && (thegrid.vau || !is_img))
 		aplay.click();
 
 	else if (is_dir)
@@ -10049,7 +10061,7 @@ function fclick(e, dbl) {
 			thegrid.sel = true;
 		}, 1);
 		thegrid.sel = false;
-		link.click();
+		this.click();
 	}
 	ev(e);
 }
@@ -11071,7 +11083,7 @@ var drag = (function() {
 
 		elem.ondragenter = elem.ondragleave = elem.ondragover = function(e) {
 			if (!r.enabled) return;
-			var elemHref = basenames((elem.tagName == "A" ? elem : elem.querySelector("td:nth-child(2) a")).href.split("?")[0])
+			var elemHref = basenames((elem.tagName == "A" ? elem : elem.querySelector("td:nth-child(3) a")).href.split("?")[0])
 			if (current == elem || elemHref == get_evpath() || currLink == elemHref) // Prevent folders being dragged into themselves
 				return;
 			ev(e);
@@ -11110,7 +11122,7 @@ var drag = (function() {
 			f.draggable = true;
 			f.ondragstart = function(e) {
 				try{
-					currLink = basenames(e.target.querySelector("td:nth-child(2) a").href.split("?"));
+					currLink = basenames(e.target.querySelector("td:nth-child(3) a").href.split("?"));
 					current = e.target;
 					r.no_warn = true;
 

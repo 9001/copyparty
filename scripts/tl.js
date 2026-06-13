@@ -256,7 +256,7 @@ Ls.hmn = {
 
 	"ct_grid": '田 the grid',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
-	"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
+	"ct_thumb": 'toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 	"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
 	"ct_dsel": 'use drag-selection in grid-view">dsel',
 	"ct_dl": 'force download (don\'t display inline) when a file is clicked">dl',

@@ -229,7 +229,7 @@ Ls.cze = {
 
 	"ct_grid": '田 mřížka',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ nápovědy',
-	"ct_thumb": 'v zobrazení mřížky přepnout ikony nebo náhledy$NKlávesová zkratka: T">🖼️ náhledy',
+	"ct_thumb": 'přepnout ikony nebo náhledy$NKlávesová zkratka: T">🖼️ náhledy',
 	"ct_csel": 'použít CTRL a SHIFT pro výběr souborů v zobrazení mřížky">výběr',
 	"ct_dsel": 'použít tažený výběr v zobrazení mřížky">tažení', //m
 	"ct_dl": 'vynutit stažení (nezobrazovat inline) při kliknutí na soubor">dl', //m

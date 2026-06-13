@@ -225,7 +225,7 @@ Ls.epo = {
 
 	"ct_grid": '田 krado',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ ŝpruchelpiloj',
-	"ct_thumb": 'dum krado-vido, baskuli montradon de simboloj aŭ bildetoj$NFulmoklavo: T">🖼️ bildetoj',
+	"ct_thumb": 'baskuli montradon de simboloj aŭ bildetoj$NFulmoklavo: T">🖼️ bildetoj',
 	"ct_csel": 'uzi STIR kaj MAJ por elekti dosierojn en krado-vido">elekto',
 	"ct_dsel": 'uzi tren-elekton en krado-vido">treni',
 	"ct_dl": 'devigi elŝuton (ne montri enkadre), kiam dosiero estas alklakita">elŝuti',

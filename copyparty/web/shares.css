@@ -61,7 +61,7 @@ th {
 	vertical-align: top;
 	white-space: nowrap;
 }
-#wrap td+td+td+td+td+td+td+td {
+#wrap td+td+td+td+td+td+td+td+td {
 	font-family: var(--font-mono), monospace, monospace;
 }
 #wrap th:first-child,

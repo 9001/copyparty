@@ -225,7 +225,7 @@ Ls.tur = {
 
 	"ct_grid": '田 ızgara',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ ipuçları',
-	"ct_thumb": 'ızgara görünümünde, simgeler ve küçük resimler arasında geçiş yapın$NKısayol: T">🖼️ küçük resimler',
+	"ct_thumb": 'simgeler ve küçük resimler arasında geçiş yapın$NKısayol: T">🖼️ küçük resimler',
 	"ct_csel": 'ızgara görünümünde dosya seçimi için CTRL ve SHIFT tuşlarını kullanın">seç',
 	"ct_dsel": 'ızgara görünümünde sürükleyerek seçimi kullanın">sürükle', //m
 	"ct_dl": 'dosyaya tıklandığında indirmeyi zorla (satır içinde görüntüleme)">dl', //m

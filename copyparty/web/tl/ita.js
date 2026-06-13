@@ -225,7 +225,7 @@ Ls.ita = {
 
 	"ct_grid": '田 griglia',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltip',
-	"ct_thumb": 'nella vista griglia, alterna icone o miniature$NTasto rapido: T">🖼️ miniature',
+	"ct_thumb": 'alterna icone o miniature$NTasto rapido: T">🖼️ miniature',
 	"ct_csel": 'usa CTRL e SHIFT per la selezione file nella vista griglia">sel',
 	"ct_dsel": 'usa la selezione tramite trascinamento nella vista griglia">trascina', //m
 	"ct_dl": 'forza il download (non visualizzare inline) quando si clicca su un file">dl', //m
