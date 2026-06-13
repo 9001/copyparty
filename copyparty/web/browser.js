@@ -9153,7 +9153,7 @@ function wait_set_fsearch(){
 
 function tr2id(tr) {
 	try {
-		return tr.cells[1].querySelector('a[id]').getAttribute('id');
+		return tr.cells[2].querySelector('a[id]').getAttribute('id');
 	}
 	catch (ex) {
 		return null;
