@@ -709,7 +709,6 @@ html.y #path {
 	display: block;
 	padding: .5em;
 	scroll-margin-top: 45vh;
-	border-radius: var(--radius);
 }
 #files tr {
 	scroll-margin-top: 25vh;
@@ -1170,6 +1169,10 @@ tr.play td:nth-child(1) a {
 	margin: -3px -2px;
 	padding: 4px 3px;
 	justify-content: center;
+}
+#files .imgcontainer img,
+#files .imgcontainer {
+	border-radius: 0;
 }
 .th_ext {
 	z-index: 2;
@@ -5622,8 +5625,8 @@ html.f #ggrid > a.sel:hover .imgcontainer::before {
 	border-color: var(--g-fsel-bg) transparent transparent var(--g-fsel-bg);
 }
 /* #wrap:not(.thin) .ghead::after, */
-html.f .dir.thumbed .imgcontainer::before,
-html.f .au.thumbed:not(.play) .imgcontainer::before {
+html.f #ggrid .dir.thumbed .imgcontainer::before,
+html.f #ggrid .au.thumbed:not(.play) .imgcontainer::before {
 	content: "";
 	position: absolute;
 	left: 0;
