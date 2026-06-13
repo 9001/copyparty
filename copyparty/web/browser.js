@@ -10948,7 +10948,7 @@ var rcm = (function () {
 				var ref = ebi(target.getAttribute('ref'));
 				file = ref && ref.closest('#files tbody tr');
 			}
-			var fa = file && file.children[1].querySelector('a[id]');
+			var fa = file && file.children[2].querySelector('a[id]');
 			if (fa && fa.id != 'unsearch') {
 				selFile.no_dsel = TOUCH || clgot(file, "sel");
 				clmod(file, "sel", true);
