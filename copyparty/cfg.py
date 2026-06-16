@@ -397,7 +397,6 @@ flagcats = {
     "wopi": {
         "wopi": "enable WOPI support for integrating with online office suites",
         "wopi-client": "address of WOPI client, e.g. Collabora Online",
-        "wopi-self-signed": "disable certificate verification of the WOPI client, only use with local use"
     },
     "opds": {
         "opds": "enable OPDS",

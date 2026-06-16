@@ -18,7 +18,6 @@ import time
 import uuid
 import urllib.request
 import urllib.parse
-import ssl
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from operator import itemgetter
@@ -1606,10 +1605,7 @@ class HttpCli(object):
         }
 
         try:
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False if self.args.wopi_self_signed else True
-            ctx.verify_mode = ssl.CERT_NONE if self.args.wopi_self_signed else ssl.CERT_REQUIRED
-            discovery = urllib.request.urlopen(self.args.wopi_client + "/hosting/discovery", context=ctx)
+            discovery = urllib.request.urlopen(self.args.wopi_client + "/hosting/discovery")
             response = ET.fromstring(discovery.read())
             ext = path.split('.')[-1]
             wopi_url = response.find(".//action[@ext='%s'][@urlsrc]" % ext).get("urlsrc")
