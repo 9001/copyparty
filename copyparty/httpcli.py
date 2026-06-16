@@ -1567,25 +1567,12 @@ class HttpCli(object):
                     "UserId": self.uname,
                     "UserFriendlyName": self.uname,
                     "UserCanWrite": True,
-                    # "UserCanNotWriteRelative": False,
-                    # "PostMessageOrigin": ,
-                    # "HidePrintOption": ,
-                    # "DisablePrint": ,
-                    # "HideSaveOption": ,
-                    # "HideExportOption": ,
-                    # "HideRepairOption": ,
-                    # "DisableExport": ,
-                    # "DisableCopy": ,
-                    # "EnableOwnerTermination": True,
+                    "UserCanNotWriteRelative": True,
                     "LastModifiedTime":
                         time.strftime(
                             "%Y-%m-%dT%H:%M:%SZ",
                             time.gmtime(os.path.getmtime(full_path))
                         ),
-                    # "IsUserLocked": ,
-                    # "IsUserRestricted": ,
-                    # "SupportsRename": True,
-                    # "UserCanRename": True,
                 }
                 ret = json.dumps(file_info).encode("utf-8", "replace")
                 self.reply(ret, 200, "application/json; charset=utf-8")
