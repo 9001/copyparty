@@ -16,7 +16,7 @@ let
     withMagic = true;
   };
 
-  call = attrs: final.python3.pkgs.callPackage ./copyparty ({ ffmpeg = final.ffmpeg-full; } // attrs);
+  call = attrs: final.python3.pkgs.callPackage ./copyparty ({ ffmpeg = final.ffmpeg-headless; } // attrs);
 in
 {
   copyparty = call { stable = true; };
