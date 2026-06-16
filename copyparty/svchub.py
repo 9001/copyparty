@@ -27,13 +27,23 @@ if True:  # pylint: disable=using-constant-test
     import typing
     from typing import Any, Optional, Union
 
-from .__init__ import ANYWIN, EXE, MACOS, PY2, TYPE_CHECKING, E, EnvParams, unicode
+from .__init__ import (
+    ANYWIN,
+    EXE,
+    MACOS,
+    PY2,
+    TYPE_CHECKING,
+    UNIX,
+    E,
+    EnvParams,
+    unicode,
+)
 from .__version__ import S_VERSION, VERSION
 from .authsrv import BAD_CFG, AuthSrv, derive_args, n_du_who, n_ver_who
 from .bos import bos
 from .cert import ensure_cert
 from .fsutil import ramdisk_chk
-from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, HAVE_MUTAGEN
+from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, HAVE_MUTAGEN, TH_BWRAP
 from .pwhash import HAVE_ARGON2
 from .sutil import close_pools as sutil_close_pools
 from .tcpsrv import TcpSrv
@@ -42,8 +52,6 @@ from .th_srv import (
     H_PIL_HEIF,
     H_PIL_WEBP,
     HAVE_DCRAW,
-    HAVE_FFMPEG,
-    HAVE_FFPROBE,
     HAVE_PIL,
     HAVE_RAWPY,
     HAVE_VIPS,
@@ -51,10 +59,12 @@ from .th_srv import (
 )
 from .up2k import Up2k
 from .util import (
+    BLOCK_SIGS,
     DEF_EXP,
     DEF_MTE,
     DEF_MTH,
     FFMPEG_URL,
+    HAVE_BWRAP,
     HAVE_PSUTIL,
     HAVE_SQLITE3,
     HAVE_ZMQ,
@@ -1012,6 +1022,8 @@ class SvcHub(object):
         fok = []
         fng = []
         t_ff = "transcode audio, create spectrograms, video thumbnails"
+
+        # fmt: off
         to_check = [
             (HAVE_SQLITE3, "sqlite", "sessions and file/media indexing"),
             (HAVE_PIL, "pillow", "image thumbnails (plenty fast)"),
@@ -1019,6 +1031,7 @@ class SvcHub(object):
             (H_PIL_WEBP, "pillow-webp", "create thumbnails as webp files"),
             (HAVE_FFMPEG, "ffmpeg", t_ff + ", good-but-slow image thumbnails"),
             (HAVE_FFPROBE, "ffprobe", t_ff + ", read audio/media tags"),
+            (HAVE_BWRAP, "bwrap", "sandbox to make ffmpeg less dangerous", not ANYWIN and not UNIX),
             (HAVE_MUTAGEN, "mutagen", "read audio tags (ffprobe is better but slower)"),
             (HAVE_ARGON2, "argon2", "secure password hashing (advanced users only)"),
             (HAVE_ZMQ, "pyzmq", "send zeromq messages from event-hooks"),
@@ -1026,17 +1039,21 @@ class SvcHub(object):
             (H_PIL_AVIF, "pillow-avif", "read .avif pics with pillow (rarely useful)"),
             (HAVE_RAWPY, "rawpy", "read RAW images"),
             (HAVE_DCRAW, "libraw", "read RAW images"),
+            (HAVE_PSUTIL, "psutil", "improved plugin cleanup  (rarely useful)", ANYWIN),
         ]
-        if ANYWIN:
-            to_check += [
-                (HAVE_PSUTIL, "psutil", "improved plugin cleanup  (rarely useful)")
-            ]
+        # fmt: on
 
         verbose = self.args.deps
         if verbose:
             self.log("dependencies", "")
 
-        for have, feat, what in to_check:
+        for zc in to_check:
+            try:
+                have, feat, what = zc
+            except:
+                have, feat, what, zb = zc
+                if not zb:
+                    continue
             lst = fok if have else fng
             lst.append((feat, what))
             if verbose:
@@ -1202,6 +1219,15 @@ class SvcHub(object):
             vsa = [x.strip() for x in vs.split(",")]
             vsa = [x.upper() for x in vsa if x]
             setattr(al, k + "_set", set(vsa))
+
+        zs = "th_bwrap"
+        for k in zs.split(" "):
+            zsl = [x for x in str(getattr(al, k)).split(" ") if x]
+            zbl = [x.encode("ascii", "replace") for x in zsl]
+            setattr(al, k + "_s", zsl)
+            setattr(al, k + "_b", zbl)
+
+        TH_BWRAP[:] = al.th_bwrap_b
 
         zs = "dav_ua1 lf_url sus_urls nonsus_urls ua_nodav ua_nodoc ua_nozip"
         for k in zs.split(" "):
@@ -1486,6 +1512,8 @@ class SvcHub(object):
 
         for sig in sigs:
             signal.signal(sig, self.signal_handler)
+            if sig not in BLOCK_SIGS and BLOCK_SIGS:
+                BLOCK_SIGS.append(sig)
 
         if self.args.sig_thr:
             Daemon(self._signal_thr, "svchub-sig")

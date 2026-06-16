@@ -127,6 +127,7 @@ from .util import (
     unescape_cookie,
     unquotep,
     vjoin,
+    vjoins,
     vol_san,
     vroots,
     vsplit,
@@ -2057,7 +2058,7 @@ class HttpCli(object):
             df = {}
 
         fgen = itertools.chain([topdir], fgen)
-        vtop = vjoin(self.args.R, vjoin(vn.vpath, rem))
+        vtop = vjoins(self.args.R, vn.vpath, rem)
 
         chunksz = 0x7FF8  # preferred by nginx or cf (dunno which)
 

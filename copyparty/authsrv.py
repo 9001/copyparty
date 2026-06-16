@@ -2328,7 +2328,7 @@ class AuthSrv(object):
             zs = vol.flags.get("rotf")
             if zs:
                 use = True
-                lim.set_rotf(zs, vol.flags.get("rotf_tz") or "UTC")
+                lim.set_rotf(zs, vol.flags.get("rotf_tz", self.args.rotf_tz) or "UTC")
 
             zs = vol.flags.get("maxn")
             if zs:

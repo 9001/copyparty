@@ -18,7 +18,7 @@ from queue import Queue
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
 from .authsrv import VFS
 from .bos import bos
-from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, au_unpk, ffprobe, have_ff
+from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, au_unpk, bwrap, ffprobe, have_ff
 from .util import BytesIO  # type: ignore
 from .util import (
     FFMPEG_URL,
@@ -763,14 +763,14 @@ class ThumbSrv(object):
 
     def _conv_dcraw(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.6, tpath)
+        bap = fsenc(abspath)
         # fmt: off
-        cmd = [
-            b"dcraw_emu",
+        cmd = bwrap(HAVE_DCRAW, bap, b"") + [
             b"-h",  # halfsize
             b"-o", b"1",  # srgb
             b"-s", b"0",  # first frame
             b"-Z", b"-",  # to stdout
-            fsenc(abspath),
+            bap,
         ]
         # fmt: on
         p = sp.Popen(cmd, stdout=sp.PIPE)
@@ -858,16 +858,15 @@ class ThumbSrv(object):
 
         res = self.getres(vn, fmt)
         bscale = scale.format(*list(res)).encode("utf-8")
+        bap_in = fsenc(abspath)
+        bap_out = fsenc(tpath)
         # fmt: off
-        cmd = [
-            HAVE_FFMPEG,
+        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner"
-        ]
-        cmd += seek
-        cmd += [
-            b"-i", fsenc(abspath),
+        ] + seek + [
+            b"-i", bap_in,
             b"-map", imap,
             b"-vf", bscale,
             b"-frames:v", b"1",
@@ -875,15 +874,15 @@ class ThumbSrv(object):
         ]
         # fmt: on
 
-        self._ffmpeg_im_o(tpath, vn, cmd)
+        self._ffmpeg_im_o(bap_out, vn, cmd)
 
-    def _ffmpeg_im_o(self, tpath: str, vn: VFS, cmd: list[bytes]) -> None:
-        if tpath.endswith(".jpg"):
+    def _ffmpeg_im_o(self, tpath: bytes, vn: VFS, cmd: list[bytes]) -> None:
+        if tpath.endswith(b".jpg"):
             cmd += [
                 b"-q:v",
                 FF_JPG_Q[vn.flags["th_qv"] // 5],  # default=??
             ]
-        elif tpath.endswith(".jxl"):
+        elif tpath.endswith(b".jxl"):
             cmd += [
                 b"-q:v",
                 unicode(vn.flags["th_qvx"]).encode("ascii"),  # default=??
@@ -898,7 +897,7 @@ class ThumbSrv(object):
                 b"6",  # default=4, 0=fast, 6=max
             ]
 
-        cmd += [fsenc(tpath)]
+        cmd.append(tpath)
         self._run_ff(cmd, vn, "convt")
 
     def _run_ff(self, cmd: list[bytes], vn: VFS, kto: str, oom: int = 400) -> None:
@@ -998,20 +997,21 @@ class ThumbSrv(object):
             b",showwavespic=s=2048x64:colors=white"
             b",convolution=1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:1 -1 1 -1 5 -1 1 -1 1"  # idk what im doing but it looks ok
         )
+        bap_in = fsenc(abspath)
+        bap_out = fsenc(tpath)
 
         # fmt: off
-        cmd = [
-            HAVE_FFMPEG,
+        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner",
-            b"-i", fsenc(abspath),
+            b"-i", bap_in,
             b"-filter_complex", flt,
             b"-frames:v", b"1",
         ]
         # fmt: on
 
-        cmd += [fsenc(tpath)]
+        cmd.append(bap_out)
         self._run_ff(cmd, vn, "convt")
 
         if "pngquant" in vn.flags:
@@ -1078,19 +1078,21 @@ class ThumbSrv(object):
                 except:
                     self.untemp[tpath] = [infile]
 
+            bap_in = fsenc(abspath)
+            bap_out = fsenc(infile)
+
             # fmt: off
-            cmd = [
-                HAVE_FFMPEG,
+            cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
                 b"-nostdin",
                 b"-v", b"error",
                 b"-hide_banner",
-                b"-i", fsenc(abspath),
+                b"-i", bap_in,
                 b"-map", b"0:a:0",
                 b"-ac", b"1",
                 b"-ar", b"48000",
                 b"-sample_fmt", b"s16",
                 b"-t", b"900",
-                b"-y", fsenc(infile),
+                b"-y", bap_out,
             ]
             # fmt: on
             self._run_ff(cmd, vn, "convt")
@@ -1110,20 +1112,22 @@ class ThumbSrv(object):
 
         fc = fc.format(fco)
 
+        bap_in = fsenc(infile)
+        bap_out = fsenc(tpath)
+
         # fmt: off
-        cmd = [
-            HAVE_FFMPEG,
+        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner",
-            b"-i", fsenc(infile),
+            b"-i", bap_in,
             b"-filter_complex", fc.encode("utf-8"),
             b"-map", b"[o]",
             b"-frames:v", b"1",
         ]
         # fmt: on
 
-        self._ffmpeg_im_o(tpath, vn, cmd)
+        self._ffmpeg_im_o(bap_out, vn, cmd)
 
     def conv_mp3(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         quality = self.args.q_mp3.lower()
@@ -1142,24 +1146,26 @@ class ThumbSrv(object):
             qk = b"-q:a"
             qv = quality[1:].encode("ascii")
 
+        bap_in = fsenc(abspath)
+        bap_out = fsenc(tpath)
+
         # extremely conservative choices for output format
         # (always 2ch 44k1) because if a device is old enough
         # to not support opus then it's probably also super picky
 
         # fmt: off
-        cmd = [
-            HAVE_FFMPEG,
+        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner",
-            b"-i", fsenc(abspath),
+            b"-i", bap_in,
         ] + self.big_tags(rawtags) + [
             b"-map", b"0:a:0",
             b"-ar", b"44100",
             b"-ac", b"2",
             b"-c:a", b"libmp3lame",
             qk, qv,
-            fsenc(tpath)
+            bap_out,
         ]
         # fmt: on
         self._run_ff(cmd, vn, "aconvt", oom=300)
@@ -1175,16 +1181,18 @@ class ThumbSrv(object):
 
         self.log("conv2 flac", 6)
 
+        bap_in = fsenc(abspath)
+        bap_out = fsenc(tpath)
+
         # fmt: off
-        cmd = [
-            HAVE_FFMPEG,
+        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner",
-            b"-i", fsenc(abspath),
+            b"-i", bap_in,
             b"-map", b"0:a:0",
             b"-c:a", b"flac",
-            fsenc(tpath)
+            bap_out,
         ]
         # fmt: on
         self._run_ff(cmd, vn, "aconvt", oom=300)
@@ -1210,16 +1218,18 @@ class ThumbSrv(object):
 
         self.log("conv2 wav", 6)
 
+        bap_in = fsenc(abspath)
+        bap_out = fsenc(tpath)
+
         # fmt: off
-        cmd = [
-            HAVE_FFMPEG,
+        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner",
-            b"-i", fsenc(abspath),
+            b"-i", bap_in,
             b"-map", b"0:a:0",
             b"-c:a", codec,
-            fsenc(tpath)
+            bap_out,
         ]
         # fmt: on
         self._run_ff(cmd, vn, "aconvt", oom=300)
@@ -1271,19 +1281,21 @@ class ThumbSrv(object):
         except:
             pass
 
+        bap_in = fsenc(abspath)
+        bap_out = fsenc(tpath)
+
         # fmt: off
-        cmd = [
-            HAVE_FFMPEG,
+        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner",
-            b"-i", fsenc(abspath),
+            b"-i", bap_in,
         ] + tagset + [
             b"-map", b"0:a:0",
             b"-ac", ac,
         ] + benc + [
             b"-f", container,
-            fsenc(tpath)
+            bap_out,
         ]
         # fmt: on
         self._run_ff(cmd, vn, "aconvt", oom=300)
@@ -1312,19 +1324,21 @@ class ThumbSrv(object):
         self.log("conv2 caf-tmp [%s]" % (enc,), 6)
         benc = enc.encode("ascii").split(b" ")
 
+        bap_in = fsenc(abspath)
+        bap_out = fsenc(tmp_opus)
+
         # fmt: off
-        cmd = [
-            HAVE_FFMPEG,
+        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
             b"-nostdin",
             b"-v", b"error",
             b"-hide_banner",
-            b"-i", fsenc(abspath),
+            b"-i", bap_in,
             b"-map_metadata", b"-1",
             b"-map", b"0:a:0",
             b"-ac", b"2",
         ] + benc + [
             b"-f", b"opus",
-            fsenc(tmp_opus)
+            bap_out,
         ]
         # fmt: on
         self._run_ff(cmd, vn, "aconvt", oom=300)
@@ -1338,20 +1352,21 @@ class ThumbSrv(object):
         if dur < 20 or sz < 256 * 1024:
             zs = bq.decode("ascii")
             self.log("conv2 caf-transcode; dur=%d sz=%d q=%s" % (dur, sz, zs), 6)
+            bap_in = fsenc(abspath)
+            bap_out = fsenc(tpath)
             # fmt: off
-            cmd = [
-                HAVE_FFMPEG,
+            cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
                 b"-nostdin",
                 b"-v", b"error",
                 b"-hide_banner",
-                b"-i", fsenc(abspath),
+                b"-i", bap_in,
                 b"-filter_complex", b"anoisesrc=a=0.001:d=7:c=pink,asplit[l][r]; [l][r]amerge[s]; [0:a:0][s]amix",
                 b"-map_metadata", b"-1",
                 b"-ac", b"2",
                 b"-c:a", b"libopus",
                 b"-b:a", bq,
                 b"-f", b"caf",
-                fsenc(tpath)
+                bap_out,
             ]
             # fmt: on
             self._run_ff(cmd, vn, "aconvt", oom=300)
@@ -1359,18 +1374,19 @@ class ThumbSrv(object):
         else:
             # simple remux should be safe
             self.log("conv2 caf-remux; dur=%d sz=%d" % (dur, sz), 6)
+            bap_in = fsenc(tmp_opus)
+            bap_out = fsenc(tpath)
             # fmt: off
-            cmd = [
-                HAVE_FFMPEG,
+            cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
                 b"-nostdin",
                 b"-v", b"error",
                 b"-hide_banner",
-                b"-i", fsenc(tmp_opus),
+                b"-i", bap_in,
                 b"-map_metadata", b"-1",
                 b"-map", b"0:a:0",
                 b"-c:a", b"copy",
                 b"-f", b"caf",
-                fsenc(tpath)
+                bap_out,
             ]
             # fmt: on
             self._run_ff(cmd, vn, "aconvt", oom=300)

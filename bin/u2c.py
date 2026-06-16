@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import print_function, unicode_literals
 
-S_VERSION = "2.21"
-S_BUILD_DT = "2026-05-25"
+S_VERSION = "2.22"
+S_BUILD_DT = "2026-06-13"
 
 """
 u2c.py: upload to copyparty
@@ -733,16 +733,22 @@ def up2k_chunksize(filesize):
             stepsize *= mul
 
 
-# mostly from copyparty/up2k.py
 def get_hashlist(file, pcb, mth):
     # type: (File, Any, Any) -> None
+    with open(file.abs, "rb", 512 * 1024) as f:
+        get_hashlist_f(file, pcb, mth, f)
+
+
+# mostly from copyparty/up2k.py
+def get_hashlist_f(file, pcb, mth, f):
+    # type: (File, Any, Any, Any) -> None
     """generates the up2k hashlist from file contents, inserts it into `file`"""
 
     chunk_sz = up2k_chunksize(file.size)
     file_rem = file.size
     file_ofs = 0
     ret = []
-    with open(file.abs, "rb", 512 * 1024) as f:
+    if True:
         t0 = time.time()
 
         if mth and file.size >= 1024 * 512:
@@ -776,6 +782,18 @@ def get_hashlist(file, pcb, mth):
     for k, v1, v2 in ret:
         if k not in file.kchunks:
             file.kchunks[k] = [v1, v2]
+
+
+def wark_stdin(ar):
+    file = File(b"", b"", int(ar.files[0]), 0)
+    get_hashlist_f(file, None, False, sys.stdin if PY2 else sys.stdin.buffer)
+    if ar.chs:
+        zsl = ["%s %d %d" % (zsii[0], n, zsii[1]) for n, zsii in enumerate(file.cids)]
+        print("chs:\n" + "\n".join(zsl))
+    zsl = [ar.wsalt, str(file.size)] + [x[0] for x in file.cids]
+    zb = hashlib.sha512("\n".join(zsl).encode("utf-8")).digest()[:33]
+    wark = ub64enc(zb).decode("utf-8")
+    print(wark)
 
 
 def printlink(ar, purl, name, fk):
@@ -1587,6 +1605,7 @@ NOTE: if server has --usernames enabled, then password is "username:password"
     ap.add_argument("--wsalt", type=unicode, metavar="S", default="hunter2", help="salt to use when creating warks; must match server config")
     ap.add_argument("--chs", action="store_true", help="verbose (print the hash/offset of each chunk in each file)")
     ap.add_argument("--jw", action="store_true", help="just identifier+filepath, not mtime/size too")
+    ap.add_argument("--stdin", action="store_true", help="calculate file-ID of stdin; u2c.py --stdin - $LEN < a.mkv")
 
     ap = app.add_argument_group("performance tweaks")
     ap.add_argument("-j", type=int, metavar="CONNS", default=2, help="parallel connections")
@@ -1616,6 +1635,10 @@ NOTE: if server has --usernames enabled, then password is "username:password"
                 input()
             except:
                 pass
+
+    if ar.stdin:
+        wark_stdin(ar)
+        return
 
     # msys2 doesn't uncygpath absolute paths with whitespace
     if not VT100:

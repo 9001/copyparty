@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+AVER=3.24
+
 [ $(id -u) -eq 0 ] && {
 	echo dont root
 	exit 1
@@ -34,8 +36,8 @@ wt() {
 }
 
 [ $pull ] && {
-	for a in $sarchs; do  # arm/v6
-		podman pull --arch=$a alpine:latest
+	for a in $sarchs; do
+		podman pull --arch=$a alpine:$AVER
 	done
 
 	podman images --format "{{.ID}} {{.History}}" |
@@ -62,19 +64,20 @@ wt() {
 	# kill abandoned builders
 	ps aux | awk '/bin\/qemu-[^-]+-static/{print$2}' | xargs -r kill -9
 
-	n=0; set -x
+	n=0; set -xo pipefail
 	for a in $archs; do
 		n=$((n+1)); wt "$n/$a"
 		#[ $n -le 3 ] || continue
-		touch b/t.$a.1.$(date +%s)
+		touch b/t.$n.$a.1.$(date +%s)
 
 		tar -c arbeidspakke.sh patch/ffmpeg |
 		time nice podman run \
 			--rm -i --pull=never -v "$self/b:/root:z" localhost/alpine-$a \
 			/bin/ash -c "cd /opt;tar -x;/bin/ash ./arbeidspakke.sh $n $a" 2>&1 |
-		tee b/log.$a
+		awk '{getline a<"/proc/uptime";close("/proc/uptime");sub(/ .*/,"",a);printf"%.2f %s\n",a-p,$0;p=a}' |
+		tee b/log.$n.$a
 
-		touch b/t.$a.2.$(date +%s)
+		touch b/t.$n.$a.2.$(date +%s)
 	done
 	wt -;wt ""
 }
@@ -89,11 +92,23 @@ echo ok
 # 50m01.04 s390x
 
 # golflympics
-#    4:09 x86_64-hub
-#    2:57 x86_64
-#    2:54 x86
-#   31:13 aarch64
-#   22:38 armv7
-#   32:17 s390x
-#   24:27 ppc64le
-# 2:00:35 summa summarum
+#    3:48 x86_64-hub
+#    2:46 x86_64
+#    2:24 x86
+#   28:50 aarch64
+#   21:34 armv7
+#   31:13 s390x
+#   22:50 ppc64le
+# 1:53:25 summa summarum
+
+# for a in version muxers demuxers devices decoders encoders filters pix_fmts layouts sample_fmts ; do ffmpeg -hide_banner -$a; done | nc 192.168.123.1 4321
+
+# v=3.24-stable
+# echo -n https://dl-cdn.alpinelinux.org/v${v%-*}/releases/x86_64/ >aver
+# curl -s $(cat aver)latest-releases.yaml | awk '/alpine-minirootfs-3.*gz$/{print$2;exit}' | grep ... >> aver
+# podman import $(cat aver) a324
+# f(){ p=/sys/fs;for w in cgroup user.slice user-1000.slice user@1000.service user.slice ;do p="$p/$w";echo $1>"$p/cgroup.subtree_control";done;}
+# f +cpuset
+#		time nice podman run --cpuset-cpus=1 \
+# grep -E '^[^0].*' -B2 -A1 log.1.amd64  # offbyone, whatever, just eyeball it
+# f -cpuset

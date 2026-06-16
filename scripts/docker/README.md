@@ -54,9 +54,14 @@ with image size after installation and when gzipped
 
 [`ac` is recommended](https://hub.docker.com/r/copyparty/ac) since the additional features available in `iv` and `dj` are rarely useful
 
-most editions support `x86`, `x86_64`, `armhf`, `aarch64`, `ppc64le`, `s390x`
-* `dj` doesn't run on `ppc64le`, `s390x`, `armhf`
-* `iv` doesn't run on `ppc64le`, `s390x`
+| this architecture              | can run these editions        |
+| ------------------------------ | ----------------------------- |
+| `x86` aka `i386` aka `386`     | `min`, `im`, `ac`, `iv`, `dj` |
+| `x86_64` aka `x64` aka `amd64` | `min`, `im`, `ac`, `iv`, `dj` |
+| `AArch64` aka `arm64/v8`       | `min`, `im`, `ac`, `iv`, `dj` |
+| `arm32` aka `arm/v7`           | `min`, `im`, `ac`             |
+| `ppc64le` aka `PowerPC`        | `min`, `im`, `ac`             |
+| `s390x` aka `IBM mainframe`    | `min`, `im`, `ac`             |
 
 > NOTE: the following editions are unfinished experiments, and not published anywhere: djd djf djff dju
 

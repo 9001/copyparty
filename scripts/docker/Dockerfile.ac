@@ -9,7 +9,7 @@ ENV     XDG_CONFIG_HOME=/cfg
 ARG     ADD_PKG=""
 
 RUN     apk --no-cache add !pyc ${ADD_PKG} \
-            tzdata wget mimalloc2 mimalloc2-insecure \
+            tzdata wget mimalloc2 mimalloc2-insecure bubblewrap \
             py3-jinja2 py3-argon2-cffi py3-pyzmq \
             py3-openssl py3-paramiko py3-pillow
 

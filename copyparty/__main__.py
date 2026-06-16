@@ -28,6 +28,7 @@ from .__init__ import (
     MACOS,
     PY2,
     PY36,
+    UNIX,
     VT100,
     WINDOWS,
     E,
@@ -45,6 +46,7 @@ from .util import (
     DEF_EXP,
     DEF_MTE,
     DEF_MTH,
+    HAVE_BWRAP,
     HAVE_IPV6,
     IMPLICATIONS,
     JINJA_VER,
@@ -1650,6 +1652,29 @@ def add_optouts(ap):
 
 
 def add_safety(ap):
+    th_bwrap = ""
+    if HAVE_BWRAP:
+        zsl = [
+            "bwrap",
+            "--proc /proc",
+            "--tmpfs /tmp",
+            "--tmpfs /var",
+            "--tmpfs /run",
+            "--dev-bind /dev/null /dev/null",
+            "--dev-bind /dev/random /dev/random",
+            "--dev-bind /dev/urandom /dev/urandom",
+            "--chdir /tmp",
+            "--clearenv",
+            "--unshare-all",
+            "--cap-drop ALL",
+            "--die-with-parent",
+            "--new-session",
+        ]
+        for d in ("/lib", "/lib64", "/usr/lib", "/usr/lib64"):
+            if os.path.isdir(d):
+                zsl.append(" --ro-bind %s %s" % (d, d))
+        th_bwrap = " ".join(zsl)
+
     ap2 = ap.add_argument_group("safety options")
     ap2.add_argument("-s", action="count", default=0, help="increase safety: Disable thumbnails / potentially dangerous software (ffmpeg/pillow/vips), hide partial uploads, avoid crawlers.\n └─Alias of\033[32m --dotpart --no-thumb --no-mtag-ff --no-robots --force-js")
     ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, webdav requires login, 404 on 403, ban on excessive 404s.\n └─Alias of\033[32m -s --no-html --no-readme --no-logues --unpost=0 --no-del --no-mv --reflink --dav-auth --vague-403 -nih")
@@ -1686,6 +1711,8 @@ def add_safety(ap):
     ap2.add_argument("--loris", metavar="B", type=int, default=60, help="if a client maxes out the server connection limit without sending headers, ban it for \033[33mB\033[0m minutes; disable with [\033[32m0\033[0m]")
     ap2.add_argument("--acao", metavar="V[,V]", type=u, default="*", help="Access-Control-Allow-Origin; list of origins (domains/IPs without port) to accept requests from; [\033[32mhttps://1.2.3.4\033[0m]. Default [\033[32m*\033[0m] allows requests from all sites but removes cookies and http-auth; only ?pw=hunter2 survives")
     ap2.add_argument("--acam", metavar="V[,V]", type=u, default="GET,HEAD", help="Access-Control-Allow-Methods; list of methods to accept from offsite ('*' behaves like \033[33m--acao\033[0m's description)")
+    if not ANYWIN and not UNIX:
+        ap2.add_argument("--th-bwrap", metavar="CMD", type=u, default=th_bwrap, help="optional bwrap sandbox command for FFmpeg and dcraw (Linux-only)")
 
 
 def add_salt(ap, fk_salt, dk_salt, ah_salt):

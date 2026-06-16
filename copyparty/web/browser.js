@@ -8999,6 +8999,13 @@ var msel = (function () {
 			return;
 		}
 
+		if (this.status == 405) {
+			tb.value = '';
+			sf.textContent = 'already existed';
+			treectl.goto(this.vp + uricom_enc(this.dn) + '/', true);
+			return tree_scrollto();
+		}
+
 		xhrchk(this, L.fd_xe1, L.fd_xe2);
 
 		if (this.status !== 201) {

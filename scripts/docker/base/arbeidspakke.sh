@@ -1,9 +1,13 @@
 #!/bin/ash
 set -e
 
+AVER=3.24
+
 [ $1 = 1 ] && hub=1
 
 uname -a
+apk update
+apk upgrade -al
 apk add alpine-sdk doas wget
 echo permit nopass root > /etc/doas.d/u.conf
 cp -pv /root/.abuild/*.pub /etc/apk/keys/ || abuild-keygen -ina
@@ -13,7 +17,7 @@ cp -pv /root/.abuild/*.pub /etc/apk/keys/ || abuild-keygen -ina
 
 mkdir /ffmpeg
 cd /ffmpeg
-base=https://github.com/alpinelinux/aports/raw/refs/heads/3.23-stable/community/ffmpeg/
+base=https://github.com/alpinelinux/aports/raw/refs/heads/$AVER-stable/community/ffmpeg/
 wget ${base}APKBUILD
 awk <APKBUILD -vb="$base" '/"/{o=0}/^source=/{o=1;next}o{print b $1}' | wget -i-
 cp -pv APKBUILD /root/
@@ -29,16 +33,23 @@ prepare() {
     default_prepare
     tar -cC/opt/patch/ffmpeg . | tar -x
     patch -p1 <aac-lc-only.patch
+
+    awk >t <libavcodec/aac/aacdec_tab.c '/^[^ \t]/{o=0} /^(static|const).*( sbr_|_hcod)/{o=1} !o{print;next} {gsub(/\{ *-?[0-9]+, *-?[0-9]+ *\}/, "{ 1, 1 }")}1'
+    mv t libavcodec/aac/aacdec_tab.c
+
+    # invent the missing disable-option for this crap
+    sed -ri 's/(^v4l2_m2m_deps=")/\1videotoolbox /' configure
 }
 EOF
 
 ##
 ## shrink-ray
 
-sed -ri 's/--enable-lib(bluray|placebo|rav1e|shaderc)/--disable-lib\1/; s/--enable-(vdpau)/--disable-\1/; s/\b(rav1e|shaderc)-dev//; s/\blib(bluray|placebo|vdpau|xfixes)-dev\b//' APKBUILD
+sed -ri 's/--enable-lib(bluray|dvdnav|dvdread|placebo|rav1e|shaderc)/--disable-lib\1/; s/--enable-(vdpau)/--disable-\1/; s/\b(rav1e|shaderc)-dev//; s/\blib(bluray|placebo|vdpau|xfixes)-dev\b//' APKBUILD
 # `- rm placebo+shaderc to drop spirv-tools (1.7 MiB apk)
 
-sed -ri 's/--enable-libxcb/--disable-libxcb --disable-indev=xcbgrab --disable-ffplay --disable-encoder=opus /' APKBUILD
+sed -ri 's/--enable-libxcb/--disable-libxcb --disable-indev=xcbgrab --disable-ffplay --disable-encoder=opus --disable-decoder=metasound --disable-decoder=twinvq/' APKBUILD
+# `- metasound+twinvq = +450 KiB apk
 sed -ri 's/\bffplay$//; s/\bsdl2-dev\b//' APKBUILD
 
 ##
@@ -52,6 +63,8 @@ sed -ri 's/(--disable-vulkan)/\1 --disable-devices --disable-hwaccels --disable-
 # `- s/av1/libdav1d/; s/libvorbis/vorbis/; s/opus/libopus/; libvorbis and mpg123 gets pulled in by openmpt 
 }
 
+[ $1 -gt 1 ] && sed -ri 's/(--disable-libxcb )/\1--disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages /' APKBUILD
+
 p=/root/packages/$(abuild -A)
 rm -rf $p
 abuild -FrcK
@@ -59,6 +72,7 @@ abuild -FrcK
 mkdir $p/ex
 mv $p/ffmpeg-d* $p/ex  # dbg,dev,doc
 cp -pv src/ffmpeg-*/ffbuild/config.log $p/
+#tar -cz src > $p/.tar
 
 [ $hub ] && rm -rf $p.hub && mv $p $p.hub
 
