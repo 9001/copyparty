@@ -3499,6 +3499,11 @@ class HttpCli(object):
             if self.do_log:
                 self.log("WOPI POST 'contents': %s" % (full_path))
 
+            last_mod_time = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path)))
+            if self.headers["x-cool-wopi-timestamp"] != last_mod_time:
+                self.reply(json.dumps({"COOLStatusCode": 1010}).encode("utf-8"), 409)
+                return True
+
             reader, _ = self.get_body_reader()
             buf = b""
             for rbuf in reader:
@@ -3510,11 +3515,11 @@ class HttpCli(object):
                 with open(full_path, "wb") as file:
                     file.write(buf)
 
-                mod_time = {
+                new_mod_time = {
                     "LastModifiedTime": 
                         time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path)))
                 }
-                ret = json.dumps(mod_time).encode("utf-8", "replace")
+                ret = json.dumps(new_mod_time).encode("utf-8", "replace")
                 self.reply(ret, 200, "application/json; charset=utf-8")
                 return True
 
