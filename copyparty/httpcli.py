@@ -1610,7 +1610,7 @@ class HttpCli(object):
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="icon" href="%s" />
-    <title>Loading...</title>
+    <title>%s</title>
     <style>
         body {
             margin: 0;
@@ -1641,7 +1641,7 @@ class HttpCli(object):
 </body>
 </html>
 """
-            % (favicon_url, url, session_key)
+            % (favicon_url, self.uparam["wopi"], url, session_key)
         ]
 
         bret = "".join(ret).encode("utf-8", "replace")
