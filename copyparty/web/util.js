@@ -877,6 +877,16 @@ function url_enc(txt) {
     return ret.join('/');
 }
 
+function uri2txt(txt, unslash) {
+    try {
+      txt = decodeURIComponent(txt.split('?')[0]);
+    }
+    catch (ex) {
+        console.log("ucd-err [" + txt + "]");
+    }
+    return unslash ? txt.replace(/\/$/, '') : txt;
+}
+
 
 function uricom_dec(txt) {
     try {

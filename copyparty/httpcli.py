@@ -7470,10 +7470,10 @@ class HttpCli(object):
             if doctxt is not None:
                 j2a["doc"] = doctxt
 
+        dirs.sort(key=itemgetter("name"))
+
         for d in dirs:
             d["name"] += "/"
-
-        dirs.sort(key=itemgetter("name"))
 
         if is_opds:
             # OpenSearch Description format requires a full-qualified URL and a "Short Name" under 16 characters
