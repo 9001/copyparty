@@ -2300,13 +2300,13 @@ function MPlayer() {
 	r.cd_pause = 0;
 
 	var re_audio = have_acode && mpl.ac_oth ? re_au_all : re_au_native,
-		trs = QSA('#files tbody tr');
+		trs = QSA('#files tbody tr'),
+		links = QSA('#files tbody a[id]');
 
 	for (var a = 0, aa = trs.length; a < aa; a++) {
-		var tds = trs[a].getElementsByTagName('td'),
-			link = tds[3].getElementsByTagName('a');
+		var tds = trs[a].getElementsByTagName('td');
+		var link = links[a];
 
-		link = link[link.length - 1];
 		var url = link.getAttribute('href'),
 			fn = url.split('?')[0];
 
@@ -6514,7 +6514,7 @@ window.thegrid = (function () {
 		var html = [],
 			svgs = new Set(),
 			max_svgs = CHROME ? 500 : 5000,
-			files = QSA('#files>tbody>tr>td:nth-child(3) a[id]');
+			files = QSA('#files>tbody>tr>td a[id]');
 
 		for (var a = 0, aa = files.length; a < aa; a++) {
 			var ao = files[a],
