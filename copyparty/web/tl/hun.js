@@ -226,7 +226,7 @@ Ls.hun = {
 
 	"ct_grid": '田 rács nézet',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ segítő szövegek',
-	"ct_thumb": 'rács nézetben ikonok/indexképek váltása$Ngyorsbillentyű: T">🖼️ képek',
+	"ct_thumb": 'ikonok/indexképek váltása$Ngyorsbillentyű: T">🖼️ képek',
 	"ct_csel": 'kijelölés CTRL és SHIFT gombokkal rács nézetben">kijelölés',
 	"ct_dsel": 'kijelölés egérhúzással rács nézetben">húzás',
 	"ct_dl": 'azonnali letöltés (beágyazás helyett)">letöltés',

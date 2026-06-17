@@ -224,7 +224,7 @@ Ls.spa = {
 
 	"ct_grid": '田 cuadrícula',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
-	"ct_thumb": 'en vista de cuadrícula, alternar iconos o miniaturas$NAtajo: T">🖼️ miniaturas',
+	"ct_thumb": 'alternar iconos o miniaturas$NAtajo: T">🖼️ miniaturas',
 	"ct_csel": 'usa CTRL y SHIFT para seleccionar archivos en la vista de cuadrícula">sel',
 	"ct_dsel": 'usa la selección por arrastre en la vista de cuadrícula">arrastrar', //m
 	"ct_dl": 'forzar descarga (no mostrar en línea) al hacer clic en un archivo">dl', //m

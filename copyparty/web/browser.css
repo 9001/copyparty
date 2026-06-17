@@ -522,6 +522,7 @@ html.dy #files tr.sel a.play {
 	color: #fff;
 }
 html.dy tr.play td:nth-child(1) a {
+  color: #000;
   background: #fff;
   border: #000 solid 1px;
 }
@@ -742,6 +743,7 @@ a:hover {
 	color: var(--a-hil);
 	background: var(--a-h-bg);
 }
+#files .imgcontainer:hover,
 #files a:hover {
 	color: var(--fg-max);
 	background: color-mix(in oklab, var(--a) 20%, transparent);
@@ -785,10 +787,6 @@ a:hover {
 a.dir {
 	color: #3584e4;
 	color: var(--a);
-}
-tr.dir td:nth-child(2) a::before {
-	content: "📁";
-	margin: 0 .1em 0 -.2em;
 }
 #files thead th {
 	padding: .3em;
@@ -844,7 +842,7 @@ html.y #files tr.fade a {
 	border-radius: 0 5px 5px 0;
 	border-radius: 0 var(--radius) var(--radius) 0;
 }
-#files tbody td:nth-child(3) {
+#files tbody td:nth-child(4) {
 	font-family: 'scp', monospace, monospace;
 	font-family: var(--font-mono), 'scp', monospace, monospace;
 	text-align: right;
@@ -1049,9 +1047,6 @@ tr td:nth-child(1) a {
 	padding: .3em;
 	margin: -.3em;
 } */
-tr.play td:nth-child(2) a::before {
-  content: "▶";
-}
 tr.play td:nth-child(1) a {
   background: var(--btn-1-bg);
   color:var(--btn-1-fg);
@@ -1118,10 +1113,14 @@ tr.play td:nth-child(1) a {
 	/* separate to allow IE to only use this rule */
 	display: block;
 }
+#files .play .thumb,
+#files .play img,
 #ggrid>a.play .thumb,
 #ggrid>a.play img {
 	background: var(--bg-u2);
 }
+.thumb,
+.imgcontainer img,
 #ggrid>a .thumb,
 #ggrid>a img {
 	color: #3584e4;
@@ -1136,6 +1135,7 @@ tr.play td:nth-child(1) a {
 	height: calc(var(--grid-sz) - 2.5em);
 	object-fit: cover;
 }
+.imgcontainer img,
 #ggrid>a img {
 	position: absolute;
 	opacity: 0;
@@ -1169,6 +1169,10 @@ tr.play td:nth-child(1) a {
 	margin: -3px -2px;
 	padding: 4px 3px;
 	justify-content: center;
+}
+#files .imgcontainer img,
+#files .imgcontainer {
+	border-radius: 0;
 }
 .th_ext {
 	z-index: 2;
@@ -2197,7 +2201,7 @@ input.ssconf_v {
 	margin: 0 .1em 0 0;
 }
 
-#files td div span {
+#files td div:not(.imgcontainer) span {
 	color: var(--fg-max);
 	padding: 0 .4em;
 	font-weight: bold;
@@ -2501,8 +2505,46 @@ html.b .btn {
 #files td.min {
 	display: none;
 }
-#files td:nth-child(2n) {
+#files td:nth-child(3){
 	color: var(--tab-alt);
+}
+#files td:has(.imgcontainer) {
+	padding: 0 1px;
+}
+#files .imgcontainer {
+	width: 2.3em;
+	height: 2.3em;
+	cursor: pointer;
+	margin: 0;
+	padding: 0;
+}
+#files .play .imgcontainer {
+	margin: -2px 0px;
+	padding: 2px;
+}
+#files .thumb,
+#files img {
+	height: 100%;
+}
+#files tbody tr.sel span.th_ext span,
+#files tbody tr.sel span.th_ext {
+	background: none;
+}
+#files .dir.thumbed img,
+#files .dir .thumbed img {
+	position: absolute;
+	opacity: .6;
+}
+#files .dir.thumbed .thumb,
+#files .dir .thumbed .thumb {
+	display: block !important;
+	z-index: 2;
+}
+#files .au .imgcontainer::after {
+  content: "▶";
+  position: absolute;
+  z-index: 2;
+  top: .6em;
 }
 #plazy {
 	width: 1px;
@@ -2542,7 +2584,6 @@ html.b .btn {
 	padding: 0;
 }
 .disabled,
-#thumbs,
 #au_prescan,
 #au_fullpre,
 #au_os_seek,
@@ -2556,7 +2597,6 @@ html.b .btn {
 #up_quick.disabled {
 	display: none;
 }
-.setting:has(#griden.on)+.setting #thumbs,
 .setting:has(#au_preload.on)+.setting #au_prescan,
 .setting:has(#au_preload.on)+.setting #au_prescan,
 .setting:has(#au_preload.on)~.setting #au_fullpre,
@@ -5237,7 +5277,8 @@ html.e #tree_footer {
 	background: transparent;
 }
 html.e #wrap {
-	padding: 0;
+	padding-left: 0;
+	padding-right: 0;
 }
 html.e #pathBar {
 	padding: 0;
@@ -5584,8 +5625,8 @@ html.f #ggrid > a.sel:hover .imgcontainer::before {
 	border-color: var(--g-fsel-bg) transparent transparent var(--g-fsel-bg);
 }
 /* #wrap:not(.thin) .ghead::after, */
-html.f .dir.thumbed .imgcontainer::before,
-html.f .au.thumbed:not(.play) .imgcontainer::before {
+html.f #ggrid .dir.thumbed .imgcontainer::before,
+html.f #ggrid .au.thumbed:not(.play) .imgcontainer::before {
 	content: "";
 	position: absolute;
 	left: 0;

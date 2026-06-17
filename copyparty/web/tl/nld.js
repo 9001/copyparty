@@ -225,7 +225,7 @@ Ls.nld = {
 
 	"ct_grid": '田 grid',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
-	"ct_thumb": 'In grid-overzicht, wissel tussen iconen of thumbnails$NHotkey: T">🖼️ thumbs',
+	"ct_thumb": 'wissel tussen iconen of thumbnails$NHotkey: T">🖼️ thumbs',
 	"ct_csel": 'Gebruik CTRL en SHIFT voor de bestand selectie in grid-overzicht>sel',
 	"ct_dsel": 'Gebruik slepen om te selecteren in grid-overzicht>slepen', //m
 	"ct_dl": 'download afdwingen (niet inline weergeven) wanneer op een bestand wordt geklikt">dl', //m

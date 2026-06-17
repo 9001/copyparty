@@ -225,7 +225,7 @@ Ls.fra = {
 
 	"ct_grid": '田 grille',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ infobulles',
-	"ct_thumb": 'vue en grille, activer les icônes ou les miniatures$NHotkey: T">🖼️ minia',
+	"ct_thumb": 'activer les icônes ou les miniatures$NHotkey: T">🖼️ minia',
 	"ct_csel": 'utiliser CTRL et MAJ pour selectioner des fichiers en vue en grille">sel',
 	"ct_dsel": 'utiliser la sélection par glisser en vue en grille">glisser', //m
 	"ct_dl": 'forcer le téléchargement (ne pas afficher en ligne) lorsqu’un fichier est cliqué">dl', //m

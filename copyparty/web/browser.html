@@ -259,7 +259,7 @@
 				{%- for f in files %}
 				<tr>
 					<td>{{ f.lead }}</td>
-					<td><a href="{{ f.href }}">{{ f.name|e }}</a></td>
+					<td><a href="{{ f.href }}" class="flink">{{ f.name|e }}</a></td>
 					<td>{{ f.sz }}</td>
 					{%- if f.tags is defined %}
 					{%- for k in taglist %}

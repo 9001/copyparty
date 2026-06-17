@@ -222,7 +222,7 @@ Ls.nor = {
 
 	"ct_grid": '田 ikoner',
 	"ct_ttips": 'vis hjelpetekst ved å holde musen over ting">ℹ️ tips',
-	"ct_thumb": 'vis miniatyrbilder istedenfor ikoner$NSnarvei: T">🖼️ bilder',
+	"ct_thumb": 'vis miniatyrbilder isteden for ikoner$NSnarvei: T">🖼️ bilder',
 	"ct_csel": 'bruk tastene CTRL og SHIFT for markering av filer i ikonvisning">merk',
 	"ct_dsel": 'marker filer med klikk-og-dra i ikonvisning">dsel',
 	"ct_dl": 'last ned filer (ikke vis i nettleseren)">dl',

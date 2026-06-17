@@ -288,7 +288,7 @@ window.baguetteBox = (function () {
         var galleries = data[selector].galleries;
         [].forEach.call(galleries, function (gallery) {
             [].forEach.call(gallery, function (imageItem) {
-                //unbind(imageItem.imageElement, 'click', imageItem.eventHandler);
+                unbind(imageItem.imageElement, 'click', imageItem.eventHandler);
             });
 
             if (currentGallery === gallery)
@@ -742,7 +742,7 @@ window.baguetteBox = (function () {
     }
 
     function showOverlay(chosenImageIndex) {
-        clmod(ebi('ggrid'), 'waiting', true);
+        clmod(ebi('wrap'), 'waiting', true);
 
         if (options.noScrollbars) {
             var a = document.documentElement.style.overflowY,
@@ -767,7 +767,7 @@ window.baguetteBox = (function () {
         loadImage(currentIndex, function () {
             preloadNext(currentIndex);
             preloadPrev(currentIndex);
-            clmod(ebi('ggrid'), 'waiting', false);
+            clmod(ebi('wrap'), 'waiting', false);
         });
 
         show_buttons(0);
@@ -796,7 +796,6 @@ window.baguetteBox = (function () {
     function hideOverlay(e, dtor) {
         ev(e);
         playvid(false);
-        removeFromCache('#files');
         if (options.noScrollbars) {
             document.documentElement.style.overflowY = scrollCSS[0];
             document.body.style.overflowY = scrollCSS[1];

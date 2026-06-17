@@ -225,7 +225,7 @@ Ls.deu = {
 
 	"ct_grid": '田 Das Raster&trade;',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ Tooltips',
-	"ct_thumb": 'In Raster-Ansicht, zwischen Icons und Vorschau wechseln$NHotkey: T">🖼️ Vorschaubilder',
+	"ct_thumb": 'Zwischen Icons und Vorschau wechseln$NHotkey: T">🖼️ Vorschaubilder',
 	"ct_csel": 'Benutze STRG und UMSCHALT für Dateiauswahl in Raster-Ansicht">sel',
 	"ct_dsel": 'Ziehauswahl in Raster-Ansicht verwenden">ziehen', //m
 	"ct_dl": 'Beim Klick auf Dateien sie immer herunterladen (nicht einbetten)">dl',

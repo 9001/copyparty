@@ -225,7 +225,7 @@ Ls.fin = {
 
 	"ct_grid": '田 kuvanäkymä',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ vihjelaatikot',
-	"ct_thumb": 'valitse kuvakkeiden / pienoiskuvien välillä kuvanäkymässä $NPikanäppäin: T">🖼️ pienoiskuvat',
+	"ct_thumb": 'valitse kuvakkeiden / pienoiskuvien välillä $NPikanäppäin: T">🖼️ pienoiskuvat',
 	"ct_csel": 'käytä CTRL ja SHIFT tiedostojen valintaan kuvanäkymässä">valitse',
 	"ct_dsel": 'käytä aluevalintaa tiedostojen valintaan kuvanäkymässä">aluevalinta',
 	"ct_dl": 'pakota lataus (älä näytä upotettuna), kun tiedostoa klikataan">dl',

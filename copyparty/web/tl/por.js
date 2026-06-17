@@ -225,7 +225,7 @@ Ls.por = {
 
 	"ct_grid": '田 a grade',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ dicas de ferramentas',
-	"ct_thumb": 'na visualização de grade, alternar entre ícones ou miniaturas$NHotkey: T">🖼️ miniaturas',
+	"ct_thumb": 'alternar entre ícones ou miniaturas$NHotkey: T">🖼️ miniaturas',
 	"ct_csel": 'usar CTRL e SHIFT para seleção de arquivo na visualização de grade">sel',
 	"ct_dsel": 'usar seleção por arrasto na visualização de grade">arrastar',
 	"ct_dl": 'forçar download (não exibir na página) ao clicar em um arquivo">dl',
