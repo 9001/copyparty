@@ -1529,7 +1529,7 @@ ebi('radius').oninput = function () {
 
 	var usefallback = isNaN(r) || r < 0 || r === '';
 	var setV = usefallback ? '' : (r + 'px');
-	swrite('radius', !usefallback && r);
+	swrite('radius', !usefallback ? r : '');
 	document.documentElement.style.setProperty('--radius', setV);
 	console.log(setV);
 }
