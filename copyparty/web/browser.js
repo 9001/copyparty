@@ -7574,7 +7574,7 @@ var search_ui = (function () {
 
 		var html = mk_files_header(tagord), seen = {};
 		html.push('<tbody>');
-		html.push('<tr class="srch_hdr"><td>-</td><td><a href="#" id="unsearch"><big style="font-weight:bold">[❌] ' + L.sl_close + '</big></a> -- ' + L.sl_hits.format(res.hits.length) + (res.trunc ? ' -- <a href="#" id="moar">' + L.sl_moar + '</a>' : '') + '</td></tr>');
+		html.push('<tr class="srch_hdr"><td>-</td><td></td><td><a href="#" id="unsearch" class="flink"><big style="font-weight:bold">[❌] ' + L.sl_close + '</big></a> -- ' + L.sl_hits.format(res.hits.length) + (res.trunc ? ' -- <a href="#" id="moar">' + L.sl_moar + '</a>' : '') + '</td></tr>');
 
 		for (var a = 0; a < res.hits.length; a++) {
 			var r = res.hits[a],
@@ -7592,8 +7592,8 @@ var search_ui = (function () {
 			if (ext.length > 8)
 				ext = '%';
 
-			var links = linksplit(r.rp + '', null, id).join('<span>/</span>'),
-				nodes = ['<tr class="' + (img_re.exec(r.rp) ? 'img ' : '') + '"><td>-</td><td><div>' + links +
+			var links = linksplit(r.rp + '', null, id, true).join('<span>/</span>'),
+				nodes = ['<tr class="' + (img_re.exec(r.rp) ? 'img ' : '') + '"><td>-</td><td></td><td><div>' + links +
 					'</div></td><td sortv="' + sz + '">' + hsz];
 
 			for (var b = 0; b < tagord.length; b++) {

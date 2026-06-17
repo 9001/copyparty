@@ -779,7 +779,7 @@ function assert_vp(path) {
 }
 
 
-function linksplit(rp, base, id) {
+function linksplit(rp, base, id, flink) {
     var ret = [],
         apath = base || '/',
         q = null;
@@ -816,7 +816,7 @@ function linksplit(rp, base, id) {
                 link += '" id="' + id;
         }
 
-        ret.push('<a href="' + apath + link + '">' + vlink + '</a>');
+        ret.push('<a href="' + apath + link + '" class="' + (!rp ? 'flink' : '') + '">' + vlink + '</a>');
         apath += link;
     }
     return ret;
