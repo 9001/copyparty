@@ -2304,7 +2304,7 @@ function MPlayer() {
 
 	for (var a = 0, aa = trs.length; a < aa; a++) {
 		var tds = trs[a].getElementsByTagName('td'),
-			link = tds[2].getElementsByTagName('a');
+			link = tds[3].getElementsByTagName('a');
 
 		link = link[link.length - 1];
 		var url = link.getAttribute('href'),
