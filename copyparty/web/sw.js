@@ -17,8 +17,9 @@ if ('serviceWorker' in navigator) {
             const responseUrl = '/'; // (ToDo: remember last upload dir)
             // ToDo: keep file references in clipboard
             // -> upload on paste
-            alert(files)
-            return Response.redirect(responseUrl, 303);
+            event.respondWith(fetch(event.request));
+            alert(files);
+            return;
             })(),
         );
     });
