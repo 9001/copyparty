@@ -679,7 +679,8 @@ html .ayjump:focus-visible {
 #bbox-btns .x,
 #qs_btns a .x {
 	line-height: .6em;
-	vertical-align: center;
+	vertical-align: middle;
+  	vertical-align: center;
 }
 #moresearch span {
 	font-size: .6em;

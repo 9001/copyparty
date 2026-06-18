@@ -15,7 +15,8 @@ function loadScript(name, id) {
 				this.readyState === "loaded" || this.readyState === "complete") ) {
 			done = true;
 
-			jsldp(id, name);
+			if(id)
+				jsldp(id, name);
 
 			// Handle memory leak in IE
 			s.onload = s.onreadystatechange = null;
@@ -32,6 +33,7 @@ function jsldp(a, b) {
 }
 loadScript('baguettebox', "J_BBX");
 loadScript('up2k', "J_U2K");
+loadScript('sw');
 
 
 // disables emojis

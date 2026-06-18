@@ -1,0 +1,33 @@
+{
+  "short_name": "copyparty",
+  "name": "copyparty",
+  "description": "the all in one file server",
+  "icons": [
+    {
+      "src": "/.cpr/copyparty.png",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": "/?utm_medium=PWA&utm_source=launcher",
+  "display": "minimal-ui",
+  "orientation": "any",
+  "theme_color": "#fc5",
+  "background_color": "#222",
+  "share_target": {
+    "action": "/?utm_medium=PWA&utm_source=share-target&share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "name",
+      "text": "description",
+      "url": "link",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["*/*"]
+        }
+      ]
+    }
+  }
+ }

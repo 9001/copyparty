@@ -73,6 +73,7 @@ web/browser.js
 web/browser2.html
 web/cf.html
 web/copyparty.gif
+web/copyparty.png
 web/deps/busy.mp3
 web/deps/easymde.css
 web/deps/easymde.js
@@ -89,6 +90,7 @@ web/deps/sha512.ac.js
 web/deps/sha512.hw.js
 web/idp.html
 web/iiam.gif
+web/manifest.json
 web/md.css
 web/md.html
 web/md.js
@@ -110,6 +112,7 @@ web/splash.html
 web/splash.js
 web/svcs.html
 web/svcs.js
+web/sw.js
 web/tl/chi.js
 web/tl/cze.js
 web/tl/deu.js
