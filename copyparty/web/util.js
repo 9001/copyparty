@@ -2353,7 +2353,7 @@ function bchrome() {
         return;
 
     try {
-        v = cprop('--bg-u3');
+        v = cprop('--a');
     }
     catch (ex) { }
     o.setAttribute('content', v ? v : document.documentElement.className.indexOf('y') + 1 ? '#eee' : '#333');

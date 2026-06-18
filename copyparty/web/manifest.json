@@ -12,7 +12,7 @@
   "start_url": "/?utm_medium=PWA&utm_source=launcher",
   "display": "minimal-ui",
   "orientation": "any",
-  "theme_color": "#fc5",
+  "theme_color": "#222",
   "background_color": "#222",
   "share_target": {
     "action": "/?utm_medium=PWA&utm_source=share-target&share-target",
