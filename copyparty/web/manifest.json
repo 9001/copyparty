@@ -4,7 +4,7 @@
   "description": "the all in one file server",
   "icons": [
     {
-      "src": "/.cpr/copyparty.png",
+      "src": "/.cpr/copyparty.svg",
       "sizes": "512x512",
       "type": "image/svg+xml"
     }
