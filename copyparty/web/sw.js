@@ -4,7 +4,7 @@
 if ('serviceWorker' in navigator) {
     self.addEventListener("fetch", (event) => {
         // Regular requests not related to Web Share Target.
-        if (event.request.method !== "POST" || !event.request.enctype.has("share-target")) {
+        if (event.request.method !== "POST" || !event.request.action.has("share-target")) {
             event.respondWith(fetch(event.request));
             return;
         }
@@ -22,22 +22,5 @@ if ('serviceWorker' in navigator) {
             return;
             })(),
         );
-    });
-
-    window.addEventListener('load', async () => {
-        try {
-            const registration = await navigator.serviceWorker.register("/.cpr/w/sw.js", {
-                scope: "/",
-            });
-            if (registration.installing) {
-                console.log("Service worker installing");
-            } else if (registration.waiting) {
-                console.log("Service worker installed");
-            } else if (registration.active) {
-                console.log("Service worker active");
-            }
-        } catch (error) {
-            console.error(`Registration failed with ${error}`);
-        }
     });
 }

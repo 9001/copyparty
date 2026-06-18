@@ -2421,4 +2421,25 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
     return fun(0, prefix + xhr.status + ": " + errtxt, tag);
 }
 
+// register service worker
+// ToDo: set http header: Service-Worker-Allowed: /
+// otherwise it will fail to register
+// https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
+window.addEventListener('load', async () => {
+	try {
+		const registration = await navigator.serviceWorker.register("/.cpr/w/sw.js", {
+			scope: "/",
+		});
+		if (registration.installing) {
+			console.log("Service worker installing");
+		} else if (registration.waiting) {
+			console.log("Service worker installed");
+		} else if (registration.active) {
+			console.log("Service worker active");
+		}
+	} catch (error) {
+		console.error(`Registration failed with ${error}`);
+	}
+});
+
 J_UTL = 2;
