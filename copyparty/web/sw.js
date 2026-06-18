@@ -13,42 +13,30 @@ if ('serviceWorker' in navigator) {
         event.respondWith(
             (async () => {
             const formData = await event.request.formData();
-            const link = formData.get("link") || "";
-            // Instead of the original URL `/save-bookmark/`, redirect
-            // the user to a URL returned by the `saveBookmark()`
-            // function, for example, `/`.
-            const responseUrl = await saveBookmark(link);
+            const files = formData.get("files") || "";
+            const responseUrl = '/'; // (ToDo: remember last upload dir)
+            // ToDo: keep file references in clipboard
+            // -> upload on paste
+            alert(files)
             return Response.redirect(responseUrl, 303);
             })(),
         );
     });
+
     window.addEventListener('load', async () => {
         try {
-            const registration = await navigator.serviceWorker.register(
-                '/service-worker.js',
-                { scope: '/' }
-            );
-            console.log('SW registered:', registration.scope);
-
-            // Check for waiting update
-            if (registration.waiting) {
-                notifyUserOfUpdate(registration);
-            }
-
-            // Listen for future updates
-            registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                newWorker?.addEventListener('statechange', () => {
-                if (
-                    newWorker.state === 'installed' &&
-                    navigator.serviceWorker.controller
-                ) {
-                    notifyUserOfUpdate(registration);
-                }
+            const registration = await navigator.serviceWorker.register("/.cpr/w/sw.js", {
+                scope: "/",
             });
-        });
+            if (registration.installing) {
+                console.log("Service worker installing");
+            } else if (registration.waiting) {
+                console.log("Service worker installed");
+            } else if (registration.active) {
+                console.log("Service worker active");
+            }
         } catch (error) {
-            console.error('SW registration failed:', error);
+            console.error(`Registration failed with ${error}`);
         }
     });
 }

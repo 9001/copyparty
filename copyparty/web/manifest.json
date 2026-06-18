@@ -19,9 +19,9 @@
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
-      "title": "name",
-      "text": "description",
-      "url": "link",
+      "title": "share",
+      "text": "upload",
+      "url": "/",
       "files": [
         {
           "name": "files",
