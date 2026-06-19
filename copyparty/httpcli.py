@@ -336,6 +336,7 @@ class HttpCli(object):
         """returns true if connection can be reused"""
         self.out_headers = {
             "Cache-Control": "no-store, max-age=0",
+            "Service-Worker-Allowed": "/",
         }
 
         if self.args.early_ban and self.is_banned():
