@@ -978,6 +978,7 @@ ebi('widget').innerHTML = (
 			'<span id="wfm"><a' +
 				' href="#" id="fclr"><span class="x">×</span><span>cancel</span></a><a' +
 				' href="#" id="fshr" tt="' + L.wt_shr + '">📨<span>share</span></a><a' +
+				' href="#" id="fcpl" tt="' + L.rc_cpl + '">🔗<span>link</span></a><a' +
 				' href="#" id="fren" tt="' + L.wt_ren + '">' + (fun_tgl ? '✏️' : '✎') + '<span>name</span></a><a' +
 				' href="#" id="fdel" tt="' + L.wt_del + '">🗑️<span>del.</span></a><a' +
 				' href="#" id="fcut" tt="' + L.wt_cut + '">' + (fun_tgl ? '✂️' : '✂') + '<span>cut</span></a><a' +
@@ -4599,6 +4600,7 @@ var fileman = (function () {
 		bcpy = ebi('fcpy'),
 		bpst = ebi('fpst'),
 		bshr = ebi('fshr'),
+		bcpl = ebi('fcpl'),
 		bclr = ebi('fclr'),
 		t_paste,
 		r = {};
@@ -4631,6 +4633,7 @@ var fileman = (function () {
 			hcut = !(have_mv && has(perms, 'move')) || !nsel,
 			hpst = !(have_mv && has(perms, 'write')) || !enpst,
 			hshr = !can_shr || !get_evpath().indexOf(have_shr),
+			hcpl = !nsel,
 			enclr = enpst || nsel;
 
 		if (!(enren || endel || encut || enpst))
@@ -4642,6 +4645,7 @@ var fileman = (function () {
 		clmod(bcpy, 'en', encpy);
 		clmod(bpst, 'en', enpst);
 		clmod(bshr, 'en', 1);
+		clmod(bcpl, 'en', 1);
 		clmod(bclr, 'en', 1);
 
 		clmod(bren, 'hide', hren);
@@ -4650,6 +4654,7 @@ var fileman = (function () {
 		clmod(bcpy, 'hide', !encpy);
 		clmod(bpst, 'hide', !enpst);
 		clmod(bshr, 'hide', hshr);
+		clmod(bcpl, 'hide', hcpl);
 		clmod(bclr, 'hide', !enclr);
 
 		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
@@ -4893,6 +4898,35 @@ var fileman = (function () {
 
 		setTimeout(sh_pw.focus.bind(sh_pw), 1);
 	};
+
+	r.link = function (e) {
+		var sel = msel.getsel(),
+			vps = [];
+
+		for (var a = 0; a < sel.length; a++)
+			vps.push(ebi(sel[a].id).href);
+
+		if (!sel.length)
+			return toast.err(3, L.fd_emore);
+
+		ev(e);
+
+		let shareData = {
+			title: (sel.length > 1 ? 'Sharing files from ' : 'Sharing a file from ') + 
+				ebi('srv_name').textContent,
+			url: vps.join('\n'),
+		};
+		if(navigator.canShare && (MOBILE || !FIREFOX)){
+			//desktop firefox CAN technically use this, but it sucks :P
+			// within 2min of testing on KDE i encountered the share being broken until browser restart
+			// + FF copying the "file", which can't be pasted depending on get perms, with no fallback,
+			// so for example pasting in discord didn't work ~Til 2026-06-19
+			if(navigator.canShare(shareData))
+				navigator.share(shareData)
+		}
+		else
+			cliptxt(shareData.url, function () { toast.ok(2, L.clipped) }); 
+	}
 
 	r.rename = function (e) {
 		ev(e);
@@ -5717,6 +5751,7 @@ var fileman = (function () {
 	bcpy.onclick = r.cpy;
 	bpst.onclick = r.paste;
 	bshr.onclick = r.share;
+	bcpl.onclick = r.link;
 	bclr.onclick = r.clear;
 
 	return r;
@@ -10918,18 +10953,7 @@ var rcm = (function () {
 				case 'pla': play('f-' + selFile.id); break;
 				case 'txt': showfile.show(selFile.name); break;
 				case 'md': location = selFile.path + (has(selFile.path, '?') ? '&v' : '?v'); break;
-				case 'cpl': 
-					if(navigator.canShare){
-						let shareData = {
-							title: selFile.name,
-							url: selFile.url,
-						};
-						if(navigator.canShare(shareData))
-							navigator.share(shareData)
-					}
-					else
-						cliptxt(selFile.url, function () { toast.ok(2, L.clipped) }); 
-					break;
+				case 'cpl': fileman.link(); break;
 				case 'dl': ebi('seldl').click(); break;
 				case 'zip': ebi('selzip').click(); break;
 				case 'del': fileman.delete(); break;

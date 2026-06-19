@@ -1466,10 +1466,10 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	white-space: nowrap;
 	text-align: center;
 	max-width: 79vw;
-	max-width: calc(100% - 3.5em);
+	max-width: calc(100% - 3.4em);
 	overflow-x: auto;
 	overflow-y: hidden;
-	margin: 0 .1em .1em .2em;
+	margin: 0 .1em .1em .1em;
 	box-shadow: 0 0 .5em var(--mp-sh);
 	border-radius: 5px;
 	border-radius: var(--radius);
@@ -1605,7 +1605,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 #wtoggle a {
 	font-size: .5em;
 	padding: .5em .5em;
-	margin: 0em .1em -.3em .1em;
+	margin: 0em .1em -.23em .1em;
 	display: inline-block;
 }
 #wtoggle #zip1 {
@@ -4293,7 +4293,6 @@ html.e #wrap.thin .ghead {
 	#wtoggle.sel {
 		display: block;
 		max-width: 100%;
-		margin: 0 .1em .1em .1em;
 	}
 	#wstack.sel #up_quick,
 	#wstack.sel #wtico {
