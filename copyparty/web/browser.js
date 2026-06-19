@@ -9807,6 +9807,7 @@ var msel = (function () {
 			r.all = null;
 
 		clmod(ebi('wtoggle'), 'sel', r.getsel().length);
+		clmod(ebi('wstack'), 'sel', r.getsel().length);
 		thegrid.loadsel();
 		fileman.render();
 		showfile.updtree();

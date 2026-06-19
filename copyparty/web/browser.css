@@ -4290,6 +4290,15 @@ html.e #wrap.thin .ghead {
 	#widget {
 		font-size: 1.4em;
 	}
+	#wtoggle.sel {
+		display: block;
+		max-width: 100%;
+		margin: 0 .1em .1em .1em;
+	}
+	#wstack.sel #up_quick,
+	#wstack.sel #wtico {
+		display: none;
+	}
 	#pathBar {
 		display: block;
 		padding: .5em 1em;
