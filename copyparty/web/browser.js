@@ -10917,7 +10917,18 @@ var rcm = (function () {
 				case 'pla': play('f-' + selFile.id); break;
 				case 'txt': showfile.show(selFile.name); break;
 				case 'md': location = selFile.path + (has(selFile.path, '?') ? '&v' : '?v'); break;
-				case 'cpl': cliptxt(selFile.url, function () { toast.ok(2, L.clipped) }); break;
+				case 'cpl': 
+					if(navigator.canShare){
+						let shareData = {
+							title: selFile.name,
+							url: selFile.url,
+						};
+						if(navigator.canShare(shareData))
+							navigator.share(shareData)
+					}
+					else
+						cliptxt(selFile.url, function () { toast.ok(2, L.clipped) }); 
+					break;
 				case 'dl': ebi('seldl').click(); break;
 				case 'zip': ebi('selzip').click(); break;
 				case 'del': fileman.delete(); break;
