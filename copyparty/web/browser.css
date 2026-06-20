@@ -5802,7 +5802,7 @@ html.f .th_ext .inner {
 
 html.fz {
 	--bg: #2e258c;
-	--bg: hsl(from var(--a) calc(h * 2.5 + 85) calc(s * .6) calc(l * .7));
+	--bg: hsl(from var(--a) calc(h * 2.5 + 55) calc(s * .6) calc(l * .7));
 	--a2: hsl(from var(--bg) calc(h - 40) calc(s * 1.2) calc(l * 1.4));
 }
 html.fz #wrap::before {
