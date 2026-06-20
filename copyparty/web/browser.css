@@ -624,8 +624,8 @@ html .ayjump:focus-visible {
 	top: 0;
 	margin: 0 -.6em;
 }
-#wfp.shifted {
-	margin-left: 2em;
+#pathBar.shifted {
+	padding-left: 3.7em;
 }
 #path {
 	position: relative;
@@ -4204,8 +4204,8 @@ html.d #treepar {
 #pathBar.thin #path a {
 	padding-top: .45em;
 }
-#pathBar.thin #wfp.shifted {
-	margin-left: 2.5em;
+#pathBar.thin.shifted {
+	padding-left: 3.5em;
 }
 #pathBar.thin #actionsArea {
 	position: fixed;
@@ -4413,11 +4413,11 @@ html.e #wrap.thin .ghead {
 		padding: .5em;
 		padding-right: 2em;
 	}
-	#wfp,
-	#wfp.shifted,
-	#pathBar.thin #wfp,
-	#pathBar.thin #wfp.shifted {
-		margin-left: 2em;
+	#pathBar,
+	#pathBar.shifted,
+	#pathBar.thin,
+	#pathBar.thin.shifted {
+		padding-left: 3em;
 	}
 	#wrap.thin .ghead {
 		top: 7em;
@@ -5316,6 +5316,9 @@ html.e #pathBar {
 	top: 0;
 	background: var(--ttlbar);
 }
+html.e #pathBar.shifted {
+	padding-left: 2.5em;
+}
 html.e   #pathBar.thin #actionsArea {
 	top: 0 !important;
 }
@@ -5950,8 +5953,11 @@ html.fy #wfp .btn {
 	margin: 0;
 	border: none;
 }
-html.fy #wfp.shifted {
-	margin-left: 2.5em;
+html.fy #actionsArea {
+	margin-left: auto;
+}
+html.fy #pathBar.shifted {
+	padding-left: 3.5em;
 }
 html.fy #wfp .btn {
 	padding: .3em;

@@ -1852,16 +1852,18 @@ var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
 var x = '';
 if (!fullui) {
 	if (window.ui_nombar || /[?&]nombar\b/.exec(sloc0)) x += '#ops,';
-	if (window.ui_noacci || /[?&]noacci\b/.exec(sloc0)) x += '#acc_info,';
-	if (window.ui_nosrvi || /[?&]nosrvi\b/.exec(sloc0)) x += '#srv_info,#srv_info2,';
+	if (window.ui_noacci || /[?&]noacci\b/.exec(sloc0)) x += '#acc_info,#opa_acc,';
+	if (window.ui_nosrvi || /[?&]nosrvi\b/.exec(sloc0)) x += '#srv_info,#srv_info2,#tree_footer';
 	if (window.ui_nocpla || /[?&]nocpla\b/.exec(sloc0)) x += '#goh,';
 	if (window.ui_nolbar || /[?&]nolbar\b/.exec(sloc0)) x += '#wfp,';
+	if (nonav) x += '#path,';
 	if (window.ui_noctxb || /[?&]noctxb\b/.exec(sloc0)) x += '#wtoggle,';
 	if (window.ui_norepl || /[?&]norepl\b/.exec(sloc0)) x += '#repl,';
 }
 if (x)
 	document.head.appendChild(mknod('style', '', x.slice(0, -1) + '{display:none!important}'));
 
+if(nonav)
 
 if (location.pathname.indexOf('//') === 0)
 	hist_replace(location.pathname.replace(/^\/+/, '/'));
@@ -7978,14 +7980,13 @@ var treectl = (function () {
 	r.show = function (instant) {
 		r.hidden = false;
 		if (!entreed) {
-			ebi('path').style.display = nonav ? 'none' : 'inline-block';
 			return;
 		}
 
 		var tree = ebi('tree')
 		tree.style.display = 'block';
 		tree.style.width = 0;
-		clmod(ebi('wfp'), 'shifted', false);
+		clmod(ebi('pathBar'), 'shifted', false);
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
 
@@ -8034,7 +8035,7 @@ var treectl = (function () {
 		ebi('tree_footer').style.display = 'none';
 		ebi('widget').style.marginLeft = '0';
 		ebi('wrap').style.marginLeft = '';
-		clmod(ebi('wfp'), 'shifted', true);
+		clmod(ebi('pathBar'), 'shifted', true);
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
 		aligngriditems();
@@ -8949,6 +8950,8 @@ var treectl = (function () {
 	if (notree) {
 		cs = 'na';
 		r.detree(null, 1);
+		ebi('treeToggleBtn').style.display = 'none';
+		clmod(ebi('pathBar'), 'shifted', false);
 	}
 
 	if (cs == 'tree' || (cs != 'na' && vw >= 60))
