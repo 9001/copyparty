@@ -266,7 +266,7 @@ if (1)
 		"cl_themes": "theme",
 		"cl_accent": "accent color (keep empty for default)$Nsupports any css color, like rgba(255, 210, 0, 1)",
 		"cl_radius": "corner radius in pixels (keep empty for default)",
-		"cl_fun": "enables or disables the FUN 🎉🚀👽🐹🥳❗ (reload the page after changing this setting)",
+		"cl_fun": "enables or disables the FUN (hides most emojis) 🎉🚀👽🐹🥳❗$Nreload the page after changing this setting.",
 		"cl_langs": "language",
 		"cl_ziptype": "folder download",
 		"cl_uopts": "upload",

@@ -77,11 +77,14 @@
 						<p id="acc_name">Login</p>
 					</a>
 					<div id="accessType" style="display: block;">{{ srv_info }}</div>
-					<a href="{{ r }}/?h" id="goh" style="display: block;">control-panel</a>
 					<form id="flogout" style="display: block;" method="post" enctype="multipart/form-data">
 						<input type="hidden" name="act" value="logout" />
 						<input id="blogout" type="submit" />
 					</form>
+					<a href="{{ r }}/?h" id="goh">control-panel</a>
+					<div class="sep" style="display: block; height: 1px; background: rgba(120, 120, 120, .5); margin: .2em;"></div>
+					<a id="inst" hidden>install as app</a>
+					<a id="pb" href="https://github.com/9001/copyparty">about copyparty</a>
 				</span>
 				<div id="opdesc"></div>
 

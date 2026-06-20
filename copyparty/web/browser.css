@@ -5542,6 +5542,13 @@ html.by #spaceUsed_bar {
 	text-align: right;
 	left: auto;
 }
+#op_acc a:not(.btn),
+#op_acc input {
+	font-size: 1.2em;
+	display: block;
+	cursor: pointer;
+	justify-self: end;
+}
 #opa_acc label {
 	cursor: pointer !important;
 }
@@ -5768,10 +5775,6 @@ html.f #u2c3t span {
 }
 html.f #u2cards span {
 	font-size: .8em;
-}
-html.f #blogout,
-html.f #goh {
-	font-size: 1.2em;
 }
 html.f #gridzoom a,
 html.f #gridchop a,
@@ -6009,6 +6012,9 @@ html.fy #up_quick_btn {
 html.fy #wtico {
 	line-height: 1.1em;
 	border-radius: 0;
+}
+html.fy #wstack #wtico:hover{
+	background: var(--bg-u2) !important;
 }
 html.fy #wtoggle,
 html.fy #wtoggle * {

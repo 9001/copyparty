@@ -2442,4 +2442,22 @@ window.addEventListener('load', async () => {
 	}
 });
 
+if(ebi('inst')){
+    var installPrompt = null;
+    window.addEventListener("beforeinstallprompt", function(e) {
+    e.preventDefault();
+    installPrompt = e;
+    ebi('inst').removeAttribute("hidden");
+    });
+    ebi('inst').onclick = async function(){
+        if (!installPrompt) {
+            return;
+        }
+        const result = await installPrompt.prompt();
+        console.log(`Install prompt was: ${result.outcome}`);
+        installPrompt = null;
+        ebi('inst').setAttribute("hidden", "");
+    }
+}
+
 J_UTL = 2;
