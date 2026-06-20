@@ -1517,6 +1517,8 @@ ebi('accent').oninput = ebi('accent_picker').oninput = function () {
 	}, 100);
 }
 var accent = sread('accent');
+if(!accent || accent.length <= 3)
+	accent = window.tcolor;
 if(accent && accent.length > 3){
 	console.log('read accent color from settings: ' + accent);
 	document.documentElement.style.setProperty('--a', parseColor(accent));
