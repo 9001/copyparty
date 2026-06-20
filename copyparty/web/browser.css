@@ -1649,16 +1649,6 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	margin-left: .2em;
 }
 
-.unfun #wfm span,
-.unfun #wm3u span,
-.unfun #wnp span {
-	font-size: 1em;
-}
-
-.unfun #wtoggle a {
-	font-size: .45em;
-}
-
 .unfun #up_quick_more a:after {
 	content: "+"
 }
@@ -1944,6 +1934,7 @@ html.b #mu_outer {
 }
 .unfun #ops a {
 	font-size: 1.2em;
+	padding-top: .35em;
 }
 .unfun #srchfolder_div {
 	left: 5.2em;
