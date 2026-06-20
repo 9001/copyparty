@@ -1501,6 +1501,9 @@ ebi('accent').oninput = ebi('accent_picker').oninput = function () {
 		setColor(validcolor);
 	}, 100);
 }
+if(accent && accent.length > 3){
+	ebi('accent').value = ebi('accent_picker').value = accent;
+}
 
 // corner radius
 ebi('radius').oninput = function () {

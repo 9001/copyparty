@@ -2372,8 +2372,6 @@ var thing = QS('meta[name=theme-color]');
 if(accent && accent.length > 3){
 	console.log('read accent color from settings: ' + accent);
 	document.documentElement.style.setProperty('--a', parseColor(accent));
-    if(ebi('accent'))
-	    ebi('accent').value = ebi('accent_picker').value = accent;
 }
 
 function bchrome() {
