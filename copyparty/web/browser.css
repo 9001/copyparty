@@ -1017,6 +1017,7 @@ html.y #path a:hover {
 }
 #flogout {
 	display: inline;
+	direction: rtl;
 }
 html.dz #flogout {
 	margin-left: 1em;
@@ -5547,7 +5548,6 @@ html.by #spaceUsed_bar {
 	font-size: 1.2em;
 	display: block;
 	cursor: pointer;
-	justify-self: end;
 }
 #opa_acc label {
 	cursor: pointer !important;
