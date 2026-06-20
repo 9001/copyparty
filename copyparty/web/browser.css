@@ -1607,10 +1607,12 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	display: inline-block;
 }
 #wtoggle #zip1 {
-	padding: .4em;
-	margin: 0 .2em;
-  	vertical-align: top;
+	padding: .2em .4em;
+  	position: relative;
 	white-space: nowrap;
+	width: 2em;
+	height: 2em;
+	vertical-align: top;
 }
 #wm3u a {
 	margin: -.2em .1em;
@@ -1630,10 +1632,24 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	font-size: .7em;
 	display: block;
 }
+#zip1:hover {
+	--fg: var(--a);
+}
+#zip1 span {
+	text-shadow: none;
+	background: var(--fg);
+	color: var(--bg-max);
+	border-radius: 2px;
+	padding: 1px 3px;
+	position: absolute;
+	z-index: 1;
+	top: 1.4em;
+	font-size: .6em;
+	margin-left: .2em;
+}
 
 .unfun #wfm span,
 .unfun #wm3u span,
-.unfun #zip1 span,
 .unfun #wnp span {
 	font-size: 1em;
 }
@@ -6124,6 +6140,9 @@ html.fy #files thead th {
 }
 html.fy #files tr:not(.sel) .imgcontainer img {
 	z-index: -1;
+}
+html.fy #zip1 {
+	--bg-max: var(--bg-u2);
 }
 
 html.f.unfun #ops a {
