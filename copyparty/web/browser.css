@@ -747,7 +747,7 @@ a:hover {
 #files .imgcontainer:hover,
 #files a:hover {
 	color: var(--fg-max);
-	background: color-mix(in oklab, var(--a) 20%, transparent);
+	background-color: color-mix(in oklab, var(--a) 20%, transparent);
 	text-decoration: underline;
 }
 #files thead th {
@@ -1028,11 +1028,11 @@ html.dz #flogout {
 	border-left: .2em solid var(--bg-u5);
 }
 #repl {
-	opacity: .3;
+	color: color-mix(in srgb, var(--a) 30%, transparent);
 	padding: .33em;
 }
 #repl:hover{
-	opacity: 1;
+	color: var(--a);
 }
 #files a.doc {
 	color: var(--a-gray);
@@ -1243,9 +1243,6 @@ tr.play td:nth-child(1) a {
 }
 html:not(.e) #ggrid>a.thumbed.dir:before {
 	content: '📂';
-}
-#ggrid>a.dir>span {
-	color: var(--g-fg);
 }
 #ggrid>a.au:before {
 	content: '▶';
@@ -1467,6 +1464,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	text-align: center;
 	max-width: 79vw;
 	max-width: calc(100% - 3.4em);
+	min-height: 1.25em;
 	overflow-x: auto;
 	overflow-y: hidden;
 	margin: 0 .1em .1em .1em;
@@ -4100,6 +4098,7 @@ html.a #path i {
 	height: 1.5em;
   	margin: -.4em .3em -.4em -1.7em;
 }
+html.fy .ghead,
 html.dy .ghead,
 html.a .ghead {
 	background: var(--bg);
@@ -4107,7 +4106,7 @@ html.a .ghead {
 	border-bottom: #303337 solid 1px;
 	border-bottom: var(--btn-bb);
 	border-radius: 0;
-	margin: 0 -.5em 1.5em -.5em;
+	margin: 0 -.5em 1.5em -.6em;
 	padding-left: .5em;
 	padding-right: .5em;
 }
@@ -4218,6 +4217,11 @@ html:not(.e) #wrap.thin #ghead {
 }
 html.cz #wrap.thin .ghead{
 	top: 7.4em;
+}
+html.fy #wrap.thin .ghead {
+	top: 6.1em;
+	border-left: none;
+	border-right: none;
 }
 html.dy #wrap.thin .ghead,
 html.a #wrap.thin .ghead {
@@ -5627,11 +5631,11 @@ html.f #ggrid > a.au::before {
 }
 html.f #ggrid > a:focus-visible .imgcontainer::before,
 html.f #ggrid > a:hover .imgcontainer::before {
-	border-color: var(--g-f-bg) transparent transparent var(--g-f-bg);
+	border-color: var(--g-f-bg) transparent transparent var(--g-f-bg) !important;
 }
 html.f #ggrid > a.sel:focus-visible .imgcontainer::before,
 html.f #ggrid > a.sel:hover .imgcontainer::before {
-	border-color: var(--g-fsel-bg) transparent transparent var(--g-fsel-bg);
+	border-color: var(--g-fsel-bg) transparent transparent var(--g-fsel-bg) !important;
 }
 /* #wrap:not(.thin) .ghead::after, */
 html.f #ggrid .dir.thumbed .imgcontainer::before,
@@ -5655,7 +5659,7 @@ html.f #ggrid > a::before {
 	text-shadow: none !important;
 }
 html.f #ggrid > a.sel .imgcontainer::before {
-	border-color: var(--g-sel-bg) transparent transparent var(--g-sel-bg);
+	border-color: var(--g-sel-bg) transparent transparent var(--g-sel-bg) !important;
 }
 html.f #ggrid > a.sel img {
 	box-shadow: none;
@@ -5809,13 +5813,15 @@ html.fz #wfp .btn {
 }
 
 html.fy {
-	--a: #305797;
+	--a: #3071b7;
+	--as: color-mix(in oklab, hsl(from var(--a) h calc(s * 1.5) 50%) 30%, var(--bg));
 	--fg: #f3f3f3;
 	--fg-weak: var(--a);
 	--a2: hsl(from var(--a) calc(h + 190) calc(s * 1.1) calc(l * .5));
 	--btn-bg: var(--fg);
 	--scrl-hint: var(--bg-u2);
 	--tree-bg: var(--bg-u2);
+	--g-f-bg: color-mix(in oklab, var(--bg-u3), var(--bg));
 }
 html.fy * {
 	box-shadow: none !important;
@@ -5824,7 +5830,10 @@ html.fy * {
 }
 
 html.fy #wrap:not(.thin) .ghead {
-	top: 3.4em;
+	top: 2.8em;
+	border-bottom-right-radius: var(--radius);
+	border-top-width: 0;
+	border-left-width: 0;
 }
 html.fy #blogout {
 	color: var(--fg) !important;
@@ -5870,10 +5879,15 @@ html.fy #files {
 }
 html.fy #path i {
 	border-color: var(--fg);
+	height: 1.2em;
+	margin: 0 .3em -.25em -1.7em;
+	opacity: .4;
+	transform: none;
 }
 
 html.fy #path a {
-	padding-top: .7em;
+	padding: .6em .4em;
+  	height: auto;
 }
 
 html.fy #path a:hover {
@@ -5891,6 +5905,7 @@ html.fy #treeToggleBtn {
 	padding: .2em;
 	margin: 0 !important;
 	border: none;
+	border-radius: 0 0 var(--radius) 0;
 }
 html.fy #srv_name {
 	line-height: 1.4em;
@@ -5903,14 +5918,14 @@ html.fy .opbox:not(#op_bup) {
 html.fy #pathBar {
 	padding: 0;
 }
-html.fy #ops,
-html.fy #path,
 html.fy .ghead {
 	border: var(--btn-bb);
+	border-top: none;
+	--fg: var(--a);
+	color: var(--fg);
+	--scrl-hint: var(--bg);
 }
 html.fy #actionsArea,
-html.fy #ops,
-html.fy #path,
 html.fy #wfp,
 html.fy #wfp .btn {
 	margin: 0;
@@ -5932,7 +5947,7 @@ html.fy #tth {
 }
 html.fy #wrap {
 	background-size: 20px 20px;
-	background-image: radial-gradient(color-mix(in oklab, var(--bg-u2) 20%, transparent) 1px, transparent 1px);
+	/* background-image: radial-gradient(color-mix(in oklab, var(--bg-u2) 10%, transparent) 1px, transparent 1px); */
 }
 html.fy .modalheader::after {
 	position: absolute;
@@ -5983,17 +5998,50 @@ html.fy #wtoggle,
 html.fy #wtoggle * {
 	line-height: .99em;
 }
+html.fy #repl::before,
+html.fy #files:before,
+html.fy #ggrid:before,
+html.fy #files:after,
+html.fy #ggrid::after,
 html.fy #wrap:before {
+	--w: 20px;
 	content: "";
-	width: 500px;
-	height: 500px;
-	border: var(--a) solid 10px;
-	border-radius: 100%;
+	width: 150px;
+	height: 220px;
+	border-radius: 10px;
 	position: fixed;
 	z-index: -1;
 	right: 10px;
-	filter: blur(3px);
-	opacity: .9;
+	filter: blur(5px);
+	background: repeating-linear-gradient(-45deg, var(--as), var(--as) var(--w), transparent var(--w), transparent calc(var(--w) * 2));
+	margin: 15vh 15vw;
+}
+html.fy #repl::before,
+html.fy #files:before,
+html.fy #ggrid:before{
+	width: 100px;
+	height: 100px;
+	margin: 33vh 6vw;
+	--w: 15px;
+	filter: blur(7px);
+	opacity: .7;
+}
+html.fy #files:after,
+html.fy #ggrid::after {
+	width: 300px;
+	height: 90px;
+	margin: 0 calc(50vw - 150px);
+	right: auto;
+	bottom: -10px;
+}
+html.fy #repl::before{
+	top: 0;
+	left: var(--nav-sz);
+	margin: 15vh 8vw;
+	width: 150px;
+	height: 130px;
+	--w: 25px;
+	opacity: .5;
 }
 html.fy #qs_btns a {
 	color: var(--bg-u2);
@@ -6007,6 +6055,75 @@ html.fy #doc {
 }
 html.fy .logue {
 	color: var(--a);
+}
+/*
+Source - https://stackoverflow.com/a/61913549
+Posted by Temani Afif, modified by community. See post 'Timeline' for change history
+Retrieved 2026-06-20, License - CC BY-SA 4.0
+*/
+html.fy #repl::after,
+html.fy a:hover .imgcontainer,
+html.fy .imgcontainer:hover,
+html.fy *:not(#ggrid)>a:not(.btn):not(.modalheader):hover,
+html.fy #wrap:after {
+	--b: 2px;   /* thickness of the border */
+	--c: var(--a);   /* color of the border */
+	--w: 10px;  /* width of border */
+	
+
+	outline: var(--b) solid #0000; /* space for the border */
+	--_g: #0000 90deg,var(--c) 0;
+	--_p: var(--w) var(--w) border-box no-repeat;
+	border-radius: 0 !important;
+	background:
+		conic-gradient(from 90deg  at top    var(--b) left  var(--b),var(--_g)) 0    0    / var(--_p),
+		conic-gradient(from 180deg at top    var(--b) right var(--b),var(--_g)) 100% 0    / var(--_p),
+		conic-gradient(from 0deg   at bottom var(--b) left  var(--b),var(--_g)) 0    100% / var(--_p),
+		conic-gradient(from -90deg at bottom var(--b) right var(--b),var(--_g)) 100% 100% / var(--_p) !important;
+}
+html.fy #ggrid>a:hover .imgcontainer {
+	--b: 3px;
+  	--w: 15px;
+}
+html.fy #repl::after,
+html.fy #wrap:after{
+	--b: 10px;
+	--c: var(--as);
+	--w: 40px;
+	
+	margin: 45vh 15vw;
+	font-size: 130px;
+
+	position: fixed;
+	top: 0;
+	content: "🌐";
+	color: transparent;
+	text-shadow: 0 0 0 var(--as);
+	height: 165px;
+	line-height: 145px;
+	
+	filter: blur(7px);
+	z-index: -1;
+	pointer-events: none;
+	padding: 10px;
+}
+html.fy #repl::after{
+	--w: 30px;
+	content: "🎉";
+	top: auto;
+	bottom: 0;
+	margin: 14vh 60vw;
+	height: 90px;
+	line-height: 85px;
+	font-size: 70px;
+	filter: blur(5px);
+	opacity: .6;
+}
+html.fy #files thead th {
+	background: transparent;
+}
+html.fy #files tr:not(.sel) .imgcontainer img {
+	z-index: -1;
 }
 
 html.f.unfun #ops a {
