@@ -5543,8 +5543,8 @@ html.by #spaceUsed_bar {
 	text-align: right;
 	left: auto;
 }
-#op_acc a:not(.btn),
-#op_acc input {
+#op_acc a:not([hidden]):not(.btn),
+#op_acc input:not([hidden]) {
 	font-size: 1.2em;
 	display: block;
 	cursor: pointer;
