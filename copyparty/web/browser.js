@@ -1480,21 +1480,6 @@ if(sread('cfg_lgcy') == 'true')
 	ebi('reloc_cfg').click();
 
 // accent color
-function parseColor (strColor) {
-	var s = new Option().style;
-	s.color = strColor;
-	return s.color !== '' ? s.color : '';
-}
-function setColor (color) {
-	accent = color;
-	swrite('accent', accent);
-	var a = accent || '';
-	console.log('accent color set to: ' + a);
-	document.documentElement.style.setProperty('--a', a);
-	pbar.drawbuf();
-	pbar.drawpos();
-	vbar.draw();
-}
 ebi('accent').oninput = ebi('accent_picker').oninput = function () {
 	var validcolor = parseColor(this.value);
 	console.log(this.value);
@@ -1515,14 +1500,6 @@ ebi('accent').oninput = ebi('accent_picker').oninput = function () {
 	setTimeout(function(){
 		setColor(validcolor);
 	}, 100);
-}
-var accent = sread('accent');
-if(!accent || accent.length <= 3)
-	accent = window.tcolor;
-if(accent && accent.length > 3){
-	console.log('read accent color from settings: ' + accent);
-	document.documentElement.style.setProperty('--a', parseColor(accent));
-	ebi('accent').value = ebi('accent_picker').value = accent;
 }
 
 // corner radius

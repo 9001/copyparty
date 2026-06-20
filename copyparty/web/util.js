@@ -2346,6 +2346,35 @@ function cprop(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name);
 }
 
+// read accent / theme color
+function parseColor (strColor) {
+	var s = new Option().style;
+	s.color = strColor;
+	return s.color !== '' ? s.color : '';
+}
+function setColor (color) {
+	accent = color;
+	swrite('accent', accent);
+	var a = accent || '';
+	console.log('accent color set to: ' + a);
+	document.documentElement.style.setProperty('--a', a);
+	pbar.drawbuf();
+	pbar.drawpos();
+	vbar.draw();
+}
+var accent = sread('accent');
+var tcolor = QS('meta[name=theme-color]');
+if(tcolor)
+    tcolor = tcolor.content;
+if((!accent || accent.length <= 3) && tcolor != "#333333")
+	accent = tcolor;
+var thing = QS('meta[name=theme-color]');
+if(accent && accent.length > 3){
+	console.log('read accent color from settings: ' + accent);
+	document.documentElement.style.setProperty('--a', parseColor(accent));
+    if(ebi('accent'))
+	    ebi('accent').value = ebi('accent_picker').value = accent;
+}
 
 function bchrome() {
     var v, o = QS('meta[name=theme-color]');
