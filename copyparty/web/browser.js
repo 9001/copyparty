@@ -1030,8 +1030,10 @@ ebi('widget').innerHTML = (
 	'			<input type="range" min="0" max="1" step="0.001" value="0" id="sliderpos"></input>' +
 	'			<span id="txtsongend"/>0:00</span>' +
 	'		</div>' +
-	'		<a class="tgl btn" tabindex="0" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '">🔁</a>' +
-	'		<a class="tgl btn" tabindex="0" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
+	'		<div id="au_tgls" style="display: contents;">' +
+	'			<a class="tgl btn" tabindex="0" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '">🔁</a>' +
+	'			<a class="tgl btn" tabindex="0" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
+	'		</div>' +
 	'		<div id="pvolbg" tabindex="0">' + svg_vol + '<canvas id="pvol"></canvas></div>' +
 	'	</div>' +
 	'</div>'+
@@ -1208,6 +1210,7 @@ var musicSettings = (
 
 	'<div class="sub"><h3 id="h_mpopts">🎧 ' + L.cl_opts + '</h3><div>' +
 	'<a class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
+	'<a class="tgl btn" id="au_shuf2" tt="' + L.mt_shuf + '">🔀</a>' +
 	'<a class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
 	'<a class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
 	'<a class="tgl btn" id="au_afade" tt="' + L.mt_afade + '</a>' +
@@ -1351,7 +1354,7 @@ ebi('op_cfg').innerHTML = (
 
 	'		<div class="c" tt="' + L.ut_ow +'">\n' +
 	'			<input type="checkbox" id="u2ow" />\n' +
-	'			<label class="tgl btn on" for="u2ow">?</a>\n' +
+	'			<label class="tgl btn on" for="u2ow">?</label>\n' +
 	'		</div>\n' +
 
 	'		<div id="u2conft" tt="' + L.ut_par +'">\n' +
@@ -1908,7 +1911,9 @@ var mpl = (function () {
 	});
 	bcfg_bind(r, 'shuf', 'au_shuf', false, function () {
 		mp.read_order();  // don't bind
+		ebi('au_shuf2').classList = ebi('au_shuf').classList;
 	});
+	ebi('au_shuf2').onclick = ebi('au_shuf').onclick;
 	bcfg_bind(r, 'aplay', 'au_aplay', true);
 	bcfg_bind(r, 'afade', 'au_afade', true);
 	bcfg_bind(r, 'preload', 'au_preload', true);
@@ -7824,6 +7829,8 @@ function onwidgetresize(){
 		var pb_container = ebi('mu_pbb');
 		pb_container.appendChild(ebi('progbar'));
 		pb_container.appendChild(ebi('altprogbar'));
+		ebi('mu_toggles').appendChild(ebi('cyclebtn_loopmode'));
+		ebi('mu_toggles').appendChild(ebi('au_shuf'));
 		ebi('altprogbar').maxWidth = '';
 		ebi('mu_vol').appendChild(ebi('pvolbg'));
 		pbar.onresize();
@@ -7845,6 +7852,7 @@ function onwidgetresize(){
 			//wide
 			ebi('trackname').after(ebi('progbar'));
 			ebi('trackname').after(ebi('altprogbar'));
+			
 			bar.style.paddingTop = '0';
 		}
 		catch (e) {
@@ -7866,6 +7874,15 @@ function onwidgetresize(){
 
 	if(ebi('mu_vol').children.length > 0){
 		bar.appendChild(ebi('pvolbg'));
+	}
+	var inmu = ebi('mu_toggles').children.length
+	if(!thin && inmu){
+		ebi('au_tgls').appendChild(ebi('cyclebtn_loopmode'));
+		ebi('au_tgls').appendChild(ebi('au_shuf'));
+	}
+	else if(thin && !inmu){
+		ebi('mu_toggles').appendChild(ebi('cyclebtn_loopmode'));
+		ebi('mu_toggles').appendChild(ebi('au_shuf'));
 	}
 
 	pbar.onresize();
