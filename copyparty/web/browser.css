@@ -2198,7 +2198,7 @@ input.ssconf_v {
 	display: inline-block;
 }
 #wfp{
-	margin: 0 .3em 0 0;
+	margin: 0;
 	white-space: nowrap;
 	display: inline-block;
 }
@@ -2208,7 +2208,7 @@ input.ssconf_v {
 	height: 2em;
 	font-size: 1em;
 	padding: .2em;
-	margin: 0 .3em 0 0;
+	margin: 0 .6em 0 0;
 }
 
 #files td div:not(.imgcontainer) span {
@@ -4021,6 +4021,16 @@ html.by #u2etas {
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
 	background: var(--bottom-glow), var(--btn-bg);
 }
+html.by #path {
+	margin-right: .1em;
+}
+html.by #wfp a {
+	margin-right: .3em;
+}
+html.fy #pathBar.shifted #hspace,
+html.by #pathBar.shifted #hspace{
+	margin-right: -.3em;
+}
 html.by #up_quick_more a,
 html.by #spaceTotal_bar,
 html.by #ops>a {
@@ -4332,10 +4342,6 @@ html.e #wrap.thin .ghead {
 	.popup,
 	#pathBar.thin .popup {
 		position: relative;
-	}
-	html.fy #actionsArea,
-	html.fy #pathBar.thin #actionsArea {
-		right: 0;
 	}
 	#folder_search {
 		margin: .5em 1em 0 .2em;
@@ -4835,6 +4841,12 @@ html.e input[type="submit"] {
   background: var(--bg);
   border: 0;
 }
+html.e #wfp a {
+	margin: 0;
+}
+html.e #pathBar.shifted #hspace{
+	margin-right: -.4em;
+}
 html.e #ops {
 	background: transparent;
 }
@@ -4975,15 +4987,14 @@ html.e #u2btn {
 }
 html.e #ops {
 	/*HC*/
-	gap: 0.6em;
 	font-size: larger;
 	padding: 0;
 	height: 2em;
 }
 html.e #srchfolder_div {
-	left: 2em;
-	top: -.1em;
-	bottom: 0;
+	left: 2.5em;
+	top: -.2em;
+	bottom: -.2em;
 }
 html.e #qs_btns {
   	top: .3em;
@@ -5004,8 +5015,7 @@ html.e #ops a {
 }
 html.e #ops a {
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
-  height: 1.4em;
-  padding: 0;
+  height: 1.3em;
   box-shadow: var(--shadow-outset);
   background: var(--bg);
   justify-content: center;
@@ -5391,9 +5401,6 @@ html.e #detree {
 html.e #wtc {
 	margin: -.2em 0 -.5em .1em;
 }
-html.e #actionsArea {
-	margin-right: .5em;
-}
 
 #rcm {
 	position: fixed;
@@ -5539,7 +5546,7 @@ html.by #spaceUsed_bar {
 }
 #op_acc a:not([hidden]):not(.btn),
 #op_acc input:not([hidden]) {
-	font-size: 1.2em;
+	font-size: 1.1em;
 	display: block;
 	cursor: pointer;
 }
@@ -5663,7 +5670,7 @@ html.f #ggrid .au.thumbed:not(.play) .imgcontainer::before {
 	border: var(--bg-u2) solid;
 	z-index: 3;
 	border-width: 4em 4em 0 0;
-	border-color: var(--bg-u2) transparent transparent var(--bg-u2);
+	border-color: var(--g-bfbg) transparent transparent var(--g-bfbg);
 	margin: 0 2px;
 }
 html.f #ggrid > a.play::before {
@@ -5795,6 +5802,7 @@ html.fz {
 	--bg: #2e258c;
 	--bg: hsl(from var(--a) calc(h * 2.5 + 55) calc(s * .6) calc(l * .7));
 	--a2: hsl(from var(--bg) calc(h - 40) calc(s * 1.2) calc(l * 1.4));
+	--g-bfbg: var(--bg-u2);
 }
 html.fz #wrap::before {
 	content: '';
@@ -5819,10 +5827,15 @@ html.fz #ops {
 	border: var(--btn-bb);
 }
 html.fz .ghead {
-	margin-left: -1px;
+	margin-top: -.2em;
+	top: 3.6em;
 }
 html.fz #wfp .btn {
 	padding: .25em .4em;
+	margin-right: .3em;
+}
+html.fz #path{
+	margin-right: .3em;
 }
 
 html.fy {
@@ -5835,6 +5848,10 @@ html.fy {
 	--scrl-hint: var(--bg-u2);
 	--tree-bg: var(--bg-u2);
 	--g-f-bg: color-mix(in oklab, var(--bg-u3), var(--bg));
+	--g-fg: var(--bg-u2);
+  	--g-bg: color-mix(var(--bg-u2) 5%, transparent);
+  	--g-g1: color-mix(var(--bg-u2) 5%, transparent);
+	--g-bfbg: color-mix(in oklab, var(--bg-max) 95%, var(--fg-max));
 }
 html.fy * {
 	box-shadow: none !important;
@@ -5946,9 +5963,6 @@ html.fy #wfp .btn {
 }
 html.fy #actionsArea {
 	margin-left: auto;
-}
-html.fy #pathBar.shifted #hspace {
-	min-width: 3.5em;
 }
 html.fy #wfp .btn {
 	padding: .45em;
