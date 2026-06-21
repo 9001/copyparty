@@ -4902,7 +4902,7 @@ var fileman = (function () {
 
 		ev(e);
 
-		let shareData = {
+		var shareData = {
 			title: (sel.length > 1 ? 'Sharing files from ' : 'Sharing a file from ') + 
 				ebi('srv_name').textContent,
 			url: vps.join('\n'),
