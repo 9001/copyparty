@@ -2451,6 +2451,15 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
     return fun(0, prefix + xhr.status + ": " + errtxt, tag);
 }
 
+// polyfill for 3DS (IE11 can do this natively)
+var MouseEvent = function (eventType, params) {
+	params = params || { bubbles: false, cancelable: false };
+	var mouseEvent = document.createEvent('MouseEvent');
+	mouseEvent.initMouseEvent(eventType, params.bubbles, params.cancelable, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+
+	return mouseEvent;
+};
+
 if (navigator.serviceWorker){
     // register service worker
     // ToDo: set http header: Service-Worker-Allowed: /
