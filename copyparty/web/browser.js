@@ -33,7 +33,8 @@ function jsldp(a, b) {
 }
 loadScript('baguettebox', "J_BBX");
 loadScript('up2k', "J_U2K");
-loadScript('sw');
+if (navigator.serviceWorker)
+	loadScript('sw');
 
 
 // disables emojis

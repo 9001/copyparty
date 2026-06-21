@@ -2362,16 +2362,19 @@ function setColor (color) {
 	pbar.drawpos();
 	vbar.draw();
 }
-var accent = sread('accent');
+
+var accent = "";
+if(sread != undefined)
+    accent = sread('accent');
 var tcolor = QS('meta[name=theme-color]');
 if(tcolor)
     tcolor = tcolor.content;
 if((!accent || accent.length <= 3) && tcolor != "#333333")
-	accent = tcolor;
+    accent = tcolor;
 var thing = QS('meta[name=theme-color]');
 if(accent && accent.length > 3){
-	console.log('read accent color from settings: ' + accent);
-	document.documentElement.style.setProperty('--a', parseColor(accent));
+    console.log('read accent color from settings: ' + accent);
+    document.documentElement.style.setProperty('--a', parseColor(accent));
 }
 
 function bchrome() {
@@ -2448,42 +2451,44 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
     return fun(0, prefix + xhr.status + ": " + errtxt, tag);
 }
 
-// register service worker
-// ToDo: set http header: Service-Worker-Allowed: /
-// otherwise it will fail to register
-// https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
-window.addEventListener('load', async () => {
-	try {
-		const registration = await navigator.serviceWorker.register("/.cpr/w/sw.js", {
-			scope: "/",
-		});
-		if (registration.installing) {
-			console.log("Service worker installing");
-		} else if (registration.waiting) {
-			console.log("Service worker installed");
-		} else if (registration.active) {
-			console.log("Service worker active");
-		}
-	} catch (error) {
-		console.error(`Registration failed with ${error}`);
-	}
-});
-
-if(ebi('inst')){
-    var installPrompt = null;
-    window.addEventListener("beforeinstallprompt", function(e) {
-        e.preventDefault();
-        installPrompt = e;
-        ebi('inst').removeAttribute("hidden");
-    });
-    ebi('inst').onclick = async function(){
-        if (!installPrompt) {
-            return;
+if (navigator.serviceWorker){
+    // register service worker
+    // ToDo: set http header: Service-Worker-Allowed: /
+    // otherwise it will fail to register
+    // https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
+    window.addEventListener('load', function() {
+        try {
+            var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
+                scope: "/",
+            });
+            if (registration.installing) {
+                console.log("Service worker installing");
+            } else if (registration.waiting) {
+                console.log("Service worker installed");
+            } else if (registration.active) {
+                console.log("Service worker active");
+            }
+        } catch (error) {
+            console.error("Registration failed with " + error);
         }
-        const result = await installPrompt.prompt();
-        console.log(`Install prompt was: ${result.outcome}`);
-        installPrompt = null;
-        ebi('inst').setAttribute("hidden", "");
+    });
+
+    if(ebi('inst')){
+        var installPrompt = null;
+        window.addEventListener("beforeinstallprompt", function(e) {
+            e.preventDefault();
+            installPrompt = e;
+            ebi('inst').removeAttribute("hidden");
+        });
+        ebi('inst').onclick = function(){
+            if (!installPrompt) {
+                return;
+            }
+            var result = installPrompt.prompt();
+            console.log("Install prompt was: " + result.outcome);
+            installPrompt = null;
+            ebi('inst').setAttribute("hidden", "");
+        }
     }
 }
 
