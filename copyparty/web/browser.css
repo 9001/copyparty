@@ -624,8 +624,8 @@ html .ayjump:focus-visible {
 	top: 0;
 	margin: 0 -.6em;
 }
-#pathBar.shifted {
-	padding-left: 3.75em;
+#pathBar.shifted #hspace {
+	min-width: 3.2em;
 }
 #path {
 	position: relative;
@@ -2194,10 +2194,13 @@ input.ssconf_v {
 	display: block;
 }
 
+#hspace {
+	display: inline-block;
+}
 #wfp{
-	margin: 0 .0em 0 0;
+	margin: 0 .3em 0 0;
 	white-space: nowrap;
-	display: flex;
+	display: inline-block;
 }
 #wfp .btn {
 	min-width: 2em;
@@ -2205,7 +2208,7 @@ input.ssconf_v {
 	height: 2em;
 	font-size: 1em;
 	padding: .2em;
-	margin: 0 .6em 0 0;
+	margin: 0 .3em 0 0;
 }
 
 #files td div:not(.imgcontainer) span {
@@ -4195,8 +4198,8 @@ html.d #treepar {
 #pathBar.thin #path a {
 	padding-top: .45em;
 }
-#pathBar.thin.shifted {
-	padding-left: 3.75em;
+#pathBar.thin.shifted #hspace {
+	min-width: 0;
 }
 #pathBar.thin #actionsArea {
 	position: fixed;
@@ -4404,11 +4407,8 @@ html.e #wrap.thin .ghead {
 		padding: .5em;
 		padding-right: 2em;
 	}
-	#pathBar,
-	#pathBar.shifted,
-	#pathBar.thin,
-	#pathBar.thin.shifted {
-		padding-left: 3.95em;
+	html:not(.e) #hspace {
+		min-width: 3em !important;
 	}
 	#wrap.thin .ghead {
 		top: 7em;
@@ -5307,8 +5307,8 @@ html.e #pathBar {
 	top: 0;
 	background: var(--ttlbar);
 }
-html.e #pathBar.shifted {
-	padding-left: 2.5em;
+html.e #pathBar.shifted #hspace {
+	min-width: 2.5em;
 }
 html.e   #pathBar.thin #actionsArea {
 	top: 0 !important;
@@ -5822,7 +5822,7 @@ html.fz .ghead {
 	margin-left: -1px;
 }
 html.fz #wfp .btn {
-	padding: .2em .4em;
+	padding: .25em .4em;
 }
 
 html.fy {
@@ -5947,11 +5947,11 @@ html.fy #wfp .btn {
 html.fy #actionsArea {
 	margin-left: auto;
 }
-html.fy #pathBar.shifted {
-	padding-left: 3.5em;
+html.fy #pathBar.shifted #hspace {
+	min-width: 3.5em;
 }
 html.fy #wfp .btn {
-	padding: .3em;
+	padding: .45em;
 }
 html.fy #bbox-overlay #bbox-next .btn,
 html.fy #bbox-overlay #bbox-prev .btn,
