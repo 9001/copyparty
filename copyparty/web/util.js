@@ -2452,26 +2452,10 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
 }
 
 // polyfill for 3DS (IE11 can do this natively)
-var MouseEvent = function (eventType, e) {
-	e = e || { bubbles: false, cancelable: false, clientX: 0, clientY: 0, ctrlKey: false, altKey: false, shiftKey: false, metaKey: false };
+var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
+	e = e || { bubbles: false, cancelable: false };
 	var mouseEvent = document.createEvent('MouseEvent');
-	mouseEvent.initMouseEvent(
-        eventType,
-        e.bubbles,
-        e.cancelable,
-        window,
-        0,
-        0,
-        e.clientX,
-        e.clientY,
-		e.ctrlKey,
-        e.altKey,
-        e.shiftKey,
-        e.metaKey,
-        0,
-        null
-    );
-
+	mouseEvent.initMouseEvent(eventType, e.bubbles, e.cancelable, window, 0, 0, 0, 0, false, false, false, false, 0, null);
 	return mouseEvent;
 };
 
