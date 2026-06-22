@@ -73,7 +73,6 @@ web/browser.js
 web/browser2.html
 web/cf.html
 web/copyparty.gif
-web/copyparty.png
 web/copyparty.svg
 web/deps/busy.mp3
 web/deps/easymde.css

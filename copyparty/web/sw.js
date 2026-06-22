@@ -5,7 +5,8 @@
 console.log('sw load')
 self.addEventListener("fetch", (event) => {
     // Regular requests not related to Web Share Target.
-    if (event.request.method !== "POST" || !event.request.action.has("share-target")) {
+    var query = event.request.url.split('?');
+    if (event.request.method !== "POST" || !query[query.length - 1].match("share-target")) {
         console.log('normal response')
         event.respondWith(fetch(event.request));
         return;
@@ -14,32 +15,24 @@ self.addEventListener("fetch", (event) => {
     // Requests related to Web Share Target.
     event.respondWith(
         (async () => {
-            const formData = await event.request.formData();
-            const files = formData.get("files") || "";
-            console.log('sw share:')
-            console.log(files)
-            await addResourcesToCache(files)
+            try{
+                const formData = await event.request.formData();
+                const files = formData.getAll('files');
 
-            // const responseUrl = '/'; // (ToDo: remember last upload dir)
-            // ToDo: keep file references in clipboard 
-            // (maybe read from cache on page load somehow)
-            // -> upload on paste
+                // store in cache for retrieval in up2k.js.
+                // leading "/" is necessary, because cache 
+                // operates relative to path of current file
+                const mediaCache = await caches.open('/media');
+                for(var i = 0; i < files.length; i++)
+                    await mediaCache.put('/shared-file-' + i, new Response(files[i]))
 
-            // Copy existing headers
-            const headers = new Headers(event.request.headers);
+                await mediaCache.put('/shared-file-count', new Response(files.length))
 
-            // Set a new header
-            var pw = await CookieStore.get('cppwd');
-            headers.set('pw', pw);
-            
-            headers.delete('origin'); // 99% sure this doesn't work, but hey
-
-            const newRequest = new Request(event.request, {
-                mode: 'cors',
-                credentials: 'omit',
-                headers: headers
-            })
-            return fetch(newRequest)
+                return Response.redirect('/?share-target', 303);
+            }
+            catch(e){
+                alert(e)
+            }
         })(),
     );
 });
@@ -47,7 +40,3 @@ self.addEventListener('install', (event) => {
     console.log('sw wait skip')
     self.skipWaiting(); // insta replace old service workers (helpful for dev)
 });
-const addResourcesToCache = async (resources) => {
-    const cache = await caches.open("files");
-    await cache.addAll(resources);
-};

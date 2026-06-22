@@ -3443,6 +3443,35 @@ function up2k_init(subtle) {
             up2k_hooks[a]();
     }, 1);
 
+    (async function () {
+        try{
+            if (window.shr_target || true) {
+                window.shr_target = false
+                // get data from sw.js
+                const mediaCache = await caches.open('/media');
+                var count = await (await mediaCache.match('/shared-file-count'))?.text();
+                if (count > 0) {
+                    //await mediaCache.delete('/shared-file-count');
+
+                    var files = []
+                    for(var i = 0; i < count; i++){
+                        const file = await mediaCache.match('/shared-file-' + i)
+                        //await mediaCache.delete('/shared-file-' + i);
+
+                        const blob = await file.blob();
+                        const realFile = new File([blob], "shared_media", { type: blob.type });
+
+                        files.push(realFile)
+                    }
+                    up_them(files);
+                }
+            }
+        }
+        catch(e){
+            alert(e)
+        }
+    })();
+
     return r;
 }
 

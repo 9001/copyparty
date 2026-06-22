@@ -23,29 +23,43 @@
                 //"mtag-mt=1",
                 //"th-mt=1",
 
-                // # listen for FTP and TFTP
-                "--ftp=3921",
-                "--ftp-pr=12000-12099",
-                "--tftp=3969",
+                // // # listen for FTP and TFTP
+                // "--ftp=3921",
+                // "--ftp-pr=12000-12099",
+                // "--tftp=3969",
 
-                // # listen on all IPv6, all IPv4, and unix-socket
-                "-i::,unix:777:a.sock",
+                // // # listen on all IPv6, all IPv4, and unix-socket
+                // "-i::,unix:777:a.sock",
 
-                // # misc
-                "--dedup",
+                // // # misc
+                // "--dedup",
+                // "-e2dsa",
+                // "-e2ts",
+                // "--rss",
+                // "--shr=/shr",
+                // "--stats",
+                // "-z",
+
+                // // # users + volumes
+                // "-aed:wark",
+                // "-vdist:dist:r",
+                // "-vsrv::r:rw,ed",
+                // "-vsrv/junk:junk:r:A,ed",
+                // "--ver"
+
+                // til's conf
+                "-v~/Pictures:/::rwmd,test",
+                "-atest:testcryztl",
+                // "--allow-csrf",
+                "--xff-src=85.215.0.0/16",
+                "--rproxy",
+                "1",
+                "--ihead",
+                "*",
+                "--ohead",
+                "*",
                 "-e2dsa",
-                "-e2ts",
-                "--rss",
-                "--shr=/shr",
-                "--stats",
-                "-z",
-
-                // # users + volumes
-                "-aed:wark",
-                "-vdist:dist:r",
-                "-vsrv::r:rw,ed",
-                "-vsrv/junk:junk:r:A,ed",
-                "--ver"
+                "-e2ts"
             ]
         },
         {

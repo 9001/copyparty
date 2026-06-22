@@ -328,7 +328,7 @@ html.y #toast {
 	box-shadow: 0 .3em 1em rgba(0,0,0,0.4);
 }
 #modalc code {
-	color: #060;
+	color: #03c;
 	background: transparent;
 	border: 1px solid #ccc;
 }
@@ -434,8 +434,8 @@ html.y #tth {
 	outline: none;
 	border: none;
 }
-#modalb a:focus,
-#modalb a:hover {
+html:not(.fy) #modalb a:focus,
+html:not(.fy) #modalb a:hover {
 	background: #06d;
 	color: #fff;
 }
