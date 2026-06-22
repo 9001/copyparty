@@ -4129,7 +4129,7 @@ html.a .ghead {
 	border-bottom: #303337 solid 1px;
 	border-bottom: var(--btn-bb);
 	border-radius: 0;
-	margin: 0 -.5em 1.5em -.6em;
+	margin: 0 -.6em 1.5em -.6em;
 	padding-left: .5em;
 	padding-right: .5em;
 }
@@ -4246,6 +4246,7 @@ html.fy #wrap.thin .ghead {
 	border-left: none;
 	border-right: none;
 }
+html.fy #wrap.thin .ghead,
 html.dy #wrap.thin .ghead,
 html.a #wrap.thin .ghead {
 	top: 6.9em;
@@ -4358,7 +4359,7 @@ html.e #wrap.thin .ghead {
 	#gfiles {
 		margin: 0em -0.5em;
 	}
-	#ghead {
+	.ghead {
 		margin: 0 .5em 1em .5em;
 	}
 	.modalheader {
@@ -6011,6 +6012,7 @@ html.fy #ops a:not(:hover):not(.act) {
 }
 html.fy #actionsArea {
 	top: 0 !important;
+	right: 0 !important;
 }
 html.fy #wtoggle {
 	margin: 0;
