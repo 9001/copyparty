@@ -193,6 +193,7 @@ if (1)
 		"wt_del": "delete selected items$NHotkey: ctrl-K",
 		"wt_cut": "cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-X",
 		"wt_cpy": "copy selected items to clipboard$N(to paste them somewhere else)$NHotkey: ctrl-C",
+		"wt_sav": "confirm upload location",
 		"wt_pst": "paste a previously cut / copied selection$NHotkey: ctrl-V",
 		"wt_selall": "select all files$NHotkey: ctrl-A (when file focused)",
 		"wt_selinv": "invert selection",
@@ -985,6 +986,7 @@ ebi('widget').innerHTML = (
 				' href="#" id="fdel" tt="' + L.wt_del + '">🗑️<span>del.</span></a><a' +
 				' href="#" id="fcut" tt="' + L.wt_cut + '">' + (fun_tgl ? '✂️' : '✂') + '<span>cut</span></a><a' +
 				' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
+				' href="#" id="fsav" tt="' + L.wt_sav + '">💾<span>save</span></a><a' +
 				' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
 			'</span><span id="wzip1"><a' +
 				' href="#" id="zip1" tt="' + L.wt_zip1 + '">' + svg_dlzip + '<span>zip</span></a>' +
@@ -4589,6 +4591,7 @@ var fileman = (function () {
 		bdel = ebi('fdel'),
 		bcut = ebi('fcut'),
 		bcpy = ebi('fcpy'),
+		bsav = ebi('fsav'),
 		bpst = ebi('fpst'),
 		bshr = ebi('fshr'),
 		bcpl = ebi('fcpl'),
@@ -4625,7 +4628,8 @@ var fileman = (function () {
 			hpst = !(have_mv && has(perms, 'write')) || !enpst,
 			hshr = !can_shr || !get_evpath().indexOf(have_shr),
 			hcpl = !nsel,
-			enclr = enpst || nsel;
+			hsav = !window.shr_target,
+			enclr = enpst || nsel || window.shr_target;
 
 		if (!(enren || endel || encut || enpst))
 			hren = hdel = hcut = hpst = true;
@@ -4635,6 +4639,7 @@ var fileman = (function () {
 		clmod(bcut, 'en', encut);
 		clmod(bcpy, 'en', encpy);
 		clmod(bpst, 'en', enpst);
+		clmod(bsav, 'en', 1);
 		clmod(bshr, 'en', 1);
 		clmod(bcpl, 'en', 1);
 		clmod(bclr, 'en', 1);
@@ -4644,6 +4649,7 @@ var fileman = (function () {
 		clmod(bcut, 'hide', hcut);
 		clmod(bcpy, 'hide', !encpy);
 		clmod(bpst, 'hide', !enpst);
+		clmod(bsav, 'hide', hsav);
 		clmod(bshr, 'hide', hshr);
 		clmod(bcpl, 'hide', hcpl);
 		clmod(bclr, 'hide', !enclr);
@@ -4697,13 +4703,25 @@ var fileman = (function () {
 		return ret;
 	};
 
-	r.clear = function (e) {
+	r.clear = async function (e) {
 		ev(e);
 		var stamp = Date.now();
 		msel.evsel();
 		jwrite('fman_clip', [stamp]);
 		r.clip = [];
 		r.tx(stamp);
+
+		if(window.shr_target){
+			window.shr_target = false;
+			var count = await (await mediaCache.match('/shared-file-count'))?.text();
+			if(count > 0){
+				await mediaCache.delete('/shared-file-count');
+				for(var i = 0; i < count; i++){
+					await mediaCache.delete('/shared-file-' + i);
+					await mediaCache.delete('/shared-filename-' + i);
+				}
+			}
+		}
 	}
 
 	r.share = function (e) {
@@ -5741,6 +5759,7 @@ var fileman = (function () {
 	bcut.onclick = r.cut;
 	bcpy.onclick = r.cpy;
 	bpst.onclick = r.paste;
+	if(up2k) bsav.onclick = up2k.save_here; // just in case up2k ever inits first
 	bshr.onclick = r.share;
 	bcpl.onclick = r.link;
 	bclr.onclick = r.clear;

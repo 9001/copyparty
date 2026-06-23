@@ -3443,25 +3443,30 @@ function up2k_init(subtle) {
             up2k_hooks[a]();
     }, 1);
 
-    (async function () {
+
+    r.save_here = async function () {
         try{
             if (window.shr_target || true) {
                 window.shr_target = false
                 // get data from sw.js
-                const mediaCache = await caches.open('/media');
+                var mediaCache = await caches.open('/media');
                 var count = await (await mediaCache.match('/shared-file-count'))?.text();
                 if (count > 0) {
-                    //await mediaCache.delete('/shared-file-count');
+                    await mediaCache.delete('/shared-file-count');
 
                     var files = []
                     for(var i = 0; i < count; i++){
-                        const file = await mediaCache.match('/shared-file-' + i)
-                        //await mediaCache.delete('/shared-file-' + i);
+                        var file = await mediaCache.match('/shared-file-' + i)
 
-                        const blob = await file.blob();
-                        const realFile = new File([blob], "shared_media", { type: blob.type });
+                        var blob = await file.blob();
+                        var realName = await (await mediaCache.match('/shared-filename-' + i))?.text();
+                        var name = realName || 'shared_file_' + i;
+                        var realFile = new File([blob], name, { type: blob.type });
 
-                        files.push(realFile)
+                        files.push([realFile, name])
+
+                        await mediaCache.delete('/shared-file-' + i);
+                        await mediaCache.delete('/shared-filename-' + i);
                     }
                     up_them(files);
                 }
@@ -3470,7 +3475,8 @@ function up2k_init(subtle) {
         catch(e){
             alert(e)
         }
-    })();
+    };
+    if(ebi('fsav')) ebi('fsav').onclick = r.save_here;
 
     return r;
 }

@@ -23,8 +23,10 @@ self.addEventListener("fetch", (event) => {
                 // leading "/" is necessary, because cache 
                 // operates relative to path of current file
                 const mediaCache = await caches.open('/media');
-                for(var i = 0; i < files.length; i++)
+                for(var i = 0; i < files.length; i++){
                     await mediaCache.put('/shared-file-' + i, new Response(files[i]))
+                    await mediaCache.put('/shared-filename-' + i, new Response(files[i].name))
+                }
 
                 await mediaCache.put('/shared-file-count', new Response(files.length))
 
