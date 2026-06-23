@@ -2459,7 +2459,7 @@ var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
 	return mouseEvent;
 };
 
-if (navigator.serviceWorker){
+if (navigator.serviceWorker && caches){
     // register service worker
     // ToDo: set http header: Service-Worker-Allowed: /
     // otherwise it will fail to register

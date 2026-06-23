@@ -3444,32 +3444,44 @@ function up2k_init(subtle) {
     }, 1);
 
 
-    r.save_here = async function () {
+    r.save_here = function () {
         try{
             window.shr_target = false
             fileman.render();
             // get data from sw.js
-            var mediaCache = await caches.open('/media');
-            var count = await (await mediaCache.match('/shared-file-count'))?.text();
-            if (count > 0) {
-                await mediaCache.delete('/shared-file-count');
+            caches.open('/media').then(function(cache){
+				cache.match('/shared-file-count').then(function(r){
+                    return r && r.text()
+                }).then(function(count){
+                    if(!(count > 0)) return;
+                    cache.delete('/shared-file-count');
 
-                var files = []
-                for(var i = 0; i < count; i++){
-                    var file = await mediaCache.match('/shared-file-' + i)
-
-                    var blob = await file.blob();
-                    var realName = await (await mediaCache.match('/shared-filename-' + i))?.text();
-                    var name = realName || 'shared_file_' + i;
-                    var realFile = new File([blob], name, { type: blob.type });
-
-                    files.push([realFile, name])
-
-                    await mediaCache.delete('/shared-file-' + i);
-                    await mediaCache.delete('/shared-filename-' + i);
-                }
-                up_them(files);
-            }
+                    var files = []
+                    function load_from_cache(i){
+                        if(i >= count){
+                            up_them(files);
+                            return;
+                        }
+                        cache.match('/shared-file-' + i).then(function(file){
+                            return file.blob()
+                        }).then(function(blob){
+                            cache.match('/shared-filename-' + i).then(function(nameR){
+                                return nameR && nameR.text()
+                            }).then(function(name){
+                                return name || 'shared_file_' + i
+                            }).then(function(name){
+                                var realFile = new File([blob], name, { type: blob.type });
+                                files.push([realFile, name]);
+                                load_from_cache(i + 1);
+                            }).then(function(){
+                                cache.delete('/shared-file-' + i);
+                                cache.delete('/shared-filename-' + i);
+                            });
+                        });
+                    }
+                    load_from_cache(0);
+                });
+			});
         }
         catch(e){
             alert(e)

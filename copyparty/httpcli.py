@@ -7100,7 +7100,6 @@ class HttpCli(object):
             "space_free": h1,
             "space_total": h2,
             "dtheme": self.args.theme,
-            "shr_target": "share-target" in self.uparam,
         }
 
         if self.args.js_browser:

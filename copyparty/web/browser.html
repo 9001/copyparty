@@ -301,8 +301,7 @@
 			dfavico = "{{ favico }}",
 			have_tags_idx = {{ have_tags_idx }},
 			logues = {{ logues|tojson if sb_lg else "[]" }},
-			ls0 = {{ ls0|tojson }},
-			shr_target = "{{ shr_target }}";
+			ls0 = {{ ls0|tojson }};
 
 		var STG = window.localStorage;
 		document.documentElement.className = (STG && STG.cpp_thm) || dtheme;

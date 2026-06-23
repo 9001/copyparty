@@ -33,7 +33,7 @@ function jsldp(a, b) {
 }
 loadScript('baguettebox', "J_BBX");
 loadScript('up2k', "J_U2K");
-if (navigator.serviceWorker)
+if (navigator.serviceWorker && caches)
 	loadScript('sw');
 
 
@@ -4585,13 +4585,16 @@ function fs_abrt() {
 	xhr.send();
 }
 
-(async function(){
-	if(navigator.serviceWorker){
-		var mediaCache = await caches.open('/media');
-		var count = await (await mediaCache.match('/shared-file-count'))?.text();
+if(navigator.serviceWorker && caches){
+	caches.open('/media').then(function(cache){
+		return cache.match('/shared-file-count')
+	}).then(function(r){
+		return r && r.text();
+	}).then(function(count){
 		window.shr_target = count > 0;
-	}
-})();
+		fileman.render();
+	});
+}
 
 var fileman = (function () {
 	var bren = ebi('fren'),
@@ -4710,20 +4713,24 @@ var fileman = (function () {
 		return ret;
 	};
 
-	r.clear = async function (e) {
+	r.clear = function (e) {
 		ev(e);
 
 		if(window.shr_target){
 			window.shr_target = false;
-			var mediaCache = await caches.open('/media');
-			var count = await (await mediaCache.match('/shared-file-count'))?.text();
-			if(count > 0){
-				await mediaCache.delete('/shared-file-count');
-				for(var i = 0; i < count; i++){
-					await mediaCache.delete('/shared-file-' + i);
-					await mediaCache.delete('/shared-filename-' + i);
+			caches.open('/media').then(function(cache){
+				return cache.match('/shared-file-count')
+			}).then(function(r){
+				return r && r.text()
+			}).then(function(count){
+				if(count > 0){
+					mediaCache.delete('/shared-file-count');
+					for(var i = 0; i < count; i++){
+						mediaCache.delete('/shared-file-' + i);
+						mediaCache.delete('/shared-filename-' + i);
+					}
 				}
-			}
+			});
 		}
 
 		var stamp = Date.now();
