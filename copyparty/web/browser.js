@@ -4585,6 +4585,13 @@ function fs_abrt() {
 	xhr.send();
 }
 
+(async function(){
+	if(navigator.serviceWorker){
+		var mediaCache = await caches.open('/media');
+		var count = await (await mediaCache.match('/shared-file-count'))?.text();
+		window.shr_target = count > 0;
+	}
+})();
 
 var fileman = (function () {
 	var bren = ebi('fren'),
@@ -4705,14 +4712,10 @@ var fileman = (function () {
 
 	r.clear = async function (e) {
 		ev(e);
-		var stamp = Date.now();
-		msel.evsel();
-		jwrite('fman_clip', [stamp]);
-		r.clip = [];
-		r.tx(stamp);
 
 		if(window.shr_target){
 			window.shr_target = false;
+			var mediaCache = await caches.open('/media');
 			var count = await (await mediaCache.match('/shared-file-count'))?.text();
 			if(count > 0){
 				await mediaCache.delete('/shared-file-count');
@@ -4722,6 +4725,12 @@ var fileman = (function () {
 				}
 			}
 		}
+
+		var stamp = Date.now();
+		msel.evsel();
+		jwrite('fman_clip', [stamp]);
+		r.clip = [];
+		r.tx(stamp);
 	}
 
 	r.share = function (e) {

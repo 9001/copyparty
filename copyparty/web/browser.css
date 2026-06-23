@@ -2639,19 +2639,19 @@ html.b .btn {
 	position: relative;
 	top: 0;
 }
+#fsav,
 #gridsel.temp {
 	animation: pulsating 1s alternate infinite;
 }
-
 @keyframes pulsating {
 	0% {
 		border-color: var(--btn-bg);
-		background: var(--btn-bg);
+		background: transparent;
 	}
 
 	100% {
 		border-color: var(--btn-1-bg);
-		background: color-mix(in oklab, var(--btn-1-bg) 30%, transparent);
+		background: color-mix(in oklab, var(--btn-1-bg) 50%, transparent);
 	}
 }
 #twig,

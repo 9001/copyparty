@@ -3446,30 +3446,29 @@ function up2k_init(subtle) {
 
     r.save_here = async function () {
         try{
-            if (window.shr_target || true) {
-                window.shr_target = false
-                // get data from sw.js
-                var mediaCache = await caches.open('/media');
-                var count = await (await mediaCache.match('/shared-file-count'))?.text();
-                if (count > 0) {
-                    await mediaCache.delete('/shared-file-count');
+            window.shr_target = false
+            fileman.render();
+            // get data from sw.js
+            var mediaCache = await caches.open('/media');
+            var count = await (await mediaCache.match('/shared-file-count'))?.text();
+            if (count > 0) {
+                await mediaCache.delete('/shared-file-count');
 
-                    var files = []
-                    for(var i = 0; i < count; i++){
-                        var file = await mediaCache.match('/shared-file-' + i)
+                var files = []
+                for(var i = 0; i < count; i++){
+                    var file = await mediaCache.match('/shared-file-' + i)
 
-                        var blob = await file.blob();
-                        var realName = await (await mediaCache.match('/shared-filename-' + i))?.text();
-                        var name = realName || 'shared_file_' + i;
-                        var realFile = new File([blob], name, { type: blob.type });
+                    var blob = await file.blob();
+                    var realName = await (await mediaCache.match('/shared-filename-' + i))?.text();
+                    var name = realName || 'shared_file_' + i;
+                    var realFile = new File([blob], name, { type: blob.type });
 
-                        files.push([realFile, name])
+                    files.push([realFile, name])
 
-                        await mediaCache.delete('/shared-file-' + i);
-                        await mediaCache.delete('/shared-filename-' + i);
-                    }
-                    up_them(files);
+                    await mediaCache.delete('/shared-file-' + i);
+                    await mediaCache.delete('/shared-filename-' + i);
                 }
+                up_them(files);
             }
         }
         catch(e){
