@@ -5,6 +5,7 @@
 
 * the web UI changed a LOT
 * nice mobile layout
+* progressive web app (more of a real copyparty app)
 * try setting an accent color in the theme settings
 * drag n drop within copyparty and between browser windows of same server
 * the used storage metric is now at the bottom of the folder tree
@@ -14,6 +15,7 @@
 
 ## 🧪 new features
 
+* Progressive web app (PWA). you can install this from the browser when visiting your server if it has real https. this PWA allows you to share to copyparty on mobile for example, basically the successor of the Party UP! app.
 * [Add moving files into other folders by dragging](https://github.com/tilse/copyparty-uiV1.5/pull/1) within the browser window to move files or folders
 * extend drag n drop logic to work between browser windows
 * custom accent color setting added. works best for light and dark themes (the first 4 in the list)

@@ -6,7 +6,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 
 * server only needs Python (2 or 3), all dependencies optional
 * 🔌 protocols: [http(s)](#the-browser) // [webdav](#webdav-server) // [sftp](#sftp-server) // [ftp(s)](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
-* 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
+* 📱 [progressive web app](#apps--integrations) // [android app](#party-up-android) // [iPhone shortcuts](#ios-shortcuts)
 
 👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
 
@@ -130,8 +130,9 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
     * [folder sync](#folder-sync) - sync folders to/from copyparty
     * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
-* [android app](#android-app) - upload to copyparty with one tap
-* [iOS shortcuts](#iOS-shortcuts) - there is no iPhone app, but
+* [web app](#apps--integrations) - (almost) full OS integration (if you have https)
+* [android app](#party-up-android) - basic uploader (web app recommended)
+* [iOS shortcuts](#ios-shortcuts) - if you don't wanna use the web app
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
     * [client-side](#client-side) - when uploading files
 * [security](#security) - there is a [discord server](https://discord.gg/25J8CdTT6G) with announcements
@@ -2957,20 +2958,29 @@ most clients will fail to mount the root of a copyparty server unless there is a
 if you have volumes that are accessible without a password, then some webdav clients (such as davfs2) require the global-option `--dav-auth` to access any password-protected areas
 
 
-# android app
+# apps & integrations
+### Progressive web app (all platforms)
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Progressive_Web_Apps_Logo.svg/3840px-Progressive_Web_Apps_Logo.svg.png" height="40">
 
+**HTTPS REQUIRED**
+
+install the app straight from the browser and access it in the share menu to upload files! it uses the normal web interface.
+
+you can install this from the browser when visiting your server if it has real https. this PWA allows you to share to copyparty on mobile for example, basically the successor of the Party UP! app.
+
+### Party UP! (android)
 upload to copyparty with one tap
 
 <a href="https://f-droid.org/packages/me.ocv.partyup/"><img src="https://ocv.me/fdroid.png" alt="Get it on F-Droid" height="50" /> '' <img src="https://img.shields.io/f-droid/v/me.ocv.partyup.svg" alt="f-droid version info" /></a> '' <a href="https://github.com/9001/party-up"><img src="https://img.shields.io/github/release/9001/party-up.svg?logo=github" alt="github version info" /></a>
 
-the app is **NOT** the full copyparty server! just a basic upload client, nothing fancy yet
+the app is **NOT** the full copyparty server! just a basic upload client. if you want the full experience, [use the PWA](#progressive-web-app-all-platforms). unlike the PWA, this app doesn't require https.
 
 if you want to run the copyparty server on your android device, see [install on android](#install-on-android)
 
 
-# iOS shortcuts
+### iOS shortcuts
 
-there is no iPhone app, but  the following shortcuts are almost as good:
+if you don't want to use the PWA, the following shortcuts are almost as good:
 
 * [upload to copyparty](https://www.icloud.com/shortcuts/41e98dd985cb4d3bb433222bc1e9e770) ([offline](https://github.com/9001/copyparty/raw/hovudstraum/contrib/ios/upload-to-copyparty.shortcut)) ([png](https://user-images.githubusercontent.com/241032/226118053-78623554-b0ed-482e-98e4-6d57ada58ea4.png)) based on the [original](https://www.icloud.com/shortcuts/ab415d5b4de3467b9ce6f151b439a5d7) by [Daedren](https://github.com/Daedren) (thx!)
   * can strip exif, upload files, pics, vids, links, clipboard
