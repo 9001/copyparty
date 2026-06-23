@@ -4241,17 +4241,17 @@ html:not(.e) #wrap.thin #ghead {
 html.cz #wrap.thin .ghead{
 	top: 7.4em;
 }
-html.fy #wrap.thin .ghead {
-	top: 6.1em;
-	border-left: none;
-	border-right: none;
-}
 html.fy #wrap.thin .ghead,
 html.dy #wrap.thin .ghead,
 html.a #wrap.thin .ghead {
 	top: 6.9em;
 	margin-left: -.5em;
 	margin-right: -.5em;
+}
+html.fy #wrap.thin .ghead {
+	top: 6.1em;
+	border-left: none;
+	border-right: none;
 }
 #wrap.thin .td_w {
 		width: calc(100vw - 8.5em);
@@ -6078,7 +6078,7 @@ html.fy #ggrid::after {
 html.fy #repl::before{
 	top: 0;
 	left: var(--nav-sz);
-	margin: 15vh 8vw;
+	margin: 15vh -10px;
 	width: 150px;
 	height: 130px;
 	--w: 25px;
