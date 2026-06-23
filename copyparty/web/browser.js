@@ -1285,7 +1285,6 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="utctid" class="tgl btn" tt="' + L.ct_utc + '</a>\n' +
 	'		<a id="ireadme" class="tgl btn" tt="' + L.ct_readme + '</a>\n' +
 	'		<a id="idxh" class="tgl btn" tt="' + L.ct_idxh + '</a>\n' +
-	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div><h3 id="h_mouse">🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' +
@@ -1326,6 +1325,7 @@ ebi('op_cfg').innerHTML = (
 	'		</div>' +
 '			<input tt="' + L.cl_radius +'" type="number" id="radius" min="-1" placeholder="[0-inf]"></input>' +
 	'		<a id="fun_tgl" class="tgl btn" tt="' + L.cl_fun + '">🥳</a>\n' +
+	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
