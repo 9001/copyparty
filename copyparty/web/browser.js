@@ -10124,7 +10124,7 @@ function fclick(e, dbl) {
 	else if (is_dir)
 		treectl.reqls(qhref, true);
 
-	else if (is_txt && !has(['md', 'htm', 'html'], is_txt))
+	else if (!is_img && is_txt && !has(['md', 'htm', 'html'], is_txt))
 		atext.click();
 
 	else if (!is_img && !is_dir && have_sel)
