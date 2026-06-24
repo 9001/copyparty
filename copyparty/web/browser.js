@@ -4719,17 +4719,17 @@ var fileman = (function () {
 		if(window.shr_target){
 			window.shr_target = false;
 			caches.open('/media').then(function(cache){
-				return cache.match('/shared-file-count')
-			}).then(function(r){
-				return r && r.text()
-			}).then(function(count){
-				if(count > 0){
-					mediaCache.delete('/shared-file-count');
-					for(var i = 0; i < count; i++){
-						mediaCache.delete('/shared-file-' + i);
-						mediaCache.delete('/shared-filename-' + i);
+				cache.match('/shared-file-count').then(function(r){
+					return r && r.text()
+				}).then(function(count){
+					if(count > 0){
+						cache.delete('/shared-file-count');
+						for(var i = 0; i < count; i++){
+							cache.delete('/shared-file-' + i);
+							cache.delete('/shared-filename-' + i);
+						}
 					}
-				}
+				});
 			});
 		}
 
