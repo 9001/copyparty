@@ -5,13 +5,13 @@
 console.log('sw load')
 self.addEventListener("fetch", (event) => {
     // Regular requests not related to Web Share Target.
-    var query = event.request.url.split('?');
-    query = query[query.length - 1];
+    var [baseurl, query] = event.request.url.split('?');
+    var isCrossSiteInit = !event.clientId && event.request.mode === 'navigate';
     if (event.request.method !== "POST" || !query.match("share-target")) {
-        if(query.match("utm_source=launcher")){
+        if(query.match("utm_source=launcher") || isCrossSiteInit){
             // prevent cors restriction
             event.respondWith(
-                fetch(new Request('/', { mode: 'same-origin' }))
+                fetch(new Request(self.location.origin, { mode: 'same-origin' }))
             );
             return;
         }
