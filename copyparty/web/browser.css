@@ -2260,6 +2260,7 @@ input.ssconf_v {
 #wtoggle,
 #ghead,
 #tree,
+#path,
 .splitsub,
 .modalsplit,
 html {
@@ -2915,6 +2916,7 @@ html.noscroll .splitsub,
 html.noscroll #treeh,
 html.noscroll .ghead,
 html.noscroll #wtoggle,
+html.noscroll #path,
 html.noscroll .sbar {
 	scrollbar-width: none;
 }
