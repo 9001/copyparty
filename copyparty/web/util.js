@@ -50,7 +50,8 @@ var wah = '',
     MACOS = /Macintosh/.test(UA),
     WINDOWS = /Windows/.test(UA),
     APPLE = IPHONE || MACOS,
-    APPLEM = TOUCH && APPLE;
+    APPLEM = TOUCH && APPLE,
+    PWA = window.matchMedia && window.matchMedia('(display-mode: minimal-ui)').matches;
 
 window.onpointerdown = function (e) {
     TOUCH = e.pointerType === "touch";
