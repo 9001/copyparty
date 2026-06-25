@@ -6,7 +6,15 @@ console.log('sw load')
 self.addEventListener("fetch", (event) => {
     // Regular requests not related to Web Share Target.
     var query = event.request.url.split('?');
-    if (event.request.method !== "POST" || !query[query.length - 1].match("share-target")) {
+    query = query[query.length - 1];
+    if (event.request.method !== "POST" || !query.match("share-target")) {
+        if(query.match("utm_source=launcher")){
+            // prevent cors restriction
+            event.respondWith(
+                fetch(new Request('/', { mode: 'same-origin' }))
+            );
+            return;
+        }
         console.log('normal response')
         event.respondWith(fetch(event.request));
         return;
@@ -22,13 +30,13 @@ self.addEventListener("fetch", (event) => {
                 // store in cache for retrieval in up2k.js.
                 // leading "/" is necessary, because cache 
                 // operates relative to path of current file
-                const mediaCache = await caches.open('/media');
+                const cache = await caches.open('/media');
                 for(var i = 0; i < files.length; i++){
-                    await mediaCache.put('/shared-file-' + i, new Response(files[i]))
-                    await mediaCache.put('/shared-filename-' + i, new Response(files[i].name))
+                    await cache.put('/shared-file-' + i, new Response(files[i]))
+                    await cache.put('/shared-filename-' + i, new Response(files[i].name))
                 }
 
-                await mediaCache.put('/shared-file-count', new Response(files.length))
+                await cache.put('/shared-file-count', new Response(files.length))
 
                 return Response.redirect('/?share-target', 303);
             }
