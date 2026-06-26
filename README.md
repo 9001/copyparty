@@ -2968,6 +2968,8 @@ install the app straight from the browser and access it in the share menu to upl
 
 you can install this from the browser when visiting your server if it has real https. this PWA allows you to share to copyparty on mobile for example, basically the successor of the Party UP! app.
 
+if you use this, you might want to consider setting [--cookie-lax](https://copyparty.eu/cli/#flags-help-page:~:text=lax), which lets you follow file/folder links without having to log in again. this creates potential risks though, since links like server.com/folder?delete are possible. (see [HTTP API](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#http-api))
+
 ### Party UP! (android)
 upload to copyparty with one tap
 
