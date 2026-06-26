@@ -5685,9 +5685,6 @@ html.f #ggrid .au.thumbed:not(.play) .imgcontainer::before {
 html.f #ggrid > a.play::before {
 	background: var(--a);
 }
-html.f #ggrid > a.play span {
-	color: var(--fg);
-}
 html.f #ggrid > a::before {
 	text-shadow: none !important;
 }

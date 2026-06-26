@@ -2526,7 +2526,7 @@ function ft2dict(tr, skip) {
 
 	for (var a = 1, aa = th.length; a < aa; a++) {
 		var tv = tr.cells[a].textContent,
-			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').pop().toLowerCase(),
+			tk = tr.cells[a].querySelector('.flink') ? 'file' : th[a].getAttribute('name').split('/').pop().toLowerCase(),
 			vis = th[a].className.indexOf('min') === -1;
 
 		if (!tv || skip[tk])
