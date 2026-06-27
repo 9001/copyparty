@@ -118,6 +118,9 @@ h3>input{
     font-size: x-large;
     font-family: initial;
 }
+.binary input{
+    opacity: 0;
+}
 
 #volumes h3{
     display: inline-block;

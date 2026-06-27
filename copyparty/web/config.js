@@ -901,8 +901,12 @@ function loadFlags(){
             var ph = flag.help.match(/(?:\(default:)(.*)(?:\))/)[1]
             ph = ph.trim()
             inp.setAttribute("placeholder", ph);
-            if(!ph.match(/[^0-9]/))
-                inp.setAttribute("type", "number");
+            // if(!ph.match(/[^0-9]/))
+            //     inp.setAttribute("type", "number");
+            if(ph.toLowerCase() == "false"){
+                inp.setAttribute("disabled", "")
+                clmod(a, "binary", true)
+            }
         }
         inp.oninput = function(e){
             flagsConf[this.parentNode.getAttribute("ref")].value = this.value;
