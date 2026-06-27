@@ -50,10 +50,8 @@
                 // til's conf
                 "-v~/Pictures:/::rwmd,test",
                 "-atest:testcryztl",
-                "--cookie-lax",
-                "--xff-src=85.215.0.0/16",
-                "--rproxy",
-                "1",
+                "-mth",
+                "!,q",
                 "--ihead",
                 "*",
                 "--ohead",

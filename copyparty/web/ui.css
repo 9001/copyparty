@@ -473,11 +473,6 @@ input, button {
 input[type="submit"] {
 	cursor: pointer;
 }
-input[type="text"]:focus,
-input:not([type]):focus,
-textarea:focus {
-	box-shadow: 0 .1em .3em var(--a), 0 -.1em .3em var(--a);
-}
 
 
 

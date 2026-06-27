@@ -187,6 +187,7 @@ class HttpSrv(object):
             "browser",
             "browser2",
             "cf",
+            "config",
             "idp",
             "md",
             "mde",

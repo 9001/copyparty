@@ -1,0 +1,183 @@
+
+html{
+    font-family: var(--font-main);
+}
+
+button{
+    margin: 2px;
+    cursor: pointer;
+}
+input{
+    margin: 2px;
+    outline: none !important;
+    border-color: var(--a-gray);
+    border-width: 0 0 1px 0;
+    line-height: 25px;
+    border-radius: 3px;
+}
+input:focus-visible{
+    border-color: var(--a);
+}
+h2{
+    background: var(--bg-u2);
+    padding: 5px;
+    font-size: large;
+    text-align: center;
+    border-radius: 5px;
+    border: var(--a) solid 1px;
+}
+
+#header{
+    display: flex;
+    height: 45px;
+    color: var(--bg);
+    background: var(--a);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+#header>*{
+    display: inline-block;
+    font-size: large;
+    margin: 8px;
+}
+#header h1{
+    font-size: x-large;
+    margin-right: auto;
+}
+#header a{
+    border-radius: 3px;
+    padding: 5px;
+    text-decoration: none;
+}
+
+#wrap{
+    padding-top: 45px;
+    padding-bottom: 100px;
+    max-width: 600px;
+    margin: auto;
+}
+.autocomplete-list{
+    max-height: 400px;
+    overflow-y: auto;
+    position: absolute;
+    z-index: 1;
+    background: var(--bg);
+    border: currentColor solid 1px;
+    border-color: var(--bg-u5);
+    border-radius: 0 7px 7px 7px;
+    box-shadow: 0 5px 10px color-mix(in srgb, currentColor 30%, transparent);
+}
+#perm-list>div,
+#volumes>div,
+#flags>div,
+.autocomplete-list>div{
+    position: relative;
+    margin: 2px;
+    border: currentColor solid 1px;
+    border-color: var(--bg-u5);
+    border-radius: 5px;
+    padding: 5px;
+}
+.autocomplete-list>div{
+    cursor: pointer;
+}
+.autocomplete-active,
+.autocomplete-list>div:hover{
+    background: #8888;
+    border-color: var(--a-dark);
+}
+strong {
+    color: var(--a);
+    margin-right: 5px;
+}
+h3>input{
+    display: block;
+}
+
+.inlinePrompt{
+    display: inline-block;
+    margin-right: 5px;
+    min-width: 170px;
+}
+
+#flags>div{
+    cursor: default;
+    max-width: max-content;
+}
+#volumes>div>div>div>strong,
+#flags>div>strong{
+    min-width: 100px;
+    display: inline-block;
+}
+.delBtn{
+    line-height: .9em;
+    vertical-align: bottom;
+    font-size: x-large;
+    font-family: initial;
+}
+
+#volumes h3{
+    display: inline-block;
+    font-size: small;
+    margin: 0;
+}
+#volumes>div>.delBtn{
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+#volumes p{
+    margin-top: 5px;
+}
+
+#perms-modal{
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 20;
+
+    padding: 20px;
+    background-color: #8885;
+}
+#perms-content{
+    max-width: 500px;
+    margin: auto;
+    overflow-y: auto;
+    background: var(--bg);
+    border: var(--bg-u5) solid 1px;
+    border-radius: 5px;
+    position: relative;
+    padding: 10px;
+    max-height: calc(100% - 40px);
+}
+#perms-content p,
+#perms-content h2{
+    margin-top: 1px;
+    font-weight: bold;
+}
+#perms-modal .delBtn{
+    /* display: none; */
+    position: absolute;
+    top: 12px;
+    right: 12px;
+}
+#m_accept{
+    display: none;
+    float: right;
+}
+.vis{
+    display: block !important;
+}
+#m_closeArea{
+    position: absolute;
+    inset: 0;
+}
+#perms-content label{
+    margin-right: 15px;
+}

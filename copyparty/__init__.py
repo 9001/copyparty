@@ -72,6 +72,9 @@ web/browser.html
 web/browser.js
 web/browser2.html
 web/cf.html
+web/config.css
+web/config.html
+web/config.js
 web/copyparty.gif
 web/copyparty.svg
 web/deps/busy.mp3

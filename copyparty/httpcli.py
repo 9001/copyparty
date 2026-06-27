@@ -1503,6 +1503,9 @@ class HttpCli(object):
             if "hc" in self.uparam:
                 return self.tx_svcs()
 
+            if "config" in self.uparam:
+                return self.tx_config()
+
             if "shares" in self.uparam:
                 return self.tx_shares()
 
@@ -5438,6 +5441,16 @@ class HttpCli(object):
         if self.do_log:
             self.log(logmsg + " " + unicode(len(html)))
 
+        return True
+
+    def tx_config(self) -> bool:
+        html = self.j2s(
+            "config",
+            args=self.args,
+            accs=bool(self.asrv.acct),
+            s="s" if self.is_https else "",
+        )
+        self.reply(html.encode("utf-8"))
         return True
 
     def tx_svcs(self) -> bool:

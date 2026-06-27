@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" id="ht_shr">
+
+<head>
+	<meta charset="utf-8">
+	<title>{{ s_doctitle }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="theme-color" content="#{{ tcolor }}">
+	<link rel="manifest" href="{{ r }}/.cpr/w/manifest.json?_={{ ts }}" />
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/config.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/ui.css?_={{ ts }}">
+{{ html_head }}
+</head>
+
+<body>
+    <div id="header">
+        <a href="/?h">⬅️</a>
+        <h1>guest list</h1>
+        <button id="copyBtn">⧉</button>
+        <a href="https://copyparty.eu/cli/">ℹ️</a>
+    </div>
+	<div id="wrap" class="main">
+
+        <div>
+            <p class="inlinePrompt">server name</p>
+            <input id="srvName" type="text" placeholder="copyparty"/>
+        </div>
+
+        <div>
+            <p class="inlinePrompt">port</p>
+            <input id="srvPort" type="text" placeholder="3923"/>
+        </div>
+
+        <div>
+            <h2>add launch arguments</h2>
+            <p class="inlinePrompt">search for arguments</p>
+            <input id="flagSearch" class="autocomplete" type="text" placeholder="-g -p 80"/>
+        </div>
+        <div id="flags"></div>
+
+        <h2>shared volumes</h2>
+        <button id="addVol">+ add volume</button>
+        <div id="volumes"></div>
+
+        <h2>users</h2>
+        <button id="addUser">+ add user</button>
+        <div id="users"></div>
+
+    </div>
+    <div id="perms-modal">
+        <div id="m_closeArea"></div>
+        <div id="perms-content">
+            <h2 id="h_perms">permissions for volume</h2>
+            <div id="perm-list"></div>
+            <button id="m_close" class="delBtn">×</button>
+            <button id="m_accept">OK</button>
+        </div>
+    </div>
+    
+	<script>
+        var SR="{{ r }}",
+            lang="{{ lang }}",
+            dfavico="{{ favico }}";
+    </script>
+    <script src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
+    <script src="{{ r }}/.cpr/w/config.js?_={{ ts }}"></script>
+    {%- if js %}
+    <script src="{{ js }}_={{ ts }}"></script>
+    {%- endif %}
+    <script>
+        Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+        jsldp("J_UTL","util");
+        jsldp("J_CFG","config");
+    </script>
+</body>
+</html>
+
