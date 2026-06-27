@@ -298,8 +298,8 @@ flagcats = {
         "db_xattr=user.foo,user.bar": "index file xattrs as media-tags",
     },
     'database, audio tags\n"mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...': {
-        "mte=artist,title": "media-tags to index/display",
-        "mth=fmt,res,ac": "media-tags to hide by default",
+        "mte=artist,title": "media-tags/file-columns to index/display",
+        "mth=fmt,res,ac": "media-tags/file-columns to hide by default",
         "mtp=.bpm=f,audio-bpm.py": 'uses the "audio-bpm.py" program to\ngenerate ".bpm" tags from uploads (f = overwrite tags)',
         "mtp=ahash,vhash=media-hash.py": "collects two tags at once",
     },

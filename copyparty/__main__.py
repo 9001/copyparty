@@ -1865,8 +1865,8 @@ def add_db_metadata(ap):
     ap2.add_argument("--mtag-vv", action="store_true", help="debug mtp settings and mutagen/FFprobe parsers")
     ap2.add_argument("--db-xattr", metavar="t,t", type=u, default="", help="read file xattrs as metadata tags; [\033[32ma,b\033[0m] reads keys \033[33ma\033[0m and \033[33mb\033[0m as tags \033[33ma\033[0m and \033[33mb\033[0m, [\033[32ma=foo,b=bar\033[0m] reads keys \033[33ma\033[0m and \033[33mb\033[0m as tags \033[33mfoo\033[0m and \033[33mbar\033[0m, [\033[32m~~a,b\033[0m] does everything except \033[33ma\033[0m and \033[33mb\033[0m, [\033[32m~~\033[0m] does everything. NOTE: Each tag must also be enabled with \033[33m-mte\033[0m (volflag=db_xattr)")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="\033[34mREPEATABLE:\033[0m add/replace metadata mapping")
-    ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.); either an entire replacement list, or add/remove stuff on the default-list with +foo or /bar", default=DEF_MTE)
-    ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags to hide by default (comma-sep.); assign/add/remove same as \033[33m-mte\033[0m", default=DEF_MTH)
+    ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags/file-columns to index/display (comma-sep.); either an entire replacement list, or add/remove stuff on the default-list with +foo or /bar", default=DEF_MTE)
+    ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags/file-columns to hide by default (comma-sep.); assign/add/remove same as \033[33m-mte\033[0m", default=DEF_MTH)
     ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="\033[34mREPEATABLE:\033[0m read tag \033[33mM\033[0m using program \033[33mBIN\033[0m to parse the file")
     ap2.add_argument("--have-db-xattr", action="store_true", help=argparse.SUPPRESS)
 
