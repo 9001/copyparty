@@ -8,9 +8,9 @@ self.addEventListener("fetch", (event) => {
     var [baseurl, query] = event.request.url.split('?');
     var isCrossSiteInit = !event.clientId && event.request.mode === 'navigate';
     if (event.request.method !== "POST" || !query.match("share-target")) {
-        if(query.match("utm_source=launcher") || isCrossSiteInit){
+        if(query?.match("utm_source=launcher") || isCrossSiteInit){
             // prevent cors restriction
-            var newUrl = query.match("utm_source=launcher") ? "/" : event.request.url;
+            var newUrl = query?.match("utm_source=launcher") ? "/" : event.request.url;
             event.respondWith(
                 fetch(new Request(newUrl, { mode: 'same-origin' }))
             );
