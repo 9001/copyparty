@@ -892,9 +892,7 @@ function loadFlags(){
         var flag = flags.filter((f) => f.cmd == flagsConf[i].cmd)[0];
         a.setAttribute("Title", flag?.help);
         a.setAttribute("ref", i);
-        a.innerHTML = (
-            "<strong>" + flagsConf[i].cmd + "</strong>"
-        );
+        a.innerHTML = '<a href="' + 'https://copyparty.eu/cli/#g' + flagsConf[i].cmd.replace("--", "-") + '">' + flagsConf[i].cmd + "</a>\n";
         var inp = mknod("input");
         inp.setAttribute("value", flagsConf[i].value);
         if(flag?.help.match(/\(default:/)){
@@ -1114,6 +1112,7 @@ function loadUsers(){
         var inp = mknod("input", "", usrsConf[i].name);
         inp.setAttribute("value", usrsConf[i].name)
         inp.setAttribute("placeholder", "username")
+        preventAutoFill(inp)
         clmod(inp, "name", true)
         inp.oninput = function(e){
             usrsConf[this.parentNode.getAttribute("ref")].name = this.value;
@@ -1125,6 +1124,7 @@ function loadUsers(){
         inp2.setAttribute("value", usrsConf[i].pw)
         inp2.setAttribute("type", "password")
         inp2.setAttribute("placeholder", "password")
+        preventAutoFill(inp2)
         clmod(inp2, "pw", true)
         inp2.oninput = function(e){
             usrsConf[this.parentNode.getAttribute("ref")].pw = this.value;
@@ -1144,6 +1144,16 @@ function loadUsers(){
         a.appendChild(b)
         container.appendChild(a)
     }
+}
+function preventAutoFill(elem){
+    elem.setAttribute("autocomplete", "off")
+    elem.setAttribute("readonly", "")
+    elem.onclick = function(){
+        this.removeAttribute('readOnly');
+    }
+    elem.addEventListener("focusout", function(){
+        this.setAttribute("readonly", "")
+    })
 }
 loadUsers();
 

@@ -4,24 +4,32 @@ html{
 }
 
 button{
-    margin: 2px;
+    margin: .1em;
+    font-size: 1em;
     cursor: pointer;
 }
+button:not(.delBtn){
+    min-height: 2.2em;
+    min-width: 2.2em;
+    margin: .3em;
+}
 input{
-    margin: 2px;
+    font-size: 1em;
+    margin: .2em;
     outline: none !important;
     border-color: var(--a-gray);
     border-width: 0 0 1px 0;
-    line-height: 25px;
-    border-radius: 3px;
+    line-height: 2.3em;
+    border-radius: .3em;
+    max-width: calc(40vw - 2em);
 }
 input:focus-visible{
     border-color: var(--a);
 }
 h2{
     background: var(--bg-u2);
-    padding: 5px;
-    font-size: large;
+    padding: .5em;
+    font-size: 1.2em;
     text-align: center;
     border-radius: 5px;
     border: var(--a) solid 1px;
@@ -29,7 +37,7 @@ h2{
 
 #header{
     display: flex;
-    height: 45px;
+    height: 3em;
     color: var(--bg);
     background: var(--a);
     position: fixed;
@@ -40,34 +48,37 @@ h2{
 }
 #header>*{
     display: inline-block;
-    font-size: large;
-    margin: 8px;
+    font-size: 1.1em;
+    margin: .2em;
+    padding: .3em;
 }
 #header h1{
-    font-size: x-large;
+    font-size: 1.2em;
     margin-right: auto;
 }
 #header a{
-    border-radius: 3px;
-    padding: 5px;
+    padding: .4em;
+}
+a:not(:hover){
     text-decoration: none;
 }
 
 #wrap{
-    padding-top: 45px;
+    padding-top: 3em;
     padding-bottom: 100px;
     max-width: 600px;
     margin: auto;
 }
 .autocomplete-list{
     max-height: 400px;
+    max-width: 600px;
     overflow-y: auto;
     position: absolute;
     z-index: 1;
     background: var(--bg);
     border: currentColor solid 1px;
     border-color: var(--bg-u5);
-    border-radius: 0 7px 7px 7px;
+    border-radius: 7px;
     box-shadow: 0 5px 10px color-mix(in srgb, currentColor 30%, transparent);
 }
 #perm-list>div,
@@ -75,11 +86,11 @@ h2{
 #flags>div,
 .autocomplete-list>div{
     position: relative;
-    margin: 2px;
+    margin: .4em;
     border: currentColor solid 1px;
     border-color: var(--bg-u5);
     border-radius: 5px;
-    padding: 5px;
+    padding: .5em;
 }
 .autocomplete-list>div{
     cursor: pointer;
@@ -89,9 +100,14 @@ h2{
     background: #8888;
     border-color: var(--a-dark);
 }
+#flags a,
 strong {
+    font-weight: bold;
     color: var(--a);
-    margin-right: 5px;
+    margin-right: .5em;
+}
+#flags a {
+    padding: .6em 0;
 }
 h3>input{
     display: block;
@@ -107,15 +123,16 @@ h3>input{
     cursor: default;
     max-width: max-content;
 }
-#volumes>div>div>div>strong,
-#flags>div>strong{
+strong,
+#flags a{
     min-width: 100px;
     display: inline-block;
 }
 .delBtn{
-    line-height: .9em;
+    line-height: .8em;
     vertical-align: bottom;
-    font-size: x-large;
+    font-size: 2.5em;
+    min-width: .9em;
     font-family: initial;
 }
 .binary input{
@@ -124,7 +141,7 @@ h3>input{
 
 #volumes h3{
     display: inline-block;
-    font-size: small;
+    font-size: .9em;
     margin: 0;
 }
 #volumes>div>.delBtn{
@@ -183,4 +200,21 @@ h3>input{
 }
 #perms-content label{
     margin-right: 15px;
+}
+
+
+/* mobile layout */
+@media (max-width: 650px){
+    html{
+        font-size: 1.2em;
+    }
+    #wrap{
+        margin: 0 1em;
+    }
+    .autocomplete-list{
+        max-width: calc(100% - 2.9em);
+    }
+    strong{
+        padding: .6em 0;
+    }
 }
