@@ -961,6 +961,7 @@ function autocompleteFlags(inp, arr) {
         var a, b, i, val = this.value.trim().split(" ")[this.value.split(" ").length - 1];
         closeAllLists();
         currentFocus = -1;
+        if(!val) return;
         a = mknod("DIV", this.id + "-list");
         clmod(a, "autocomplete-list", true)
         this.parentNode.appendChild(a);
@@ -1032,6 +1033,7 @@ function autocompleteVolFlags(inp, arr, index) {
         var a, b, i, val = this.value.trim().split(" ")[this.value.split(" ").length - 1];
         closeAllLists();
         currentFocus = -1;
+        if(!val) return;
         a = mknod("DIV", this.id + "-list");
         clmod(a, "autocomplete-list", true)
         this.parentNode.appendChild(a);
