@@ -1257,11 +1257,11 @@ function loadVolumes(){
 
         var pr = mknod("p", "", "+ search for volflag")
         clmod(pr, "inlinePrompt", true)
-        pr.setAttribute("placeholder", "dedup, grid, ...");
         a.appendChild(pr)
 
         var vf = mknod("input", "vf" + i)
         clmod(vf, "autocomplete", true)
+        vf.setAttribute("placeholder", "volflags");
         autocompleteVolFlags(vf, volflags, i)
         a.appendChild(vf)
 

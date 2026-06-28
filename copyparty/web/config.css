@@ -69,12 +69,19 @@ a:not(:hover){
     max-width: 600px;
     margin: auto;
 }
+.autocomplete:focus{
+    position: fixed;
+    top: 0;
+    z-index: 50;
+    width: 30vw;
+}
 .autocomplete-list{
-    max-height: 400px;
+    max-height: calc(100vh - 5em);
     max-width: 600px;
     overflow-y: auto;
-    position: absolute;
-    z-index: 1;
+    position: fixed;
+    top: 3.5em;
+    z-index: 50;
     background: var(--bg);
     border: currentColor solid 1px;
     border-color: var(--bg-u5);
@@ -90,7 +97,7 @@ a:not(:hover){
     border: currentColor solid 1px;
     border-color: var(--bg-u5);
     border-radius: 5px;
-    padding: .5em;
+    padding: .2em .2em .2em .5em;
 }
 .autocomplete-list>div{
     cursor: pointer;
@@ -213,8 +220,13 @@ strong,
     }
     .autocomplete-list{
         max-width: calc(100% - 2.9em);
+        left: 1.5em;
     }
     strong{
         padding: .6em 0;
+    }
+    .autocomplete:focus{
+        left: 10em;
+        width: calc(100% - 16em);
     }
 }
