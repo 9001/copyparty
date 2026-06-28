@@ -5946,8 +5946,12 @@ var thegrid = (function () {
 			},
 			onChange: function (i, maxIdx) {
 				if (this[i].imageElement) {
-					sethash('g' + this[i].imageElement.getAttribute('ref') + getsort());
-				}
+					var h = 'g' + this[i].imageElement.getAttribute('ref');
+					if (this[i].page)
+						h += ',p' + this[i].page;
+					h += getsort();
+					sethash(h);
+    			}
 			}
 		});
 		r.bbox = true;

@@ -196,6 +196,23 @@ window.baguetteBox = (function () {
         return [selectorData.galleries, options];
     }
 
+    function getHashPageForRef(ref) {
+        try {
+            var h = (location.hash || "").replace(/^#/, "");
+            var parts = h.split(",");
+            if (!parts.length || parts[0] !== ("g" + ref))
+                return 1;
+
+            for (var a = 1; a < parts.length; a++) {
+                var m = /^p([0-9]+)$/.exec(parts[a]);
+                if (m)
+                    return Math.max(1, parseInt(m[1], 10) || 1);
+            }
+        } catch (ex) { }
+
+        return 1;
+    }
+
     function bindCbzClickListeners(tagsNodeList, userOptions) {
         var cbzNodes = [].filter.call(tagsNodeList, function (element) {
             return re_cbz.test(element.href);
@@ -212,8 +229,12 @@ window.baguetteBox = (function () {
 
                 e.preventDefault ? e.preventDefault() : e.returnValue = false;
                 fillCbzGallery(gallery, cbzElement, eventHandler).then(function () {
+                        var ref = cbzElement.getAttribute('ref');
+                        var page = getHashPageForRef(ref);
+                        var pageIndex = Math.max(0, Math.min(gallery.length - 1, page - 1));
+
                         prepareOverlay(gallery, userOptions);
-                        showOverlay(0);
+                        showOverlay(pageIndex);
                     }
                 ).catch(function (reason) {
                     console.error("cbz-ded", reason);
@@ -239,6 +260,7 @@ window.baguetteBox = (function () {
             return Promise.resolve();
         }
         var href = cbzElement.href;
+
         var zlsHref = href + (href.indexOf("?") === -1 ? "?" : "&") + "zls";
         return fetch(zlsHref)
             .then(function (response) {
@@ -266,9 +288,10 @@ window.baguetteBox = (function () {
                         + encodeURIComponent(imageName);
 
                     var galleryItem = {
-                        href: imageHref,
-                        imageElement: cbzElement,
-                        eventHandler: eventHandler,
+                         href: imageHref,
+                         imageElement: cbzElement,
+                         eventHandler: eventHandler,
+                         page: index + 1
                     };
                     gallery.push(galleryItem);
                 });
@@ -619,6 +642,24 @@ window.baguetteBox = (function () {
     var passiveEvent = passiveSupp ? { passive: false } : null;
     var nonPassiveEvent = passiveSupp ? { passive: true } : null;
 
+    function applyHashPage() {
+        if (!isOverlayVisible || !currentGallery.length)
+            return;
+
+        try {
+            var item = currentGallery[currentIndex];
+            if (!item || !item.imageElement)
+                return;
+
+            var ref = item.imageElement.getAttribute('ref');
+            var page = getHashPageForRef(ref);
+            var pageIndex = Math.max(0, Math.min(currentGallery.length - 1, page - 1));
+
+            if (pageIndex !== currentIndex)
+                show(pageIndex);
+        } catch (ex) { }
+    }
+
     function bindEvents() {
         bind(document, 'keydown', keyDownHandler);
         bind(document, 'keyup', keyUpHandler);
@@ -641,6 +682,7 @@ window.baguetteBox = (function () {
         bind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
         bind(overlay, 'touchend', touchendHandler);
         bind(document, 'focus', trapFocusInsideOverlay, true);
+        bind(window, 'hashchange', applyHashPage);
     }
 
     function unbindEvents() {
@@ -665,6 +707,7 @@ window.baguetteBox = (function () {
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
         unbind(overlay, 'touchend', touchendHandler);
         unbind(document, 'focus', trapFocusInsideOverlay, true);
+        unbind(window, 'hashchange', applyHashPage);
         timer.rm(rotn);
     }
 
