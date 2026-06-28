@@ -981,7 +981,7 @@ function autocompleteFlags(inp, arr) {
         var leftovers = [];
         for (i = 0; i < arr.length; i++) {
             // check if cmd contains query
-            if (!val || arr[i].cmd.toUpperCase().match(val.toUpperCase())) {
+            if (arr[i].cmd.toUpperCase().match(val.toUpperCase())) {
                 b = mknod("DIV");
                 b.innerHTML = "<strong>" + arr[i].cmd + "</strong>\n";
                 b.innerHTML += arr[i].help;
@@ -996,7 +996,7 @@ function autocompleteFlags(inp, arr) {
         // achieves basic sorting prio by appending help text matches to the dropdown later
         for (i = 0; i < leftovers.length; i++) {
             // check if help text contains query
-            if (!val || leftovers[i].help.toUpperCase().match(val.toUpperCase())) {
+            if (leftovers[i].help.toUpperCase().match(val.toUpperCase())) {
                 b = mknod("DIV");
                 b.innerHTML = "<strong>" + leftovers[i].cmd + "</strong>\n";
                 b.innerHTML += leftovers[i].help;
@@ -1052,7 +1052,7 @@ function autocompleteVolFlags(inp, arr, index) {
         var leftovers = [];
         for (i = 0; i < arr.length; i++) {
             // check if cmd contains query
-            if (!val || arr[i].cmd.toUpperCase().match(val.toUpperCase())) {
+            if (arr[i].cmd.toUpperCase().match(val.toUpperCase())) {
                 b = mknod("DIV");
                 b.innerHTML = "<strong>" + arr[i].cmd + "</strong>\n";
                 b.innerHTML += arr[i].help;
@@ -1067,7 +1067,7 @@ function autocompleteVolFlags(inp, arr, index) {
         // achieves basic sorting prio by appending help text matches to the dropdown later
         for (i = 0; i < leftovers.length; i++) {
             // check if help text contains query
-            if (!val || leftovers[i].help.toUpperCase().match(val.toUpperCase())) {
+            if (leftovers[i].help.toUpperCase().match(val.toUpperCase())) {
                 b = mknod("DIV");
                 b.innerHTML = "<strong>" + leftovers[i].cmd + "</strong>\n";
                 b.innerHTML += leftovers[i].help;
