@@ -76,7 +76,7 @@ a:not(:hover){
     width: 30vw;
 }
 .autocomplete-list{
-    max-height: calc(100vh - 5em);
+    max-height: calc(100% - 5em);
     max-width: 600px;
     overflow-y: auto;
     position: fixed;
