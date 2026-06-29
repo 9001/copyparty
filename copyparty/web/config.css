@@ -149,7 +149,7 @@ strong,
 #volumes h3{
     display: inline-block;
     font-size: .9em;
-    margin: 0;
+    margin: 1em 0 0 0;
 }
 #volumes>div>.delBtn{
     position: absolute;
@@ -157,7 +157,7 @@ strong,
     right: 2px;
 }
 #volumes p{
-    margin-top: 5px;
+    margin: 5px 0;
 }
 
 #perms-modal{

@@ -1213,6 +1213,9 @@ function loadVolumes(){
         pbtn.onclick = showPermConf;
         a.appendChild(pbtn)
 
+        var h3_3 = mknod("h3", "", "volume settings")
+        a.appendChild(h3_3)
+
         if(volsConf[i].flags == undefined)
             volsConf[i].flags = []
 
@@ -1257,7 +1260,7 @@ function loadVolumes(){
         }
         a.appendChild(vfc)
 
-        var pr = mknod("p", "", "+ search for volflag")
+        var pr = mknod("p", "", "+ search")
         clmod(pr, "inlinePrompt", true)
         a.appendChild(pr)
 

@@ -2460,27 +2460,55 @@ var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
 	return mouseEvent;
 };
 
+// start DL of secondary JS
+// based on https://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
+function loadScript(name, id) {
+	var head = (document.getElementsByTagName("head")[0] || document.head)
+    var s = document.createElement('script');
+    s.src = window.SR + '/.cpr/w/' + name + '.js?_=' + window.TS;
+	var done = false;
+    s.onload = s.onreadystatechange = function() {
+		if (!done && (!this.readyState ||
+				this.readyState === "loaded" || this.readyState === "complete") ) {
+			done = true;
+
+			if(id)
+				jsldp(id, name);
+
+			// Handle memory leak in IE
+			s.onload = s.onreadystatechange = null;
+			if ( head && s.parentNode ) {
+				head.removeChild(s);
+			}
+		}
+	};
+    head.appendChild(s);
+}
+
 if (navigator.serviceWorker && caches){
     // register service worker
     // ToDo: set http header: Service-Worker-Allowed: /
     // otherwise it will fail to register
     // https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
-    window.addEventListener('load', function() {
-        try {
-            var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
-                scope: "/",
-            });
-            if (registration.installing) {
-                console.log("Service worker installing");
-            } else if (registration.waiting) {
-                console.log("Service worker installed");
-            } else if (registration.active) {
-                console.log("Service worker active");
+    if(PWA){
+    	loadScript('sw');
+        window.addEventListener('load', function() {
+            try {
+                var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
+                    scope: "/",
+                });
+                if (registration.installing) {
+                    console.log("Service worker installing");
+                } else if (registration.waiting) {
+                    console.log("Service worker installed");
+                } else if (registration.active) {
+                    console.log("Service worker active");
+                }
+            } catch (error) {
+                console.error("Registration failed with " + error);
             }
-        } catch (error) {
-            console.error("Registration failed with " + error);
-        }
-    });
+        });
+    }
 
     if(ebi('inst')){
         var installPrompt = null;

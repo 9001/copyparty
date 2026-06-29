@@ -3,38 +3,13 @@
 var J_BRW = 1;
 
 
-// start DL of secondary JS
-// based on https://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
-function loadScript(name, id) {
-	var head = (document.getElementsByTagName("head")[0] || document.head)
-    var s = document.createElement('script');
-    s.src = window.SR + '/.cpr/w/' + name + '.js?_=' + window.TS;
-	var done = false;
-    s.onload = s.onreadystatechange = function() {
-		if (!done && (!this.readyState ||
-				this.readyState === "loaded" || this.readyState === "complete") ) {
-			done = true;
 
-			if(id)
-				jsldp(id, name);
-
-			// Handle memory leak in IE
-			s.onload = s.onreadystatechange = null;
-			if ( head && s.parentNode ) {
-				head.removeChild(s);
-			}
-		}
-	};
-    head.appendChild(s);
-}
 // re-define this function to ensure it's available when needed
 function jsldp(a, b) {
 	2 != window[a] && alert("FATAL ERROR: cannot load " + b + ".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")
 }
 loadScript('baguettebox', "J_BBX");
 loadScript('up2k', "J_U2K");
-if (navigator.serviceWorker && caches)
-	loadScript('sw');
 
 
 // disables emojis
