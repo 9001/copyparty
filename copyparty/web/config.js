@@ -1386,7 +1386,8 @@ function getConfig(){
     }
 
     for(var i = 0; i < usrsConf.length; i++){
-        conf += "-a " + [usrsConf[i].name, usrsConf[i].pw].join(":") + " "
+        if(usrsConf[i].pw != "")
+            conf += "-a " + [usrsConf[i].name, usrsConf[i].pw].join(":") + " "
     }
 
     for(var i = 0; i < volsConf.length; i++){
