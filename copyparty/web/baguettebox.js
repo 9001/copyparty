@@ -46,6 +46,7 @@ window.baguetteBox = (function () {
         imagesElements = [],
         documentLastFocus = null,
         isFullscreen = false,
+        isCbz = false,
         vmute = false,
         vloop = sread('vmode') == 'L',
         vnext = sread('vmode') == 'C',
@@ -137,7 +138,7 @@ window.baguetteBox = (function () {
     };
 
     var trapFocusInsideOverlay = function (e) {
-        if (modal.busy || ebi('modal'))
+        if (modal.busy)
             return;
 
         if (overlay.style.display === 'block' && (overlay.contains && !overlay.contains(e.target))) {
@@ -199,21 +200,14 @@ window.baguetteBox = (function () {
         return [selectorData.galleries, options];
     }
 
-    function getHashPageForRef(ref) {
+    function getCbzPage() {
         try {
-            var h = (location.hash || "").replace(/^#/, "");
-            var parts = h.split(",");
-            if (!parts.length || parts[0] !== ("g" + ref))
-                return 1;
-
-            for (var a = 1; a < parts.length; a++) {
-                var m = /^p([0-9]+)$/.exec(parts[a]);
-                if (m)
-                    return Math.max(1, parseInt(m[1], 10) || 1);
-            }
-        } catch (ex) { }
-
-        return 1;
+            var ret = parseInt(/,p([0-9]+)(,|$)/.exec(location.hash)[1]);
+            if (isNum(ret))
+                return Math.max(Math.min(ret, currentGallery.length), 1) - 1;
+        }
+        catch (ex) { }
+        return 0;
     }
 
     function bindCbzClickListeners(tagsNodeList, userOptions) {
@@ -232,14 +226,9 @@ window.baguetteBox = (function () {
 
                 e.preventDefault ? e.preventDefault() : e.returnValue = false;
                 fillCbzGallery(gallery, cbzElement, eventHandler).then(function () {
-                        var ref = cbzElement.getAttribute('ref');
-                        var page = getHashPageForRef(ref);
-                        var pageIndex = Math.max(0, Math.min(gallery.length - 1, page - 1));
-
-                        prepareOverlay(gallery, userOptions);
-                        showOverlay(pageIndex);
-                    }
-                ).catch(function (reason) {
+                    prepareOverlay(gallery, userOptions, true);
+                    showOverlay(getCbzPage());
+                }).catch(function (reason) {
                     console.error("cbz-ded", reason);
                     var t;
                     try {
@@ -290,10 +279,10 @@ window.baguetteBox = (function () {
                         + encodeURIComponent(imageName);
 
                     var galleryItem = {
-                         href: imageHref,
-                         imageElement: cbzElement,
-                         eventHandler: eventHandler,
-                         page: index + 1
+                        href: imageHref,
+                        imageElement: cbzElement,
+                        eventHandler: eventHandler,
+                        page: index + 1,
                     };
                     gallery.push(galleryItem);
                 });
@@ -470,7 +459,7 @@ window.baguetteBox = (function () {
             btnZoom.click();
         else if (kl == "s")
             tglsel();
-        else if (kl == "g" && isCbzMode())
+        else if (kl == "g" && isCbz)
             gotoCbzPage(e);
         else if (kl == "r")
             rotn(e.shiftKey ? -1 : 1);
@@ -537,40 +526,21 @@ window.baguetteBox = (function () {
             v.play();
     }
 
-    function isCbzMode() {
-        var item = currentGallery[currentIndex] || currentGallery[0];
-        return !!(item && item.page && item.imageElement && re_cbz.test(item.imageElement.href || ''));
-    }
-
-    function setCbzPageButton() {
-        if (!btnGoPage)
-            return;
-
-        var isCbz = isCbzMode();
-        btnGoPage.style.display = isCbz ? '' : 'none';
-    }
-
     function gotoCbzPage(e) {
         ev(e);
-        if (!isCbzMode())
-            return;
 
         var cur = currentIndex + 1,
             max = currentGallery.length;
 
         modal.prompt('Go to page (1-' + max + ')', '' + cur, function (v) {
-            if (v === null)
+            if (!v)
                 return;
 
-            v = ('' + v).trim();
-            if (!/^[0-9]+$/.test(v))
-                return toast.warn(4, 'invalid page number');
+            v = parseInt(v);
+            if (!isNum(v))
+                return toast.warn(4, 'invalid input');
 
-            var page = parseInt(v, 10);
-            if (page < 1 || page > max)
-                return toast.warn(4, 'page must be between 1 and ' + max);
-
-            show(page - 1);
+            show(Math.max(Math.min(v, max), 1) - 1);
         });
     }
 
@@ -686,24 +656,6 @@ window.baguetteBox = (function () {
     var passiveEvent = passiveSupp ? { passive: false } : null;
     var nonPassiveEvent = passiveSupp ? { passive: true } : null;
 
-    function applyHashPage() {
-        if (!isOverlayVisible || !currentGallery.length)
-            return;
-
-        try {
-            var item = currentGallery[currentIndex];
-            if (!item || !item.imageElement)
-                return;
-
-            var ref = item.imageElement.getAttribute('ref');
-            var page = getHashPageForRef(ref);
-            var pageIndex = Math.max(0, Math.min(currentGallery.length - 1, page - 1));
-
-            if (pageIndex !== currentIndex)
-                show(pageIndex);
-        } catch (ex) { }
-    }
-
     function bindEvents() {
         bind(document, 'keydown', keyDownHandler);
         bind(document, 'keyup', keyUpHandler);
@@ -727,7 +679,6 @@ window.baguetteBox = (function () {
         bind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
         bind(overlay, 'touchend', touchendHandler);
         bind(document, 'focus', trapFocusInsideOverlay, true);
-        bind(window, 'hashchange', applyHashPage);
     }
 
     function unbindEvents() {
@@ -753,13 +704,15 @@ window.baguetteBox = (function () {
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
         unbind(overlay, 'touchend', touchendHandler);
         unbind(document, 'focus', trapFocusInsideOverlay, true);
-        unbind(window, 'hashchange', applyHashPage);
         timer.rm(rotn);
     }
 
-    function prepareOverlay(gallery, userOptions) {
+    function prepareOverlay(gallery, userOptions, cbz) {
         if (currentGallery === gallery)
             return;
+
+        isCbz = cbz;
+        btnGoPage.style.display = isCbz ? '' : 'none';
 
         currentGallery = gallery;
         setOptions(userOptions);
@@ -819,7 +772,6 @@ window.baguetteBox = (function () {
             options.buttons = false;
 
         btnPrev.style.display = btnNext.style.display = (options.buttons ? '' : 'none');
-        setCbzPageButton();
     }
 
     function showOverlay(chosenImageIndex) {
@@ -838,7 +790,6 @@ window.baguetteBox = (function () {
 
         bindEvents();
         currentIndex = chosenImageIndex;
-        setCbzPageButton();
         touch = {
             count: 0,
             startX: null,
@@ -1117,7 +1068,6 @@ window.baguetteBox = (function () {
         catch (ex) { }
 
         currentIndex = index;
-        setCbzPageButton();
         loadImage(currentIndex, function () {
             preloadNext(currentIndex);
             preloadPrev(currentIndex);
