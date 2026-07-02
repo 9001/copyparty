@@ -5951,7 +5951,7 @@ var thegrid = (function () {
 						h += ',p' + this[i].page;
 					h += getsort();
 					sethash(h);
-    			}
+				}
 			}
 		});
 		r.bbox = true;
