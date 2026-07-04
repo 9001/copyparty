@@ -28,6 +28,7 @@ from .util import (
     fsenc,
     ipnorm,
     pybin,
+    read_utf8,
     relchk,
     runhook,
     sanitize_fn,
@@ -624,12 +625,18 @@ class Ftpd(object):
 
             hs.append([h1, self.args.ftps])
 
+        zs = self.args.ftp_banner
+        if zs.startswith("@"):
+            zs = read_utf8(None, zs[1:], False)
+        banner = zs.replace("\r", "").replace("\n", "").strip()
+
         for h_lp in hs:
             h2, lp = h_lp
             FtpHandler.hub = h2.hub = hub
             FtpHandler.args = h2.args = hub.args
             FtpHandler.authorizer = h2.authorizer = FtpAuth(hub)
-            FtpHandler.banner = self.args.ftp_banner.replace("\\n", "\r\n")
+            FtpHandler.banner = banner
+
             if self.args.ftp_pr:
                 p1, p2 = [int(x) for x in self.args.ftp_pr.split("-")]
                 if self.args.ftp and self.args.ftps:
