@@ -4,6 +4,7 @@ from __future__ import print_function, unicode_literals
 
 import json
 import os
+import re
 import unittest
 
 from copyparty.__init__ import ANYWIN
@@ -310,3 +311,18 @@ gnab/gc
         zl1 = sorted(zs.strip().split("\n"))[:]
         zl2 = sorted(list(au.vfs.all_vols))[:]
         self.assertListEqual(zl1, zl2)
+
+    def test_9(self):
+        """
+        groupnames containing ":" (github#1461)
+        """
+        _, cfgdir, xcfg = self.prep()
+        au = AuthSrv(Cfg(c=[cfgdir + "/9.conf"], **xcfg), self.log)
+        # ":" is a default group-separator, so it must be
+        # dropped from idp-gsep to appear in groupnames
+        au.args.idp_gsep = re.compile("[|;+,]")
+
+        self.assertAxs(au.vfs.axs, [])
+        au.idp_checkin(None, "iua", "GRP:foo")
+        iu = ["iua"]
+        self.assertAxs(au.vfs.axs, [iu, iu, iu, iu, iu, [], [], iu, iu])

@@ -1517,7 +1517,7 @@ class AuthSrv(object):
                 err = ""
                 try:
                     self._l(ln, 5, "volume access config:")
-                    sk, sv = ln.split(":")
+                    sk, sv = ln.split(":", 1)
                     if re.sub("[rwmdgGhaA.]", "", sk) or not sk:
                         err = "invalid accs permissions list; "
                         raise Exception(err)
