@@ -625,10 +625,10 @@ class Ftpd(object):
 
             hs.append([h1, self.args.ftps])
 
-        zs = self.args.ftp_banner
+        zs = self.args.ftp_banner.replace("\\n", "\n")
         if zs.startswith("@"):
             zs = read_utf8(None, zs[1:], False)
-        banner = zs.replace("\r", "").replace("\n", "").strip()
+        banner = zs.replace("\r", "").replace("\n", "\r\n").strip()
 
         for h_lp in hs:
             h2, lp = h_lp
