@@ -1314,6 +1314,10 @@ class SvcHub(object):
 
         for k in ["idp_gsep"]:
             ptn = getattr(self.args, k)
+            if not ptn:
+                # config-files cannot express whitespace-only values,
+                # so a blank value means space (github#1020)
+                ptn = " "
             if "]" in ptn:
                 ptn = "]" + ptn.replace("]", "")
             if "[" in ptn:
