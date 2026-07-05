@@ -1222,8 +1222,7 @@ class SvcHub(object):
 
         zs = "th_bwrap"
         for k in zs.split(" "):
-            # --th-bwrap only exists on linux (bwrap is linux-only); default to
-            # blank elsewhere instead of crashing at startup
+            # --th-bwrap only exists on linux (bwrap is linux-only) so we default to blank elsewhere
             zsl = [x for x in str(getattr(al, k, "") or "").split(" ") if x]
             zbl = [x.encode("ascii", "replace") for x in zsl]
             setattr(al, k + "_s", zsl)
