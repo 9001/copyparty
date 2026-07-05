@@ -48,8 +48,8 @@
                 // "--ver"
 
                 // til's conf
-                "-v~/Pictures:/::rwmd,test",
-                "-atest:testcryztl",
+                "-v~/Pictures:/::A,test",
+                "-atest:test",
                 "-mth",
                 "!,q",
                 "--ihead",
