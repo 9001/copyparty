@@ -7,7 +7,8 @@ self.addEventListener("fetch", (event) => {
     // Regular requests not related to Web Share Target.
     var [baseurl, query] = event.request.url.split('?');
     if (event.request.method !== "POST" || !query.match("share-target")) {
-        if(query?.match("utm_source=launcher")){
+        var toplevel = baseurl == self.location.origin;
+        if(query?.match("utm_source=launcher") && toplevel){
             // prevent cors restriction
             event.respondWith(
                 fetch(new Request("/", { mode: 'same-origin' }))
