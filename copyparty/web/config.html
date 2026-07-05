@@ -18,8 +18,11 @@
     <div id="header">
         <a href="/?h">⬅️</a>
         <h1>guest list</h1>
-        <button id="copyBtn">⧉</button>
         <a href="https://copyparty.eu/cli/">ℹ️</a>
+    </div>
+    <button id="copyBtn" class="abtn" title="export config / copy to clipboard">📋</button>
+    <div id="disclaimer">
+        ⚠️ this page is a preview feature! not all of the options are configurable nicely yet. feedback is welcome in the copyparty discord. ⚠️
     </div>
 	<div id="wrap" class="main">
 
@@ -37,7 +40,7 @@
             <h2>global settings</h2>
             <div id="flags"></div>
             <p class="inlinePrompt">+ add launch argument</p>
-            <input id="flagSearch" class="autocomplete" type="text" placeholder="launch arguments"/>
+            <input id="flagSearch" class="autocomplete" type="text" placeholder="🔎 arguments"/>
         </div>
 
         <h2>shared volumes</h2>
@@ -63,6 +66,9 @@
         var SR="{{ r }}",
             lang="{{ lang }}",
             dfavico="{{ favico }}";
+
+        var STG = window.localStorage;
+        document.documentElement.className = (STG && STG.cpp_thm) || "{{ theme }}";
     </script>
     <script src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
     <script src="{{ r }}/.cpr/w/config.js?_={{ ts }}"></script>

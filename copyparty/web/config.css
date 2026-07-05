@@ -2,6 +2,17 @@
 html{
     font-family: var(--font-main);
 }
+body{
+    padding-top: 3em;
+    margin: 0;
+}
+
+#disclaimer{
+    background-color: rgb(240, 38, 28);
+    color: black;
+    padding: .5em;
+    text-align: center;
+}
 
 button{
     margin: .1em;
@@ -13,6 +24,22 @@ button:not(.delBtn){
     min-width: 2.2em;
     margin: .3em;
 }
+#copyBtn{
+    position: fixed;
+    font-size: 1.5em;
+    bottom: .6em;
+    right: .6em;
+    z-index: 10;
+    box-shadow: 1px 15px 20px #0009;
+}
+button,
+.abtn{
+    background: var(--a);
+    border: var(--bg) solid 1px;
+    border-radius: 10px;
+    color: var(--bg);
+    padding: 0 .5em;
+}
 input{
     font-size: 1em;
     margin: .2em;
@@ -22,6 +49,7 @@ input{
     line-height: 2.3em;
     border-radius: .3em;
     max-width: calc(40vw - 2em);
+    padding-left: .5em;
 }
 input:focus-visible{
     border-color: var(--a);
@@ -59,12 +87,21 @@ h2{
 #header a{
     padding: .4em;
 }
+a{
+    border-radius: 5px;
+}
 a:not(:hover){
     text-decoration: none;
 }
+.abtn:hover,
+button:hover{
+    background: color-mix(in srgb, var(--a-dark), var(--a));
+}
+a:hover{
+    background: color-mix(in srgb, var(--a-dark), transparent);
+}
 
 #wrap{
-    padding-top: 3em;
     padding-bottom: 100px;
     max-width: 600px;
     margin: auto;
@@ -136,6 +173,7 @@ strong,
     display: inline-block;
 }
 .delBtn{
+    padding: .05em .1em;
     line-height: .8em;
     vertical-align: bottom;
     font-size: 2.5em;
@@ -150,6 +188,9 @@ strong,
     display: inline-block;
     font-size: .9em;
     margin: 1em 0 0 0;
+}
+#volumes .h_vcfg{
+    display: block;
 }
 #volumes>div>.delBtn{
     position: absolute;
@@ -227,6 +268,6 @@ strong,
     }
     .autocomplete:focus{
         left: 10em;
-        width: calc(100% - 16em);
+        width: calc(100% - 13em);
     }
 }

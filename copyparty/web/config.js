@@ -1,3 +1,23 @@
+/* ToDo: 
+get searchable commands on demand by searching via xhr, like file search,
+OR hand over this list generated from within httpcli.py or something
+(remove the hard-coded arg lists in this file afterwards)
+
+read current config and hand over from httpcli.py on page load or on button press
+
+import from command string(?)
+
+export: better indication / user guidance
+
+add config for user groups
+
+indicate that users without pw are usable for external identity providers, possibly linking it to the setting that enables idps
+
+require usernames checkbox setting
+
+finally, remove the disclaimer banner
+*/
+
 "use strict";
 
 var J_CFG = 1;
@@ -9,11 +29,10 @@ class Argument {
     }
 }
 
-// ToDo: potentially get these on demand by searching via xhr
 /*
 FLAGS
 
-to update from the documentation:
+to update manually from the documentation:
 copy what makes sense from the cli help page
 https://copyparty.eu/cli/
 
@@ -1214,6 +1233,7 @@ function loadVolumes(){
         a.appendChild(pbtn)
 
         var h3_3 = mknod("h3", "", "volume settings")
+        clmod(h3_3, "h_vcfg", true)
         a.appendChild(h3_3)
 
         if(volsConf[i].flags == undefined)
@@ -1260,13 +1280,13 @@ function loadVolumes(){
         }
         a.appendChild(vfc)
 
-        var pr = mknod("p", "", "+ search")
+        var pr = mknod("p", "", "+ add volume setting")
         clmod(pr, "inlinePrompt", true)
         a.appendChild(pr)
 
         var vf = mknod("input", "vf" + i)
         clmod(vf, "autocomplete", true)
-        vf.setAttribute("placeholder", "volflags");
+        vf.setAttribute("placeholder", "🔎 volflags");
         autocompleteVolFlags(vf, volflags, i)
         a.appendChild(vf)
 

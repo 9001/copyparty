@@ -5449,6 +5449,7 @@ class HttpCli(object):
             args=self.args,
             accs=bool(self.asrv.acct),
             s="s" if self.is_https else "",
+            theme=self.args.theme,
         )
         self.reply(html.encode("utf-8"))
         return True
