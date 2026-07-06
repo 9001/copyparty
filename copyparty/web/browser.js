@@ -6574,10 +6574,6 @@ window.thegrid = (function () {
 		}
 		ggrid.innerHTML = html.join('\n');
 
-		var ths = QSA('#ggrid>a>img');
-		for (var a = 0, aa = ths.length; a < aa; a++)
-			ths[a].onload = th_onload;
-
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
 
