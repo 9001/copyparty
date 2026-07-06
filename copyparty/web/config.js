@@ -1127,7 +1127,7 @@ function loadUsers(){
     var container = ebi('users');
     container.innerHTML = ""
     for (var i = 0; i < usrsConf.length; i++) {
-        var a = mknod("div");
+        var a = mknod("form");
         a.setAttribute("ref", i);
 
         var inp = mknod("input", "", usrsConf[i].name);
