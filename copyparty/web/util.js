@@ -2487,6 +2487,7 @@ function loadScript(name, id) {
 	var head = (document.getElementsByTagName("head")[0] || document.head)
     var s = document.createElement('script');
     s.src = window.SR + '/.cpr/w/' + name + '.js?_=' + window.TS;
+    s.setAttribute('nonce', JS_NONCE);
 	var done = false;
     s.onload = s.onreadystatechange = function() {
 		if (!done && (!this.readyState ||
