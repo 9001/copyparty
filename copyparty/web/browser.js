@@ -2139,6 +2139,7 @@ var mpl = (function () {
 			var url = r.cover.slice(0, -1) + 'wf3';
 
 			set_loaded(o, false);
+			o.onload = th_onload;
 			o.setAttribute('src', url);
 
 			o = QS('html.b #music, html.f #music');
