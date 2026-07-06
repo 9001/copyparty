@@ -572,7 +572,7 @@ Ls.grc = {
 	"u_https1": "πρέπει",
 	"u_https2": "μετάβαση σε https",
 	"u_https3": "για καλύτερη απόδοση",
-	"u_ancient": 'ο browser σου είναι εντυπωσιακά απαρχαιωμένος — ίσως να <a href="#" onclick="goto(\'bup\')">χρησιμοποιήσεις το bup αντί γι\' αυτό</a>',
+	"u_ancient": 'ο browser σου είναι εντυπωσιακά απαρχαιωμένος — ίσως να <a href="#" id="u2nah">χρησιμοποιήσεις το bup αντί γι\' αυτό</a>',
 	"u_nowork": "χρειάζεται firefox 53+ ή chrome 57+ ή iOS 11+",
 	"tail_2old": "χρειάζεται firefox 105+ ή chrome 71+ ή iOS 14.5+",
 	"u_nodrop": "ο browser σου είναι πολύ παλιός για drag&amp;drop μεταφορτώσεις",

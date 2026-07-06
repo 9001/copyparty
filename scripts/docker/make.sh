@@ -27,6 +27,17 @@ for x in awk jq podman python3 tar wget ; do
 done
 [ $err ] && exit 1
 
+getver() {
+    ver=$(
+        python3 ../../dist/copyparty-sfx.py --version 2>/dev/null |
+        awk '/^copyparty v/{sub(/-.*/,"");sub(/v/,"");print$2;exit}'
+    )
+    echo $ver | grep -E '[0-9]\.[0-9]' || {
+        echo no ver
+        exit 1
+    }
+}
+
 for v in "$@"; do
     [ "$v" = clean  ] && clean=1
     [ "$v" = hclean ] && hclean=1
@@ -80,6 +91,11 @@ filt=
 }
 
 [ $img ] && {
+    getver
+    t_ver="org.opencontainers.image.version=$ver"
+    t_cre="org.opencontainers.image.created=$( date -u +%Y-%m-%dT%H:%M:%SZ )"
+    vbt="LABEL $(echo "$t_ver $t_cre" | sed -r 's/=([^ ]+)/="\1"/g' )"
+
     [ -e base/test-aac/lc.m4a ] || (
         echo building aac smoketest
         mkdir -p base/test-aac
@@ -120,6 +136,7 @@ filt=
 
     for i in $imgs; do
         podman rm copyparty-$i || true  # old manifest
+        sed -r "s/^#vbt.*/$vbt/" <Dockerfile.$i >.Dockerfile.$i.w
         for a in $archs; do
             [[ " ${ngs[*]} " =~ " $i-$a " ]] && continue  # known incompat
 
@@ -136,7 +153,7 @@ filt=
 
             # not sure if this is necessary or if inherit-annotations=false was enough, but won't hurt
             readarray -t annot < <(awk <Dockerfile.$i '/org.opencontainers.image/{sub(/[^\.]+/,"");sub(/[" \\]+$/,"");sub(/"/,"");print"--annotation";print"org"$0}')
-            annot+=( --annotation "org.opencontainers.image.created=$( date -u +%Y-%m-%dT%H:%M:%SZ )" )
+            annot+=( --annotation "$t_ver" --annotation "$t_cre" )
 
             # --pull=never does nothing at all btw
             (set -x
@@ -147,7 +164,7 @@ filt=
                 --inherit-annotations=false \
                 "${annot[@]}" \
                 -t copyparty-$i-$a$suf \
-                -f Dockerfile.$i . ||
+                -f .Dockerfile.$i.w . ||
                     (echo $? $i-$a >> err; printf '%096d\n' $(seq 1 42))
             rm -f .blk
             ) 2> >(tee $a.err | sed "s/^/$aa:/" >&2) > >(tee $a.out | sed "s/^/$aa:/") &
@@ -163,6 +180,7 @@ filt=
         done
     done
     wait
+    rm -f .Dockerfile.*.w
     [ -e err ] && {
         echo somethign died,
         cat err
@@ -183,14 +201,7 @@ filt=
 }
 
 [ $push ] && {
-    ver=$(
-        python3 ../../dist/copyparty-sfx.py --version 2>/dev/null |
-        awk '/^copyparty v/{sub(/-.*/,"");sub(/v/,"");print$2;exit}'
-    )
-    echo $ver | grep -E '[0-9]\.[0-9]' || {
-        echo no ver
-        exit 1
-    }
+    getver
     for i in $dhub_order; do
         printf '\ndockerhub %s\n' $i
         podman manifest push --all copyparty-$i copyparty/$i:$ver

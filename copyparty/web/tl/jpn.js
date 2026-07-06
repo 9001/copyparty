@@ -572,7 +572,7 @@ Ls.jpn = {
 	"u_https1": "あなたはするべき",
 	"u_https2": "httpsに切り替える",
 	"u_https3": "パフォーマンス向上のため",
-	"u_ancient": '現在のブラウザは驚くほど古いです -- <a href="#" onclick="goto(\'bup\')">代わりにbup</a>を使った方がいいかもしれません',
+	"u_ancient": '現在のブラウザは驚くほど古いです -- <a href="#" id="u2nah">代わりにbup</a>を使った方がいいかもしれません',
 	"u_nowork": "Firefox 53以降、Chrome 57以降、またはiOS 11以降が必要です",
 	"tail_2old": "Firefox 105以降、Chrome 71以降、またはiOS 14.5以降が必要です",
 	"u_nodrop": '現在のブラウザは古すぎてドラッグ＆ドロップによるアップロードに対応していません',

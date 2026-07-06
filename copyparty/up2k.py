@@ -19,7 +19,7 @@ from copy import deepcopy
 
 from queue import Queue
 
-from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, UNIX, WINDOWS, E
 from .authsrv import LEELOO_DALLAS, SEESLOG, VFS, AuthSrv
 from .bos import bos
 from .cfg import vf_bmap, vf_cmap, vf_vmap
@@ -70,6 +70,7 @@ from .util import (
     ub64enc,
     unhumanize,
     vjoin,
+    vjoins,
     vsplit,
     w8b64dec,
     w8b64enc,
@@ -2730,6 +2731,17 @@ class Up2k(object):
             t = "-" * 72
             raise Exception("%s\n%s\n%s" % (t, txt, t))
 
+    def _sql_ok(self, cur: "sqlite3.Cursor", q: str) -> bool:
+        try:
+            cur.execute(q).fetchone()
+            return True
+        except Exception as ex:
+            if "no such table" not in str(ex):
+                t = "WARNING: database issues, maybe due to server filesystem or hardware (check %sOS-logs):\n  %r -- \033[31m%r\n"
+                t2 = "" if ANYWIN or UNIX else "dmesg / "
+                self.log(t % (t2, q, ex), 3)
+        return False
+
     def _orz(self, db_path: str) -> "sqlite3.Cursor":
         assert sqlite3  # type: ignore  # !rm
         c = sqlite3.connect(
@@ -2903,11 +2915,8 @@ class Up2k(object):
 
     def _add_dhash_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5 -> v5a
-        try:
-            cur.execute("select d, h from dh limit 1").fetchone()
+        if self._sql_ok(cur, "select d, h from dh limit 1"):
             return
-        except:
-            pass
 
         for cmd in [
             r"create table dh (d text, h text)",
@@ -2921,11 +2930,8 @@ class Up2k(object):
     def _add_xiu_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5a -> v5b
         # store rd+fn rather than warks to support nohash vols
-        try:
-            cur.execute("select c, w, rd, fn from iu limit 1").fetchone()
+        if self._sql_ok(cur, "select c, w, rd, fn from iu limit 1"):
             return
-        except:
-            pass
 
         try:
             cur.execute("drop table iu")
@@ -2943,11 +2949,8 @@ class Up2k(object):
 
     def _add_cv_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5b -> v5c
-        try:
-            cur.execute("select rd, dn, fn from cv limit 1").fetchone()
+        if self._sql_ok(cur, "select rd, dn, fn from cv limit 1"):
             return
-        except:
-            pass
 
         for cmd in [
             r"create table cv (rd text, dn text, fn text)",
@@ -2982,11 +2985,8 @@ class Up2k(object):
 
     def _add_ds_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5d -> v5e
-        try:
-            cur.execute("select rd, sz from ds limit 1").fetchone()
+        if self._sql_ok(cur, "select rd, sz from ds limit 1"):
             return
-        except:
-            pass
 
         for cmd in [
             r"create table ds (rd text, sz int, nf int)",
@@ -3037,7 +3037,7 @@ class Up2k(object):
             raise Pebkac(500, "too many xbu relocs, giving up")
 
         ptop = cj["ptop"]
-        if not self.register_vpath(ptop, cj["vcfg"]):
+        if not self.register_vpath(ptop, cj.pop("vcfg")):
             if ptop not in self.registry:
                 raise Pebkac(410, "location unavailable")
 
@@ -3190,7 +3190,7 @@ class Up2k(object):
                 c2 = None
                 for cur, dp_dir, dp_fn in lost:
                     t = "forgetting desynced db entry: %r"
-                    self.log(t % ("/" + vjoin(vjoin(vfs.vpath, dp_dir), dp_fn)))
+                    self.log(t % ("/" + vjoins(vfs.vpath, dp_dir, dp_fn)))
                     self.db_rm(cur, vfs.flags, dp_dir, dp_fn, cj["size"])
                     if c2 and c2 != cur:
                         c2.connection.commit()
@@ -3280,7 +3280,10 @@ class Up2k(object):
                         vfs.lim.nup(cj["addr"])
                         vfs.lim.bup(cj["addr"], cj["size"])
 
-                    if "done" not in job:
+                    if "rvp0" in job and wark in reg:
+                        # xbu reloc; accept wrong path
+                        job["addr"] = cj["addr"]
+                    elif "done" not in job:
                         self.log("unfinished:\n  %r\n  %r" % (src, dst))
                         err = "partial upload exists at a different location; please resume uploading here instead:\n"
                         err += "/" + quotep(vsrc) + " "
@@ -3370,9 +3373,9 @@ class Up2k(object):
                                 x = pathmod(self.vfs, dst, vp, hr["reloc"])
                                 if x:
                                     ud1 = (vfs.vpath, job["prel"], job["name"])
+                                    job["rvp0"] = vjoins(*ud1)
                                     pdir, _, job["name"], (vfs, rem) = x
                                     dst = os.path.join(pdir, job["name"])
-                                    job["vcfg"] = vfs.flags
                                     job["ptop"] = vfs.realpath
                                     job["vtop"] = vfs.vpath
                                     job["prel"] = rem
@@ -3380,8 +3383,19 @@ class Up2k(object):
                                     ud2 = (vfs.vpath, job["prel"], job["name"])
                                     if ud1 != ud2:
                                         # print(json.dumps(job, sort_keys=True, indent=4))
+                                        job["vcfg"] = vfs.flags
                                         job["hash"] = cj["hash"]
-                                        self.log("xbu reloc1:%d..." % (depth,), 6)
+                                        t = "xbu reloc1=%d ptop=%r vtop=%r prel=%r name=%r"
+                                        t = t % (
+                                            depth,
+                                            job["ptop"],
+                                            job["vtop"],
+                                            job["prel"],
+                                            job["name"],
+                                        )
+                                        self.log(t, 6)
+                                        zs = djoin(job["ptop"], job["prel"])
+                                        bos.makedirs(zs, vf=vfs.flags)
                                         return self._handle_json(job, depth + 1)
 
                         job["name"] = self._untaken(pdir, job, now)
@@ -5217,7 +5231,7 @@ class Up2k(object):
         if eno not in E_FS_CRIT:
             return self.log("hashing failed; %r @ %r\n%s" % (ex, ap, min_ex()), 3)
         t = "hashing failed; %r @ %r\n%s\nWARNING: This MAY indicate a serious issue with your harddisk or filesystem! Please investigate %sOS-logs\n"
-        t2 = "" if ANYWIN or MACOS else "dmesg and "
+        t2 = "" if ANYWIN or UNIX else "dmesg and "
         return self.log(t % (ex, ap, min_ex(), t2), 1)
 
     def _new_upload(self, job: dict[str, Any], vfs: VFS, depth: int) -> dict[str, str]:
@@ -5263,15 +5277,25 @@ class Up2k(object):
                 x = pathmod(self.vfs, ap_chk, vp_chk, hr["reloc"])
                 if x:
                     ud1 = (vfs.vpath, job["prel"], job["name"])
+                    job["rvp0"] = vjoins(*ud1)
                     pdir, _, job["name"], (vfs, rem) = x
-                    job["vcfg"] = vf = vfs.flags
+                    vf = vfs.flags
                     job["ptop"] = vfs.realpath
                     job["vtop"] = vfs.vpath
                     job["prel"] = rem
                     job["name"] = sanitize_fn(job["name"])
                     ud2 = (vfs.vpath, job["prel"], job["name"])
                     if ud1 != ud2:
-                        self.log("xbu reloc2:%d..." % (depth,), 6)
+                        job["vcfg"] = vf
+                        t = "xbu reloc2=%d ptop=%r vtop=%r prel=%r name=%r" % (
+                            depth,
+                            job["ptop"],
+                            job["vtop"],
+                            job["prel"],
+                            job["name"],
+                        )
+                        self.log(t, 6)
+                        bos.makedirs(djoin(job["ptop"], job["prel"]), vf=vf)
                         return self._handle_json(job, depth + 1)
 
         job["name"] = self._untaken(pdir, job, job["t0"])

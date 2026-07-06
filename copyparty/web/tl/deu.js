@@ -572,7 +572,7 @@ Ls.deu = {
 	"u_https1": "für bessere Performance solltest du",
 	"u_https2": "auf HTTPS wechseln",
 	"u_https3": " ",
-	"u_ancient": 'Dein Browser ist verdammt antik -- vielleicht solltest du <a href="#" onclick="goto(\'bup\')">stattdessen bup benutzen</a>',
+	"u_ancient": 'Dein Browser ist verdammt antik -- vielleicht solltest du <a href="#" id="u2nah">stattdessen bup benutzen</a>',
 	"u_nowork": "Benötigt Firefox 53+ oder Chrome 57+ oder iOS 11+",
 	"tail_2old": "Benötigt Firefox 105+ oder Chrome 71+ oder iOS 14.5+",
 	"u_nodrop": 'Dein Browser ist zu alt für Drag-and-Drop Uploads',

@@ -576,7 +576,7 @@ Ls.cze = {
 	"u_https1": "měli byste",
 	"u_https2": "přejít na https",
 	"u_https3": "pro lepší výkon",
-	"u_ancient": "váš prohlížeč je úctyhodně starý -- možná byste měli <a href=\"#\" onclick=\"goto('bup')\">použít bup</a>",
+	"u_ancient": "váš prohlížeč je úctyhodně starý -- možná byste měli <a href=\"#\" id=\"u2nah\">použít bup</a>",
 	"u_nowork": "vyžadován firefox 53+ nebo chrome 57+ nebo iOS 11+",
 	"tail_2old": "vyžadován firefox 105+ nebo chrome 71+ nebo iOS 14.5+",
 	"u_nodrop": "váš prohlížeč je příliš starý pro nahrávání přetažením (drag-and-drop)",

@@ -572,7 +572,7 @@ Ls.fin = {
 	"u_https1": "sinun kannattaisi",
 	"u_https2": "vaihtaa https:ään",
 	"u_https3": "paremman suorituskyvyn vuoksi",
-	"u_ancient": 'selaimesi on ns. vaikuttavan ikivanha --  kannattais varmaan <a href="#" onclick="goto(\'bup\')">käyttää bup:ia tän sijaan</a>',
+	"u_ancient": 'selaimesi on ns. vaikuttavan ikivanha --  kannattais varmaan <a href="#" id="u2nah">käyttää bup:ia tän sijaan</a>',
 	"u_nowork": "tarvitaan firefox 53+ tai chrome 57+ tai iOS 11+",
 	"tail_2old": "tarvitaan firefox 105+ tai chrome 71+ tai iOS 14.5+",
 	"u_nodrop": 'selaimesi on liian vanha vedä-ja-pudota lataamiseen',

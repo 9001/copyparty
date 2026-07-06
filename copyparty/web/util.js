@@ -215,7 +215,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     window.onerror = undefined;
     var html = [
         '<h1>you hit a bug!</h1>',
-        '<p style="font-size:1.3em;margin:0;line-height:2em">try to <a href="#" onclick="localStorage.clear();location.reload();">reset copyparty settings</a> if you are stuck here, or <a href="#" onclick="ignex();">ignore this</a> / <a href="#" onclick="ignex(true);">ignore all</a> / <a href="?b=u">basic</a></p>',
+        '<p style="font-size:1.3em;margin:0;line-height:2em">try to <a href="#" id="exh_wipecfg">reset copyparty settings</a> if you are stuck here, or <a href="#" id="exh_ignex">ignore this</a> / <a href="#" id="exh_ignexa">ignore all</a> / <a href="?b=u">basic</a></p>',
         '<p style="color:#fff">please send me a screenshot arigathanks gozaimuch: <a href="<ghi>" target="_blank">new github issue</a></p>',
         '<p class="b">' + esc(url + ' @' + lineNo + ':' + columnNo), '<br />' + esc(msg).replace(/\n/g, '<br />') + '</p>',
         '<p><b>UA:</b> ' + esc(UA)
@@ -300,14 +300,23 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     catch (e) {
         document.body.innerHTML = html.join('\n');
     }
+    var x = ebi('exh_wipecfg');
+    if (x) x.onclick = function () {
+        localStorage.clear();
+        location.reload();
+    };
+    x = ebi('exh_ignex'); if (x) x.onclick = ignex;
+    x = ebi('exh_ignexa'); if (x) x.onclick = ignexa;
 }
-function ignex(all) {
+function ignexa() {
     var o = ebi('exbox');
     o.style.display = 'none';
     o.innerHTML = '';
     crashed = false;
-    if (!all)
-        window.onerror = vis_exh;
+}
+function ignex() {
+    ignexa();
+    window.onerror = vis_exh;
 }
 window.onerror = vis_exh;
 
@@ -448,6 +457,8 @@ function import_js(url, cb, ecb) {
     var head = document.head || document.getElementsByTagName('head')[0];
     var script = mknod('script');
     script.type = 'text/javascript';
+    if (window.JS_NONCE)
+        script.nonce = JS_NONCE;
     script.src = url + '?_=' + (window.TS || 'a');
     script.onload = cb;
     script.onerror = ecb || function () {
@@ -889,6 +900,16 @@ function url_enc(txt) {
         ret.push(uricom_enc(parts[a]));
 
     return ret.join('/');
+}
+
+function uri2txt(txt, unslash) {
+    try {
+      txt = decodeURIComponent(txt.split('?')[0]);
+    }
+    catch (ex) {
+        console.log("ucd-err [" + txt + "]");
+    }
+    return unslash ? txt.replace(/\/$/, '') : txt;
 }
 
 

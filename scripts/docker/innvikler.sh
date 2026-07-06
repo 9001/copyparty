@@ -48,6 +48,7 @@ cat >initcfg <<'EOF'
 [global]
   chdir: /w
   no-crt
+  use-bwrap: n
 
 % /cfg
 EOF

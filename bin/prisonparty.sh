@@ -20,6 +20,8 @@ example:
 example for running straight from source (instead of using an sfx):
   PYTHONPATH=$PWD ./prisonparty.sh /var/lib/copyparty-jail cpp cpp /mnt/nas/music -- python3 -um copyparty -v /mnt/nas/music::rwmd
 
+NOT COMPATIBLE WITH: --th-bwrap
+
 note that if you have python modules installed as --user (such as bpm/key detectors),
   you should add /home/foo/.local as a VOLDIR
 
@@ -97,6 +99,7 @@ jail="${jail%/}"
 
 
 # bind-mount system directories and volumes
+mkdir -p "$jail"
 for a in {1..30}; do mkdir "$jail/.prisonlock" && break; sleep 0.1; done
 printf '%s\n' "${sysdirs[@]}" "${vols[@]}" | sed -r 's`/$``' | LC_ALL=C sort | uniq |
 while IFS= read -r v; do

@@ -246,7 +246,7 @@ you may also want these, especially on servers:
 because the following environment variables are commonly used in service-scripts, they are understood by copyparty:
 
 * `NOTIFY_SOCKET` as provided by systemd with service type=notify (see systemd/copyparty.service above)
-* `S6_NOTIFY_FD` for s6/dinit [`ready-notification = pipevar:S6_NOTIFY_FD`](https://skarnet.org/software/s6/notifywhenup.html)
+* `S6_NOTIFY_FD` for dinit [`ready-notification = pipevar:S6_NOTIFY_FD`](https://davmac.org/projects/dinit/man-pages-html/dinit-service.5.html#ready) and [s6 supervision suite notification](https://skarnet.org/software/s6/notifywhenup.html) support
 
 and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
 ```
@@ -3127,6 +3127,8 @@ permissions `wG` (write + upget) lets users upload files and receive their own f
 ### dirkeys
 
 share specific folders in a volume  without giving away full read-access to the rest -- the visitor only needs the `g` (get) permission to view the link
+
+> ℹ️ a better alternative to this is [shares](#shares)
 
 volflag `dk` generates dirkeys (per-directory accesskeys) for all folders, granting read-access to that folder; by default only that folder itself, no subfolders
 

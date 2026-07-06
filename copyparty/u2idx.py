@@ -22,6 +22,7 @@ from .util import (
     quotep,
     s3dec,
     vjoin,
+    vjoins,
 )
 
 if HAVE_SQLITE3:
@@ -437,7 +438,7 @@ class U2idx(object):
                 if rd.startswith("//") or fn.startswith("//"):
                     rd, fn = s3dec(rd, fn)
 
-                vp = vjoin(vjoin(vtop, rd), fn)
+                vp = vjoins(vtop, rd, fn)
 
                 if vp in seen_rps:
                     continue

@@ -572,7 +572,7 @@ Ls.kor = {
 	"u_https1": "더 나은 성능을 위해",
 	"u_https2": "https로 전환",
 	"u_https3": "하는 것이 좋습니다",
-	"u_ancient": '브라우저가 정말 오래되었네요 -- 아마도 <a href="#" onclick="goto(\'bup\')">bup을 대신 사용</a>해야 할 것 같습니다',
+	"u_ancient": '브라우저가 정말 오래되었네요 -- 아마도 <a href="#" id="u2nah">bup을 대신 사용</a>해야 할 것 같습니다',
 	"u_nowork": "Firefox 53+, Chrome 57+ 또는 iOS 11+가 필요합니다",
 	"tail_2old": "Firefox 105+, Chrome 71+ 또는 iOS 14.5+가 필요합니다",
 	"u_nodrop": '브라우저가 너무 오래되어 드래그 앤 드롭 업로드를 지원하지 않습니다',

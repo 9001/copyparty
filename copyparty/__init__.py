@@ -141,7 +141,6 @@ web/tl/vie.js
 web/ui.css
 web/up2k.js
 web/util.js
-web/w.hash.js
 """
 RES = set(zs.strip().split("\n"))
 RESM = {

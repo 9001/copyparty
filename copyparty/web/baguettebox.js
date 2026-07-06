@@ -28,7 +28,7 @@ window.baguetteBox = (function () {
             onChange: null,
             readDirRtl: false,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnPixelated, btnVmode, btnReadDir, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnPixelated, btnVmode, btnReadDir, btnGoPage, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -46,6 +46,7 @@ window.baguetteBox = (function () {
         imagesElements = [],
         documentLastFocus = null,
         isFullscreen = false,
+        isCbz = false,
         vmute = false,
         vloop = sread('vmode') == 'L',
         vnext = sread('vmode') == 'C',
@@ -137,6 +138,9 @@ window.baguetteBox = (function () {
     };
 
     var trapFocusInsideOverlay = function (e) {
+        if (modal.busy)
+            return;
+
         if (overlay.style.display === 'block' && (overlay.contains && !overlay.contains(e.target))) {
             e.stopPropagation();
             btnClose.focus();
@@ -196,6 +200,16 @@ window.baguetteBox = (function () {
         return [selectorData.galleries, options];
     }
 
+    function getCbzPage() {
+        try {
+            var ret = parseInt(/,p([0-9]+)(,|$)/.exec(location.hash)[1]);
+            if (isNum(ret))
+                return Math.max(Math.min(ret, currentGallery.length), 1) - 1;
+        }
+        catch (ex) { }
+        return 0;
+    }
+
     function bindCbzClickListeners(tagsNodeList, userOptions) {
         var cbzNodes = [].filter.call(tagsNodeList, function (element) {
             return re_cbz.test(element.href);
@@ -212,10 +226,9 @@ window.baguetteBox = (function () {
 
                 e.preventDefault ? e.preventDefault() : e.returnValue = false;
                 fillCbzGallery(gallery, cbzElement, eventHandler).then(function () {
-                        prepareOverlay(gallery, userOptions);
-                        showOverlay(0);
-                    }
-                ).catch(function (reason) {
+                    prepareOverlay(gallery, userOptions, true);
+                    showOverlay(getCbzPage());
+                }).catch(function (reason) {
                     console.error("cbz-ded", reason);
                     var t;
                     try {
@@ -269,6 +282,7 @@ window.baguetteBox = (function () {
                         href: imageHref,
                         imageElement: cbzElement,
                         eventHandler: eventHandler,
+                        page: index + 1,
                     };
                     gallery.push(galleryItem);
                 });
@@ -309,6 +323,7 @@ window.baguetteBox = (function () {
                 '<div id="bbox-next"><a class="btn" aria-label="Next">▶</a></div>' +
                 '<div id="bbox-btns">' +
                     '<a id="bbox-close" class="btn" aria-label="Close"><span class="x">×</span></a>' +
+                    '<a id="bbox-gopage" type="button" tt="go to page">pg</a>' +
                     '<a id="bbox-vmode" class="btn" tt="a"></a>' +
                     '<a id="bbox-full" class="btn" tt="full-screen">⛶</a>' +
                     '<a id="bbzoom" class="tgl btn" tt="zoom/stretch smaller images to fill screen">↕</a>' +
@@ -338,6 +353,7 @@ window.baguetteBox = (function () {
         btnZoom = ebi('bbzoom');
         btnPixelated = ebi('bbpixelated');
         btnVmode = ebi('bbox-vmode');
+        btnGoPage = ebi('bbox-gopage');
         btnClose = ebi('bbox-close');
 
         bcfg_bind(options, 'bbzoom', 'bbzoom', false, setzoom);
@@ -362,6 +378,7 @@ window.baguetteBox = (function () {
             ['Z', 'toggle zoom/stretch'],
             ['X', 'toggle pixelated rendering'],
             ['S', 'toggle file selection'],
+            ['G', 'cbz: go to page'],
             ['space, P, K', 'video: play / pause'],
             ['U', 'video: seek 10sec back'],
             ['O', 'video: seek 10sec ahead'],
@@ -449,6 +466,8 @@ window.baguetteBox = (function () {
             btnPixelated.click();
         else if (kl == "s")
             tglsel();
+        else if (kl == "g" && isCbz)
+            gotoCbzPage(e);
         else if (kl == "r")
             rotn(e.shiftKey ? -1 : 1);
         else if (kl == "y")
@@ -512,6 +531,24 @@ window.baguetteBox = (function () {
         v.loop = vloop
         if (vloop && v.paused)
             v.play();
+    }
+
+    function gotoCbzPage(e) {
+        ev(e);
+
+        var cur = currentIndex + 1,
+            max = currentGallery.length;
+
+        modal.prompt('Go to page (1-' + max + ')', '' + cur, function (v) {
+            if (!v)
+                return;
+
+            v = parseInt(v);
+            if (!isNum(v))
+                return toast.warn(4, 'invalid input');
+
+            show(Math.max(Math.min(v, max), 1) - 1);
+        });
     }
 
     function tglVmode() {
@@ -645,6 +682,7 @@ window.baguetteBox = (function () {
         bind(btnRotR, 'click', rotr);
         bind(btnSel, 'click', tglsel);
         bind(btnFull, 'click', tglfull);
+        bind(btnGoPage, 'click', gotoCbzPage);
         bind(slider, 'contextmenu', contextmenuHandler);
         bind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         bind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -669,6 +707,7 @@ window.baguetteBox = (function () {
         unbind(btnRotR, 'click', rotr);
         unbind(btnSel, 'click', tglsel);
         unbind(btnFull, 'click', tglfull);
+        unbind(btnGoPage, 'click', gotoCbzPage);
         unbind(slider, 'contextmenu', contextmenuHandler);
         unbind(overlay, 'touchstart', touchstartHandler, nonPassiveEvent);
         unbind(overlay, 'touchmove', touchmoveHandler, passiveEvent);
@@ -677,9 +716,12 @@ window.baguetteBox = (function () {
         timer.rm(rotn);
     }
 
-    function prepareOverlay(gallery, userOptions) {
+    function prepareOverlay(gallery, userOptions, cbz) {
         if (currentGallery === gallery)
             return;
+
+        isCbz = cbz;
+        btnGoPage.style.display = isCbz ? '' : 'none';
 
         currentGallery = gallery;
         setOptions(userOptions);

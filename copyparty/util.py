@@ -326,7 +326,14 @@ except:
     BITNESS = struct.calcsize("P") * 8
 
 
-CAN_SIGMASK = not (ANYWIN or PY2 or GRAAL)
+try:
+    if ANYWIN or PY2 or GRAAL or not hasattr(signal, "pthread_sigmask"):
+        raise Exception()
+    BLOCK_SIGS = [signal.SIGINT, signal.SIGTERM, signal.SIGHUP, signal.SIGUSR1]
+    CAN_SIGMASK = True
+except:
+    BLOCK_SIGS = []
+    CAN_SIGMASK = False
 
 
 RE_ANSI = re.compile("\033\\[[^mK]*[mK]")
@@ -429,6 +436,18 @@ IMPLICATIONS = [
     ["no_dupe_m", "no_dupe"],
     ["no_html", "no_script"],
     ["nohtml", "noscript"],
+    ["no_html", "nohtml"],  # user-typo
+    ["no_script", "noscript"],  # user-typo
+    ["no_readmes", "no_readme"],  # user-typo
+    ["noreadmes", "no_readme"],  # user-typo
+    ["noreadme", "no_readme"],  # user-typo
+    ["no_logue", "no_logues"],  # user-typo
+    ["nologues", "no_logues"],  # user-typo
+    ["nologue", "no_logues"],  # user-typo
+    ["plainlogue", "plainlogues"],  # user-typo
+    ["plainreadmes", "plainreadme"],  # user-typo
+    ["noscript", "plainlogues"],
+    ["noscript", "plainreadme"],
     ["sftpvv", "sftpv"],
     ["smbw", "smb"],
     ["smb1", "smb"],
@@ -653,6 +672,14 @@ if EXE:
             pass
 
 
+try:
+    if PY2 or ANYWIN:
+        raise Exception()
+    HAVE_BWRAP = shutil.which("bwrap")
+except:
+    HAVE_BWRAP = ""
+
+
 def py_desc() -> str:
     interp = platform.python_implementation()
     py_ver = ".".join([str(x) for x in sys.version_info])
@@ -835,10 +862,8 @@ class Daemon(threading.Thread):
             self.start()
 
     def run(self):
-        if CAN_SIGMASK:
-            signal.pthread_sigmask(
-                signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]
-            )
+        if BLOCK_SIGS:
+            signal.pthread_sigmask(signal.SIG_BLOCK, BLOCK_SIGS)
 
         self.fun(*self.a, **self.ka)
 
@@ -1781,9 +1806,7 @@ def log_thrs(log: Callable[[str, str, int], None], ival: float, name: str) -> No
 
 
 def _sigblock():
-    signal.pthread_sigmask(
-        signal.SIG_BLOCK, [signal.SIGINT, signal.SIGTERM, signal.SIGUSR1]
-    )
+    signal.pthread_sigmask(signal.SIG_BLOCK, BLOCK_SIGS)
 
 
 sigblock = _sigblock if CAN_SIGMASK else noop
@@ -2677,6 +2700,10 @@ def vjoin(rd: str, fn: str) -> str:
         return rd + "/" + fn
     else:
         return rd or fn
+
+
+def vjoins(*a: str) -> str:
+    return "/".join([x for x in a if x])
 
 
 # url-join

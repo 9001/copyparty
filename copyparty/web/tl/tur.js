@@ -572,7 +572,7 @@ Ls.tur = {
 	"u_https1": "daha iyi performans",
 	"u_https2": "için https'i",
 	"u_https3": "kullanın",
-	"u_ancient": 'tarayıcınız resmen fosilleşmiş -- belki de <a href="#" onclick="goto(\'bup\')">bup kullanmalısınız</a>',
+	"u_ancient": 'tarayıcınız resmen fosilleşmiş -- belki de <a href="#" id="u2nah">bup kullanmalısınız</a>',
 	"u_nowork": "firefox 53+ veya chrome 57+ veya iOS 11+ gerekiyor",
 	"tail_2old": "firefox 105+ veya chrome 71+ veya iOS 14.5+ gerekiyor",
 	"u_nodrop": 'tarayıcınız sürükleyip bırakmak için çok eski',

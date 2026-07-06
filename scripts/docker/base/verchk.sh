@@ -1,16 +1,19 @@
 #!/bin/bash
 set -e
 
-v=3.23
+AVER=3.24
+
+v=$AVER-stable
+#v=master
 
 mkdir -p cver
 rm -rf cver2
 mkdir cver2
 cd cver2
 curl \
-    -Lo1 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v-stable/main/musl/APKBUILD \
-    -Lo2 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v-stable/main/python3/APKBUILD \
-    -Lo3 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v-stable/community/ffmpeg/APKBUILD \
+    -Lo1 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v/main/musl/APKBUILD \
+    -Lo2 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v/main/python3/APKBUILD \
+    -Lo3 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v/community/ffmpeg/APKBUILD \
     ;
 
 zlib= ff=

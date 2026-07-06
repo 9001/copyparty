@@ -19,6 +19,9 @@
 * [assumptions](#assumptions)
     * [mdns](#mdns)
 * [sfx repack](#sfx-repack) - reduce the size of an sfx by removing features
+* [dependencies](#dependencies)
+    * [vendored dependencies](#vendored-dependencies) - some third-party code
+    * [optional dependencies](#optional-dependencies) - better explained in the main readme
 * [building](#building)
     * [dev env setup](#dev-env-setup)
     * [just the sfx](#just-the-sfx)
@@ -363,7 +366,7 @@ for the `re`pack to work, first run one of the sfx'es once to unpack it
 
 ## vendored dependencies
 
-some third-party code has been vendored into the git repo; some for convenience, some because they have been lightly hacked to fit copyparty's usecase better:
+some third-party code  has been vendored into the git repo; some for convenience, some because they have been lightly hacked to fit copyparty's usecase better:
 
 * inside the folder [/copyparty/stolen](https://github.com/9001/copyparty/tree/hovudstraum/copyparty/stolen) is python-libraries which runs on the serverside:
   * `surrogateescape.py` (BSD2) can be removed; only needed for python2 support
@@ -389,7 +392,7 @@ some third-party code has been vendored into the git repo; some for convenience,
 
 ## optional dependencies
 
-explained in the [main readme](https://github.com/9001/copyparty/tree/hovudstraum#optional-dependencies), but a quick recap:
+better explained in the main readme  -- [optional-dependencies](https://github.com/9001/copyparty/tree/hovudstraum#optional-dependencies) -- but a quick recap:
 
 * recommended python libraries: `argon2-cffi paramiko pyftpdlib pyopenssl pillow rawpy pyzmq` [python-magic](https://pypi.org/project/python-magic/)
   * only recommended on Windows: `psutil` (not very useful on Linux)

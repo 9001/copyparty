@@ -8,7 +8,7 @@ all:
 
 ff:
 # legally comfy
-	/usr/bin/time ./build-no265.sh img
+	/usr/bin/time ./build-no265.sh pull img
 
 
 zlib:

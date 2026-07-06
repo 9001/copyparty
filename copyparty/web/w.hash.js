@@ -1,5 +1,5 @@
-"use strict";
-
+// here begins copyparty/web/w.hash.js
+if (typeof document == 'undefined') {
 
 function hex2u8(txt) {
     return new Uint8Array(txt.match(/.{2}/g).map(function (b) { return parseInt(b, 16); }));
@@ -29,9 +29,6 @@ catch (ex) {
 }
 function load_fb() {
     subtle = null;
-    if (self.hashwasm)
-        return;
-    importScripts('deps/sha512.hw.js');
     console.log('using fallback hasher');
 }
 
@@ -42,10 +39,12 @@ var reader = null,
 
 
 onmessage = (d) => {
-    if (d.data == 'nosubtle')
+    var d0 = d.data[0];
+
+    if (d0 == 'nosubtle')
         return load_fb();
 
-    if (d.data == 'ping')
+    if (d0 == 'ping')
         return postMessage(['pong']);
 
     if (busy)
@@ -122,4 +121,6 @@ onmessage = (d) => {
             });
         }
     };
+}
+
 }

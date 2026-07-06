@@ -572,7 +572,7 @@ Ls.nld = {
 	"u_https1": "Je moet",
 	"u_https2": "overschakelen naar https",
 	"u_https3": "voor betere prestaties",
-	"u_ancient": 'Je browser is indrukwekkend oud -- misschien moet je <a href="#" onclick="goto(\'bup\')">in plaats daarvan bup gebruiken</a>',
+	"u_ancient": 'Je browser is indrukwekkend oud -- misschien moet je <a href="#" id="u2nah">in plaats daarvan bup gebruiken</a>',
 	"u_nowork": "Je moet firefox 53+ of chrome 57+ of iOS 11+ hebben",
 	"tail_2old": "Je moet firefox 105+ of chrome 71+ of iOS 14.5+ hebben",
 	"u_nodrop": 'Je browser is te oud voor uploaden via slepen en neerzetten',

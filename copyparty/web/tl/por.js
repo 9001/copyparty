@@ -572,7 +572,7 @@ Ls.por = {
 	"u_https1": "você deveria",
 	"u_https2": "mudar para https",
 	"u_https3": "para um melhor desempenho",
-	"u_ancient": 'seu navegador é impressionantemente antigo -- talvez você devesse <a href="#" onclick="goto(\'bup\')">usar o bup em vez disso</a>',
+	"u_ancient": 'seu navegador é impressionantemente antigo -- talvez você devesse <a href="#" id="u2nah">usar o bup em vez disso</a>',
 	"u_nowork": "precisa do firefox 53+ ou chrome 57+ ou iOS 11+",
 	"tail_2old": "precisa do firefox 105+ ou chrome 71+ ou iOS 14.5+",
 	"u_nodrop": 'seu navegador é muito antigo para upload de arrastar e soltar',

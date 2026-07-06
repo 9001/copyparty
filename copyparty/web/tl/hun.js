@@ -573,7 +573,7 @@ Ls.hun = {
 	"u_https1": 'érdemesebb lenne',
 	"u_https2": 'https-re váltani',
 	"u_https3": 'a jobb sebességért',
-	"u_ancient": 'lenyűgözően őskori a böngésződ -- talán <a href="#" onclick="goto(\'bup\')">használd inkább az egyszerű uploader-t</a>',
+	"u_ancient": 'lenyűgözően őskori a böngésződ -- talán <a href="#" id="u2nah">használd inkább az egyszerű uploader-t</a>',
 	"u_nowork": 'legalább Firefox 53, Chrome 57 vagy iOS 11 kell',
 	"tail_2old": 'legalább Firefox 105, Chrome 71 vagy iOS 14.5 kell',
 	"u_nodrop": 'a böngésződ túl öreg a drag-and-drop-hoz',

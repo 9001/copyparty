@@ -78,6 +78,7 @@ cd /mnt/nas/music/.hist
 # [`prisonparty.sh`](prisonparty.sh)
 * run copyparty in a chroot, preventing any accidental file access
 * creates bindmounts for /bin, /lib, and so on, see `sysdirs=`
+* **not compatible with:** `--th-bwrap`
 
 # [`bubbleparty.sh`](bubbleparty.sh)
 * run copyparty in an isolated process, preventing any accidental file access and more

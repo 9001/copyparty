@@ -28,6 +28,7 @@ from .__init__ import (
     MACOS,
     PY2,
     PY36,
+    UNIX,
     VT100,
     WINDOWS,
     E,
@@ -45,6 +46,7 @@ from .util import (
     DEF_EXP,
     DEF_MTE,
     DEF_MTH,
+    HAVE_BWRAP,
     HAVE_IPV6,
     IMPLICATIONS,
     JINJA_VER,
@@ -106,6 +108,8 @@ zsid = uuid.uuid4().urn[4:]
 CFG_DEF = [os.environ.get("PRTY_CONFIG", "")]
 if not CFG_DEF[0]:
     CFG_DEF.pop()
+
+FULL_HELP = os.environ.get("PRTY_FULL_HELP", "")
 
 
 class RiceFormatter(argparse.HelpFormatter):
@@ -1352,9 +1356,9 @@ def add_network(ap):
     ap2.add_argument("--cachectl", metavar="TXT", default="no-cache", help="default-value of the 'Cache-Control' response-header (controls caching in webbrowsers). Default prevents repeated downloading of the same file unless necessary (browser will ask copyparty if the file has changed). Examples: [\033[32mmax-age=604869\033[0m] will cache for 7 days, [\033[32mno-store, max-age=0\033[0m] will always redownload. (volflag=cachectl)")
     ap2.add_argument("--http-vary", metavar="TXT", type=u, default="Origin, PW, Cookie", help="value of the 'Vary' response-header; a hint for caching proxies")
     ap2.add_argument("--http-no-tcp", action="store_true", help="do not listen on TCP/IP for http/https; only listen on unix-domain-sockets")
-    if ANYWIN:
-        ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets on windows; allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
-    elif not MACOS:
+    if FULL_HELP or ANYWIN:
+        ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets (windows-only); allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
+    if FULL_HELP or (not ANYWIN and not MACOS):
         ap2.add_argument("--freebind", action="store_true", help="allow listening on IPs which do not yet exist, for example if the network interfaces haven't finished going up. Only makes sense for IPs other than '0.0.0.0', '127.0.0.1', '::', and '::1'. May require running as root (unless net.ipv6.ip_nonlocal_bind)")
     ap2.add_argument("--wr-h-eps", metavar="PATH", type=u, default="", help="write list of listening-on ip:port to textfile at \033[33mPATH\033[0m when http-servers have started")
     ap2.add_argument("--wr-h-aon", metavar="PATH", type=u, default="", help="write list of accessible-on ip:port to textfile at \033[33mPATH\033[0m when http-servers have started")
@@ -1505,6 +1509,8 @@ def add_sftp(ap):
     ap2.add_argument("--sftp-hostk", metavar="FP", type=u, default=E.cfg, help="path to folder with hostkeys, for example 'ssh_host_rsa_key'; missing keys will be generated")
     ap2.add_argument("--sftp-banner", metavar="T", type=u, default="", help="bannertext to send when someone connects; can be @filepath")
     ap2.add_argument("--sftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m (comma-separated); specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m / \033[33m--ipar\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
+    ap2.add_argument("--sftp-hs-t", metavar="SEC", type=int, default=15, help="connection handshake timeout in seconds")
+    ap2.add_argument("--sftp-hs-n", metavar="NUM", type=int, default=4, help="max num ongoing/incomplete handshakes")
 
 
 def add_ftp(ap):
@@ -1519,6 +1525,7 @@ def add_ftp(ap):
     ap2.add_argument("--ftp-wt", metavar="SEC", type=int, default=7, help="grace period for resuming interrupted uploads (any client can write to any file last-modified more recently than \033[33mSEC\033[0m seconds ago)")
     ap2.add_argument("--ftp-nat", metavar="ADDR", type=u, default="", help="the NAT address to use for passive connections")
     ap2.add_argument("--ftp-pr", metavar="P-P", type=u, default="", help="the range of TCP ports to use for passive connections, for example \033[32m12000-13000")
+    ap2.add_argument("--ftp-banner", metavar="T", type=u, default="welcome to the party", help="bannertext to send when someone connects; \\n is newline, can be @filepath (loaded into memory on startup); if it has a newline then banner must be longer than 75 chars")
 
 
 def add_webdav(ap):
@@ -1643,6 +1650,29 @@ def add_optouts(ap):
 
 
 def add_safety(ap):
+    th_bwrap = ""
+    if HAVE_BWRAP:
+        zsl = [
+            HAVE_BWRAP,
+            "--proc /proc",
+            "--tmpfs /tmp",
+            "--tmpfs /var",
+            "--tmpfs /run",
+            "--dev-bind /dev/null /dev/null",
+            "--dev-bind /dev/random /dev/random",
+            "--dev-bind /dev/urandom /dev/urandom",
+            "--chdir /tmp",
+            "--clearenv",
+            "--unshare-all",
+            "--cap-drop ALL",
+            "--die-with-parent",
+            "--new-session",
+        ]
+        for d in ("/lib", "/lib64", "/usr/lib", "/usr/lib64"):
+            if os.path.isdir(d):
+                zsl.append(" --ro-bind %s %s" % (d, d))
+        th_bwrap = " ".join(zsl)
+
     ap2 = ap.add_argument_group("safety options")
     ap2.add_argument("-s", action="count", default=0, help="increase safety: Disable thumbnails / potentially dangerous software (ffmpeg/pillow/vips), hide partial uploads, avoid crawlers.\n └─Alias of\033[32m --dotpart --no-thumb --no-mtag-ff --no-robots --force-js")
     ap2.add_argument("-ss", action="store_true", help="further increase safety: Prevent js-injection, accidental move/delete, broken symlinks, webdav requires login, 404 on 403, ban on excessive 404s.\n └─Alias of\033[32m -s --no-html --no-readme --no-logues --unpost=0 --no-del --no-mv --reflink --dav-auth --vague-403 -nih")
@@ -1654,9 +1684,11 @@ def add_safety(ap):
     ap2.add_argument("--vol-or-crash", action="store_true", help="if a volume's folder does not exist on the HDD, then burst into flames (volflag=assert_root)")
     ap2.add_argument("--no-dot-mv", action="store_true", help="disallow moving dotfiles; makes it impossible to move folders containing dotfiles")
     ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to turn something into a dotfile")
-    ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings")
-    ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme/preadme.md into directory listings")
-    ap2.add_argument("--no-script", action="store_true", help="disables javascript in html files; helps prevent XSS but kills interactive websites (volflag=noscript)")
+    ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings (volflag=no_logues)")
+    ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme/preadme.md into directory listings (volflag=no_readme)")
+    ap2.add_argument("--csp-ui", metavar="TXT", default="script-src 'unsafe-eval' 'nonce-{{ js_nonce }}'; worker-src 'self'", help="content-security-policy to apply for the web-UI; default helps prevent XSS by blocking <script> / onclick / ... (volflag=csp_ui)")
+    ap2.add_argument("--csp-dl", metavar="TXT", default="", help="content-security-policy to apply for static files (volflag=csp_dl)")
+    ap2.add_argument("--no-script", action="store_true", help="disables javascript in html files; helps prevent XSS but kills interactive websites; this will override \033[33m--csp-dl\033[0m with [\033[32mscript-src 'none'\033[0m] (volflag=noscript)")
     ap2.add_argument("--no-html", action="store_true", help="show html-files as plain text; helps prevent XSS but kills websites/blogs, also enables --no-script (volflag=nohtml)")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise). \033[1;31mWARNING:\033[0m Not compatible with WebDAV")
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore \033[33m--no-robots\033[0m")
@@ -1679,6 +1711,11 @@ def add_safety(ap):
     ap2.add_argument("--loris", metavar="B", type=int, default=60, help="if a client maxes out the server connection limit without sending headers, ban it for \033[33mB\033[0m minutes; disable with [\033[32m0\033[0m]")
     ap2.add_argument("--acao", metavar="V[,V]", type=u, default="*", help="Access-Control-Allow-Origin; list of origins (domains/IPs without port) to accept requests from; [\033[32mhttps://1.2.3.4\033[0m]. Default [\033[32m*\033[0m] allows requests from all sites but removes cookies and http-auth; only ?pw=hunter2 survives")
     ap2.add_argument("--acam", metavar="V[,V]", type=u, default="GET,HEAD", help="Access-Control-Allow-Methods; list of methods to accept from offsite ('*' behaves like \033[33m--acao\033[0m's description)")
+    if FULL_HELP or (not ANYWIN and not UNIX):
+        ap2.add_argument("--th-bwrap", metavar="CMD", type=u, default=th_bwrap, help="optional bwrap sandbox command for FFmpeg and dcraw (Linux-only)")
+        ap2.add_argument("--use-bwrap", metavar="C", type=u, default="a", help="a/n/f; [\033[32ma\033[0m]=auto (yes if the program 'bwrap' exists (assumes it works)), [\033[32mn\033[0m]=no (assumes bwrap is broken), [\033[32mf\033[0m]=force (disables FFmpeg if bwrap unavailable)")
+    else:
+        ap2.add_argument("--use-bwrap", metavar="C", type=u, default="n", help=argparse.SUPPRESS)
 
 
 def add_salt(ap, fk_salt, dk_salt, ah_salt):
@@ -1875,7 +1912,9 @@ def add_txt(ap):
     ap2 = ap.add_argument_group("textfile options")
     ap2.add_argument("--rw-edit", metavar="T,T", type=u, default="md", help="comma-sep. list of file-extensions to allow editing with permissions read+write; all others require read+write+delete (volflag=rw_edit)")
     ap2.add_argument("--md-no-br", action="store_true", help="markdown: disable newline-is-newline; will only render a newline into the html given two trailing spaces or a double-newline (volflag=md_no_br)")
-    ap2.add_argument("--md-hist", metavar="TXT", type=u, default="s", help="where to store old version of markdown files; [\033[32ms\033[0m]=subfolder, [\033[32mv\033[0m]=volume-histpath, [\033[32mn\033[0m]=nope/disabled (volflag=md_hist)")
+    ap2.add_argument("--md-hist", metavar="TXT", type=u, default="s", help="where to store old version of textfiles; [\033[32ms\033[0m]=subfolder, [\033[32mv\033[0m]=volume-histpath, [\033[32mn\033[0m]=nope/disabled (volflag=md_hist)")
+    ap2.add_argument("--md-nhist", metavar="TXT", type=int, default=99, help="how many old versions of textfiles to keep; 0=infinite (volflag=md_nhist)")
+    ap2.add_argument("--show-hist", action="store_true", help="allow browsing the .hist folder; enable to view old markdown files (volflag=show_hist)")
     ap2.add_argument("--txt-eol", metavar="TYPE", type=u, default="", help="enable EOL conversion when writing documents; supported: CRLF, LF (volflag=txt_eol)")
     ap2.add_argument("-mcr", metavar="SEC", type=int, default=60, help="the textfile editor will check for serverside changes every \033[33mSEC\033[0m seconds")
     ap2.add_argument("-emp", action="store_true", help="enable markdown plugins -- neat but dangerous, big XSS risk")
@@ -1934,7 +1973,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--css-browser", metavar="L", type=u, default="", help="URL to additional CSS to include in the filebrowser html")
     ap2.add_argument("--js-browser", metavar="L", type=u, default="", help="URL to additional JS to include in the filebrowser html")
     ap2.add_argument("--js-other", metavar="L", type=u, default="", help="URL to additional JS to include in all other pages")
-    ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages (except for basic-browser); can be @PATH to send the contents of a file at PATH, and/or begin with %% to render as jinja2 template (volflag=html_head)")
+    ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages (except for basic-browser); can be @PATH to send the contents of a file at PATH, and/or begin with %% to render as jinja2 template; \033[32m<script>\033[0m will not work, use \033[32m<script nonce=\"{{ js_nonce }}\">\033[0m (volflag=html_head)")
     ap2.add_argument("--html-head-s", metavar="T", type=u, default="", help="text to append to the <head> of all HTML pages (except for basic-browser); similar to (and can be combined with) --html-head but only accepts static text (volflag=html_head_s)")
     ap2.add_argument("--ih", action="store_true", help="if a folder contains index.html, show that instead of the directory listing by default (can be changed in the client settings UI, or add ?v to URL for override)")
     ap2.add_argument("--textfiles", metavar="CSV", type=u, default="txt,nfo,diz,cue,readme", help="file extensions to present as plaintext")
@@ -1978,16 +2017,16 @@ def add_debug(ap):
     ap2.add_argument("--vc", action="store_true", help="verbose config file parser (explain config)")
     ap2.add_argument("--cgen", action="store_true", help="generate config file from current config (best-effort; probably buggy)")
     ap2.add_argument("--deps", action="store_true", help="list information about detected optional dependencies")
-    if hasattr(select, "poll"):
+    if FULL_HELP or hasattr(select, "poll"):
         ap2.add_argument("--no-poll", action="store_true", help="kernel-bug workaround: disable poll; use select instead (limits max num clients to ~700)")
     ap2.add_argument("--no-sendfile", action="store_true", help="kernel-bug workaround: disable sendfile; do a safe and slow read-send-loop instead")
     ap2.add_argument("--no-scandir", action="store_true", help="kernel-bug workaround: disable scandir; do a listdir + stat on each file instead")
     ap2.add_argument("--no-fastboot", action="store_true", help="wait for initial filesystem indexing before accepting client requests")
     ap2.add_argument("--no-htp", action="store_true", help="disable httpserver threadpool, create threads as-needed instead")
-    if ANYWIN or sys.version_info < (3, 7):
-        ap2.add_argument("--sig-thr", action="store_true", default=True, help=argparse.SUPPRESS)
-    else:
+    if sys.version_info > (3, 7) and not ANYWIN:
         ap2.add_argument("--sig-thr", action="store_true", help="start separate thread for OS-signals (try this if CTRL-C is busted)")
+    else:
+        ap2.add_argument("--sig-thr", action="store_true", default=True, help=argparse.SUPPRESS)
     ap2.add_argument("--rm-sck", action="store_true", help="when listening on unix-sockets, do a basic delete+bind instead of the default atomic bind")
     ap2.add_argument("--srch-dbg", action="store_true", help="explain search processing, and do some extra expensive sanity checks")
     ap2.add_argument("--rclone-mdns", action="store_true", help="use mdns-domain instead of server-ip on /?hc")

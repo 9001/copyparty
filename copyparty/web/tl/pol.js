@@ -575,7 +575,7 @@ Ls.pol = {
 	"u_https1": "powinieneś przejść",
 	"u_https2": "na HTTPS w celu",
 	"u_https3": "uzyskania lepszej wydajności",
-	"u_ancient": 'twoja przeglądarka jest niezwykle zabytkowa -- powinieneś zamiast tego <a href="#" onclick="goto(\'bup\')">użyć bup</a>',
+	"u_ancient": 'twoja przeglądarka jest niezwykle zabytkowa -- powinieneś zamiast tego <a href="#" id="u2nah">użyć bup</a>',
 	"u_nowork": "wymaga Firefox 53+, Chrome 57+ lub iOS 11+",
 	"tail_2old": "wymaga Firefox 105+, Chrome 71+ lub iOS 14.5+",
 	"u_nodrop": 'ta przeglądarka jest za stara, nie wspiera przesyłania "przeciągnij i upuść"',

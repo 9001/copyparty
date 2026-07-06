@@ -571,7 +571,7 @@ Ls.spa = {
 	"u_https1": "deberías",
 	"u_https2": "cambiar a https",
 	"u_https3": "para un mejor rendimiento",
-	"u_ancient": "tu navegador es impresionantemente antiguo -- quizás deberías <a href=\"#\" onclick=\"goto('bup')\">usar bup en su lugar</a>",
+	"u_ancient": "tu navegador es impresionantemente antiguo -- quizás deberías <a href=\"#\" id=\"u2nah\">usar bup en su lugar</a>",
 	"u_nowork": "se necesita firefox 53+ o chrome 57+ o iOS 11+",
 	"tail_2old": "se necesita firefox 105+ o chrome 71+ o iOS 14.5+",
 	"u_nodrop": "tu navegador es demasiado antiguo para subir arrastrando y soltando",
