@@ -1133,7 +1133,7 @@ function loadUsers(){
         var inp = mknod("input", "", usrsConf[i].name);
         inp.setAttribute("value", usrsConf[i].name)
         inp.setAttribute("placeholder", "username")
-        preventAutoFill(inp)
+        inp.setAttribute("autocomplete", "new-password")
         clmod(inp, "name", true)
         inp.oninput = function(e){
             usrsConf[this.parentNode.getAttribute("ref")].name = this.value;
@@ -1145,7 +1145,7 @@ function loadUsers(){
         inp2.setAttribute("value", usrsConf[i].pw)
         inp2.setAttribute("type", "password")
         inp2.setAttribute("placeholder", "password")
-        preventAutoFill(inp2)
+        inp2.setAttribute("autocomplete", "new-password")
         clmod(inp2, "pw", true)
         inp2.oninput = function(e){
             usrsConf[this.parentNode.getAttribute("ref")].pw = this.value;
@@ -1165,16 +1165,6 @@ function loadUsers(){
         a.appendChild(b)
         container.appendChild(a)
     }
-}
-function preventAutoFill(elem){
-    elem.setAttribute("autocomplete", "off")
-    elem.setAttribute("readonly", "")
-    elem.onclick = function(){
-        this.removeAttribute('readOnly');
-    }
-    elem.addEventListener("focusout", function(){
-        this.setAttribute("readonly", "")
-    })
 }
 loadUsers();
 

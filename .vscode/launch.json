@@ -48,6 +48,7 @@
                 // "--ver"
 
                 // til's conf
+                "--qr"
                 "-v~/Pictures:/::A,test",
                 "-atest:test",
                 "-mth",

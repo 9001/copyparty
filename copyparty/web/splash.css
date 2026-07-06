@@ -97,7 +97,7 @@ a {
 	border-bottom: 2px solid rgb(3, 50, 112);
 	border-radius: .2em;
 	padding: .2em .6em;
-	margin: 0 .3em;
+	margin: 0 .6em 0 0;
 }
 #lo {
 	padding: 0 .6em;
@@ -187,6 +187,7 @@ table {
 	overflow-x: auto;
 	display: block;
 	overflow-y: hidden;
+	margin-bottom: .5em;
 }
 .vols td,
 .vols th {
@@ -213,30 +214,16 @@ table {
 .cn {
 	text-align: center;
 }
-.btns {
-	margin: 1em 0;
-}
-.btns>a:first-child {
-	margin-left: 0;
+.btns a, .btns form {
+  display: inline-block;
+  margin-bottom: .3em;
 }
 .agr br {
 	display: none;
 }
 .agr a,
 .agr form {
-	margin: 0 .5em 0 0;
 	line-height: 1.3em;
-    display: inline-block;
-}
-.agr form,
-.agr input {
-	display: inline;
-	padding: 0;
-	margin: 0;
-}
-.agr input {
-	line-height: 1em;
-	font-weight: normal;
 }
 #msg {
 	margin: 3em 0;
