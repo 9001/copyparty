@@ -36,7 +36,7 @@ button,
 .abtn{
     background: var(--a);
     border: var(--bg) solid 1px;
-    border-radius: 10px;
+    border-radius: 7px;
     color: var(--bg);
     padding: 0 .5em;
 }
@@ -53,6 +53,9 @@ input{
 }
 input:focus-visible{
     border-color: var(--a);
+}
+input[type=number]{
+    width: 5em;
 }
 h2{
     background: var(--bg-u2);
@@ -157,6 +160,24 @@ h3>input{
     display: block;
 }
 
+#users{
+    padding: 0 .2em;
+}
+#uopt>*:not(input[type=checkbox]){
+    display: inline-block;
+    margin-bottom: .5em;
+    margin-right: .5em;
+}
+.uinp {
+    line-height: 1em;
+}
+.inplbl{
+    position: absolute;
+    font-size: .8em;
+    margin-top: -1em;
+    margin-left: .3em;
+    opacity: .7;
+}
 .inlinePrompt{
     display: inline-block;
     margin-right: 5px;

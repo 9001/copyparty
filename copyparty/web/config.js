@@ -29,8 +29,7 @@ class Argument {
     }
 }
 
-/*
-FLAGS
+/* FLAGS update instructions
 
 to update manually from the documentation:
 copy what makes sense from the cli help page
@@ -899,7 +898,28 @@ var volflags = [
 ]
 
 
-// main code
+// main code ________________________________________________________________________________________________
+
+// these flags have a better, feature-complete way to be configured
+function loadUiFlags(){
+    var uiOnlyFlags = QSA('input[data-flag]')
+    for(var i = 0; i < uiOnlyFlags.length; i++){
+        var elem = uiOnlyFlags[i]
+        var val = sread(elem.getAttribute('data-flag'))
+        if(elem && val){
+            elem.value = val
+        }
+        elem.oninput = function(){
+            var cmd = this.getAttribute('data-flag');
+            if(!cmd) return;
+            if(this.value)
+                swrite(cmd, this.value);
+            else
+                sdrop(cmd);
+        }
+    }
+};
+loadUiFlags();
 
 // get extra flags
 var flagsConf = jread("flagsConf", []);
@@ -1119,6 +1139,9 @@ function autocompleteVolFlags(inp, arr, index) {
     });
 }
 autocompleteFlags(ebi('flagSearch'), flags);
+
+// alternative call that hides flags that have a better UI method
+//autocompleteFlags(ebi('flagSearch'), flags.filter((arg) => !QS('input[data-flag="' + arg.cmd + '"]')));
 
 
 // users
@@ -1388,8 +1411,22 @@ ebi('addVol').onclick = function(){
 function getConfig(){
     var conf = "python -m copyparty "
 
-    if(ebi('srvName').value) conf += '--name \\"' + ebi('srvName').value + '" ';
-    if(ebi('srvPort').value) conf += '-p ' + ebi('srvPort').value + " ";
+    var uiOnlyFlags = QSA('input[data-flag]')
+    for(var i = 0; i < uiOnlyFlags.length; i++){
+        var elem = uiOnlyFlags[i]
+        var iscb = elem.getAttribute('type') == 'checkbox'
+        var flag = elem.getAttribute('data-flag')
+        if(iscb){
+            if(elem.checked)
+                conf += flag + ' ';
+        }
+        else if(elem.value){
+            var val = elem.value
+            if(val.match(' '))
+                val = '"' + val + '"';
+            conf += elem.getAttribute('data-flag') + '=' + val + ' ';
+        }
+    }
 
     for(var i = 0; i < flagsConf.length; i++){
         conf += [flagsConf[i].cmd, flagsConf[i].value].join(" ") + " "

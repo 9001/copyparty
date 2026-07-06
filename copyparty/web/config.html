@@ -28,12 +28,12 @@
 
         <div>
             <p class="inlinePrompt">server name</p>
-            <input id="srvName" type="text" placeholder="copyparty"/>
+            <input data-flag="--name" type="text" placeholder="copyparty"/>
         </div>
 
         <div>
             <p class="inlinePrompt">port</p>
-            <input id="srvPort" type="text" placeholder="3923"/>
+            <input data-flag="-p" type="text" placeholder="3923"/>
         </div>
 
         <div>
@@ -48,6 +48,18 @@
         <button id="addVol">+ add volume</button>
 
         <h2>users</h2>
+        <div id="uopt">
+            <input type="checkbox" id="unames" data-flag="--usernames"/>
+            <label for="unames">require usernames</label>
+
+            <input type="checkbox" id="uchpw" data-flag="--chpw"/>
+            <label for="uchpw">allow password change</label>
+
+            <div>
+                <label for="uminpw" class="inplbl">min pw length</label>
+                <input type="number" class="uinp" id="uminpw" data-flag="--chpw-len" placeholder="8"/>
+            </div>
+        </div>
         <div id="users"></div>
         <button id="addUser">+ add user</button>
 
