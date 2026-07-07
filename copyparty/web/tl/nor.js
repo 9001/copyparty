@@ -569,7 +569,7 @@ Ls.nor = {
 	"u_https1": "du burde",
 	"u_https2": "bytte til https",
 	"u_https3": "for høyere hastighet",
-	"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup istedenfor</a>',
+	"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" id="u2nah">bruke bup istedenfor</a>',
 	"u_nowork": "krever firefox 53+, chrome 57+, eller iOS 11+",
 	"tail_2old": "krever firefox 105+, chrome 71+, eller iOS 14.5+",
 	"u_nodrop": 'nettleseren din er for gammel til å laste opp filer ved å dra dem inn i vinduet',

@@ -19,7 +19,7 @@ from copy import deepcopy
 
 from queue import Queue
 
-from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING, UNIX, WINDOWS, E
 from .authsrv import LEELOO_DALLAS, SEESLOG, VFS, AuthSrv
 from .bos import bos
 from .cfg import vf_bmap, vf_cmap, vf_vmap
@@ -2731,6 +2731,17 @@ class Up2k(object):
             t = "-" * 72
             raise Exception("%s\n%s\n%s" % (t, txt, t))
 
+    def _sql_ok(self, cur: "sqlite3.Cursor", q: str) -> bool:
+        try:
+            cur.execute(q).fetchone()
+            return True
+        except Exception as ex:
+            if "no such table" not in str(ex):
+                t = "WARNING: database issues, maybe due to server filesystem or hardware (check %sOS-logs):\n  %r -- \033[31m%r\n"
+                t2 = "" if ANYWIN or UNIX else "dmesg / "
+                self.log(t % (t2, q, ex), 3)
+        return False
+
     def _orz(self, db_path: str) -> "sqlite3.Cursor":
         assert sqlite3  # type: ignore  # !rm
         c = sqlite3.connect(
@@ -2904,11 +2915,8 @@ class Up2k(object):
 
     def _add_dhash_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5 -> v5a
-        try:
-            cur.execute("select d, h from dh limit 1").fetchone()
+        if self._sql_ok(cur, "select d, h from dh limit 1"):
             return
-        except:
-            pass
 
         for cmd in [
             r"create table dh (d text, h text)",
@@ -2922,11 +2930,8 @@ class Up2k(object):
     def _add_xiu_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5a -> v5b
         # store rd+fn rather than warks to support nohash vols
-        try:
-            cur.execute("select c, w, rd, fn from iu limit 1").fetchone()
+        if self._sql_ok(cur, "select c, w, rd, fn from iu limit 1"):
             return
-        except:
-            pass
 
         try:
             cur.execute("drop table iu")
@@ -2944,11 +2949,8 @@ class Up2k(object):
 
     def _add_cv_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5b -> v5c
-        try:
-            cur.execute("select rd, dn, fn from cv limit 1").fetchone()
+        if self._sql_ok(cur, "select rd, dn, fn from cv limit 1"):
             return
-        except:
-            pass
 
         for cmd in [
             r"create table cv (rd text, dn text, fn text)",
@@ -2983,11 +2985,8 @@ class Up2k(object):
 
     def _add_ds_tab(self, cur: "sqlite3.Cursor") -> None:
         # v5d -> v5e
-        try:
-            cur.execute("select rd, sz from ds limit 1").fetchone()
+        if self._sql_ok(cur, "select rd, sz from ds limit 1"):
             return
-        except:
-            pass
 
         for cmd in [
             r"create table ds (rd text, sz int, nf int)",
@@ -5232,7 +5231,7 @@ class Up2k(object):
         if eno not in E_FS_CRIT:
             return self.log("hashing failed; %r @ %r\n%s" % (ex, ap, min_ex()), 3)
         t = "hashing failed; %r @ %r\n%s\nWARNING: This MAY indicate a serious issue with your harddisk or filesystem! Please investigate %sOS-logs\n"
-        t2 = "" if ANYWIN or MACOS else "dmesg and "
+        t2 = "" if ANYWIN or UNIX else "dmesg and "
         return self.log(t % (ex, ap, min_ex(), t2), 1)
 
     def _new_upload(self, job: dict[str, Any], vfs: VFS, depth: int) -> dict[str, str]:

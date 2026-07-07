@@ -66,6 +66,7 @@ from .util import (
     alltrace,
     atomic_move,
     b64dec,
+    b64enc,
     eol_conv,
     exclude_dotfiles,
     exclude_dotfiles_ls,
@@ -242,6 +243,7 @@ class HttpCli(object):
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
         self.tls = self.is_https = hasattr(self.s, "cipher")
         self.is_vproxied = bool(self.args.R)
+        self.js_nonce = b64enc(os.urandom(16)).decode("ascii")
 
         # placeholders; assigned by run()
         self.keepalive = False
@@ -320,6 +322,7 @@ class HttpCli(object):
         ka["favico"] = self.args.favico
         ka["s_doctitle"] = self.args.doctitle
         ka["tcolor"] = self.vn.flags["tcolor"]
+        ka["js_nonce"] = self.js_nonce
 
         if self.args.js_other and "js" not in ka:
             zs = self.args.js_other
@@ -330,7 +333,7 @@ class HttpCli(object):
             ka["this"] = self
             self._build_html_head(ka)
 
-        ka["html_head"] = self.html_head
+        ka["html_head"] = self.html_head.replace("{{ js_nonce }}", self.js_nonce)
         return tpl.render(**ka)  # type: ignore
 
     def j2j(self, name: str) -> jinja2.Template:
@@ -792,9 +795,13 @@ class HttpCli(object):
                     self.pw = ""
                     self.uname = idp_usr
                     if self.args.ao_have_pw or self.args.idp_logout:
-                        self.html_head += "<script>var is_idp=1</script>\n"
+                        self.html_head += (
+                            '<script nonce="{{ js_nonce }}">var is_idp=1</script>\n'
+                        )
                     else:
-                        self.html_head += "<script>var is_idp=2</script>\n"
+                        self.html_head += (
+                            '<script nonce="{{ js_nonce }}">var is_idp=2</script>\n'
+                        )
                     zs = self.asrv.ases.get(idp_usr)
                     if zs:
                         self.set_idp_cookie(zs)
@@ -1124,7 +1131,7 @@ class HttpCli(object):
                 self.cbonk(self.conn.hsrv.gmal, zs, "cc_hdr", "Cc in out-hdr")
                 raise Pebkac(999)
 
-        response.append(self.vn.flags[oh_k])
+        response.append(self.vn.flags[oh_k].replace("{{ js_nonce }}", self.js_nonce))
 
         if self.args.ohead and self.do_log:
             zs = response.pop()[:-4]
@@ -4330,6 +4337,16 @@ class HttpCli(object):
                     pass
             if dp:
                 atomic_move(self.log, fp, os.path.join(dp, mfile2), vfs.flags)
+                nmax = dbv.flags["md_nhist"]
+                if nmax:
+                    zs = r"%s\.[0-9]+\.[0-9]{3}\.%s"
+                    ptn = re.compile(zs % (re.escape(fname), re.escape(fext)))
+                    zsl = [x for x in os.listdir(dp) if ptn.match(x)]
+                    zsl.sort(reverse=True)
+                    while len(zsl) > nmax:
+                        zs = os.path.join(dp, zsl.pop())
+                        self.log("rm %r" % (zs,))
+                        wunlink(self.log, zs, vfs.flags)
 
         assert self.parser.gen  # !rm
         p_field, _, p_data = next(self.parser.gen)
@@ -4529,6 +4546,8 @@ class HttpCli(object):
                 logues[n] = read_utf8(self.log, fsenc(fn), False)
                 if "exp" in vn.flags:
                     logues[n] = self._expand(logues[n], vn.flags.get("exp_lg") or [])
+                if "plainlogues" in vn.flags:
+                    logues[n] = html_escape(logues[n]).replace("\n", "<br />")
                 break
 
         readmes = ["", ""]
@@ -4546,6 +4565,10 @@ class HttpCli(object):
                 readmes[n] = read_utf8(self.log, fsenc(fn), False)
                 if "exp" in vn.flags:
                     readmes[n] = self._expand(readmes[n], vn.flags.get("exp_md") or [])
+                if "plainreadme" in vn.flags:
+                    zs = html_escape(readmes[n]).replace("\n", "<br />")
+                    logues[n] = "<pre>%s</pre>" % (zs,)
+                    readmes[n] = ""
                 break
 
         return logues, readmes
@@ -5539,7 +5562,7 @@ class HttpCli(object):
         file_ts = int(max(ts_md, self.E.t0))
         file_lastmod, do_send, _ = self._chk_lastmod(file_ts)
         self.out_headers["Last-Modified"] = file_lastmod
-        self.out_headers["Cache-Control"] = "no-cache"
+        # default Cache-Control (no-store) due to csp nonce
         status = 200 if do_send else 304
 
         arg_base = "?"
@@ -5549,17 +5572,16 @@ class HttpCli(object):
         boundary = "\roll\tide"
         targs = {
             "r": self.args.SR if self.is_vproxied else "",
+            "js_nonce": self.js_nonce,
             "ts": self.conn.hsrv.cachebuster(),
             "edit": "edit" in self.uparam,
             "title": html_escape(self.vpath, crlf=True),
             "lastmod": int(ts_md * 1000),
             "lang": self.cookies.get("cplng") or self.args.lang,
             "favico": self.args.favico,
-            "have_emp": int(self.args.emp),
-            "md_no_br": int(vn.flags.get("md_no_br") or 0),
-            "md_chk_rate": self.args.mcr,
             "md": boundary,
             "arg_base": arg_base,
+            "cgv1": self.vn.md_htm,
         }
 
         if self.args.js_other and "js" not in targs:
@@ -7321,7 +7343,7 @@ class HttpCli(object):
         # [num-backups, most-recent, hist-path]
         hist: dict[str, tuple[int, float, str]] = {}
         try:
-            if vf["md_hist"] != "s":
+            if "show_hist" not in vf or vf["md_hist"] != "s":
                 raise Exception()
             histdir = os.path.join(fsroot, ".hist")
             ptn = RE_MDV
@@ -7347,7 +7369,7 @@ class HttpCli(object):
             else:
                 ls_names = exclude_dotfiles(ls_names)
 
-        add_dk = vf.get("dk")
+        add_dk = not use_filekey and vf.get("dk")
         add_fk = vf.get("fk")
         fk_alg = 2 if "fka" in vf else 1
         if add_dk:
@@ -7635,10 +7657,10 @@ class HttpCli(object):
             if doctxt is not None:
                 j2a["doc"] = doctxt
 
+        dirs.sort(key=itemgetter("name"))
+
         for d in dirs:
             d["name"] += "/"
-
-        dirs.sort(key=itemgetter("name"))
 
         if is_opds:
             # OpenSearch Description format requires a full-qualified URL and a "Short Name" under 16 characters

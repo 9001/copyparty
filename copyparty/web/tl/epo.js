@@ -572,7 +572,7 @@ Ls.epo = {
 	"u_https1": "vi devas",
 	"u_https2": "ŝalti HTTPS-protokolon",
 	"u_https3": "por pli bona rendimento",
-	"u_ancient": 'via retumilo estas vere antikva -- eble vi devus <a href="#" onclick="goto(\'bup\')">uzi alŝutilon bup anstataŭe</a>',
+	"u_ancient": 'via retumilo estas vere antikva -- eble vi devus <a href="#" id="u2nah">uzi alŝutilon bup anstataŭe</a>',
 	"u_nowork": "Firefox 53+ aŭ Chrome 57+ aŭ iOS 11+ necesas",
 	"tail_2old": "Firefox 105+ aŭ Chrome 71+ aŭ iOS 14.5+ necesas",
 	"u_nodrop": 'via retumilo estas tro malnova por ŝova-kaj-demeta alŝutado',

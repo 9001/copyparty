@@ -81,7 +81,9 @@ RUN     tar --no-same-owner -xf zopfli.tgz \
 
 # build hash-wasm
 RUN     cd hash-wasm/dist \
-        && mv sha512.umd.min.js /z/dist/sha512.hw.js
+        && echo '"use strict";' > /z/dist/sha512.hw.js \
+        && cat sha512.umd.min.js >> /z/dist/sha512.hw.js \
+        && touch -r sha512.umd.min.js /z/dist/sha512.hw.js
 
 
 # build marked

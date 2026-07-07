@@ -572,7 +572,7 @@ Ls.swe = {
 	"u_https1": "du bör",
 	"u_https2": "byta till https",
 	"u_https3": "för bättre prestanda",
-	"u_ancient": 'din webbläsare är imponerande uråldrig -- du kanske borde <a href="#" onclick="goto(\'bup\')">använda bup istället</a>',
+	"u_ancient": 'din webbläsare är imponerande uråldrig -- du kanske borde <a href="#" id="u2nah">använda bup istället</a>',
 	"u_nowork": "firefox 53+ eller chrome 57+ eller iOS 11+ krävs",
 	"tail_2old": "firefox 105+ eller chrome 71+ eller iOS 14.5+ krävs",
 	"u_nodrop": 'din webbläsare är för gammal för dra-och-släpp-uppladdning',

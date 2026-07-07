@@ -1188,6 +1188,17 @@ class SvcHub(object):
         al.th_covers_set = set(al.th_covers)
         al.th_coversd_set = set(al.th_coversd)
 
+        zs = al.use_bwrap.strip().lower()
+        if zs == "a":
+            if not HAVE_BWRAP:
+                al.th_bwrap = ""
+        elif zs == "n":
+            al.th_bwrap = ""
+        elif zs == "f":
+            al.th_bwrap = al.th_bwrap or "bwrap-not-available"
+        else:
+            raise Exception("--use-bwrap must be a/n/f")
+
         for k in "c".split(" "):
             if self.args.env_expand in (0, 2):
                 break
@@ -1222,7 +1233,7 @@ class SvcHub(object):
 
         zs = "th_bwrap"
         for k in zs.split(" "):
-            zsl = [x for x in str(getattr(al, k)).split(" ") if x]
+            zsl = [x for x in str(getattr(al, k, "")).split(" ") if x]
             zbl = [x.encode("ascii", "replace") for x in zsl]
             setattr(al, k + "_s", zsl)
             setattr(al, k + "_b", zbl)

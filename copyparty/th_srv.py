@@ -18,7 +18,16 @@ from queue import Queue
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
 from .authsrv import VFS
 from .bos import bos
-from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, au_unpk, bwrap, ffprobe, have_ff
+from .mtag import (
+    HAVE_FFMPEG,
+    HAVE_FFPROBE,
+    TH_BWRAP,
+    au_unpk,
+    bwrap,
+    bwrap_fail,
+    ffprobe,
+    have_ff,
+)
 from .util import BytesIO  # type: ignore
 from .util import (
     FFMPEG_URL,
@@ -905,6 +914,9 @@ class ThumbSrv(object):
         ret, _, serr = runcmd(cmd, timeout=vn.flags[kto], nice=True, oom=oom)
         if not ret:
             return
+
+        if TH_BWRAP:
+            bwrap_fail(serr)
 
         c: Union[str, int] = "90"
         t = "FFmpeg failed (probably a corrupt file):\n"

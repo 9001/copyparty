@@ -572,7 +572,7 @@ Ls.ita = {
 	"u_https1": "dovresti",
 	"u_https2": "passare a https",
 	"u_https3": "per prestazioni migliori",
-	"u_ancient": 'il tuo browser è incredibilmente antico -- forse dovresti <a href="#" onclick="goto(\'bup\')">usare bup invece</a>',
+	"u_ancient": 'il tuo browser è incredibilmente antico -- forse dovresti <a href="#" id="u2nah">usare bup invece</a>',
 	"u_nowork": "serve firefox 53+ o chrome 57+ o iOS 11+",
 	"tail_2old": "serve firefox 105+ o chrome 71+ o iOS 14.5+",
 	"u_nodrop": 'il tuo browser è troppo vecchio per il caricamento drag-and-drop',

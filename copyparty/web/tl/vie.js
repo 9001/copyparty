@@ -581,7 +581,7 @@ Ls.vie = {
 	"u_https2": "chuyển sang https",
 	"u_https3": "để có hiệu suất tốt hơn",
 
-	"u_ancient": "trình duyệt của bạn quá cũ; bạn có thể <a href=\"#\" onclick=\"goto('bup')\">dùng bup</a> thay thế",
+	"u_ancient": "trình duyệt của bạn quá cũ; bạn có thể <a href=\"#\" id=\"u2nah\">dùng bup</a> thay thế",
 	"u_nowork": "cần Firefox 53+, Chrome 57+ hoặc iOS 11+",
 	"tail_2old": "cần Firefox 105+, Chrome 71+ hoặc iOS 14.5+",
 	"u_nodrop": "trình duyệt của bạn quá cũ để dùng kéo thả khi tải lên",

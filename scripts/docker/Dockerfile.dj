@@ -15,7 +15,6 @@ RUN     apk add -U !pyc ${ADD_PKG} \
             tzdata wget mimalloc2 mimalloc2-insecure bubblewrap \
             py3-jinja2 py3-argon2-cffi py3-pyzmq \
             py3-openssl py3-paramiko py3-pillow \
-            py3-pip \
             py3-magic \
             vips-jxl vips-poppler vips-magick \
             py3-numpy fftw libsndfile \
@@ -25,17 +24,19 @@ RUN     apk add -U !pyc ${ADD_PKG} \
             bash wget gcc g++ make cmake patchelf \
             ffmpeg ffmpeg-dev \
             python3-dev fftw-dev libsndfile-dev \
-            py3-wheel py3-numpy-dev \
+            py3-pip py3-wheel py3-setuptools py3-numpy-dev \
             vamp-sdk-dev \
         && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
         && python3 -m pip install pyvips --no-build-isolation \
         && bash install-deps.sh \
-        && apk del py3-pip .bd \
+        && apk del .bd \
         && chmod 777 /root \
         && ln -s /root/vamp /root/.local /
 
 COPY    i innvikler.sh ./
 RUN     ash innvikler.sh dj
+
+#vbt
 
 WORKDIR /state
 EXPOSE  3923

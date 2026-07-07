@@ -66,11 +66,14 @@ var u2min = `
 
 </style>
 
-<a href="#" onclick="this.parentNode.innerHTML='';">show advanced options</a>
+<a href="#" id="u2min_off">show advanced options</a>
 `;
 
 if (!has(perms, 'read')) {
   var e2 = mknod('div');
   e2.innerHTML = u2min;
   ebi('wrap').insertBefore(e2, QS('#wfp'));
+  ebi('u2min_off').onclick = function () {
+    this.parentNode.innerHTML='';
+  };
 }

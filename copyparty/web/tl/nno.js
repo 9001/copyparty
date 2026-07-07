@@ -569,7 +569,7 @@ Ls.nno = {
 	"u_https1": "du burde",
 	"u_https2": "bytte åt https",
 	"u_https3": "for høgare hastigheit",
-	"u_ancient": 'nettlesaren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup i staden for</a>',
+	"u_ancient": 'nettlesaren din er prehistorisk -- mulig du burde <a href="#" id="u2nah">bruke bup i staden for</a>',
 	"u_nowork": "krev firefox 53+, chrome 57+, eller iOS 11+",
 	"tail_2old": "krev firefox 105+, chrome 71+, eller iOS 14.5+",
 	"u_nodrop": 'nettlesaren din er for gamal åt å laste opp filer ved å drage dei inn i vindauget',

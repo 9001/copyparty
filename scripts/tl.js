@@ -602,7 +602,7 @@ Ls.hmn = {
 	"u_https1": "you should",
 	"u_https2": "switch to https",
 	"u_https3": "for better performance",
-	"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" onclick="goto(\'bup\')">use bup instead</a>',
+	"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" id="u2nah">use bup instead</a>',
 	"u_nowork": "need firefox 53+ or chrome 57+ or iOS 11+",
 	"tail_2old": "need firefox 105+ or chrome 71+ or iOS 14.5+",
 	"u_nodrop": 'your browser is too old for drag-and-drop uploading',

@@ -1,0 +1,34 @@
+# docker-compose.yml for traefik
+services:
+  traefik:
+    image: traefik:latest
+    command:
+      - --api.insecure=false
+      - --api.dashboard=true
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entryPoints.websecure.http.tls=true
+      - --entryPoints.web.http.redirections.entryPoint.to=websecure
+      - --entryPoints.web.http.redirections.entryPoint.scheme=https
+      - --certificatesresolvers.le.acme.email=<your email here>
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt:/letsencrypt
+    labels:
+      # OPTIONAL: host your traefik dashboard on <DOMAIN>
+      # - traefik.http.routers.traefik-dash.rule=Host(`<DOMAIN>`)
+      # - traefik.http.routers.traefik-dash.entrypoints=websecure
+      # - traefik.http.routers.traefik-dash.service=api@internal
+      # - traefik.http.routers.traefik-dash.tls.certresolver=le
+      # - traefik.http.routers.traefik-dash.middlewares=traefik-dash-auth,traefik-dash-redirect
+      # - traefik.http.middlewares.traefik-dash-auth.basicauth.users=<USERNAME>:<HTPASSWD_ENCODED_PASSWD>
+      # - traefik.http.middlewares.traefik-dash-redirect.redirectregex.regex=^https://<SUBDOMAIN>\.<DOMAIN>\.TLD/?$
+      # - traefik.http.middlewares.traefik-dash-redirect.redirectregex.replacement=https://<DOMAIN>/dashboard/
+
+networks: {}

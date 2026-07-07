@@ -21,6 +21,7 @@ from paramiko.sftp import (
     SFTP_OP_UNSUPPORTED,
     SFTP_PERMISSION_DENIED,
 )
+from queue import Queue
 
 from .__init__ import ANYWIN, TYPE_CHECKING
 from .authsrv import LEELOO_DALLAS, VFS, AuthSrv
@@ -736,6 +737,22 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
         return "/%s" % (undot(path),)
 
 
+class Transport2(paramiko.Transport):
+    def __init__(self, cli, addr):
+        self.addr = addr
+        super(Transport2, self).__init__(cli)
+
+    def _check_banner(self):
+        try:
+            return super()._check_banner()
+        except Exception as ex:
+            if "Error reading SSH protocol bann" in str(ex):
+                self.logger.warning("%s rejected: %s" % (self.addr, ex))
+                self.addr = None
+            else:
+                raise
+
+
 class Sftpd(object):
     def __init__(self, hub: "SvcHub") -> None:
         self.hub = hub
@@ -743,6 +760,7 @@ class Sftpd(object):
         self.log_func = hub.log
         self.srv: list[socket.socket] = []
         self.bound: list[str] = []
+        self.hs_q = Queue()
         self.sessions = {}
 
         ips = args.sftp_i
@@ -793,6 +811,9 @@ class Sftpd(object):
 
         self.log("listening @ %s port %s" % (self.bound, args.sftp))
 
+        for n in range(self.args.sftp_hs_n):
+            Daemon(self.acceptor, "sftp-hs-%d" % (n,))
+
     def log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.hub.log("sftp", msg, c)
 
@@ -828,12 +849,18 @@ class Sftpd(object):
         cli, addr = srv.accept()
         # cli.settimeout(0)  # == srv.setblocking(False)
         self.log("%r is connecting" % (addr,))
-        zs = "sftp-%s" % (addr[0],)
-        # Daemon(self._accept2, zs, (cli, addr))
-        self._accept2(cli, addr)
+        self.hs_q.put((cli, addr))
+
+    def acceptor(self) -> None:
+        while True:
+            try:
+                cli, addr = self.hs_q.get()
+                self._accept2(cli, addr)
+            except:
+                time.sleep(1)
 
     def _accept2(self, cli, addr) -> None:
-        tra = paramiko.Transport(cli)
+        tra = Transport2(cli, addr)
         for hkey in self.hostkeys:
             tra.add_server_key(hkey)
         tra.set_subsystem_handler("sftp", paramiko.SFTPServer, SFTP_Srv)
@@ -841,11 +868,12 @@ class Sftpd(object):
         try:
             tra.start_server(server=psrv)
         except Exception as ex:
-            self.log("%r could not establish connection: %r" % (addr, ex), 3)
+            if tra.addr:
+                self.log("%r could not establish connection: %r" % (addr, ex), 3)
             cli.close()
             return
 
-        chan = tra.accept()
+        chan = tra.accept(timeout=self.args.sftp_hs_t)
         if chan is None:
             self.log("%r did not open an sftp channel" % (addr,), 3)
             cli.close()

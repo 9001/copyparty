@@ -780,8 +780,20 @@ function sfx_nice() {
 }
 
 
-function fsearch_explain(n) {
-    if (n)
+function bind_fsearch_explain() {
+    var o = QSA('.fsearch_explain');
+    for (var a = 0, aa = o.length; a < aa; a++)
+        o[a].onclick = fsearch_explain;
+}
+
+
+function fsearch_explain() {
+    var a = this.getAttribute('a');
+
+    if (a == "u")
+        return toast.inf(60, L.ue_ab);
+
+    if (a == "r")
         return toast.inf(60, L.ue_ro + (acct == '*' ? L.ue_nl : L.ue_la).format(acct));
 
     if (bcfg_get('fsearch', false))
@@ -801,7 +813,7 @@ function up2k_init(subtle) {
 
     setTimeout(function () {
         if (WebAssembly && !hws.length)
-            fetch(SR + '/.cpr/w/w.hash.js?_=' + TS);
+            fetch(SR + '/.cpr/w/deps/sha512.hw.js?_=' + TS);
     }, 1000);
 
     function showmodal(msg) {
@@ -842,6 +854,7 @@ function up2k_init(subtle) {
             var o = mknod('div', 'u2depmsg');
             o.innerHTML = nosubtle ? '' : m;
             ebi('u2foot').appendChild(o);
+            setmonclick();
         }
         loading_deps = true;
     }
@@ -858,12 +871,13 @@ function up2k_init(subtle) {
             ebi('u2err').className = '';
             ebi('u2err').innerHTML = '';
         }
-        if (msg == suggest_up2k) {
-            ebi('u2yea').onclick = function (e) {
-                ev(e);
-                goto('up2k');
-            };
-        }
+        setmonclick();
+    }
+
+    function setmonclick() {
+        var x;
+        x = ebi('u2yea'); if (x) x.onclick = go2up2k;
+        x = ebi('u2nah'); if (x) x.onclick = go2bup;
     }
 
     function un2k(msg) {
@@ -1470,11 +1484,11 @@ function up2k_init(subtle) {
             }
 
             for (var a = 0; a < nw; a++)
-                hws.push(new Worker(SR + '/.cpr/w/w.hash.js?_=' + TS));
+                hws.push(new Worker(SR + '/.cpr/w/deps/sha512.hw.js?_=' + TS));
 
             if (!subtle)
                 for (var a = 0; a < hws.length; a++)
-                    hws[a].postMessage('nosubtle');
+                    hws[a].postMessage(['nosubtle']);
 
             console.log(hws.length + " hashers");
         }
@@ -1557,7 +1571,11 @@ function up2k_init(subtle) {
             if (!actx || actx.state != 'suspended' || toast.visible)
                 return;
 
-            toast.warn(30, "<div onclick=\"start_actx();toast.inf(3,'thanks!')\">" + L.u_actx + "</div>");
+            toast.warn(30, '<div id="actx_go">' + L.u_actx + '</div>');
+            ebi('actx_go').onclick = function () {
+                start_actx();
+                toast.inf(3, 'thanks!');
+            };
         }, 500);
     }
 
@@ -2294,7 +2312,7 @@ function up2k_init(subtle) {
             var w = hws[a];
             w.onmessage = onmsg;
             if (init)
-                w.postMessage('ping');
+                w.postMessage(['ping']);
             if (mem > 0)
                 free.push(w);
             mem -= chunksize;
@@ -2548,8 +2566,9 @@ function up2k_init(subtle) {
 
                     if (!response || !response.hits || !response.hits.length) {
                         smsg = '404';
-                        msg = (L.u_s404 + ' <a href="#" onclick="fsearch_explain(' +
-                            (has(perms, 'write') ? '0' : '1') + ')" class="fsearch_explain">(' + L.u_expl + ')</a>');
+                        msg = (L.u_s404 + ' <a href="#" class="fsearch_explain" a="' +
+                            (has(perms, 'write') ? 'w' : 'r') + '">(' + L.u_expl + ')</a>');
+                        timer.add(bind_fsearch_explain);
                     }
                     else {
                         smsg = 'found';
@@ -2747,7 +2766,8 @@ function up2k_init(subtle) {
                         }
                     }
                     if (err_pend) {
-                        err += ' <a href="#" onclick="toast.inf(60, L.ue_ab);" class="fsearch_explain">(' + L.u_expl + ')</a>';
+                        err += ' <a href="#" class="fsearch_explain" a="u">(' + L.u_expl + ')</a>';
+                        timer.add(bind_fsearch_explain);
                     }
                 }
 

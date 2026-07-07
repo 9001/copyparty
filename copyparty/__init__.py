@@ -80,6 +80,7 @@ web/deps/marked.js
 web/deps/mfusepy.py
 web/deps/mini-fa.css
 web/deps/mini-fa.woff
+web/deps/orbitron.woff2
 web/deps/prism.css
 web/deps/prism.js
 web/deps/prismd.css
@@ -134,7 +135,6 @@ web/tl/vie.js
 web/ui.css
 web/up2k.js
 web/util.js
-web/w.hash.js
 """
 RES = set(zs.strip().split("\n"))
 RESM = {

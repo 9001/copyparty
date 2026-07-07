@@ -131,8 +131,9 @@
 
 	<div id="rcm" tabindex="0"></div>
 
-	<script>
+	<script nonce="{{ js_nonce }}">
 		var SR = "{{ r }}",
+			JS_NONCE = "{{ js_nonce }}",
 			CGV1 = {{ cgv1 }},
 			CGV = {{ cgv|tojson }},
 			TS = "{{ ts }}",
@@ -146,17 +147,17 @@
 		var STG = window.localStorage;
 		document.documentElement.className = (STG && STG.cpp_thm) || dtheme;
 	</script>
-	<script src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
+	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
 	{%- if lang != "eng" %}
-	<script src="{{ r }}/.cpr/w/tl/{{ lang }}.js?_={{ ts }}"></script>
+	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/tl/{{ lang }}.js?_={{ ts }}"></script>
 	{%- endif %}
-	<script src="{{ r }}/.cpr/w/baguettebox.js?_={{ ts }}"></script>
-	<script src="{{ r }}/.cpr/w/browser.js?_={{ ts }}"></script>
-	<script src="{{ r }}/.cpr/w/up2k.js?_={{ ts }}"></script>
+	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/baguettebox.js?_={{ ts }}"></script>
+	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/browser.js?_={{ ts }}"></script>
+	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/up2k.js?_={{ ts }}"></script>
 	{%- if js %}
-	<script src="{{ js }}_={{ ts }}"></script>
+	<script nonce="{{ js_nonce }}" src="{{ js }}_={{ ts }}"></script>
 	{%- endif %}
-	<script>
+	<script nonce="{{ js_nonce }}">
 		Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
 		jsldp("J_UTL","util");
 		jsldp("J_BBX","baguettebox");

@@ -17,6 +17,11 @@ cd ../dist
 
 kwds='-bind -accounts -auth -auth-ord -flags -handlers -hooks -idp -urlform -exp -ls -dbd -chmod -pwhash -zm'
 
+export PRTY_FULL_HELP=1
+export PRTY_NO_PARAMIKO=1
+export PRTY_NO_VIPS=1
+export PRTY_NO_PIL=1
+
 html() {
     for a in '' $kwds; do
         echo "html$a" >&2

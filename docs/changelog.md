@@ -1,4 +1,46 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0526-1845  `v1.20.16`  s6-ready
+
+## 🧪 new features
+
+* #1463 opds: improved compatibility with various clients (thx @kamaeff!) 9068ec6a
+* #1485 users with read-access can now create get-only shares (thx @Scotsguy!) 0bb80e92
+* #1466 support the s6 service notification protocol (thx @mobin-2008!) 8c201b84 ca406472
+* download-as-zip/tar: the toplevel folder can be renamed with url-param `&name=foo` or entirely removed with `&name` cc5420a3
+* #1487 option to generate music spectrograms with logarithmic frequency scale (thx @9hax!) 83dc20f3
+* option to set custom name/path for ffmpeg/ffprobe binaries 5e806ec1
+* #1489 audio playback of mka files
+
+## 🩹 bugfixes
+
+* #1480 #1482 fix get-only shares not expiring if the creator is removed (thx @celinke97 and @Scotsguy!) 3b53a228
+* #1474 toggling between cropped/fullsize coverart for music didn't work 926c6e81
+* #1470 files from the year 30828 would break file listing 27031f73
+* #1494 fix js-crash when dragging a pic from the gallery out of the browser (thx @icxes!) 7d81b9e8
+* "fancy markdown editor" didn't work on phones 6183540c
+* improve signal handling f4f97b6c
+  * if I messed something up then `--sig-thr` or send 7x sigterm
+
+## 🔧 other changes
+
+* docker: the arm32 build of the iv image has graduated 6e75faa6
+  * `copyparty/iv` is now only available for `i386` / `x86_64` / `aarch64`
+* docker: rawpy is no longer bundled; now using libraw directly 348b4bb5
+  * creating thumbnails of .raw photos is now MUCH slower but quality is also much better
+* partyfuse: switch to mfusepy; adds fuse3 support and improves performance b2401ff1
+* additional advisory tiers for use with the vulnerability-checker 4e9ad781
+* clarify behavior of `xvol` regarding permissions e3271830
+* packaging/docs:
+  * #1479 freebsd: fix deps in rc.d (thx @Kansattica!) f432ef6d
+  * #1458 macos docs (thx @ilotoki0804!) d7eb556c
+
+## 🌠 fun facts
+
+* there will be a tiny handful of copyparty stickers at dokomi this weekend
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0424-2222  `v1.20.14`  autolocalization
 
 ## 🧪 new features

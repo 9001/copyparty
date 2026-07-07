@@ -573,7 +573,7 @@ Ls.chi = {
 	"u_https1": "你应该",
 	"u_https2": "切换到 https",
 	"u_https3": "以获得更好的性能",
-	"u_ancient": '你还在用远古浏览器，也许你应该 <a href="#" onclick="goto(\'bup\')">改用 bup</a>',
+	"u_ancient": '你还在用远古浏览器，也许你应该 <a href="#" id="u2nah">改用 bup</a>',
 	"u_nowork": "需要 Firefox 53+ 或 Chrome 57+ 或 iOS 11+",
 	"tail_2old": "需要 Firefox 105+ 或 Chrome 71+ 或 iOS 14.5+",
 	"u_nodrop": '浏览器版本低，不支持通过拖动文件到窗口来上传文件',

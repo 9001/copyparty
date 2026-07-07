@@ -15,6 +15,7 @@ from .authsrv import VFS
 from .bos import bos
 from .util import (
     FFMPEG_URL,
+    LOG,
     REKOBO_LKEY,
     VF_CAREFUL,
     expand_osenv_c,
@@ -236,6 +237,11 @@ def bwrap(prog: bytes, ap_in: bytes, ap_out: bytes) -> list[bytes]:
     return ret
 
 
+def bwrap_fail(serr: str) -> None:
+    if "bwrap:" in serr:
+        LOG[0]("root", "ffmpeg failed due to --th-bwrap;\n  " + serr, 3)
+
+
 def ffprobe(
     abspath: str, timeout: int = 60
 ) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]], list[Any], dict[str, Any]]:
@@ -249,6 +255,8 @@ def ffprobe(
         bap,
     ]
     rc, so, se = runcmd(cmd, timeout=timeout, nice=True, oom=200)
+    if rc and TH_BWRAP:
+        bwrap_fail(se)
     retchk(rc, cmd, se)
     return parse_ffprobe(so)
 

@@ -16,6 +16,8 @@ RUN     apk --no-cache add !pyc ${ADD_PKG} \
 COPY    i innvikler.sh ./
 RUN     ash innvikler.sh ac
 
+#vbt
+
 WORKDIR /state
 EXPOSE  3923
 ENTRYPOINT ["/bin/ash", "/z/cpp.sh", "-c", "/z/initcfg"]

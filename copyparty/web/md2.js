@@ -316,8 +316,8 @@ function Modpoll() {
     };
 
     setTimeout(r.periodic, 300);
-    if (md_opt.modpoll_freq > 0)
-        setInterval(r.periodic, 1000 * md_opt.modpoll_freq);
+    if (modpoll_freq > 0)
+        setInterval(r.periodic, 1000 * modpoll_freq);
 
     return r;
 }

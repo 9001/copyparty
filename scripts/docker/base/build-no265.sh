@@ -93,15 +93,17 @@ echo ok
 
 # golflympics
 #    3:48 x86_64-hub
-#    2:46 x86_64
-#    2:24 x86
-#   28:50 aarch64
-#   21:34 armv7
-#   31:13 s390x
-#   22:50 ppc64le
-# 1:53:25 summa summarum
+#    2:21 x86_64
+#    2:05 x86
+#   22:56 aarch64
+#   17:56 armv7
+#   25:25 s390x
+#   19:11 ppc64le
+# 1:33:42 summa summarum
+#  `- ls -1 t.* | awk -F. '$4==1{v=$5}$4==2{d=$5-v;t+=d;m=int(d/60);s=d-m*60;printf"%d:%02d %s\n",m,s,$3}END{m=int(t/60);s=t-m*60;printf"%d:%02d\n",m,s}'
 
-# for a in version muxers demuxers devices decoders encoders filters pix_fmts layouts sample_fmts ; do ffmpeg -hide_banner -$a; done | nc 192.168.123.1 4321
+# for a in version muxers demuxers devices decoders encoders filters pix_fmts layouts sample_fmts bsfs ; do ffmpeg -hide_banner -$a; done | nc 192.168.123.1 4321
+# podman run --rm -it --entrypoint /bin/ash copyparty/ac:latest -c 'for a in version muxers demuxers devices decoders encoders filters pix_fmts layouts sample_fmts bsfs ; do ffmpeg -hide_banner -$a; done' > ffmpeg-features.txt
 
 # v=3.24-stable
 # echo -n https://dl-cdn.alpinelinux.org/v${v%-*}/releases/x86_64/ >aver

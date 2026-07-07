@@ -22,9 +22,10 @@
         <div id="tw"></div>
     </div>
 	<a href="#" id="repl">π</a>
-	<script>
+	<script nonce="{{ js_nonce }}">
 
 var SR="{{ r }}",
+	JS_NONCE = "{{ js_nonce }}",
 	lang="{{ lang }}",
     dutc={{ this.args.js_utc }},
 	dfavico="{{ favico }}";
@@ -33,13 +34,13 @@ var STG = window.localStorage;
 document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme }}";
 
 </script>
-<script src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
-<script>var V={{ v }};</script>
-<script src="{{ r }}/.cpr/w/rups.js?_={{ ts }}"></script>
+<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
+<script nonce="{{ js_nonce }}">var V={{ v }};</script>
+<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/rups.js?_={{ ts }}"></script>
 {%- if js %}
-<script src="{{ js }}_={{ ts }}"></script>
+<script nonce="{{ js_nonce }}" src="{{ js }}_={{ ts }}"></script>
 {%- endif %}
-<script>
+<script nonce="{{ js_nonce }}">
 	Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
 	jsldp("J_UTL","util");
 	jsldp("J_RUP","rups");

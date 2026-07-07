@@ -436,6 +436,18 @@ IMPLICATIONS = [
     ["no_dupe_m", "no_dupe"],
     ["no_html", "no_script"],
     ["nohtml", "noscript"],
+    ["no_html", "nohtml"],  # user-typo
+    ["no_script", "noscript"],  # user-typo
+    ["no_readmes", "no_readme"],  # user-typo
+    ["noreadmes", "no_readme"],  # user-typo
+    ["noreadme", "no_readme"],  # user-typo
+    ["no_logue", "no_logues"],  # user-typo
+    ["nologues", "no_logues"],  # user-typo
+    ["nologue", "no_logues"],  # user-typo
+    ["plainlogue", "plainlogues"],  # user-typo
+    ["plainreadmes", "plainreadme"],  # user-typo
+    ["noscript", "plainlogues"],
+    ["noscript", "plainreadme"],
     ["sftpvv", "sftpv"],
     ["smbw", "smb"],
     ["smb1", "smb"],

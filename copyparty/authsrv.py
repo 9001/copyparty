@@ -443,6 +443,7 @@ class VFS(object):
         self.adot: dict[str, list[str]] = {}
         self.js_ls = {}
         self.js_htm = ""
+        self.md_htm = ""
         self.all_vols: dict[str, VFS] = {}  # flattened recursive
         self.all_nodes: dict[str, VFS] = {}  # also jumpvols/shares
         self.all_fvols: dict[str, VFS] = {}  # volumes which are files
@@ -2463,7 +2464,7 @@ class AuthSrv(object):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
-            zs = "forget_ip gid nrand tail_who th_qv th_qvx th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
+            zs = "forget_ip gid md_nhist nrand tail_who th_qv th_qvx th_spec_p u2abort u2ow uid unp_who ups_who zip_who"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
@@ -2616,6 +2617,8 @@ class AuthSrv(object):
             zsl4 = list(set([x.lower() for x in zsl2]))
             emb_all.update(zsl3)
             emb_all.update(zsl4)
+            if "no_readme" in vol.flags:
+                zsl1 = zsl2 = zsl3 = zsl4 = []
             vol.flags["emb_mds"] = [[0, zsl1, zsl3], [1, zsl2, zsl4]]
 
             zsl1 = [x for x in vol.flags["prologues"].split(",") if x]
@@ -2624,6 +2627,8 @@ class AuthSrv(object):
             zsl4 = list(set([x.lower() for x in zsl2]))
             emb_all.update(zsl3)
             emb_all.update(zsl4)
+            if "no_logues" in vol.flags:
+                zsl1 = zsl2 = zsl3 = zsl4 = []
             vol.flags["emb_lgs"] = [[0, zsl1, zsl3], [1, zsl2, zsl4]]
 
             zs = str(vol.flags.get("html_head") or "")
@@ -2640,17 +2645,22 @@ class AuthSrv(object):
             if head_s and not head_s.endswith("\n"):
                 head_s += "\n"
 
+            zs = vol.flags.get("csp_ui", "")
+            csp_ui = "Content-Security-Policy: %s\r\n" % (zs,) if zs else ""
+            zs = vol.flags.get("csp_dl", "")
+            csp_dl = "Content-Security-Policy: %s\r\n" % (zs,) if zs else ""
+
             zs = "X-Content-Type-Options: nosniff\r\n"
             if "norobots" in vol.flags:
                 head_s += META_NOBOTS
                 zs += "X-Robots-Tag: noindex, nofollow\r\n"
             if self.args.http_vary:
                 zs += "Vary: %s\r\n" % (self.args.http_vary,)
-            vol.flags["oh_g"] = zs + "\r\n"
+            vol.flags["oh_g"] = zs + csp_ui + "\r\n"
 
             if "noscript" in vol.flags:
-                zs += "Content-Security-Policy: script-src 'none';\r\n"
-            vol.flags["oh_f"] = zs + "\r\n"
+                csp_dl = "Content-Security-Policy: script-src 'none';\r\n"
+            vol.flags["oh_f"] = zs + csp_dl + "\r\n"
 
             ico_url = vol.flags.get("ufavico")
             if ico_url:
@@ -2795,6 +2805,28 @@ class AuthSrv(object):
             up_q = [UP_MTE_MAP[x] for x in up_m]
             zs = "select %s from up where rd=? and fn=?" % (", ".join(up_q),)
             vol.flags["ls_q_m"] = (zs if up_m else "", up_m)
+
+        for vn1 in vfs.all_nodes.values():
+            if "show_hist" in vn1.flags or not vn1.realpath:
+                continue
+            ap = vn1.realpath.replace(os.sep, "/")
+            apS = ap.rstrip("/") + "/"
+            for vn2 in vfs.all_nodes.values():
+                if not vn2.realpath:
+                    continue
+                haps = [
+                    vn2.histpath.replace(os.sep, "/"),
+                    vn2.dbpath.replace(os.sep, "/"),
+                ]
+                for hap in list(set(haps)):
+                    if not hap.startswith(apS):
+                        continue
+                    zs = hap[len(apS) :]
+                    if "/" in zs:
+                        t = "note: /%s/%s gives access to %s"
+                        self.log(t % (vn2.vpath, zs, hap), 3)
+                    else:
+                        vn1.add("", zs, zs)
 
         vfs.all_fvols = {
             zs: vol for zs, vol in vfs.all_vols.items() if "is_file" in vol.flags
@@ -3193,7 +3225,7 @@ class AuthSrv(object):
             db.close()
 
         self.js_ls = {}
-        self.js_htm = {}
+        self.js_htm = ""
         for vp, vn in self.vfs.all_nodes.items():
             if enshare and vp.startswith(shrs):
                 continue  # propagates later in this func
@@ -3285,7 +3317,13 @@ class AuthSrv(object):
                 zs2 = getattr(self.args, zs, "")
                 if zs2:
                     js_htm[zs] = zs2
+
+            zs = "have_emp md_no_br"
+            md_htm = {x: js_htm[x] for x in zs.split(" ")}
+            md_htm["modpoll_freq"] = self.args.mcr
+
             vn.js_htm = json_hesc(json.dumps(js_htm))
+            vn.md_htm = json_hesc(json.dumps(md_htm))
 
         vols = list(vfs.all_nodes.values())
         if enshare:

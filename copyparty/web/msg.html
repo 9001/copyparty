@@ -40,19 +40,19 @@ a{color:#fc5}</style>
 		{%- endif %}
 
 		{%- if click %}
-		<script>document.getElementsByTagName("a")[0].click()</script>
+		<script nonce="{{ js_nonce }}">document.getElementsByTagName("a")[0].click()</script>
 		{%- endif %}
 	</div>
 
 	{%- if redir %}
-	<script>
+	<script nonce="{{ js_nonce }}">
 		setTimeout(function() {
 			location.replace("{{ redir }}");
 		}, 800);
 	</script>
 	{%- endif %}
 	{%- if js %}
-	<script src="{{ js }}_={{ ts }}"></script>
+	<script nonce="{{ js_nonce }}" src="{{ js }}_={{ ts }}"></script>
 	{%- endif %}
 </body>
 

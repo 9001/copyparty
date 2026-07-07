@@ -50,6 +50,7 @@ def cnv(src):
     in_cores = 0
     in_hash_mt = False
     in_th_ram_max = 0
+    in_th_bwrap = 0
 
     while True:
         ln = next(src)
@@ -106,9 +107,18 @@ def cnv(src):
             in_th_ram_max = 3
         if in_th_ram_max:
             in_th_ram_max -= 1
-            ln = re.sub(r">[0-9]{1,2}\.[0-9]<", ">dynamic<", ln)
+            ln = re.sub(r">[0-9]{1,2}\.[0-9]<", ">depends-on-available-ram<", ln)
             if t != ln:
                 in_th_ram_max = 0
+        if "--th-bwrap CMD" in ln:
+            in_th_bwrap = 5
+        if in_th_bwrap:
+            in_th_bwrap -= 1
+            ln = re.sub(r">[^< ]+/bwrap .*", ">depends-on-system-env)</span>", ln)
+            if t == ln:
+                if "</span>" in ln:
+                    in_th_bwrap = 0
+                continue
         m = re.search(r"^# (.* help page)(.*)", ln)
         if m:
             zs1, zs2 = m.groups()

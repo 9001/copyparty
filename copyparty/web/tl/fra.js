@@ -572,7 +572,7 @@ Ls.fra = {
 	"u_https1": "vous devriez",
 	"u_https2": "passer à https",
 	"u_https3": "pour de meilleure performances",
-	"u_ancient": 'votre navigateur est impressionnamment ancien -- vous devriez peut-être <a href="#" onclick="goto(\'bup\')">utiliser bup à la place</a>',
+	"u_ancient": 'votre navigateur est impressionnamment ancien -- vous devriez peut-être <a href="#" id="u2nah">utiliser bup à la place</a>',
 	"u_nowork": "nécessite firefox 53+ ou chrome 57+ ou iOS 11+",
 	"tail_2old": "nécessite firefox 105+ ou chrome 71+ ou iOS 14.5+",
 	"u_nodrop": 'votre navigateur est trop ancien pour le téléversement par glisser-déposer',

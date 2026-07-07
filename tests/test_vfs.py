@@ -52,6 +52,14 @@ class TestVFS(unittest.TestCase):
     def log(self, src, msg, c=0):
         pass
 
+    def assertNodes(self, vfs, expected):
+        got = list(sorted(vfs.nodes.keys()))
+        self.assertEqual(got, [".hist"] + expected)
+
+    def assertJump(self, vfs, expected):
+        got = list(sorted(vfs.nodes.keys()))
+        self.assertEqual(got, expected)
+
     def assertAxs(self, dct, lst):
         t1 = list(sorted(dct))
         t2 = list(sorted(lst))
@@ -81,7 +89,7 @@ class TestVFS(unittest.TestCase):
         # defaults
         self.wipe_vfs(td)
         vfs = AuthSrv(Cfg(), self.log).vfs
-        self.assertEqual(vfs.nodes, {})
+        self.assertNodes(vfs, [])
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, td)
         self.assertAxs(vfs.axs.uread, ["*"])
@@ -90,7 +98,7 @@ class TestVFS(unittest.TestCase):
         # single read-only rootfs (relative path)
         self.wipe_vfs(td)
         vfs = AuthSrv(Cfg(v=["a/ab/::r"]), self.log).vfs
-        self.assertEqual(vfs.nodes, {})
+        self.assertNodes(vfs, [])
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, os.path.join(td, "a", "ab"))
         self.assertAxs(vfs.axs.uread, ["*"])
@@ -99,7 +107,7 @@ class TestVFS(unittest.TestCase):
         # single read-only rootfs (absolute path)
         self.wipe_vfs(td)
         vfs = AuthSrv(Cfg(v=[td + "//a/ac/../aa//::r"]), self.log).vfs
-        self.assertEqual(vfs.nodes, {})
+        self.assertNodes(vfs, [])
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, os.path.join(td, "a", "aa"))
         self.assertAxs(vfs.axs.uread, ["*"])
@@ -111,25 +119,25 @@ class TestVFS(unittest.TestCase):
             Cfg(a=["k:k"], v=[".::r:rw,k", "a/ac/acb:a/ac/acb:w:rw,k"]),
             self.log,
         ).vfs
-        self.assertEqual(len(vfs.nodes), 1)
+        self.assertNodes(vfs, ["a"])
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, td)
         self.assertAxs(vfs.axs.uread, ["*", "k"])
         self.assertAxs(vfs.axs.uwrite, ["k"])
         n = vfs.nodes["a"]
-        self.assertEqual(len(vfs.nodes), 1)
+        self.assertNodes(n, ["ac"])
         self.assertEqual(n.vpath, "a")
         self.assertEqual(n.realpath, os.path.join(td, "a"))
         self.assertAxs(n.axs.uread, ["*", "k"])
         self.assertAxs(n.axs.uwrite, ["k"])
         n = n.nodes["ac"]
-        self.assertEqual(len(vfs.nodes), 1)
+        self.assertNodes(n, ["acb"])
         self.assertEqual(n.vpath, "a/ac")
         self.assertEqual(n.realpath, os.path.join(td, "a", "ac"))
         self.assertAxs(n.axs.uread, ["*", "k"])
         self.assertAxs(n.axs.uwrite, ["k"])
         n = n.nodes["acb"]
-        self.assertEqual(n.nodes, {})
+        self.assertNodes(n, [])
         self.assertEqual(n.vpath, "a/ac/acb")
         self.assertEqual(n.realpath, os.path.join(td, "a", "ac", "acb"))
         self.assertAxs(n.axs.uread, ["k"])
@@ -176,13 +184,13 @@ class TestVFS(unittest.TestCase):
             Cfg(a=["k:k"], v=[".::rw,k", "a:a:r"]),
             self.log,
         ).vfs
-        self.assertEqual(len(vfs.nodes), 1)
+        self.assertEqual(len(vfs.nodes), 2)
         self.assertEqual(vfs.vpath, "")
         self.assertEqual(vfs.realpath, td)
         self.assertAxs(vfs.axs.uread, ["k"])
         self.assertAxs(vfs.axs.uwrite, ["k"])
         n = vfs.nodes["a"]
-        self.assertEqual(len(vfs.nodes), 1)
+        self.assertEqual(len(vfs.nodes), 2)
         self.assertEqual(n.vpath, "a")
         self.assertEqual(n.realpath, os.path.join(td, "a"))
         self.assertAxs(n.axs.uread, ["*", "k"])
@@ -273,6 +281,6 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(n.realpath, os.path.join(td, "src"))
         self.assertAxs(n.axs.uread, ["a", "asd"])
         self.assertAxs(n.axs.uwrite, ["asd"])
-        self.assertEqual(len(n.nodes), 0)
+        self.assertNodes(n, [])
 
         os.unlink(cfg_path)
