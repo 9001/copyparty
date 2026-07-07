@@ -1642,13 +1642,13 @@ class HttpCli(object):
 
     <iframe id="viewer" name="viewer" allow="clipboard-read *; clipboard-write *; fullscreen *"></iframe>
 
-    <script>
+    <script nonce="%s">
         document.getElementById("submit-form").submit();
     </script>
 </body>
 </html>
 """
-            % (favicon_url, self.uparam["wopi"], url, session_key)
+            % (favicon_url, self.uparam["wopi"], url, session_key, self.js_nonce)
         ]
 
         bret = "".join(ret).encode("utf-8", "replace")
