@@ -138,7 +138,7 @@ html.bz {
 }
 html.by {
 	--a: #139cf1;
-	--b: color-mix(in srgb, var(--bg) 20%, var(--a));
+	--b: color-mix(in srgb, var(--bg) 20%, var(--a) 5%, transparent);
 	--radius: 15px;
 	--a-dark: hsl(from color-mix(in oklab, var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.5) l);
 	--bg-u3: color-mix(in oklab, var(--bg-max) 70%, var(--b) 30%);
@@ -277,8 +277,7 @@ html.by a:not(.play) .imgcontainer::before{
 }
 html.by #ops a {
 	position: relative;
-	margin-left: 2px;
-	margin-right: 2px;
+	margin-left: 4px;
 }
 html.by #srchfolder_div {
 	left: 3.2em;
@@ -620,7 +619,7 @@ html .ayjump:focus-visible {
 	position: sticky;
 	z-index: 11;
 	background: linear-gradient(to bottom, var(--bg), transparent);
-	padding: .6em .5em;
+	padding: .6em;
 	top: 0;
 	margin: 0 -.6em;
 }
@@ -4247,8 +4246,8 @@ html.fy #wrap.thin .ghead,
 html.dy #wrap.thin .ghead,
 html.a #wrap.thin .ghead {
 	top: 6.9em;
-	margin-left: -.5em;
-	margin-right: -.5em;
+	margin-left: -.6em;
+	margin-right: -.6em;
 }
 html.fy #wrap.thin .ghead {
 	top: 6.1em;
@@ -4358,11 +4357,11 @@ html.e #wrap.thin .ghead {
 	#wfp {
 		margin-left: .1em;
 	}
-	#gfiles {
-		margin: 0em -0.5em;
+	html:not(.e) #gfiles {
+		margin: 0em -0.4em;
 	}
 	.ghead {
-		margin: 0 .5em 1em .5em;
+		margin: 0 .4em 1em .4em;
 	}
 	.modalheader {
 		padding: .8em 3em .8em .7em;
@@ -5331,6 +5330,7 @@ html.e #pathBar.shifted #hspace {
 }
 html.e   #pathBar.thin #actionsArea {
 	top: 0 !important;
+	right: 0 !important;
 }
 html.e input[type="radio"] {
   accent-color: #232323;
