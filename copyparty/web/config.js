@@ -1499,6 +1499,8 @@ function loadPerms(vol){
                     o.perms += p
                 else
                     o.perms = o.perms.replace(p, "")
+                if(o.perms.length == 0)
+                    aperms.splice(o, 1)
                 volume.perms = aperms
             }
             b.appendChild(c)
