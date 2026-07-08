@@ -1216,8 +1216,16 @@ function loadUsers(){
     for (var i = 0; i < usrsConf.length; i++) {
         var a = mknod("form");
         a.setAttribute("ref", i);
+        
+        var handle = mknod('p', '', '::::')
+        clmod(handle, 'dhandle', true)
+        handle.setAttribute('draggable', true)
+        handle.ondragstart = function(e){
+		    e.dataTransfer.setData("text", ', ' + usrsConf[this.parentNode.getAttribute("ref")].name);
+        }
+        a.appendChild(handle)
 
-        var inp = mknod("input", "", usrsConf[i].name);
+        var inp = mknod("input");
         inp.setAttribute("value", usrsConf[i].name)
         inp.setAttribute("placeholder", "username")
         inp.setAttribute("autocomplete", "new-password")
@@ -1256,12 +1264,64 @@ function loadUsers(){
 loadUsers();
 
 ebi('addUser').onclick = function(){
-    usrsConf.push({name: "", pw: ""});
+    usrsConf.push({name: "", pw: "", grp: ""});
 
     console.log(usrsConf);
     loadUsers();
     
     var ins = QSA('#users .name')
+    ins[ins.length - 1].focus();
+}
+
+var groups = jread("groupsConf", []);
+function loadGroups(){
+    var container = ebi('groups');
+    container.innerHTML = ""
+    for (var i = 0; i < groups.length; i++) {
+        var a = mknod("div");
+        a.setAttribute("ref", i);
+
+        var inp = mknod("input");
+        inp.setAttribute("value", groups[i].name)
+        inp.setAttribute("placeholder", "group name")
+        clmod(inp, "name", true)
+        inp.oninput = function(e){
+            groups[this.parentNode.getAttribute("ref")].name = this.value;
+            jwrite("groupsConf", groups);
+        }
+        a.appendChild(inp);
+
+        var inp2 = mknod("input");
+        inp2.setAttribute("value", groups[i].users)
+        inp2.setAttribute("placeholder", "(drag users here, or type)")
+        clmod(inp2, "users", true)
+        inp2.oninput = function(e){
+            while(this.value.startsWith(',') || this.value.startsWith(' ')) this.value = this.value.slice(1);
+            groups[this.parentNode.getAttribute("ref")].users = this.value;
+            jwrite("groupsConf", groups);
+        }
+        a.appendChild(inp2);
+
+        var b = mknod("button", "", "×");
+        clmod(b, "delBtn", true);
+        b.value = i
+        b.onclick = function(){
+            console.log("removing group at index " + this.value)
+            groups.splice(this.value, 1)
+            loadGroups();
+            jwrite("groupsConf", groups);
+        }
+        a.appendChild(b)
+        container.appendChild(a)
+    }
+}
+loadGroups();
+ebi('addGrp').onclick = function(){
+    groups.push({name: "", users: ""});
+
+    loadGroups();
+    
+    var ins = QSA('#groups .name')
     ins[ins.length - 1].focus();
 }
 
@@ -1401,8 +1461,12 @@ function loadPerms(vol){
     container.innerHTML = ""
     var volume = volsConf[vol]
     ebi('h_perms').innerHTML = "permissions for " + (volume.dst.length > 0 ? volume.dst : "home")
-    for(var i = -1; i < usrsConf.length; i++){
-        var usr = i > -1 ? usrsConf[i] : {name: "everyone"};
+    var users = usrsConf
+    for(var i = 0; i < groups.length; i++){
+        users.push({name: '@' + groups[i].name})
+    }
+    for(var i = -1; i < users.length; i++){
+        var usr = i > -1 ? users[i] : {name: "everyone"};
         var aperms = volume.perms ?? []
         var uperms = aperms.filter((o) => o.user == usr.name)[0]
         var a = mknod("div")
@@ -1424,7 +1488,7 @@ function loadPerms(vol){
             c.onclick = function(){
                 var p = this.getAttribute("p")
                 var uid = this.getAttribute("uid")
-                var usr = uid > -1 ? usrsConf[uid] : {name: "everyone"}
+                var usr = uid > -1 ? users[uid] : {name: "everyone"}
                 var o = aperms.filter((o) => o.user == usr.name)[0]
                 if(!o){
                     o = {user: usr.name, perms: ""}
@@ -1485,6 +1549,11 @@ function getConfig(){
     for(var i = 0; i < usrsConf.length; i++){
         if(usrsConf[i].pw != "")
             conf += "-a " + [usrsConf[i].name, usrsConf[i].pw].join(":") + " "
+    }
+
+    for(var i = 0; i < groups.length; i++){
+        if(groups[i].name != "" && groups[i].users != "")
+            conf += "--grp " + [groups[i].name, groups[i].users.replaceAll(' ', ',').replaceAll(',,', ',')].join(":") + " "
     }
 
     for(var i = 0; i < volsConf.length; i++){

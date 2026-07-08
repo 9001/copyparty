@@ -57,6 +57,10 @@ input:focus-visible{
 input[type=number]{
     width: 5em;
 }
+input[type=checkbox]{
+    width: 1.25em;
+    height: 1.25em;
+}
 h2{
     background: var(--bg-u2);
     padding: .5em;
@@ -184,6 +188,19 @@ h3>input{
     margin-right: 5px;
     min-width: 170px;
 }
+#users form{
+    border: transparent solid 1px;
+    border-radius: 5px;
+}
+.dhandle{
+    cursor: move;
+    display: inline-block;
+    margin: auto 0;
+    padding: .5em;
+}
+#users form:has(.dhandle:hover){
+    background: var(--bg-u5);
+}
 
 #flags>div{
     cursor: default;
@@ -291,5 +308,8 @@ strong,
     .autocomplete:focus{
         left: 10em;
         width: calc(100% - 13em);
+    }
+    .dhandle{
+        display: none;
     }
 }
