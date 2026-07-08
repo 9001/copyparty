@@ -1559,7 +1559,9 @@ function getConfig(){
 
     for(var i = 0; i < volsConf.length; i++){
         conf += "-v " + volsConf[i].src + ":" + volsConf[i].dst
-        volsConf[i].perms = volsConf[i].perms.sort((u) => u.name != 'everyone')
+        var a = volsConf[i].perms.filter((u) => u.user === 'everyone')
+        var b = volsConf[i].perms.filter((u) => u.user !== 'everyone')
+        volsConf[i].perms = [...a, ...b]
         for(var j = 0; j < volsConf[i].perms.length; j++){
             var uname = volsConf[i].perms[j].user
             if(uname)
