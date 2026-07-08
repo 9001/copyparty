@@ -1543,8 +1543,11 @@ function getConfig(){
     var conf = ebi('rpre').value + ' ';
 
     for(var i = 0; i < flagsConf.length; i++){
+        var val = flagsConf[i].value;
+        if(val.match(' ') && !val.startsWith('"'))
+            val = '"' + val + '"';
         // checkboxes set text value to 'on'
-        conf += [flagsConf[i].cmd, (flagsConf[i].value != 'on' ? flagsConf[i].value : '')].join(" ") + " "
+        conf += [flagsConf[i].cmd, (val != 'on' ? val : '')].join(" ") + " ";
     }
 
     for(var i = 0; i < usrsConf.length; i++){
