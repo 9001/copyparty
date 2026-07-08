@@ -1461,10 +1461,11 @@ function loadPerms(vol){
     container.innerHTML = ""
     var volume = volsConf[vol]
     ebi('h_perms').innerHTML = "permissions for " + (volume.dst.length > 0 ? volume.dst : "home")
-    var users = usrsConf
+    var users = []
     for(var i = 0; i < groups.length; i++){
         users.push({name: '@' + groups[i].name})
     }
+    users = users.concat(usrsConf)
     for(var i = -1; i < users.length; i++){
         var usr = i > -1 ? users[i] : {name: "everyone"};
         var aperms = volume.perms ?? []
