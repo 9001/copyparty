@@ -1541,29 +1541,33 @@ ebi('addVol').onclick = function(){
 
 
 // config generation
+function esc(s){
+    if(s.match(' ') && !s.startsWith('"'))
+        s = '"' + s + '"';
+    return s;
+}
 function getConfig(){
     var conf = ebi('rpre').value + ' ';
 
     for(var i = 0; i < flagsConf.length; i++){
         var val = flagsConf[i].value;
-        if(val.match(' ') && !val.startsWith('"'))
-            val = '"' + val + '"';
         // checkboxes set text value to 'on'
-        conf += [flagsConf[i].cmd, (val != 'on' ? val : '')].join(" ") + " ";
+        conf += flagsConf[i].cmd + (val != 'on' ? ('=' + esc(val)) : '') + " ";
     }
 
     for(var i = 0; i < usrsConf.length; i++){
-        if(usrsConf[i].pw != "")
-            conf += "-a " + [usrsConf[i].name, usrsConf[i].pw].join(":") + " "
+        if(usrsConf[i].pw != ""){
+            conf += "-a=" + esc(usrsConf[i].name) + ':' + esc(usrsConf[i].pw) + " "
+        }
     }
 
     for(var i = 0; i < groups.length; i++){
         if(groups[i].name != "" && groups[i].users != "")
-            conf += "--grp " + [groups[i].name, groups[i].users.replaceAll(' ', ',').replaceAll(',,', ',')].join(":") + " "
+            conf += "--grp=" + esc(groups[i].name) + ':' + groups[i].users.replaceAll(' ', ',').replaceAll(',,', ',') + " "
     }
 
     for(var i = 0; i < volsConf.length; i++){
-        conf += "-v " + volsConf[i].src + ":" + volsConf[i].dst
+        conf += "-v=" + esc(volsConf[i].src) + ":" + esc(volsConf[i].dst)
         var a = volsConf[i].perms.filter((u) => u.user === 'everyone')
         var b = volsConf[i].perms.filter((u) => u.user !== 'everyone')
         volsConf[i].perms = [...a, ...b]
