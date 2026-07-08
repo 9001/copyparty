@@ -2502,7 +2502,7 @@ function loadScript(name, id) {
 	var head = (document.getElementsByTagName("head")[0] || document.head)
     var s = document.createElement('script');
     s.src = window.SR + '/.cpr/w/' + name + '.js?_=' + window.TS;
-    s.setAttribute('nonce', JS_NONCE);
+    s.setAttribute('nonce', window.JS_NONCE);
 	var done = false;
     s.onload = s.onreadystatechange = function() {
 		if (!done && (!this.readyState ||
@@ -2523,11 +2523,10 @@ function loadScript(name, id) {
 }
 
 if (navigator.serviceWorker && caches){
-    // register service worker
-    // ToDo: set http header: Service-Worker-Allowed: /
-    // otherwise it will fail to register
     // https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
-    if(PWA){
+    if(PWA && window.JS_NONCE){
+        // loadScript requires a nonce, which may not be present on every page. 
+        // the service worker is not needed most of the time though, since it only handles sharing and app init, so it should be ok
     	loadScript('sw');
         window.addEventListener('load', function() {
             try {
