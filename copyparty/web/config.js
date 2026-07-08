@@ -937,8 +937,11 @@ function loadUiFlags(){
                     o = QS('input[data-flag="' + n + '"]');
                 }
             }
-            else{
-                elem.value = val
+            else {
+                if (elem.getAttribute('type') == 'checkbox')
+                    elem.checked = val ? true : false;
+                else
+                    elem.value = val
             }
         }
         elem.oninput = uiOptInput;
@@ -967,7 +970,9 @@ var uiOptInput = function(){
             o = QS('input[data-flag="' + n + '"]');
         }
     }
-
+    console.log(val)
+    if (e1.getAttribute('type') == 'checkbox')
+        val = e1.checked ? 'on' : '';
     if(val){
         var f = flagsConf.filter((f) => f.cmd == cmd)[0]
         if(!f)
@@ -1073,6 +1078,11 @@ function autocompleteFlags(inp, arr) {
             var val = this.getElementsByTagName("input")[0].value;
             inp.value = "";
             closeAllLists();
+            var exel = QS('input[data-flag="' + val + '"]')
+            if (exel) {
+                exel.focus();
+                return
+            }
             flagsConf.push({cmd: val, value: ""});
 
             console.log(flagsConf);
@@ -1114,16 +1124,17 @@ function autocompleteFlags(inp, arr) {
     inp.addEventListener("keydown", function(e) {
         var x = ebi(this.id + "-list");
         if (x) x = x.getElementsByTagName("div");
-        if (e.keyCode == 40) {
+        console.log(e.key)
+        if (e.key === 'ArrowDown' || e.key === 'Tab') {
             ev(e);
             currentFocus++;
             addActive(x);
-        } else if (e.keyCode == 38) { //up
+        } else if (e.key === 'ArrowUp') {
             ev(e);
             currentFocus--;
             addActive(x);
-        } else if (e.keyCode == 13) {
-            e.preventDefault();
+        } else if (e.key === 'Enter') {
+            ev(e);
             if (currentFocus > -1) {
                 if (x) x[currentFocus].click();
             }
@@ -1186,16 +1197,16 @@ function autocompleteVolFlags(inp, arr, index) {
     inp.addEventListener("keydown", function(e) {
         var x = ebi(this.id + "-list");
         if (x) x = x.getElementsByTagName("div");
-        if (e.keyCode == 40) {
+        if (e.key === 'ArrowDown' || e.key === 'Tab') {
             ev(e);
             currentFocus++;
             addActive(x);
-        } else if (e.keyCode == 38) { //up
+        } else if (e.key === 'Up') {
             ev(e);
             currentFocus--;
             addActive(x);
-        } else if (e.keyCode == 13) {
-            e.preventDefault();
+        } else if (e.key === 'Enter') {
+            ev(e);
             if (currentFocus > -1) {
                 if (x) x[currentFocus].click();
             }
