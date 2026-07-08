@@ -2139,6 +2139,7 @@ var mpl = (function () {
 			var url = r.cover.slice(0, -1) + 'wf3';
 
 			set_loaded(o, false);
+			o.onload = th_onload;
 			o.setAttribute('src', url);
 
 			o = QS('html.b #music, html.f #music');
@@ -6574,7 +6575,7 @@ window.thegrid = (function () {
 		}
 		ggrid.innerHTML = html.join('\n');
 
-		var ths = QSA('#ggrid>a>img');
+		var ths = QSA('#ggrid .imgcontainer>img');
 		for (var a = 0, aa = ths.length; a < aa; a++)
 			ths[a].onload = th_onload;
 
@@ -6811,13 +6812,14 @@ function get_thumb(ohref, ref, isdir, grid){
 				(thegrid.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' + (ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')' :
 				'.8em') + 
 			'"><span class="inner">' + ext + '</span></span>') +
-		'<img loading="lazy" fetchPriority="low" onload="th_onload(this)" src="' +
+		'<img loading="lazy" fetchPriority="low" src="' +
 		ihref + '" /></div>'
+		// onload needs to be set afterwards due to nonces
 	return container;
 }
 
-function th_onload(el) {
-	set_loaded(el, true, false)
+function th_onload() {
+	set_loaded(this, true, false)
 }
 
 function set_loaded(el, state, dblcheck) {
@@ -8724,6 +8726,11 @@ var treectl = (function () {
 		html.push('</tbody>');
 		html = html.join('\n');
 		set_files_html(html);
+
+		var ths = QSA('#files .imgcontainer>img');
+		for (var a = 0, aa = ths.length; a < aa; a++)
+			ths[a].onload = th_onload;
+
 		if (r.dlni) {
 			var o = QSA('#files a[id]');
 			for (var a = 0, aa = o.length; a < aa; a++)
