@@ -22,9 +22,14 @@
     </div>
     <button id="copyBtn" class="abtn" title="export config / copy to clipboard">📋</button>
     <div id="disclaimer">
-        ⚠️ this page is a preview feature! not all of the options are configurable nicely yet. feedback is welcome in the copyparty discord. ⚠️
+        ⚠️ this page is a preview feature! this is only a config builder and doesn't use your actual config atm. feedback is welcome in the copyparty discord. ⚠️
     </div>
 	<div id="wrap" class="main">
+
+        <div>
+            <p class="inlinePrompt">run prefix</p>
+            <input id="rpre" type="text" placeholder="python -m copyparty"/>
+        </div>
 
         <div>
             <p class="inlinePrompt">server name</p>
@@ -63,6 +68,31 @@
         <div id="users"></div>
         <button id="addUser">+ add user</button>
 
+        <h2>display defaults</h2>
+        <div id="dopt">
+            <input type="checkbox" id="gview" data-flag="--grid"/>
+            <label for="gview">grid view</label>
+
+            <div>
+                <label for="dtheme" class="inplbl">default theme no.</label>
+                <input type="number" class="uinp" id="dtheme" data-flag="--theme" placeholder="0-11"/>
+            </div>
+
+            <div style="display: inline-block;">
+                <label for="bg-url" class="inplbl">background image url</label>
+                <input type="text" class="uinp" id="bg-url" data-flag="--bg-img" placeholder="https://...jpg"/>
+            </div>
+            <div style="display: inline-block;">
+                <label for="bg-opa" class="inplbl">opacity</label>
+                <input type="number" class="uinp" id="bg-opa" data-prefix="opacity=" data-flag="--bg-img+" placeholder="0-1"/>
+            </div>
+            <div style="display: inline-block;">
+                <label for="bg-blur" class="inplbl">blur in px</label>
+                <input type="number" class="uinp" id="bg-blur" data-prefix="blur=" data-flag="--bg-img++" placeholder="0-50"/>
+
+            </div>
+        </div>
+
     </div>
     <div id="perms-modal">
         <div id="m_closeArea"></div>
@@ -77,6 +107,7 @@
 	<script nonce="{{ js_nonce }}">
         var SR="{{ r }}",
             lang="{{ lang }}",
+			bg_img = "{{ bg_img }}",
             dfavico="{{ favico }}";
 
         var STG = window.localStorage;

@@ -10,7 +10,7 @@
 	--sbh: 0.5em;
 
 	--tab-alt: var(--a);
-	--row-alt: var(--bg-u1);
+	--row-alt: color-mix(in oklab, transparent 80%, var(--fg-max) 15%);
 
 	--sel-fg: var(--bg-d1);
 	--sel-bg: var(--fg);
@@ -84,10 +84,10 @@
 	--g-play-b2: var(--a);
 
 	--g-sel-fg: var(--fg-max);
-	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 30%, var(--bg) 70%);
+	--g-sel-bg: color-mix(in xyz, var(--g-sel-b1) 30%, transparent 70%);
 	--g-sel-b1: var(--a-dark);
 	--g-sel-sh: hsl(from var(--a) h calc(s * 1.05) calc(l * .3));
-	--g-fsel-bg: color-mix(in xyz, var(--g-sel-b1) 70%, var(--bg-max) 30%);
+	--g-fsel-bg: color-mix(in xyz, var(--g-sel-b1) 70%, transparent 30%);
 	--g-fsel-b1: var(--a);
 	--g-fsel-ts: hsl(from var(--a) h calc(s * 1.05) calc(l * .3));
 	--g-dfg: #bbb;
@@ -132,6 +132,8 @@ html.b {
 
 	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a) 40%, transparent), color-mix(in oklab, var(--btn-bg-a)70%, var(--a-gray)));
 	--btn-bs: .1em .2em .1em var(--mp-sh);
+
+	--g-bg: color-mix(var(--bg-u2), transparent);
 }
 html.bz {
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
@@ -145,8 +147,8 @@ html.by {
 	--g-fsel-ts: transparent;
 	--scrl-hint: transparent;
 	--bg-u1: color-mix(in oklab, transparent 92%, var(--fg-max));
-	--w2: color-mix(in srgb, var(--a) 40%, var(--bg));
-	--row-alt: color-mix(in srgb, var(--a) 30%, var(--bg));
+	--w2: color-mix(in srgb, transparent 60%, var(--a) 25%, var(--bg));
+	--row-alt: color-mix(in srgb, var(--a) 30%, transparent);
 	--g-sel-bg: var(--a);
 
 
@@ -313,11 +315,12 @@ html.a {
 
 	--tree-bg: var(--bg);
 
-	--g-bg: var(--bg);
-	--g-b1: var(--bg);
-	--g-b2: var(--bg);
-	--g-g1: var(--bg);
+	--g-bg: transparent;
+	--g-b1: transparent;
+	--g-b2: transparent;
+	--g-g1: transparent;
 	--g-sh: rgba(0,0,0,0);
+	--g-f-bg: color-mix(var(--fg), var(--bg), transparent 60%);
 
 	--op-aa-bg: rgba(255,255,255,0.06);
 

@@ -2379,7 +2379,7 @@ function setColor (color) {
 	swrite('accent', accent);
 	var a = accent || '';
 	console.log('accent color set to: ' + a);
-	document.documentElement.style.setProperty('--a', a);
+	setcvar('--a', a);
 	pbar.drawbuf();
 	pbar.drawpos();
 	vbar.draw();
@@ -2396,7 +2396,22 @@ if((!accent || accent.length <= 3) && tcolor != "#333333")
 var thing = QS('meta[name=theme-color]');
 if(accent && accent.length > 3){
     console.log('read accent color from settings: ' + accent);
-    document.documentElement.style.setProperty('--a', parseColor(accent));
+    setcvar('--a', parseColor(accent));
+}
+
+if(window.bg_img){
+    var parts = window.bg_img.split(',');
+    if(parts.length > 0){
+        setcvar('--bg-img', 'url(' + parts[0] + ')')
+    }
+    for(var i = 0; i < parts.length; i++){
+        if(parts[i].match('=')){
+            var o = parts[i].split('=')
+            if(o[0].trim() == 'blur')
+                o[1] = 'blur(' + o[1] + 'px)'
+            setcvar('--bg-' + o[0].trim(), o[1])
+        }
+    }
 }
 
 function bchrome() {

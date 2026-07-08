@@ -5469,10 +5469,10 @@ class HttpCli(object):
     def tx_config(self) -> bool:
         html = self.j2s(
             "config",
-            args=self.args,
             accs=bool(self.asrv.acct),
             s="s" if self.is_https else "",
             theme=self.args.theme,
+            bg_img=self.args.bg_img,
         )
         self.reply(html.encode("utf-8"))
         return True
@@ -7137,6 +7137,7 @@ class HttpCli(object):
             "space_free": h1,
             "space_total": h2,
             "dtheme": self.args.theme,
+            "bg_img": self.args.bg_img,
         }
 
         if self.args.js_browser:

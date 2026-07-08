@@ -11010,7 +11010,6 @@ var rcm = (function () {
 					break;
 				case 'sin': msel.evsel(null, 't'); break;
 				case 'shr': fileman.share(); break;
-				case 'shr': fileman.cancel(); break;
 			}
 			r.hide(true);
 		};

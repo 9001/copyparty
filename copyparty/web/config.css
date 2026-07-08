@@ -46,7 +46,7 @@ input{
     outline: none !important;
     border-color: var(--a-gray);
     border-width: 0 0 1px 0;
-    line-height: 2.3em;
+    line-height: 2em;
     border-radius: .3em;
     max-width: calc(40vw - 2em);
     padding-left: .5em;
@@ -64,6 +64,7 @@ h2{
     text-align: center;
     border-radius: 5px;
     border: var(--a) solid 1px;
+    margin-bottom: .3em;
 }
 
 #header{
@@ -111,7 +112,7 @@ a:hover{
 }
 .autocomplete:focus{
     position: fixed;
-    top: 0;
+    top: .2em;
     z-index: 50;
     width: 30vw;
 }
@@ -169,12 +170,12 @@ h3>input{
     margin-right: .5em;
 }
 .uinp {
-    line-height: 1em;
+    margin-top: 1em;
+    display: inline-block;
 }
 .inplbl{
     position: absolute;
     font-size: .8em;
-    margin-top: -1em;
     margin-left: .3em;
     opacity: .7;
 }

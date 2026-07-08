@@ -115,6 +115,7 @@ def vf_vmap() -> dict[str, str]:
         "du_who",
         "epilogues",
         "ufavico",
+        "bg_img",
         "forget_ip",
         "fsnt",
         "hsortn",
@@ -346,6 +347,7 @@ flagcats = {
     },
     "client and ux": {
         "grid": "show grid/thumbnails by default",
+        "bg_img": "set a background image",
         "gsel": "select files in grid by ctrl-click",
         "sort": "default sort order",
         "nsort": "natural-sort of leading digits in filenames",

@@ -37,6 +37,21 @@
 	color: #b9bdc1;
     color: var(--fg);
 }
+html::before {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background-image: var(--bg-img);
+  background-size: cover;
+  background-position: center center;
+  content: "";
+  z-index: -1;
+  opacity: var(--bg-opacity);
+  filter: var(--bg-blur);
+}
 html.y {
 	color-scheme: light;
 

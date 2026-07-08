@@ -581,6 +581,7 @@ var flags = [
     new Argument("--dothidden", "hide specific files in a folder by listing them in a file named .hidden -- WARNING: Mostly cosmetic! Download-as-zip/tar will still download them. Do not rely on this for security (volflag=dothidden) (default: False)"),
     new Argument("--favico", "favicon-text [ foreground [ background ] ], set blank to disable (default: 🎉 000 none)"),
     new Argument("--ufavico", "URL to .ico/png/gif/svg file; --favico takes precedence unless disabled (volflag=ufavico) (default: )"),
+    new Argument("--bg-img", "URL to .jpg/png/gif/svg file (volflag=background)"),
     new Argument("--ext-th", "REPEATABLE: use thumbnail-image VP for file-extension E, example: [exe=/.res/exe.png] (volflag=ext_th) (default: None)"),
     new Argument("--notooltips", "tooltips disabled as default (default: False)"),
     new Argument("--spinner", "emoji or emoji,css Example: [🥖,padding:0] (default: 🌲)"),
@@ -807,6 +808,7 @@ var volflags = [
     new Argument("nsort", "natural-sort of leading digits in filenames"),
     new Argument("hsortn", "number of sort-rules to add to media URLs"),
     new Argument("ufavico", "URL per-volume favicon (.ico/png/gif/svg)"),
+    new Argument("bg-img", "background image url"),
     new Argument("unlist", "dont list files matching REGEX"),
     new Argument("dothidden", "enable support for .hidden files"),
     new Argument("dlni", "force-download (no-inline) files on click"),
@@ -900,33 +902,95 @@ var volflags = [
 
 // main code ________________________________________________________________________________________________
 
+
+ebi('rpre').value = sread('rprefix') ?? 'python -m copyparty'
+ebi('rpre').oninput = function(){
+    swrite('rprefix', this.value)
+}
+
+// get flags
+var flagsConf = jread("flagsConf", []);
+
 // these flags have a better, feature-complete way to be configured
+var uiOnlyFlags = QSA('input[data-flag]')
 function loadUiFlags(){
-    var uiOnlyFlags = QSA('input[data-flag]')
     for(var i = 0; i < uiOnlyFlags.length; i++){
         var elem = uiOnlyFlags[i]
-        var val = sread(elem.getAttribute('data-flag'))
+        var cmd = elem.getAttribute('data-flag')
+        var val = flagsConf.filter((f) => f.cmd == cmd)[0]?.value;
         if(elem && val){
-            elem.value = val
+            var n = cmd + '+'
+            var o = QS('input[data-flag="' + n + '"]');
+            if(o){
+                var arr = val.split(',')
+                elem.value = arr[0];
+                var j = 1
+                while(o){
+                    var val2 = arr[j]
+                    if(val2){
+                        var prefix = o.getAttribute('data-prefix');
+                        if(prefix) val2 = val2.replace(prefix, '')
+                        o.value = val2
+                    }
+                    n += '+'
+                    j++;
+                    o = QS('input[data-flag="' + n + '"]');
+                }
+            }
+            else{
+                elem.value = val
+            }
         }
-        elem.oninput = function(){
-            var cmd = this.getAttribute('data-flag');
-            if(!cmd) return;
-            if(this.value)
-                swrite(cmd, this.value);
-            else
-                sdrop(cmd);
-        }
+        elem.oninput = uiOptInput;
     }
 };
+var uiOptInput = function(){
+    var cmd = this.getAttribute('data-flag');
+    if(!cmd) return;
+    var e1 = this;
+    if(cmd.endsWith('+')){
+        cmd = cmd.replaceAll('+', '');
+        e1 = QS('input[data-flag="' + cmd + '"]')
+    }
+    var val = e1.value
+    
+    // collect all parts of cmd
+    var n = cmd + '+'
+    var o = QS('input[data-flag="' + n + '"]');
+    if(o){
+        while(o){
+            if(o.value){
+                var prefix = o.getAttribute('data-prefix');
+                val += ',' + (prefix ? prefix : '') + o.value;
+            }
+            n += '+'
+            o = QS('input[data-flag="' + n + '"]');
+        }
+    }
+
+    if(val){
+        var f = flagsConf.filter((f) => f.cmd == cmd)[0]
+        if(!f)
+            flagsConf.push({cmd: cmd, value: val});
+        else
+            f.value = val;
+    }
+    else{
+        var f = flagsConf.filter((f) => f.cmd == cmd)[0]
+        if(!f) return;
+        var index = flagsConf.indexOf(f)
+        console.log("removing arg at index " + index)
+        flagsConf.splice(index, 1)
+    }
+    jwrite("flagsConf", flagsConf);
+}
 loadUiFlags();
 
-// get extra flags
-var flagsConf = jread("flagsConf", []);
 function loadFlags(){
     var container = ebi('flags');
     container.innerHTML = ""
     for (var i = 0; i < flagsConf.length; i++) {
+        if(QS('input[data-flag="' + flagsConf[i].cmd + '"]')) continue;
         var a = mknod("div");
         var flag = flags.filter((f) => f.cmd == flagsConf[i].cmd)[0];
         a.setAttribute("Title", flag?.help);
@@ -1206,39 +1270,41 @@ var volsConf = jread("volsConf", []);
 function loadVolumes(){
     var container = ebi('volumes');
     container.innerHTML = ""
+
+    var srcInput = function(){
+        volsConf[this.parentNode.parentNode.getAttribute("ref")].src = this.value;
+        jwrite("volsConf", volsConf);
+    }
+    var dstInput = function(){
+        volsConf[this.parentNode.parentNode.getAttribute("ref")].dst = this.value;
+        jwrite("volsConf", volsConf);
+    }
     for (var i = 0; i < volsConf.length; i++) {
         var a = mknod("div");
         a.setAttribute("ref", i);
 
         var h = mknod("p", "", "Volume #" + i)
-        a.appendChild(h)
+        a.appendChild(h);
 
-        var h3_1 = mknod("h3", "", "real path")
+        var h3_1 = mknod("h3", "", "real path");
         var inp = mknod("input", "rp" + i, volsConf[i].src);
-        inp.setAttribute("value", volsConf[i].src)
-        inp.setAttribute("placeholder", "/storage/emulated/0/files")
-        clmod(inp, "src", true)
-        inp.oninput = function(e){
-            volsConf[this.parentNode.parentNode.getAttribute("ref")].src = this.value;
-            jwrite("volsConf", volsConf);
-        }
+        inp.setAttribute("value", volsConf[i].src);
+        inp.setAttribute("placeholder", "/storage/emulated/0/files");
+        clmod(inp, "src", true);
+        inp.oninput = srcInput;
         h3_1.appendChild(inp);
-        a.appendChild(h3_1)
+        a.appendChild(h3_1);
 
-        a.innerHTML += "➡️"
+        a.appendChild(document.createTextNode("➡️"));
 
-        var h3_2 = mknod("h3", "", "virtual path")
+        var h3_2 = mknod("h3", "", "virtual path");
         var inp2 = mknod("input", "vp" + i, volsConf[i].dst);
-        inp2.setAttribute("value", volsConf[i].dst)
-        inp2.setAttribute("placeholder", "/")
-        clmod(inp2, "dst", true)
-        inp2.oninput = function(e){
-            volsConf[this.parentNode.parentNode.getAttribute("ref")].dst = this.value;
-            jwrite("volsConf", volsConf);
-        }
-        a.appendChild(inp2);
+        inp2.setAttribute("value", volsConf[i].dst);
+        inp2.setAttribute("placeholder", "/");
+        clmod(inp2, "dst", true);
+        inp2.oninput = dstInput;
         h3_2.appendChild(inp2);
-        a.appendChild(h3_2)
+        a.appendChild(h3_2);
 
         var pbtn = mknod("button", "", "⚙️ permissions")
         pbtn.setAttribute("value", i)
@@ -1409,27 +1475,11 @@ ebi('addVol').onclick = function(){
 
 // config generation
 function getConfig(){
-    var conf = "python -m copyparty "
-
-    var uiOnlyFlags = QSA('input[data-flag]')
-    for(var i = 0; i < uiOnlyFlags.length; i++){
-        var elem = uiOnlyFlags[i]
-        var iscb = elem.getAttribute('type') == 'checkbox'
-        var flag = elem.getAttribute('data-flag')
-        if(iscb){
-            if(elem.checked)
-                conf += flag + ' ';
-        }
-        else if(elem.value){
-            var val = elem.value
-            if(val.match(' '))
-                val = '"' + val + '"';
-            conf += elem.getAttribute('data-flag') + '=' + val + ' ';
-        }
-    }
+    var conf = ebi('rpre').value + ' ';
 
     for(var i = 0; i < flagsConf.length; i++){
-        conf += [flagsConf[i].cmd, flagsConf[i].value].join(" ") + " "
+        // checkboxes set text value to 'on'
+        conf += [flagsConf[i].cmd, (flagsConf[i].value != 'on' ? flagsConf[i].value : '')].join(" ") + " "
     }
 
     for(var i = 0; i < usrsConf.length; i++){
@@ -1439,6 +1489,7 @@ function getConfig(){
 
     for(var i = 0; i < volsConf.length; i++){
         conf += "-v " + volsConf[i].src + ":" + volsConf[i].dst
+        volsConf[i].perms = volsConf[i].perms.sort((u) => u.name != 'everyone')
         for(var j = 0; j < volsConf[i].perms.length; j++){
             var uname = volsConf[i].perms[j].user
             if(uname)
@@ -1446,9 +1497,9 @@ function getConfig(){
                     (uname != "everyone" ? "," + uname : "")
         }
         for(var j = 0; j < volsConf[i].flags.length; j++){
-            conf += ":c," + volsConf[i].flags[j].cmd + (volsConf[i].flags[j].value ? "=" + volsConf[i].flags[j].value : "")
+            conf += ":c," + volsConf[i].flags[j].cmd.replaceAll('-', '_') + (volsConf[i].flags[j].value ? '="' + volsConf[i].flags[j].value + '"' : '')
         }
-        conf += " "
+        conf += ": "
     }
 
     return conf;
