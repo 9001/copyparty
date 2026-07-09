@@ -4616,7 +4616,7 @@ html.ey {
   --fg: #000;
   --fg-max: #0000ff;
   --fg-weak: #0000ff;
-  --bg: #c6c3c6;
+  --bg: #c0c0c0;
   --bg-d3: #7eb8f591;
   --bg-d2: var(--w3);
   --bg-d1: var(--bg);
@@ -4650,6 +4650,7 @@ html.ey {
   --u2-tab-1-bg: var(--w2);
   --sort-1: var(--fg-weak);
   --tree-bg: var(--w);
+  --g-bg: transparent;
   --g-b1: a;
   --g-b2: a;
   --g-f-bg: var(--w2);
