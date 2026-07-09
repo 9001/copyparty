@@ -153,6 +153,7 @@ window.baguetteBox = (function () {
         return bindImageClickListeners(selector, userOptions);
     }
 
+    var manualOpen = false;
     function bindImageClickListeners(selector, userOptions) {
         var galleryNodeList = QSA(selector);
         var selectorData = {
@@ -184,6 +185,12 @@ window.baguetteBox = (function () {
                         return true;
 
                     e.preventDefault ? e.preventDefault() : e.returnValue = false;
+                    var newHash = '#g' + this.getAttribute('id') + getsort();
+                    if(location.hash != newHash){
+                        console.log("opened bbox manually: hist push");
+                        manualOpen = true;
+                        hist_push(newHash);
+                    }
                     prepareOverlay(gallery, userOptions);
                     showOverlay(imageIndex);
                 };
@@ -858,8 +865,14 @@ window.baguetteBox = (function () {
 
         if (options.duringHide)
             options.duringHide();
-
-        sethash('');
+        
+        if(manualOpen){
+            console.log("closed bbox after manual open: hist back");
+            history.back();
+            manualOpen = false;
+        }
+        else
+            sethash('');
         unbindEvents();
 
         // Fade out and hide the overlay
@@ -1414,7 +1427,8 @@ window.baguetteBox = (function () {
         urltime: urltime,
         playpause: playpause,
         hide: hideOverlay,
-        destroy: destroyPlugin
+        destroy: destroyPlugin,
+        manualOpen: manualOpen
     };
 })();
 
