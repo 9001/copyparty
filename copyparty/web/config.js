@@ -808,7 +808,7 @@ var volflags = [
     new Argument("nsort", "natural-sort of leading digits in filenames"),
     new Argument("hsortn", "number of sort-rules to add to media URLs"),
     new Argument("ufavico", "URL per-volume favicon (.ico/png/gif/svg)"),
-    new Argument("bg-img", "background image url"),
+    new Argument("bg_img", "background image url"),
     new Argument("unlist", "dont list files matching REGEX"),
     new Argument("dothidden", "enable support for .hidden files"),
     new Argument("dlni", "force-download (no-inline) files on click"),
@@ -1589,7 +1589,7 @@ function getConfig(){
                     (uname != "everyone" ? "," + uname : "")
         }
         for(var j = 0; j < volsConf[i].flags.length; j++){
-            conf += ":c," + volsConf[i].flags[j].cmd.replaceAll('-', '_') + (volsConf[i].flags[j].value ? '="' + volsConf[i].flags[j].value + '"' : '')
+            conf += ":c," + volsConf[i].flags[j].cmd + (volsConf[i].flags[j].value ? '="' + volsConf[i].flags[j].value + '"' : '')
         }
         conf += ": "
     }

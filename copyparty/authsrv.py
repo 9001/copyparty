@@ -3248,6 +3248,7 @@ class AuthSrv(object):
                 "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
                 "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
                 "rw_edit": vf["rw_edit"],
+                "bg_img": vf["bg_img"],
             }
             if "ufavico_h" in vf:
                 vn.js_ls["ufavico"] = vf["ufavico_h"]
@@ -3274,6 +3275,7 @@ class AuthSrv(object):
                 "sba_md": vf.get("md_sba") or "",
                 "sba_lg": vf.get("lg_sba") or "",
                 "rw_edit": vf["rw_edit"],
+                "bg_img": vf["bg_img"],
                 "txt_ext": self.args.textfiles.replace(",", " "),
                 "def_hcols": list(vf.get("mth") or []),
                 "unlist0": vf.get("unlist") or "",

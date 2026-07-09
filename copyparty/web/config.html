@@ -84,7 +84,7 @@
 
             <div style="display: inline-block;">
                 <label for="bg-url" class="inplbl">background image url</label>
-                <input type="text" class="uinp" id="bg-url" data-flag="--bg-img" placeholder="https://...jpg"/>
+                <input type="text" class="uinp" id="bg-url" data-flag="--bg-img" placeholder="https://...jpg" title="the url may not contain any commas or spaces"/>
             </div>
             <div style="display: inline-block;">
                 <label for="bg-opa" class="inplbl">opacity</label>
@@ -92,8 +92,7 @@
             </div>
             <div style="display: inline-block;">
                 <label for="bg-blur" class="inplbl">blur in px</label>
-                <input type="number" class="uinp" id="bg-blur" data-prefix="blur=" data-flag="--bg-img++" placeholder="0-50"/>
-
+                <input type="number" class="uinp" id="bg-blur" data-prefix="blur=" data-flag="--bg-img++" placeholder="0-50" title="it's recommended to blur the image itself instead of using this setting for performance reasons"/>
             </div>
         </div>
 

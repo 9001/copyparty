@@ -140,7 +140,7 @@ html.bz {
 }
 html.by {
 	--a: #139cf1;
-	--b: color-mix(in srgb, color-mix(in srgb, var(--bg) 20%, var(--a) 5%) 25%, transparent);
+	--b: color-mix(in srgb, var(--bg) 30%, var(--a) 5%);
 	--radius: 15px;
 	--a-dark: hsl(from color-mix(in oklab, var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.5) l);
 	--bg-u3: color-mix(in oklab, var(--bg-max) 70%, var(--b) 30%);
@@ -4233,7 +4233,11 @@ html.e #pathBar.thin #path {
 }
 html:not(.e) #wrap.thin .ghead {
 	top: 7em;
-	padding: .3em;
+	/* padding: .3em; */
+}
+html:not(.e):not(.fy) #wrap.thin #wtc {
+	margin-left: 0;
+	margin-right: 0;
 }
 html:not(.e) #wrap.thin #ghead {
 	text-wrap-mode: nowrap;
@@ -4453,6 +4457,9 @@ html.e #wrap.thin .ghead {
 	}
 	html:not(.e):not(.f) #mu_inner {
 		margin: -.5em;
+	}
+	html.by #tree{
+		backdrop-filter: blur(10px);
 	}
 }
 

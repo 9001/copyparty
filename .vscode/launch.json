@@ -49,7 +49,7 @@
 
                 // til's conf
                 "--qr"
-                "-v~/Pictures:/::A,test",
+                "-v~/Pictures:/a::A,test",//:c,bg_img=/a/HLCourDWYAA8RLl.webp",
                 "-atest:test",
                 "-mth",
                 "!,q",
@@ -59,6 +59,7 @@
                 "*",
                 "-e2dsa",
                 "-e2ts"
+                // "--bg-img=https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Parthenon_from_west.jpg/1280px-Parthenon_from_west.jpg,opacity=.5,blur=10"
             ]
         },
         {
