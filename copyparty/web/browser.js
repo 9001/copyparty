@@ -1732,6 +1732,10 @@ window.onhashchange = function() {
 		}
 		ebi(location.hash.slice(1)).scrollIntoView();
 	}
+	else if (location.hash.startsWith('#gf-')){
+		hash0 = location.hash;
+		eval_hash()
+	}
 }
 
 
