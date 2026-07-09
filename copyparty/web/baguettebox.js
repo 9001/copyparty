@@ -187,7 +187,7 @@ window.baguetteBox = (function () {
                     e.preventDefault ? e.preventDefault() : e.returnValue = false;
                     var newHash = '#g' + this.getAttribute('id') + getsort();
                     if(location.hash != newHash){
-                        console.log("opened bbox manually: hist push");
+                        console.log("opened bbox manually");
                         manualOpen = true;
                         hist_push(newHash);
                     }
@@ -865,9 +865,9 @@ window.baguetteBox = (function () {
 
         if (options.duringHide)
             options.duringHide();
-        
+
         if(manualOpen){
-            console.log("closed bbox after manual open: hist back");
+            console.log("closed bbox after manual open");
             history.back();
             manualOpen = false;
         }
