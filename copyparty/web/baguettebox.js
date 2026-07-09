@@ -868,7 +868,8 @@ window.baguetteBox = (function () {
 
         if(manualOpen){
             console.log("closed bbox after manual open");
-            history.back();
+            if(location.hash.startsWith('#gf-'))
+                history.back();
             manualOpen = false;
         }
         else
