@@ -10,7 +10,7 @@
 	--sbh: 0.5em;
 
 	--tab-alt: var(--a);
-	--row-alt: color-mix(in oklab, transparent 85%, var(--fg-max) 10%, var(--bg-max));
+	--row-alt: color-mix(in oklab, color-mix(in oklab, transparent 85%, var(--fg-max) 10%) 95%, var(--bg-max));
 
 	--sel-fg: var(--bg-d1);
 	--sel-bg: var(--fg);
@@ -140,7 +140,7 @@ html.bz {
 }
 html.by {
 	--a: #139cf1;
-	--b: color-mix(in srgb, var(--bg) 20%, var(--a) 5%, transparent);
+	--b: color-mix(in srgb, color-mix(in srgb, var(--bg) 20%, var(--a) 5%) 25%, transparent);
 	--radius: 15px;
 	--a-dark: hsl(from color-mix(in oklab, var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.5) l);
 	--bg-u3: color-mix(in oklab, var(--bg-max) 70%, var(--b) 30%);
@@ -1835,7 +1835,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 }
 html.f #mu_outer,
 html.b #mu_outer {
-	background: color-mix(in oklab, var(--a) 10%, var(--bg-u2) 10%, transparent);
+	background: color-mix(in oklab, color-mix(in oklab, var(--a) 10%, var(--bg-u2) 10%) 20%, transparent);
 	backdrop-filter: blur(32px);
 }
 #h_music {
