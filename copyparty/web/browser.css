@@ -134,11 +134,7 @@ html.b {
 	--btn-bs: .1em .2em .1em var(--mp-sh);
 
 	--g-bg: color-mix(var(--bg-u2), transparent);
-}
-html.bz {
-	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
-}
-html.by {
+
 	--a: #139cf1;
 	--b: color-mix(in srgb, var(--bg) 30%, var(--a) 5%);
 	--radius: 15px;
@@ -165,99 +161,112 @@ html.by {
 	
   	text-shadow: 0px 0px 4px rgb(255, 255, 255);
 }
-html.by #srchfolder_div,
-html.by #up_quick_more a,
-html.by #spaceTotal_bar,
-html.by #s_list h3,
-html.by #wtico,
-html.by #wtoggle,
-html.by #ggrid>a,
-html.by #ops a,
-html.by #tree ul a.hl,
-html.by .btn {
+html.bz {
+	--a: #5fb9b8;
+	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
+	text-shadow: 0px 0px 4px #000;
+	--fg-weak: var(--fg-max);
+
+	--glow-intensity: 0.5;
+	--bottom-glow: radial-gradient(
+		farthest-corner at bottom center,
+		color-mix(in srgb, var(--a-hil) 10%, rgba(0,0,0, var(--glow-intensity))),
+		transparent
+	);
+}
+html.b #srchfolder_div,
+html.b #up_quick_more a,
+html.b #spaceTotal_bar,
+html.b #s_list h3,
+html.b #wtico,
+html.b #wtoggle,
+html.b #ggrid>a,
+html.b #ops a,
+html.b #tree ul a.hl,
+html.b .btn {
 	transition: all .15s;
 	background: var(--bottom-glow), var(--btn-bg);
 	border-radius: var(--radius);
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4) !important;
 }
-html.by #files thead th {
+html.b #files thead th {
 	background: none;
 }
-html.by #s_list h3{
+html.b #s_list h3{
 	border-radius: var(--radius) var(--radius) 0 0;
 	position: relative;
 }
-html.by #wtico {
+html.b #wtico {
 	border-radius: var(--radius) 0 0 0;
 	position: relative;
 }
-html.by #up_quick_more a:hover,
-html.by #ggrid>a:hover,
-html.by #ops a:hover,
-html.by .btn:hover {
+html.b #up_quick_more a:hover,
+html.b #ggrid>a:hover,
+html.b #ops a:hover,
+html.b .btn:hover {
 	background: var(--bottom-glow), 
 	linear-gradient(
 		to bottom, 
 		color-mix(in oklab, transparent, var(--a-dark)),
 		color-mix(in oklab, transparent, var(--a)));
 }
-html.by #up_quick_more a:active,
-html.by #ggrid>a:active,
-html.by .btn:active {
+html.b #up_quick_more a:active,
+html.b #ggrid>a:active,
+html.b .btn:active {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 	transform: translateY(2px);
 }
-html.by #widgeti {
+html.b #widgeti {
 	background: color-mix(in srgb, var(--bg) 40%, var(--a));
 }
-html.by #mu_outer {
+html.b #mu_outer {
 	background: color-mix(in oklab, var(--b) 50%, transparent);
 }
-html.by .divider {
+html.b .divider {
 	display: none;
 }
-html.by summary {
+html.b summary {
 	color: var(--fg);
 }
-html.by #pvolbg {
+html.b #pvolbg {
 	color: var(--bg);
 }
-html.by #srchfolder_div,
-html.by .modalcontent,
-html.by,
-html.by #ops a.act,
-html.by #ggrid>a.sel,
-html.by #tree ul a.hl:hover,
-html.by #tree ul a.hl,
-html.by .tgl.btn.on {
+html.b #srchfolder_div,
+html.b .modalcontent,
+html.b,
+html.b #ops a.act,
+html.b #ggrid>a.sel,
+html.b #tree ul a.hl:hover,
+html.b #tree ul a.hl,
+html.b .tgl.btn.on {
 	background-color: var(--a);
 	background:
 		var(--bottom-glow),
 		linear-gradient(to bottom, var(--a-dark), var(--a));
 
 }
-html.by #wtoggle a {
+html.b #wtoggle a {
 	position: relative;
 }
-html.by #up_quick_more a{
+html.b #up_quick_more a{
 	position: relative;
 	margin: .5em 0;
 }
-html.by #up_quick_more{
+html.b #up_quick_more{
 	background: none;
 	border: none;
 }
-html.by #srchfolder_div::after,
-html.by #up_quick_more a::after,
-html.by #wtico::after,
-html.by #s_list h3::after,
-html.by #spaceUsed_bar::after,
-html.by #wtoggle a:after,
-html.by a:not(.play) .imgcontainer::before,
-html.by #ops a:after,
-html.by #path:after,
-html.by #tree ul a.hl:after,
-html.by .btn::after {
+html.b #srchfolder_div::after,
+html.b #up_quick_more a::after,
+html.b #wtico::after,
+html.b #s_list h3::after,
+html.b #spaceUsed_bar::after,
+html.b #wtoggle a:after,
+html.b a:not(.play) .imgcontainer::before,
+html.b #ops a:after,
+html.b #path:after,
+html.b #tree ul a.hl:after,
+html.b .btn::after {
   content: "" !important;
   position: absolute;
   top: 4%;
@@ -274,28 +283,28 @@ html.by .btn::after {
   transition: background 400ms ease;
   pointer-events: none;
 }
-html.by a:not(.play) .imgcontainer::before{
+html.b a:not(.play) .imgcontainer::before{
   	z-index: 2;
 }
-html.by #ops a {
+html.b #ops a {
 	position: relative;
 	margin-left: 4px;
 }
-html.by #srchfolder_div {
+html.b #srchfolder_div {
 	left: 3.2em;
 }
-html.by #spaceTotal_bar,
-html.by #spaceUsed_bar{
+html.b #spaceTotal_bar,
+html.b #spaceUsed_bar{
 	height: 1.6em;
 }
-html.by #files tbody tr:not(.sel):hover td, 
-html.by #files tbody tr:not(.sel):hover td+td {
+html.b #files tbody tr:not(.sel):hover td, 
+html.b #files tbody tr:not(.sel):hover td+td {
 	background: rgba(255, 255, 255, 0.6);
 }
-html.by #spaceMax {
+html.b #spaceMax {
 	display: none;
 }
-html.by #spaceFree {
+html.b #spaceFree {
 	position: absolute;
     z-index: 1;
     bottom: 2.1em;
@@ -303,7 +312,7 @@ html.by #spaceFree {
     width: calc(100% - 3em);
     text-align: center;
 }
-html.by #ops a.act {
+html.b #ops a.act {
 	margin-top: -.15em;
 	margin-bottom: -.15em;
 	padding-top: .3em;
@@ -331,9 +340,6 @@ html.a {
 
 	--f-sh1: 0.1;
 	--mp-b-bg: transparent;
-}
-html.bz {
-	--a: #fc5;
 }
 html.ay {
 	--a: #07c;
@@ -3964,14 +3970,6 @@ html.b .ghead {
 	box-shadow: var(--btn-bs);
 }
 
-html.bz .ghead,
-html.bz #treeToggleBtn:not(:hover):not(.on),
-html.bz #ops,
-html.bz #path,
-html.bz #wtoggle,
-html.bz #up_quick_more,
-html.bz #up_quick_btn:not(:hover):not(.on),
-
 html.cz .ghead,
 html.cz #wfp .btn:not(:hover),
 html.cz #treeToggleBtn:not(:hover):not(.on),
@@ -3984,14 +3982,10 @@ html.cz #up_quick_btn:not(:hover):not(.on) {
 	background: var(--btn-bg);
 }
 
-html.bz #wfp .btn:not(:hover){
-	backdrop-filter: blur(10px);
-}
-
 html.c .modal .setting:hover {
 	background: color-mix(in oklab, var(--bg-u5) 30%, transparent);
 }
-html.by #u2btn {
+html.b #u2btn {
 	box-shadow: .4em .4em 0 #ccc;
 }
 html.dz #u2btn {
@@ -4008,7 +4002,7 @@ html.c #u2foot:empty,
 html.b #u2foot:empty {
 	margin-bottom: -1em;
 }
-html.by #ops{
+html.b #ops{
 	background: none;
 	backdrop-filter: none;
 	border: none;
@@ -4017,48 +4011,48 @@ html.by #ops{
 	padding-left: 0;
 	padding-right: 0;
 }
-html.by .opbox,
-html.by #path,
-html.by #doc,
-html.by #srch_form,
-html.by .ghead,
-html.by #u2etas {
+html.b .opbox,
+html.b #path,
+html.b #doc,
+html.b #srch_form,
+html.b .ghead,
+html.b #u2etas {
 	border-color: var(--bg-u3);
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
 	background: var(--bottom-glow), var(--btn-bg);
 }
-html.by #path {
+html.b #path {
 	margin-right: .1em;
 }
-html.by #wfp a {
+html.b #wfp a {
 	margin-right: .3em;
 }
 html.fy #pathBar.shifted #hspace,
-html.by #pathBar.shifted #hspace{
+html.b #pathBar.shifted #hspace{
 	margin-right: -.3em;
 }
-html.by #up_quick_more a,
-html.by #spaceTotal_bar,
-html.by #ops>a {
+html.b #up_quick_more a,
+html.b #spaceTotal_bar,
+html.b #ops>a {
 	border: var(--bg-u3) solid 1px;
 }
-html.by #tree li,
-html.by #treepar {
+html.b #tree li,
+html.b #treepar {
 	border-color: var(--bg-u5) var(--bg-max) transparent var(--bg-max);
 }
-html.by #treesuperh,
-html.by #treepar {
+html.b #treesuperh,
+html.b #treepar {
 	backdrop-filter: blur(10px);
 	background: color-mix(in srgb, var(--bg) 40%, transparent);
 	border-color: #ddd;
 }
-html.by #tree {
+html.b #tree {
 	background: var(--b);
 }
-html.by #tree_footer {
+html.b #tree_footer {
 	 background: linear-gradient(to top, var(--b), color-mix(in oklab, var(--b) 80%, transparent), transparent);
 }
-html.by #pathBar {
+html.b #pathBar {
 	background: linear-gradient(to bottom, var(--a), transparent);
 }
 
@@ -4458,7 +4452,7 @@ html.e #wrap.thin .ghead {
 	html:not(.e):not(.f) #mu_inner {
 		margin: -.5em;
 	}
-	html.by #tree{
+	html.b #tree{
 		backdrop-filter: blur(10px);
 	}
 }
@@ -4471,7 +4465,7 @@ html.e #wrap.thin .ghead {
 	#srchfolder_div {
 		left: 3em;
 	}
-	html.by #srchfolder_div {
+	html.b #srchfolder_div {
 		left: 2.8em;
 	}
 }
@@ -5510,10 +5504,7 @@ html.e #wtc {
 	background: rgb(85, 144, 255);
 	background: var(--a);
 }
-html.bz #spaceUsed_bar {
-	background: linear-gradient(to right, transparent, var(--a-dark), var(--a));
-}
-html.by #spaceUsed_bar {
+html.b #spaceUsed_bar {
   	background: linear-gradient(to right, var(--a), var(--a-dark));
 }
 #spaceTotal_bar {

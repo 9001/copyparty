@@ -9612,7 +9612,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['flat dark', 'flat light', 'fancy dark', 'frutiger', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'poison', 'wing', ];
+			names = ['flat dark', 'flat light', 'frutiger dark', 'frutiger light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'poison', 'wing', ];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));
