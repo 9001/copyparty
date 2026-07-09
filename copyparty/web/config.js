@@ -1563,7 +1563,7 @@ function getConfig(){
     for(var i = 0; i < flagsConf.length; i++){
         var val = flagsConf[i].value;
         // checkboxes set text value to 'on'
-        conf += flagsConf[i].cmd + (val != 'on' ? ('=' + esc(val)) : '') + " ";
+        conf += flagsConf[i].cmd + ((val !== '' && val !== 'on') ? ('=' + esc(val)) : '') + " ";
     }
 
     for(var i = 0; i < usrsConf.length; i++){
