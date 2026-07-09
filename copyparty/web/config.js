@@ -947,7 +947,9 @@ function loadUiFlags(){
         elem.oninput = uiOptInput;
     }
 };
+var synching = false;
 var uiOptInput = function(){
+    if(synching) return;
     var cmd = this.getAttribute('data-flag');
     if(!cmd) return;
     var e1 = this;
@@ -988,6 +990,17 @@ var uiOptInput = function(){
         flagsConf.splice(index, 1)
     }
     jwrite("flagsConf", flagsConf);
+
+    n = this.id.replaceAll('+', '')
+    o = ebi(n)
+    synching = true;
+    while(o){
+        if(o.value != this.value)
+            o.value = this.value;
+        n += '+'
+        o = ebi(n)
+    }
+    synching = false;
 }
 loadUiFlags();
 
@@ -998,7 +1011,7 @@ function loadFlags(){
         if(QS('input[data-flag="' + flagsConf[i].cmd + '"]')) continue;
         var a = mknod("div");
         var flag = flags.filter((f) => f.cmd == flagsConf[i].cmd)[0];
-        a.setAttribute("Title", flag?.help);
+        a.setAttribute("tt", flag?.help);
         a.setAttribute("ref", i);
         a.innerHTML = '<a href="' + 'https://copyparty.eu/cli/#g' + flagsConf[i].cmd.replace("--", "-") + '">' + flagsConf[i].cmd + "</a>\n";
         var inp = mknod("input");
@@ -1393,7 +1406,7 @@ function loadVolumes(){
         for(var j = 0; j < volsConf[i].flags.length; j++){
             var a2 = mknod("div");
             var flag = volflags.filter((f) => f.cmd == volsConf[i].flags[j].cmd)[0];
-            a2.setAttribute("Title", flag?.help);
+            a2.setAttribute("tt", flag?.help);
             a2.setAttribute("vol", i);
             a2.setAttribute("ref", j);
             a2.innerHTML = (
@@ -1496,7 +1509,7 @@ function loadPerms(vol){
             c.setAttribute("p", perms[j].letter);
             if(uperms?.perms.includes(perms[j].letter))
                 c.setAttribute("checked", "")
-            c.setAttribute("Title", perms[j].desc)
+            c.setAttribute("tt", perms[j].desc)
             c.onclick = function(){
                 var p = this.getAttribute("p")
                 var uid = this.getAttribute("uid")
@@ -1518,7 +1531,7 @@ function loadPerms(vol){
 
             var l = mknod("label", "", perms[j].letter)
             l.setAttribute("for", cid)
-            l.setAttribute("Title", perms[j].desc)
+            l.setAttribute("tt", perms[j].desc)
             b.appendChild(l)
         }
         a.appendChild(b)
@@ -1562,6 +1575,8 @@ function getConfig(){
 
     for(var i = 0; i < flagsConf.length; i++){
         var val = flagsConf[i].value;
+        // i think none of the options want a leading # for colors
+        if(val.startsWith('#')) val = val.slice(1);
         // checkboxes set text value to 'on'
         conf += flagsConf[i].cmd + ((val !== '' && val !== 'on') ? ('=' + esc(val)) : '') + " ";
     }
@@ -1604,5 +1619,6 @@ ebi('copyBtn').onclick = function(){
     });
 }
 
+tt.init();
 
 J_CFG = 2;

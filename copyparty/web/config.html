@@ -20,13 +20,13 @@
         <h1>guest list</h1>
         <a href="https://copyparty.eu/cli/">ℹ️</a>
     </div>
-    <button id="copyBtn" class="abtn" title="export config / copy to clipboard">📋</button>
+    <button id="copyBtn" class="abtn" tt="export config / copy to clipboard">📋</button>
     <div id="disclaimer">
         ⚠️ this page is a preview feature! this is only a config builder and doesn't use your actual config atm. feedback is welcome in the copyparty discord. ⚠️
     </div>
 	<div id="wrap" class="main">
 
-        <div>
+        <div tt="feel free to add anything here. this will be the at the start of your run command 1:1">
             <p class="inlinePrompt">run prefix</p>
             <input id="rpre" type="text" placeholder="python -m copyparty"/>
         </div>
@@ -75,24 +75,30 @@
         <h2>display defaults</h2>
         <div id="dopt">
             <input type="checkbox" id="gview" data-flag="--grid"/>
-            <label for="gview">grid view</label>
+            <label for="gview" tt="--grid: enable or disable the grid by default. can be set per folder via volflag: grid">grid view</label>
 
-            <div>
+            <div tt="--theme: 0=flat dark, 1=flat light... look at the settings dialog when navigating your files for reference">
                 <label for="dtheme" class="inplbl">default theme no.</label>
                 <input type="number" class="uinp" id="dtheme" data-flag="--theme" placeholder="0-11"/>
             </div>
 
-            <div style="display: inline-block;">
+            <div tt="--tcolor: default theme color. users can change this in the settings. this can be set per volume with volflag: tcolor">
+                <label for="tcolor" class="inplbl">accent color</label>
+                <input type="text" class="uinp" id="tcolor" data-flag="--tcolor" placeholder="fc5 / ffcc55"/>
+                <input type="color" class="uinp" id="tcolor+" data-flag="--tcolor"/>
+            </div>
+
+            <div style="display: inline-block;" tt="--bg-img: the url may not contain any commas or spaces (can be set per volume with volflag: bg_img)">
                 <label for="bg-url" class="inplbl">background image url</label>
-                <input type="text" class="uinp" id="bg-url" data-flag="--bg-img" placeholder="https://...jpg" title="the url may not contain any commas or spaces"/>
+                <input type="text" class="uinp" id="bg-url" data-flag="--bg-img" placeholder="https://...jpg"/>
             </div>
             <div style="display: inline-block;">
                 <label for="bg-opa" class="inplbl">opacity</label>
                 <input type="number" class="uinp" id="bg-opa" data-prefix="opacity=" data-flag="--bg-img+" placeholder="0-1"/>
             </div>
-            <div style="display: inline-block;">
+            <div style="display: inline-block;" tt="it's recommended to blur the image itself instead of using this setting for performance reasons">
                 <label for="bg-blur" class="inplbl">blur in px</label>
-                <input type="number" class="uinp" id="bg-blur" data-prefix="blur=" data-flag="--bg-img++" placeholder="0-50" title="it's recommended to blur the image itself instead of using this setting for performance reasons"/>
+                <input type="number" class="uinp" id="bg-blur" data-prefix="blur=" data-flag="--bg-img++" placeholder="0-50"/>
             </div>
         </div>
 
