@@ -950,6 +950,10 @@ function loadUiFlags(){
 var synching = false;
 var uiOptInput = function(){
     if(synching) return;
+
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=2035033
+    if(FIREFOX && this.value == '#000000') return;
+
     var cmd = this.getAttribute('data-flag');
     if(!cmd) return;
     var e1 = this;
