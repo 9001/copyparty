@@ -604,8 +604,8 @@ done
 	cd copyparty/web
 	[ -e w.hash.js.gz ] || [ -e w.hash.js ] && {
 		echo modding sha512.hw.js
-		[ -e deps/sha512.hw.js.gz ] && gzip -d deps/sha512.hw.js.gz
-		[ -e w.hash.js.gz ] && gzip -d w.hash.js
+		[ -e deps/sha512.hw.js.gz ] && gzip -df deps/sha512.hw.js.gz
+		[ -e w.hash.js.gz ] && gzip -df w.hash.js
 		iawk '/copyparty/{exit}/./' deps/sha512.hw.js
 		printf '\n\n\n\n\n' >> deps/sha512.hw.js
 		cat w.hash.js >> deps/sha512.hw.js

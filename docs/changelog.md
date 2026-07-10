@@ -1,4 +1,60 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0706-1937  `v1.20.17`  SECURITY: fix dirkeys
+
+## ⚠️ ATTN: this release fixes a dirkey vulnerability
+
+in volumes with **both** [dirkeys](https://github.com/9001/copyparty/#dirkeys) and [filekeys](https://github.com/9001/copyparty/#filekeys) enabled (default-disabled), a valid filekey could be converted into a dirkey, granting read-access to the containing folder
+
+## recent important news
+
+* [v1.20.17 (2026-07-06)](https://github.com/9001/copyparty/releases/tag/v1.20.17) fixed a vuln when a volume has both filekeys and dirkeys enabled
+* [v1.20.17 (2026-07-06)](https://github.com/9001/copyparty/releases/tag/v1.20.17) introduced csp nonces, possibly breaking some javascript-based plugins
+
+## 🧪 new features
+
+* enforce csp nonces on javascript (additional xss defense) d3b95994
+  * this could *possibly* break some aftermarket javascript-based plugins ([--js-browser](https://copyparty.eu/cli/#g-js-browser) / [--html-head](https://copyparty.eu/cli/#g-html-head))
+  * now probably safe to disable the markdown/logue sandboxes ([--no-sb-md](https://copyparty.eu/cli/#g-no-sb-md) / `--no-sb-lg`) in most deployments, avoiding #230
+* sandbox ffmpeg/ffprobe in bwrap to defend against future FFmpeg vulns efa43f89 85be3b8d
+  * doesn't work in docker / podman, so `initcfg` in the images have [use-bwrap: n](https://copyparty.eu/cli/#g-use-bwrap) to disable it db68353e
+  * doesn't work in [prisonparty](https://github.com/9001/copyparty/blob/hovudstraum/bin/prisonparty.sh) either... pain peko
+* #1535 cbz-reader: go-to-page (thx @romfir!) 12d877b0
+* volflags `plainreadme` and `plainlogues` to show readmes/logues as plaintext 9fa950bc
+* volflags for `no_readme` and `no_logues` (previously global-only) 379c0aa6
+* u2c: new mode to calculate wark from data on stdin 90639de9
+* #1504 `--ftp-banner` 8242e693
+
+## 🩹 bugfixes
+
+* GHSA-x5pq-m9p8-f4vx (dir/filekey confusion) (thx @poolcritter!) e4075533
+* fix resuming xbu-relocated partial uploads 5beecd66
+* fix resuming partial uploads after server restart 22c3a3dd
+* openbsd: fix signal masking for custom signals a00bc93f
+* #1119 #1528 fix directory sort-order edgecases (thx @NecRaul!) d33d1132
+* #1526 fix [--rotf-tz](https://copyparty.eu/cli/#g-rotf-tz); was effectively volflag-only (thx @NecRaul!) e017b1bc
+
+## 🔧 other changes
+
+* ffmpeg: remove lots of obscure codecs and formats for improved security 4c820301
+* textfile-editor: some tweaks to the autobackup feature;
+  * option [--md-nhist](https://copyparty.eu/cli/#g-md-nhist) to limit the number of old versions to keep 34c856e8
+  * browsing old versions is now default-disabled; [--show-hist](https://copyparty.eu/cli/#g-show-hist) reenables it fa1499ae
+* #1512 web-ui: if mkdir fails because folder already exists, then just cd into it 5dbff4af
+* #1519 sftp: reduce excessive spam from portscanners 8c4e9313
+* make database corruption more obvious on startup (usually due to broken server filesystem/hardware) be31a744
+* docker:
+  * #1532 add LABELs for version and creationtime 32d074ff
+  * updated the [image compatibility matrix](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker#editions) c3eb9ece
+    * the `iv` image is no longer available for arm32 / armv6 6e75faa6
+
+## 🌠 fun facts
+
+* contains patches powered by [seventhrun - the ill shit](https://www.youtube.com/watch?v=_QW8mY663Ho&list=PLBO2h-GzDvIYRmupTCAasjzDjNxvjG639&index=12) + the rest of basschasers2 on [the Oslo-Bergen line](https://a.ocv.me/pub/g/2026/07/PXL_20260702_190436425b.jpg?cache), 1110 masl
+* to those who celebrate, happy 6/7
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0526-1845  `v1.20.16`  s6-ready
 
 ## 🧪 new features

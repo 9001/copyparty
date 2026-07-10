@@ -248,6 +248,20 @@ class TestVFS(unittest.TestCase):
         self.assertEqual(r1, r2)
         self.assertEqual(list(v1), list(v2))
 
+        # shadowing II
+        self.wipe_vfs(td)
+        vfs = AuthSrv(Cfg(v=[".::r", "//NULL:a/ab:", "//NULL:a/ac:"]), self.log).vfs
+
+        fsp, r1, v1 = self.ls(vfs, "", "*")
+        self.assertEqual(fsp, td)
+        self.assertEqual(r1, ["b", "c"])
+        self.assertEqual(list(v1), ["a"])
+
+        fsp, r1, v1 = self.ls(vfs, "a", "*")
+        self.assertEqual(fsp, os.path.join(td, "a"))
+        self.assertEqual(r1, ["aa"])
+        self.assertEqual(list(v1), [])  # ["ab", "ac"]
+
         # config file parser
         cfg_path = os.path.join(self.td, "test.cfg")
         with open(cfg_path, "wb") as f:
