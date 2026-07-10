@@ -167,10 +167,9 @@ html.bz {
 	text-shadow: 0px 0px 4px #000;
 	--fg-weak: var(--fg-max);
 
-	--glow-intensity: 0.5;
 	--bottom-glow: radial-gradient(
 		farthest-corner at bottom center,
-		color-mix(in srgb, var(--a-hil) 10%, rgba(0,0,0, var(--glow-intensity))),
+		color-mix(in srgb, var(--a-hil) 10%, var(--bg) 20%),
 		transparent
 	);
 }
@@ -210,6 +209,17 @@ html.b .btn:hover {
 		color-mix(in oklab, transparent, var(--a-dark)),
 		color-mix(in oklab, transparent, var(--a)));
 }
+html.bz #up_quick_more a:hover,
+html.bz #ggrid>a:hover,
+html.bz #ops a:hover,
+html.bz .btn:hover {
+	background: 
+		var(--bottom-glow), 
+		linear-gradient( 
+			to bottom, 
+			color-mix(in oklab, #0006, var(--a-dark)), 
+			color-mix(in oklab, transparent, #000b))
+}
 html.b #up_quick_more a:active,
 html.b #ggrid>a:active,
 html.b .btn:active {
@@ -239,11 +249,9 @@ html.b #ggrid>a.sel,
 html.b #tree ul a.hl:hover,
 html.b #tree ul a.hl,
 html.b .tgl.btn.on {
-	background-color: var(--a);
 	background:
 		var(--bottom-glow),
 		linear-gradient(to bottom, var(--a-dark), var(--a));
-
 }
 html.b #wtoggle a {
 	position: relative;
