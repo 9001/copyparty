@@ -241,6 +241,7 @@ if (1)
 		"cl_opts": "general",
 		"cl_hfsz": "filesize",
 		"cl_themes": "theme",
+		"cl_overr_thm": "override server theme. reload the page when turning this off",
 		"cl_accent": "accent color (keep empty for default)$Nsupports any css color, like rgba(255, 210, 0, 1)",
 		"cl_radius": "corner radius in pixels (keep empty for default)",
 		"cl_fun": "enables or disables the FUN (hides most emojis) 🎉🚀👽🐹🥳❗$Nreload the page after changing this setting.",
@@ -1296,12 +1297,15 @@ ebi('op_cfg').innerHTML = (
 	'<div>\n' +
 	'	<h3 id="h_theme">🎨 ' + L.cl_themes + '</h3>\n' +
 	'	<div>' +
-	'		<select id="themes"></select>' +
+	'		<div id="thmdiv" tt="' + L.cl_overr_thm +'">' +
+	'			<a id="override_thm" class="tgl btn">override</a>\n' +
+	'			<select id="themes"></select>' +
+	'		</div>' +
 	'		<div id="colordiv" tt="' + L.cl_accent +'">' +
 	'			<input type="text" id="accent" placeholder="#color"></input>' +
 	'			<input type="color" id="accent_picker"></input>' +
 	'		</div>' +
-'			<input tt="' + L.cl_radius +'" type="number" id="radius" min="-1" placeholder="[0-inf]"></input>' +
+	'		<input tt="' + L.cl_radius +'" type="number" id="radius" min="-1" placeholder="[0-inf]"></input>' +
 	'		<a id="fun_tgl" class="tgl btn" tt="' + L.cl_fun + '">🥳</a>\n' +
 	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
 	'	</div>\n' +
@@ -9576,7 +9580,7 @@ var mukey = (function () {
 })();
 
 
-var light, theme, themen;
+var light, theme, themen, override_thm = false;
 var settheme = (function () {
 	var r = {},
 		ax = 'abcdefghijklmnopqrstuvwx',
@@ -9590,7 +9594,11 @@ var settheme = (function () {
 		'7': ['▲', 'font-size:3em'], //cp437
 	};
 
-	theme = sread('cpp_thm') || 'a';
+	theme = sread('cpp_thm');
+	if(!theme)
+		theme = 'a';
+	else
+		override_thm = true;
 	if (!/^[a-x][yz]/.exec(theme)){
 		theme = dtheme;
 	}
@@ -9617,7 +9625,7 @@ var settheme = (function () {
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));
 
-		ebi('themes').innerHTML = html.join('');
+		cb.innerHTML = html.join('');
 		cb.value = itheme;
 		cb.onchange = r.onsel;
 
@@ -9630,8 +9638,21 @@ var settheme = (function () {
 		bcfg_set('light', light);
 	}
 
+	ebi('override_thm').onclick = function(){
+		clmod(this, 'on', 't');
+		override_thm = !override_thm;
+		if(override_thm)
+			r.onsel();
+		else
+			sdrop('cpp_thm');
+	}
+	clmod(ebi('override_thm'), 'on', override_thm)
+
 	r.onsel = function () {
-		r.go(parseInt(ebi('themes').value));
+		if(!override_thm)
+			ebi('override_thm').click();
+		else
+			r.go(parseInt(ebi('themes').value));
 	};
 
 	r.go = function (i) {
