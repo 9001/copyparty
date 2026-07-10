@@ -313,3 +313,11 @@ strong,
         display: none;
     }
 }
+@media (min-width: 950px){
+    .autocomplete:focus{
+        width: 585px;
+        left: calc(50% - 300px);
+        right: auto;
+        max-width: none;
+    }
+}

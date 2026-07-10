@@ -1070,7 +1070,7 @@ function closeAllLists(elmnt) {
     var x = document.getElementsByClassName("autocomplete-list");
     for (var i = 0; i < x.length; i++) {
         if (elmnt != x[i]) {
-        x[i].parentNode.removeChild(x[i]);
+            x[i].parentNode.removeChild(x[i]);
         }
     }
 }
@@ -1080,6 +1080,13 @@ document.addEventListener("click", function (e) {
     else
         closeAllLists(e.target);
 });
+document.onkeyup = function(e){
+    if(e.key.match("Esc")){
+        closeAllLists();
+        var o = QS('.autocomplete:focus')
+        if(o) o.blur();
+    }
+}
 function autocompleteFlags(inp, arr) {
     inp.onclick = 
     inp.oninput = function(e) {
@@ -1155,6 +1162,8 @@ function autocompleteFlags(inp, arr) {
             if (currentFocus > -1) {
                 if (x) x[currentFocus].click();
             }
+            else
+                if(x && x.length > 0) x[0].click();
         }
     });
 }
@@ -1227,6 +1236,8 @@ function autocompleteVolFlags(inp, arr, index) {
             if (currentFocus > -1) {
                 if (x) x[currentFocus].click();
             }
+            else
+                if(x && x.length > 0) x[0].click();
         }
     });
 }
@@ -1430,6 +1441,8 @@ function loadVolumes(){
                     .flags[this.parentNode.getAttribute("ref")]
                     .value = this.value;
                 jwrite("volsConf", volsConf);
+                if(this.value.match(':'))
+                    toast.err(30, 'volflags cannot contain ":" in commandline arguments. if you really need to use ":", consider making a configuration file.')
             }
             a2.appendChild(inp3);
             var b2 = mknod("button", "", "×");
