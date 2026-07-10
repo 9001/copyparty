@@ -4460,8 +4460,13 @@ html.e #wrap.thin .ghead {
 	html:not(.e):not(.f) #mu_inner {
 		margin: -.5em;
 	}
-	html.b #tree{
+	html.b #tree::before {
+		content: "";
+		position: fixed;
 		backdrop-filter: blur(10px);
+		top: 0;
+		left: 0;
+		width: var(--nav-sz);
 	}
 }
 
