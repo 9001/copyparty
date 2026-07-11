@@ -49,7 +49,8 @@
 
                 // til's conf
                 "--qr"
-                "-v~/Pictures:/a::A,test",//:c,bg_img=/a/HLCourDWYAA8RLl.webp",
+                "-v~/:/::A,test",
+                "-v~/Pictures:/a::A,test:c,bg_img=/a/HLCourDWYAA8RLl.webp:c,tcolor=ccc:c,theme=11",
                 "-atest:test",
                 "-mth",
                 "!,q",
@@ -57,9 +58,9 @@
                 "*",
                 "--ohead",
                 "*",
-                "-e2dsa",
-                "-e2ts",
                 "--bg-img=https://access.riceball.art/public/read-only/wiiu%20bg.webm",
+                "--tcolor=07c",
+                "--theme=3",
                 "--chpw",
             ]
         },

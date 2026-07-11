@@ -809,6 +809,7 @@ var volflags = [
     new Argument("hsortn", "number of sort-rules to add to media URLs"),
     new Argument("ufavico", "URL per-volume favicon (.ico/png/gif/svg)"),
     new Argument("bg_img", "background image url"),
+    new Argument("theme", "default theme"),
     new Argument("unlist", "dont list files matching REGEX"),
     new Argument("dothidden", "enable support for .hidden files"),
     new Argument("dlni", "force-download (no-inline) files on click"),

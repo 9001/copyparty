@@ -2370,13 +2370,16 @@ function cprop(name) {
 
 // read accent / theme color
 function parseColor (strColor) {
+    if(strColor.length > 0 && strColor.length <= 6 && !strColor.startsWith('#')) 
+        strColor = '#' + strColor;
 	var s = new Option().style;
 	s.color = strColor;
 	return s.color !== '' ? s.color : '';
 }
-function setColor (color) {
+function setColor (color, temp) {
 	accent = color;
-	swrite('accent', accent);
+    if(!temp)
+	    swrite('accent', accent);
 	var a = accent || '';
 	console.log('accent color set to: ' + a);
 	setcvar('--a', a);
@@ -2399,29 +2402,53 @@ if(accent && accent.length > 3){
     setcvar('--a', parseColor(accent));
 }
 
-if(window.bg_img){
-    var parts = window.bg_img.split(','),
-        re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i;
-    if(parts.length > 0){
-        if(re_v.test(parts[0])){
-            var bgv = mknod('video','bg_vid', '<source src="' + parts[0] + '" type="video/mp4"/>');
-            bgv.setAttribute('autoplay', '')
-            bgv.setAttribute('muted', '')
-            bgv.setAttribute('loop', '')
-            document.documentElement.appendChild(bgv)
+var HAS_BG = false
+var setBg = function(bg){
+    var bgv = ebi('bg_vid');
+    if(!bg) bg = window.bg_img;
+    HAS_BG = bg != ''; 
+    if(sread('enbg') == 0) bg = '';
+    console.log('setting bg to: ' + (bg || 'none'))
+    if(bg){
+        var parts = bg.split(','),
+            re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i;
+        if(parts.length > 0){
+            if(re_v.test(parts[0])){
+                if(!bgv){
+                    bgv = mknod('video','bg_vid', '<source src="' + parts[0] + '" type="video/mp4"/>');
+                    bgv.setAttribute('autoplay', '')
+                    bgv.setAttribute('muted', '')
+                    bgv.setAttribute('loop', '')
+                    document.documentElement.appendChild(bgv)
+                }
+                else{
+                    bgv.querySelector('source').src = parts[0]
+                }
+            }
+            else{
+                if(bgv) bgv.remove();
+                setcvar('--bg-img', 'url("' + parts[0] + '")')
+            }
         }
-        else
-            setcvar('--bg-img', 'url("' + parts[0] + '")')
+        else{
+            setcvar('--bg-img', '');
+            if(bgv) bgv.remove();
+        }
+        for(var i = 0; i < parts.length; i++){
+            if(parts[i].match('=')){
+                var o = parts[i].split('=')
+                if(o[0].trim() == 'blur')
+                    o[1] = 'blur(' + o[1] + 'px)'
+                setcvar('--bg-' + o[0].trim(), o[1])
+            }
+        }
     }
-    for(var i = 0; i < parts.length; i++){
-        if(parts[i].match('=')){
-            var o = parts[i].split('=')
-            if(o[0].trim() == 'blur')
-                o[1] = 'blur(' + o[1] + 'px)'
-            setcvar('--bg-' + o[0].trim(), o[1])
-        }
+    else{
+        setcvar('--bg-img', '');
+        if(bgv) bgv.remove();
     }
 }
+setBg();
 
 function bchrome() {
     var v, o = QS('meta[name=theme-color]');

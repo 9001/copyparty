@@ -276,6 +276,7 @@ if (1)
 		"ct_readme": 'show README.md in folder listings">📜 readme',
 		"ct_idxh": 'show index.html instead of folder listing">htm',
 		"ct_sbars": 'show scrollbars">⟊',
+		"ct_enbg": 'en-/disable custom backgrounds',
 
 		"cut_umod": "if a file already exists on the server, update the server's last-modified timestamp to match your local file (requires write+delete permissions)\">re📅",
 
@@ -1308,6 +1309,7 @@ ebi('op_cfg').innerHTML = (
 	'		<input tt="' + L.cl_radius +'" type="number" id="radius" min="-1" placeholder="[0-inf]"></input>' +
 	'		<a id="fun_tgl" class="tgl btn" tt="' + L.cl_fun + '">🥳</a>\n' +
 	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
+	(HAS_BG ? '<a id="enbg" class="tgl btn" tt="' + L.ct_enbg + '">🖼️ bg</a>\n' : '') +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -4312,6 +4314,9 @@ function eval_hash() {
 	}
 	bcfg_bind(props, 'sbars', 'sbars', true, setsb);
 	setsb();
+
+	if(HAS_BG)
+		bcfg_bind(props, 'enbg', 'enbg', true, function(){ setBg(props.enbg ? window.bg_img : '')});
 
 	// compact media player
 	function setacmp() {
@@ -8534,6 +8539,11 @@ var treectl = (function () {
 		if (!sread('griden'))
 			clmod(ebi('griden'), 'on', thegrid.en = dgrid);
 
+		// ToDo: instantly change accent color according to volflag
+		var accent = parseColor(sread('accent'))
+		if(!accent && (res.tcolor || tcolor))
+			setColor(parseColor(res.tcolor ? res.tcolor : tcolor), true);
+
 		srvinf = res.srvinf;
 		ebi('spaceFree').innerHTML = res.space_free + ' free of ' + res.space_total ;
 		ebi('spaceUsed_bar').width = res.space_used_percent + '%';
@@ -8622,6 +8632,12 @@ var treectl = (function () {
 
 		if (can_shr && in_shr && QS('#op_unpost.act'))
 			goto('unpost');
+
+		setBg(res.bg_img);
+
+		if(!override_thm && res.theme){
+			settheme.init(res.theme)
+		}
 	}
 
 	r.chk_index_html = function (top, res) {
@@ -9594,17 +9610,37 @@ var settheme = (function () {
 		'7': ['▲', 'font-size:3em'], //cp437
 	};
 
-	theme = sread('cpp_thm');
-	if(!theme)
-		theme = 'a';
-	else
-		override_thm = true;
-	if (!/^[a-x][yz]/.exec(theme)){
-		theme = dtheme;
-	}
+	r.init = function(t){
+		theme = sread('cpp_thm');
+		if(!theme)
+			theme = 'a';
+		else
+			override_thm = true;
+		if (!/^[a-x][yz]/.exec(theme))
+			theme = dtheme;
+		if(t)
+			theme = t;
 
-	themen = theme.split(/ /)[0];
-	light = !!(theme.indexOf('y') + 1);
+		if(theme.match(/[0-9]/)){
+			t = theme;
+			var ch = "abcdefghijklmnopqrstuvwx"
+			theme = ch[parseInt(t / 2)]
+			theme += t % 2 ? 'y' : 'z'
+			theme += ' ' + theme[0] + ' ' + theme[1]
+		}
+
+		console.log('theme: ' + theme)
+
+		themen = theme.split(/ /)[0];
+		light = !!(theme.indexOf('y') + 1);
+
+		var m = /[?&]theme=([0-9]+)/.exec(sloc0);
+		if (m)
+			r.go(parseInt(m[1]));
+		else
+			freshen();
+	}
+	r.init();
 
 	function freshen() {
 		var cl = document.documentElement.className;
@@ -9664,12 +9700,6 @@ var settheme = (function () {
 		swrite('cpp_thm', theme);
 		freshen();
 	};
-
-	var m = /[?&]theme=([0-9]+)/.exec(sloc0);
-	if (m)
-		r.go(parseInt(m[1]));
-	else
-		freshen();
 
 	return r;
 })();
