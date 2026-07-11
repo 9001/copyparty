@@ -9640,7 +9640,6 @@ var settheme = (function () {
 		else
 			freshen();
 	}
-	r.init();
 
 	function freshen() {
 		var cl = document.documentElement.className;
@@ -9700,6 +9699,8 @@ var settheme = (function () {
 		swrite('cpp_thm', theme);
 		freshen();
 	};
+	
+	r.init();
 
 	return r;
 })();
