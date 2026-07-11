@@ -2402,7 +2402,7 @@ if(accent && accent.length > 3){
 if(window.bg_img){
     var parts = window.bg_img.split(',');
     if(parts.length > 0){
-        setcvar('--bg-img', 'url(' + parts[0] + ')')
+        setcvar('--bg-img', 'url("' + parts[0] + '")')
     }
     for(var i = 0; i < parts.length; i++){
         if(parts[i].match('=')){
