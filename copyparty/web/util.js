@@ -2419,7 +2419,9 @@ var setBg = function(bg){
                     bgv.setAttribute('autoplay', '')
                     bgv.setAttribute('muted', '')
                     bgv.setAttribute('loop', '')
+                    bgv.setAttribute('playsinline', '')
                     document.documentElement.appendChild(bgv)
+                    bgv.play()
                 }
                 else{
                     bgv.querySelector('source').src = parts[0]
