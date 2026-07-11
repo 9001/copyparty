@@ -38,19 +38,24 @@
     color: var(--fg);
 }
 html::before {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+	background-image: var(--bg-img);
+	background-size: cover;
+	background-position: center center;
+	content: "";
+}
+html::before,
+#bg_vid{
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	object-fit: cover;
+	z-index: -1;
+	pointer-events: none;
 
-  background-image: var(--bg-img);
-  background-size: cover;
-  background-position: center center;
-  content: "";
-  z-index: -1;
-  opacity: var(--bg-opacity);
-  filter: var(--bg-blur);
+	opacity: var(--bg-opacity);
+	filter: var(--bg-blur);
 }
 html.y {
 	color-scheme: light;

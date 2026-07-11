@@ -1946,7 +1946,7 @@ def add_ui(ap, retry: int):
     THEMES = 12
     ap2 = ap.add_argument_group("ui options")
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
-    ap2.add_argument("--bg-img", metavar="M,M,M", type=u, default="", help="URL to .jpg/png/gif/svg file, for example \033[32m/folder/image.jpg,opacity=0.5(optional),blur=5(optional)\033[0m supports relative paths. (volflag=bg_img)")
+    ap2.add_argument("--bg-img", metavar="M,M,M", type=u, default="", help="URL to .jpg/png/gif/svg/webm/mp4/mkv/m4v/mov file to use as background, for example \033[32m/folder/image.jpg,opacity=0.5(optional),blur=5(optional)\033[0m supports relative paths. (volflag=bg_img)")
     ap2.add_argument("--no-gsel", action="store_true", help="ctrl-click in gridview will open-in-new-tab instead of select-file (volflag=-gsel)")
     ap2.add_argument("--localtime", action="store_true", help="default to local timezone instead of UTC")
     ap2.add_argument("--ui-filesz", metavar="FMT", type=u, default="6", help="default filesize format; one of these: 0, 1, 2, 2c, 3, 3c, 4, 4c, 5, 5c, 6, 6c, 7, 7c, fuzzy (see UI)")

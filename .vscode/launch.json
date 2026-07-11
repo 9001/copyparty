@@ -59,7 +59,7 @@
                 "*",
                 "-e2dsa",
                 "-e2ts"
-                // "--bg-img=https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Parthenon_from_west.jpg/1280px-Parthenon_from_west.jpg,opacity=.5,blur=10"
+                "--bg-img=https://access.riceball.art/public/read-only/wiiu%20bg.webm,opacity=.5,blur=10"
             ]
         },
         {

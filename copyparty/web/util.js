@@ -2400,9 +2400,18 @@ if(accent && accent.length > 3){
 }
 
 if(window.bg_img){
-    var parts = window.bg_img.split(',');
+    var parts = window.bg_img.split(','),
+        re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i;
     if(parts.length > 0){
-        setcvar('--bg-img', 'url("' + parts[0] + '")')
+        if(re_v.test(parts[0])){
+            var bgv = mknod('video','bg_vid', '<source src="' + parts[0] + '" type="video/mp4"/>');
+            bgv.setAttribute('autoplay', '')
+            bgv.setAttribute('muted', '')
+            bgv.setAttribute('loop', '')
+            document.documentElement.appendChild(bgv)
+        }
+        else
+            setcvar('--bg-img', 'url("' + parts[0] + '")')
     }
     for(var i = 0; i < parts.length; i++){
         if(parts[i].match('=')){
