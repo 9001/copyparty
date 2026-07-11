@@ -4928,7 +4928,7 @@ var fileman = (function () {
 		var shareData = {
 			title: (sel.length > 1 ? 'Sharing files from ' : 'Sharing a file from ') + 
 				ebi('srv_name').textContent,
-			url: vps.join('\n'),
+			url: vps.join(' \n'),
 		};
 		if(navigator.canShare && (MOBILE || !FIREFOX)){
 			//desktop firefox CAN technically use this, but it sucks :P
