@@ -18,6 +18,7 @@ html {
 	border-top: var(--bg-u5) solid 1px;
 	border-right: var(--bg-u5) solid 1px;
 	border-bottom: 2px solid rgb(7, 130, 212);
+	border-bottom-color: var(--a);
 	position: fixed;
 	z-index: 10;
 	box-shadow: 0 0 1em color-mix(in oklab, var(--bg-max) 60%, transparent 40%);
@@ -56,7 +57,7 @@ html {
 	box-shadow: 0 0 2em color-mix(in oklab, var(--bg-max) 60%, transparent 40%);
 }
 html.y #wrap {
-	background: color-mix(in oklab, var(--a-gray) 18%, var(--bg-max));
+	background: color-mix(in oklab, var(--a-gray) 18%, var(--bg-max) 20%);
 }
 #wrap.w {
 	max-width: 96%;
@@ -292,6 +293,7 @@ form {
 	flex-direction: column;
 	margin: auto;
 }
+#x,
 input {
 	margin: 1em 0 0 0;
 	background: #ccc;
@@ -299,6 +301,7 @@ input {
 	padding: .5em;
 	border-color: rgb(72, 182, 255);
 	border-radius: .3em;
+	text-align: center;
 }
 input::placeholder {
 	font-size: 1.2em;
@@ -323,6 +326,7 @@ input[type=submit] {
 	border-radius: .3em;
 	padding: .4em .6em;
 	font-size: 1em;
+	line-height: 1.35em;
 }
 #x:hover, #x:focus-visible,
 input[type=submit]:hover, input[type=submit]:focus-visible {
