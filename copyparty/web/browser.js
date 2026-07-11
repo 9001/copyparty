@@ -9673,16 +9673,6 @@ var settheme = (function () {
 		bcfg_set('light', light);
 	}
 
-	ebi('override_thm').onclick = function(){
-		clmod(this, 'on', 't');
-		override_thm = !override_thm;
-		if(override_thm)
-			r.onsel();
-		else
-			sdrop('cpp_thm');
-	}
-	clmod(ebi('override_thm'), 'on', override_thm)
-
 	r.onsel = function () {
 		if(!override_thm)
 			ebi('override_thm').click();
@@ -9699,8 +9689,18 @@ var settheme = (function () {
 		swrite('cpp_thm', theme);
 		freshen();
 	};
-	
+
 	r.init();
+
+	ebi('override_thm').onclick = function(){
+		clmod(this, 'on', 't');
+		override_thm = !override_thm;
+		if(override_thm)
+			r.onsel();
+		else
+			sdrop('cpp_thm');
+	}
+	clmod(ebi('override_thm'), 'on', override_thm)
 
 	return r;
 })();

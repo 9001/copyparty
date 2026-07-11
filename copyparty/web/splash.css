@@ -93,6 +93,7 @@ p {
 #lo,
 a {
 	color: #fff;
+	color: var(--bg);
 	background: rgba(5, 92, 184, 0.69);
 	background: var(--a);
 	text-decoration: none;
@@ -134,6 +135,7 @@ td a {
 }
 
 #a {
+	color: #fff;
 	background: transparent;
 	border: var(--bg-u5) solid 1px;
 	font-weight: bold;
@@ -148,6 +150,7 @@ html.y #a {
 #lo,
 .logout,
 a.r {
+	color: #fff;
 	background: rgba(230, 3, 3, 0.61);
 	border-color: rgb(178, 5, 66);
 }
@@ -328,6 +331,7 @@ html.z input::placeholder {
 #x,
 input[type=submit] {
 	color: #fff;
+	color: var(--bg);
 	background: rgb(39, 130, 204);
 	border-color: rgb(72, 182, 255);
 	background: var(--a);

@@ -172,6 +172,8 @@ html.bz {
 		color-mix(in srgb, var(--a-hil) 10%, var(--bg) 20%),
 		transparent
 	);
+	--btn-fg: var(--fg);
+	--btn-h-fg: var(--fg);
 }
 html.b #srchfolder_div,
 html.b #up_quick_more a,
