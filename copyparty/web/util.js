@@ -2370,7 +2370,7 @@ function cprop(name) {
 
 // read accent / theme color
 function parseColor (strColor) {
-    if(strColor.length > 0 && strColor.length <= 6 && !strColor.startsWith('#')) 
+    if(strColor && strColor.length > 0 && strColor.length <= 6 && !strColor.startsWith('#')) 
         strColor = '#' + strColor;
 	var s = new Option().style;
 	s.color = strColor;
