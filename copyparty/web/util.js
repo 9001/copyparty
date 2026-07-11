@@ -2404,37 +2404,19 @@ if(accent && accent.length > 3){
 
 var HAS_BG = false
 var setBg = function(bg){
-    var bgv = ebi('bg_vid');
+    var bgv = ebi('bg_vid'),
+        re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i,
+        isVid = false,
+        src;
     if(!bg) bg = window.bg_img;
     HAS_BG = bg != ''; 
     if(sread('enbg') == 0) bg = '';
     console.log('setting bg to: ' + (bg || 'none'))
     if(bg){
-        var parts = bg.split(','),
-            re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i;
-        if(parts.length > 0){
-            if(re_v.test(parts[0])){
-                if(!bgv){
-                    bgv = mknod('video','bg_vid', '<source src="' + parts[0] + '" type="video/mp4"/>');
-                    bgv.setAttribute('autoplay', '')
-                    bgv.setAttribute('muted', '')
-                    bgv.setAttribute('loop', '')
-                    bgv.setAttribute('playsinline', '')
-                    document.documentElement.appendChild(bgv)
-                    bgv.play()
-                }
-                else{
-                    bgv.querySelector('source').src = parts[0]
-                }
-            }
-            else{
-                if(bgv) bgv.remove();
-                setcvar('--bg-img', 'url("' + parts[0] + '")')
-            }
-        }
-        else{
-            setcvar('--bg-img', '');
-            if(bgv) bgv.remove();
+        var parts = bg.split(',');
+        if(parts){
+            isVid = re_v.test(parts[0])
+            src = parts[0]
         }
         for(var i = 0; i < parts.length; i++){
             if(parts[i].match('=')){
@@ -2445,10 +2427,10 @@ var setBg = function(bg){
             }
         }
     }
-    else{
-        setcvar('--bg-img', '');
-        if(bgv) bgv.remove();
-    }
+    setcvar('--bg-img', !isVid ? src : '');
+    clmod(bgv, 'vis', isVid);
+    if(isVid)
+        bgv.innerHTML = '<source src="' + src + '" type="video/mp4"/>';
 }
 setBg();
 

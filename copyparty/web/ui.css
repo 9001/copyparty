@@ -45,6 +45,7 @@ html::before {
 }
 html::before,
 #bg_vid{
+	display: none;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -56,6 +57,9 @@ html::before,
 
 	opacity: var(--bg-opacity);
 	filter: var(--bg-blur);
+}
+#bg_vid.vis{
+	display: block;
 }
 html.y {
 	color-scheme: light;
