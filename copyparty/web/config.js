@@ -1450,7 +1450,7 @@ function loadVolumes(){
             a2.appendChild(inp3);
             var b2 = mknod("button", "", "×");
             clmod(b2, "delBtn", true);
-            b2.value = i
+            b2.value = j
             b2.onclick = function(){
                 console.log("removing volflag at index " + this.value)
                 volsConf[this.parentNode.getAttribute("vol")]
@@ -1710,18 +1710,18 @@ function importConfig(txt){
                 volsConf.push(getVolFromStr(val))
                 break;
             case "-a":
-                var name = val.split(':')
-                var pw = val.slice(name.length)
+                var name = val.split(':')[0]
+                var pw = val.slice(name.length + 1)
                 usrsConf.push({name: name, pw: pw})
                 break;
-            case "-g":
-                var name = val.split(':')
-                var u = val.slice(name.length)
+            case "--grp":
+                var name = val.split(':')[0]
+                var u = val.slice(name.length + 1)
                 groups.push({name: name, users: u})
                 break;
             default:
                 if(val.startsWith('"') && val.endsWith('"'))
-                    val = val.slice(1, val.length - 2)
+                    val = val.slice(1, val.length - 1)
                 flagsConf.push({cmd: c, value: val});
                 break;
         }
@@ -1757,7 +1757,7 @@ function getVolFromStr(s){
             var c = o.split(/(\s|=)/)[0]
             var val = o.slice(c.length + 1)
             if(val.startsWith('"') && val.endsWith('"'))
-                val = val.slice(1, val.length - 2)
+                val = val.slice(1, val.length - 1)
             flags.push({cmd: c, value: val})
         }
         else{
