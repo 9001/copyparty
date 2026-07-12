@@ -5472,7 +5472,6 @@ class HttpCli(object):
             "config",
             accs=bool(self.asrv.acct),
             s="s" if self.is_https else "",
-            theme=self.args.theme,
             bg_img=self.args.bg_img,
         )
         self.reply(html.encode("utf-8"))
