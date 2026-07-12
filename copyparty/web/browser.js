@@ -8539,9 +8539,8 @@ var treectl = (function () {
 		if (!sread('griden'))
 			clmod(ebi('griden'), 'on', thegrid.en = dgrid);
 
-		// ToDo: instantly change accent color according to volflag
 		var accent = parseColor(sread('accent'))
-		if(!accent && (res.tcolor || tcolor))
+		if(!accent && (res.tcolor && res.tcolor != "#333333" || tcolor && tcolor != "#333333"))
 			setColor(parseColor(res.tcolor ? res.tcolor : tcolor), true);
 
 		srvinf = res.srvinf;

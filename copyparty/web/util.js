@@ -2408,7 +2408,6 @@ var setBg = function(bg){
         re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i,
         isVid = false,
         src;
-    if(!bg) bg = window.bg_img;
     HAS_BG = bg != ''; 
     if(sread('enbg') == 0) bg = '';
     console.log('setting bg to: ' + (bg || 'none'))
@@ -2427,12 +2426,12 @@ var setBg = function(bg){
             }
         }
     }
-    setcvar('--bg-img', !isVid ? src : '');
+    setcvar('--bg-img', !isVid ? ('url("' + src + '")') : '');
     clmod(bgv, 'vis', isVid);
     if(isVid)
         bgv.innerHTML = '<source src="' + src + '" type="video/mp4"/>';
 }
-setBg();
+setBg(window.bg_img);
 
 function bchrome() {
     var v, o = QS('meta[name=theme-color]');

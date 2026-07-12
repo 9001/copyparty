@@ -58,9 +58,9 @@
                 "*",
                 "--ohead",
                 "*",
-                "--bg-img=https://access.riceball.art/public/read-only/wiiu%20bg.webm",
-                "--tcolor=07c",
-                "--theme=3",
+                // "--bg-img=https://access.riceball.art/public/read-only/wiiu%20bg.webm",
+                // "--tcolor=07c",
+                // "--theme=3",
                 "--chpw",
             ]
         },
