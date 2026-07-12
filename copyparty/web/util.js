@@ -2408,10 +2408,10 @@ var setBg = function(bg){
         re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i,
         isVid = false,
         src;
-    HAS_BG = bg != ''; 
+    HAS_BG = bg != '' && bg !== true; 
     if(sread('enbg') == 0) bg = '';
     console.log('setting bg to: ' + (bg || 'none'))
-    if(bg){
+    if(bg && bg !== true){
         var parts = bg.split(',');
         if(parts){
             isVid = re_v.test(parts[0])
