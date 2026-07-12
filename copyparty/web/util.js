@@ -2426,7 +2426,7 @@ var setBg = function(bg){
             }
         }
     }
-    setcvar('--bg-img', !isVid ? ('url("' + src + '")') : '');
+    setcvar('--bg-img', !isVid && src ? ('url("' + src + '")') : '');
     clmod(bgv, 'vis', isVid);
     if(isVid)
         bgv.innerHTML = '<source src="' + src + '" type="video/mp4"/>';
