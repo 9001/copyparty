@@ -2427,6 +2427,14 @@ var setBg = function(bg){
         }
     }
     setcvar('--bg-img', !isVid && src ? ('url("' + src + '")') : '');
+    if(!bgv && isVid){
+        bgv = mknod('video', 'bg_vid')
+        bgv.setAttribute('autoplay', '')
+        bgv.setAttribute('muted', '')
+        bgv.setAttribute('loop', '')
+        bgv.setAttribute('playsinline', '')
+        document.documentElement.insertBefore(bgv, QS('body'))
+    }
     clmod(bgv, 'vis', isVid);
     if(isVid)
         bgv.innerHTML = '<source src="' + src + '" type="video/mp4"/>';
