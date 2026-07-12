@@ -919,20 +919,21 @@ function loadUiFlags(){
         var elem = uiOnlyFlags[i]
         var cmd = elem.getAttribute('data-flag')
         var val = flagsConf.filter((f) => f.cmd == cmd)[0]?.value;
-        if(elem && val){
+        if(elem){
             var n = cmd + '+'
             var o = QS('input[data-flag="' + n + '"]');
             if(o){
-                var arr = val.split(',')
-                elem.value = arr[0];
+                var arr = val ? val.split(',') : val
+                elem.value = arr ? arr[0] : '';
                 var j = 1
                 while(o){
-                    var val2 = arr[j]
+                    var val2 = arr ? arr[j] : ''
                     if(val2){
                         var prefix = o.getAttribute('data-prefix');
                         if(prefix) val2 = val2.replace(prefix, '')
                         o.value = val2
                     }
+                    else o.value = ''
                     n += '+'
                     j++;
                     o = QS('input[data-flag="' + n + '"]');
@@ -942,7 +943,7 @@ function loadUiFlags(){
                 if (elem.getAttribute('type') == 'checkbox')
                     elem.checked = val ? true : false;
                 else
-                    elem.value = val
+                    elem.value = val != undefined ? val : ''
             }
         }
         elem.oninput = uiOptInput;
@@ -997,6 +998,7 @@ var uiOptInput = function(){
     jwrite("flagsConf", flagsConf);
 
     n = this.id.replaceAll('+', '')
+    if(!n) return;
     o = ebi(n)
     synching = true;
     while(o){
@@ -1635,6 +1637,136 @@ ebi('copyBtn').onclick = function(){
         ebi('copyBtn').innerHTML = "✅";
         setTimeout(function(){ebi('copyBtn').innerHTML = a;}, 1000);
     });
+}
+
+ebi('resetBtn').onclick = function(){
+    modal.confirm("this will delete your entire configuration on this page! (not your actual server config) continue?", reset, null);
+}
+function reset(){
+    flagsConf = []
+    volsConf = []
+    usrsConf = []
+    groups = []
+
+    swrite('rprefix', 'python -m copyparty')
+    jwrite('flagsConf', flagsConf)
+    jwrite('volsConf', volsConf)
+    jwrite('usrsConf', usrsConf)
+    jwrite('groups', groups)
+
+    ebi('rpre').value = 'python -m copyparty'
+    loadUiFlags()
+    loadFlags()
+    loadVolumes()
+    loadUsers()
+    loadGroups()
+}
+ebi('importBtn').onclick = function(){
+    modal.confirm("this will overwrite your configuration on this page! (not your actual server config) continue?", importConfig, null);
+}
+function importConfig(txt){
+    if(!txt || txt === true)
+        txt = ebi('importTxt').value.trim()
+
+    flagsConf = []
+    volsConf = []
+    usrsConf = []
+    groups = []
+
+    var first = true;
+    var buffer = "";
+    while(txt.length > 0){
+        var cmd = txt.match(/^.*?\s-/)
+        if(!cmd)
+            cmd = txt
+        else
+            cmd = cmd[0]
+        txt = txt.slice(cmd.length)
+        if(cmd.match(/"/g)?.length % 2 > 1){
+            var m = txt.match(/"\S*\s-/)[0]
+            cmd += m
+            txt.slice(m.length)
+        }
+        var c = (first ? '' : '-') + cmd.split(/(\s|=)/)[0]
+        first = false
+        var val = cmd.slice(c.length + first)
+        val = val.replace(/\s-$/, '')
+        console.log(c)
+        console.log(val)
+        var flag = flags.filter((f) => f.cmd == c)[0];
+        if(!flag){
+            buffer += cmd
+            continue
+        }
+        else if(buffer){
+            buffer = buffer.slice(0, buffer.length - 2)
+            swrite('rprefix', buffer)
+            ebi('rpre').value = buffer
+        }
+        buffer = ''
+
+        switch(c){
+            case "-v":
+                volsConf.push(getVolFromStr(val))
+                break;
+            case "-a":
+                var name = val.split(':')
+                var pw = val.slice(name.length)
+                usrsConf.push({name: name, pw: pw})
+                break;
+            case "-g":
+                var name = val.split(':')
+                var u = val.slice(name.length)
+                groups.push({name: name, users: u})
+                break;
+            default:
+                if(val.startsWith('"') && val.endsWith('"'))
+                    val = val.slice(1, val.length - 2)
+                flagsConf.push({cmd: c, value: val});
+                break;
+        }
+    }
+
+    console.log(flagsConf)
+    console.log(volsConf)
+    console.log(usrsConf)
+    console.log(groups)
+
+    jwrite('flagsConf', flagsConf)
+    jwrite('volsConf', volsConf)
+    jwrite('usrsConf', usrsConf)
+    jwrite('groups', groups)
+
+    loadUiFlags()
+    loadFlags()
+    loadVolumes()
+    loadUsers()
+    loadGroups()
+}
+function getVolFromStr(s){
+    var parts = s.split(':')
+    var src = parts[0]
+    var dst = parts[1]
+    var rest = parts.slice(2)
+    var perms = []
+    var flags = []
+    for(var i = 0; i < rest.length; i++){
+        var o = rest[i]
+        if(o.startsWith('c,')){
+            o = o.slice(2)
+            var c = o.split(/(\s|=)/)[0]
+            var val = o.slice(c.length + 1)
+            if(val.startsWith('"') && val.endsWith('"'))
+                val = val.slice(1, val.length - 2)
+            flags.push({cmd: c, value: val})
+        }
+        else{
+            var p = o.split(',')[0]
+            var u = o.slice(p.length + 1)
+            perms.push({user: u, perms: p})
+        }
+    }
+    return {src: src, dst: dst, perms: perms, flags: flags}
 }
 
 tt.init();
