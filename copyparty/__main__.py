@@ -1042,7 +1042,7 @@ def get_sects():
             .1   = when necessary, append a dot followed by a single digit
             .1!  = counter is always added, even when not necessary
             -3   = a hyphen followed by three-digit counter
-            (blank) = disable counter; overwrite existing logfile
+            no   = disable counter; overwrite existing logfile
             """
             ),
         ],
@@ -1713,9 +1713,9 @@ def add_safety(ap):
     ap2.add_argument("--acam", metavar="V[,V]", type=u, default="GET,HEAD", help="Access-Control-Allow-Methods; list of methods to accept from offsite ('*' behaves like \033[33m--acao\033[0m's description)")
     if FULL_HELP or (not ANYWIN and not UNIX):
         ap2.add_argument("--th-bwrap", metavar="CMD", type=u, default=th_bwrap, help="optional bwrap sandbox command for FFmpeg and dcraw (Linux-only)")
-        ap2.add_argument("--use-bwrap", metavar="C", type=u, default="a", help="a/n/f; [\033[32ma\033[0m]=auto (yes if the program 'bwrap' exists (assumes it works)), [\033[32mn\033[0m]=no (assumes bwrap is broken), [\033[32mf\033[0m]=force (disables FFmpeg if bwrap unavailable)")
+        ap2.add_argument("--use-bwrap", metavar="TXT", type=u, default="n", help="a/n/f; [\033[32ma\033[0m]=auto (yes if the program 'bwrap' exists (assumes it works)), [\033[32mn\033[0m]=no (assumes bwrap is broken), [\033[32mf\033[0m]=force (disables FFmpeg if bwrap unavailable)")
     else:
-        ap2.add_argument("--use-bwrap", metavar="C", type=u, default="n", help=argparse.SUPPRESS)
+        ap2.add_argument("--use-bwrap", metavar="TXT", type=u, default="n", help=argparse.SUPPRESS)
 
 
 def add_salt(ap, fk_salt, dk_salt, ah_salt):
@@ -1802,7 +1802,7 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-ff-jpg", action="store_true", help="force jpg output for video thumbs (avoids issues on some FFmpeg builds)")
     ap2.add_argument("--th-ff-swr", action="store_true", help="use swresample instead of soxr for audio thumbs (faster, lower accuracy, avoids issues on some FFmpeg builds)")
     ap2.add_argument("--th-vips-jxl", metavar="N", type=int, default=1, help="when to allow generating jxl thumbnails with libvips; 0=never, 1=musl-mallocng, 2=always")
-    ap2.add_argument("--th-poke", metavar="SEC", type=int, default=300, help="activity labeling cooldown -- avoids doing keepalive pokes (updating the mtime) on thumbnail folders more often than \033[33mSEC\033[0m seconds")
+    ap2.add_argument("--th-poke", metavar="SEC", type=int, default=300, help="activity labeling cooldown -- avoids doing keepalive pokes (updating the mtime) on thumbnail folders more often than \033[33mSEC\033[0m seconds; 0=no-keepalive")
     ap2.add_argument("--th-clean", metavar="SEC", type=int, default=43200, help="cleanup interval; 0=disabled")
     ap2.add_argument("--th-maxage", metavar="SEC", type=int, default=604800, help="max folder age -- folders which haven't been poked for longer than \033[33m--th-poke\033[0m seconds will get deleted every \033[33m--th-clean\033[0m seconds")
     ap2.add_argument("--th-pregen", metavar="F,F", type=u, default="", help="pregenerate thumbnails on startup; \033[33mF,F\033[0m is comma-separated list of formats; example: [\033[32mj,jf,w,w3,wf,wf3,x,xf\033[0m] NOTE: remember to set \033[33m--th-maxage 123456789\033[0m (volflag=th_pregen)")

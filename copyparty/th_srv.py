@@ -273,7 +273,7 @@ class ThumbSrv(object):
         self.log = self._log
         self.nextlog = 0
 
-        self.poke_cd = Cooldown(self.args.th_poke)
+        self.poke_cd = Cooldown(self.args.th_poke) if self.args.th_poke else None
 
         self.mutex = threading.Lock()
         self.busy: dict[str, list[threading.Condition]] = {}
@@ -1419,7 +1419,7 @@ class ThumbSrv(object):
         return ret
 
     def poke(self, tdir: str) -> None:
-        if not self.poke_cd.poke(tdir):
+        if not self.poke_cd or not self.poke_cd.poke(tdir):
             return
 
         ts = int(time.time())

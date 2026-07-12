@@ -89,11 +89,16 @@ class TestVFS(unittest.TestCase):
 
         self.assertEqual(au.vfs.vpath, "")
         self.assertApEq(au.vfs.realpath, "/")
-        self.assertNodes(au.vfs, ["vb"])
+        self.assertNodes(au.vfs, ["vb", "x1", "x2"])
         self.assertNodes(au.vfs.nodes["vb"], [])
+        self.assertJump(au.vfs.nodes["x1"], [])
+        self.assertJump(au.vfs.nodes["x2"], [])
 
         self.assertAxs(au.vfs.axs, [["ua"]])
         self.assertAxs(au.vfs.nodes["vb"].axs, [])
+
+        self.assertEqual("", au.vfs.nodes["x1"].realpath)
+        self.assertEqual("", au.vfs.nodes["x2"].realpath)
 
     def test_2(self):
         """
@@ -104,14 +109,19 @@ class TestVFS(unittest.TestCase):
 
         self.assertEqual(au.vfs.vpath, "")
         self.assertApEq(au.vfs.realpath, "/")
-        self.assertNodes(au.vfs, ["vb", "vc"])
+        self.assertNodes(au.vfs, ["vb", "vc", "x1", "x2"])
         self.assertNodes(au.vfs.nodes["vb"], [])
         self.assertNodes(au.vfs.nodes["vc"], [])
+        self.assertJump(au.vfs.nodes["x1"], [])
+        self.assertJump(au.vfs.nodes["x2"], [])
 
         self.assertAxs(au.vfs.axs, [["ua", "ub"]])
         self.assertAxsAt(au, "vb", [["ua", "ub"]])  # same as:
         self.assertAxs(au.vfs.nodes["vb"].axs, [["ua", "ub"]])
         self.assertAxs(au.vfs.nodes["vc"].axs, [["ua", "ub", "uc"]])
+
+        self.assertEqual("", au.vfs.nodes["x1"].realpath)
+        self.assertEqual("", au.vfs.nodes["x2"].realpath)
 
     def test_3(self):
         """

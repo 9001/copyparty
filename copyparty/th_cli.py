@@ -31,7 +31,7 @@ class ThumbCli(object):
         self.asrv = hsrv.asrv
 
         # cache on both sides for less broker spam
-        self.cooldown = Cooldown(self.args.th_poke)
+        self.cooldown = Cooldown(self.args.th_poke) if self.args.th_poke else None
 
         self.thumbable = c["thumbable"]
         self.fmt_pil = c["pil"]
@@ -149,14 +149,15 @@ class ThumbCli(object):
                 pass
 
         if ret:
-            tdir = os.path.dirname(tpath)
-            if self.cooldown.poke(tdir):
-                self.broker.say("thumbsrv.poke", tdir)
+            if self.cooldown:
+                tdir = os.path.dirname(tpath)
+                if self.cooldown.poke(tdir):
+                    self.broker.say("thumbsrv.poke", tdir)
 
-            if want_opus:
-                # audio files expire individually
-                if self.cooldown.poke(tpath):
-                    self.broker.say("thumbsrv.poke", tpath)
+                if want_opus:
+                    # audio files expire individually
+                    if self.cooldown.poke(tpath):
+                        self.broker.say("thumbsrv.poke", tpath)
 
             return ret
 

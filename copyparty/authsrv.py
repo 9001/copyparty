@@ -1195,7 +1195,7 @@ class AuthSrv(object):
         for ptn, sigil in ((PTN_U_ANY, "${u}"), (PTN_G_ANY, "${g}")):
             if bool(ptn.search(src)) != bool(ptn.search(dst)):
                 zsl.append(sigil)
-        if zsl:
+        if zsl and src != "//NULL":
             t = "ERROR: if %s is mentioned in a volume definition, it must be included in both the filesystem-path [%s] and the volume-url [/%s]"
             t = "\n".join([t % (x, src, dst) for x in zsl])
             self.log(t, 1)
@@ -1275,8 +1275,16 @@ class AuthSrv(object):
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
     ) -> tuple[str, str]:
-        src = os.path.expanduser(self.args.shenvexp(src))
-        src = absreal(src)
+        if src == "//NULL":
+            src = ""
+        else:
+            src = os.path.expanduser(self.args.shenvexp(src))
+            src = absreal(src)
+
+        if dst == "//NULL":
+            t = "//NULL given as URL instead of filesystem-path"
+            self.log(t, 1)
+            raise Exception(t)
         dst = dst.strip("/")
 
         if dst in mount:
@@ -1284,7 +1292,7 @@ class AuthSrv(object):
             self.log(t.format(dst, mount[dst][0], src), c=1)
             raise Exception(BAD_CFG)
 
-        if src in mount.values():
+        if src and src in mount.values():
             t = "filesystem-path [{}] mounted in multiple locations:"
             t = t.format(src)
             for v in [k for k, v in mount.items() if v[0] == src] + [dst]:
@@ -1293,7 +1301,7 @@ class AuthSrv(object):
             self.log(t, c=3)
             raise Exception(BAD_CFG)
 
-        if not bos.path.exists(src):
+        if src and not bos.path.exists(src):
             self.log("warning: filesystem-path did not exist: %r" % (src,), 3)
 
         vf = {}
@@ -1861,7 +1869,7 @@ class AuthSrv(object):
         if WINDOWS:
             cased = {}
             for vp, (ap, vp0) in mount.items():
-                cased[vp] = (absreal(ap), vp0)
+                cased[vp] = (absreal(ap) if ap else "", vp0)
 
             mount = cased
 
@@ -2806,6 +2814,7 @@ class AuthSrv(object):
             zs = "select %s from up where rd=? and fn=?" % (", ".join(up_q),)
             vol.flags["ls_q_m"] = (zs if up_m else "", up_m)
 
+        zltss = []  # recheck
         for vn1 in vfs.all_nodes.values():
             if "show_hist" in vn1.flags or not vn1.realpath:
                 continue
@@ -2823,10 +2832,15 @@ class AuthSrv(object):
                         continue
                     zs = hap[len(apS) :]
                     if "/" in zs:
-                        t = "note: /%s/%s gives access to %s"
-                        self.log(t % (vn2.vpath, zs, hap), 3)
+                        zltss.append((vjoin(vn1.vpath, zs), hap))
                     else:
                         vn1.add("", zs, zs)
+        for vp, hap in zltss:
+            zss = vfs.get(vp, "", False, False)[0].axs.uget
+            if zss:
+                t = "note: /%s gives access to %r for %s"
+                self.log(t % (vp, hap, zss), 3)
+        zltss[:] = []
 
         vfs.all_fvols = {
             zs: vol for zs, vol in vfs.all_vols.items() if "is_file" in vol.flags
