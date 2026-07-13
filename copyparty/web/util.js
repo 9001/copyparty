@@ -467,6 +467,11 @@ function import_js(url, cb, ecb) {
     };
     head.appendChild(script);
 }
+function import_mjs(name, id) {
+    import_js(SR + "/.cpr/w/" + name + ".js", function () {
+        if (id) jsldp(id, name);
+    });
+}
 
 
 function unsmart(txt) {
@@ -2508,6 +2513,10 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
     return fun(0, prefix + xhr.status + ": " + errtxt, tag);
 }
 
+function jsldp(a, b) {
+	2 != window[a] && alert("FATAL ERROR: cannot load " + b + ".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R");
+}
+
 // polyfill for 3DS (IE11 can do this natively)
 var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
 	e = e || { bubbles: false, cancelable: false };
@@ -2515,32 +2524,6 @@ var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
 	mouseEvent.initMouseEvent(eventType, e.bubbles, e.cancelable, window, 0, 0, 0, 0, false, false, false, false, 0, null);
 	return mouseEvent;
 };
-
-// start DL of secondary JS
-// based on https://stackoverflow.com/questions/4845762/onload-handler-for-script-tag-in-internet-explorer
-function loadScript(name, id) {
-	var head = (document.getElementsByTagName("head")[0] || document.head)
-    var s = document.createElement('script');
-    s.src = window.SR + '/.cpr/w/' + name + '.js?_=' + window.TS;
-    s.setAttribute('nonce', window.JS_NONCE);
-	var done = false;
-    s.onload = s.onreadystatechange = function() {
-		if (!done && (!this.readyState ||
-				this.readyState === "loaded" || this.readyState === "complete") ) {
-			done = true;
-
-			if(id)
-				jsldp(id, name);
-
-			// Handle memory leak in IE
-			s.onload = s.onreadystatechange = null;
-			if ( head && s.parentNode ) {
-				head.removeChild(s);
-			}
-		}
-	};
-    head.appendChild(s);
-}
 
 if (navigator.serviceWorker && caches){
     // https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp

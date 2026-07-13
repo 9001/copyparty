@@ -1433,18 +1433,12 @@ window.baguetteBox = (function () {
     };
 })();
 
-
-function init(){
-    if(msel != undefined && msel.bbox != true){
-        console.log('bbox load')
+function bboxinit() {
+    if (msel && msel.bbox != true) {
+        timer.rm(bboxinit);
         msel.bagit();
     }
-    else{
-        setTimeout(init, 100)
-    }
 }
-
-console.log('wait for file list init');
-init();
+timer.add(bboxinit, true);
 
 J_BBX = 2;
