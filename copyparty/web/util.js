@@ -2380,7 +2380,7 @@ function setColor (color, temp) {
     if(color == '#333333' || color == 'rgb(51, 51, 51)') color = '';
 	accent = color;
     if(!temp)
-	    swrite('accent', accent);
+	    swrite('paccent', accent);
 	var a = accent || '';
 	console.log('accent color set to: ' + a);
 	setcvar('--a', a);
@@ -2389,9 +2389,7 @@ function setColor (color, temp) {
 	vbar.draw();
 }
 
-var accent = "";
-if(sread != undefined)
-    accent = sread('accent');
+var accent = sread('paccent');
 var tcolor = QS('meta[name=theme-color]');
 if(tcolor)
     tcolor = tcolor.content;

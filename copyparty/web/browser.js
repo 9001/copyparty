@@ -8538,7 +8538,7 @@ var treectl = (function () {
 		if (!sread('griden'))
 			clmod(ebi('griden'), 'on', thegrid.en = dgrid);
 
-		var accent = parseColor(sread('accent'))
+		var accent = parseColor(sread('paccent'))
 		if(!accent && (res.tcolor || tcolor))
 			setColor(parseColor(res.tcolor ? res.tcolor : tcolor), true);
 
