@@ -10,7 +10,6 @@ import json
 import os
 import random
 import re
-import secrets
 import socket
 import stat
 import sys
@@ -1588,9 +1587,10 @@ class HttpCli(object):
         return self.tx_404()
 
     def tx_wopi(self) -> bool:
+        from secrets import token_urlsafe
         path = self.vpath + "/" + str(self.uparam["wopi"])
-        access_token = secrets.token_urlsafe(64)
-        file_id = secrets.token_urlsafe(64)
+        access_token = token_urlsafe(64)
+        file_id = token_urlsafe(64)
         self.conn.hsrv.wopi_files[access_token] = {
             "uname": self.uname,
             "file_id": file_id,
