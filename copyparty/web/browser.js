@@ -7186,7 +7186,7 @@ var ahotkeys = function (e) {
 		if (kl == 'v')
 			return fileman.d_paste(e);
 
-		if (kl == 'k' || k.endsWith('Delete'))
+		if (kl == 'k' || (k.endsWith('Delete') && !ctrl(e)))
 			return fileman.delete(e);
 
 		return;
