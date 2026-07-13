@@ -130,7 +130,7 @@
             dfavico="{{ favico }}";
 
         var STG = window.localStorage;
-        document.documentElement.className = (STG && STG.cpp_thm) || "{{ theme }}";
+        document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme }}";
     </script>
     <script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
     <script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/config.js?_={{ ts }}"></script>
