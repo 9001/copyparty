@@ -5469,6 +5469,7 @@ class HttpCli(object):
     def tx_config(self) -> bool:
         html = self.j2s(
             "config",
+            this=self,
             accs=bool(self.asrv.acct),
             s="s" if self.is_https else "",
             bg_img=self.args.bg_img,
