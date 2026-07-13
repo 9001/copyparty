@@ -581,7 +581,7 @@ var flags = [
     new Argument("--dothidden", "hide specific files in a folder by listing them in a file named .hidden -- WARNING: Mostly cosmetic! Download-as-zip/tar will still download them. Do not rely on this for security (volflag=dothidden) (default: False)"),
     new Argument("--favico", "favicon-text [ foreground [ background ] ], set blank to disable (default: 🎉 000 none)"),
     new Argument("--ufavico", "URL to .ico/png/gif/svg file; --favico takes precedence unless disabled (volflag=ufavico) (default: )"),
-    new Argument("--bg-img", "URL to .jpg/png/gif/svg file (volflag=background)"),
+    new Argument("--bg-img", "URL to .jpg/png/gif/svg file (volflag=bg_img)"),
     new Argument("--ext-th", "REPEATABLE: use thumbnail-image VP for file-extension E, example: [exe=/.res/exe.png] (volflag=ext_th) (default: None)"),
     new Argument("--notooltips", "tooltips disabled as default (default: False)"),
     new Argument("--spinner", "emoji or emoji,css Example: [🥖,padding:0] (default: 🌲)"),
