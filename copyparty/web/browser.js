@@ -1834,8 +1834,6 @@ if (!fullui) {
 if (x)
 	document.head.appendChild(mknod('style', '', x.slice(0, -1) + '{display:none!important}'));
 
-if(nonav)
-
 if (location.pathname.indexOf('//') === 0)
 	hist_replace(location.pathname.replace(/^\/+/, '/'));
 
@@ -6747,7 +6745,6 @@ function get_thumb(ohref, ref, isdir, grid){
 	var href = ohref.split('?')[0],
 		ext = '',
 		ext0 = '',
-		name = uricom_dec(vsplit(href)[1]),
 		need_ext = !thegrid.thumbs || !!ext_th,
 		use_ext_th = thegrid.thumbs && ext_th,
 		ihref = ohref;

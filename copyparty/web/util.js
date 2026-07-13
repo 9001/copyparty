@@ -2400,7 +2400,6 @@ if(tcolor)
     tcolor = tcolor.content;
 if((!accent || accent.length <= 3) && tcolor != "#333333")
     accent = tcolor;
-var thing = QS('meta[name=theme-color]');
 if(accent && accent.length > 3){
     console.log('read accent color from settings: ' + accent);
     setcvar('--a', parseColor(accent));
