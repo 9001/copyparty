@@ -1107,14 +1107,19 @@ class SvcHub(object):
                 t = "not listening on any ip-addresses (only unix-sockets and/or FDs); cannot enable zeroconf/mdns/ssdp as requested"
                 self.log("root", t, 3)
 
-        if not self.args.no_dav:
+        if self.args.wopi or not self.args.no_dav:
             from .dxml import DXML_OK
 
             if not DXML_OK:
-                if not self.args.no_dav:
-                    self.args.no_dav = True
-                    t = "WARNING:\nDisabling WebDAV support because dxml selftest failed. Please report this bug;\n%s\n...and include the following information in the bug-report:\n%s | expat %s\n"
-                    self.log("root", t % (URL_BUG, VERSIONS, expat_ver()), 1)
+                self.args.wopi = False
+                self.args.no_dav = True
+                t = "WARNING:\nDisabling WebDAV and WOPI support because dxml selftest failed. Please report this bug;\n%s\n...and include the following information in the bug-report:\n%s | expat %s\n"
+                self.log("root", t % (URL_BUG, VERSIONS, expat_ver()), 1)
+
+        if self.args.wopi and self.args.j != 1:
+            self.args.wopi = False
+            t = "WARNING: Disabling --wopi because -j is not 1 (the default and recommended -j value)"
+            self.log("root", t, 1)
 
         if (
             not E.scfg
