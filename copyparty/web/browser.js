@@ -4664,6 +4664,9 @@ var fileman = (function () {
 
 		bpst.setAttribute('tt', L.ft_paste.format(r.clip.length));
 		bshr.setAttribute('tt', nsel ? L.fs_ss : L.fs_sc);
+
+		ebi('spaceFree').innerHTML = volspace[0] + ' free of ' + volspace[1];
+		ebi('spaceUsed_bar').style.width = (volspace[2] / 100) + '%';
 	};
 
 	r.fsi = function (sel) {
