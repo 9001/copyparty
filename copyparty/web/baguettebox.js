@@ -1429,7 +1429,7 @@ window.baguetteBox = (function () {
         playpause: playpause,
         hide: hideOverlay,
         destroy: destroyPlugin,
-        manualOpen: manualOpen
+        manualOpen: manualOpen,
     };
 })();
 

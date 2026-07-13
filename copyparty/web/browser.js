@@ -2763,7 +2763,7 @@ var pbar = (function () {
 			bctx = bc.ctx,
 			apos, adur;
 
-		if (!widget.is_open || mpl.waves == false)
+		if (!widget.is_open || !mpl.waves)
 			return;
 
 		bctx.clearRect(0, 0, bc.w, bc.h);
@@ -2880,7 +2880,7 @@ var pbar = (function () {
 				});
 		}
 
-		if (!widget.is_open || mpl.waves == false && !force)
+		if (!widget.is_open || !mpl.waves && !force)
 			return;
 
 		pctx.fillStyle = '#bbb'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
