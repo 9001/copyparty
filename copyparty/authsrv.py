@@ -3268,7 +3268,7 @@ class AuthSrv(object):
                 "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
                 "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
                 "rw_edit": vf["rw_edit"],
-                "theme": vf["theme"],
+                "dtheme": vf["theme"],
                 "bg_img": vf["bg_img"],
                 "tcolor": vf["tcolor"],
             }
@@ -3297,7 +3297,7 @@ class AuthSrv(object):
                 "sba_md": vf.get("md_sba") or "",
                 "sba_lg": vf.get("lg_sba") or "",
                 "rw_edit": vf["rw_edit"],
-                "theme": vf["theme"],
+                "dtheme": vf["theme"],
                 "bg_img": vf["bg_img"],
                 "tcolor": vf["tcolor"],
                 "txt_ext": self.args.textfiles.replace(",", " "),

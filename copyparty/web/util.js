@@ -19,7 +19,6 @@ if (window.CGV1)
 if (window.CGV)
     Object.assign(window, window.CGV);
 
-
 function supportsEmoji() {
     var ctx = document.createElement('canvas').getContext('2d');
     ctx.canvas.width = ctx.canvas.height = 1;
@@ -2359,7 +2358,8 @@ var favico = (function () {
         scfg_bind(r, 'bg', 'icob', bg, r.upd);
         r.upd();
     };
-    r.init();
+
+    r.to = setTimeout(r.init, 100);
     return r;
 })();
 

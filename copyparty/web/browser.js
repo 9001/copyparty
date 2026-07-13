@@ -8633,8 +8633,8 @@ var treectl = (function () {
 
 		setBg(res.bg_img);
 
-		if(!override_thm && res.theme){
-			settheme.init(res.theme)
+		if(!override_thm && res.dtheme){
+			settheme.init(res.dtheme)
 		}
 	}
 
