@@ -7061,6 +7061,7 @@ var ahotkeys = function (e) {
 		settheme.go(6);
 		start_actx();
 		sfx_nice();
+		treectl.entree();
 		toast.inf(9, 'omega clearance granted', null, 'top');
 		setTimeout(function () {
 			apply_perms(treectl.lsc);
@@ -9084,7 +9085,8 @@ function apply_perms(res) {
 
 	if (konmai < 0) {
 		acct = 'Ted Faro';
-		srvinf = 'FAS Nexus</span> // <span>57.3 EiB free of 127 EiB';
+		ebi('srv_name').innerHTML = 'FAS Nexus';
+		volspace = ['57.3 EiB', '127 EiB', 4512];
 		res.shr_who = 'auth';
 		perms = res.perms = chk;
 		have_up2k_idx = have_tags_idx = 1;
