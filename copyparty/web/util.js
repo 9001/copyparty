@@ -2375,7 +2375,7 @@ function cprop(name) {
 
 // read accent / theme color
 function parseColor (strColor) {
-    if(strColor && strColor.length > 0 && strColor.length <= 6 && !strColor.startsWith('#')) 
+    if(strColor && strColor.length > 0 && strColor.length <= 8 && !strColor.startsWith('#') && !strColor.match(",")) 
         strColor = '#' + strColor;
 	var s = new Option().style;
 	s.color = strColor;
