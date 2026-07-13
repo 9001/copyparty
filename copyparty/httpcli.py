@@ -319,7 +319,6 @@ class HttpCli(object):
         ka["favico"] = self.args.favico
         ka["s_doctitle"] = self.args.doctitle
         ka["tcolor"] = self.vn.flags["tcolor"]
-        ka["theme"] = self.vn.flags["theme"]
         ka["js_nonce"] = self.js_nonce
 
         if self.args.js_other and "js" not in ka:
@@ -7131,9 +7130,7 @@ class HttpCli(object):
             "srv_info": srv_infot,
             "srv_name": "" if self.args.nih else self.args.name,
             "srv_url": self.args.name_url if self.args.name_url else "/",
-            "theme": self.args.theme,
-            "bg_img": self.args.bg_img,
-            "tcolor": self.args.tcolor,
+            "dtheme": self.args.theme,
         }
 
         if self.args.js_browser:
