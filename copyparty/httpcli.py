@@ -7023,9 +7023,7 @@ class HttpCli(object):
             self.log("#wow #whoa")
 
         zi = vn.flags["du_iwho"]
-        h1 = ""
-        h2 = ""
-        space_used_percent = 0
+        volspace = []
         if zi and (
             zi == 9
             or (zi == 7 and self.uname != "*")
@@ -7050,11 +7048,12 @@ class HttpCli(object):
                             free = min(free, max(0, vn.lim.vbmax - zi))
                         except:
                             pass
-                h1 = humansize(free or 0)
+                if not free:
+                    free = 0
+                h1 = humansize(free)
                 h2 = humansize(total)
                 srv_info.append("{} free of {}".format(h1, h2))
-                if(total > 0):
-                    space_used_percent = (total - (free or 0)) / total * 100
+                volspace = [h1, h2, int((total - free) / total * 10000)]
             elif zs:
                 self.log("diskfree(%r): %s" % (abspath, zs), 3)
 
@@ -7105,9 +7104,7 @@ class HttpCli(object):
             "files": [],
             "taglist": [],
             "srvinf": srv_infot,
-            "space_used_percent": space_used_percent,
-            "space_free": h1,
-            "space_total": h2,
+            "volspace": volspace,
             "acct": self.uname,
             "perms": perms,
             "cfg": vn.js_ls,
@@ -7116,6 +7113,7 @@ class HttpCli(object):
             "ls0": None,
             "acct": self.uname,
             "perms": perms,
+            "volspace": volspace,
         }
         # also see `js_htm` in authsrv.py
         j2a = {
@@ -7133,9 +7131,6 @@ class HttpCli(object):
             "srv_info": srv_infot,
             "srv_name": "" if self.args.nih else self.args.name,
             "srv_url": self.args.name_url if self.args.name_url else "/",
-            "space_used_percent": space_used_percent,
-            "space_free": h1,
-            "space_total": h2,
             "theme": self.args.theme,
             "bg_img": self.args.bg_img,
             "tcolor": self.args.tcolor,

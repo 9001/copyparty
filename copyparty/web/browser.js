@@ -8537,8 +8537,7 @@ var treectl = (function () {
 			setColor(parseColor(res.tcolor ? res.tcolor : tcolor), true);
 
 		srvinf = res.srvinf;
-		ebi('spaceFree').innerHTML = res.space_free + ' free of ' + res.space_total ;
-		ebi('spaceUsed_bar').width = res.space_used_percent + '%';
+		volspace = res.volspace;
 		if (rtt !== null){
 			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
 			ebi('rtt_latency').innerHTML = 'latency: ' + rtt + 'ms';
