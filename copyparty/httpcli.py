@@ -1554,7 +1554,7 @@ class HttpCli(object):
     def tx_wopi_api(self) -> bool:
         path = self.vpath.split('/')
 
-        if "files" in path and self.conn.hsrv.wopi_files[self.uparam["access_token"]]["file_key"] in path:
+        if "files" in path and self.conn.hsrv.wopi_files[self.uparam["access_token"]]["file_id"] in path:
             real_path = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["path"]
             vfs, _ = self.asrv.vfs.get(real_path, self.uname, False, True)
             full_path = vfs.realpath + "/" + real_path
@@ -1590,11 +1590,11 @@ class HttpCli(object):
 
     def tx_wopi(self) -> bool:
         path = self.vpath + "/" + str(self.uparam["wopi"])
-        session_key = secrets.token_urlsafe(64)
-        file_key = secrets.token_urlsafe(64)
-        self.conn.hsrv.wopi_files[session_key] = {
+        access_token = secrets.token_urlsafe(64)
+        file_id = secrets.token_urlsafe(64)
+        self.conn.hsrv.wopi_files[access_token] = {
             "uname": self.uname,
-            "file_key": file_key,
+            "file_id": file_id,
             "path": path,
         }
 
@@ -1604,7 +1604,7 @@ class HttpCli(object):
             ext = path.split('.')[-1]
             wopi_url = response.find(".//action[@ext='%s'][@urlsrc]" % ext).get("urlsrc")
             favicon_url = response.find(".//action[@ext='%s'].." % ext).get("favIconUrl")
-            url = wopi_url + urllib.parse.quote("WOPISrc=https://" + self.host + "/wopi/files/" + file_key, safe="=")
+            url = wopi_url + urllib.parse.quote("WOPISrc=https://" + self.host + "/wopi/files/" + file_id, safe="=")
         except Exception as error:
             self.log("Couldn't get urls from WOPI client: %s" % error)
             return False
@@ -1648,7 +1648,7 @@ class HttpCli(object):
 </body>
 </html>
 """
-            % (favicon_url, self.uparam["wopi"], url, session_key, self.js_nonce)
+            % (favicon_url, self.uparam["wopi"], url, access_token, self.js_nonce)
         ]
 
         bret = "".join(ret).encode("utf-8", "replace")
@@ -3497,7 +3497,7 @@ class HttpCli(object):
         if (
             "files" in path and
             "contents" in path and
-            self.conn.hsrv.wopi_files[self.uparam["access_token"]]["file_key"] in path
+            self.conn.hsrv.wopi_files[self.uparam["access_token"]]["file_id"] in path
         ):
             real_path = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["path"]
             vfs, _ = self.asrv.vfs.get(real_path, self.uname, False, True)
