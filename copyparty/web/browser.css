@@ -1160,10 +1160,13 @@ tr.play td:nth-child(1) a {
 	position: absolute;
 	opacity: 0;
 }
-#ggrid>a.dir .thumb,
-#ggrid>a.dir img {
+#ggrid>a.dir.thumbed .thumb,
+#ggrid>a.dir.thumbed img {
 	max-width: calc(var(--grid-sz) - 20px);
 	margin: 10px auto 0 auto;
+}
+#ggrid>a.dir.thumbed .imgcontainer img {
+    height: calc(var(--grid-sz) - 2.5em - 10px);
 }
 #ggrid.noupscale>a img {
 	width: auto;
