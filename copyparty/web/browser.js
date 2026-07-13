@@ -9006,7 +9006,6 @@ var treectl = (function () {
 	if (cs == 'tree' || (cs != 'na' && vw >= 60))
 		r.entree(null, true);
 
-	var lastReq = location.pathname;
 	r.onpopfun = function (e) {
 		console.log("h-pop " + e.state);
 		if (!e.state)
@@ -9019,12 +9018,10 @@ var treectl = (function () {
 			mdoc = /[?&]doc=/.exec('' + url),
 			mdk = /[?&](k=[^&#]+)/.exec('' + url);
 
-		if(req == lastReq){
-			if(location.hash == '' && QS('#bbox-overlay.visible'))
-				baguetteBox.hide();
+		if(location.hash == '' && QS('#bbox-overlay.visible')){
+			baguetteBox.hide();
 			return;
 		}
-		lastReq = req;
 
 		if (mdoc && hbase == cbase)
 			return showfile.show(hbase + showfile.sname(url.search), true);
