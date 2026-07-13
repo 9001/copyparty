@@ -9620,14 +9620,6 @@ var settheme = (function () {
 		if(t)
 			theme = t;
 
-		if(theme.match(/[0-9]/)){
-			t = theme;
-			var ch = "abcdefghijklmnopqrstuvwx"
-			theme = ch[parseInt(t / 2)]
-			theme += t % 2 ? 'y' : 'z'
-			theme += ' ' + theme[0] + ' ' + theme[1]
-		}
-
 		console.log('theme: ' + theme)
 
 		themen = theme.split(/ /)[0];

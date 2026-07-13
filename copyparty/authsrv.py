@@ -3244,6 +3244,12 @@ class AuthSrv(object):
             if enshare and vp.startswith(shrs):
                 continue  # propagates later in this func
             vf = vn.flags
+            if "theme" in vf:
+                if re.match(r'[0-9]', vf["theme"]):
+                    zs = int(vf["theme"])
+                    bri = "zy"[zs % 2 :][:1]
+                    ch = "abcdefghijklmnopqrstuvwx"[int(zs / 2)]
+                    vf["theme"] = "{0}{1} {0} {1}".format(ch, bri)
             vn.js_ls = {
                 "idx": "e2d" in vf,
                 "itag": "e2t" in vf,
