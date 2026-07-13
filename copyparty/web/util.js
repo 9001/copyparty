@@ -2377,6 +2377,7 @@ function parseColor (strColor) {
 	return s.color !== '' ? s.color : '';
 }
 function setColor (color, temp) {
+    if(color == '#333333' || color == 'rgb(51, 51, 51)') color = '';
 	accent = color;
     if(!temp)
 	    swrite('accent', accent);
