@@ -1309,7 +1309,7 @@ ebi('op_cfg').innerHTML = (
 	'		<input tt="' + L.cl_radius +'" type="number" id="radius" min="-1" placeholder="[0-inf]"></input>' +
 	'		<a id="fun_tgl" class="tgl btn" tt="' + L.cl_fun + '">🥳</a>\n' +
 	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
-	(HAS_BG ? '<a id="enbg" class="tgl btn" tt="' + L.ct_enbg + '">🖼️ bg</a>\n' : '') +
+	'		<a id="enbg" class="tgl btn" tt="' + L.ct_enbg + '">🖼️ bg</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
@@ -4315,8 +4315,7 @@ function eval_hash() {
 	bcfg_bind(props, 'sbars', 'sbars', true, setsb);
 	setsb();
 
-	if(HAS_BG)
-		bcfg_bind(props, 'enbg', 'enbg', true, function(){ setBg(props.enbg ? window.bg_img : '')});
+	bcfg_bind(props, 'enbg', 'enbg', true, function(){ setBg(props.enbg ? window.bg_img : '')});
 
 	// compact media player
 	function setacmp() {

@@ -2409,7 +2409,7 @@ var setBg = function(bg){
         re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i,
         isVid = false,
         src;
-    HAS_BG = bg != '' && bg !== true; 
+    HAS_BG = bg != '' && bg !== true;
     if(sread('enbg') == 0) bg = '';
     console.log('setting bg to: ' + (bg || 'none'))
     if(bg && bg !== true){
