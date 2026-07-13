@@ -1579,8 +1579,9 @@ def add_opds(ap):
 
 def add_wopi(ap):
     ap2 = ap.add_argument_group("WOPI options")
-    ap2.add_argument("--wopi", action="store_true", help="allows for integrating with office suites using WOPI (volflag=wopi)")
+    ap2.add_argument("--wopi", action="store_true", help="allows for integrating with office suites using WOPI")
     ap2.add_argument("--wopi-client", type=u, default="https://demo.eu.collaboraonline.com", help="where to find your WOPI client, this is what actually hosts e.g. Collabora Online")
+    ap2.add_argument("--wopi-ttl", type=int, default=1800, help="amount of seconds after which the session expires, defaults to 30 minutes")
 
 
 def add_handlers(ap):

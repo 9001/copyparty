@@ -410,6 +410,7 @@ flagcats = {
     "wopi": {
         "wopi": "enable WOPI support for integrating with online office suites",
         "wopi-client": "address of WOPI client, e.g. Collabora Online",
+        "wopi-ttl": "amount of seconds after which the session expires"
     },
     "opds": {
         "opds": "enable OPDS",
