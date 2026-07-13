@@ -3945,10 +3945,14 @@ function play(tid, is_ev, seek) {
 		mp.au.src = mp.au.rsrc = url;
 	}
 
-	mp.au.osrc = decodeURI(mp.tracks[tid].split('/').pop());
-	var tname = esc(uricom_dec(mp.au.osrc));
-	ebi('trackname').innerHTML = tname;
-	ebi('trackname').setAttribute('tt', tname);
+	mp.au.osrc = mp.tracks[tid];
+
+	var tname = esc(uricom_dec(mp.au.osrc.split('/').pop()));
+	var el = ebi('trackname');
+	el.innerHTML = tname;
+	el.setAttribute('tt', tname);
+	tt.att(ebi('pctl'));
+
 	afilt.apply();
 
 	// popup player
