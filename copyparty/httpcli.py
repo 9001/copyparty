@@ -19,7 +19,6 @@ import time
 import uuid
 import urllib.request
 import urllib.parse
-import xml.etree.ElementTree as ET
 from datetime import datetime
 from operator import itemgetter
 
@@ -1605,8 +1604,9 @@ class HttpCli(object):
         ).start()
 
         try:
+            from .dxml import parse_xml
             discovery = urllib.request.urlopen(self.args.wopi_client + "/hosting/discovery")
-            response = ET.fromstring(discovery.read())
+            response = parse_xml(discovery.read())
             ext = path.split('.')[-1]
             wopi_url = response.find(".//action[@ext='%s'][@urlsrc]" % ext).get("urlsrc")
             favicon_url = response.find(".//action[@ext='%s'].." % ext).get("favIconUrl")
