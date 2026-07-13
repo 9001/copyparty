@@ -10,6 +10,7 @@ import json
 import os
 import random
 import re
+import secrets
 import socket
 import stat
 import sys
@@ -1589,9 +1590,8 @@ class HttpCli(object):
 
     def tx_wopi(self) -> bool:
         path = self.vpath + "/" + str(self.uparam["wopi"])
-        session_salt = ub64enc(os.urandom(64)).decode("utf-8")
-        session_key = self.gen_fk(2, session_salt, self.uname, 0, 0)
-        file_key = self.gen_fk(2, self.args.fk_salt, path, 0, 0)
+        session_key = secrets.token_urlsafe(64)
+        file_key = secrets.token_urlsafe(64)
         self.conn.hsrv.wopi_files[session_key] = {
             "uname": self.uname,
             "file_key": file_key,
