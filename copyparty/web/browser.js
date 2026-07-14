@@ -1512,7 +1512,7 @@ if(radius){
 
 
 // no fun allowed
-bcfg_bind(this, 'fun_tgl', 'fun_tgl');
+bcfg_bind(this, 'fun_tgl', 'fun_tgl', fun_tgl);
 
 // navpane
 ebi('treeh').innerHTML += (

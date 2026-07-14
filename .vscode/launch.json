@@ -48,20 +48,18 @@
                 // "--ver"
 
                 // til's conf
-                "--qr"
-                "-v~/:/::A,test:c,bg_img",
-                "-v~/Pictures:/a::A,test:c,bg_img=/a/HLCourDWYAA8RLl.webp",
-                "-atest:test",
-                "-mth",
-                "!,q",
+                "-v~/:/::A,admin",
+                "-aadmin:test",
+                // "-mth",
+                // "!,q",
                 "--ihead",
                 "*",
                 "--ohead",
                 "*",
                 "--bg-img=https://access.riceball.art/public/read-only/wiiu%20bg.webm",
-                "--tcolor=a07cb4ff",
-                "--theme=3",
-                "--chpw",
+                // "--tcolor=a07cb4ff",
+                // "--theme=3",
+                "--unfun",
             ]
         },
         {
