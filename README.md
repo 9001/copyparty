@@ -1,4 +1,4 @@
-<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>
+<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" style="max-width:40%" align="right"/>
 
 ### 💾🎉 copyparty
 
@@ -7,6 +7,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * server only needs Python (2 or 3), all dependencies optional
 * 🔌 protocols: [http(s)](#the-browser) // [webdav](#webdav-server) // [sftp](#sftp-server) // [ftp(s)](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
 * 📱 [progressive web app](#apps--integrations) // [android app](#party-up-android) // [iPhone shortcuts](#ios-shortcuts)
+* ⚙️ [config GUI](#config-gui)
 
 👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
 
@@ -195,6 +196,8 @@ enable thumbnails (images/audio/video), media indexing, and audio transcoding by
 * see [optional dependencies](#optional-dependencies) to enable even more features
 
 running copyparty without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
+
+you can use the [config GUI](#config-gui) (recommended for beginners)
 
 or see [some usage examples](#complete-examples) for inspiration, or the [complete windows example](./docs/examples/windows.md)
 
@@ -519,9 +522,25 @@ upgrade notes
     ```
 
 
+# config GUI
+
+to help you configure copyparty, you can use the config GUI ("guest list"), which is accessible via the `✏️ edit config` button (only visible on the control panel when you're logged in as an admin), or by visiting `http://[your-ip]:3923?config`
+
+the config helper page currently has no option to load your real config, but you can import your config from a start command at the bottom of the page. otherwise, all changes are local and use your browser cache
+
+you will probably want to replace your run prefix according to the [quickstart section](#quickstart)
+
+in the config GUI, you can search for [commands](https://copyparty.eu/cli/) and see their descriptions, easily configure [users, groups and volumes](#accounts-and-volumes), as well as getting suggestions for some of the recommended options
+
+once you're done with your configuration, just copy it to your clipboard and run it or save it as a bash file
+
+
 # accounts and volumes
 
-per-folder, per-user permissions  - if your setup is getting complex, consider making a [config file](./docs/example.conf) instead of using arguments
+per-folder, per-user permissions  - if your setup is getting complex, consider using the [config GUI](#config-gui), or making a [config file](./docs/example.conf) instead of using arguments
+
+advantages of a [config file](./docs/example.conf):
+
 * much easier to manage, and you can modify the config at runtime with `systemctl reload copyparty` or more conveniently using the `[reload cfg]` button in the control-panel (if the user has `a`/admin in any volume)
   * changes to the `[global]` config section requires a restart to take effect
 
