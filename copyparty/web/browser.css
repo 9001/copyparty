@@ -190,6 +190,10 @@ html.b .btn {
 	border-radius: var(--radius);
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4) !important;
 }
+html.b .btn:not(.on){
+	color: var(--fg);
+	background-color: color-mix(in srgb, var(--bg) 70%, transparent);
+}
 html.b #files thead th {
 	background: none;
 }
