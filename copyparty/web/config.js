@@ -1690,7 +1690,8 @@ function importConfig(txt){
         var c = (first ? '' : '-') + cmd.split(/(\s|=)/)[0]
         first = false
         var val = cmd.slice(c.length + first)
-        val = val.replace(/\s-$/, '')
+        val = val.replace(/(^|\s)-$/, '')
+        if(val === '') val = 'on'
         console.log(c)
         console.log(val)
         var flag = flags.filter((f) => f.cmd == c)[0];
@@ -1712,12 +1713,22 @@ function importConfig(txt){
             case "-a":
                 var name = val.split(':')[0]
                 var pw = val.slice(name.length + 1)
-                usrsConf.push({name: name, pw: pw})
+                var user = usrsConf.filter((u) => u.name == name)[0]
+                if(!user)
+                    usrsConf.push({name: name, pw: pw})
+                else
+                    user.pw = pw
                 break;
             case "--grp":
                 var name = val.split(':')[0]
                 var u = val.slice(name.length + 1)
                 groups.push({name: name, users: u})
+                
+                var n = u.split(',')
+                for(var j = 0; j < n.length; j++){
+                    if(n[j] && !usrsConf.filter((u) => u.name === n[j])[0])
+                        usrsConf.push({name: n[j], pw: ''})
+                }
                 break;
             default:
                 if(val.startsWith('"') && val.endsWith('"'))
@@ -1762,8 +1773,14 @@ function getVolFromStr(s){
         }
         else{
             var p = o.split(',')[0]
-            var u = o.slice(p.length + 1)
-            perms.push({user: u, perms: p})
+            var n = o.slice(p.length + 1)
+            for(var j = 0; j < n.length; j++){
+                console.log('user: ' + n[j] + ' gets perms: ' + p)
+                perms.push({user: n[j], perms: p})
+
+                if(n[j] && !usrsConf.filter((u) => u.name === n[j])[0])
+                    usrsConf.push({name: n[j], pw: ''})
+            }
         }
     }
     return {src: src, dst: dst, perms: perms, flags: flags}
