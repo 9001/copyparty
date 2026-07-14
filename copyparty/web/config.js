@@ -1558,6 +1558,8 @@ function loadPerms(vol){
         a.appendChild(b)
         container.appendChild(a)
     }
+
+    tt.init();
 }
 function showPermConf(){
     var index = this.value
