@@ -8429,7 +8429,7 @@ var treectl = (function () {
 		r.reqls(href, true);
 		r.dir_cb = tree_scrollto;
 		thegrid.setvis(true);
-		clmod(this, 'ld', 1);
+		clmod(this.previousSibling, 'ld', 1);
 	}
 
 	r.reqls = function (url, hpush, back, hydrate) {

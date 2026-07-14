@@ -2456,16 +2456,17 @@ html.b .btn {
 	text-shadow: none;
 }
 #tree ul a.ld::before {
-	font-weight: bold;
-	font-family: sans-serif;
-	display: inline-block;
-	text-align: center;
+	position: absolute;
 	width: 1em;
-	margin: 0 .3em 0 -1.3em;
-	color: var(--fg-max);
-	opacity: 0;
-	content: '◠';
-	animation: .5s linear infinite forwards spin, ease .25s 1 forwards fadein;
+	height: 1em;
+	margin: -4px 0 0 -.3em;
+	content: "";
+	animation: .7s linear infinite forwards spin, ease .25s 1 forwards fadein;
+	border: 2px solid;
+	border-radius: 1em;
+	border-color: currentColor currentColor transparent transparent;
+	position: absolute;
+	z-index: 1;
 }
 #tree ul a.par {
 	color: var(--fg-max);
