@@ -6472,7 +6472,8 @@ window.thegrid = (function () {
 		if (ctrl(e) || !r.sel && !r.tempsel)
 			return true;
 
-		return fclick.call(this, e, true);
+		var td = ebi(this.getAttribute('ref'));
+		return fclick.call(td, e, true);
 	}
 
 	r.imshow = function (url) {
