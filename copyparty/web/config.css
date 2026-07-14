@@ -61,6 +61,11 @@ input[type=checkbox]{
     width: 1.25em;
     height: 1.25em;
 }
+input[type="checkbox"] + label {
+    vertical-align: top;
+    margin-top: .1em;
+    display: inline-block;
+}
 h2{
     background: var(--bg-u2);
     padding: .5em;
@@ -168,10 +173,16 @@ h3>input{
 #users{
     padding: 0 .2em;
 }
-#uopt>*:not(input[type=checkbox]){
+#uopt>*{
     display: inline-block;
     margin-bottom: .5em;
     margin-right: .5em;
+    vertical-align: baseline;
+}
+#uopt>input[type=checkbox]{
+    margin-right: auto;
+    margin-bottom: 0;
+    vertical-align: center;
 }
 .uinp {
     margin-top: 1em;

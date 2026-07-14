@@ -59,7 +59,7 @@
                 "--bg-img=https://access.riceball.art/public/read-only/wiiu%20bg.webm",
                 // "--tcolor=a07cb4ff",
                 // "--theme=3",
-                "--unfun",
+                "--shr=/shr",
             ]
         },
         {

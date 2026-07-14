@@ -941,7 +941,7 @@ function loadUiFlags(){
                 }
             }
             else {
-                if (elem.getAttribute('type') == 'checkbox')
+                if (elem.getAttribute('type') == 'checkbox' || elem.getAttribute('type') == 'radio')
                     elem.checked = val ? true : false;
                 else
                     elem.value = val != undefined ? val : ''
@@ -980,7 +980,7 @@ var uiOptInput = function(){
         }
     }
     console.log(val)
-    if (e1.getAttribute('type') == 'checkbox')
+    if (e1.getAttribute('type') == 'checkbox' || e1.getAttribute('type') == 'radio')
         val = e1.checked ? 'on' : '';
     if(val){
         var f = flagsConf.filter((f) => f.cmd == cmd)[0]
@@ -1028,9 +1028,7 @@ function loadFlags(){
             var ph = flag.help.match(/(?:\(default:)(.*)(?:\))/)[1]
             ph = ph.trim()
             inp.setAttribute("placeholder", ph);
-            // if(!ph.match(/[^0-9]/))
-            //     inp.setAttribute("type", "number");
-            if(ph.toLowerCase() == "false"){
+            if(ph.toLowerCase() == "false" || ph.toLowerCase() == "true"){
                 inp.setAttribute("disabled", "")
                 clmod(a, "binary", true)
             }
@@ -1437,8 +1435,10 @@ function loadVolumes(){
                 var ph = flag.help.match(/(?:\(default:)(.*)(?:\))/)[1]
                 ph = ph.trim()
                 inp3.setAttribute("placeholder", ph);
-                if(!ph.match(/[^0-9]/))
-                    inp3.setAttribute("type", "number");
+                if(ph.toLowerCase() == "false" || ph.toLowerCase() == "true"){
+                    inp.setAttribute("disabled", "")
+                    clmod(a, "binary", true)
+                }
             }
             inp3.oninput = function(e){
                 volsConf[this.parentNode.getAttribute("vol")]

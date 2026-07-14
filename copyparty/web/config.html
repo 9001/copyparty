@@ -20,7 +20,7 @@
     <div id="header">
         <a href="/?h">⬅️</a>
         <h1>guest list</h1>
-        <a href="https://copyparty.eu/cli/">ℹ️</a>
+        <a href="https://github.com/9001/copyparty#quickstart">ℹ️</a>
     </div>
     <button id="copyBtn" class="abtn" tt="export config / copy to clipboard">📋</button>
     <div id="disclaimer">
@@ -104,8 +104,19 @@
             </div>
         </div>
 
+        <div>
+            <h2>database options</h2>
+            <input type="checkbox" name="e2d" id="e2dsa" data-flag="--e2dsa"/>
+            <label for="e2dsa">enable file search</label>
+            <br/>
+            <input type="checkbox" id="e2ts" data-flag="--e2ts"/>
+            <label for="e2ts">metadata indexing (file properties become searchable)</label>
+            <p>you can find more related options and explanations by searching for "e2" in the global settings</p>
+        </div>
+
         <h2>save / load</h2>
         <p>your changes are saved automatically</p>
+        <p>saving / loading the real server config is currently not implemented, but you can import an existing config command below</p>
         <input id="importTxt" placeholder="paste command here" tt="format is more strict than normal. supports importing configs generated on this page."/>
         <button id="importBtn">import</button>
         <br/>
