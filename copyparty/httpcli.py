@@ -7132,6 +7132,7 @@ class HttpCli(object):
             "srv_name": "" if self.args.nih else self.args.name,
             "srv_url": self.args.name_url if self.args.name_url else "/",
             "dtheme": self.args.theme,
+            "unfun": self.args.unfun,
         }
 
         if self.args.js_browser:

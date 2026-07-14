@@ -621,6 +621,7 @@ var flags = [
     new Argument("--ui-nolbar", "hide link-bar in the UI (volflag=ui_nolbar) (default: False)"),
     new Argument("--ui-noctxb", "hide context-buttons in the UI (volflag=ui_noctxb) (default: False)"),
     new Argument("--ui-norepl", "hide repl-button in the UI (volflag=ui_norepl) (default: False)"),
+    new Argument("--unfun", "hides many of the emojis in the UI (default: False)"),
     new Argument("--no-reload", "disable ?reload=cfg (reload users/volumes/volflags from config file) (default: False)"),
     new Argument("--no-rescan", "disable ?scan (volume reindexing) (default: False)"),
     new Argument("--no-stack", "disable ?stack (list all stacks); same as --stack-who=no (default: False)"),

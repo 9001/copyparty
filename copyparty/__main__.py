@@ -2011,6 +2011,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--ui-norepl", action="store_true", help="hide repl-button in the UI (volflag=ui_norepl)")
     ap2.add_argument("--have-unlistc", action="store_true", help=argparse.SUPPRESS)
     ap2.add_argument("--gsel", action="store_true", default=True, help=argparse.SUPPRESS)
+    ap2.add_argument("--unfun", action="store_true", help="hides many of the emojis in the UI")
 
 
 def add_debug(ap):

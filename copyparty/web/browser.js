@@ -8,8 +8,9 @@ import_mjs('up2k', 'J_U2K');
 // disables emojis
 var fun_tgl = sread('fun_tgl');
 if( fun_tgl == null)
-	swrite('fun_tgl', 1);
-fun_tgl = fun_tgl != 0;
+	fun_tgl = !window.unfun;
+else
+	fun_tgl = fun_tgl != 0;
 console.log('fun_tgl: ' + fun_tgl);
 if(!fun_tgl){
 	clmod(document.documentElement, 'unfun', true);
