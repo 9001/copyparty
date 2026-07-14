@@ -8352,6 +8352,7 @@ var treectl = (function () {
 		links = QSA('#treeul li>a:first-child');
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			links[a].setAttribute('dst', links[a].nextSibling.getAttribute('href'));
+			clmod(links[a], 'ld', false);
 			links[a].onclick = treegrow;
 		}
 		ebi('tree').onscroll = nowrap ? unmenter : null;
