@@ -1731,9 +1731,12 @@ window.onhashchange = function() {
 		}
 		ebi(location.hash.slice(1)).scrollIntoView();
 	}
-	else if (location.hash.startsWith('#gf-') && !baguetteBox.manualOpen){
+	else if (location.hash.startsWith('#gf-') && !baguetteBox.getUserAction()){
 		hash0 = location.hash;
 		eval_hash()
+	}
+	else if(location.hash == '' && QS('#bbox-overlay.visible')){
+		baguetteBox.hide();
 	}
 }
 
@@ -9018,6 +9021,8 @@ var treectl = (function () {
 			baguetteBox.hide();
 			return;
 		}
+		if(baguetteBox.getUserAction())
+			return;
 
 		if (mdoc && hbase == cbase)
 			return showfile.show(hbase + showfile.sname(url.search), true);

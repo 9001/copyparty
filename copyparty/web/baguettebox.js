@@ -153,7 +153,8 @@ window.baguetteBox = (function () {
         return bindImageClickListeners(selector, userOptions);
     }
 
-    var manualOpen = false;
+    var userAction = false;
+    function getUserAction(){return userAction}
     function bindImageClickListeners(selector, userOptions) {
         var galleryNodeList = QSA(selector);
         var selectorData = {
@@ -188,7 +189,7 @@ window.baguetteBox = (function () {
                     var newHash = '#g' + this.getAttribute('id') + getsort();
                     if(location.hash != newHash){
                         console.log("opened bbox manually");
-                        manualOpen = true;
+                        userAction = true;
                         hist_push(newHash);
                     }
                     prepareOverlay(gallery, userOptions);
@@ -866,11 +867,10 @@ window.baguetteBox = (function () {
         if (options.duringHide)
             options.duringHide();
 
-        if(manualOpen){
+        if(userAction){
             console.log("closed bbox after manual open");
             if(location.hash.startsWith('#gf-'))
                 history.back();
-            manualOpen = false;
         }
         else
             sethash('');
@@ -1429,7 +1429,7 @@ window.baguetteBox = (function () {
         playpause: playpause,
         hide: hideOverlay,
         destroy: destroyPlugin,
-        manualOpen: manualOpen,
+        getUserAction: getUserAction,
     };
 })();
 
