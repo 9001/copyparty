@@ -2524,7 +2524,7 @@ var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
 	return mouseEvent;
 };
 
-if (PWA || navigator.serviceWorker && caches){
+if (PWA || window.isSecureContext && navigator.serviceWorker && caches){
     // https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
     if(PWA){
         // loadScript requires a nonce, which may not be present on every page. 
@@ -2547,8 +2547,7 @@ if (PWA || navigator.serviceWorker && caches){
             }
         });
     }
-
-    if(ebi('inst')){
+    else if(ebi('inst')){
         var installPrompt = null;
         window.addEventListener("beforeinstallprompt", function(e) {
             e.preventDefault();
