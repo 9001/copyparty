@@ -1099,11 +1099,13 @@ function up2k_init(subtle) {
         }
     }
     function onovercmn(self, e, btn) {
-        if(e.dataTransfer && e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
-            return;
-        }
         try {
             var ok = false, dt = e.dataTransfer.types;
+            for (var a = 0; a < dt.length; a++)
+                if(dt[a] == 'application/copyparty'){
+                    ev(e)
+                    return;
+                }
             for (var a = 0; a < dt.length; a++)
                 if (dt[a] == 'Files')
                     ok = true;

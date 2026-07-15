@@ -11340,6 +11340,7 @@ var drag = (function() {
 		e.dataTransfer.setData("text", payload);
 		e.dataTransfer.setData("text/plain", payload);
 		e.dataTransfer.setData("text/uri-list", payload);
+		e.dataTransfer.setData("application/copyparty", true);
 	}
 
 	return r;
