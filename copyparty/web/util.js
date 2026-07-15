@@ -2524,9 +2524,9 @@ var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
 	return mouseEvent;
 };
 
-if (navigator.serviceWorker && caches){
+if (PWA || navigator.serviceWorker && caches){
     // https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
-    if(PWA && window.JS_NONCE){
+    if(PWA){
         // loadScript requires a nonce, which may not be present on every page. 
         // the service worker is not needed most of the time though, since it only handles sharing and app init, so it should be ok
     	import_mjs('sw');
