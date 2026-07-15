@@ -2524,28 +2524,30 @@ var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
 	return mouseEvent;
 };
 
-if (PWA || window.isSecureContext && navigator.serviceWorker && caches){
+if (PWA || navigator.serviceWorker && caches){
     // https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
     if(PWA){
         // loadScript requires a nonce, which may not be present on every page. 
         // the service worker is not needed most of the time though, since it only handles sharing and app init, so it should be ok
     	import_mjs('sw');
-        window.addEventListener('load', function() {
-            try {
-                var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
-                    scope: "/",
-                });
-                if (registration.installing) {
-                    console.log("Service worker installing");
-                } else if (registration.waiting) {
-                    console.log("Service worker installed");
-                } else if (registration.active) {
-                    console.log("Service worker active");
+        if(window.isSecureContext){
+            window.addEventListener('load', function() {
+                try {
+                    var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
+                        scope: "/",
+                    });
+                    if (registration.installing) {
+                        console.log("Service worker installing");
+                    } else if (registration.waiting) {
+                        console.log("Service worker installed");
+                    } else if (registration.active) {
+                        console.log("Service worker active");
+                    }
+                } catch (error) {
+                    console.error("Registration failed with " + error);
                 }
-            } catch (error) {
-                console.error("Registration failed with " + error);
-            }
-        });
+            });
+        }
     }
     else if(ebi('inst')){
         var installPrompt = null;
