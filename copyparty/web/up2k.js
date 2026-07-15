@@ -1107,15 +1107,17 @@ function up2k_init(subtle) {
             for (var a = 0; a < dt.length; a++)
                 if (dt[a] == 'Files')
                     ok = true;
-                else if (dt[a] == 'text/uri-list') {
-                    if (btn) {
-                        ok = true;
-                        if (toast.txt == L.u_uri)
-                            toast.hide();
+            if(!ok)
+                for (var a = 0; a < dt.length; a++)
+                    if (dt[a] == 'text/uri-list') {
+                        if (btn) {
+                            ok = true;
+                            if (toast.txt == L.u_uri)
+                                toast.hide();
+                        }
+                        else if (!window.drag || !drag.no_warn)
+                            return toast.inf(10, L.u_uri) || true;
                     }
-                    else if (!window.drag || !drag.no_warn)
-                        return toast.inf(10, L.u_uri) || true;
-                }
 
             if (!ok)
                 return true;
@@ -1164,7 +1166,7 @@ function up2k_init(subtle) {
     ebi('u2btn').ondrop = gotfile;
     ebi('u2btn').ondragover = onoverbtn;
     ebi('wrap').ondrop = gotfile;
-    ebi('wrap').ondragover = onoverbtn;
+    ebi('wrap').ondragover = onover;
 
     var drops = [ebi('up_dz'), ebi('srch_dz')];
     for (var a = 0; a < 2; a++) {
