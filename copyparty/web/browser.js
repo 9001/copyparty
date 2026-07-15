@@ -11687,4 +11687,42 @@ var mpss = (function () {
 
 treectl.hydrate();
 
+// https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
+if(PWA){
+	import_mjs('sw');
+	window.addEventListener('load', function() {
+		try {
+			var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
+				scope: "/",
+			});
+			if (registration.installing) {
+				console.log("Service worker installing");
+			} else if (registration.waiting) {
+				console.log("Service worker installed");
+			} else if (registration.active) {
+				console.log("Service worker active");
+			}
+		} catch (error) {
+			console.error("Registration failed with " + error);
+		}
+	});
+}
+else if (!PWA && navigator.serviceWorker && caches){
+	var installPrompt = null;
+	window.addEventListener("beforeinstallprompt", function(e) {
+		e.preventDefault();
+		installPrompt = e;
+		ebi('inst').removeAttribute("hidden");
+	});
+	ebi('inst').onclick = function(){
+		if (!installPrompt) {
+			return;
+		}
+		var result = installPrompt.prompt();
+		console.log("Install prompt was: " + result.outcome);
+		installPrompt = null;
+		ebi('inst').setAttribute("hidden", "");
+	}
+}
+
 J_BRW = 2;
