@@ -2530,7 +2530,7 @@ if (PWA || navigator.serviceWorker && caches){
         // loadScript requires a nonce, which may not be present on every page. 
         // the service worker is not needed most of the time though, since it only handles sharing and app init, so it should be ok
     	import_mjs('sw');
-        if(window.isSecureContext){
+        if(window.isSecureContext && navigator.serviceWorker){
             window.addEventListener('load', function() {
                 try {
                     var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
