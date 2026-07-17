@@ -4931,12 +4931,7 @@ var fileman = (function () {
 
 		ev(e);
 
-		var shareData = {
-			title: (sel.length > 1 ? 'Sharing files from ' : 'Sharing a file from ') + 
-				ebi('srv_name').textContent,
-			url: vps.join(' \n'),
-		};
-		cliptxt(shareData.url, function () { toast.ok(2, L.clipped) }); 
+		cliptxt(vps.join(' \n'), function () { toast.ok(2, L.clipped) }); 
 	}
 
 	r.rename = function (e) {
