@@ -4936,16 +4936,7 @@ var fileman = (function () {
 				ebi('srv_name').textContent,
 			url: vps.join(' \n'),
 		};
-		if(navigator.canShare && (MOBILE || !FIREFOX)){
-			//desktop firefox CAN technically use this, but it sucks :P
-			// within 2min of testing on KDE i encountered the share being broken until browser restart
-			// + FF copying the "file", which can't be pasted depending on get perms, with no fallback,
-			// so for example pasting in discord didn't work ~Til 2026-06-19
-			if(navigator.canShare(shareData))
-				navigator.share(shareData)
-		}
-		else
-			cliptxt(shareData.url, function () { toast.ok(2, L.clipped) }); 
+		cliptxt(shareData.url, function () { toast.ok(2, L.clipped) }); 
 	}
 
 	r.rename = function (e) {
