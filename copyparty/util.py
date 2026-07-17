@@ -4033,7 +4033,7 @@ def runihook(
 
     t0 = time.time()
     if fork:
-        Daemon(runcmd, cmd, bcmd, ka=sp_ka)
+        Daemon(runcmd, cmd, [bcmd], ka=sp_ka)
     else:
         rc, v, err = runcmd(bcmd, **sp_ka)  # type: ignore
         if chk and rc:
