@@ -11211,8 +11211,8 @@ var drag = (function() {
 		elem.ondrop = function(e) {
 			if (!r.enabled) return;
 			ev(e);
-			if (e.dataTransfer && e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
-				currLink = e.dataTransfer.getData("text");
+			if (e.dataTransfer && e.dataTransfer.getData("text/plain") && e.dataTransfer.getData("text/plain").startsWith(window.location.origin)){
+				currLink = e.dataTransfer.getData("text/plain");
 				console.log("elem.ondrop: " + currLink);
 				fileman.clip = currLink.split("\n");
 
@@ -11313,20 +11313,33 @@ var drag = (function() {
 	};
 	r.setDataForTransfer = function(e){
 		var sel = msel.getsel(),
-			vps = [];
+			vps = [],
+			xMozUrlPayload = [];
 
 		for (var a = 0; a < sel.length; a++) {
 			var link = sel[a].vp;
 			if(!link.startsWith(window.location.origin))
 				link = window.location.origin + link;
 			vps.push(link);
+			xMozUrlPayload.push(link + '\n' + link)
 		}
+
+		e.dataTransfer.clearData();
+		e.dataTransfer.items.clear();
+		e.dataTransfer.dropEffect = "copy";
 
 		var payload = vps.join('\n')
 		e.dataTransfer.setData("text", payload);
 		e.dataTransfer.setData("text/plain", payload);
-		e.dataTransfer.setData("text/uri-list", payload);
+		e.dataTransfer.setData("text/uri-list", vps.join('\r\n') + '\r\n');
 		e.dataTransfer.setData("application/copyparty", true);
+
+		// x-moz-url makes dolphin dragdrop work, while breaking discord and other places where plain text is the better choice
+		if(FIREFOX && !MOBILE)
+			if(ctrl(e))
+				e.dataTransfer.setData("text/x-moz-url", xMozUrlPayload.join('\n'));
+			else
+				toast.inf(5, 'dragging in plain text mode. hold ctrl while starting the drag/drop for OS file browser support');
 	}
 
 	return r;
