@@ -29,6 +29,12 @@ a {
 }
 #wrap td a {
 	margin: 0;
+	max-width: 40vw;
+	display: inline-block;
+	white-space: wrap;
+	word-wrap: break-word;
+	vertical-align: top;
+	line-height: 1.5em;
 }
 #w {
 	color: #fff;
