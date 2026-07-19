@@ -1,1560 +1,1560 @@
-# coding: utf-8
-from __future__ import print_function, unicode_literals
-
-import hashlib
-import io
-import logging
-import os
-import re
-import shlex
-import shutil
-import subprocess as sp
-import tempfile
-import threading
-import time
-
-from queue import Queue
-
-from .__init__ import ANYWIN, PY2, TYPE_CHECKING, unicode
-from .authsrv import VFS
-from .bos import bos
-from .mtag import (
-    HAVE_FFMPEG,
-    HAVE_FFPROBE,
-    TH_BWRAP,
-    au_unpk,
-    bwrap,
-    bwrap_fail,
-    ffprobe,
-    have_ff,
-)
-from .util import BytesIO  # type: ignore
-from .util import (
-    FFMPEG_URL,
-    VF_CAREFUL,
-    Cooldown,
-    Daemon,
-    afsenc,
-    atomic_move,
-    fsenc,
-    min_ex,
-    runcmd,
-    statdir,
-    ub64enc,
-    vsplit,
-    wunlink,
-)
-
-if True:  # pylint: disable=using-constant-test
-    from typing import Any, Callable, Optional, Union
-
-if TYPE_CHECKING:
-    from .svchub import SvcHub
-
-if PY2:
-    range = xrange  # type: ignore
-
-HAVE_PIL = False
-HAVE_PILF = False
-H_PIL_HEIF = False
-H_PIL_AVIF = False
-H_PIL_WEBP = False
-H_PIL_JXL = False
-
-TH_CH = {"j": "jpg", "p": "png", "w": "webp", "x": "jxl"}
-
-EXTS_TH = set(["jpg", "webp", "jxl", "png"])
-EXTS_AC = set(["opus", "owa", "caf", "mp3", "flac", "wav"])
-EXTS_SPEC_SAFE = set("aif aiff flac mp3 opus wav".split())
-
-PTN_TS = re.compile("^-?[0-9a-f]{8,10}$")
-
-# for n in {1..100}; do rm -rf /home/ed/Pictures/wp/.hist/th/ ; python3 -m copyparty -qv /home/ed/Pictures/wp/::r --th-no-webp --th-qv $n --th-dec pil >/dev/null 2>&1 & p=$!; printf '\033[A\033[J%3d ' $n; while true; do sleep 0.1; curl -s 127.1:3923 >/dev/null && break; done; curl -s '127.1:3923/?tar=j' >/dev/null ; cat /home/ed/Pictures/wp/.hist/th/1n/bs/1nBsjDetfie1iDq3y2D4YzF5/*.* | wc -c; kill $p; wait >/dev/null 2>&1; done
-# filesize-equivalent, not quality (ff looks much shittier)
-FF_JPG_Q = {
-    0: b"30",  # 0
-    1: b"30",  # 5
-    2: b"30",  # 10
-    3: b"30",  # 15
-    4: b"28",  # 20
-    5: b"21",  # 25
-    6: b"17",  # 30
-    7: b"15",  # 35
-    8: b"13",  # 40
-    9: b"12",  # 45
-    10: b"11",  # 50
-    11: b"10",  # 55
-    12: b"9",  # 60
-    13: b"8",  # 65
-    14: b"7",  # 70
-    15: b"6",  # 75
-    16: b"5",  # 80
-    17: b"4",  # 85
-    18: b"3",  # 90
-    19: b"2",  # 95
-    20: b"2",  # 100
-}
-# FF_JPG_Q = {xn: ("%d" % (xn,)).encode("ascii") for xn in range(2, 33)}
-VIPS_JPG_Q = {
-    0: 4,  # 0
-    1: 7,  # 5
-    2: 12,  # 10
-    3: 17,  # 15
-    4: 22,  # 20
-    5: 27,  # 25
-    6: 32,  # 30
-    7: 37,  # 35
-    8: 42,  # 40
-    9: 47,  # 45
-    10: 52,  # 50
-    11: 56,  # 55
-    12: 61,  # 60
-    13: 66,  # 65
-    14: 71,  # 70
-    15: 75,  # 75
-    16: 80,  # 80
-    17: 85,  # 85
-    18: 89,  # 90 (vips explodes past this point)
-    19: 91,  # 95
-    20: 97,  # 100
-}
-
-
-try:
-    if os.environ.get("PRTY_NO_PIL"):
-        raise Exception()
-
-    from PIL import ExifTags, Image, ImageFont, ImageOps
-
-    HAVE_PIL = True
-    try:
-        if os.environ.get("PRTY_NO_PILF"):
-            raise Exception()
-
-        ImageFont.load_default(size=16)
-        HAVE_PILF = True
-    except:
-        pass
-
-    try:
-        if os.environ.get("PRTY_NO_PIL_WEBP"):
-            raise Exception()
-
-        Image.new("RGB", (2, 2)).save(BytesIO(), format="webp")
-        H_PIL_WEBP = True
-    except:
-        pass
-
-    try:
-        if os.environ.get("PRTY_NO_PIL_JXL"):
-            raise Exception()
-
-        try:
-            import pillow_jxl
-        except ImportError:
-            pass
-
-        Image.new("RGB", (2, 2)).save(BytesIO(), format="jxl")
-        H_PIL_JXL = True
-    except:
-        pass
-
-    try:
-        if os.environ.get("PRTY_NO_PIL_HEIF"):
-            raise Exception()
-
-        try:
-            from pillow_heif import register_heif_opener
-        except ImportError:
-            from pyheif_pillow_opener import register_heif_opener
-
-        register_heif_opener()
-        H_PIL_HEIF = True
-    except:
-        pass
-
-    try:
-        if os.environ.get("PRTY_NO_PIL_AVIF"):
-            raise Exception()
-
-        if ".avif" in Image.registered_extensions():
-            H_PIL_AVIF = True
-            raise Exception()
-
-        import pillow_avif  # noqa: F401  # pylint: disable=unused-import
-
-        H_PIL_AVIF = True
-    except:
-        pass
-
-    logging.getLogger("PIL").setLevel(logging.WARNING)
-except:
-    pass
-
-try:
-    if os.environ.get("PRTY_NO_VIPS"):
-        raise ImportError()
-
-    if "VIPS_CONCURRENCY" not in os.environ:
-        # reduces glibc RAM usage from 4.7 to 3.5 GiB ...yep, still bonkers
-        os.environ["VIPS_CONCURRENCY"] = "1"
-
-    HAVE_VIPS = True
-    import pyvips
-
-    pyvips.cache_set_max(0)
-    logging.getLogger("pyvips").setLevel(logging.WARNING)
-except Exception as e:
-    HAVE_VIPS = False
-    if not isinstance(e, ImportError):
-        logging.warning("libvips found, but failed to load: " + str(e))
-
-
-PRTY_NO_RAW = os.environ.get("PRTY_NO_RAW")
-PRTY_NO_RAWPY = PRTY_NO_RAW or os.environ.get("PRTY_NO_RAWPY")
-PRTY_NO_DCRAW = PRTY_NO_RAW or os.environ.get("PRTY_NO_DCRAW")
-try:
-    if PRTY_NO_RAWPY:
-        raise Exception()
-
-    HAVE_RAWPY = True
-    import rawpy
-
-    logging.getLogger("rawpy").setLevel(logging.WARNING)
-except:
-    HAVE_RAWPY = False
-
-
-HAVE_DCRAW = not PRTY_NO_DCRAW and have_ff("dcraw_emu")
-
-
-th_dir_cache = {}
-
-
-def thumb_path(histpath: str, rem: str, mtime: float, fmt: str, ffa: set[str]) -> str:
-    # base16 = 16 = 256
-    # b64-lc = 38 = 1444
-    # base64 = 64 = 4096
-    rd, fn = vsplit(rem)
-    if not rd:
-        rd = "\ntop"
-
-    dcache = th_dir_cache
-    rd_key = rd + "\n" + fmt
-    rd = dcache.get(rd_key)
-    if not rd:
-        h = hashlib.sha512(afsenc(rd_key)).digest()
-        b64 = ub64enc(h).decode("ascii")[:24]
-        rd = ("%s/%s/" % (b64[:2], b64[2:4])).lower() + b64
-        if len(dcache) > 9001:
-            dcache.clear()
-        dcache[rd_key] = rd
-
-    # could keep original filenames but this is safer re pathlen
-    h = hashlib.sha512(afsenc(fn)).digest()
-    fn = ub64enc(h).decode("ascii")[:24]
-
-    if fmt in EXTS_AC:
-        cat = "ac"
-    else:
-        fmt = TH_CH[fmt[:1]]
-        cat = "th"
-
-    return "%s/%s/%s/%s.%x.%s" % (histpath, cat, rd, fn, int(mtime), fmt)
-
-
-class ThumbSrv(object):
-    def __init__(self, hub: "SvcHub") -> None:
-        self.hub = hub
-        self.asrv = hub.asrv
-        self.args = hub.args
-        self.log_func = hub.log
-
-        self.log = self._log
-        self.nextlog = 0
-
-        self.poke_cd = Cooldown(self.args.th_poke) if self.args.th_poke else None
-
-        self.mutex = threading.Lock()
-        self.busy: dict[str, list[threading.Condition]] = {}
-        self.untemp: dict[str, list[str]] = {}
-        self.ram: dict[str, float] = {}
-        self.memcond = threading.Condition(self.mutex)
-        self.stopping = False
-        self.rm_nullthumbs = True  # forget failed conversions on startup
-        self.nthr = max(1, self.args.th_mt)
-
-        self.exts_spec_unsafe = set(self.args.th_spec_cnv.split(","))
-
-        # libvips can easily gobble up 4 GiB of RAM when generating JXL thumbnails on glibc so let's not
-        self.vips_jxl = False
-        if HAVE_VIPS and self.args.th_vips_jxl == 2:
-            self.vips_jxl = True
-        elif HAVE_VIPS and self.args.th_vips_jxl == 1:
-            try:
-                with open("/proc/self/maps", "rb") as f:
-                    zb = f.read()
-                self.vips_jxl = b"/ld-musl-" in zb and b"mimalloc" not in zb
-            except:
-                pass
-
-        self.q: Queue[Optional[tuple[str, str, str, VFS]]] = Queue(self.nthr * 4)
-        for n in range(self.nthr):
-            Daemon(self.worker, "thumb-{}-{}".format(n, self.nthr))
-
-        want_ff = not self.args.no_vthumb or not self.args.no_athumb
-        if want_ff and (not HAVE_FFMPEG or not HAVE_FFPROBE):
-            missing = []
-            if not HAVE_FFMPEG:
-                missing.append("FFmpeg")
-
-            if not HAVE_FFPROBE:
-                missing.append("FFprobe")
-
-            msg = "cannot create audio/video thumbnails because some of the required programs are not available: "
-            msg += ", ".join(missing)
-            self.log(msg, c=3)
-            if ANYWIN and self.args.no_acode:
-                self.log("download FFmpeg to fix it:\033[0m " + FFMPEG_URL, 3)
-
-        self.conv_raw = self._conv_rawpy if HAVE_RAWPY else self._conv_dcraw
-
-        if self.args.th_clean:
-            Daemon(self.cleaner, "thumb.cln")
-
-        (
-            self.fmt_pil,
-            self.fmt_vips,
-            self.fmt_raw,
-            self.fmt_ffi,
-            self.fmt_ffv,
-            self.fmt_ffa,
-        ) = [
-            set(y.split(","))
-            for y in [
-                self.args.th_r_pil,
-                self.args.th_r_vips,
-                self.args.th_r_raw,
-                self.args.th_r_ffi,
-                self.args.th_r_ffv,
-                self.args.th_r_ffa,
-            ]
-        ]
-
-        if not H_PIL_HEIF:
-            for f in "heif heifs heic heics".split(" "):
-                self.fmt_pil.discard(f)
-
-        if not H_PIL_AVIF:
-            for f in "avif avifs".split(" "):
-                self.fmt_pil.discard(f)
-
-        if not H_PIL_WEBP:
-            for f in "webp".split(" "):
-                self.fmt_pil.discard(f)
-
-        if not H_PIL_JXL:
-            for f in "jxl".split(" "):
-                self.fmt_pil.discard(f)
-
-        self.thumbable: set[str] = set()
-        self._build_thumbable()
-
-    def _build_thumbable(self) -> None:
-        self.thumbable.clear()
-
-        if "pil" in self.args.th_dec:
-            self.thumbable |= self.fmt_pil
-
-        if "vips" in self.args.th_dec:
-            self.thumbable |= self.fmt_vips
-
-        if "raw" in self.args.th_dec:
-            self.thumbable |= self.fmt_raw
-
-        if "ff" in self.args.th_dec:
-            for zss in [self.fmt_ffi, self.fmt_ffv, self.fmt_ffa]:
-                self.thumbable |= zss
-
-    def _log(self, msg: str, c: Union[int, str] = 0) -> None:
-        self.log_func("thumb", msg, c)
-
-    def _slog(self, msg: str, c: Union[int, str] = 0) -> None:
-        now = time.time()
-        if c in (0, 6) and now < self.nextlog:
-            return
-        self.nextlog = now + self.args.th_pre_rl
-        self.log_func("thumb", msg, c)
-
-    def shutdown(self) -> None:
-        self.stopping = True
-        Daemon(self._fire_sentinels, "thumbstopper")
-
-    def _fire_sentinels(self):
-        for _ in range(self.nthr):
-            self.q.put(None)
-
-    def stopped(self) -> bool:
-        with self.mutex:
-            return not self.nthr
-
-    def getres(self, vn: VFS, fmt: str) -> tuple[int, int]:
-        mul = 3 if "3" in fmt else 1
-        w, h = vn.flags["thsize"].split("x")
-        return int(w) * mul, int(h) * mul
-
-    def get(self, ptop: str, rem: str, mtime: float, fmt: str) -> Optional[str]:
-        histpath = self.asrv.vfs.histtab.get(ptop)
-        if not histpath:
-            self.log("no histpath for %r" % (ptop,))
-            return None
-
-        tpath = thumb_path(histpath, rem, mtime, fmt, self.fmt_ffa)
-        abspath = os.path.join(ptop, rem)
-        cond = threading.Condition(self.mutex)
-        do_conv = False
-        with self.mutex:
-            try:
-                self.busy[tpath].append(cond)
-                self.log("joined waiting room for %r" % (tpath,))
-            except:
-                thdir = os.path.dirname(tpath)
-                chmod = bos.MKD_700 if self.args.free_umask else bos.MKD_755
-                bos.makedirs(os.path.join(thdir, "w"), vf=chmod)
-
-                inf_path = os.path.join(thdir, "dir.txt")
-                if not bos.path.exists(inf_path):
-                    with open(inf_path, "wb") as f:
-                        f.write(afsenc(os.path.dirname(abspath)))
-                    self.writevolcfg(histpath)
-
-                self.busy[tpath] = [cond]
-                do_conv = True
-
-        if do_conv:
-            allvols = list(self.asrv.vfs.all_vols.values())
-            vn = next((x for x in allvols if x.realpath == ptop), None)
-            if not vn:
-                self.log("ptop %r not in %s" % (ptop, allvols), 3)
-                vn = self.asrv.vfs.all_aps[0][1][0]
-
-            self.q.put((abspath, tpath, fmt, vn))
-            self.log("conv %r :%s \033[0m%r" % (tpath, fmt, abspath), 6)
-
-        while not self.stopping:
-            with self.mutex:
-                if tpath not in self.busy:
-                    break
-
-            with cond:
-                cond.wait(3)
-
-        try:
-            st = bos.stat(tpath)
-            if st.st_size:
-                self.poke(tpath)
-                return tpath
-        except:
-            pass
-
-        return None
-
-    def _rebuild_thumbable(self) -> None:
-        self._build_thumbable()
-        self.hub.broker.say("httpsrv.set_th_cfg", self.getcfg(), (self.args.th_no_jxl,))
-
-    def getcfg(self) -> dict[str, set[str]]:
-        return {
-            "thumbable": self.thumbable,
-            "pil": self.fmt_pil,
-            "vips": self.fmt_vips,
-            "raw": self.fmt_raw,
-            "ffi": self.fmt_ffi,
-            "ffv": self.fmt_ffv,
-            "ffa": self.fmt_ffa,
-        }
-
-    def volcfgi(self, vn: VFS) -> str:
-        ret = []
-        zs = "th_dec th_no_webp th_no_jpg"
-        for zs in zs.split(" "):
-            ret.append("%s(%s)\n" % (zs, getattr(self.args, zs)))
-        zs = "th_spec_fl"
-        for zs in zs.split(" "):
-            v = getattr(self.args, zs)
-            if v:
-                ret.append("%s(%s)\n" % (zs, v))
-        zs = "th_qv th_qvx thsize th_spec_p convt"
-        for zs in zs.split(" "):
-            ret.append("%s(%s)\n" % (zs, vn.flags.get(zs)))
-        return "".join(ret)
-
-    def volcfga(self, vn: VFS) -> str:
-        ret = []
-        zs = "q_opus q_mp3"
-        for zs in zs.split(" "):
-            ret.append("%s(%s)\n" % (zs, getattr(self.args, zs)))
-        zs = "aconvt"
-        for zs in zs.split(" "):
-            ret.append("%s(%s)\n" % (zs, vn.flags.get(zs)))
-        return "".join(ret)
-
-    def writevolcfg(self, histpath: str) -> None:
-        try:
-            bos.stat(os.path.join(histpath, "th", "cfg.txt"))
-            bos.stat(os.path.join(histpath, "ac", "cfg.txt"))
-            return
-        except:
-            pass
-        cfgi = cfga = ""
-        for vn in self.asrv.vfs.all_vols.values():
-            if vn.histpath == histpath:
-                cfgi = self.volcfgi(vn)
-                cfga = self.volcfga(vn)
-                break
-        t = "writing thumbnailer-config %d,%d to %s"
-        self.log(t % (len(cfgi), len(cfga), histpath))
-        chmod = bos.MKD_700 if self.args.free_umask else bos.MKD_755
-        for cfg, cat in ((cfgi, "th"), (cfga, "ac")):
-            bos.makedirs(os.path.join(histpath, cat), vf=chmod)
-            with open(os.path.join(histpath, cat, "cfg.txt"), "wb") as f:
-                f.write(cfg.encode("utf-8"))
-
-    def wait4ram(self, need: float, ttpath: str) -> None:
-        ram = self.args.th_ram_max
-        if need > ram * 0.99:
-            t = "file too big; need %.2f GiB RAM, but --th-ram-max is only %.1f"
-            raise Exception(t % (need, ram))
-
-        while True:
-            with self.mutex:
-                used = sum([v for k, v in self.ram.items() if k != ttpath]) + need
-                if used < ram:
-                    # self.log("XXX self.ram: %s" % (self.ram,), 5)
-                    self.ram[ttpath] = need
-                    return
-            with self.memcond:
-                # self.log("at RAM limit; used %.2f GiB, need %.2f more" % (used-need, need), 1)
-                self.memcond.wait(3)
-
-    def worker(self) -> None:
-        while not self.stopping:
-            task = self.q.get()
-            if not task:
-                break
-
-            abspath, tpath, fmt, vn = task
-            ext = abspath.split(".")[-1].lower()
-            png_ok = False
-            funs = []
-
-            if ext in self.args.au_unpk:
-                ap_unpk = au_unpk(self.log, self.args.au_unpk, abspath, vn)
-            else:
-                ap_unpk = abspath
-
-            if ap_unpk and not bos.path.exists(tpath):
-                tex = tpath.rsplit(".", 1)[-1]
-                want_mp3 = tex == "mp3"
-                want_opus = tex in ("opus", "owa", "caf")
-                want_flac = tex == "flac"
-                want_wav = tex == "wav"
-                want_png = tex == "png"
-                want_au = want_mp3 or want_opus or want_flac or want_wav
-                for lib in self.args.th_dec:
-                    can_au = lib == "ff" and (
-                        ext in self.fmt_ffa or ext in self.fmt_ffv
-                    )
-
-                    if lib == "pil" and ext in self.fmt_pil and tex in self.fmt_pil:
-                        funs.append(self.conv_pil)
-                    elif (
-                        lib == "vips"
-                        and ext in self.fmt_vips
-                        and (tex != "jxl" or self.vips_jxl)
-                    ):
-                        funs.append(self.conv_vips)
-                    elif lib == "raw" and ext in self.fmt_raw:
-                        funs.append(self.conv_raw)
-                    elif can_au and (want_png or want_au):
-                        if want_opus:
-                            funs.append(self.conv_opus)
-                        elif want_mp3:
-                            funs.append(self.conv_mp3)
-                        elif want_flac:
-                            funs.append(self.conv_flac)
-                        elif want_wav:
-                            funs.append(self.conv_wav)
-                        elif want_png:
-                            funs.append(self.conv_waves)
-                            png_ok = True
-                    elif lib == "ff" and (ext in self.fmt_ffi or ext in self.fmt_ffv):
-                        funs.append(self.conv_ffmpeg)
-                    elif lib == "ff" and ext in self.fmt_ffa and not want_au:
-                        funs.append(self.conv_spec)
-
-            tdir, tfn = os.path.split(tpath)
-            ttpath = os.path.join(tdir, "w", tfn)
-            try:
-                wunlink(self.log, ttpath, vn.flags)
-            except:
-                pass
-
-            conv_ok = False
-            for fun in funs:
-                try:
-                    if not png_ok and tpath.endswith(".png"):
-                        raise Exception("png only allowed for waveforms")
-
-                    fun(ap_unpk, ttpath, fmt, vn)
-                    conv_ok = True
-                    break
-                except Exception as ex:
-                    r321 = getattr(ex, "returncode", 0) == 321
-                    msg = "%s could not create thumbnail of %r\n%s"
-                    msg = msg % (fun.__name__, abspath, ex if r321 else min_ex())
-                    c: Union[str, int] = 1 if "<Signals.SIG" in msg else "90"
-                    self.log(msg, c)
-                    if not r321:
-                        if fun == funs[-1]:
-                            try:
-                                with open(ttpath, "wb") as _:
-                                    pass
-                            except Exception as ex:
-                                t = "failed to create the file [%s]: %r"
-                                self.log(t % (ttpath, ex), 3)
-                    else:
-                        # ffmpeg may spawn empty files on windows
-                        try:
-                            wunlink(self.log, ttpath, vn.flags)
-                        except:
-                            pass
-
-            if abspath != ap_unpk and ap_unpk:
-                wunlink(self.log, ap_unpk, vn.flags)
-
-            try:
-                atomic_move(self.log, ttpath, tpath, vn.flags)
-            except Exception as ex:
-                if conv_ok and not os.path.exists(tpath):
-                    t = "failed to move  [%s]  to  [%s]:  %r"
-                    self.log(t % (ttpath, tpath, ex), 3)
-                elif not conv_ok:
-                    try:
-                        open(tpath, "ab").close()
-                    except:
-                        pass
-
-            untemp = []
-            with self.mutex:
-                subs = self.busy[tpath]
-                del self.busy[tpath]
-                self.ram.pop(ttpath, None)
-                untemp = self.untemp.pop(ttpath, None) or []
-
-            for ap in untemp:
-                try:
-                    wunlink(self.log, ap, VF_CAREFUL)
-                except:
-                    pass
-
-            for x in subs:
-                with x:
-                    x.notify_all()
-
-            with self.memcond:
-                self.memcond.notify_all()
-
-        with self.mutex:
-            self.nthr -= 1
-
-    def fancy_pillow(self, im: "Image.Image", fmt: str, vn: VFS) -> "Image.Image":
-        # exif_transpose is expensive (loads full image + unconditional copy)
-        res = self.getres(vn, fmt)
-        r = max(*res) * 2
-        im.thumbnail((r, r), resample=Image.LANCZOS)
-        try:
-            k = next(k for k, v in ExifTags.TAGS.items() if v == "Orientation")
-            exif = im.getexif()
-            rot = int(exif[k])
-            del exif[k]
-        except:
-            rot = 1
-
-        rots = {8: Image.ROTATE_90, 3: Image.ROTATE_180, 6: Image.ROTATE_270}
-        if rot in rots:
-            im = im.transpose(rots[rot])
-
-        if "f" in fmt:
-            im.thumbnail(res, resample=Image.LANCZOS)
-        else:
-            iw, ih = im.size
-            dw, dh = res
-            res = (min(iw, dw), min(ih, dh))
-            im = ImageOps.fit(im, res, method=Image.LANCZOS)
-
-        return im
-
-    def conv_image_pil(self, im: "Image.Image", tpath: str, fmt: str, vn: VFS) -> None:
-        try:
-            im = self.fancy_pillow(im, fmt, vn)
-        except Exception as ex:
-            self.log("fancy_pillow {}".format(ex), "90")
-            im.thumbnail(self.getres(vn, fmt))
-
-        fmts = ["RGB", "L"]
-        zs = "th_qvx" if tpath.endswith(".jxl") else "th_qv"
-        args = {"quality": vn.flags[zs]}
-
-        if tpath.endswith(".webp"):
-            # quality 80 = pillow-default
-            # quality 75 = ffmpeg-default
-            # method 0 = pillow-default, fast
-            # method 4 = ffmpeg-default
-            # method 6 = max, slow
-            fmts.extend(("RGBA", "LA"))
-            args["method"] = 6
-        else:
-            # default q = 75
-            args["progressive"] = True
-
-        if im.mode not in fmts:
-            # print("conv {}".format(im.mode))
-            im = im.convert("RGB")
-
-        im.save(tpath, **args)
-
-    def conv_pil(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        self.wait4ram(0.2, tpath)
-        with Image.open(fsenc(abspath)) as im:
-            self.conv_image_pil(im, tpath, fmt, vn)
-
-    def conv_image_vips(
-        self, loader: "Callable[[int, dict], Any]", tpath: str, fmt: str, vn: VFS
-    ) -> None:
-        crops = ["centre", "none"]
-        if "f" in fmt:
-            crops = ["none"]
-
-        w, h = self.getres(vn, fmt)
-        kw = {"height": h, "size": "down", "intent": "relative"}
-
-        img = None
-        for c in crops:
-            try:
-                kw["crop"] = c
-                img = loader(w, kw)
-                break
-            except:
-                if c == crops[-1]:
-                    raise
-
-        assert img  # type: ignore  # !rm
-        args = {}
-        qv = vn.flags["th_qv"]
-        if tpath.endswith("jpg"):
-            qv = VIPS_JPG_Q[qv // 5]
-            args["optimize_coding"] = True
-        elif tpath.endswith("jxl"):
-            qv = vn.flags["th_qvx"]
-            # args["effort"] = 8
-            #  `- not worth it; twice as slow, size drops 12%, no visual improvement unlike ffmpeg
-        img.write_to_file(tpath, Q=qv, strip=True, **args)
-        img.invalidate()
-
-    def conv_vips(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        self.wait4ram(0.2, tpath)
-
-        def _loader(w: int, kw: dict) -> Any:
-            return pyvips.Image.thumbnail(abspath, w, **kw)
-
-        self.conv_image_vips(_loader, tpath, fmt, vn)
-
-    def _conv_dcraw(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        self.wait4ram(0.6, tpath)
-        bap = fsenc(abspath)
-        # fmt: off
-        cmd = bwrap(HAVE_DCRAW, bap, b"") + [
-            b"-h",  # halfsize
-            b"-o", b"1",  # srgb
-            b"-s", b"0",  # first frame
-            b"-Z", b"-",  # to stdout
-            bap,
-        ]
-        # fmt: on
-        p = sp.Popen(cmd, stdout=sp.PIPE)
-        try:
-            if HAVE_PIL:
-                self.conv_image_pil(Image.open(p.stdout), tpath, fmt, vn)
-            elif HAVE_VIPS:
-                ppm, _ = p.communicate(timeout=vn.flags["convt"])
-
-                def _loader(w: int, kw: dict) -> Any:
-                    return pyvips.Image.thumbnail_buffer(ppm, w, **kw)
-
-                self.conv_image_vips(_loader, tpath, fmt, vn)
-            else:
-                raise Exception(
-                    "either pil or vips is needed to process embedded bitmap thumbnails in raw files"
-                )
-        finally:
-            if p and p.poll() is None:
-                p.kill()
-
-    def _conv_rawpy(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        self.wait4ram(0.6, tpath)
-        with rawpy.imread(abspath) as raw:
-            thumb = raw.extract_thumb()
-        if thumb.format == rawpy.ThumbFormat.JPEG and tpath.endswith(".jpg"):
-            # if we have a jpg thumbnail and no webp output is available,
-            # just write the jpg directly (it'll be the wrong size, but it's fast)
-            with open(tpath, "wb") as f:
-                f.write(thumb.data)
-        if HAVE_VIPS:
-
-            def _loader(w: int, kw: dict) -> Any:
-                if thumb.format == rawpy.ThumbFormat.BITMAP:
-                    img = pyvips.Image.new_from_array(thumb.data, interpretation="rgb")
-                    return img.thumbnail_image(w, **kw)
-                else:
-                    return pyvips.Image.thumbnail_buffer(thumb.data, w, **kw)
-
-            self.conv_image_vips(_loader, tpath, fmt, vn)
-        elif HAVE_PIL:
-            if thumb.format == rawpy.ThumbFormat.BITMAP:
-                im = Image.fromarray(thumb.data, "RGB")
-            else:
-                im = Image.open(io.BytesIO(thumb.data))
-            self.conv_image_pil(im, tpath, fmt, vn)
-        else:
-            raise Exception(
-                "either pil or vips is needed to process embedded bitmap thumbnails in raw files"
-            )
-
-    def conv_ffmpeg(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        self.wait4ram(0.2, tpath)
-        ret, raw, strms, ctnr = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if not ret:
-            return
-
-        if "vc" not in ret and "ac" in ret:
-            # audio in a video trenchcoat
-            return self.conv_spec(abspath, tpath, fmt, vn)
-
-        for strm in strms:
-            if (
-                strm.get("codec_type") == "video"
-                and strm.get("DISPOSITION:attached_pic") == "1"
-            ):
-                return self.conv_emb_cv(abspath, tpath, fmt, vn, strm)
-
-        ext = abspath.rsplit(".")[-1].lower()
-        if ext in ["h264", "h265"] or ext in self.fmt_ffi:
-            seek: list[bytes] = []
-        else:
-            dur = ret[".dur"][1] if ".dur" in ret else 4
-            seek = [b"-ss", "{:.0f}".format(dur / 3).encode("utf-8")]
-
-        self._ffmpeg_im(abspath, tpath, fmt, vn, seek, b"0:v:0")
-
-    def _ffmpeg_im(
-        self,
-        abspath: str,
-        tpath: str,
-        fmt: str,
-        vn: VFS,
-        seek: list[bytes],
-        imap: bytes,
-    ) -> None:
-        scale = "scale={0}:{1}:force_original_aspect_ratio="
-        if "f" in fmt:
-            scale += "decrease,setsar=1:1"
-        else:
-            scale += "increase,crop={0}:{1},setsar=1:1"
-
-        res = self.getres(vn, fmt)
-        bscale = scale.format(*list(res)).encode("utf-8")
-        bap_in = fsenc(abspath)
-        bap_out = fsenc(tpath)
-        # fmt: off
-        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner"
-        ] + seek + [
-            b"-i", bap_in,
-            b"-map", imap,
-            b"-vf", bscale,
-            b"-frames:v", b"1",
-            b"-metadata:s:v:0", b"rotate=0",
-        ]
-        # fmt: on
-
-        self._ffmpeg_im_o(bap_out, vn, cmd)
-
-    def _ffmpeg_im_o(self, tpath: bytes, vn: VFS, cmd: list[bytes]) -> None:
-        if tpath.endswith(b".jpg"):
-            cmd += [
-                b"-q:v",
-                FF_JPG_Q[vn.flags["th_qv"] // 5],  # default=??
-            ]
-        elif tpath.endswith(b".jxl"):
-            cmd += [
-                b"-q:v",
-                unicode(vn.flags["th_qvx"]).encode("ascii"),  # default=??
-                b"-effort:v",
-                b"7",  # default=7, 1=fast, 9=max, 9~=8 but slower
-            ]
-        else:
-            cmd += [
-                b"-q:v",
-                unicode(vn.flags["th_qv"]).encode("ascii"),  # default=75
-                b"-compression_level:v",
-                b"6",  # default=4, 0=fast, 6=max
-            ]
-
-        cmd.append(tpath)
-        self._run_ff(cmd, vn, "convt")
-
-    def _run_ff(self, cmd: list[bytes], vn: VFS, kto: str, oom: int = 400) -> None:
-        # self.log((b" ".join(cmd)).decode("utf-8"))
-        ret, _, serr = runcmd(cmd, timeout=vn.flags[kto], nice=True, oom=oom)
-        if not ret:
-            return
-
-        if TH_BWRAP:
-            bwrap_fail(serr)
-
-        c: Union[str, int] = "90"
-        t = "FFmpeg failed (probably a corrupt file):\n"
-
-        if "but no decoder found for: hevc" in serr:
-            t = "thumbnail cannot be created due to legal reasons; https://github.com/9001/copyparty/blob/hovudstraum/docs/bad-codecs.md \033[0;90m\n"
-            ret = 321
-            c = 3
-
-        elif cmd[-1].lower().endswith(b".jxl") and (
-            "Error selecting an encoder" in serr
-            or "find a suitable output format" in serr
-            or "Automatic encoder selection failed" in serr
-            or "Default encoder for format webp" in serr
-            or "Unrecognized option 'effort:v" in serr
-            or "Please choose an encoder manually" in serr
-        ):
-            self.args.th_no_jxl = True
-            self.fmt_ffi.discard("jxl")
-            self.fmt_ffv.discard("jxl")
-            self._rebuild_thumbable()
-            t = "FFmpeg failed because it was compiled without jpegxl; enabling --th-no-jxl to force webp output:\n"
-            ret = 321
-            c = 1
-
-        elif (
-            (not self.args.th_ff_jpg or time.time() - int(self.args.th_ff_jpg) < 60)
-            and cmd[-1].lower().endswith(b".webp")
-            and (
-                "Error selecting an encoder" in serr
-                or "Automatic encoder selection failed" in serr
-                or "Default encoder for format webp" in serr
-                or "Please choose an encoder manually" in serr
-            )
-        ):
-            self.args.th_ff_jpg = time.time()
-            t = "FFmpeg failed because it was compiled without libwebp; enabling --th-ff-jpg to force jpeg output:\n"
-            ret = 321
-            c = 1
-
-        elif (
-            not self.args.th_ff_swr or time.time() - int(self.args.th_ff_swr) < 60
-        ) and (
-            "Requested resampling engine is unavailable" in serr
-            or "output pad on Parsed_aresample_" in serr
-        ):
-            self.args.th_ff_swr = time.time()
-            t = "FFmpeg failed because it was compiled without libsox; enabling --th-ff-swr to force swr resampling:\n"
-            ret = 321
-            c = 1
-
-        lines = serr.strip("\n").split("\n")
-        if len(lines) > 50:
-            lines = lines[:25] + ["[...]"] + lines[-25:]
-
-        txt = "\n".join(["ff: " + unicode(x) for x in lines])
-        if len(txt) > 5000:
-            txt = txt[:2500] + "...\nff: [...]\nff: ..." + txt[-2500:]
-
-        try:
-            zs = shlex.join([x.decode("utf-8", "replace") for x in cmd])
-        except:
-            zs = "'" + (b"' '".join(cmd)).decode("utf-8", "replace") + "'"
-
-        self.log("%scmd: %s\n%s" % (t, zs, txt), c=c)
-        raise sp.CalledProcessError(ret, (cmd[0], b"...", cmd[-1]))
-
-    def conv_waves(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        ret, _, _, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if "ac" not in ret:
-            raise Exception("not audio")
-
-        # jt_versi.xm: 405M/839s
-        dur = ret[".dur"][1] if ".dur" in ret else 300
-        need = 0.2 + dur / 3000
-        speedup = b""
-        if need > self.args.th_ram_max * 0.7:
-            self.log("waves too big (need %.2f GiB); trying to optimize" % (need,))
-            need = 0.2 + dur / 4200  # only helps about this much...
-            speedup = b"aresample=8000,"
-        if need > self.args.th_ram_max * 0.96:
-            raise Exception("file too big; cannot waves")
-
-        self.wait4ram(need, tpath)
-
-        flt = b"[0:a:0]" + speedup
-        flt += (
-            b"compand=.3|.3:1|1:-90/-60|-60/-40|-40/-30|-20/-20:6:0:-90:0.2"
-            b",volume=2"
-            b",showwavespic=s=2048x64:colors=white"
-            b",convolution=1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:1 1 1 1 1 1 1 1 1:1 -1 1 -1 5 -1 1 -1 1"  # idk what im doing but it looks ok
-        )
-        bap_in = fsenc(abspath)
-        bap_out = fsenc(tpath)
-
-        # fmt: off
-        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner",
-            b"-i", bap_in,
-            b"-filter_complex", flt,
-            b"-frames:v", b"1",
-        ]
-        # fmt: on
-
-        cmd.append(bap_out)
-        self._run_ff(cmd, vn, "convt")
-
-        if "pngquant" in vn.flags:
-            wtpath = tpath + ".png"
-            cmd = [
-                b"pngquant",
-                b"--strip",
-                b"--nofs",
-                b"--output",
-                fsenc(wtpath),
-                fsenc(tpath),
-            ]
-            ret = runcmd(cmd, timeout=vn.flags["convt"], nice=True, oom=400)[0]
-            if ret:
-                try:
-                    wunlink(self.log, wtpath, vn.flags)
-                except:
-                    pass
-            else:
-                atomic_move(self.log, wtpath, tpath, vn.flags)
-
-    def conv_emb_cv(
-        self, abspath: str, tpath: str, fmt: str, vn: VFS, strm: dict[str, Any]
-    ) -> None:
-        self.wait4ram(0.2, tpath)
-        self._ffmpeg_im(
-            abspath, tpath, fmt, vn, [], b"0:" + strm["index"].encode("ascii")
-        )
-
-    def conv_spec(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        ret, raw, strms, ctnr = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if "ac" not in ret:
-            raise Exception("not audio")
-
-        want_spec = vn.flags.get("th_spec_p", 1)
-        if want_spec < 2:
-            for strm in strms:
-                if (
-                    strm.get("codec_type") == "video"
-                    and strm.get("DISPOSITION:attached_pic") == "1"
-                ):
-                    return self.conv_emb_cv(abspath, tpath, fmt, vn, strm)
-
-        if not want_spec:
-            raise Exception("spectrograms forbidden by volflag")
-
-        fext = abspath.split(".")[-1].lower()
-
-        # https://trac.ffmpeg.org/ticket/10797
-        # expect 1 GiB every 600 seconds when duration is tricky;
-        # simple filetypes are generally safer so let's special-case those
-        coeff = 1800 if fext in EXTS_SPEC_SAFE else 600
-        dur = ret[".dur"][1] if ".dur" in ret else 900
-        need = 0.2 + dur / coeff
-        self.wait4ram(need, tpath)
-
-        infile = abspath
-        if dur >= 900 or fext in self.exts_spec_unsafe:
-            with tempfile.NamedTemporaryFile(suffix=".spec.flac", delete=False) as f:
-                f.write(b"h")
-                infile = f.name
-                try:
-                    self.untemp[tpath].append(infile)
-                except:
-                    self.untemp[tpath] = [infile]
-
-            bap_in = fsenc(abspath)
-            bap_out = fsenc(infile)
-
-            # fmt: off
-            cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-                b"-nostdin",
-                b"-v", b"error",
-                b"-hide_banner",
-                b"-i", bap_in,
-                b"-map", b"0:a:0",
-                b"-ac", b"1",
-                b"-ar", b"48000",
-                b"-sample_fmt", b"s16",
-                b"-t", b"900",
-                b"-y", bap_out,
-            ]
-            # fmt: on
-            self._run_ff(cmd, vn, "convt")
-
-        fscale = ":fscale=log" if self.args.th_spec_fl else ""
-
-        fc = "[0:a:0]aresample=48000{},showspectrumpic=s="
-        if "3" in fmt:
-            fc += "1280x1024%s,crop=1420:1056:70:48[o]" % fscale
-        else:
-            fc += "640x512%s,crop=780:544:70:48[o]" % fscale
-
-        if self.args.th_ff_swr:
-            fco = ":filter_size=128:cutoff=0.877"
-        else:
-            fco = ":resampler=soxr"
-
-        fc = fc.format(fco)
-
-        bap_in = fsenc(infile)
-        bap_out = fsenc(tpath)
-
-        # fmt: off
-        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner",
-            b"-i", bap_in,
-            b"-filter_complex", fc.encode("utf-8"),
-            b"-map", b"[o]",
-            b"-frames:v", b"1",
-        ]
-        # fmt: on
-
-        self._ffmpeg_im_o(bap_out, vn, cmd)
-
-    def conv_mp3(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        quality = self.args.q_mp3.lower()
-        if self.args.no_acode or not quality:
-            raise Exception("disabled in server config")
-
-        self.wait4ram(0.2, tpath)
-        tags, rawtags, _, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if "ac" not in tags:
-            raise Exception("not audio")
-
-        if quality.endswith("k"):
-            qk = b"-b:a"
-            qv = quality.encode("ascii")
-        else:
-            qk = b"-q:a"
-            qv = quality[1:].encode("ascii")
-
-        bap_in = fsenc(abspath)
-        bap_out = fsenc(tpath)
-
-        # extremely conservative choices for output format
-        # (always 2ch 44k1) because if a device is old enough
-        # to not support opus then it's probably also super picky
-
-        # fmt: off
-        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner",
-            b"-i", bap_in,
-        ] + self.big_tags(rawtags) + [
-            b"-map", b"0:a:0",
-            b"-ar", b"44100",
-            b"-ac", b"2",
-            b"-c:a", b"libmp3lame",
-            qk, qv,
-            bap_out,
-        ]
-        # fmt: on
-        self._run_ff(cmd, vn, "aconvt", oom=300)
-
-    def conv_flac(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        if self.args.no_acode or not self.args.allow_flac:
-            raise Exception("flac not permitted in server config")
-
-        self.wait4ram(0.2, tpath)
-        tags, _, _, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if "ac" not in tags:
-            raise Exception("not audio")
-
-        self.log("conv2 flac", 6)
-
-        bap_in = fsenc(abspath)
-        bap_out = fsenc(tpath)
-
-        # fmt: off
-        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner",
-            b"-i", bap_in,
-            b"-map", b"0:a:0",
-            b"-c:a", b"flac",
-            bap_out,
-        ]
-        # fmt: on
-        self._run_ff(cmd, vn, "aconvt", oom=300)
-
-    def conv_wav(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        if self.args.no_acode or not self.args.allow_wav:
-            raise Exception("wav not permitted in server config")
-
-        self.wait4ram(0.2, tpath)
-        tags, _, _, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if "ac" not in tags:
-            raise Exception("not audio")
-
-        bits = tags[".bps"][1]
-        if bits == 0.0:
-            bits = tags[".bprs"][1]
-
-        codec = b"pcm_s32le"
-        if bits <= 16.0:
-            codec = b"pcm_s16le"
-        elif bits <= 24.0:
-            codec = b"pcm_s24le"
-
-        self.log("conv2 wav", 6)
-
-        bap_in = fsenc(abspath)
-        bap_out = fsenc(tpath)
-
-        # fmt: off
-        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner",
-            b"-i", bap_in,
-            b"-map", b"0:a:0",
-            b"-c:a", codec,
-            bap_out,
-        ]
-        # fmt: on
-        self._run_ff(cmd, vn, "aconvt", oom=300)
-
-    def conv_opus(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
-        if self.args.no_acode or not self.args.q_opus:
-            raise Exception("disabled in server config")
-
-        self.wait4ram(0.2, tpath)
-        tags, rawtags, _, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))
-        if "ac" not in tags:
-            raise Exception("not audio")
-
-        sq = "%dk" % (self.args.q_opus,)
-        bq = sq.encode("ascii")
-        if tags["ac"][1] == "opus":
-            enc = "-c:a copy"
-        else:
-            enc = "-c:a libopus -b:a " + sq
-
-        fun = self._conv_caf if fmt == "caf" else self._conv_owa
-
-        fun(abspath, tpath, tags, rawtags, enc, bq, vn)
-
-    def _conv_owa(
-        self,
-        abspath: str,
-        tpath: str,
-        tags: dict[str, tuple[int, Any]],
-        rawtags: dict[str, list[Any]],
-        enc: str,
-        bq: bytes,
-        vn: VFS,
-    ) -> None:
-        if tpath.endswith(".owa"):
-            container = b"webm"
-            tagset = [b"-map_metadata", b"-1"]
-        else:
-            container = b"opus"
-            tagset = self.big_tags(rawtags)
-
-        self.log("conv2 %s [%s]" % (container, enc), 6)
-        benc = enc.encode("ascii").split(b" ")
-
-        ac = b"2"
-        try:
-            if tags["chs"][1] in ("mono", "1", "1.0"):
-                ac = b"1"
-        except:
-            pass
-
-        bap_in = fsenc(abspath)
-        bap_out = fsenc(tpath)
-
-        # fmt: off
-        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner",
-            b"-i", bap_in,
-        ] + tagset + [
-            b"-map", b"0:a:0",
-            b"-ac", ac,
-        ] + benc + [
-            b"-f", container,
-            bap_out,
-        ]
-        # fmt: on
-        self._run_ff(cmd, vn, "aconvt", oom=300)
-
-    def _conv_caf(
-        self,
-        abspath: str,
-        tpath: str,
-        tags: dict[str, tuple[int, Any]],
-        rawtags: dict[str, list[Any]],
-        enc: str,
-        bq: bytes,
-        vn: VFS,
-    ) -> None:
-        tmp_opus = tpath + ".opus"
-        try:
-            wunlink(self.log, tmp_opus, vn.flags)
-        except:
-            pass
-
-        try:
-            dur = tags[".dur"][1]
-        except:
-            dur = 0
-
-        self.log("conv2 caf-tmp [%s]" % (enc,), 6)
-        benc = enc.encode("ascii").split(b" ")
-
-        bap_in = fsenc(abspath)
-        bap_out = fsenc(tmp_opus)
-
-        # fmt: off
-        cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-            b"-nostdin",
-            b"-v", b"error",
-            b"-hide_banner",
-            b"-i", bap_in,
-            b"-map_metadata", b"-1",
-            b"-map", b"0:a:0",
-            b"-ac", b"2",
-        ] + benc + [
-            b"-f", b"opus",
-            bap_out,
-        ]
-        # fmt: on
-        self._run_ff(cmd, vn, "aconvt", oom=300)
-
-        # iOS fails to play some "insufficiently complex" files
-        # (average file shorter than 8 seconds), so of course we
-        # fix that by mixing in some inaudible pink noise :^)
-        # 6.3 sec seems like the cutoff so lets do 7, and
-        # 7 sec of psyqui-musou.opus @ 3:50 is 174 KiB
-        sz = bos.path.getsize(tmp_opus)
-        if dur < 20 or sz < 256 * 1024:
-            zs = bq.decode("ascii")
-            self.log("conv2 caf-transcode; dur=%d sz=%d q=%s" % (dur, sz, zs), 6)
-            bap_in = fsenc(abspath)
-            bap_out = fsenc(tpath)
-            # fmt: off
-            cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-                b"-nostdin",
-                b"-v", b"error",
-                b"-hide_banner",
-                b"-i", bap_in,
-                b"-filter_complex", b"anoisesrc=a=0.001:d=7:c=pink,asplit[l][r]; [l][r]amerge[s]; [0:a:0][s]amix",
-                b"-map_metadata", b"-1",
-                b"-ac", b"2",
-                b"-c:a", b"libopus",
-                b"-b:a", bq,
-                b"-f", b"caf",
-                bap_out,
-            ]
-            # fmt: on
-            self._run_ff(cmd, vn, "aconvt", oom=300)
-
-        else:
-            # simple remux should be safe
-            self.log("conv2 caf-remux; dur=%d sz=%d" % (dur, sz), 6)
-            bap_in = fsenc(tmp_opus)
-            bap_out = fsenc(tpath)
-            # fmt: off
-            cmd = bwrap(HAVE_FFMPEG, bap_in, bap_out) + [
-                b"-nostdin",
-                b"-v", b"error",
-                b"-hide_banner",
-                b"-i", bap_in,
-                b"-map_metadata", b"-1",
-                b"-map", b"0:a:0",
-                b"-c:a", b"copy",
-                b"-f", b"caf",
-                bap_out,
-            ]
-            # fmt: on
-            self._run_ff(cmd, vn, "aconvt", oom=300)
-
-        try:
-            wunlink(self.log, tmp_opus, vn.flags)
-        except:
-            pass
-
-    def big_tags(self, raw_tags: dict[str, list[str]]) -> list[bytes]:
-        ret = []
-        for k, vs in raw_tags.items():
-            for v in vs:
-                if len(unicode(v)) >= 1024:
-                    bv = k.encode("utf-8", "replace")
-                    ret += [b"-metadata", bv + b"="]
-                    break
-        return ret
-
-    def poke(self, tdir: str) -> None:
-        if not self.poke_cd or not self.poke_cd.poke(tdir):
-            return
-
-        ts = int(time.time())
-        try:
-            for _ in range(4):
-                bos.utime(tdir, (ts, ts))
-                tdir = os.path.dirname(tdir)
-        except:
-            pass
-
-    def cleaner(self) -> None:
-        interval = self.args.th_clean
-        while True:
-            ndirs = 0
-            for vol, histpath in self.asrv.vfs.histtab.items():
-                if histpath.startswith(vol):
-                    self.log("\033[Jcln {}/\033[A".format(histpath))
-                else:
-                    self.log("\033[Jcln {} ({})/\033[A".format(histpath, vol))
-
-                try:
-                    ndirs += self.clean(histpath)
-                except Exception as ex:
-                    self.log("\033[Jcln err in %s: %r" % (histpath, ex), 3)
-
-            self.log("\033[Jcln ok; rm {} dirs".format(ndirs))
-            self.rm_nullthumbs = False
-            time.sleep(interval)
-
-    def clean(self, histpath: str) -> int:
-        cfgi = cfga = ""
-        for vn in self.asrv.vfs.all_vols.values():
-            if vn.histpath == histpath:
-                cfgi = self.volcfgi(vn)
-                cfga = self.volcfga(vn)
-                break
-        for cfg, cat in ((cfgi, "th"), (cfga, "ac")):
-            if not cfg:
-                continue
-            try:
-                with open(os.path.join(histpath, cat, "cfg.txt"), "rb") as f:
-                    oldcfg = f.read().decode("utf-8")
-            except:
-                oldcfg = ""
-            if cfg == oldcfg:
-                continue
-            zs = os.path.join(histpath, cat)
-            if not os.path.exists(zs):
-                continue
-            self.log("thumbnailer-config changed; deleting %s" % (zs,), 3)
-            shutil.rmtree(zs)
-
-        ret = 0
-        for cat in ["th", "ac"]:
-            top = os.path.join(histpath, cat)
-            if not bos.path.isdir(top):
-                continue
-
-            ret += self._clean(cat, top)
-
-        return ret
-
-    def _clean(self, cat: str, thumbpath: str) -> int:
-        # self.log("cln {}".format(thumbpath))
-        exts = EXTS_TH if cat == "th" else EXTS_AC
-        maxage = getattr(self.args, cat + "_maxage")
-        now = time.time()
-        prev_b64 = None
-        prev_fp = ""
-        try:
-            t1 = statdir(
-                self.log_func, not self.args.no_scandir, False, thumbpath, False
-            )
-            ents = sorted(list(t1))
-        except:
-            return 0
-
-        ndirs = 0
-        for f, inf in ents:
-            fp = os.path.join(thumbpath, f)
-            cmp = fp.lower().replace("\\", "/")
-
-            # "top" or b64 prefix/full (a folder)
-            if len(f) <= 3 or len(f) == 24:
-                age = now - inf.st_mtime
-                if age > maxage:
-                    with self.mutex:
-                        safe = True
-                        for k in self.busy:
-                            if k.lower().replace("\\", "/").startswith(cmp):
-                                safe = False
-                                break
-
-                        if safe:
-                            ndirs += 1
-                            self.log("rm -rf [{}]".format(fp))
-                            shutil.rmtree(fp, ignore_errors=True)
-                else:
-                    ndirs += self._clean(cat, fp)
-
-                continue
-
-            # thumb file
-            try:
-                b64, ts, ext = f.split(".")
-                if len(ts) > 8 and PTN_TS.match(ts):
-                    ts = "yeahokay"
-                if len(b64) != 24 or len(ts) != 8 or ext not in exts:
-                    raise Exception()
-            except:
-                if f != "dir.txt" and f != "cfg.txt":
-                    self.log("foreign file in thumbs dir: [{}]".format(fp), 1)
-
-                continue
-
-            if self.rm_nullthumbs and not inf.st_size:
-                bos.unlink(fp)
-                continue
-
-            if b64 == prev_b64:
-                self.log("rm replaced [{}]".format(fp))
-                bos.unlink(prev_fp)
-
-            if cat != "th" and inf.st_mtime + maxage < now:
-                self.log("rm expired [{}]".format(fp))
-                bos.unlink(fp)
-
-            prev_b64 = b64
-            prev_fp = fp
-
-        return ndirs
+🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟
+🫟
+
+🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+
+🫟🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+
+🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟🫟
+🫟
+🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+    🫟🫟 🫟🫟  🫟 🫟
+    🫟🫟 🫟🫟  🫟 🫟
+    🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟🫟
+🫟
+
+
+🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+
+    🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+
+    🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+
+    🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+
+    🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟
+
+🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+
+
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+
+
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+
+
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+    🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟
+    🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟
+    🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟 🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟
+    🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟 🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+
+    🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+
+
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+            🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+                    🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+            🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟
+        🫟
+
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+                        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟 🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+                🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+            🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟 🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+                    🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟 🫟🫟
+
+            🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟
+                        🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟
+
+                    🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟 🫟
+                        🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟
+                        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+                    🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟
+                    🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+                    🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟
+                    🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+                    🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+                        🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟
+                                🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+                                    🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+                                🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟
+                                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+                    🫟🫟🫟🫟🫟
+                        🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟
+
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟  🫟🫟🫟🫟  🫟🫟  🫟🫟🫟🫟🫟  🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+                🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟
+                        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+
+            🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟
+
+            🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+            🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟
+
+        🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+        🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟
+    🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+                🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+                🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟  🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟  🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+        🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+                🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+                🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟
+                🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+
+        🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+            🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+    🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟
+            🫟 🫟 🫟
+
+        🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟
+            🫟 🫟 🫟
+
+        🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟
+        🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟
+            🫟 🫟 🫟
+
+        🫟🫟🫟🫟 🫟
+            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟 🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟
+            🫟 🫟 🫟
+
+        🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟  🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟 🫟 🫟 🫟 🫟 🫟🫟🫟 🫟 🫟 🫟 🫟 🫟 🫟 🫟 🫟🫟🫟 🫟 🫟 🫟 🫟 🫟 🫟 🫟 🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟  🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+        🫟
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟
+                🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+    🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+                🫟🫟
+                    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟 🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟
+            🫟 🫟🫟🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟
+
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟
+    🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟
+    🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+
+        🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+        🫟 🫟🫟🫟🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+        🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟
+        🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟
+        🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟
+            🫟 🫟🫟🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟🫟🫟🫟 🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟
+            🫟 🫟🫟🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+                    🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟 🫟
+            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+
+                🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+                    🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+            🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟 🫟
+        🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟
+            🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟
+
+        🫟🫟🫟🫟🫟 🫟 🫟
+        🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+
+            🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+                🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+                        🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                                🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+                                🫟🫟🫟🫟🫟
+
+                        🫟🫟 🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟 🫟🫟 🫟
+                            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+
+                🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟
+                🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+
+                🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟

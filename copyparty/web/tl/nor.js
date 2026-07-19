@@ -1,724 +1,724 @@
-Ls.nor = {
-	"tt": "Norsk",
+🫟🫟🫟🫟🫟🫟 🫟 🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cols": {
-		"c": "handlingsknapper",
-		"dur": "varighet",
-		"q": "kvalitet / bitrate",
-		"Ac": "lyd-format",
-		"Vc": "video-format",
-		"Fmt": "format / innpakning",
-		"Ahash": "lyd-kontrollsum",
-		"Vhash": "video-kontrollsum",
-		"Res": "oppløsning",
-		"T": "filtype",
-		"aq": "lydkvalitet / bitrate",
-		"vq": "videokvalitet / bitrate",
-		"pixfmt": "fargekoding / detaljenivå",
-		"resw": "horisontal oppløsning",
-		"resh": "vertikal oppløsning",
-		"chs": "lydkanaler",
-		"hz": "lyd-oppløsning",
-	},
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟
 
-	"hks": [
-		[
-			"ymse",
-			["ESC", "lukk saker og ting"],
+🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-			"filbehandler",
-			["G", "listevisning eller ikoner"],
-			["T", "miniatyrbilder på/av"],
-			["⇧ A/D", "ikonstørrelse"],
-			["ctrl-K", "slett valgte"],
-			["ctrl-X", "klipp ut valgte"],
-			["ctrl-C", "kopiér til utklippstavle"],
-			["ctrl-V", "lim inn (flytt/kopiér)"],
-			["Y", "last ned valgte"],
-			["F2", "endre navn på valgte"],
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-			"filmarkering",
-			["space", "marker fil"],
-			["↑/↓", "flytt markør"],
-			["ctrl ↑/↓", "flytt markør og scroll"],
-			["⇧ ↑/↓", "velg forr./neste fil"],
-			["ctrl-A", "velg alle filer / mapper"],
-		], [
-			"navigering",
-			["B", "mappehierarki eller filsti"],
-			["I/K", "forr./neste mappe"],
-			["M", "ett nivå opp (eller lukk)"],
-			["V", "vis mapper eller tekstfiler"],
-			["A/D", "panelstørrelse"],
-		], [
-			"musikkspiller",
-			["J/L", "forr./neste sang"],
-			["U/O", "hopp 10sek bak/frem"],
-			["0..9", "hopp til 0%..90%"],
-			["P", "pause, eller start / fortsett"],
-			["S", "marker spillende sang"],
-			["Y", "last ned sang"],
-		], [
-			"bildeviser",
-			["J/L, ←/→", "forr./neste bilde"],
-			["Home/End", "første/siste bilde"],
-			["F", "fullskjermvisning"],
-			["R", "rotere mot høyre"],
-			["⇧ R", "rotere mot venstre"],
-			["S", "marker bilde"],
-			["Y", "last ned bilde"],
-		], [
-			"videospiller",
-			["U/O", "hopp 10sek bak/frem"],
-			["P/K/Space", "pause / fortsett"],
-			["C", "fortsett til neste fil"],
-			["V", "gjenta avspilling"],
-			["M", "lyd av/på"],
-			["[ og ]", "gjentaksintervall"],
-		], [
-			"dokumentviser",
-			["I/K", "forr./neste fil"],
-			["M", "lukk tekstdokument"],
-			["E", "rediger tekstdokument"],
-			["S", "marker fil (for F2/ctrl-x/...)"],
-			["Y", "last ned tekstfil"],
-			["⇧ J", "formattér json"],
-		]
-	],
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟
+🫟🫟🫟
 
-	"m_ok": "OK",
-	"m_ng": "Avbryt",
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"enable": "Aktiv",
-	"danger": "VARSKU",
-	"clipped": "kopiert til utklippstavlen",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ht_s1": "sekund",
-	"ht_s2": "sekunder",
-	"ht_m1": "minutt",
-	"ht_m2": "minutter",
-	"ht_h1": "time",
-	"ht_h2": "timer",
-	"ht_d1": "dag",
-	"ht_d2": "dager",
-	"ht_and": " og ",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟
 
-	"goh": "kontrollpanel",
-	"gop": 'naviger til mappen før denne">forr.',
-	"gou": 'naviger ett nivå opp">opp',
-	"gon": 'naviger til mappen etter denne">neste',
-	"logout": "Logg ut ",
-	"login": "Logg inn",
-	"access": " tilgang",
-	"ot_close": "lukk verktøy",
-	"ot_search": "`søk etter filer ved å angi filnavn, mappenavn, tid, størrelse, eller metadata som sangtittel / artist / osv.$N$N`foo bar` = inneholder både «foo» og «bar»,$N`foo -bar` = inneholder «foo» men ikke «bar»,$N`^yana .opus$` = starter med «yana», filtype «opus»$N`&quot;try unite&quot;` = «try unite» eksakt$N$Ndatoformat er iso-8601, så f.eks.$N`2009-12-31` eller `2020-09-12 23:30:00`",
-	"ot_unpost": "unpost: slett filer som du nylig har lastet opp; «angre-knappen»",
-	"ot_bup": "bup: tradisjonell / primitiv filopplastning,$N$Nfungerer i omtrent samtlige nettlesere",
-	"ot_mkdir": "mkdir: lag en ny mappe",
-	"ot_md": "new-file: lag en ny tekstfil",
-	"ot_msg": "msg: send en beskjed til serverloggen",
-	"ot_mp": "musikkspiller-instillinger",
-	"ot_cfg": "andre innstillinger",
-	"ot_u2i": 'up2k: last opp filer (hvis du har skrivetilgang) eller bytt til søkemodus for å sjekke om filene finnes et-eller-annet sted på serveren$N$Nopplastninger kan gjenopptas etter avbrudd, skjer stykkevis for potensielt høyere ytelse, og ivaretar datostempling -- men bruker litt mer prosessorkraft enn [🎈]&nbsp; (den primitive opplasteren "bup")<br /><br />mens opplastninger foregår så vises fremdriften her oppe!',
-	"ot_u2w": 'up2k: filopplastning med støtte for å gjenoppta avbrutte opplastninger -- steng ned nettleseren og dra de samme filene inn i nettleseren igjen for å plukke opp igjen der du slapp$N$Nopplastninger skjer stykkevis for potensielt høyere ytelse, og ivaretar datostempling -- men bruker litt mer prosessorkraft enn [🎈]&nbsp; (den primitive opplasteren "bup")<br /><br />mens opplastninger foregår så vises fremdriften her oppe!',
-	"ot_noie": 'Fungerer mye bedre i Chrome / Firefox / Edge',
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
 
-	"ab_mkdir": "lag mappe",
-	"ab_mkdoc": "ny tekstfil",
-	"ab_msg": "send melding",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ay_path": "gå videre til mapper",
-	"ay_files": "gå videre til filer",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"wt_ren": "gi nye navn til de valgte filene$NSnarvei: F2",
-	"wt_del": "slett de valgte filene$NSnarvei: ctrl-K",
-	"wt_cut": "klipp ut de valgte filene &lt;small&gt;(for å lime inn et annet sted)&lt;/small&gt;$NSnarvei: ctrl-X",
-	"wt_cpy": "kopiér de valgte filene til utklippstavlen$N(for å lime inn et annet sted)$NSnarvei: ctrl-C",
-	"wt_pst": "lim inn filer (som tidligere ble klippet ut / kopiert et annet sted)$NSnarvei: ctrl-V",
-	"wt_selall": "velg alle filer$NSnarvei: ctrl-A (mens fokus er på en fil)",
-	"wt_selinv": "inverter utvalg",
-	"wt_zip1": "last ned denne mappen som et arkiv",
-	"wt_selzip": "last ned de valgte filene som et arkiv",
-	"wt_seldl": "last ned de valgte filene$NSnarvei: Y",
-	"wt_npirc": "kopiér sang-info (irc-formatert)",
-	"wt_nptxt": "kopiér sang-info",
-	"wt_m3ua": "legg til sang i m3u-spilleliste$N(husk å klikke på <code>📻copy</code> senere)",
-	"wt_m3uc": "kopiér m3u-spillelisten til utklippstavlen",
-	"wt_grid": "bytt mellom ikoner og listevisning$NSnarvei: G",
-	"wt_prev": "forrige sang$NSnarvei: J",
-	"wt_play": "play / pause$NSnarvei: P",
-	"wt_next": "neste sang$NSnarvei: L",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"ul_par": "samtidige handl.:",
-	"ut_rand": "finn opp nye tilfeldige filnavn",
-	"ut_u2ts": "gi filen på serveren samme$Ntidsstempel som lokalt hos deg\">📅",
-	"ut_ow": "overskrive eksisterende filer på serveren?$N🛡️: aldri (finner på et nytt filnavn istedenfor)$N🕒: overskriv hvis serverens fil er eldre$N♻️: alltid, gitt at innholdet er forskjellig$N⏭️: hopp over alle eksisterende filer",
-	"ut_mt": "fortsett å befare køen mens opplastning foregår$N$Nskru denne av dersom du har en$Ntreg prosessor eller harddisk",
-	"ut_ask": 'bekreft filutvalg før opplastning starter">💭',
-	"ut_pot": "forbedre ytelsen på trege enheter ved å$Nforenkle brukergrensesnittet",
-	"ut_srch": "utfør søk istedenfor å laste opp --$Nleter igjennom alle mappene du har lov til å se",
-	"ut_par": "sett til 0 for å midlertidig stanse opplastning$N$Nhøye verdier (4 eller 8) kan gi bedre ytelse,$Nspesielt på trege internettlinjer$N$Nbør ikke være høyere enn 1 på LAN$Neller hvis serveren sin harddisk er treg",
-	"ul_btn": "slipp filer / mapper<br>her (eller klikk meg)",
-	"ul_btnu": "L A S T &nbsp; O P P",
-	"ul_btns": "F I L S Ø K",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟 🫟 🫟 🫟🫟🫟
 
-	"ul_hash": "befar",
-	"ul_send": "&nbsp;send",
-	"ul_done": "total",
-	"ul_idle1": "ingen handlinger i køen",
-	"ut_etah": "snitthastighet for &lt;em&gt;befaring&lt;/em&gt; samt gjenstående tid",
-	"ut_etau": "snitthastighet for &lt;em&gt;opplastning&lt;/em&gt; samt gjenstående tid",
-	"ut_etat": "&lt;em&gt;total&lt;/em&gt; snitthastighet og gjenstående tid",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
 
-	"uct_ok": "fullført uten problemer",
-	"uct_ng": "fullført under tvil (duplikat, ikke funnet, ...)",
-	"uct_done": "fullført (enten &lt;em&gt;ok&lt;/em&gt; eller &lt;em&gt;ng&lt;/em&gt;)",
-	"uct_bz": "aktive handlinger (befaring / opplastning)",
-	"uct_q": "køen",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"utl_name": "filnavn",
-	"utl_ulist": "vis",
-	"utl_ucopy": "kopiér",
-	"utl_links": "lenker",
-	"utl_stat": "status",
-	"utl_prog": "fremdrift",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	// må være korte:
-	"utl_404": "404",
-	"utl_err": "FEIL!",
-	"utl_oserr": "OS-feil",
-	"utl_found": "funnet",
-	"utl_defer": "senere",
-	"utl_yolo": "YOLO",
-	"utl_done": "ferdig",
+🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ul_flagblk": "filene har blitt lagt i køen</b><br>men det er en annen nettleserfane som holder på med befaring eller opplastning akkurat nå,<br>så venter til den er ferdig først",
-	"ul_btnlk": "bryteren har blitt låst til denne tilstanden i serverens konfigurasjon",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"udt_up": "Last opp",
-	"udt_srch": "Søk",
-	"udt_drop": "Slipp filene her",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
 
-	"u_nav_m": '<h6>hva har du?</h6><code>Enter</code> = Filer (én eller flere)\n<code>ESC</code> = Én mappe (inkludert undermapper)',
-	"u_nav_b": '<a href="#" id="modal-ok">Filer</a><a href="#" id="modal-ng">Én mappe</a>',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cl_opts": "brytere",
-	"cl_hfsz": "filstørrelse",
-	"cl_themes": "utseende",
-	"cl_langs": "språk",
-	"cl_ziptype": "nedlastning av mapper",
-	"cl_uopts": "up2k-brytere",
-	"cl_favico": "favicon",
-	"cl_bigdir": "store mapper",
-	"cl_hsort": "#sort",
-	"cl_keytype": "notasjon for musikalsk dur",
-	"cl_hiddenc": "skjulte kolonner",
-	"cl_hidec": "skjul",
-	"cl_reset": "nullstill",
-	"cl_hpick": "klikk på overskriften til kolonnene du ønsker å skjule i tabellen nedenfor",
-	"cl_hcancel": "kolonne-skjuling avbrutt",
-	"cl_rcm": "høyreklikkmeny",
-	"cl_gauto": "auto田",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ct_grid": '田 ikoner',
-	"ct_ttips": 'vis hjelpetekst ved å holde musen over ting">ℹ️ tips',
-	"ct_thumb": 'vis miniatyrbilder istedenfor ikoner$NSnarvei: T">🖼️ bilder',
-	"ct_csel": 'bruk tastene CTRL og SHIFT for markering av filer i ikonvisning">merk',
-	"ct_dsel": 'marker filer med klikk-og-dra i ikonvisning">dsel',
-	"ct_dl": 'last ned filer (ikke vis i nettleseren)">dl',
-	"ct_ihop": 'bla ned til sist viste bilde når bildeviseren lukkes">g⮯',
-	"ct_dots": 'vis skjulte filer (gitt at serveren tillater det)">.synlig',
-	"ct_qdel": 'sletteknappen spør bare én gang om bekreftelse">hurtig🗑️',
-	"ct_dir1st": 'sorter slik at mapper kommer foran filer">📁 først',
-	"ct_nsort": 'naturlig sortering (forstår tall i filnavn)">nsort',
-	"ct_utc": 'bruk UTC for alle klokkeslett">UTC',
-	"ct_readme": 'vis README.md nedenfor filene">📜 readme',
-	"ct_idxh": 'vis index.html istedenfor fil-liste">htm',
-	"ct_sbars": 'vis rullgardiner / skrollefelt">⟊',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_umod": 'i tilfelle en fil du laster opp allerede finnes på serveren, så skal serverens tidsstempel oppdateres slik at det stemmer overens med din lokale fil (krever rettighetene write+delete)">re📅',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_turbo": "forenklet befaring ved opplastning; bør sannsynlig <em>ikke</em> skrus på:$N$Nnyttig dersom du var midt i en svær opplastning som måtte restartes av en eller annen grunn, og du vil komme igang igjen så raskt som overhodet mulig.$N$Nnår denne er skrudd på så forenkles befaringen kraftig; istedenfor å utføre en trygg sjekk på om filene finnes på serveren i god stand, så sjekkes kun om <em>filstørrelsen</em> stemmer. Så dersom en korrupt fil skulle befinne seg på serveren allerede, på samme sted med samme størrelse og navn, så blir det <em>ikke oppdaget</em>.$N$Ndet anbefales å kun benytte denne funksjonen for å komme seg raskt igjennom selve opplastningen, for så å skru den av, og til slutt &quot;laste opp&quot; de samme filene én gang til -- slik at integriteten kan verifiseres\">turbo",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_datechk": "har ingen effekt dersom turbo er avslått$N$Ngjør turbo bittelitt tryggere ved å sjekke datostemplingen på filene (i tillegg til filstørrelse)$N$N<em>burde</em> oppdage og gjenoppta de fleste ufullstendige opplastninger, men er <em>ikke</em> en fullverdig erstatning for å deaktivere turbo og gjøre en skikkelig sjekk\">date-chk",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_u2sz": "størrelse i megabyte for hvert bruddstykke for opplastning. Store verdier flyr bedre over atlanteren. Små verdier kan være bedre på særdeles ustabile forbindelser",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_flag": "samkjører nettleserfaner slik at bare én $N kan holde på med befaring / opplastning $N -- andre faner må også ha denne skrudd på $N -- fungerer kun innenfor samme domene",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_az": "last opp filer i alfabetisk rekkefølge, istedenfor minste-fil-først$N$Nalfabetisk kan gjøre det lettere å anslå om alt gikk bra, men er bittelitt tregere på fiber / LAN",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
 
-	"cut_nag": "meldingsvarsel når opplastning er ferdig$N(kun om nettleserfanen ikke er synlig)",
-	"cut_sfx": "lydvarsel når opplastning er ferdig$N(kun om nettleserfanen ikke er synlig)",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_mt": "raskere befaring ved å bruke hele CPU'en$N$Ndenne funksjonen anvender web-workers$Nog krever mer RAM (opptil 512 MiB ekstra)$N$Ngjør https 30% raskere, http 4.5x raskere\">mt",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_wasm": "bruk wasm istedenfor nettleserens sha512-funksjon; gir bedre ytelse på chrome-baserte nettlesere, men bruker mere CPU, og eldre versjoner av chrome tåler det ikke (spiser opp all RAM og krasjer)\">wasm",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cft_text": "ikontekst (blank ut og last siden på nytt for å deaktivere)",
-	"cft_fg": "farge",
-	"cft_bg": "bakgrunnsfarge",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cdt_lim": "maks antall filer å vise per mappe",
-	"cdt_ask": "vis knapper for å laste flere filer nederst på siden istedenfor å gradvis laste mer av mappen når man scroller ned",
-	"cdt_hsort": "`antall sorterings-regler (`,sorthref`) som skal inkluderes når media-URL'er genereres. Hvis denne er 0 så vil sorterings-regler i URL'er hverken bli generert eller lest",
-	"cdt_ren": "bruk egendefinert høyreklikkmeny (den vanlige menyen er tilgjengelig med shift + høyreklikk)\">aktiv",
-	"cdt_rdb": "høyreklikk to ganger for å vise den vanlige høyreklikkmenyen\">x2",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"tt_entree": "bytt til mappehierarki$NSnarvei: B",
-	"tt_detree": "bytt til tradisjonell sti-visning$NSnarvei: B",
-	"tt_visdir": "bla ned til den åpne mappen",
-	"tt_ftree": "bytt mellom filstruktur og tekstfiler$NSnarvei: V",
-	"tt_pdock": "vis de overordnede mappene i et panel",
-	"tt_dynt": "øk bredden på panelet ettersom treet utvider seg",
-	"tt_wrap": "linjebryting",
-	"tt_hover": "vis hele mappenavnet når musepekeren treffer mappen$N( gjør dessverre at scrollhjulet fusker dersom musepekeren ikke befinner seg i grøfta )",
-	"tt_gauto": "bytt visningsmodus (liste/ikoner) avhengig av mappeinnhold",
-	"tt_gathr": "vis som ikoner når denne prosentandelen er bilder/videoer",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ml_pmode": "ved enden av mappen",
-	"ml_btns": "knapper",
-	"ml_tcode": "konvertering",
-	"ml_tcode2": "konverter til",
-	"ml_tint": "tint",
-	"ml_eq": "audio equalizer (tonejustering)",
-	"ml_drc": "compressor (volum-utjevning)",
-	"ml_ss": "spol forbi stillhet",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"mt_loop": "spill den samme sangen om og om igjen\">🔁",
-	"mt_one": "spill kun én sang\">1️⃣",
-	"mt_shuf": "sangene i hver mappe$Nspilles i tilfeldig rekkefølge\">🔀",
-	"mt_aplay": "forsøk å starte avspilling hvis linken du klikket på for å åpne nettsiden inneholder en sang-ID$N$Nhvis denne deaktiveres så vil heller ikke nettside-URL'en bli oppdatert med sang-ID'er når musikk spilles, i tilfelle innstillingene skulle gå tapt og nettsiden lastes på ny\">a▶",
-	"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
-	"mt_prescan": "ved behov, bla til neste mappe$Nslik at nettleseren lar oss$Nfortsette å spille musikk\">bla",
-	"mt_fullpre": "hent ned hele neste sang, ikke bare litt:$N✅ skru på hvis nettet ditt er <b>ustabilt</b>,$N❌ skru av hvis nettet ditt er <b>tregt</b>\">full",
-	"mt_fau": "for telefoner: forhindre at avspilling stopper hvis nettet er for tregt til å laste neste sang i tide. Hvis påskrudd, kan forårsake at sang-info ikke vises korrekt i OS'et\">☕️",
-	"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
-	"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
-	"mt_m3u_c": "vis knapper for å kopiere de valgte$Nsangene som innslag i en m3u8 spilleliste\">📻",
-	"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
-	"mt_oseek": "tillat spoling med fjernkontroll$N$Nmerk: på noen enheter (iPhones) så vil$Ndette erstatte knappen for neste sang\">spoling",
-	"mt_oscv": "vis album-cover på infoskjermen\">bilde",
-	"mt_follow": "bla slik at sangen som spilles alltid er synlig\">🎯",
-	"mt_compact": "tettpakket avspillerpanel\">⟎",
-	"mt_uncache": "prøv denne hvis en sang ikke spiller riktig\">oppfrisk",
-	"mt_mloop": "repeter hele mappen\">🔁 gjenta",
-	"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
-	"mt_mstop": "stopp avspilling\">⏸ stopp",
-	"mt_cflac": "konverter flac / wav-filer til {0}\">flac",
-	"mt_caac": "konverter aac / m4a-filer til to {0}\">aac",
-	"mt_coth": "konverter alt annet (men ikke mp3) til {0}\">andre",
-	"mt_c2opus": "det beste valget for alle PCer og Android\">opus",
-	"mt_c2owa": "opus-weba, for iOS 17.5 og nyere\">owa",
-	"mt_c2caf": "opus-caf, for iOS 11 tilogmed 17\">caf",
-	"mt_c2mp3": "bra valg for steinalder-utstyr (slår aldri feil)\">mp3",
-	"mt_c2flac": "gir best lydkvalitet, men eter nettet ditt\">flac",
-	"mt_c2wav": "helt rå lydstrøm (bruker enda mere data enn flac)\">wav",
-	"mt_c2ok": "bra valg!",
-	"mt_c2nd": "ikke det foretrukne valget for din enhet, men funker sikkert greit",
-	"mt_c2ng": "ser virkelig ikke ut som enheten din takler dette formatet... men ok, vi prøver",
-	"mt_xowa": "iOS har fortsatt problemer med avspilling av owa-musikk i bakgrunnen. Bruk caf eller mp3 istedenfor",
-	"mt_tint": "nivå av bakgrunnsfarge på søkestripa (0-100),$Ngjør oppdateringer mindre distraherende",
-	"mt_eq": "`aktiver tonekontroll og forsterker;$N$Nboost `0` = normal volumskala$N$Nwidth `1 &nbsp;` = normal stereo$Nwidth `0.5` = 50% blanding venstre-høyre$Nwidth `0 &nbsp;` = mono$N$Nboost `-0.8` &amp; width `10` = instrumental :^)$N$Nreduserer også dødtid imellom sangfiler",
-	"mt_drc": "aktiver volum-utjevning (dynamic range compressor); vil også aktivere tonejustering, så sett alle EQ-feltene bortsett fra 'width' til 0 hvis du ikke vil ha noe EQ$N$Nfilteret vil dempe volumet på alt som er høyere enn TRESH dB; for hver RATIO dB over grensen er det 1dB som treffer høyttalerne, så standardverdiene tresh -24 og ratio 12 skal bety at volumet ikke går høyere enn -22 dB, slik at man trygt kan øke boost-verdien i equalizer'n til rundt 0.8, eller 1.8 kombinert med ATK 0 og RLS 90 (bare mulig i firefox; andre nettlesere tar ikke høyere RLS enn 1)$N$Nwikipedia forklarer dette mye bedre forresten",
-	"mt_ss": "`spoler forbi stillhet i sanger; spiller `ffwd` ganger raskere nær start/slutt av sangen når volum er under `vol` og posisjonen er innenfor de første `start`% eller siste `slutt`% av sangen",
-	"mt_ssvt": "volumterskel (0-255)\">volum",
-	"mt_ssts": "aktiv innenfor første % av sangen\">start",
-	"mt_sste": "aktiv innenfor siste % av sangen\">slutt",
-	"mt_sssm": "avspillingshastighetsmultiplikator\">ffwd",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"mb_play": "lytt",
-	"mm_hashplay": "spill denne sangen?",
-	"mm_m3u": "trykk <code>Enter/OK</code> for å spille\ntrykk <code>ESC/Avbryt</code> for å redigere",
-	"mp_breq": "krever firefox 82+, chrome 73+, eller iOS 15+",
-	"mm_bload": "laster inn...",
-	"mm_bconv": "konverterer til {0}, vent litt...",
-	"mm_opusen": "nettleseren din forstår ikke aac / m4a;\nkonvertering til opus er nå aktivert",
-	"mm_playerr": "avspilling feilet: ",
-	"mm_eabrt": "Avspillingsforespørselen ble avbrutt",
-	"mm_enet": "Nettet ditt er ustabilt",
-	"mm_edec": "Noe er galt med musikkfilen",
-	"mm_esupp": "Nettleseren din forstår ikke filtypen",
-	"mm_eunk": "Ukjent feil",
-	"mm_e404": "Avspilling feilet: Fil ikke funnet.",
-	"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
-	"mm_e415": "Avspilling feilet: Kunne ikke konvertere filen, sjekk serverloggen.",
-	"mm_e500": "Avspilling feilet: Rusk i maskineriet, sjekk serverloggen.",
-	"mm_e5xx": "Avspilling feilet: ",
-	"mm_nof": "finner ikke flere sanger i nærheten",
-	"mm_prescan": "Leter etter neste sang...",
-	"mm_scank": "Fant neste sang:",
-	"mm_uncache": "alle sanger vil lastes på nytt ved neste avspilling",
-	"mm_hnf": "sangen finnes ikke lenger",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"im_hnf": "bildet finnes ikke lenger",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"f_empty": 'denne mappen er tom',
-	"f_chide": 'dette vil skjule kolonnen «{0}»\n\nfanen for "andre innstillinger" lar deg vise kolonnen igjen',
-	"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
-	"f_bigtxt2": "vil du se bunnen av filen istedenfor? du vil da også se nye linjer som blir lagt til på slutten av filen i sanntid",
-	"fbd_more": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_more">vis {2}</a> eller <a href="#" id="bd_all">vis alle</a></div>',
-	"fbd_all": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_all">vis alle</a></div>',
-	"f_anota": "kun {0} av totalt {1} elementer ble markert;\nfor å velge alt må du bla til bunnen av mappen først",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"f_dls": 'linkene i denne mappen er nå\nomgjort til nedlastningsknapper',
-	"f_dl_nd": 'hopper over mappe (bruk zip/tar-nedlasting i stedet):\n',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"f_partial": "For å laste ned en fil som enda ikke er ferdig opplastet, klikk på filen som har samme filnavn som denne, men uten <code>.PARTIAL</code> på slutten. Da vil serveren passe på at nedlastning går bra. Derfor anbefales det sterkt å trykke AVBRYT eller Escape-tasten.\n\nHvis du virkelig ønsker å laste ned denne <code>.PARTIAL</code>-filen på en ukontrollert måte, trykk OK / Enter for å ignorere denne advarselen. Slik vil du høyst sannsynlig motta korrupt data.",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"ft_paste": "Lim inn {0} filer$NSnarvei: ctrl-V",
-	"fr_eperm": 'kan ikke endre navn:\ndu har ikke “move”-rettigheten i denne mappen',
-	"fd_eperm": 'kan ikke slette:\ndu har ikke “delete”-rettigheten i denne mappen',
-	"fc_eperm": 'kan ikke klippe ut:\ndu har ikke “move”-rettigheten i denne mappen',
-	"fp_eperm": 'kan ikke lime inn:\ndu har ikke “write”-rettigheten i denne mappen',
-	"fr_emore": "velg minst én fil som skal få nytt navn",
-	"fd_emore": "velg minst én fil som skal slettes",
-	"fc_emore": "velg minst én fil som skal klippes ut",
-	"fcp_emore": "velg minst én fil som skal kopieres til utklippstavlen",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"fs_sc": "del mappen du er i nå",
-	"fs_ss": "del de valgte filene",
-	"fs_just1d": "du kan ikke markere flere mapper samtidig,\neller kombinere mapper og filer",
-	"fs_abrt": "❌ avbryt",
-	"fs_rand": "🎲 tilfeldig navn",
-	"fs_go": "✅ opprett deling",
-	"fs_name": "navn",
-	"fs_src": "kilde",
-	"fs_pwd": "passord",
-	"fs_exp": "varighet",
-	"fs_tmin": "min",
-	"fs_thrs": "timer",
-	"fs_tdays": "dager",
-	"fs_never": "for evig",
-	"fs_pname": "frivillig navn (blir noe tilfeldig ellers)",
-	"fs_tsrc": "fil/mappe som skal deles",
-	"fs_ppwd": "frivillig passord",
-	"fs_w8": "oppretter deling...",
-	"fs_ok": "trykk <code>Enter/OK</code> for å kopiere linken (for CTRL-V)\ntrykk <code>ESC/Avbryt</code> for å bare bekrefte",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"frt_dec": "kan korrigere visse ødelagte filnavn\">url-decode",
-	"frt_rst": "nullstiller endringer (tilbake til de originale filnavnene)\">↺ reset",
-	"frt_abrt": "avbryt og lukk dette vinduet\">❌ avbryt",
-	"frb_apply": "IVERKSETT",
-	"fr_adv": "automasjon basert på metadata<br>og / eller mønster (regulære uttrykk)\">avansert",
-	"fr_case": "versalfølsomme uttrykk\">Aa",
-	"fr_win": "bytt ut bokstavene <code>&lt;&gt;:&quot;\\|?*</code> med$Ntilsvarende som windows ikke får panikk av\">win",
-	"fr_slash": "bytt ut bokstaven <code>/</code> slik at den ikke forårsaker at nye mapper opprettes\">ikke /",
-	"fr_re": "`regex-mønster som kjøres på hvert filnavn. Grupper kan leses ut i format-feltet nedenfor, f.eks. `(1)` og `(2)` osv.",
-	"fr_fmt": "`inspirert av foobar2000:$N`(title)` byttes ut med sangtittel,$N`[(artist) - ](title)` dropper [dette] hvis artist er blank$N`$lpad((tn),2,0)` viser sangnr. med 2 siffer",
-	"fr_pdel": "slett",
-	"fr_pnew": "lagre som",
-	"fr_pname": "gi innstillingene dine et navn",
-	"fr_aborted": "avbrutt",
-	"fr_lold": "gammelt navn",
-	"fr_lnew": "nytt navn",
-	"fr_tags": "metadata for de valgte filene (kun for referanse):",
-	"fr_busy": "endrer navn på {0} filer...\n\n{1}",
-	"fr_efail": "endring av navn feilet:\n",
-	"fr_nchg": "{0} av navnene ble justert pga. <code>win</code> og/eller <code>ikke /</code>\n\nvil du fortsette med de nye navnene som ble valgt?",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"fd_ok": "sletting OK",
-	"fd_err": "sletting feilet:\n",
-	"fd_none": "ingenting ble slettet; kanskje avvist av serverkonfigurasjon (xbd)?",
-	"fd_busy": "sletter {0} filer...\n\n{1}",
-	"fd_warn1": "SLETT disse {0} filene?",
-	"fd_warn2": "<b>Siste sjanse!</b> Dette kan ikke angres. Slett?",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"fc_ok": "klippet ut {0} filer",
-	"fc_warn": 'klippet ut {0} filer\n\nmen: kun <b>denne</b> nettleserfanen har mulighet til å lime dem inn et annet sted, siden antallet filer er helt hinsides',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"fcc_ok": "kopierte {0} filer til utklippstavlen",
-	"fcc_warn": 'kopierte {0} filer til utklippstavlen\n\nmen: kun <b>denne</b> nettleserfanen har mulighet til å lime dem inn et annet sted, siden antallet filer er helt hinsides',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"fp_apply": "bekreft og lim inn nå",
-	"fp_skip": "kun ledige",
-	"fp_ecut": "du må klippe ut eller kopiere noen filer / mapper først\n\nmerk: du kan gjerne jobbe på kryss av nettleserfaner; klippe ut i én fane, lime inn i en annen",
-	"fp_ename": "{0} filer kan ikke flyttes til målmappen fordi det allerede finnes filer med samme navn. Gi dem nye navn nedenfor, eller gi dem et blankt navn (\"kun ledige\") for å hoppe over dem:",
-	"fcp_ename": "{0} filer kan ikke kopieres til målmappen fordi det allerede finnes filer med samme navn. Gi dem nye navn nedenfor, eller gi dem et blankt navn (\"kun ledige\") for å hoppe over dem:",
-	"fp_emore": "det er fortsatt flere navn som må endres",
-	"fp_ok": "flytting OK",
-	"fcp_ok": "kopiering OK",
-	"fp_busy": "flytter {0} filer...\n\n{1}",
-	"fcp_busy": "kopierer {0} filer...\n\n{1}",
-	"fp_abrt": "avbryter...",
-	"fp_err": "flytting feilet:\n",
-	"fcp_err": "kopiering feilet:\n",
-	"fp_confirm": "flytt disse {0} filene hit?",
-	"fcp_confirm": "kopiér disse {0} filene hit?",
-	"fp_etab": 'kunne ikke lese listen med filer ifra den andre nettleserfanen',
-	"fp_name": "Laster opp én fil fra enheten din. Velg filnavn:",
-	"fp_both_m": '<h6>hva skal limes inn her?</h6><code>Enter</code> = Flytt {0} filer fra «{1}»\n<code>ESC</code> = Last opp {2} filer fra enheten din',
-	"fcp_both_m": '<h6>hva skal limes inn her?</h6><code>Enter</code> = Kopiér {0} filer fra «{1}»\n<code>ESC</code> = Last opp {2} filer fra enheten din',
-	"fp_both_b": '<a href="#" id="modal-ok">Flytt</a><a href="#" id="modal-ng">Last opp</a>',
-	"fcp_both_b": '<a href="#" id="modal-ok">Kopiér</a><a href="#" id="modal-ng">Last opp</a>',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"mk_noname": "skriv inn et navn i tekstboksen til venstre først :p",
-	"nmd_i1": "legg også til ønsket filtype, for eksempel <code>.md</code>",
-	"nmd_i2": "du kan bare lage <code>.{0}</code>-filer fordi du ikke har delete-tilgang",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"tv_load": "Laster inn tekstfil:\n\n{0}\n\n{1}% ({2} av {3} MiB lastet ned)",
-	"tv_xe1": "kunne ikke laste tekstfil:\n\nfeil ",
-	"tv_xe2": "404, Fil ikke funnet",
-	"tv_lst": "tekstfiler i mappen",
-	"tvt_close": "gå tilbake til mappen$NSnarvei: M (eller Esc)\">❌ lukk",
-	"tvt_dl": "last ned denne filen$NSnarvei: Y\">💾 last ned",
-	"tvt_prev": "vis forrige dokument$NSnarvei: i\">⬆ forr.",
-	"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ neste",
-	"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
-	"tvt_j": "formattér json$NSnarvei: shift-J\">j",
-	"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
-	"tvt_tail": "overvåk filen for endringer og vis nye linjer i sanntid\">📡 følg",
-	"tvt_wrap": "tekstbryting\">↵",
-	"tvt_atail": "hold de nyeste linjene synlig (lås til bunnen av siden)\">⚓",
-	"tvt_ctail": "forstå og vis terminalfarger (ansi-sekvenser)\">🌈",
-	"tvt_ntail": "maks-grense for antall bokstaver som skal vises i vinduet",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"m3u_add1": "sangen ble lagt til i m3u-spillelisten",
-	"m3u_addn": "{0} sanger ble lagt til i m3u-spillelisten",
-	"m3u_clip": "m3u-spillelisten ble kopiert til utklippstavlen\n\nneste steg er å opprette et tekstdokument med filnavn som slutter på <code>.m3u</code> og lime inn spillelisten der",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
 
-	"gt_vau": "ikke vis videofiler, bare spill lyden\">🎧",
-	"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
-	"gt_crop": "beskjær ikonene så de passer bedre\">✂",
-	"gt_3x": "høyere oppløsning på ikoner\">3x",
-	"gt_zoom": "zoom",
-	"gt_chop": "trim",
-	"gt_sort": "sorter",
-	"gt_name": "navn",
-	"gt_sz": "størr.",
-	"gt_ts": "dato",
-	"gt_ext": "type",
-	"gt_c1": "reduser maks-lengde på filnavn",
-	"gt_c2": "øk maks-lengde på filnavn",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"sm_w8": "søker...",
-	"sm_prev": "søkeresultatene er fra et tidligere søk:\n  ",
-	"sl_close": "lukk søkeresultater",
-	"sl_hits": "viser {0} treff",
-	"sl_moar": "hent flere",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟  🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"s_sz": "størr.",
-	"s_dt": "dato",
-	"s_rd": "sti",
-	"s_fn": "navn",
-	"s_ta": "meta",
-	"s_ua": "up@",
-	"s_ad": "avns.",
-	"s_s1": "større enn ↓ MiB",
-	"s_s2": "mindre enn ↓ MiB",
-	"s_d1": "nyere enn &lt;dato&gt;",
-	"s_d2": "eldre enn",
-	"s_u1": "lastet opp etter",
-	"s_u2": "og/eller før",
-	"s_r1": "mappenavn inneholder",
-	"s_f1": "filnavn inneholder",
-	"s_t1": "sang-info inneholder",
-	"s_a1": "konkrete egenskaper",
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"md_eshow": "viser forenklet ",
-	"md_off": "[📜<em>readme</em>] er avskrudd i [⚙️] -- dokument skjult",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"badreply": "Ugyldig svar ifra serveren",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"xhr403": "403: Tilgang nektet\n\nkanskje du ble logget ut? prøv å trykk F5",
-	"xhr0": "ukjent (enten nettverksproblemer eller serverkrasj)",
-	"cf_ok": "beklager -- liten tilfeldig kontroll, alt OK\n\nting skal fortsette om ca. 30 sekunder\n\nhvis ikkeno skjer, trykk F5 for å laste siden på nytt",
-	"tl_xe1": "kunne ikke hente undermapper:\n\nfeil ",
-	"tl_xe2": "404: Mappen finnes ikke",
-	"fl_xe1": "kunne ikke hente filer i mappen:\n\nfeil ",
-	"fl_xe2": "404: Mappen finnes ikke",
-	"fd_xe1": "kan ikke opprette ny mappe:\n\nfeil ",
-	"fd_xe2": "404: Den overordnede mappen finnes ikke",
-	"fsm_xe1": "kunne ikke sende melding:\n\nfeil ",
-	"fsm_xe2": "404: Den overordnede mappen finnes ikke",
-	"fu_xe1": "kunne ikke hente listen med nylig opplastede filer ifra serveren:\n\nfeil ",
-	"fu_xe2": "404: Filen finnes ikke??",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"fz_tar": "ukomprimert gnu-tar arkiv, for linux og mac",
-	"fz_pax": "ukomprimert pax-tar arkiv, litt tregere",
-	"fz_targz": "gnu-tar pakket med gzip (nivå 3)$N$NNB: denne er veldig treg;$Nukomprimert tar er bedre",
-	"fz_tarxz": "gnu-tar pakket med xz (nivå 1)$N$NNB: denne er veldig treg;$Nukomprimert tar er bedre",
-	"fz_zip8": "zip med filnavn i utf8 (noe problematisk på windows 7 og eldre)",
-	"fz_zipd": "zip med filnavn i cp437, for høggamle maskiner",
-	"fz_zipc": "cp437 med tidlig crc32,$Nfor MS-DOS PKZIP v2.04g (oktober 1993)$N(øker behandlingstid på server)",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"un_m1": "nedenfor kan du angre / slette filer som du nylig har lastet opp, eller avbryte ufullstendige opplastninger",
-	"un_upd": "oppdater",
-	"un_m4": "eller hvis du vil dele nedlastnings-lenkene:",
-	"un_ulist": "vis",
-	"un_ucopy": "kopiér",
-	"un_flt": "valgfritt filter:&nbsp; filnavn / filsti må inneholde",
-	"un_fclr": "nullstill filter",
-	"un_derr": 'unpost-sletting feilet:\n',
-	"un_f5": 'noe gikk galt, prøv å oppdatere listen eller trykk F5',
-	"un_uf5": "beklager, men du må laste siden på nytt (f.eks. ved å trykke F5 eller CTRL-R) før denne opplastningen kan avbrytes",
-	"un_nou": '<b>advarsel:</b> kan ikke vise ufullstendige opplastninger akkurat nå; klikk på oppdater-linken om litt',
-	"un_noc": '<b>advarsel:</b> angring av fullførte opplastninger er deaktivert i serverkonfigurasjonen',
-	"un_max": "viser de første 2000 filene (bruk filteret for å innsnevre)",
-	"un_avail": "{0} nylig opplastede filer kan slettes<br />{1} ufullstendige opplastninger kan avbrytes",
-	"un_m2": "sortert etter opplastningstid; nyeste først:",
-	"un_no1": "men nei, her var det jaggu ikkeno som slettes kan",
-	"un_no2": "men nei, her var det jaggu ingenting som passet overens med filteret",
-	"un_next": "slett de neste {0} filene nedenfor",
-	"un_abrt": "avbryt",
-	"un_del": "slett",
-	"un_m3": "henter listen med nylig opplastede filer...",
-	"un_busy": "sletter {0} filer...",
-	"un_clip": "{0} lenker kopiert til utklippstavlen",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"u_https1": "du burde",
-	"u_https2": "bytte til https",
-	"u_https3": "for høyere hastighet",
-	"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" id="u2nah">bruke bup istedenfor</a>',
-	"u_nowork": "krever firefox 53+, chrome 57+, eller iOS 11+",
-	"tail_2old": "krever firefox 105+, chrome 71+, eller iOS 14.5+",
-	"u_nodrop": 'nettleseren din er for gammel til å laste opp filer ved å dra dem inn i vinduet',
-	"u_notdir": "mottok ikke mappen!\n\nnettleseren din er for gammel,\nprøv å dra mappen inn i vinduet istedenfor",
-	"u_uri": "for å laste opp bilder ifra andre nettleservinduer,\nslipp bildet rett på den store last-opp-knappen",
-	"u_enpot": 'bytt til <a href="#">enkelt UI</a> (gir sannsynlig raskere opplastning)',
-	"u_depot": 'bytt til <a href="#">snæsent UI</a> (gir sannsynlig tregere opplastning)',
-	"u_gotpot": 'byttet til et enklere UI for å laste opp raskere,\n\ndu kan gjerne bytte tilbake altså!',
-	"u_pott": "<p>filer: &nbsp; <b>{0}</b> ferdig, &nbsp; <b>{1}</b> feilet, &nbsp; <b>{2}</b> behandles, &nbsp; <b>{3}</b> i kø</p>",
-	"u_ever": "dette er den primitive opplasteren; up2k krever minst:<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1",
-	"u_su2k": 'dette er den primitive opplasteren; <a href="#" id="u2yea">up2k</a> er bedre',
-	"u_uput": 'litt raskere (uten sha512)',
-	"u_ewrite": 'du har ikke skrivetilgang i denne mappen',
-	"u_eread": 'du har ikke lesetilgang i denne mappen',
-	"u_enoi": 'filsøk er deaktivert i serverkonfigurasjonen',
-	"u_enoow": "kan ikke overskrive filer her (Delete-rettigheten er nødvendig)",
-	"u_badf": 'Disse {0} filene (av totalt {1}) kan ikke leses, kanskje pga rettighetsproblemer i filsystemet på datamaskinen din:\n\n',
-	"u_blankf": 'Disse {0} filene (av totalt {1}) er blanke / uten innhold; ønsker du å laste dem opp uansett?\n\n',
-	"u_applef": 'Disse {0} filene (av totalt {1}) er antagelig uønskede;\nTrykk <code>OK/Enter</code> for å HOPPE OVER disse filene,\nTrykk <code>Avbryt/ESC</code> for å LASTE OPP disse filene også:\n\n',
-	"u_just1": '\nFunker kanskje bedre hvis du bare tar én fil om gangen',
-	"u_ff_many": 'Hvis du bruker <b>Linux / MacOS / Android,</b> så kan dette antallet filer<br /><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank"><em>kanskje</em> krasje Firefox!</a> Hvis det skjer, så prøv igjen (eller bruk Chrome).',
-	"u_up_life": "Filene slettes fra serveren {0}\netter at opplastningen er fullført",
-	"u_asku": 'Laste opp disse {0} filene til <code>{1}</code>',
-	"u_unpt": "Du kan angre / slette opplastningen med 🧯 oppe til venstre",
-	"u_bigtab": 'Vil nå vise {0} filer...\n\nDette kan krasje nettleseren din. Fortsette?',
-	"u_scan": 'Leser mappene...',
-	"u_dirstuck": 'Nettleseren din fikk ikke tilgang til å lese følgende {0} filer/mapper, så de blir hoppet over:',
-	"u_etadone": 'Ferdig ({0}, {1} filer)',
-	"u_etaprep": '(forbereder opplastning)',
-	"u_hashdone": 'befaring ferdig',
-	"u_hashing": 'les',
-	"u_hs": 'serveren tenker...',
-	"u_started": "filene blir nå lastet opp 🚀",
-	"u_dupdefer": "duplikat; vil bli håndtert til slutt",
-	"u_actx": "klikk her for å forhindre tap av<br />ytelse ved bytte til andre vinduer/faner",
-	"u_fixed": "OK!&nbsp; Løste seg 👍",
-	"u_cuerr": "kunne ikke laste opp del {0} av {1};\nsikkert greit, fortsetter\n\nfil: {2}",
-	"u_cuerr2": "server nektet opplastningen (del {0} av {1});\nprøver igjen senere\n\nfil: {2}\n\nerror ",
-	"u_ehstmp": "prøver igjen; se mld nederst",
-	"u_ehsfin": "server nektet forespørselen om å ferdigstille filen; prøver igjen...",
-	"u_ehssrch": "server nektet forespørselen om å utføre søk; prøver igjen...",
-	"u_ehsinit": "server nektet forespørselen om å begynne en ny opplastning; prøver igjen...",
-	"u_eneths": "et problem med nettverket gjorde at avtale om opplastning ikke kunne inngås; prøver igjen...",
-	"u_enethd": "et problem med nettverket gjorde at filsjekk ikke kunne utføres; prøver igjen...",
-	"u_cbusy": "venter på klarering ifra server etter et lite nettverksglipp...",
-	"u_ehsdf": "serveren er full!\n\nprøver igjen regelmessig,\ni tilfelle noen rydder litt...",
-	"u_emtleak1": "uff, det er mulig at nettleseren din har en minnelekkasje...\nForeslår",
-	"u_emtleak2": ' helst at du <a href="{0}">bytter til https</a>, eller ',
-	"u_emtleak3": ' at du ',
-	"u_emtleakc": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru av &nbsp;<code>mt</code>&nbsp; bryteren under &nbsp;<code>⚙️ innstillinger</code></li><li>og forsøk den samme opplastningen igjen</li></ul>Opplastning vil gå litt tregere, men det får så være.\nBeklager bryderiet !\n\nPS: feilen <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">skal være fikset</a> i chrome v107',
-	"u_emtleakf": 'prøver følgende:\n<ul><li>trykk F5 for å laste siden på nytt</li><li>så skru på <code>🥔</code> ("enkelt UI") i opplasteren</li><li>og forsøk den samme opplastningen igjen</li></ul>\nPS: Firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">fikser forhåpentligvis feilen</a> en eller annen gang',
-	"u_s404": "ikke funnet på serveren",
-	"u_expl": "forklar",
-	"u_maxconn": "de fleste nettlesere tillater ikke mer enn 6, men firefox lar deg øke grensen med <code>connections-per-server</code> i <code>about:config</code>",
-	"u_tu": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;avbrutte opplastninger vil muligens ikke oppdages og gjenopptas; hold musepekeren over turbo-knappen for mer info</span></p>',
-	"u_ts": '<p class="warn">ADVARSEL: turbo er på, <span>&nbsp;søkeresultater kan være feil; hold musepekeren over turbo-knappen for mer info</span></p>',
-	"u_turbo_c": "turbo er deaktivert i serverkonfigurasjonen",
-	"u_turbo_g": 'turbo ble deaktivert fordi du ikke har\ntilgang til å se mappeinnhold i dette volumet',
-	"u_life_cfg": 'slett opplastning etter <input id="lifem" p="60" /> min (eller <input id="lifeh" p="3600" /> timer)',
-	"u_life_est": 'opplastningen slettes <span id="lifew" tt="lokal tid">---</span>',
-	"u_life_max": 'denne mappen tillater ikke å \noppbevare filer i mer enn {0}',
-	"u_unp_ok": 'opplastning kan angres i {0}',
-	"u_unp_ng": 'opplastning kan IKKE angres',
-	"ue_ro": 'du har ikke skrivetilgang i denne mappen\n\n',
-	"ue_nl": 'du er ikke logget inn',
-	"ue_la": 'du er logget inn som "{0}"',
-	"ue_sr": 'du er i filsøk-modus\n\nbytt til opplastning ved å klikke på forstørrelsesglasset 🔎 (ved siden av den store FILSØK-knappen) og prøv igjen\n\nsorry',
-	"ue_ta": 'prøv å laste opp igjen, det burde funke nå',
-	"ue_ab": "den samme filen er allerede under opplastning til en annen mappe, og den må fullføres der før filen kan lastes opp andre steder.\n\nDu kan avbryte og glemme den påbegynte opplastningen ved hjelp av 🧯 oppe til venstre",
-	"ur_1uo": "OK: Filen ble lastet opp",
-	"ur_auo": "OK: Alle {0} filene ble lastet opp",
-	"ur_1so": "OK: Filen ble funnet på serveren",
-	"ur_aso": "OK: Alle {0} filene ble funnet på serveren",
-	"ur_1un": "Opplastning feilet!",
-	"ur_aun": "Alle {0} opplastningene gikk feil!",
-	"ur_1sn": "Filen finnes IKKE på serveren",
-	"ur_asn": "Fant INGEN av de {0} filene på serveren",
-	"ur_um": "Ferdig;\n{0} opplastninger gikk bra,\n{1} opplastninger gikk feil",
-	"ur_sm": "Ferdig;\n{0} filer ble funnet,\n{1} filer finnes IKKE på serveren",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"rc_opn": "åpne",
-	"rc_ply": "spill av",
-	"rc_pla": "spill av som lyd",
-	"rc_txt": "åpne i filviser",
-	"rc_md": "åpne i teksteditor",
-	"rc_dl": "Last ned",
-	"rc_zip": "Last ned som arkiv",
-	"rc_cpl": "kopier lenke",
-	"rc_del": "slett",
-	"rc_cut": "klipp ut",
-	"rc_cpy": "kopier",
-	"rc_pst": "Lim inn",
-	"rc_rnm": "gi nytt navn",
-	"rc_nfo": "ny mappe",
-	"rc_nfi": "ny fil",
-	"rc_sal": "velg alle",
-	"rc_sin": "inverter utvalg",
-	"rc_shf": "del denne mappen",
-	"rc_shs": "del markering",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"lang_set": "passer det å laste siden på nytt?",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"splash": {
-		"a1": "oppdater",
-		"b1": "halloien &nbsp; <small>(du er ikke logget inn)</small>",
-		"c1": "logg ut",
-		"d1": "tilstand",
-		"d2": "vis tilstanden til alle tråder",
-		"e1": "last innst.",
-		"e2": "leser inn konfigurasjonsfiler på nytt$N(kontoer, volumer, volumbrytere)$Nog kartlegger alle e2ds-volumer$N$Nmerk: endringer i globale parametere$Nkrever en full restart for å ta gjenge",
-		"f1": "du kan betrakte:",
-		"g1": "du kan laste opp til:",
-		"cc1": "brytere og sånt:",
-		"h1": "skru av k304",
-		"i1": "skru på k304",
-		"j1": "k304 bryter tilkoplingen for hver HTTP 304. Dette hjelper mot visse mellomtjenere som kan sette seg fast / plutselig slutter å laste sider, men det reduserer også ytelsen betydelig",
-		"k1": "nullstill innstillinger",
-		"l1": "logg inn:",
-		"ls3": "logg inn",
-		"lu4": "brukernavn",
-		"lp4": "passord",
-		"lo3": "logg ut “{0}” overalt",
-		"lo2": "avslutter økten på alle nettlesere",
-		"m1": "velkommen tilbake,",
-		"n1": "404: filen finnes ikke &nbsp;┐( ´ -`)┌",
-		"o1": 'eller kanskje du ikke har tilgang? prøv et passord eller <a href="' + SR + '/?h">gå hjem</a>',
-		"p1": "403: tilgang nektet &nbsp;~┻━┻",
-		"q1": 'prøv et passord eller <a href="' + SR + '/?h">gå hjem</a>',
-		"r1": "gå hjem",
-		".s1": "kartlegg",
-		"t1": "handling",
-		"u2": "tid siden noen sist skrev til serveren$N( opplastning / navneendring / ... )$N$N17d = 17 dager$N1h23 = 1 time 23 minutter$N4m56 = 4 minuter 56 sekunder",
-		"v1": "koble til",
-		"v2": "bruk denne serveren som en lokal harddisk",
-		"w1": "bytt til https",
-		"x1": "bytt passord",
-		"y1": "dine delinger",
-		"z1": "lås opp område:",
-		"ta1": "du må skrive et nytt passord først",
-		"ta2": "gjenta for å bekrefte nytt passord:",
-		"ta3": "fant en skrivefeil; vennligst prøv igjen",
-		"nop": "FEIL: Passord kan ikke være blankt",
-		"nou": "FEIL: Både brukernavn og passord må angis",
-		"aa1": "innkommende:",
-		"ab1": "skru av no304",
-		"ac1": "skru på no304",
-		"ad1": "no304 stopper all bruk av cache. Hvis ikke k304 var nok, prøv denne. Vil mangedoble dataforbruk!",
-		"ae1": "utgående:",
-		"af1": "vis nylig opplastede filer",
-		"ag1": "vis kjente IdP-brukere",
-	}
-};
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟
+🫟🫟

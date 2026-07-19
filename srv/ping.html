@@ -1,199 +1,199 @@
-<!DOCTYPE html><html><head>
-	<meta charset="utf-8">
-	<title>partyping</title>
-<!--
-// ping.html - when icmp is not an option
-// 2014, ed <irc.rizon.net>, MIT-licensed
-// https://github.com/9001/copyparty/blob/hovudstraum/contrib/ping.html
--->
-	<style>
-html {
-	color: #000;
-	background: #eee;
-	font-family: sans-serif;
-	overflow-x: hidden;
-	overflow-y: scroll;
-}
-#wrap {
-	margin: 0 auto;
-	max-width: 30em;
-	text-align: center;
-}
-table {
-	font-family: monospace, monospace;
-	margin: 1em auto;
-	font-size: 1.5em;
-}
-td {
-	padding: .2em .4em;
-}
-.conf td {
-	text-align: left;
-}
-.conf td:first-child {
-	text-align: right;
-}
-.stats td {
-	padding: .2em .7em;
-	border: 1px solid #bbb;
-	border-width: 0 1px 1px 0;
-}
-#start {
-	width: 100%;
-}
-#log {
-	margin: 2em;
-	font-size: .9em;
-	text-align: left;
-}
-input {
-	font: inherit;
-}
-</style></head><body><div id="wrap">
-	<table class="conf">
-		<tr>
-			<td>interval (msec):</td>
-			<td><input id="delay" type="text" value="1000" size="7" /></td>
-		</tr>
-		<tr>
-			<td>num pings:</td>
-			<td><input id="more" type="text" value="100" size="7" /></td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td><input id="start" type="button" value="start" onclick="okgo();return false" /></td>
-	</table>
-	<table class="stats">
-		<tr>
-			<td>min</td>
-			<td>avg</td>
-			<td>med</td>
-			<td>max</td>
-			<td>mdev</td>
-		</tr>
-		<tr>
-			<td id="min">x</td>
-			<td id="avg">x</td>
-			<td id="med">x</td>
-			<td id="max">x</td>
-			<td id="mdv">x</td>
-		</tr>
-	</table>
-	<div id="log">
-		Log goes here
-	</div>
-</div>
-<script>
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟 🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟
+🫟
+🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
 
-// ping.html - when icmp is not an option
-// 2014, ed <irc.rizon.net>, MIT-licensed
-// https://github.com/9001/copyparty/blob/hovudstraum/contrib/ping.html
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-function ebi(k) {
-	return document.getElementById(k);
-}
-var log = [],
-	srt = [],
-	delay,
-	t0 = -1,
-	nbad = 0,
-	min = 9999999,
-	max = 0,
-	sum = 0,
-	sum2 = 0,
-	omin = ebi('min'),
-	omax = ebi('max'),
-	oavg = ebi('avg'),
-	omed = ebi('med'),
-	omdv = ebi('mdv'),
-	olog = ebi('log');
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟
+🫟🫟🫟🫟 🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟 🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-function insert(t, v) {
-	var lo = 0, hi = t.length;
-	while (lo < hi) {
-		var mid = Math.floor((lo+hi)/2);
-		if (t[mid] < v)
-			lo = mid + 1;
-		else
-			hi = mid;
-	}
-	t.splice(lo, 0, v);
-}
-function f2f(val, nd) {
-    val = (parseFloat(val) * Math.pow(10, nd)).toFixed(0).split('.')[0];
-    return nd ? (val.slice(0, -nd) || '0') + '.' + val.slice(-nd) : val;
-}
-function okgo() {
-	if (t0 < 0)
-		ping();
-}
-function ping() {
-	var xh,
-		more = parseInt(ebi('more').value) - 1,
-		stats = [omin.innerHTML, omed.innerHTML, omax.innerHTML, omdv.innerHTML];
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟
+    🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	if (more < 0)
-		return;
+🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	if (more > 499)
-		more = 499;
+🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
 
-	delay = parseInt(ebi('delay').value);
-	if (delay < 100)
-		delay = 100;
+🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
 
-	if (window.XMLHttpRequest)
-		xh = new XMLHttpRequest();
-	else
-		xh = new ActiveXObject("Microsoft.XMLHTTP");
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	xh.onreadystatechange = function() {
-		if (xh.readyState != 4)
-			return;
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-		var t = new Date().getTime() - t0,
-			ok = xh.status == 200,
-			rsp = xh.responseText;
+🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-		if (ok)
-			ok = rsp.indexOf('o7') === 0;
+🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟
 
-		if (!ok)
-			nbad++;
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-		sum += t;
-		sum2 += t * t;
-		log.push(t);
-		insert(srt, t);
+🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-		if (min > t)
-			min = t;
+🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
 
-		if (max < t)
-			max = t;
+🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
 
-		var avg = sum / log.length,
-			smean = sum2 / log.length,
-			med = srt[Math.floor(srt.length/2)],
-			mdev = Math.sqrt(smean-(avg*avg));
+🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-		omin.innerHTML = min;
-		omax.innerHTML = max;
-		oavg.innerHTML = Math.round(avg);
-		omed.innerHTML = med;
-		omdv.innerHTML = f2f(mdev, 2);
-		olog.innerHTML = log.join(', ') + '<br /><br />' + srt.join(', ') + (
-			nbad ? "<br /><br />invalid/corrupted ping responses: " + nbad : '');
-		setTimeout(ping, delay);
-	};
-	t0 = new Date().getTime();
-	stats.push(t0);
-	xh.open("GET", "/?setck=a=x&ping="+stats.join(","), true);
-	xh.send();
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟
+🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	ebi('more').value = more;
-	olog.innerHTML += '<br /><br />ping...';
-}
-</script>
-</body></html>
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 

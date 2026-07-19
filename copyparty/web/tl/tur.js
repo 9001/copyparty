@@ -1,722 +1,722 @@
 
-// "//m" ile biten satırlar doğrulanmamış makine çevirileridir
+🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-Ls.tur = {
-	"tt": "Türkçe",
+🫟🫟🫟🫟🫟🫟 🫟 🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cols": {
-		"c": "işlem butonları",
-		"dur": "süre",
-		"q": "kalite / bitrate",
-		"Ac": "ses kodlaması",
-		"Vc": "video kodlaması",
-		"Fmt": "format / yapı",
-		"Ahash": "ses denetim toplamı",
-		"Vhash": "video denetim toplamı",
-		"Res": "çözünürlük",
-		"T": "dosya türü",
-		"aq": "ses kalitesi / bitrate",
-		"vq": "video kalitesi / bitrate",
-		"pixfmt": "subsampling / pixel yapısı",
-		"resw": "yatay çözünürlük",
-		"resh": "dikey çözünürlük",
-		"chs": "ses kanalları",
-		"hz": "örnekleme hızı",
-	},
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟
 
-	"hks": [
-		[
-			"diğer",
-			["ESC", "kapat"],
+🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-			"dosya yönetimi",
-			["G", "liste / ızgara görünümü arasında geçiş yap"],
-			["T", "küçük resimler / simgeler arasında geçiş yap"],
-			["⇧ A/D", "küçük resim boyutu"],
-			["ctrl-K", "seçileni sil"],
-			["ctrl-X", "seçimi panoya kes"],
-			["ctrl-C", "seçimi panoya kopyala"],
-			["ctrl-V", "buraya yapıştır (taşı/kopyala)"],
-			["Y", "seçileni indir"],
-			["F2", "seçileni yeniden adlandır"],
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-			"dosya yönetimi seçimleri",
-			["boşluk", "seçimi değiştir"],
-			["↑/↓", "seçim imlecini hareket ettir"],
-			["ctrl ↑/↓", "imleci ve görünümü hareket ettir"],
-			["⇧ ↑/↓", "önceki/sonraki dosyayı seç"],
-			["ctrl-A", "tüm dosyaları / klasörleri seç"],
-		], [
-			"navigasyon",
-			["B", "içerik haritası / navigasyon paneli arasında geçiş yap"],
-			["I/K", "önceki/sonraki klasör"],
-			["M", "üst klasör (veya mevcut olanı daralt)"],
-			["V", "navigasyon panelinde klasörler / metin dosyaları arasında geçiş yap"],
-			["A/D", "navigasyon paneli boyutu"],
-		], [
-			"ses oynatıcı",
-			["J/L", "önceki/sonraki şarkı"],
-			["U/O", "10sn geri/ileri atla"],
-			["0..9", "%0..%90 atla"],
-			["P", "oynat/duraklat (aynı zamanda oynatıcıyı aç)"],
-			["S", "şarkıyı seç"],
-			["Y", "şarkıyı indir"],
-		], [
-			"resim görüntüleyici",
-			["J/L, ←/→", "önceki/sonraki resim"],
-			["Home/End", "ilk/son resim"],
-			["F", "tam ekran"],
-			["R", "sağa döndür"],
-			["⇧ R", "sola döndür"],
-			["S", "resmi seç"],
-			["Y", "resmi indir"],
-		], [
-			"video oynatıcı",
-			["U/O", "10sn geri/ileri atla"],
-			["P/K/Space", "oynat/duraklat"],
-			["C", "sıradakinden devam et"],
-			["V", "döngü"],
-			["M", "sessiz"],
-			["[ ve ]", "döngü aralığını ayarla"],
-		], [
-			"metin dosyası görüntüleyici",
-			["I/K", "önceki/sonraki dosya"],
-			["M", "metin dosyasını kapat"],
-			["E", "metin dosyasını düzenle"],
-			["S", "dosyayı seç (kes/kopyala/yeniden adlandır)"],
-			["Y", "metin dosyasını indir"], //m
-			["⇧ J", "json güzelleştir"], //m
-		]
-	],
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟
+🫟🫟🫟
 
-	"m_ok": "Tamam",
-	"m_ng": "İptal",
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"enable": "Etkinleştir",
-	"danger": "TEHLİKE",
-	"clipped": "panoya kopyalandı",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ht_s1": "saniye",
-	"ht_s2": "saniye",
-	"ht_m1": "dakika",
-	"ht_m2": "dakika",
-	"ht_h1": "saat",
-	"ht_h2": "saat",
-	"ht_d1": "gün",
-	"ht_d2": "gün",
-	"ht_and": " ve ",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟
 
-	"goh": "kontrol paneli",
-	"gop": 'önceki kardeş">önceki',
-	"gou": 'üst klasör">üst',
-	"gon": 'sonraki klasör">sonraki',
-	"logout": "Çıkış ",
-	"login": "Giriş",
-	"access": " erişim",
-	"ot_close": "alt menüyü kapat",
-	"ot_search": "`dosyaları özniteliklere, yol / ad, müzik etiketlerine veya bunların herhangi bir kombinasyonuna göre arayın$N$N`foo bar` = hem «foo» hem de «bar» içermelidir,$N`foo -bar` = «foo» içermeli ancak «bar» içermemelidir,$N`^yana .opus$` = «yana» ile başlamalı ve bir «opus» dosyası olmalıdır$N`&quot;try unite&quot;` = tam olarak «try unite» içermelidir$N$N tarih formatı iso-8601'dir, gibi$N`2009-12-31` veya `2020-09-12 23:30:00`",
-	"ot_unpost": "unpost: son yüklemelerinizi silin veya tamamlanmamış olanları iptal edin",
-	"ot_bup": "bup: temel yükleyici, hatta netscape 4.0'ı destekler",
-	"ot_mkdir": "mkdir: yeni bir dizin oluştur",
-	"ot_md": "new-file: yeni bir metin dosyası oluştur", //m
-	"ot_msg": "msg: sunucu günlüğüne bir mesaj gönder",
-	"ot_mp": "medya oynatıcı seçenekleri",
-	"ot_cfg": "konfigürasyon seçenekleri",
-	"ot_u2i": 'up2k: dosyaları yükle (yazma erişiminiz varsa) veya sunucuda bir yerde var olup olmadıklarını görmek için arama moduna geçiş yap$N$Nyüklemeler devam ettirilebilir, çok iş parçacıklı ve dosya zaman damgaları korunur, ancak [🎈]&nbsp; (temel yükleyici) ile karşılaştırıldığında daha fazla CPU kullanır<br /><br />yükleme sırasında, bu simge bir ilerleme göstergesi haline gelir!',
-	"ot_u2w": 'up2k: devam desteği ile dosyaları yükle (tarayıcınızı kapatın ve daha sonra aynı dosyaları bırakın)$N$Nçok iş parçacıklı ve dosya zaman damgaları korunur, ancak [🎈]&nbsp; (temel yükleyici) ile karşılaştırıldığında daha fazla CPU kullanır<br /><br />yükleme sırasında, bu simge bir ilerleme göstergesi haline gelir!',
-	"ot_noie": 'Lütfen Chrome / Firefox / Edge kullanın',
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ab_mkdir": "dizin oluştur",
-	"ab_mkdoc": "yeni metin dosyası", //m
-	"ab_msg": "sunucu günlüğüne mesaj gönder",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ay_path": "klasörlere atla",
-	"ay_files": "dosyalara atla",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
 
-	"wt_ren": "seçilenleri yeniden adlandır$NKısa yol: F2",
-	"wt_del": "Seçilen ögeleri sil$Kısa yol: ctrl-K",
-	"wt_cut": "seçilen ögeleri kes &lt;small&gt;&lt;/small&gt;$NKısa yol: ctrl-X",
-	"wt_cpy": "seçilen ögeleri panoya kopyala$N$NKısa yol: ctrl-C",
-	"wt_pst": "daha önce kesilmiş / kopyalanmış bir seçimi yapıştır$NKısa yol: ctrl-V",
-	"wt_selall": "tüm dosyaları seç$NKısa yol: ctrl-A (dosya odaklandığında)",
-	"wt_selinv": "seçimi tersine çevir",
-	"wt_zip1": "seçilenleri sıkıştırılmış bir arşiv olarak indir",
-	"wt_selzip": "seçimi arşiv olarak indir",
-	"wt_seldl": "seçimi ayrı dosyalar olarak indir$NHotkey: Y",
-	"wt_npirc": "irc biçiminde parça bilgilerini kopyala",
-	"wt_nptxt": "düz metin parça bilgilerini kopyala",
-	"wt_m3ua": "m3u çalma listesine ekle (daha sonra <code>📻kopyala</code>ya tıklayın)",
-	"wt_m3uc": "m3u çalma listesini panoya kopyala",
-	"wt_grid": "ızgara / liste görünümünü değiştir$NHotkey: G",
-	"wt_prev": "önceki parça$NHotkey: J",
-	"wt_play": "oynat / duraklat$NHotkey: P",
-	"wt_next": "sonraki parça$NHotkey: L",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"ul_par": "paralel yüklemeler:",
-	"ut_rand": "dosya adlarını rastgeleleştir",
-	"ut_u2ts": "kendi dosyalarınızdan sunucuya$Nzaman damgasını kopyala\">📅",
-	"ut_ow": "sunucudaki mevcut dosyaları üzerine yazmak mı?$N🛡️: asla (yerine yeni bir dosya adı oluşturur)$N🕒: sunucu dosyası sizinkinden daha eskiyse üzerine yaz$N♻️: dosyalar farklıysa her zaman üzerine yaz$N⏭️: mevcut tüm dosyaları koşulsuz atla", //m
-	"ut_mt": "yükleme yaparken diğer dosyaların hash'lenmesini durdur$N$kötü bir CPU veya HDD'ye sahipseniz kullanabilirsiniz.",
-	"ut_ask": 'yüklemeye başlamadan önce doğrulama mesajı göster">💭',
-	"ut_pot": "arayüzü daha az karmaşık hale getirerek$Nyükleme hızını yavaş cihazlarda artır",
-	"ut_srch": "gerçekten yükleme yapma, bunun yerine dosyaların $N sunucuda var olup olmadığını kontrol et (okuma izniniz olan tüm klasörleri tarar)",
-	"ut_par": "0'a ayarlayarak yüklemeleri durdur$N$Nbağlantınız yavaşsa değeri artırın$N$NLAN'daysanız veya sunucu HDD'si darboğaz yapıyorsa 1'de tutun",
-	"ul_btn": "dosyaları / klasörleri <br>buraya sürükleyin (veya bana tıklayın)",
-	"ul_btnu": "Y Ü K L E",
-	"ul_btns": "A R A",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟 🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟
 
-	"ul_hash": "hash",
-	"ul_send": "gönder",
-	"ul_done": "tamamlandı",
-	"ul_idle1": "henüz bekleyen yükleme yok",
-	"ut_etah": "ortalama &lt;em&gt;hash&lt;/em&gt; hızı ve bitişe kadar tahmini süre",
-	"ut_etau": "ortalama &lt;em&gt;yükleme&lt;/em&gt; hızı ve bitişe kadar tahmini süre",
-	"ut_etat": "ortalama &lt;em&gt;toplam&lt;/em&gt; hızı ve bitişe kadar tahmini süre",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
 
-	"uct_ok": "başarıyla tamamlandı",
-	"uct_ng": "başarısız: başarısız / reddedildi / bulunamadı",
-	"uct_done": "hem başarılı hem de başarısız",
-	"uct_bz": "hash'liyor veya yüklüyor",
-	"uct_q": "beklemede, gönderiliyor",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"utl_name": "dosya adı",
-	"utl_ulist": "liste",
-	"utl_ucopy": "kopyala",
-	"utl_links": "bağlantılar",
-	"utl_stat": "durum",
-	"utl_prog": "ilerleme",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	// kısa tutun:
-	"utl_404": "404",
-	"utl_err": "HATA",
-	"utl_oserr": "OS-hatası",
-	"utl_found": "bulundu",
-	"utl_defer": "ertele",
-	"utl_yolo": "YOLO",
-	"utl_done": "tamamlandı",
+🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ul_flagblk": "dosyalar sıraya alındı</b><br>ancak başka bir tarayıcı sekmesinde meşgul bir up2k var,<br>bu nedenle önce onun bitmesini bekliyor",
-	"ul_btnlk": "sunucu yapılandırması bu anahtarı bu duruma kilitledi",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"udt_up": "Yükle",
-	"udt_srch": "Ara",
-	"udt_drop": "buraya bırakın",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"u_nav_m": '<h6>Pekâlâ, bakalım neyin  varmnış?</h6><code>Enter</code> = Dosyalar (bir veya birden fazla)\n<code>ESC</code> = Bir klasör (alt klasörler dahil)',
-	"u_nav_b": '<a href="#" id="modal-ok">Dosyalar</a><a href="#" id="modal-ng">Tek klasör</a>',
-	
-	"cl_opts": "aç / kapat",
-	"cl_hfsz": "dosya boyutu", //m
-	"cl_themes": "tema",
-	"cl_langs": "dil",
-	"cl_ziptype": "klasör indirme",
-	"cl_uopts": "up2k aç / kapat",
-	"cl_favico": "favicon",
-	"cl_bigdir": "big dirs",
-	"cl_hsort": "#sort",
-	"cl_keytype": "anahtar notasyonu",
-	"cl_hiddenc": "gizli sütunlar",
-	"cl_hidec": "gizle",
-	"cl_reset": "sıfırla",
-	"cl_hpick": "aşağıdaki tabloda gizlemek için sütun başlıklarına dokunun",
-	"cl_hcancel": "sütun gizleme iptal edildi",
-	"cl_rcm": "sağ tık menüsü", //m
-	"cl_gauto": "otomatik田", //m
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"ct_grid": '田 ızgara',
-	"ct_ttips": '◔ ◡ ◔">ℹ️ ipuçları',
-	"ct_thumb": 'ızgara görünümünde, simgeler ve küçük resimler arasında geçiş yapın$NKısayol: T">🖼️ küçük resimler',
-	"ct_csel": 'ızgara görünümünde dosya seçimi için CTRL ve SHIFT tuşlarını kullanın">seç',
-	"ct_dsel": 'ızgara görünümünde sürükleyerek seçimi kullanın">sürükle', //m
-	"ct_dl": 'dosyaya tıklandığında indirmeyi zorla (satır içinde görüntüleme)">dl', //m
-	"ct_ihop": 'resim görüntüleyici kapatıldığında, en son görüntülenen dosyaya kaydırın">g⮯',
-	"ct_dots": 'gizli dosyaları göster (sunucu izin veriyorsa)">nokta dosyaları',
-	"ct_qdel": 'dosyaları silerken yalnız bir kez onay isteyin">qdel',
-	"ct_dir1st": 'sıralamada klasörleri dosyalardan önceye koy">ilk 📁',
-	"ct_nsort": 'doğal sıralama (başında sayı bulunan isimler için)">dsort',
-	"ct_utc": 'tüm zaman damgalarını UTC diliminde göster">UTC',
-	"ct_readme": 'README.md\'yi klasör listelemelerinde göster">📜 readme',
-	"ct_idxh": 'index.html\'i klasör listelemeleri yerine göster">htm',
-	"ct_sbars": 'kaydırma çubuklarını göster">⟊',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_umod": "eğer bir dosya sunucuda mevcutsa sunucudaki dosyanın son-değiştirilme zaman damgasını yereldekiyle değiştir (yazma+silme izinlerini gerektirir)\">re📅",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_turbo": "yolo butonu, bunu muhtemelen etkinleştirmek itemezsiniz:$N$Nyalnızca aynı anda çok fazla sayıda dosya yüklerken harhangi bir sebepten yüklemeyi durdurup anında yeniden başlatmanız gerekirse kullanın$N$Nbu, hash fonksiyonunu basit bir <em> ile değiştirir&quot;sunucudaki boyutu da aynı mı?&quot;</em> dosya içerikleri farklıysa yükleme devam ETMEYECEKTİR!$N$Nyükleme tamamlandığında bu ayarı kapatın ve sonra aynı dosyaları yeniden &quot;yüklemeyi&quot; deneyin ki sunucu bu dosyaları doğrulayabilsin\">turbo",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_datechk": "turbo modu açıksa hiçbir etkisi yoktur$N$Nyolo faktörünü az bir miktar düşürür; sunucudaki dosya zaman damgalarının sizinkiyle eşleşip eşleşmediğini kontrol eder$N$Nteorik olarak tamamlanmamış / bozuk yüklemelerin çoğunu yakalaması gerekir ancak turbo devre dışı bırakıldıktan sonra yapılan doğrulama geçişinin yerini tutamaz\">date-chk",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_u2sz": "her yükleme parçasının boyutu (MiB cinsinden); büyük değerler Atlantik boyunca daha iyi iletilir. Çok güvenilmez bağlantılarda düşük değerler deneyin",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_flag": "aynı anda sadece bir sekmenin yükleme yapabilmesini sağlayın $N -- diğer sekmelerde de bu ayar açık olmalıdır $N -- sadece aynı alan adı altındaki sekmeleri etkiler",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_az": "dosyaları en küçüğünden başlamak yerine alfabetik sırayla yükleyin$N$Nalefabetik sıralama, sunucuda bir şeylerin yanlış gidip gitmediğini gözlemlemenizi daha kolay hale getirebilir ancak fiber / LAN üzerinde yüklemeyi biraz yavaşlatır",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_nag": "yükleme tamamlandığında işletim sistemi bildirimi$N(sadece tarayıcı veya serkme aktif değilse)",
-	"cut_sfx": "yükleme tamamlandığında sesli bildirim$N(sadece tarayıcı veya serkme aktif değilse)",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_mt": "dosya hash'lemesini hızlandırmak için çoklu izlekleri kullan$N$Nbu ayar web işlerini kullanır ve daha fazla$Nmore RAM (fazladan 512 MiB'a kadar) kullanır$N$https bağlantısını %30, http'yi ise 4.5 kat hızlandırır\">mt",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cut_wasm": "tarayıcının varsayılan hash fonksiyonu yerine WASM'ı kullan; Chrome tabanlı tarayıcılarda performansla birlikte CPU kullanımını artırır, ayrıca Chrome'un birçok eski sürümünde bu ayar etkinleştiğinde tarayıcının tüm RAM'i yemesine ve çökmesine sebep olan hatalar bulunur\">wasm",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"cft_text": "favicon yazısı (devre dışı bırakmak için boş bırakıp yenileyin)",
-	"cft_fg": "ön plan rengi",
-	"cft_bg": "arka plan rengi",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"cdt_lim": "bir klasörde gösterilecek maksimum dosya sayısı",
-	"cdt_ask": "aşağı kaydırırken,$Ndaha fazla dosya yüklemek yerine,$Nne yapılacağını sor",
-	"cdt_hsort": "`medya-URL'lerinde dahil edilecek sıralama kurallarının sayısı (`,sorthref`). Bunu 0 olarak ayarlamak, tıklanırken medya bağlantılarına dahil edilen sıralama kurallarını da yok sayacaktır",
-	"cdt_ren": "özel sağ tık menüsünü etkinleştir, normal menü shift + sağ tık ile erişilebilir\">etkinleştir", //m
-	"cdt_rdb": "özel menü zaten açıkken tekrar sağ tıklanınca normal sağ tık menüsünü göster\">x2", //m
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"tt_entree": "navigasyon panosunu göster (yan dizin panosu)$NHotkey: B",
-	"tt_detree": "içerik haritasını göster$Kısayol: B",
-	"tt_visdir": "seçili klasöre kaydır",
-	"tt_ftree": "klasör ağacını / metin dosyalarını aç/kapat$Kısayol: V",
-	"tt_pdock": "üstteki bir pencerede üst klasörleri göster",
-	"tt_dynt": "ağaç genişledikçe otomatik büyüt",
-	"tt_wrap": "kelime sarma",
-	"tt_hover": "fare ile üzerine gelindiğinde taşan satırları göster$N( fare imleci sol kenarda değilse kaydırmayı bozar )",
-	"tt_gauto": "klasör içeriğine bağlı olarak ızgara veya liste olarak göster", //m
-	"tt_gathr": "dosyaların bu yüzdesi resim/video ise ızgara kullan", //m
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"ml_pmode": "klasör sonunda...",
-	"ml_btns": "komutlar",
-	"ml_tcode": "dönüştür",
-	"ml_tcode2": "dönüştür",
-	"ml_tint": "tonlama",
-	"ml_eq": "ses eşitleyici",
-	"ml_drc": "dinamik aralık sıkıştırıcı",
-	"ml_ss": "sessizliği atla", //m
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"mt_loop": "bir şarkıyı döngüye al / tekrar et\">🔁",
-	"mt_one": "bir şarkıdan sonra dur\">1️⃣",
-	"mt_shuf": "klasörlerdeki şarkıları karıştır\">🔀",
-	"mt_aplay": "sunucuya erişmek için kullandığın bağlantıda geçerli bir şarkı varsa otomatik oynat$N$Nbunu etkisiz kılmak aynı zamanda müzik oynatıldığında sayfa URL'nin değişmesini de engeller\">a▶",
-	"mt_preload": "aralıksız oynatma için sıradaki şarkıyı önceden yüklemeye başla\">ön yükleme",
-	"mt_prescan": "son şarkı bitmeden önce bir sonraki klasöre git$Nweb tarayıcısını mutlu tutar$Nbu nedenle oynatmayı durdurmaz\">nav",
-	"mt_fullpre": "tüm şarkıyı ön yüklemeye çalış;$N✅ <b>güvenilmez</b> bağlantılarda etkinleştir,$N❌ <b>yavaş</b> bağlantılarda devre dışı bırak\">full",
-	"mt_fau": "telefonlarda, bir sonraki şarkı yeterince hızlı ön yüklenmezse müziğin durmasını önle (etiketlerin bozuk görünmesine neden olabilir)\">☕️",
-	"mt_waves": "dalga formu kaydırıcı:$Nses genliğini kaydırıcıda göster\">~s",
-	"mt_npclip": "şu anda çalan şarkıyı kopyalamak için düğmeleri göster\">/np",
-	"mt_m3u_c": "seçilen şarkıları m3u8 çalma listesi girişleri olarak kopyalamak için düğmeleri göster\">📻",
-	"mt_octl": "os entegrasyonu (medya kısayolları / osd)\">os-ctl",
-	"mt_oseek": "OS entegrasyonuyla şarkı ilerletmeye izin ver$N$Nnot: bazı cihazlarda (iPhone'lar)$Nbu, sıradaki şarkı düğmesini değiştirir\">ilerletme",
-	"mt_oscv": "ekranda albüm kapaklarını göster\">görsel",
-	"mt_follow": "oynatılan müzik ibaresini görünümde tut\">🎯",
-	"mt_compact": "kompakt kontroller\">⟎",
-	"mt_uncache": "önbelleği temizle &nbsp;(bunu, tarayıcınızın bozuk bir şarkı kopyasını önbelleğe alması nedeniyle çalmayı reddettiğinde deneyin)\">önbelleği temizle",
-	"mt_mloop": "açık klasörü döngüye al\">🔁 döngü",
-	"mt_mnext": "bir sonraki klasörü yükle ve devam et\">📂 sonraki",
-	"mt_mstop": "oynatmayı durdur\">⏸ durdur",
-	"mt_cflac": "flac / wav'ı {0}'a dönüştür\">flac",
-	"mt_caac": "aac / m4a'yı {0}'a dönüştür\">aac",
-	"mt_coth": "diğer tüm formatları (mp3 hariç) {0}'a dönüştür\">oth",
-	"mt_c2opus": "masaüstü, dizüstü bilgisayarlar, android için en iyi seçim\">opus",
-	"mt_c2owa": "opus-weba, iOS 17.5 ve üzeri için\">owa",
-	"mt_c2caf": "opus-caf, iOS 11 ile 17 arasında için\">caf",
-	"mt_c2mp3": "çok eski cihazlarda bunu kullanın\">mp3",
-	"mt_c2flac": "en iyi ses kalitesi, ancak büyük indirmeler\">flac",
-	"mt_c2wav": "sıkıştırılmamış oynatma (daha da büyük)\">wav",
-	"mt_c2ok": "güzel, iyi seçim",
-	"mt_c2nd": "bu, cihazınız için önerilen çıkış formatı değil, ama sorun değil",
-	"mt_c2ng": "cihazınız bu çıkış formatını desteklemiyor gibi görünüyor, ama yine de deneyelim",
-	"mt_xowa": "iOS'ta bu formatta arka plan oynatımını engelleyen hatalar var; lütfen bunun yerine caf veya mp3 kullanın",
-	"mt_tint": "seekbar'da arka plan seviyesi (0-100)$ön belleğin daha az dikkat dağıtıcı olmasını sağlar",
-	"mt_eq": "`ekolayzer ve kazanç kontrolünü aktifleştirir;$N$Nboost `0` = standart %100 ses (varsayılan)$N$Ngenişlik `1 &nbsp;` = standart çift kanal (varsayılan)$Ngenişlik `0.5` = %50 sol-sağ crossfeed$Ngenişlik `0 &nbsp;` = mono$N$Nartış `-0.8` &amp; artış `10` = vokal kaldırma :^)$N$Nekolayzeri aktifleştirmek, aralıksız albümleri gerçekten aralıksız yapar, bu yüzden tüm değerleri 0'da bırakın (width = 1 hariç) tabii bunu umursuyorsnaız",
-	"mt_drc": "dinamik aralık sıkıştırıcıyı (ses düzleştiriciyi) aktifleştirir; spagettiyi dengelemek için aynı zamanda EQ'yu da açar, bunun olmasını istemiyorsanız EQ'daki 'genişlik' hariç tüm alanları 0 yapın$N$Nsınır dB'inin üstündeki tüm sesleri kısar; sınırı geçen her 1 dB için ancak 1 dB ses verilir, yani varsayılan eşik -24 ve oran 12 değerleri sesin -22 dB'den yükseğe çıkmayacağını ve EQ artışının 0,8'e, hatta ATK 0 ve hayvan gibi RLS (örneğin 90, bu sadece Firefox'ta çalışır; diğer tarayıcılarda RLS en fazla 1'dir) gibi değerlerle 1.,8'e kadar güvenle çıkabileceğini gösteriyor$N$N(git vikipediye bak, orada daha iyi açıklanıyor)",
-	"mt_ss": "`sessizlik atlamayı etkinleştirir; ses `ses` altındayken ve konum ilk `bas`% veya son `son`% içindeyken başlangıç/bitiş yakınında oynatma hızını `ileri` ile çarpar", //m
-	"mt_ssvt": "ses eşiği (0-255)\">ses", //m
-	"mt_ssts": "etkin eşik (% parça, başlangıç)\">bas", //m
-	"mt_sste": "etkin eşik (% parça, bitiş)\">son", //m
-	"mt_sssm": "oynatma hızı çarpanı\">ileri", //m
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"mb_play": "oynat",
-	"mm_hashplay": "bu ses dosyası oynatılsın mı?",
-	"mm_m3u": "Oynatmak için <code>Enter/Tamam</code> tuşuna basın\nDüzenlemek için <code>ESC/İptal</code> tuşuna basın",
-	"mp_breq": "firefox 82+ veya chrome 73+ veya iOS 15+ gerektirir",
-	"mm_bload": "şu anda yükleniyor...",
-	"mm_bconv": "{0} formatına dönüştürülüyor, lütfen bekleyin...",
-	"mm_opusen": "tarayıcınız aac / m4a dosyalarını oynatamıyor;\nopus'a dönüştürme etkinleştirildi",
-	"mm_playerr": "oynatma hatası: ",
-	"mm_eabrt": "Oynatma denemesi iptal edildi",
-	"mm_enet": "İnternet bağlantınızda bir bokluk var",
-	"mm_edec": "Bu dosya muhtemelen bozuk!",
-	"mm_esupp": "Tarayıcınız salak, bu ses formatını anlamıyor",
-	"mm_eunk": "Bilinmeyen Hata",
-	"mm_e404": "Ses oynatılamadı; hata 404: Dosya bulunamadı.",
-	"mm_e403": "Ses oynatılamadı; hata 403: Erişim reddedildi.\n\nYeniden yüklemek için F5 tuşuna basın, oturumunuz kapanmış olabilir.",
-	"mm_e415": "Ses oynatılamadı; hata 415: Dosya dönüştürme başarısız oldu; sunucu günlüklerini kontrol edin.", //m
-	"mm_e500": "Ses oynatılamadı; hata 500: Sunucu günlüklerini kontrol edin.",
-	"mm_e5xx": "Ses oynatılamadı; sunucu hatası ",
-	"mm_nof": "yakınlarda başka ses dosyası bulunamadı",
-	"mm_prescan": "Sonraki şarkı aranıyor...",
-	"mm_scank": "Sonraki şarkı bulundu:",
-	"mm_uncache": "önbellek temizlendi; tüm şarkılar bir sonraki çalınmada yeniden indirilecek",
-	"mm_hnf": "bu şarkı artık mevcut değil",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"im_hnf": "bu resim artık mevcut değil",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"f_empty": 'bu klasör boş',
-	"f_chide": 'bu, «{0}» sütununu gizleyecektir\n\nsütunları ayarlar sekmesinden yeniden açabilirsiniz',
-	"f_bigtxt": "bu dosya {0} MiB boyutunda -- Cidden saf yazı olarak mı görüntülemek istiyo'n?",
-	"f_bigtxt2": "dosyanın sadece sonunu görüntülemek ister misin? bu, takip etme/sonlandırma işlemini de etkinleştirecek ve gerçek zamanlı olarak yeni eklenen metin satırlarını gösterecektir.",
-	"fbd_more": '<div id="blazy"><code>{1}</code> dosyadan <code>{0}</code> tanesi gösteriliyor; <a href="#" id="bd_more">{2}</a> tanesini ya da <a href="#" id="bd_all">tümünü göster</a></div>',
-	"fbd_all": '<div id="blazy"><code>{1}</code> dosyadan <code>{0}</code> tanesi gösteriliyor; <a href="#" id="bd_all">tümünü göster</a></div>',
-	"f_anota": "{1} dosyadan sadece {0} tanesi seçildi;\nTüm klasörü seçmek için önce en alta kaydırın.",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"f_dls": 'bu klasördeki dosya linkleri\nindirme linklerine dönüştürüldü',
-	"f_dl_nd": 'klasör atlanıyor (bunun yerine zip/tar indirmesini kullanın):\n', //m
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"f_partial": "Mevcutta yüklenen bir dosyayı güvenli bir şekilde indirmek için lütfen aynı adlı ama <code>.PARTIAL</code> uzantısına sahip olmayan dosyaya tıklayın. Lütfen bunu yapmak için İPTAL veya Esc tuşuna basın.\n\nTamam / Enter tuşuna basmak, bu uyarıyı yok sayacak ve bunun yerine <code>.PARTIAL</code> geçici dosyasını indirmeye devam edecektir ki bu da elinize bozuk veriler sunacaktır.",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"ft_paste": "{0} ögeyi yapıştır$Kısayol: ctrl-V",
-	"fr_eperm": 'yeniden adlandırılamıyor:\nbu klasörü “taşıma” izniniz yok',
-	"fd_eperm": 'silinemiyor:\nbu klasörde “silme” izniniz yok',
-	"fc_eperm": 'kesilemiyor:\nbu klasörde “taşıma“ izniniz yok',
-	"fp_eperm": 'yapıştırılamıyor:\nbu klasörde “yazma“ izniniz yok',
-	"fr_emore": "yeniden adlandırmak için en az bir öge seçin",
-	"fd_emore": "silmek için en az bir öge seçin",
-	"fc_emore": "kesmek için en az bir öge seçin",
-	"fcp_emore": "panoya kopyalamak için en az bir öge seçin",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"fs_sc": "bulunduğunuz klasörü paylaşın",
-	"fs_ss": "seçilen dosyaları paylaşın",
-	"fs_just1d": "birden fazla klasör seçemezsiniz\nveya bir seçimde dosyaları ve klasörleri karıştıramazsınız",
-	"fs_abrt": "❌ iptal",
-	"fs_rand": "🎲 rastgele.ad",
-	"fs_go": "✅ paylaşımı oluştur",
-	"fs_name": "isim",
-	"fs_src": "kaynak",
-	"fs_pwd": "şifre",
-	"fs_exp": "son kullanma",
-	"fs_tmin": "dakika",
-	"fs_thrs": "saat",
-	"fs_tdays": "gün",
-	"fs_never": "sonsuz",
-	"fs_pname": "isteğe bağlı bağlantı adı; boşsa rastgele olacaktır",
-	"fs_tsrc": "paylaşılacak dosya veya klasör",
-	"fs_ppwd": "isteğe bağlı şifre",
-	"fs_w8": "paylaşım oluşturuluyor...",
-	"fs_ok": "panoya kopyalamak için <code>Enter/Tamam</code> tuşuna basın\nkapatmak için <code>ESC/İptal</code> tuşuna basın",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"frt_dec": "bazı bozuk dosya adlarını düzeltebilir\">url-decode",
-	"frt_rst": "değiştirilen dosya adlarını orijinal haline döndür\">↺ sıfırla",
-	"frt_abrt": "iptal et ve bu pencereyi kapat\">❌ iptal",
-	"frb_apply": "YENİ ADI UYGULA",
-	"fr_adv": "toplu / meta veri / desen yeniden adlandırma\">gelişmiş",
-	"fr_case": "büyük/küçük harf duyarlı regex\">büyük/küçük harf",
-	"fr_win": "windows'a uygun adlar; <code>&lt;&gt;:&quot;\\|?*</code> karakterlerini Japonca tam genişlik karakterleriyle değiştir\">win",
-	"fr_slash": "<code>/</code> karakterini yeni klasörlerin oluşturulmasına neden olmayan bir karakterle değiştir\">/ yok",
-	"fr_re": "`orijinal dosya adlarına uygulanacak regex arama deseni; yakalama grupları aşağıdaki format alanında `(1)` ve `(2)` gibi belirtilebilir",
-	"fr_fmt": "`foobar2000'den esinlenilmiştir:$N`(title)` şarkı başlığıyla değiştirilir,$N`[(artist) - ](title)` sanatçı boşsa [bu] kısmı atlar$N`$lpad((tn),2,0)` parça numarasını 2 basamağa doldurur",
-	"fr_pdel": "sil",
-	"fr_pnew": "farklı kaydet",
-	"fr_pname": "yeni ayarınızı adlandırın",
-	"fr_aborted": "iptal edildi",
-	"fr_lold": "eski ad",
-	"fr_lnew": "yeni ad",
-	"fr_tags": "seçilen dosyalar için etiketler (salt okunur, sadece referans için):",
-	"fr_busy": "{0} öğe yeniden adlandırılıyor...\n\n{1}",
-	"fr_efail": "yeniden adlandırma başarısız:\n",
-	"fr_nchg": "{0} yeni adlardan bazıları <code>win</code> ve/veya <code>/ yok</code> nedeniyle değiştirildi\n\nBu değiştirilmiş yeni adlarla devam etmek için Tamam'a basın.",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"fd_ok": "silme tamam",
-	"fd_err": "silme başarısız:\n",
-	"fd_none": "hiçbir şey silinmedi; belki sunucu yapılandırması (xbd) tarafından engellenmiştir?",
-	"fd_busy": "{0} öğe siliniyor...\n\n{1}",
-	"fd_warn1": "Bu {0} öge silinsin mi?",
-	"fd_warn2": "<b>Son şans!</b> Geri alma imkanın yok. Silinsin mi?",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
 
-	"fc_ok": "{0} öge kesildi",
-	"fc_warn": '{0} öge kesildi\n\namma velakin: sadece <b>bu</b> tarayıcı penceresine yapıştırılabilirler\n(çünkü seçiminin boyutu hayvan gibi)',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"fcc_ok": "{0} öge panoya kopyalandı",
-	"fcc_warn": '{0} öge panoya kopyalandı\n\namma velakin: sadece <b>bu</b> tarayıcı penceresine yapıştırılabilirler\n(çünkü seçiminin boyutu hayvan gibi)',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"fp_apply": "bu adları kullan",
-	"fp_skip": "çakışmaları atla", //m
-	"fp_ecut": "önce bazı dosyaları / klasörleri kes veya kopyala, sonra yapıştır / taşı\n\nnot: farklı tarayıcı sekmeleri arasında kes / yapıştır yapabilirsiniz",
-	"fp_ename": "{0} öğe buraya taşınamaz çünkü adlar zaten alınmış. Devam etmek için aşağıda yeni adlar verin veya atlamak için adları boş bırakın (\"çakışmaları atla\"):", //m
-	"fcp_ename": "{0} öğe buraya kopyalanamaz çünkü adlar zaten alınmış. Devam etmek için aşağıda yeni adlar verin veya atlamak için adları boş bırakın (\"çakışmaları atla\"):", //m
-	"fp_emore": "hâlâ düzeltilmesi gereken bazı dosya adı çakışmaları var",
-	"fp_ok": "taşıma tamam",
-	"fcp_ok": "kopyalama tamam",
-	"fp_busy": "{0} öğe taşınıyor...\n\n{1}",
-	"fcp_busy": "{0} öğe kopyalanıyor...\n\n{1}",
-	"fp_abrt": "İptal ediliyor...",
-	"fp_err": "taşıma başarısız:\n",
-	"fcp_err": "kopyalama başarısız:\n",
-	"fp_confirm": "bu {0} öğeyi buraya taşımak istiyor musunuz?",
-	"fcp_confirm": "bu {0} öğeyi buraya kopyalamak istiyor musunuz?",
-	"fp_etab": 'diğer tarayıcı sekmesinden pano okunamadı',
-	"fp_name": "cihazınızdan bir dosya yüklüyorsunuz. Bir ad verin:",
-	"fp_both_m": '<h6>yapıştırılacak şeyi seçin</h6><code>Enter</code> = «{1}» içinden {0} dosyayı taşı\n<code>ESC</code> = cihazınızdan {2} dosyayı yükle',
-	"fcp_both_m": '<h6>yapıştırılacak şeyi seçin</h6><code>Enter</code> = «{1}» içinden {0} dosyayı kopyala\n<code>ESC</code> = cihazınızdan {2} dosyayı yükle',
-	"fp_both_b": '<a href="#" id="modal-ok">Taşı</a><a href="#" id="modal-ng">Yükle</a>',
-	"fcp_both_b": '<a href="#" id="modal-ok">Kopyala</a><a href="#" id="modal-ng">Yükle</a>',
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"mk_noname": "bunu yapmadan önce soldaki boşluğa bir şeyler yazsana :p",
-	"nmd_i1": "ayrıca istediğin dosya uzantısını ekleyebilirsin, örneğin <code>.md</code>", //m
-	"nmd_i2": "silme iznin olmadığı için yalnızca <code>.{0}</code> dosyaları oluşturabilirsin", //m
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"tv_load": "Metin belgesi yükleniyor:\n\n{0}\n\n{1}% ({2} of {3} MiB yüklendi)",
-	"tv_xe1": "metin dosyası yüklenemedi:\n\nhata ",
-	"tv_xe2": "404, dosya bulunamadı",
-	"tv_lst": "metin dosyalarının listesi",
-	"tvt_close": "klasör görünümüne dön$NKısayol: M (veya Esc)\">❌ kapat",
-	"tvt_dl": "bu dosyayı indir$NKısayol: Y\">💾 indir",
-	"tvt_prev": "önceki belgeyi göster$NKısayol: i\">⬆ önceki",
-	"tvt_next": "sonraki belgeyi göster$NKısayol: K\">⬇ sonraki",
-	"tvt_sel": "dosyayı seç$NKısayol: S\">seç",
-	"tvt_j": "json güzelleştir$NKısayol: shift-J\">j", //m
-	"tvt_edit": "dosyayı metin düzenleyicisinde aç$NKısayol: E\">✏️ düzenle",
-	"tvt_tail": "dosyalardaki değişiklikleri izle; yeni satırları gerçek zamanlı göster\">📡 takip",
-	"tvt_wrap": "kelime sarma\">↵",
-	"tvt_atail": "sayfanın altına sabitle\">⚓",
-	"tvt_ctail": "terminal renklerini çöz (ansi kaçış kodları)\">🌈",
-	"tvt_ntail": "önbellek limiti (kaç byte yüklenmiş metin tutulacağı)",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"m3u_add1": "şarkı m3u çalma listesine eklendi",
-	"m3u_addn": "{0} şarkı m3u çalma listesine eklendi",
-	"m3u_clip": "m3u çalma listesi şimdi panoya kopyalandı\n\nyeni bir metin dosyası oluşturmalı ve adını dosya.m3u koymalısınız ve çalma listesini o belgeye yapıştırmalısınız; bu sayede oynatılabilir hale gelecektir",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"gt_vau": "videoları gösterme, sadece sesi oynat\">🎧",
-	"gt_msel": "dosya seçimlerini etkinleştir; bir dosyayı geçersiz kılmak için ctrl-tıkla$N$N&lt;em&gt;etkin olduğunda: bir dosyayı / klasörü açmak için çift tıkla&lt;/em&gt;$N$NKısayol: S\">çoklu seçim",
-	"gt_crop": "küçültülmüş önizlemeleri ortala\">kırp",
-	"gt_3x": "yüksek çözünürlüklü önizlemeler\">3x",
-	"gt_zoom": "yakınlaştır",
-	"gt_chop": "kes",
-	"gt_sort": "sırala",
-	"gt_name": "isim",
-	"gt_sz": "boyut",
-	"gt_ts": "tarih",
-	"gt_ext": "tip",
-	"gt_c1": "dosya adlarını daha fazla kısalt (daha az göster)",
-	"gt_c2": "dosya adlarını daha az kısalt (daha fazla göster)",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"sm_w8": "aranıyor...",
-	"sm_prev": "aşağıdaki arama sonuçları önceki bir sorgudan alınmıştır:\n  ",
-	"sl_close": "arama sonuçlarını kapat",
-	"sl_hits": "gösterilen {0} sonuç",
-	"sl_moar": "daha fazla yükle",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟  🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"s_sz": "boyut",
-	"s_dt": "tarih",
-	"s_rd": "yol",
-	"s_fn": "isim",
-	"s_ta": "etiketler",
-	"s_ua": "yükleme@",
-	"s_ad": "gel.",
-	"s_s1": "en az MiB",
-	"s_s2": "en fazla MiB",
-	"s_d1": "en az iso8601",
-	"s_d2": "en fazla. iso8601",
-	"s_u1": "yüklendi",
-	"s_u2": "veya önce",
-	"s_r1": "dosya yolu &nbsp içerir; (boşlukla ayrılmış)",
-	"s_f1": "isim &nbsp içerir; (-nope kullan)",
-	"s_t1": "etiketler &nbsp içerir; (^=baş, son=$)",
-	"s_a1": "özel metadata özellikleri",
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"md_eshow": "görüntülenemiyor:  ",
-	"md_off": "[📜<em>beni-oku</em>], [⚙️] içinde kapalıdır -- belge gizli",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟  🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
 
-	"badreply": "Sunucudan gelen yanıt çözümlenemedi",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"xhr403": "403: Erişim reddedildi\n\nF5'e basmayı deneyin, oturumunuz kapanmış olabilir",
-	"xhr0": "bilinmiyor (muhtemelen sunucuya bağlantı kaybedildi veya sunucu çevrimdışı)",
-	"cf_ok": "pardon yahu -- DD" + wah + "oS koruması şey etti\n\n30 saniyeye düzelmiş olurum\n\nbi' halt olmazsa f5'e basarak sayfayı yenile",
-	"tl_xe1": "alt klasörler listelenemiyor:\n\nhata ",
-	"tl_xe2": "404: klasör bulunamadı",
-	"fl_xe1": "dosyalar listelenemiyor:\n\nhata ",
-	"fl_xe2": "404: klasör bulunamadı",
-	"fd_xe1": "alt klasör oluşturulamadı:\n\nhata ",
-	"fd_xe2": "404: Üst klasör bulunamadı",
-	"fsm_xe1": "mesaj gönderilemedi:\n\nhata ",
-	"fsm_xe2": "404: Üst klasör bulunamadı",
-	"fu_xe1": "sunucudan unpost(?) listesini yüklemek başarısız oldu:\n\nhata ",
-	"fu_xe2": "404: Dosya bulunamadı!!",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"fz_tar": "sıkıştırılmamış gnu-tar dosyası (linux / mac)",
-	"fz_pax": "sıkıştırılmamış pax-format tar (daha yavaş)",
-	"fz_targz": "gnu-tar ile gzip seviye 3 sıkıştırma$N$Nbu genellikle çok yavaştır, bu yüzden$Nsıkıştırılmamış tar kullanın",
-	"fz_tarxz": "gnu-tar ile xz seviye 1 sıkıştırma$N$Nbu genellikle çok yavaştır, bu yüzden$Nsıkıştırılmamış tar kullanın",
-	"fz_zip8": "utf8 dosya adları ile zip (windows 7 ve daha eski sürümlerde sorunlu olabilir)",
-	"fz_zipd": "gerçekten eski yazılımlar için geleneksel cp437 dosya adları ile zip",
-	"fz_zipc": "erken hesaplanan crc32 ile cp437,$NMS-DOS PKZIP v2.04g (ekim 1993) için$N(indirmenin başlamasından önce işlenmesi daha uzun sürer)",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"un_m1": "aşağıdan son yüklemelerinizi (veya tamamlanmamış olanları) silebilirsiniz",
-	"un_upd": "yenile",
-	"un_m4": "veya aşağıda görünen dosyaları paylaşın:",
-	"un_ulist": "göster",
-	"un_ucopy": "kopyala",
-	"un_flt": "isteğe bağlı filtre:&nbsp; URL şunu içermelidir:",
-	"un_fclr": "filtreyi temizle",
-	"un_derr": 'unpost-delete failed:\n',
-	"un_f5": 'bir şeyler bozuldu, lütfen yenilemeyi deneyin veya F5 tuşuna basın',
-	"un_uf5": "üzgünüm ama bu yükleme iptal edilmeden önce sayfayı yenilemeniz gerekiyor (F5 veya CTRL-R tuşlarına basarak)",
-	"un_nou": '<b>uyarı:</b> sunucu tamamlanmamış yüklemeleri göstermek için çok meşgul; birazdan "yenile" bağlantısına tıklayın',
-	"un_noc": '<b>uyarı:</b> tamamen yüklenmiş dosyaların unpost edilmesi sunucu yapılandırmasında etkinleştirilmemiştir/izin verilmemiştir',
-	"un_max": "ilk 2000 dosya gösteriliyor (filtreyi kullan)",
-	"un_avail": "son yüklemelerin {0} tanesi silinebilir<br />tamamlanmayanların {1} tanesi iptal edilebilir",
-	"un_m2": "yükleme zamanına göre sıralandı; en son önce:",
-	"un_no1": "Hayda! yeterince güncel yükleme yok",
-	"un_no2": "Hayda! o filtreye uyan yeterince güncel yükleme yok",
-	"un_next": "aşağıdaki {0} dosyayı sil",
-	"un_abrt": "iptal",
-	"un_del": "sil",
-	"un_m3": "son yüklemelerinizi hazırlanıyor...",
-	"un_busy": "{0} dosya siliniyor...",
-	"un_clip": "{0} bağlantı panoya kopyalandı",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"u_https1": "daha iyi performans",
-	"u_https2": "için https'i",
-	"u_https3": "kullanın",
-	"u_ancient": 'tarayıcınız resmen fosilleşmiş -- belki de <a href="#" id="u2nah">bup kullanmalısınız</a>',
-	"u_nowork": "firefox 53+ veya chrome 57+ veya iOS 11+ gerekiyor",
-	"tail_2old": "firefox 105+ veya chrome 71+ veya iOS 14.5+ gerekiyor",
-	"u_nodrop": 'tarayıcınız sürükleyip bırakmak için çok eski',
-	"u_notdir": "bu bir klasör değil!\n\ntarayıcınız çok eski,\nlütfen bunun yerine sürükleyip bırakmayı deneyin",
-	"u_uri": "başka tarayıcı pencerelerinden sürükle-bırak ile yükleme yapmak için,\nlütfen büyük yükleme düğmesinin üstüne bırakın",
-	"u_enpot": '<a href="#">Patates arayüze</a> geçiş yap (yükleme hızını artırabilir)',
-	"u_depot": '<a href="#">Havalı arayüze</a> geçiş yap (yükleme hızını azaltabilir)',
-	"u_gotpot": 'yükleme hızını artırmak için patates arayüzüne geçiliyor,\n\nkatılmıyorsanız geri dönmekte özgürsünüz!',
-	"u_pott": "<p>dosyalar: &nbsp; <b>{0}</b> tamamlandı, &nbsp; <b>{1}</b> başarısız, &nbsp; <b>{2}</b> meşgul, &nbsp; <b>{3}</b> sırada bekliyor</p>",
-	"u_ever": "bu temel yükleyici; up2k en az<br>chrome 21 // firefox 13 // edge 12 // opera 12 // safari 5.1 gerektirir",
-	"u_su2k": 'bu temel yükleyici; <a href="#" id="u2yea">up2k</a> daha iyidir',
-	"u_uput": 'hız için optimize et (kontrol toplamını atla)',
-	"u_ewrite": 'bu klasöre yazma izniniz yok',
-	"u_eread": 'bu klasörü okuma izniniz yok',
-	"u_enoi": 'dosya arama sunucu yapılandırmasında etkin değil',
-	"u_enoow": "üstüne yazma burada çalışmayacak; Silme izni gerekiyor",
-	"u_badf": 'Bu {0} dosya (toplam {1} arasında) atlandı, muhtemelen dosya sistemi izinleri nedeniyle:\n\n',
-	"u_blankf": 'Bu {0} dosya (toplam {1} arasında) boş / boş; yine de yüklemek ister misiniz?\n\n',
-	"u_applef": 'Bu {0} dosya (toplam {1} arasında) muhtemelen istenmiyor;\nAşağıdaki dosyaları ATLAMAK için <code>TAMAM/Enter</code> tuşuna basın,\nyüklemek için <code>İptal/ESC</code> tuşuna basın\n\n',
-	"u_just1": '\nBelki sadece bir dosya seçerseniz daha iyi çalışır',
-	"u_ff_many": "eğer <b>Linux / MacOS / Android</b> kullanıyorsanız bu kadar çok dosya yüklemenin <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>Firefox'u</em> çökertme ihtimali var!</a>\nEğer çökerse lütfen tekrar deneyin (veya Chrome kullanın).",
-	"u_up_life": "Bu yükleme, tamamlandıktan {0} süre sonra sunucudan silinecek\n",
-	"u_asku": 'bu {0} dosya <code>{1}</code> içerisine yükleniyor',
-	"u_unpt": "bu yüklemeyi sol üstteki 🧯 ile geri alabilir / silebilirsiniz",
-	"u_bigtab": '{0} dosya görüntülenmek üzere\n\nBu kadar fazlası tarayıcınızı çökertebilir, emin misiniz?',
-	"u_scan": 'Dsyalar tarıyor...',
-	"u_dirstuck": 'dizin yineleyicisi aşağıdaki {0} öğeye erişmeye çalışırken takıldı; atlanacak:',
-	"u_etadone": 'Tamamlandı ({0}, {1} dosya)',
-	"u_etaprep": '(yüklemeye hazırlanıyor)',
-	"u_hashdone": 'hash\'leme tamamlandı',
-	"u_hashing": 'hash\'leniyor',
-	"u_hs": 'el sıkılıyor...',
-	"u_started": "dosyalar şu anda yükleniyor; [🚀]'i gör",
-	"u_dupdefer": "başka bir dosyanın kopyası; diğer tüm dosyalardan sonra işlenecek",
-	"u_actx": "diğer pencereler/sekmeler arasında geçiş yaparken <br /> performansın düşmemesi için bu yazıya tıklayın",
-	"u_fixed": "Timam!&nbsp; Hallettim 👍",
-	"u_cuerr": "parça {0} / {1} yüklenemedi;\nmuhtemelen zararsız, devam ediliyor\n\ndosya: {2}",
-	"u_cuerr2": "sunucu yüklemeyi reddetti (parça {0} / {1});\nsonra tekrar denenecek\n\ndosya: {2}\n\nhata ",
-	"u_ehstmp": "tekrar denenecek; sağ alt köşeye mak",
-	"u_ehsfin": "sunucu yüklemeyi tamamlama isteğini reddetti; tekrar deniyor...",
-	"u_ehssrch": "sunucu arama yapma isteğini reddetti; tekrar deniyor...",
-	"u_ehsinit": "sunucu yüklemeyi başlatma isteğini reddetti; tekrar deniyor...",
-	"u_eneths": "yükleme el sıkışması sırasında ağ hatası; tekrar deniyor...",
-	"u_enethd": "hedef varlığını test ederken ağ hatası; tekrar deniyor...",
-	"u_cbusy": "ağ kesintisinden sonra sunucunun bize tekrar güvenmesini bekliyoruz...",
-	"u_ehsdf": "sunucuda disk alanı kalmadı!\n\ndevam edebilmek için birinin\nyeterli alan açmasını bekleyeceğiz",
-	"u_emtleak1": "görünüşe göre web tarayıcınızda bir bellek sızıntısı var;\nlütfen",
-	"u_emtleak2": ' <a href="{0}">https\'ye geçin (önerilir)</a> veya ',
-	"u_emtleak3": ' ',
-	"u_emtleakc": 'sırayla şunları deneyin:\n<ul><li>sayfayı yenilemek için <code>F5</code>\'e basın</li><li>sonra &nbsp;<code>mt</code>&nbsp; düğmesini &nbsp;<code>⚙️ ayarlar</code> menüsünde devre dışı bırakın</li><li>ve o yüklemeyi tekrar deneyin</li></ul>Yüklemeler biraz daha yavaş olacaktır, ama salla gitsin.\nSorun için özür dileriz!\n\nDipnot: chrome v107 <a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1354816" target="_blank">için bir hata düzeltmesi</a>',
-	"u_emtleakf": 'şunları deneyin:\n<ul><li>sayfayı yenilemek için <code>F5</code>\'e basın</li><li>sonra yükleme arayüzünde <code>🥔</code> (patates) seçeneğini etkinleştirin<li>ve yüklemeyi tekrar deneyin</li></ul>\nDipnot: firefox <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank">için muhtemel bir hata düzeltmesi</a>',
-	"u_s404": "sunucuda bulunamadı",
-	"u_expl": "açıklama",
-	"u_maxconn": "çoğu tarayıcı bunu 6 ile sınırlar, ancak firefox bunu <code>about:config</code> içinde <code>connections-per-server</code> ile artırmanıza izin verir",
-	"u_tu": '<p class="warn">UYARI: turbo etkin, <span>&nbsp;istemci tamamlanmamış yüklemeleri algılayamayabilir ve devam ettiremeyebilir; turbo düğmesinden ipuçlarına bakabilirsiniz</span></p>',
-	"u_ts": '<p class="warn">UYARI: turbo etkin, <span>&nbsp;arama sonuçları yanlış olabilir; turbo düğmesi ipuçlarına bakın</span></p>',
-	"u_turbo_c": "turbo sunucu yapılandırmasında devre dışı bırakıldı",
-	"u_turbo_g": "turbo devre dışı bırakılıyor çünkü bu alanda\ndizin listeleme ayrıcalıklarınız yok",
-	"u_life_cfg": 'yüklemeleri <input id="lifem" p="60" /> dk (veya <input id="lifeh" p="3600" /> saat) sonra otomatik olarak sil',
-	"u_life_est": 'yükleme <span id="lifew" tt="local time">---</span> sonra silinecek',
-	"u_life_max": 'bu klasör bir\nmaksimum ömür {0} uygular',
-	"u_unp_ok": 'unpost {0} için izin verildi',
-	"u_unp_ng": 'unpost izin verilmeyecek',
-	"ue_ro": 'bu klasöre erişiminiz Salt Okuma\n\n',
-	"ue_nl": 'şu anda oturum açmamışsınız',
-	"ue_la": 'şu anda "{0}" olarak oturum açmışsınız',
-	"ue_sr": 'şu anda dosya arama modundasınız\n\nbüyüteç simgesine tıklayarak yükleme moduna geçin 🔎 (büyük ARAMA düğmesinin yanındaki) ve tekrar yüklemeyi deneyin\n\nyeter be',
-	"ue_ta": 'tekrar yüklemeyi deneyin, artık çalışsana be',
-	"ue_ab": "bu dosya zaten başka bir klasöre yükleniyor ve o yükleme tamamlanmadan dosya başka bir yere yüklenemez.\n\nİlk yüklemeyi iptal edip unutmak için sol üstteki 🧯 simgesini kullanabilirsiniz.",
-	"ur_1uo": "OK: Dosya başarıyla yüklendi",
-	"ur_auo": "OK: {0} dosyanın tamamı başarıyla yüklendi",
-	"ur_1so": "OK: Dosya sunucuda bulundu",
-	"ur_aso": "OK: {0} dosyanın tamamı sunucuda bulundu",
-	"ur_1un": "Yükleme başarısız oldu, üzgünüm",
-	"ur_aun": "{0} yüklemenin tamamı başarısız oldu, üzgünüm",
-	"ur_1sn": "Dosya sunucuda bulunamadı",
-	"ur_asn": "{0} dosyas sunucuda bulunamadı",
-	"ur_um": "Tamamlandı;\n{0} yükleme başarılı,\n{1} yükleme başarısız oldu, üzgünüm",
-	"ur_sm": "Tamamlandı;\n{0} dosya sunucuda bulundu,\n{1} dosya sunucuda bulunamadı",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-	"rc_opn": "aç", //m
-	"rc_ply": "oynat", //m
-	"rc_pla": "ses olarak oynat", //m
-	"rc_txt": "dosya görüntüleyicide aç", //m
-	"rc_md": "metin düzenleyicide aç", //m
-	"rc_dl": "i̇ndir", //m
-	"rc_zip": "arşiv olarak indir", //m
-	"rc_cpl": "bağlantıyı kopyala", //m
-	"rc_del": "sil", //m
-	"rc_cut": "kes", //m
-	"rc_cpy": "kopyala", //m
-	"rc_pst": "yapıştır", //m
-	"rc_rnm": "yeniden adlandır", //m
-	"rc_nfo": "yeni klasör", //m
-	"rc_nfi": "yeni dosya", //m
-	"rc_sal": "tümünü seç", //m
-	"rc_sin": "seçimi tersine çevir", //m
-	"rc_shf": "bu klasörü paylaş", //m
-	"rc_shs": "seçimi paylaş", //m
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-	"lang_set": "Değişikliklerin etki göstermesi için sayfa yenilensin mi?",
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
 
-	"splash": {
-		"a1": "yenile",
-		"b1": "N'aber aga &nbsp; <small>(giriş yapmamışsın)</small>",
-		"c1": "çıkış yap",
-		"d1": "yığını yolla",
-		"d2": "tüm aktif iş parçacıklarının durumunu gösterir",
-		"e1": "cfg'yi yenile",
-		"e2": "yapılandırma dosyalarını yenile (hesaplar/hacimler/hacim bayrakları),$Nve tüm e2ds hacimlerini yeniden tarayın$N$Nnot: global ayarlardaki herhangi bir değişiklik$Netkili hale gelmesi için tam bir yeniden başlatma gerektirir",
-		"f1": "göz atabilirsiniz:",
-		"g1": "yükleyebilirsiniz:",
-		"cc1": "diğer şeyler:",
-		"h1": "k304'ü devre dışı bırak",
-		"i1": "k304'ü etkinleştir",
-		"j1": "k304'ü etkinleştirmek, her HTTP 304'te istemcinizin bağlantısını keser, bu da bazı hatalı proxy'lerin takılmasını önleyebilir (sayfaların birdenbire yüklenmesinin durması gibi); <em>ama</em> bu, aynı zamanda genel olarak işleyişi yavaşlatır",
-		"k1": "istemci ayarlarını sıfırla",
-		"l1": "daha fazlası için giriş yap:",
-		"m1": "hoş geldin,",
-		"n1": "404 bulunamadı &nbsp;┐( ´ -`)┌",
-		"o1": 'ya da erişim iznin yok -- bir şifre dene veya <a href="' + SR + '/?h">ana sayfaya dön</a>',
-		"p1": "403 yasaklandı &nbsp;~┻━┻",
-		"q1": 'bir şifre kullan veya <a href="' + SR + '/?h">ana sayfaya dön</a>',
-		"r1": "ana sayfaya dön",
-		".s1": "yeniden tara",
-		"t1": "işlem",
-		"u2": "son sunucu yazma zamanı$N( yükleme / yeniden adlandırma / ... )$N$N17d = 17 gün$N1h23 = 1 saat 23 dakika$N4m56 = 4 dakika 56 saniye",
-		"v1": "bağlan",
-		"v2": "bu sunucuyu yerel HDD olarak kullan",
-		"w1": "https'ye geç",
-		"x1": "şifreyi değiştir",
-		"y1": "paylaşılanları düzenle",
-		"z1": "gizli paylaşımın kilidini aç:",
-		"ta1": "ilk önce yeni şifreyi doldur",
-		"ta2": "yeni şifreyi onaylamak için tekrar girin:",
-		"ta3": "bir yazım hatası bulundu; lütfen tekrar deneyin",
-		"nop": "HATA: Parola boş olamaz", //m
-		"nou": "HATA: Kullanıcı adı ve/veya parola boş olamaz", //m
-		"aa1": "gelen dosyalar:",
-		"ab1": "no304'ü devre dışı bırak",
-		"ac1": "no304'ü etkinleştir",
-		"ad1": "no304'ü etkinleştirmek, tüm önbelleği devre dışı bırakır; bunu k304 yeterli olmadıysa deneyin. Bu, büyük miktarda ağ trafiği israf edecektir!",
-		"ae1": "aktif indirmeler:",
-		"af1": "son yüklemeleri göster",
-		"ag1": "bilinen IdP kullanıcılarını göster", //m
-	}
-};
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+🫟🫟
+🫟🫟

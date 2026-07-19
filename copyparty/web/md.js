@@ -1,529 +1,529 @@
-"use strict";
-
-var J_MD = 1;
-var dom_toc = ebi('toc'),
-    dom_wrap = ebi('mw'),
-    dom_hbar = ebi('mh'),
-    dom_nav = ebi('mn'),
-    dom_pre = ebi('mp'),
-    dom_src = ebi('mt'),
-    dom_navtgl = ebi('navtoggle'),
-    hash0 = location.hash;
-
-
-// chrome 49 needs this
-var chromedbg = function () { console.log(arguments); }
-
-// null-logger
-var dbg = function () { };
-
-// replace dbg with the real deal here or in the console:
-// dbg = chromedbg;
-// dbg = console.log;
-
-
-// dodge browser issues
-(function () {
-    if (UA.indexOf(') Gecko/') !== -1 && /Linux| Mac /.exec(UA)) {
-        // necessary on ff-68.7 at least
-        var s = mknod('style');
-        s.innerHTML = '@page { margin: .5in .6in .8in .6in; }';
-        console.log(s.innerHTML);
-        document.head.appendChild(s);
-    }
-})();
-
-
-// add navbar
-(function () {
-    var parts = (get_evpath().slice(0, -1).split('?')[0] + '?v').split('/'), link = '', o;
-    for (var a = 0, aa = parts.length - 1; a <= aa; a++) {
-        link += parts[a] + (a < aa ? '/' : '');
-        o = mknod('a');
-        o.setAttribute('href', link);
-        o.textContent = uricom_dec(parts[a].split('?')[0]) || 'top';
-        dom_nav.appendChild(o);
-    }
-})();
-
-
-// image load handler
-var img_load = (function () {
-    var r = {};
-    r.callbacks = [];
-
-    var fire = function () {
-        for (var a = 0; a < r.callbacks.length; a++)
-            r.callbacks[a]();
-    }
-
-    var timeout = null;
-    r.done = function () {
-        clearTimeout(timeout);
-        timeout = setTimeout(fire, 500);
-    };
-
-    return r;
-})();
-
-
-// faster than replacing the entire html (chrome 1.8x, firefox 1.6x)
-function copydom(src, dst, lv) {
-    var sc = src.childNodes,
-        dc = dst.childNodes;
-
-    if (sc.length !== dc.length) {
-        dbg("replace L%d (%d/%d) |%d|",
-            lv, sc.length, dc.length, src.innerHTML.length);
-
-        dst.innerHTML = src.innerHTML;
-        return;
-    }
-
-    var rpl = [];
-    for (var a = sc.length - 1; a >= 0; a--) {
-        var st = sc[a].tagName || sc[a].nodeType,
-            dt = dc[a].tagName || dc[a].nodeType;
-
-        if (st !== dt) {
-            dbg("replace L%d (%d/%d) type %s/%s", lv, a, sc.length, st, dt);
-            dst.innerHTML = src.innerHTML;
-            return;
-        }
-
-        var sa = sc[a].attributes || [],
-            da = dc[a].attributes || [];
-
-        if (sa.length !== da.length) {
-            dbg("replace L%d (%d/%d) attr# %d/%d",
-                lv, a, sc.length, sa.length, da.length);
-
-            rpl.push(a);
-            continue;
-        }
-
-        var dirty = false;
-        for (var b = sa.length - 1; b >= 0; b--) {
-            var name = sa[b].name,
-                sv = sa[b].value,
-                dv = dc[a].getAttribute(name);
-
-            if (name == "data-ln" && sv !== dv) {
-                dc[a].setAttribute(name, sv);
-                continue;
-            }
-
-            if (sv !== dv) {
-                dbg("replace L%d (%d/%d) attr %s [%s] [%s]",
-                    lv, a, sc.length, name, sv, dv);
-
-                dirty = true;
-                break;
-            }
-        }
-        if (dirty)
-            rpl.push(a);
-    }
-
-    // TODO pure guessing
-    if (rpl.length > sc.length / 3) {
-        dbg("replace L%d fully, %s (%d/%d) |%d|",
-            lv, rpl.length, sc.length, src.innerHTML.length);
-
-        dst.innerHTML = src.innerHTML;
-        return;
-    }
-
-    // repl is reversed; build top-down
-    var nbytes = 0;
-    for (var a = rpl.length - 1; a >= 0; a--) {
-        var i = rpl[a],
-            prop = sc[i].nodeType == 1 ? 'outerHTML' : 'nodeValue';
-
-        var html = sc[i][prop];
-        dc[i][prop] = html;
-        nbytes += html.length;
-    }
-    if (nbytes > 0)
-        dbg("replaced %d bytes L%d", nbytes, lv);
-
-    for (var a = 0; a < sc.length; a++)
-        copydom(sc[a], dc[a], lv + 1);
-
-    if (src.innerHTML !== dst.innerHTML) {
-        dbg("setting %d bytes L%d", src.innerHTML.length, lv);
-        dst.innerHTML = src.innerHTML;
-    }
-}
-
-
-md_plug_err = function (ex, js) {
-    qsr('#md_errbox');
-    if (!ex)
-        return;
-
-    var msg = (ex + '').split('\n')[0];
-    var ln = ex.lineNumber;
-    var o = null;
-    if (ln) {
-        msg = "Line " + ln + ", " + msg;
-        var lns = js.split('\n');
-        if (ln < lns.length) {
-            o = mknod('span');
-            o.style.cssText = "color:#ac2;font-size:.9em;font-family:'scp',monospace,monospace;display:block";
-            o.textContent = lns[ln - 1];
-        }
-    }
-    var errbox = mknod('div', 'md_errbox');
-    errbox.style.cssText = 'position:absolute;top:0;left:0;padding:1em .5em;background:#2b2b2b;color:#fc5'
-    errbox.textContent = msg;
-    errbox.onclick = function () {
-        modal.alert('<pre>' + esc(ex.stack) + '</pre>');
-    };
-    if (o) {
-        errbox.appendChild(o);
-        errbox.style.padding = '.25em .5em';
-    }
-    dom_nav.appendChild(errbox);
-
-    try {
-        console.trace();
-    }
-    catch (ex2) { }
-}
-
-
-function convert_markdown(md_text, dest_dom) {
-    md_text = md_text.replace(/\r/g, '');
-
-    md_plug_err(null);
-    md_text = load_md_plug(md_text, 'pre');
-    md_text = load_md_plug(md_text, 'post');
-
-    var marked_opts = {
-        //headerPrefix: 'h-',
-        breaks: !md_no_br,
-        gfm: true
-    };
-
-    var ext = md_plug.pre;
-    if (ext)
-        Object.assign(marked_opts, ext[0]);
-
-    try {
-        var md_html = marked.parse(md_text, marked_opts);
-        if (!have_emp)
-            md_html = DOMPurify.sanitize(md_html);
-    }
-    catch (ex) {
-        if (IE) {
-            dest_dom.innerHTML = 'IE cannot into markdown ;_;';
-            return false;
-        }
-
-        if (ext)
-            md_plug_err(ex, ext[1]);
-
-        throw ex;
-    }
-    var md_dom = dest_dom;
-    try {
-        md_dom = new DOMParser().parseFromString(md_html, "text/html").body;
-    }
-    catch (ex) {
-        md_dom.innerHTML = md_html;
-        window.copydom = noop;
-    }
-
-    var nodes = md_dom.getElementsByTagName('a');
-    for (var a = nodes.length - 1; a >= 0; a--) {
-        var href = nodes[a].getAttribute('href');
-        var txt = nodes[a].innerHTML;
-
-        if (/\.[Mm][Dd]$/.test(href)) {
-            var o = new URL(href, location.href).origin;
-            if (!o || o == location.origin)
-                nodes[a].href = href + '?v';
-        }
-
-        if (!txt)
-            nodes[a].textContent = href;
-        else if (href !== txt && !nodes[a].className)
-            nodes[a].className = 'vis';
-    }
-
-    // todo-lists (should probably be a marked extension)
-    nodes = md_dom.getElementsByTagName('input');
-    for (var a = nodes.length - 1; a >= 0; a--) {
-        var dom_box = nodes[a];
-        if (dom_box.getAttribute('type') !== 'checkbox')
-            continue;
-
-        var dom_li = dom_box.parentNode;
-        var done = dom_box.getAttribute('checked');
-        done = done !== null;
-        var clas = done ? 'done' : 'pend';
-        var char = done ? 'Y' : 'N';
-
-        dom_li.className = 'task-list-item';
-        dom_li.style.listStyleType = 'none';
-        var html = dom_li.innerHTML;
-        dom_li.innerHTML =
-            '<span class="todo_' + clas + '">' + char + '</span>' +
-            html.slice(html.indexOf('>') + 1);
-    }
-
-    // separate <code> for each line in <pre>
-    nodes = md_dom.getElementsByTagName('pre');
-    for (var a = nodes.length - 1; a >= 0; a--) {
-        var el = nodes[a];
-
-        var is_precode =
-            el.tagName == 'PRE' &&
-            el.childNodes.length === 1 &&
-            el.childNodes[0].tagName == 'CODE';
-
-        if (!is_precode)
-            continue;
-
-        var nline = parseInt(el.getAttribute('data-ln')) + 1;
-        var lines = el.innerHTML.replace(/\n<\/code>$/i, '</code>').split(/\n/g);
-        for (var b = 0; b < lines.length - 1; b++)
-            lines[b] += '</code>\n<code data-ln="' + (nline + b) + '">';
-
-        el.innerHTML = lines.join('');
-    }
-
-    // self-link headers
-    var id_seen = {},
-        dyn = md_dom.getElementsByTagName('*');
-
-    nodes = [];
-    for (var a = 0, aa = dyn.length; a < aa; a++)
-        if (/^[Hh]([1-6])/.exec(dyn[a].tagName) !== null)
-            nodes.push(dyn[a]);
-
-    for (var a = 0; a < nodes.length; a++) {
-        el = nodes[a];
-        var id = el.getAttribute('id'),
-            orig_id = id;
-
-        if (id_seen[id]) {
-            for (var n = 1; n < 4096; n++) {
-                id = orig_id + '-' + n;
-                if (!id_seen[id])
-                    break;
-            }
-            el.setAttribute('id', id);
-        }
-        id_seen[id] = 1;
-        el.innerHTML = '<a href="#' + id + '">' + el.innerHTML + '</a>';
-    }
-
-    ext = md_plug.post;
-    if (ext && ext[0].render)
-        try {
-            ext[0].render(md_dom);
-        }
-        catch (ex) {
-            md_plug_err(ex, ext[1]);
-        }
-
-    copydom(md_dom, dest_dom, 0);
-
-    var imgs = dest_dom.getElementsByTagName('img');
-    for (var a = 0, aa = imgs.length; a < aa; a++)
-        imgs[a].onload = img_load.done;
-
-    if (ext && ext[0].render2)
-        try {
-            ext[0].render2(dest_dom);
-        }
-        catch (ex) {
-            md_plug_err(ex, ext[1]);
-        }
-
-    if (hash0)
-        setTimeout(function () {
-            try {
-                QS(hash0).scrollIntoView();
-                hash0 = '';
-            }
-            catch (ex) { }
-        }, 1);
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+
+🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟
+
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+
+🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+🫟🫟🫟🫟🫟
+
+
+🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+🫟🫟🫟🫟🫟
+
+
+🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+    🫟🫟🫟 🫟 🫟 🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+    🫟🫟
+
+    🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟
+
+
+🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟
+    🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+    🫟
+
+    🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟
+        🫟
+
+        🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+
+        🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟
+            🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+            🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟
+
+            🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+
+                🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟
+            🫟
+        🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+
+    🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+    🫟
+
+    🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟
+
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+🫟
+
+
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟
+    🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟 🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+    🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+    🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟
+🫟
+
+
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+    🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟 🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟 🫟🫟🫟
+    🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+    🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+    🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+    🫟
+
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+    🫟
+
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+        🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟
+
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+                🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟
+            🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟
+
+    🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟
+
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+            🫟🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+            🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟
+        🫟🫟 🫟🫟🫟
     
-    return true;
-}
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟
 
 
-function init_toc() {
-    qsr('#ml');
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-    var anchors = [];  // list of toc entries, complex objects
-    var anchor = null; // current toc node
-    var html = [];     // generated toc html
-    var lv = 0;        // current indentation level in the toc html
-    var ctr = [0, 0, 0, 0, 0, 0];
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟  🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟     🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟 🫟 🫟🫟        🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟
 
-    var manip_nodes_dyn = dom_pre.getElementsByTagName('*');
-    var manip_nodes = [];
-    for (var a = 0, aa = manip_nodes_dyn.length; a < aa; a++)
-        manip_nodes.push(manip_nodes_dyn[a]);
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-    for (var a = 0, aa = manip_nodes.length; a < aa; a++) {
-        var elm = manip_nodes[a];
-        var m = /^[Hh]([1-6])/.exec(elm.tagName);
-        var is_header = m !== null;
-        if (is_header) {
-            var nlv = m[1];
-            while (lv < nlv) {
-                html.push('<ul>');
-                lv++;
-            }
-            while (lv > nlv) {
-                html.push('</ul>');
-                lv--;
-            }
-            ctr[lv - 1]++;
-            for (var b = lv; b < 6; b++)
-                ctr[b] = 0;
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟
+            🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟
+            🫟
+            🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
 
-            elm.childNodes[0].setAttribute('ctr', ctr.slice(0, lv).join('.'));
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-            var elm2 = elm.cloneNode(true);
-            elm2.childNodes[0].textContent = elm.textContent;
-            while (elm2.childNodes.length > 1)
-                elm2.removeChild(elm2.childNodes[1]);
+            🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-            html.push('<li>' + elm2.innerHTML + '</li>');
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-            if (anchor != null)
-                anchors.push(anchor);
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-            anchor = {
-                elm: elm,
-                kids: [],
-                y: null
-            };
-        }
-        if (!is_header && anchor)
-            anchor.kids.push(elm);
-    }
-    dom_toc.innerHTML = html.join('\n');
-    if (anchor != null)
-        anchors.push(anchor);
+            🫟🫟🫟🫟🫟🫟 🫟 🫟
+                🫟🫟🫟🫟 🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟 🫟🫟🫟
+                🫟🫟 🫟🫟🫟🫟
+            🫟🫟
+        🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-    // copy toc links into the toc list
-    var atoc = dom_toc.getElementsByTagName('a');
-    for (var a = 0, aa = anchors.length; a < aa; a++)
-        anchors[a].lnk = atoc[a];
+    🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
 
-    // collect vertical position of all toc items (headers in document)
-    function freshen_offsets() {
-        var top = yscroll();
-        for (var a = anchors.length - 1; a >= 0; a--) {
-            var y = top + anchors[a].elm.getBoundingClientRect().top;
-            y = Math.round(y * 10.0) / 10;
-            if (anchors[a].y === y)
-                break;
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟
+            🫟🫟🫟 🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟
+                🫟🫟🫟🫟🫟🫟
 
-            anchors[a].y = y;
-        }
-    }
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟
+    🫟
 
-    // highlight the correct toc items + scroll into view
-    function freshen_toclist() {
-        if (anchors.length == 0)
-            return;
+    🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟
 
-        var ptop = yscroll();
-        var hit = anchors.length - 1;
-        for (var a = 0; a < anchors.length; a++) {
-            if (anchors[a].y >= ptop - 8) {  //???
-                hit = a;
-                break;
-            }
-        }
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+            🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟 🫟  🫟🫟🫟🫟🫟
+                🫟🫟🫟 🫟 🫟🫟
+                🫟🫟🫟🫟🫟🫟
+            🫟
+        🫟
 
-        var links = dom_toc.getElementsByTagName('a');
-        if (!anchors[hit].active) {
-            for (var a = 0; a < anchors.length; a++) {
-                if (anchors[a].active) {
-                    anchors[a].active = false;
-                    links[a].className = '';
-                }
-            }
-            anchors[hit].active = true;
-            links[hit].className = 'act';
-        }
+        🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+                🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+                    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+                🫟
+            🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+        🫟
 
-        var pane_height = parseInt(getComputedStyle(dom_toc).height);
-        var link_bounds = links[hit].getBoundingClientRect();
-        var top = link_bounds.top - (pane_height / 6);
-        var btm = link_bounds.bottom + (pane_height / 6);
-        if (top < 0)
-            dom_toc.scrollTop -= -top;
-        else if (btm > pane_height)
-            dom_toc.scrollTop += btm - pane_height;
-    }
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
 
-    function refresh() {
-        freshen_offsets();
-        freshen_toclist();
-    }
+    🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
 
-    return { "refresh": refresh }
-}
-
-
-// "main" :p
-convert_markdown(dom_src.value, dom_pre);
-var toc = init_toc();
-img_load.callbacks = [toc.refresh];
+    🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟
 
 
-// scroll handler
-var redraw = (function () {
-    var sbs = true;
-    var onresize = function () {
-        if (window.matchMedia)
-            sbs = window.matchMedia('(min-width: 64em)').matches;
-
-        var y = (dom_hbar.offsetTop + dom_hbar.offsetHeight) + 'px';
-        if (sbs) {
-            dom_toc.style.top = y;
-            dom_wrap.style.top = y;
-            dom_toc.style.marginTop = '0';
-        }
-        onscroll();
-    }
-
-    var onscroll = function () {
-        toc.refresh();
-    }
-
-    window.onresize = onresize;
-    window.onscroll = onscroll;
-    dom_wrap.onscroll = onscroll;
-
-    onresize();
-    return onresize;
-})();
+🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
 
-dom_navtgl.onclick = function () {
-    var hidden = dom_navtgl.innerHTML == 'hide nav';
-    dom_navtgl.innerHTML = hidden ? 'show nav' : 'hide nav';
-    dom_nav.style.display = hidden ? 'none' : 'block';
+🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+    🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+        🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-    swrite('hidenav', hidden ? 1 : 0);
-    redraw();
-};
+        🫟🫟🫟 🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟 🫟🫟🫟🫟🫟 🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟
+            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+        🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
 
-if (sread('hidenav') == 1)
-    dom_navtgl.onclick();
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
 
-if (window.tt && tt.init)
-    tt.init();
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-J_MD = 2;
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟
+
+
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟
+    🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟 🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟
+
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+🫟🫟🫟🫟 🫟 🫟🫟

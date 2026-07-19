@@ -1,475 +1,475 @@
-# coding: utf-8
-from __future__ import print_function, unicode_literals
+🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-# awk -F\" '/add_argument\("-[^-]/{print(substr($2,2))}' copyparty/__main__.py | sort | tr '\n' ' '
-zs = "a c e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vp e2vu ed emp i j lo mcr mte mth mtm mtp nb nc nid nih nth nw p q s ss sss v z zv"
-onedash = set(zs.split())
+🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟 🫟 🫟
+🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟 🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟 🫟 🫟 🫟🫟 🫟🫟🫟 🫟 🫟 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-# verify that all volflags are documented here:
-# grep volflag= __main__.py | sed -r 's/.*volflag=//;s/\).*//' | sort | uniq | while IFS= read -r x; do grep -E "\"$x(=[^ \"]+)?\": \"" cfg.py || printf '%s\n' "$x"; done
-
-
-def vf_bmap() -> dict[str, str]:
-    """argv-to-volflag: simple bools"""
-    ret = {
-        "dav_auth": "davauth",
-        "dav_rt": "davrt",
-        "ed": "dots",
-        "hardlink_only": "hardlinkonly",
-        "no_clone": "noclone",
-        "no_dirsz": "nodirsz",
-        "no_dupe": "nodupe",
-        "no_dupe_m": "nodupem",
-        "no_forget": "noforget",
-        "no_html": "nohtml",
-        "no_pipe": "nopipe",
-        "no_robots": "norobots",
-        "no_script": "noscript",
-        "no_tail": "notail",
-        "no_thumb": "dthumb",
-        "no_vthumb": "dvthumb",
-        "no_athumb": "dathumb",
-        "vol_nospawn": "nospawn",
-        "vol_or_crash": "assert_root",
-    }
-    for k in (
-        "dedup",
-        "dlni",
-        "dothidden",
-        "dotsrch",
-        "e2d",
-        "e2ds",
-        "e2dsa",
-        "e2t",
-        "e2ts",
-        "e2tsr",
-        "e2v",
-        "e2vu",
-        "e2vp",
-        "exp",
-        "grid",
-        "gsel",
-        "hardlink",
-        "magic",
-        "md_no_br",
-        "no_db_ip",
-        "no_logues",
-        "no_readme",
-        "no_sb_md",
-        "no_sb_lg",
-        "nsort",
-        "og",
-        "og_no_head",
-        "og_s_title",
-        "opds",
-        "rand",
-        "reflink",
-        "rm_partial",
-        "rmagic",
-        "rss",
-        "show_hist",
-        "ui_noacci",
-        "ui_nocpla",
-        "ui_nolbar",
-        "ui_nombar",
-        "ui_nonav",
-        "ui_notree",
-        "ui_norepl",
-        "ui_nosrvi",
-        "ui_noctxb",
-        "wo_up_readme",
-        "wram",
-        "xdev",
-        "xlink",
-        "xvol",
-        "zipmaxu",
-    ):
-        ret[k] = k
-    return ret
+🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
 
 
-def vf_vmap() -> dict[str, str]:
-    """argv-to-volflag: simple values"""
-    ret = {
-        "ac_convt": "aconvt",
-        "no_hash": "nohash",
-        "no_idx": "noidx",
-        "re_maxage": "scan",
-        "safe_dedup": "safededup",
-        "th_convt": "convt",
-        "th_size": "thsize",
-        "th_crop": "crop",
-        "th_x3": "th3x",
-    }
-    for k in (
-        "apnd_who",
-        "bup_ck",
-        "cachectl",
-        "casechk",
-        "chmod_d",
-        "chmod_f",
-        "csp_ui",
-        "csp_dl",
-        "dbd",
-        "db_xattr",
-        "du_who",
-        "epilogues",
-        "ufavico",
-        "forget_ip",
-        "fsnt",
-        "hsortn",
-        "html_head",
-        "html_head_s",
-        "lg_sbf",
-        "md_sbf",
-        "lg_sba",
-        "md_sba",
-        "md_hist",
-        "md_nhist",
-        "nrand",
-        "u2ow",
-        "og_desc",
-        "og_site",
-        "og_th",
-        "og_title",
-        "og_title_a",
-        "og_title_v",
-        "og_title_i",
-        "og_tpl",
-        "og_ua",
-        "opds_exts",
-        "prologues",
-        "preadmes",
-        "put_ck",
-        "put_name",
-        "readmes",
-        "rotf_tz",
-        "mv_retry",
-        "rm_retry",
-        "rss_sort",
-        "rss_fmt_t",
-        "rss_fmt_d",
-        "rw_edit",
-        "shr_who",
-        "sort",
-        "tail_fd",
-        "tail_rate",
-        "tail_tmax",
-        "tail_who",
-        "tcolor",
-        "th_covers",
-        "th_pregen",
-        "th_qv",
-        "th_qvx",
-        "th_spec_p",
-        "txt_eol",
-        "unlist",
-        "u2abort",
-        "u2ts",
-        "uid",
-        "gid",
-        "unp_who",
-        "ups_who",
-        "zip_who",
-        "zipmaxn",
-        "zipmaxs",
-        "zipmaxt",
-    ):
-        ret[k] = k
-    return ret
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟
+    🫟🫟🫟 🫟 🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟 🫟
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
 
-def vf_cmap() -> dict[str, str]:
-    """argv-to-volflag: complex/lists"""
-    ret = {}
-    for k in (
-        "exp_lg",
-        "exp_md",
-        "ext_th",
-        "mte",
-        "mth",
-        "mtp",
-        "xac",
-        "xad",
-        "xar",
-        "xau",
-        "xban",
-        "xbc",
-        "xbd",
-        "xbr",
-        "xbu",
-        "xiu",
-        "xm",
-    ):
-        ret[k] = k
-    return ret
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟
+    🫟🫟🫟 🫟 🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟 🫟
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
 
-permdescs = {
-    "r": "read; list folder contents, download files",
-    "w": 'write; upload files; need "r" to see the uploads',
-    "m": 'move; move files and folders; need "w" at destination',
-    "d": "delete; permanently delete files and folders",
-    ".": "dots; user can ask to show dotfiles in listings",
-    "g": "get; download files, but cannot see folder contents",
-    "G": 'upget; same as "g" but can see filekeys of their own uploads',
-    "h": 'html; same as "g" but folders return their index.html',
-    "a": "admin; can see uploader IPs, config-reload",
-    "A": "all; same as 'rwmda.' (read/write/move/delete/dotfiles)",
-}
+🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟 🫟🫟
+    🫟🫟🫟 🫟 🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟
+    🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟 🫟
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
 
-flagcats = {
-    "uploads, general": {
-        "dedup": "enable symlink-based file deduplication",
-        "hardlink": "enable hardlink-based file deduplication,\nwith fallback on symlinks when that is impossible",
-        "hardlinkonly": "dedup with hardlink only, never symlink;\nmake a full copy if hardlink is impossible",
-        "reflink": "enable reflink-based file deduplication,\nwith fallback on full copy when that is impossible",
-        "safededup": "verify on-disk data before using it for dedup",
-        "noclone": "take dupe data from clients, even if available on HDD",
-        "nodupe": "rejects existing files (instead of linking/cloning them)",
-        "nodupem": "rejects existing files during moves as well",
-        "casechk=auto": "actively prevent case-insensitive filesystem? y/n",
-        "chmod_d=755": "unix-permission for new dirs/folders",
-        "chmod_f=644": "unix-permission for new files",
-        "uid=573": "change owner of new files/folders to unix-user 573",
-        "gid=999": "change owner of new files/folders to unix-group 999",
-        "fsnt=auto": "filesystem filename traits (lin/win/mac/auto)",
-        "wram": "allow uploading into ramdisks",
-        "sparse": "force use of sparse files, mainly for s3-backed storage",
-        "nosparse": "deny use of sparse files, mainly for slow storage",
-        "rm_partial": "delete unfinished uploads from HDD when they timeout",
-        "daw": "enable full WebDAV write support (dangerous);\nPUT-operations will now \033[1;31mOVERWRITE\033[0;35m existing files",
-        "nosub": "forces all uploads into the top folder of the vfs",
-        "magic": "enables filetype detection for nameless uploads",
-        "put_name": "fallback filename for nameless uploads",
-        "put_ck": "default checksum-hasher for PUT/WebDAV uploads",
-        "bup_ck": "default checksum-hasher for bup/basic uploads",
-        "gz": "allows server-side gzip compression of uploads with ?gz",
-        "xz": "allows server-side lzma compression of uploads with ?xz",
-        "pk": "forces server-side compression, optional arg: xz,9",
-    },
-    "upload rules": {
-        "apnd_who=dw": "who can append? (aw/dw/w/no)",
-        "maxn=250,600": "max 250 uploads over 15min",
-        "maxb=1g,300": "max 1 GiB over 5min (suffixes: b, k, m, g, t)",
-        "vmaxb=1g": "total volume size max 1 GiB (suffixes: b, k, m, g, t)",
-        "vmaxn=4k": "max 4096 files in volume (suffixes: b, k, m, g, t)",
-        "medialinks": "return medialinks for non-up2k uploads (not hotlinks)",
-        "wo_up_readme": "write-only users can upload logues without getting renamed",
-        "rand": "force randomized filenames, 9 chars long by default",
-        "nrand=N": "randomized filenames are N chars long",
-        "u2ow=N": "overwrite existing files? 0=no 1=if-older 2=always",
-        "u2ts=fc": "[f]orce [c]lient-last-modified or [u]pload-time",
-        "u2abort=1": "allow aborting unfinished uploads? 0=no 1=strict 2=ip-chk 3=acct-chk",
-        "sz=1k-3m": "allow filesizes between 1 KiB and 3MiB",
-        "df=1g": "ensure 1 GiB free disk space",
-    },
-    "upload rotation\n(moves all uploads into the specified folder structure)": {
-        "rotn=100,3": "3 levels of subfolders with 100 entries in each",
-        "rotf=%Y-%m/%d-%H": "date-formatted organizing",
-        "rotf_tz=Europe/Oslo": "timezone (default=UTC)",
-        "lifetime=3600": "uploads are deleted after 1 hour",
-    },
-    "database, general": {
-        "e2d": "enable database; makes files searchable + enables upload-undo",
-        "e2ds": "scan writable folders for new files on startup; also sets -e2d",
-        "e2dsa": "scans all folders for new files on startup; also sets -e2d",
-        "e2t": "enable multimedia indexing; makes it possible to search for tags",
-        "e2ts": "scan existing files for tags on startup; also sets -e2t",
-        "e2tsr": "delete all metadata from DB (full rescan); also sets -e2ts",
-        "d2ts": "disables metadata collection for existing files",
-        "e2v": "verify integrity on startup by hashing files and comparing to db",
-        "e2vu": "when e2v fails, update the db (assume on-disk files are good)",
-        "e2vp": "when e2v fails, panic and quit copyparty",
-        "d2ds": "disables onboot indexing, overrides -e2ds*",
-        "d2t": "disables metadata collection, overrides -e2t*",
-        "d2v": "disables file verification, overrides -e2v*",
-        "d2d": "disables all database stuff, overrides -e2*",
-        "hist=/tmp/cdb": "puts thumbnails and indexes at that location",
-        "dbpath=/tmp/cdb": "puts indexes at that location",
-        "landmark=foo": "disable db if file foo doesn't exist",
-        "scan=60": "scan for new files every 60sec, same as --re-maxage",
-        "nohash=\\.iso$": "skips hashing file contents if path matches *.iso",
-        "noidx=\\.iso$": "fully ignores the contents at paths matching *.iso",
-        "noforget": "don't forget files when deleted from disk",
-        "forget_ip=43200": "forget uploader-IP after 30 days (GDPR)",
-        "no_db_ip": "never store uploader-IP in the db; disables unpost",
-        "fat32": "avoid excessive reindexing on android sdcardfs",
-        "dbd=[acid|swal|wal|yolo]": "database speed-durability tradeoff",
-        "xlink": "cross-volume dupe detection / linking (dangerous)",
-        "xdev": "do not descend into other filesystems",
-        "xvol": "do not follow symlinks leaving the volume root",
-        "dotsrch": "show dotfiles in search results",
-        "nodotsrch": "hide dotfiles in search results (default)",
-        "srch_excl": "exclude search results with URL matching this regex",
-        "db_xattr=user.foo,user.bar": "index file xattrs as media-tags",
-    },
-    'database, audio tags\n"mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...': {
-        "mte=artist,title": "media-tags to index/display",
-        "mth=fmt,res,ac": "media-tags to hide by default",
-        "mtp=.bpm=f,audio-bpm.py": 'uses the "audio-bpm.py" program to\ngenerate ".bpm" tags from uploads (f = overwrite tags)',
-        "mtp=ahash,vhash=media-hash.py": "collects two tags at once",
-    },
-    "thumbnails": {
-        "dthumb": "disables all thumbnails",
-        "dvthumb": "disables video thumbnails",
-        "dathumb": "disables audio thumbnails (spectrograms)",
-        "dithumb": "disables image thumbnails",
-        "pngquant": "compress audio waveforms 33% better",
-        "thsize": "thumbnail res; WxH",
-        "crop": "center-cropping (y/n/fy/fn)",
-        "th3x": "3x resolution (y/n/fy/fn)",
-        "th_qv=40": "webp/jpg thumbnail quality (10~90)",
-        "th_qvx=40": "jxl thumbnail quality (10~90)",
-        "th_covers=a.jpg,a.png": "filenames to prefer as folder-thumbs",
-        "convt": "convert-to-image timeout in seconds",
-        "aconvt": "convert-to-audio timeout in seconds",
-        "th_spec_p=1": "make spectrograms? 0=never 1=fallback 2=always",
-        "ext_th=s=/b.png": "use /b.png as thumbnail for file-extension s",
-        "th_pregen=w,wf": "pregenerate thumbs for these formats",
-    },
-    "handlers\n(better explained in --help-handlers)": {
-        "on404=PY": "handle 404s by executing PY file",
-        "on403=PY": "handle 403s by executing PY file",
-    },
-    "event hooks\n(better explained in --help-hooks)": {
-        "xbu=CMD": "execute CMD before a file upload starts",
-        "xau=CMD": "execute CMD after  a file upload finishes",
-        "xiu=CMD": "execute CMD after  all uploads finish and volume is idle",
-        "xbc=CMD": "execute CMD before a file copy",
-        "xac=CMD": "execute CMD after  a file copy",
-        "xbr=CMD": "execute CMD before a file rename/move",
-        "xar=CMD": "execute CMD after  a file rename/move",
-        "xbd=CMD": "execute CMD before a file delete",
-        "xad=CMD": "execute CMD after  a file delete",
-        "xm=CMD": "execute CMD on message",
-        "xban=CMD": "execute CMD if someone gets banned",
-    },
-    "client and ux": {
-        "grid": "show grid/thumbnails by default",
-        "gsel": "select files in grid by ctrl-click",
-        "sort": "default sort order",
-        "nsort": "natural-sort of leading digits in filenames",
-        "hsortn": "number of sort-rules to add to media URLs",
-        "ufavico=URL": "per-volume favicon (.ico/png/gif/svg)",
-        "unlist": "dont list files matching REGEX",
-        "dothidden": "enable support for .hidden files",
-        "dlni": "force-download (no-inline) files on click",
-        "html_head=TXT": "includes TXT in the <head>, or @PATH for file at PATH",
-        "html_head_s=TXT": "additional static text in the html <head>",
-        "tcolor=#fc0": "theme color (a hint for webbrowsers, discord, etc.)",
-        "nodirsz": "don't show total folder size",
-        "du_who=all": "show disk-usage info to everyone",
-        "robots": "allows indexing by search engines (default)",
-        "norobots": "kindly asks search engines to leave",
-        "unlistcr": "don't list read-access in controlpanel",
-        "unlistcw": "don't list write-access in controlpanel",
-        "prologues=.prologue.html": "files to embed above/before files",
-        "epilogues=.epilogue.html": "files to embed below/after files",
-        "readmes=readme.md,README.md": "files to embed as readmes",
-        "preadmes=preadme.md,PREADME.md": "files to embed as preadmes",
-        "plainreadme": "embed readme/preadme as monospace plaintext",
-        "plainlogues": "embed prologue/epilogue as sans-serif plaintext",
-        "no_readme": "disable embedding readme/preadme",
-        "no_logues": "disable embedding prologue/epilogue",
-        "no_sb_md": "disable js sandbox for markdown files",
-        "no_sb_lg": "disable js sandbox for prologue/epilogue",
-        "sb_md": "enable js sandbox for markdown files (default)",
-        "sb_lg": "enable js sandbox for prologue/epilogue (default)",
-        "md_sbf": "list of markdown-sandbox safeguards to disable",
-        "lg_sbf": "list of *logue-sandbox safeguards to disable",
-        "md_sba": "value of iframe allow-prop for markdown-sandbox",
-        "lg_sba": "value of iframe allow-prop for *logue-sandbox",
-        "csp_ui": "content-security-policy for the web-UI",
-        "csp_dl": "content-security-policy for static files",
-        "nohtml": "return html and markdown as text/html",
-        "noscript": "disable most javascript by use of CSP",
-        "ui_noacci": "hide account-info in the UI",
-        "ui_nocpla": "hide cpanel-link in the UI",
-        "ui_nolbar": "hide link-bar in the UI",
-        "ui_nombar": "hide top-menu in the UI",
-        "ui_nonav": "hide navpane+breadcrumbs in the UI",
-        "ui_notree": "hide navpane in the UI",
-        "ui_norepl": "hide repl-button in the UI",
-        "ui_nosrvi": "hide server-info in the UI",
-        "ui_noctxb": "hide context-buttons in the UI",
-    },
-    "opengraph (discord embeds)": {
-        "og": "enable OG (disables hotlinking)",
-        "og_site": "sitename; defaults to --name, disable with '-'",
-        "og_desc": "description text for all files; disable with '-'",
-        "og_th=jf": "thumbnail format; j / jf / jf3 / w / w3 / ...",
-        "og_title_a": "audio title format; default: {{ artist }} - {{ title }}",
-        "og_title_v": "video title format; default: {{ title }}",
-        "og_title_i": "image title format; default: {{ title }}",
-        "og_title=foo": "fallback title if there's nothing in the db",
-        "og_s_title": "force default title; do not read from tags",
-        "og_tpl": "custom html; see --og-tpl in --help",
-        "og_no_head": "you want to add tags manually with og_tpl",
-        "og_ua": "if defined: only send OG html if useragent matches this regex",
-    },
-    "opds": {
-        "opds": "enable OPDS",
-        "opds_exts": "file formats to list in OPDS feeds; leave empty to show everything",
-    },
-    "textfiles": {
-        "rw_edit=md,txt": "only require read+write to edit .md and .txt",
-        "md_no_br": "newline only on double-newline or two tailing spaces",
-        "md_hist": "where to put text-editor backups; s=subfolder, v=volHist, n=nope",
-        "md_nhist=99": "how many text-editor backups to keep",
-        "show_hist": "allow browsing the .hist folder (old textfiles)",
-        "exp": "enable textfile expansion; see --help-exp",
-        "exp_md": "placeholders to expand in markdown files; see --help",
-        "exp_lg": "placeholders to expand in prologue/epilogue; see --help",
-        "txt_eol=lf": "enable EOL conversion when writing docs (LF or CRLF)",
-    },
-    "tailing": {
-        "notail": "disable ?tail (download a growing file continuously)",
-        "tail_fd=1": "check if file was replaced (new fd) every 1 sec",
-        "tail_rate=0.2": "check for new data every 0.2 sec",
-        "tail_tmax=30": "kill connection after 30 sec",
-        "tail_who=2": "restrict ?tail access (1=admins,2=authed,3=everyone)",
-    },
-    "rss": {
-        "rss": "allow '?rss' URL suffix (experimental)",
-        "rss_sort=m": "default sort-order (m/u/n/s)",
-        "rss_fmt_t={fname}": "default title-format",
-        "rss_fmt_d={album},{.tn}": "default description-format",
-    },
-    "others": {
-        "dots": "allow all users with read-access to\nenable the option to show dotfiles in listings",
-        "fk=8": 'generates per-file accesskeys,\nwhich are then required at the "g" permission;\nkeys are invalidated if filesize or inode changes',
-        "fka=8": 'generates slightly weaker per-file accesskeys,\nwhich are then required at the "g" permission;\nnot affected by filesize or inode numbers',
-        "dk=8": 'generates per-directory accesskeys,\nwhich are then required at the "g" permission;\nkeys are invalidated if filesize or inode changes',
-        "dks": "per-directory accesskeys allow browsing into subdirs",
-        "dky": 'allow seeing files (not folders) inside a specific folder\nwith "g" perm, and does not require a valid dirkey to do so',
-        "rmagic": "expensive analysis for mimetype accuracy",
-        "shr_who=auth": "who can create shares? no/auth/a",
-        "unp_who=2": "unpost only if same... 1=ip+name, 2=ip, 3=name",
-        "ups_who=2": "restrict viewing the list of recent uploads",
-        "zip_who=2": "restrict access to download-as-zip/tar",
-        "zipmaxn=9k": "reject download-as-zip if more than 9000 files",
-        "zipmaxs=2g": "reject download-as-zip if size over 2 GiB",
-        "zipmaxt=no": "reply with 'no' if download-as-zip exceeds max",
-        "zipmaxu": "zip-size-limit does not apply to authenticated users",
-        "nopipe": "disable race-the-beam (download unfinished uploads)",
-        "cachectl=no-cache": "controls caching in webbrowsers",
-        "mv_retry": "ms-windows: timeout for renaming busy files",
-        "rm_retry": "ms-windows: timeout for deleting busy files",
-        "nospawn": "don't create volume's folder if not exist",
-        "assert_root": "crash on startup if volume's folder not exist",
-        "davauth": "ask webdav clients to login for all folders",
-        "davrt": "show lastmod time of symlink destination, not the link itself\n(note: this option is always enabled for recursive listings)",
-    },
-}
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟
 
 
-flagdescs = {k.split("=")[0]: v for tab in flagcats.values() for k, v in tab.items()}
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟 🫟 🫟🫟🫟 🫟 🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟
+🫟
 
 
-if True:  # so it gets removed in release-builds
-    for fun in [vf_bmap, vf_cmap, vf_vmap]:
-        for k in fun().values():
-            if k not in flagdescs:
-                raise Exception("undocumented volflag: " + k)
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+
+
+🫟🫟 🫟🫟🫟🫟🫟  🫟 🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟 🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+            🫟🫟 🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+                🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟 🫟🫟

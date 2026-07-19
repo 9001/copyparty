@@ -1,797 +1,797 @@
-ffmpeg version 8.1.1 Copyright (c) 2000-2026 the FFmpeg developers
-built with gcc 15.2.0 (Alpine 15.2.0)
-configuration: arbeidspakke-2026-06-26-d7ea02a8a4d74155-2-1782492563
-libavutil      60. 26.101 / 60. 26.101
-libavcodec     62. 28.101 / 62. 28.101
-libavformat    62. 12.101 / 62. 12.101
-libavdevice    62.  3.101 / 62.  3.101
-libavfilter    11. 14.101 / 11. 14.101
-libswscale      9.  5.101 /  9.  5.101
-libswresample   6.  3.101 /  6.  3.101
+🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟    🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟    🫟🫟🫟  🫟🫟🫟🫟🫟 🫟 🫟🫟🫟  🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟    🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟  🫟🫟🫟🫟🫟 🫟  🫟🫟  🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟   🫟🫟  🫟🫟🫟🫟🫟 🫟  🫟🫟  🫟🫟🫟🫟🫟
 
-Exiting with exit code 0
-Formats:
- D.. = Demuxing supported
- .E. = Muxing supported
- ..d = Is a device
- ---
-  E  aiff            Audio IFF
-  E  apng            Animated Portable Network Graphics
-  E  caf             Apple CAF (Core Audio Format)
-  E  f32le           PCM 32-bit floating-point little-endian
-  E  ffmetadata      FFmpeg metadata in text
-  E  fifo            FIFO queue pseudo-muxer
-  E  flac            raw FLAC
-  E  image2          image2 sequence
-  E  image2pipe      piped image2 sequence
-  E  matroska        Matroska
-  E  mjpeg           raw MJPEG video
-  E  mp3             MP3 (MPEG audio layer 3)
-  E  null            raw null video
-  E  ogg             Ogg
-  E  opus            Ogg Opus
-  E  s16le           PCM signed 16-bit little-endian
-  E  wav             WAV / WAVE (Waveform Audio)
-  E  webm            WebM
-  E  webp            WebP
-  E  yuv4mpegpipe    YUV4MPEG pipe
-Formats:
- D.. = Demuxing supported
- .E. = Muxing supported
- ..d = Is a device
- ---
- D   aac             raw ADTS AAC (Advanced Audio Coding)
- D   ac3             raw AC-3
- D   ac4             raw AC-4
- D   aiff            Audio IFF
- D   alaw            PCM A-law
- D   amr             3GPP AMR
- D   amrnb           raw AMR-NB
- D   amrwb           raw AMR-WB
- D   ape             Monkey's Audio
- D   apng            Animated Portable Network Graphics
- D   asf             ASF (Advanced / Active Streaming Format)
- D   asf_o           ASF (Advanced / Active Streaming Format)
- D   au              Sun AU
- D   av1             AV1 Annex B
- D   avi             AVI (Audio Video Interleaved)
- D   bfstm           BFSTM (Binary Cafe Stream)
- D   brstm           BRSTM (Binary Revolution Stream)
- D   codec2          codec2 .c2 demuxer
- D   codec2raw       raw codec2 demuxer
- D   dfpwm           raw DFPWM1a
- D   dnxhd           raw DNxHD (SMPTE VC-3)
- D   dts             raw DTS
- D   dtshd           raw DTS-HD
- D   eac3            raw E-AC-3
- D   f32be           PCM 32-bit floating-point big-endian
- D   f32le           PCM 32-bit floating-point little-endian
- D   f64be           PCM 64-bit floating-point big-endian
- D   f64le           PCM 64-bit floating-point little-endian
- D   ffmetadata      FFmpeg metadata in text
- D   flac            raw FLAC
- D   flv             FLV (Flash Video)
- D   g722            raw G.722
- D   g723_1          G.723.1
- D   g726            raw big-endian G.726 ("left aligned")
- D   g726le          raw little-endian G.726 ("right aligned")
- D   g728            raw G.728
- D   g729            G.729 raw format demuxer
- D   gif             CompuServe Graphics Interchange Format (GIF)
- D   gif_pipe        piped gif sequence
- D   gsm             raw GSM
- D   h261            raw H.261
- D   h263            raw H.263
- D   h264            raw H.264 video
- D   ico             Microsoft Windows ICO
- D   iff             IFF (Interchange File Format)
- D   image2          image2 sequence
- D   image2pipe      piped image2 sequence
- D   jpeg_pipe       piped jpeg sequence
- D   jpegxl_anim     Animated JPEG XL
- D   libopenmpt      Tracker formats (libopenmpt)
- D   m4v             raw MPEG-4 video
- D   matroska,webm   Matroska / WebM
- D   mov,mp4,m4a,3gp,3g2,mj2 QuickTime / MOV
- D   mp3             MP2/3 (MPEG audio layer 2/3)
- D   mpc             Musepack
- D   mpc8            Musepack SV8
- D   mpeg            MPEG-PS (MPEG-2 Program Stream)
- D   mpegts          MPEG-TS (MPEG-2 Transport Stream)
- D   mpegtsraw       raw MPEG-TS (MPEG-2 Transport Stream)
- D   mpegvideo       raw MPEG video
- D   mulaw           PCM mu-law
- D   nut             NUT
- D   ogg             Ogg
- D   png_pipe        piped png sequence
- D   rm              RealMedia
- D   s16be           PCM signed 16-bit big-endian
- D   s16le           PCM signed 16-bit little-endian
- D   s24be           PCM signed 24-bit big-endian
- D   s24le           PCM signed 24-bit little-endian
- D   s32be           PCM signed 32-bit big-endian
- D   s32le           PCM signed 32-bit little-endian
- D   s337m           SMPTE 337M
- D   s8              PCM signed 8-bit
- D   sox             SoX (Sound eXchange) native
- D   swf             SWF (ShockWave Flash)
- D   tak             raw TAK
- D   tta             TTA (True Audio)
- D   u16be           PCM unsigned 16-bit big-endian
- D   u16le           PCM unsigned 16-bit little-endian
- D   u24be           PCM unsigned 24-bit big-endian
- D   u24le           PCM unsigned 24-bit little-endian
- D   u32be           PCM unsigned 32-bit big-endian
- D   u32le           PCM unsigned 32-bit little-endian
- D   u8              PCM unsigned 8-bit
- D   vc1             raw VC-1
- D   wav             WAV / WAVE (Waveform Audio)
- D   wv              WavPack
-Devices:
- D. = Demuxing supported
- .E = Muxing supported
- ---
-Decoders:
- V..... = Video
- A..... = Audio
- S..... = Subtitle
- .F.... = Frame-level multithreading
- ..S... = Slice-level multithreading
- ...X.. = Codec is experimental
- ....B. = Supports draw_horiz_band
- .....D = Supports direct rendering method 1
- ------
- VF...D apng                 APNG (Animated Portable Network Graphics) image
- V..... libdav1d             dav1d AV1 decoder by VideoLAN (codec av1)
- V....D bmp                  BMP (Windows and OS/2 bitmap)
- V.S..D dds                  DirectDraw Surface image decoder
- VFS..D dnxhd                VC3/DNxHD
- VF...D dpx                  DPX (Digital Picture Exchange) image
- VFS..D dxv                  Resolume DXV
- VFS..D exr                  OpenEXR image
- VFS..D ffv1                 FFmpeg video codec #1
- VF..BD ffvhuff              Huffyuv FFmpeg variant
- V...BD flv                  FLV / Sorenson Spark / Sorenson H.263 (Flash Video) (codec flv1)
- V....D gif                  GIF (Graphics Interchange Format)
- V...BD h263                 H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2
- V...BD h263i                Intel H.263
- V...BD h263p                H.263 / H.263-1996, H.263+ / H.263-1998 / H.263 version 2
- VFS..D h264                 H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10
- VF...D hdr                  HDR (Radiance RGBE format) image
- VF..BD huffyuv              Huffyuv / HuffYUV
- VF..BD hymt                 HuffYUV MT
- V....D libjxl               libjxl JPEG XL (codec jpegxl)
- V....D libjxl_anim          libjxl JPEG XL animated (codec jpegxl_anim)
- V....D mjpeg                MJPEG (Motion JPEG)
- V.S.BD mpeg1video           MPEG-1 video
- V.S.BD mpeg2video           MPEG-2 video
- V.S.BD mpegvideo            MPEG-1 video (codec mpeg2video)
- VF..BD mpeg4                MPEG-4 part 2
- V...BD msmpeg4v1            MPEG-4 part 2 Microsoft variant version 1
- V...BD msmpeg4v2            MPEG-4 part 2 Microsoft variant version 2
- V...BD msmpeg4              MPEG-4 part 2 Microsoft variant version 3 (codec msmpeg4v3)
- V....D msrle                Microsoft RLE
- V....D pbm                  PBM (Portable BitMap) image
- V....D pcx                  PC Paintbrush PCX image
- V....D pgm                  PGM (Portable GrayMap) image
- V....D pgmyuv               PGMYUV (Portable GrayMap YUV) image
- VF...D png                  PNG (Portable Network Graphics) image
- V....D ppm                  PPM (Portable PixelMap) image
- VF...D qoi                  QOI (Quite OK Image format) image
- V..... rawvideo             raw video
- V....D rv10                 RealVideo 1.0
- V....D rv20                 RealVideo 2.0
- VF...D rv30                 RealVideo 3.0
- VF...D rv40                 RealVideo 4.0
- V.S..D rv60                 RealVideo 6.0
- V....D targa                Truevision Targa image
- V....D targa_y216           Pinnacle TARGA CineWave YUV16
- VF...D tiff                 TIFF image
- VF...D utvideo              Ut Video
- VFS..D v410                 Uncompressed 4:4:4 10-bit
- V....D vc1                  SMPTE VC-1
- V....D vnull                null video
- V....D vp7                  On2 VP7
- VFS..D vp8                  On2 VP8
- VFS..D vp9                  Google VP9
- VF...D webp                 WebP image
- V...BD wmv1                 Windows Media Video 7
- V...BD wmv2                 Windows Media Video 8
- V....D wmv3                 Windows Media Video 9
- V....D wmv3image            Windows Media Video 9 Image
- V..... wrapped_avframe      AVPacket to AVFrame passthrough
- V....D xbm                  XBM (X BitMap) image
- V....D xpm                  XPM (X PixMap) image
- V....D yuv4                 Uncompressed packed 4:2:0
- V....D zmbv                 Zip Motion Blocks Video
- A....D aac                  AAC (Advanced Audio Coding)
- A....D aac_fixed            AAC (Advanced Audio Coding) (codec aac)
- A....D aac_latm             AAC LATM (Advanced Audio Coding LATM syntax)
- A....D ac3                  ATSC A/52A (AC-3)
- A....D ac3_fixed            ATSC A/52A (AC-3) (codec ac3)
- A....D adpcm_4xm            ADPCM 4X Movie
- A....D adpcm_adx            SEGA CRI ADX ADPCM
- A....D adpcm_afc            ADPCM Nintendo Gamecube AFC
- A....D adpcm_aica           ADPCM Yamaha AICA
- A....D adpcm_circus         ADPCM Circus
- A....D g722                 G.722 ADPCM (codec adpcm_g722)
- A....D g726                 G.726 ADPCM (codec adpcm_g726)
- A....D g726le               G.726 ADPCM little-endian (codec adpcm_g726le)
- A....D adpcm_ima_qt         ADPCM IMA QuickTime
- A....D adpcm_ima_wav        ADPCM IMA WAV
- A....D adpcm_ima_ws         ADPCM IMA Westwood
- A....D adpcm_ima_xbox       ADPCM IMA Xbox
- A....D adpcm_ms             ADPCM Microsoft
- A....D adpcm_n64            ADPCM Silicon Graphics N64
- A....D adpcm_psx            ADPCM Playstation
- A....D adpcm_psxc           ADPCM Playstation C
- A....D adpcm_sanyo          ADPCM Sanyo
- A....D adpcm_sbpro_2        ADPCM Sound Blaster Pro 2-bit
- A....D adpcm_sbpro_3        ADPCM Sound Blaster Pro 2.6-bit
- A....D adpcm_sbpro_4        ADPCM Sound Blaster Pro 4-bit
- A....D adpcm_swf            ADPCM Shockwave Flash
- A....D adpcm_thp            ADPCM Nintendo THP
- A....D adpcm_thp_le         ADPCM Nintendo THP (little-endian)
- A....D adpcm_xa             ADPCM CDROM XA
- A....D adpcm_yamaha         ADPCM Yamaha
- AF...D alac                 ALAC (Apple Lossless Audio Codec)
- A....D amrnb                AMR-NB (Adaptive Multi-Rate NarrowBand) (codec amr_nb)
- A....D amrwb                AMR-WB (Adaptive Multi-Rate WideBand) (codec amr_wb)
- A....D anull                null audio
- A....D ape                  Monkey's Audio
- A....D atrac1               ATRAC1 (Adaptive TRansform Acoustic Coding)
- A....D atrac3               ATRAC3 (Adaptive TRansform Acoustic Coding 3)
- A....D atrac3al             ATRAC3 AL (Adaptive TRansform Acoustic Coding 3 Advanced Lossless)
- A....D atrac3plus           ATRAC3+ (Adaptive TRansform Acoustic Coding 3+) (codec atrac3p)
- A....D atrac3plusal         ATRAC3+ AL (Adaptive TRansform Acoustic Coding 3+ Advanced Lossless) (codec atrac3pal)
- A....D atrac9               ATRAC9 (Adaptive TRansform Acoustic Coding 9)
- A....D on2avc               On2 Audio for Video Codec (codec avc)
- A....D dfpwm                DFPWM1a audio
- A....D dst                  DST (Digital Stream Transfer)
- A....D dca                  DCA (DTS Coherent Acoustics) (codec dts)
- A....D dvaudio              Ulead DV Audio
- A....D eac3                 ATSC A/52B (AC-3, E-AC-3)
- AF...D flac                 FLAC (Free Lossless Audio Codec)
- A....D g723_1               G.723.1
- A....D g728                 G.728)
- A....D g729                 G.729
- A....D gsm                  GSM
- A....D gsm_ms               GSM Microsoft variant
- A....D mp1                  MP1 (MPEG audio layer 1)
- A....D mp1float             MP1 (MPEG audio layer 1) (codec mp1)
- A....D mp2                  MP2 (MPEG audio layer 2)
- A....D mp2float             MP2 (MPEG audio layer 2) (codec mp2)
- A....D mp3float             MP3 (MPEG audio layer 3) (codec mp3)
- A....D mp3                  MP3 (MPEG audio layer 3)
- A....D mp3adufloat          ADU (Application Data Unit) MP3 (MPEG audio layer 3) (codec mp3adu)
- A....D mp3adu               ADU (Application Data Unit) MP3 (MPEG audio layer 3)
- A....D mp3on4float          MP3onMP4 (codec mp3on4)
- A....D mp3on4               MP3onMP4
- A....D als                  MPEG-4 Audio Lossless Coding (ALS) (codec mp4als)
- A....D mpc7                 Musepack SV7 (codec musepack7)
- A....D mpc8                 Musepack SV8 (codec musepack8)
- A....D libopus              libopus Opus (codec opus)
- A....D pcm_alaw             PCM A-law / G.711 A-law
- A....D pcm_bluray           PCM signed 16|20|24-bit big-endian for Blu-ray media
- A....D pcm_dvd              PCM signed 16|20|24-bit big-endian for DVD media
- A....D pcm_f16le            PCM 16.8 floating point little-endian
- A....D pcm_f24le            PCM 24.0 floating point little-endian
- A....D pcm_f32be            PCM 32-bit floating point big-endian
- A....D pcm_f32le            PCM 32-bit floating point little-endian
- A....D pcm_f64be            PCM 64-bit floating point big-endian
- A....D pcm_f64le            PCM 64-bit floating point little-endian
- A....D pcm_mulaw            PCM mu-law / G.711 mu-law
- A....D pcm_s16be            PCM signed 16-bit big-endian
- A....D pcm_s16be_planar     PCM signed 16-bit big-endian planar
- A....D pcm_s16le            PCM signed 16-bit little-endian
- A....D pcm_s16le_planar     PCM signed 16-bit little-endian planar
- A....D pcm_s24be            PCM signed 24-bit big-endian
- A....D pcm_s24le            PCM signed 24-bit little-endian
- A....D pcm_s24le_planar     PCM signed 24-bit little-endian planar
- A....D pcm_s32be            PCM signed 32-bit big-endian
- A....D pcm_s32le            PCM signed 32-bit little-endian
- A....D pcm_s32le_planar     PCM signed 32-bit little-endian planar
- A....D pcm_s64be            PCM signed 64-bit big-endian
- A....D pcm_s64le            PCM signed 64-bit little-endian
- A....D pcm_s8               PCM signed 8-bit
- A....D pcm_s8_planar        PCM signed 8-bit planar
- A....D pcm_u16be            PCM unsigned 16-bit big-endian
- A....D pcm_u16le            PCM unsigned 16-bit little-endian
- A....D pcm_u24be            PCM unsigned 24-bit big-endian
- A....D pcm_u24le            PCM unsigned 24-bit little-endian
- A....D pcm_u32be            PCM unsigned 32-bit big-endian
- A....D pcm_u32le            PCM unsigned 32-bit little-endian
- A....D pcm_u8               PCM unsigned 8-bit
- A....D qcelp                QCELP / PureVoice
- A....D qoa                  QOA (Quite OK Audio)
- A....D real_144             RealAudio 1.0 (14.4K) (codec ra_144)
- A....D real_288             RealAudio 2.0 (28.8K) (codec ra_288)
- A....D ralf                 RealAudio Lossless
- A....D sipr                 RealAudio SIPR / ACELP.NET
- A....D smackaud             Smacker audio (codec smackaudio)
- A....D speex                Speex
- AF...D tak                  TAK (Tom's lossless Audio Kompressor)
- A....D truehd               TrueHD
- AF...D tta                  TTA (True Audio)
- A....D vorbis               Vorbis
- A..... libvorbis            libvorbis (codec vorbis)
- A....D wavesynth            Wave synthesis pseudo-codec
- AFS..D wavpack              WavPack
- A....D wmalossless          Windows Media Audio Lossless
- A....D wmapro               Windows Media Audio 9 Professional
- A....D wmav1                Windows Media Audio 1
- A....D wmav2                Windows Media Audio 2
-Encoders:
- V..... = Video
- A..... = Audio
- S..... = Subtitle
- .F.... = Frame-level multithreading
- ..S... = Slice-level multithreading
- ...X.. = Codec is experimental
- ....B. = Supports draw_horiz_band
- .....D = Supports direct rendering method 1
- ------
- V....D libjxl               libjxl JPEG XL (codec jpegxl)
- VFS..D mjpeg                MJPEG (Motion JPEG)
- VF...D png                  PNG (Portable Network Graphics) image
- VF...D rawvideo             raw video
- V..... vnull                null video
- V....D libwebp              libwebp WebP image (codec webp)
- V..... wrapped_avframe      AVFrame to AVPacket passthrough
- A....D flac                 FLAC (Free Lossless Audio Codec)
- A....D libmp3lame           libmp3lame MP3 (MPEG audio layer 3) (codec mp3)
- A....D libopus              libopus Opus (codec opus)
- A....D pcm_f32le            PCM 32-bit floating point little-endian
- A....D pcm_s16le            PCM signed 16-bit little-endian
- A....D pcm_s16le_planar     PCM signed 16-bit little-endian planar
-Filters:
-  T.. = Timeline support
-  .S. = Slice threading
-  A = Audio input/output
-  V = Video input/output
-  N = Dynamic number and/or type of input/output
-  | = Source or sink filter
-  ------
- .. aformat           A->A       Convert the input audio to one of the specified formats.
- .. amerge            N->A       Merge two or more audio streams into a single multi-channel stream.
- .. amix              N->A       Audio mixing.
- .. anull             A->A       Pass the source unchanged to the output.
- .. aresample         A->A       Resample audio data.
- .. asplit            A->N       Pass on the audio input to N audio outputs.
- .. atrim             A->A       Pick one continuous section from the input, drop the rest.
- .. compand           A->A       Compress or expand audio dynamic range.
- T. volume            A->A       Change input volume.
- .. anoisesrc         |->A       Generate a noise audio signal.
- TS convolution       V->V       Apply convolution filter.
- .. crop              V->V       Crop the input video.
- .. format            V->V       Convert the input video to one of the specified pixel formats.
- TS hflip             V->V       Horizontally flip the input video.
- .. null              V->V       Pass the source unchanged to the output.
- TS rotate            V->V       Rotate the input image.
- .. scale             V->V       Scale the input video size and/or convert the image format.
- .. setsar            V->V       Set the pixel sample aspect ratio.
- .S transpose         V->V       Transpose input video.
- .. trim              V->V       Pick one continuous section from the input, drop the rest.
- T. vflip             V->V       Flip the input video vertically.
- .S showspectrumpic   A->V       Convert input audio to a spectrum video output single picture.
- .. showwavespic      A->V       Convert input audio to a video output single picture.
- .. abuffer           |->A       Buffer audio frames, and make them accessible to the filterchain.
- .. buffer            |->V       Buffer video frames, and make them accessible to the filterchain.
- .. abuffersink       A->|       Buffer audio frames, and make them available to the end of the filter graph.
- .. buffersink        V->|       Buffer video frames, and make them available to the end of the filter graph.
-Pixel formats:
-I.... = Supported Input  format for conversion
-.O... = Supported Output format for conversion
-..H.. = Hardware accelerated format
-...P. = Paletted format
-....B = Bitstream format
-FLAGS NAME            NB_COMPONENTS BITS_PER_PIXEL BIT_DEPTHS
------
-IO... yuv420p                3             12      8-8-8
-IO... yuyv422                3             16      8-8-8
-IO... rgb24                  3             24      8-8-8
-IO... bgr24                  3             24      8-8-8
-IO... yuv422p                3             16      8-8-8
-IO... yuv444p                3             24      8-8-8
-IO... yuv410p                3              9      8-8-8
-IO... yuv411p                3             12      8-8-8
-IO... gray                   1              8      8
-IO..B monow                  1              1      1
-IO..B monob                  1              1      1
-I..P. pal8                   1              8      8
-IO... yuvj420p               3             12      8-8-8
-IO... yuvj422p               3             16      8-8-8
-IO... yuvj444p               3             24      8-8-8
-IO... uyvy422                3             16      8-8-8
-I.... uyyvyy411              3             12      8-8-8
-IO... bgr8                   3              8      3-3-2
-.O..B bgr4                   3              4      1-2-1
-IO... bgr4_byte              3              4      1-2-1
-IO... rgb8                   3              8      3-3-2
-.O..B rgb4                   3              4      1-2-1
-IO... rgb4_byte              3              4      1-2-1
-IO... nv12                   3             12      8-8-8
-IO... nv21                   3             12      8-8-8
-IO... argb                   4             32      8-8-8-8
-IO... rgba                   4             32      8-8-8-8
-IO... abgr                   4             32      8-8-8-8
-IO... bgra                   4             32      8-8-8-8
-IO... gray16be               1             16      16
-IO... gray16le               1             16      16
-IO... yuv440p                3             16      8-8-8
-IO... yuvj440p               3             16      8-8-8
-IO... yuva420p               4             20      8-8-8-8
-IO... rgb48be                3             48      16-16-16
-IO... rgb48le                3             48      16-16-16
-IO... rgb565be               3             16      5-6-5
-IO... rgb565le               3             16      5-6-5
-IO... rgb555be               3             15      5-5-5
-IO... rgb555le               3             15      5-5-5
-IO... bgr565be               3             16      5-6-5
-IO... bgr565le               3             16      5-6-5
-IO... bgr555be               3             15      5-5-5
-IO... bgr555le               3             15      5-5-5
-..H.. vaapi                  0              0      0
-IO... yuv420p16le            3             24      16-16-16
-IO... yuv420p16be            3             24      16-16-16
-IO... yuv422p16le            3             32      16-16-16
-IO... yuv422p16be            3             32      16-16-16
-IO... yuv444p16le            3             48      16-16-16
-IO... yuv444p16be            3             48      16-16-16
-..H.. dxva2_vld              0              0      0
-IO... rgb444le               3             12      4-4-4
-IO... rgb444be               3             12      4-4-4
-IO... bgr444le               3             12      4-4-4
-IO... bgr444be               3             12      4-4-4
-IO... ya8                    2             16      8-8
-IO... bgr48be                3             48      16-16-16
-IO... bgr48le                3             48      16-16-16
-IO... yuv420p9be             3             13      9-9-9
-IO... yuv420p9le             3             13      9-9-9
-IO... yuv420p10be            3             15      10-10-10
-IO... yuv420p10le            3             15      10-10-10
-IO... yuv422p10be            3             20      10-10-10
-IO... yuv422p10le            3             20      10-10-10
-IO... yuv444p9be             3             27      9-9-9
-IO... yuv444p9le             3             27      9-9-9
-IO... yuv444p10be            3             30      10-10-10
-IO... yuv444p10le            3             30      10-10-10
-IO... yuv422p9be             3             18      9-9-9
-IO... yuv422p9le             3             18      9-9-9
-IO... gbrp                   3             24      8-8-8
-IO... gbrp9be                3             27      9-9-9
-IO... gbrp9le                3             27      9-9-9
-IO... gbrp10be               3             30      10-10-10
-IO... gbrp10le               3             30      10-10-10
-IO... gbrp16be               3             48      16-16-16
-IO... gbrp16le               3             48      16-16-16
-IO... yuva422p               4             24      8-8-8-8
-IO... yuva444p               4             32      8-8-8-8
-IO... yuva420p9be            4             22      9-9-9-9
-IO... yuva420p9le            4             22      9-9-9-9
-IO... yuva422p9be            4             27      9-9-9-9
-IO... yuva422p9le            4             27      9-9-9-9
-IO... yuva444p9be            4             36      9-9-9-9
-IO... yuva444p9le            4             36      9-9-9-9
-IO... yuva420p10be           4             25      10-10-10-10
-IO... yuva420p10le           4             25      10-10-10-10
-IO... yuva422p10be           4             30      10-10-10-10
-IO... yuva422p10le           4             30      10-10-10-10
-IO... yuva444p10be           4             40      10-10-10-10
-IO... yuva444p10le           4             40      10-10-10-10
-IO... yuva420p16be           4             40      16-16-16-16
-IO... yuva420p16le           4             40      16-16-16-16
-IO... yuva422p16be           4             48      16-16-16-16
-IO... yuva422p16le           4             48      16-16-16-16
-IO... yuva444p16be           4             64      16-16-16-16
-IO... yuva444p16le           4             64      16-16-16-16
-..H.. vdpau                  0              0      0
-IO... xyz12le                3             36      12-12-12
-IO... xyz12be                3             36      12-12-12
-IO... nv16                   3             16      8-8-8
-IO... nv20le                 3             20      10-10-10
-IO... nv20be                 3             20      10-10-10
-IO... rgba64be               4             64      16-16-16-16
-IO... rgba64le               4             64      16-16-16-16
-IO... bgra64be               4             64      16-16-16-16
-IO... bgra64le               4             64      16-16-16-16
-IO... yvyu422                3             16      8-8-8
-IO... ya16be                 2             32      16-16
-IO... ya16le                 2             32      16-16
-IO... gbrap                  4             32      8-8-8-8
-IO... gbrap16be              4             64      16-16-16-16
-IO... gbrap16le              4             64      16-16-16-16
-..H.. qsv                    0              0      0
-..H.. mmal                   0              0      0
-..H.. d3d11va_vld            0              0      0
-..H.. cuda                   0              0      0
-IO... 0rgb                   3             24      8-8-8
-IO... rgb0                   3             24      8-8-8
-IO... 0bgr                   3             24      8-8-8
-IO... bgr0                   3             24      8-8-8
-IO... yuv420p12be            3             18      12-12-12
-IO... yuv420p12le            3             18      12-12-12
-IO... yuv420p14be            3             21      14-14-14
-IO... yuv420p14le            3             21      14-14-14
-IO... yuv422p12be            3             24      12-12-12
-IO... yuv422p12le            3             24      12-12-12
-IO... yuv422p14be            3             28      14-14-14
-IO... yuv422p14le            3             28      14-14-14
-IO... yuv444p12be            3             36      12-12-12
-IO... yuv444p12le            3             36      12-12-12
-IO... yuv444p14be            3             42      14-14-14
-IO... yuv444p14le            3             42      14-14-14
-IO... gbrp12be               3             36      12-12-12
-IO... gbrp12le               3             36      12-12-12
-IO... gbrp14be               3             42      14-14-14
-IO... gbrp14le               3             42      14-14-14
-IO... yuvj411p               3             12      8-8-8
-I.... bayer_bggr8            3              8      2-4-2
-I.... bayer_rggb8            3              8      2-4-2
-I.... bayer_gbrg8            3              8      2-4-2
-I.... bayer_grbg8            3              8      2-4-2
-I.... bayer_bggr16le         3             16      4-8-4
-I.... bayer_bggr16be         3             16      4-8-4
-I.... bayer_rggb16le         3             16      4-8-4
-I.... bayer_rggb16be         3             16      4-8-4
-I.... bayer_gbrg16le         3             16      4-8-4
-I.... bayer_gbrg16be         3             16      4-8-4
-I.... bayer_grbg16le         3             16      4-8-4
-I.... bayer_grbg16be         3             16      4-8-4
-IO... yuv440p10le            3             20      10-10-10
-IO... yuv440p10be            3             20      10-10-10
-IO... yuv440p12le            3             24      12-12-12
-IO... yuv440p12be            3             24      12-12-12
-IO... ayuv64le               4             64      16-16-16-16
-IO... ayuv64be               4             64      16-16-16-16
-..H.. videotoolbox_vld       0              0      0
-IO... p010le                 3             15      10-10-10
-IO... p010be                 3             15      10-10-10
-IO... gbrap12be              4             48      12-12-12-12
-IO... gbrap12le              4             48      12-12-12-12
-IO... gbrap10be              4             40      10-10-10-10
-IO... gbrap10le              4             40      10-10-10-10
-..H.. mediacodec             0              0      0
-IO... gray12be               1             12      12
-IO... gray12le               1             12      12
-IO... gray10be               1             10      10
-IO... gray10le               1             10      10
-IO... p016le                 3             24      16-16-16
-IO... p016be                 3             24      16-16-16
-..H.. d3d11                  0              0      0
-IO... gray9be                1              9      9
-IO... gray9le                1              9      9
-IO... gbrpf32be              3             96      32-32-32
-IO... gbrpf32le              3             96      32-32-32
-IO... gbrapf32be             4            128      32-32-32-32
-IO... gbrapf32le             4            128      32-32-32-32
-..H.. drm_prime              0              0      0
-..H.. opencl                 0              0      0
-IO... gray14be               1             14      14
-IO... gray14le               1             14      14
-IO... grayf32be              1             32      32
-IO... grayf32le              1             32      32
-IO... yuva422p12be           4             36      12-12-12-12
-IO... yuva422p12le           4             36      12-12-12-12
-IO... yuva444p12be           4             48      12-12-12-12
-IO... yuva444p12le           4             48      12-12-12-12
-IO... nv24                   3             24      8-8-8
-IO... nv42                   3             24      8-8-8
-..H.. vulkan                 0              0      0
-..... y210be                 3             20      10-10-10
-IO... y210le                 3             20      10-10-10
-IO... x2rgb10le              3             30      10-10-10
-..... x2rgb10be              3             30      10-10-10
-IO... x2bgr10le              3             30      10-10-10
-..... x2bgr10be              3             30      10-10-10
-IO... p210be                 3             20      10-10-10
-IO... p210le                 3             20      10-10-10
-IO... p410be                 3             30      10-10-10
-IO... p410le                 3             30      10-10-10
-IO... p216be                 3             32      16-16-16
-IO... p216le                 3             32      16-16-16
-IO... p416be                 3             48      16-16-16
-IO... p416le                 3             48      16-16-16
-IO... vuya                   4             32      8-8-8-8
-I.... rgbaf16be              4             64      16-16-16-16
-I.... rgbaf16le              4             64      16-16-16-16
-IO... vuyx                   3             24      8-8-8
-IO... p012le                 3             18      12-12-12
-IO... p012be                 3             18      12-12-12
-..... y212be                 3             24      12-12-12
-IO... y212le                 3             24      12-12-12
-....B xv30be                 3             30      10-10-10
-IO... xv30le                 3             30      10-10-10
-IO... xv36be                 3             36      12-12-12
-IO... xv36le                 3             36      12-12-12
-I.... rgbf32be               3             96      32-32-32
-I.... rgbf32le               3             96      32-32-32
-..... rgbaf32be              4            128      32-32-32-32
-..... rgbaf32le              4            128      32-32-32-32
-IO... p212be                 3             24      12-12-12
-IO... p212le                 3             24      12-12-12
-IO... p412be                 3             36      12-12-12
-IO... p412le                 3             36      12-12-12
-IO... gbrap14be              4             56      14-14-14-14
-IO... gbrap14le              4             56      14-14-14-14
-..H.. d3d12                  0              0      0
-IO... ayuv                   4             32      8-8-8-8
-IO... uyva                   4             32      8-8-8-8
-IO... vyu444                 3             24      8-8-8
-....B v30xbe                 3             30      10-10-10
-IO... v30xle                 3             30      10-10-10
-I.... rgbf16be               3             48      16-16-16
-I.... rgbf16le               3             48      16-16-16
-..... rgba128be              4            128      32-32-32-32
-..... rgba128le              4            128      32-32-32-32
-..... rgb96be                3             96      32-32-32
-..... rgb96le                3             96      32-32-32
-..... y216be                 3             32      16-16-16
-IO... y216le                 3             32      16-16-16
-IO... xv48be                 3             48      16-16-16
-IO... xv48le                 3             48      16-16-16
-I.... gbrpf16be              3             48      16-16-16
-I.... gbrpf16le              3             48      16-16-16
-I.... gbrapf16be             4             64      16-16-16-16
-I.... gbrapf16le             4             64      16-16-16-16
-I.... grayf16be              1             16      16
-I.... grayf16le              1             16      16
-..H.. amf                    0              0      0
-..... gray32be               1             32      32
-..... gray32le               1             32      32
-I.... yaf32be                2             64      32-32
-I.... yaf32le                2             64      32-32
-I.... yaf16be                2             32      16-16
-I.... yaf16le                2             32      16-16
-..... gbrap32be              4            128      32-32-32-32
-..... gbrap32le              4            128      32-32-32-32
-IO... yuv444p10msbbe         3             30      10-10-10
-IO... yuv444p10msble         3             30      10-10-10
-IO... yuv444p12msbbe         3             36      12-12-12
-IO... yuv444p12msble         3             36      12-12-12
-IO... gbrp10msbbe            3             30      10-10-10
-IO... gbrp10msble            3             30      10-10-10
-IO... gbrp12msbbe            3             36      12-12-12
-IO... gbrp12msble            3             36      12-12-12
-..H.. ohcodec                0              0      0
-Individual channels:
-NAME           DESCRIPTION
-FL             front left
-FR             front right
-FC             front center
-LFE            low frequency
-BL             back left
-BR             back right
-FLC            front left-of-center
-FRC            front right-of-center
-BC             back center
-SL             side left
-SR             side right
-TC             top center
-TFL            top front left
-TFC            top front center
-TFR            top front right
-TBL            top back left
-TBC            top back center
-TBR            top back right
-DL             downmix left
-DR             downmix right
-WL             wide left
-WR             wide right
-SDL            surround direct left
-SDR            surround direct right
-LFE2           low frequency 2
-TSL            top side left
-TSR            top side right
-BFC            bottom front center
-BFL            bottom front left
-BFR            bottom front right
-SSL            side surround left
-SSR            side surround right
-TTL            top surround left
-TTR            top surround right
-BIL            binaural left
-BIR            binaural right
+🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟
+  🫟  🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟
+  🫟  🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟             🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟            🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+  🫟  🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟             🫟🫟🫟
+  🫟  🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟             🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟            🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟            🫟🫟🫟🫟
+  🫟  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟    🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟 🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟🫟 🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟              🫟🫟🫟 🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟 🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟       🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟          🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟       🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟   🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟   🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟       🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟🫟       🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟              🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟   🫟🫟              🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟              🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟
+ 🫟   🫟🫟🫟             🫟🫟🫟 🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟   🫟🫟              🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟       🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟          🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟
+ 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟               🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟                  🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟                 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟              🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟 🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟       🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟              🫟🫟🫟🫟       🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟             🫟🫟🫟🫟       🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟       🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟             🫟🫟🫟🫟       🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟       🫟🫟🫟🫟       🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟              🫟🫟🫟🫟       🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟             🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟              🫟🫟🫟🫟       🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟             🫟🫟🫟🫟       🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟       🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟              🫟🫟🫟🫟       🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟             🫟🫟🫟🫟       🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟   🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟 🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟           🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟            🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟       🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+ 🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟  🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟                    🫟             🫟🫟      🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟                    🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟              🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟       🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟            🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟            🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟           🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟            🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟            🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟                  🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟                   🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟            🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟            🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟                 🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟             🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟                    🫟              🫟      🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟               🫟             🫟🫟      🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟             🫟🫟      🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟            🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟              🫟            🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟         🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟            🫟             🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟                🫟              🫟      🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟             🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟           🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
 
-Standard channel layouts:
-NAME           DECOMPOSITION
-mono           FC
-stereo         FL+FR
-2.1            FL+FR+LFE
-3.0            FL+FR+FC
-3.0(back)      FL+FR+BC
-4.0            FL+FR+FC+BC
-quad           FL+FR+BL+BR
-quad(side)     FL+FR+SL+SR
-3.1            FL+FR+FC+LFE
-5.0            FL+FR+FC+BL+BR
-5.0(side)      FL+FR+FC+SL+SR
-4.1            FL+FR+FC+LFE+BC
-5.1            FL+FR+FC+LFE+BL+BR
-5.1(side)      FL+FR+FC+LFE+SL+SR
-6.0            FL+FR+FC+BC+SL+SR
-6.0(front)     FL+FR+FLC+FRC+SL+SR
-3.1.2          FL+FR+FC+LFE+TFL+TFR
-hexagonal      FL+FR+FC+BL+BR+BC
-6.1            FL+FR+FC+LFE+BC+SL+SR
-6.1(back)      FL+FR+FC+LFE+BL+BR+BC
-6.1(front)     FL+FR+LFE+FLC+FRC+SL+SR
-7.0            FL+FR+FC+BL+BR+SL+SR
-7.0(front)     FL+FR+FC+FLC+FRC+SL+SR
-7.1            FL+FR+FC+LFE+BL+BR+SL+SR
-7.1(wide)      FL+FR+FC+LFE+BL+BR+FLC+FRC
-7.1(wide-side) FL+FR+FC+LFE+FLC+FRC+SL+SR
-5.1.2          FL+FR+FC+LFE+SL+SR+TFL+TFR
-5.1.2(back)    FL+FR+FC+LFE+BL+BR+TFL+TFR
-octagonal      FL+FR+FC+BL+BR+BC+SL+SR
-cube           FL+FR+BL+BR+TFL+TFR+TBL+TBR
-5.1.4          FL+FR+FC+LFE+SL+SR+TFL+TFR+TBL+TBR
-7.1.2          FL+FR+FC+LFE+BL+BR+SL+SR+TFL+TFR
-7.1.4          FL+FR+FC+LFE+BL+BR+SL+SR+TFL+TFR+TBL+TBR
-7.2.3          FL+FR+FC+LFE+BL+BR+SL+SR+TFL+TFR+TBC+LFE2
-9.1.4          FL+FR+FC+LFE+BL+BR+FLC+FRC+SL+SR+TFL+TFR+TBL+TBR
-9.1.6          FL+FR+FC+LFE+BL+BR+FLC+FRC+SL+SR+TFL+TFR+TBL+TBR+TSL+TSR
-hexadecagonal  FL+FR+FC+BL+BR+BC+SL+SR+TFL+TFC+TFR+TBL+TBC+TBR+WL+WR
-binaural       BIL+BIR
-downmix        DL+DR
-22.2           FL+FR+FC+LFE+BL+BR+FLC+FRC+BC+SL+SR+TC+TFL+TFC+TFR+TBL+TBC+TBR+LFE2+TSL+TSR+BFC+BFL+BFR
-name   depth
-u8        8 
-s16      16 
-s32      32 
-flt      32 
-dbl      64 
-u8p       8 
-s16p     16 
-s32p     32 
-fltp     32 
-dblp     64 
-s64      64 
-s64p     64 
-Bitstream filters:
-aac_adtstoasc
-ahx_to_mp2
-apv_metadata
-av1_frame_merge
-av1_frame_split
-av1_metadata
-chomp
-dump_extra
-dca_core
-dovi_rpu
-dv_error_marker
-eac3_core
-eia608_to_smpte436m
-evc_frame_merge
-extract_extradata
-filter_units
-h264_metadata
-h264_mp4toannexb
-h264_redundant_pps
-hapqa_extract
-imxdump
-lcevc_metadata
-media100_to_mjpegb
-mjpeg2jpeg
-mjpegadump
-mpeg2_metadata
-mpeg4_unpack_bframes
-mov2textsub
-noise
-null
-opus_metadata
-pcm_rechunk
-pgs_frame_merge
-prores_metadata
-remove_extra
-setts
-showinfo
-smpte436m_to_eia608
-text2movsub
-trace_headers
-truehd_core
-vp9_metadata
-vp9_raw_reorder
-vp9_superframe
-vp9_superframe_split
+🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟           🫟🫟
+🫟🫟🫟🫟🫟🫟         🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟     🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟            🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟          🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟       🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟        🫟🫟🫟🫟🫟
+🫟🫟🫟🫟           🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟   🫟🫟🫟🫟🫟
+🫟🫟        🫟 
+🫟🫟🫟      🫟🫟 
+🫟🫟🫟      🫟🫟 
+🫟🫟🫟      🫟🫟 
+🫟🫟🫟      🫟🫟 
+🫟🫟🫟       🫟 
+🫟🫟🫟🫟     🫟🫟 
+🫟🫟🫟🫟     🫟🫟 
+🫟🫟🫟🫟     🫟🫟 
+🫟🫟🫟🫟     🫟🫟 
+🫟🫟🫟      🫟🫟 
+🫟🫟🫟🫟     🫟🫟 
+🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟
+🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 

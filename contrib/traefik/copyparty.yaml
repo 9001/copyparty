@@ -1,25 +1,25 @@
-# ./traefik --configFile=copyparty.yaml
+🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-entryPoints:
-  web:
-    address: :8080
-    transport:
-      # don't disconnect during big uploads
-      respondingTimeouts:
-        readTimeout: "0s"
-log:
-  level: DEBUG
-providers:
-  file:
-    # WARNING: must be same filename as current file
-    filename: "copyparty.yaml"
-http:
-  services:
-    service-cpp:
-      loadBalancer:
-        servers:
-          - url: "http://127.0.0.1:3923/"
-  routers:
-    my-router:
-      rule: "PathPrefix(`/`)"
-      service: service-cpp
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟
+    🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+        🫟🫟🫟🫟🫟🫟🫟🫟
+          🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟

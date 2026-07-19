@@ -1,60 +1,60 @@
-# Authelia configuration
+🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-identity_validation:
-  reset_password:
-    jwt_secret: 'a_very_important_secret_so_please_change_this'
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-server:
-  address: 'tcp://:9091'
+🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-log:
-  level: info
+🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
 
-totp:
-  issuer: authelia.com
+🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-authentication_backend:
-  file:
-    path: /config/users_database.yml
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-access_control:
-  default_policy: deny
-  rules:
-    - domain: auth.example.com
-      policy: bypass  # Allow access to the login UI
-    - domain: fs.example.com
-      policy: one_factor
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟
+    🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟 🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟
+    🫟 🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-session:
-  secret: unsecure_session_secret
-  cookies:
-    - name: authelia_session
-      domain: example.com  # this should match whatever your root protected domain is
-      default_redirection_url: https://fs.example.com
-      authelia_url: https://authelia.example.com/
-      expiration: 3600  # 1 hour
-      inactivity: 300  # 5 minutes
+🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟  🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟 🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟  🫟 🫟 🫟🫟🫟🫟
+      🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟  🫟 🫟 🫟🫟🫟🫟🫟🫟🫟
 
-  redis:
-    host: valkey
-    port: 6379
-    password: your_secure_password_here
+  🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
 
-regulation:
-  max_retries: 3
-  find_time: 120
-  ban_time: 300
+🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟
 
-storage:
-  encryption_key: you_must_generate_a_random_string_of_more_than_twenty_chars_and_configure_this
-  local:
-    path: /config/db.sqlite3
+🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
 
-notifier:
-  disable_startup_check: true
-  smtp:
-    address: 'smtp://127.0.0.1:25'
-    username: 'test'
-    password: 'password'
-    sender: "Authelia <admin@example.com>"
+🫟🫟🫟🫟🫟🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟
+  🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
+    🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟 🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟🫟
