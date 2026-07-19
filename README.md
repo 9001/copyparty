@@ -3410,11 +3410,13 @@ if you are suddenly unable to access storage (permission issues), try forcequitt
 
 ## external storage on android
 
-if you want to use external storage like an SD card or USB stick, you need to get the mount path from the folder info in a file explorer (for example [CX explorer](https://play.google.com/store/apps/details?id=com.cxinventor.file.explorer) (unaffiliated, closed source))
+**exFAT recommended!**
 
-on newer versions of Android (11+), you also need to work around Android's file system safety, for example by turning off selinux enforcing (`su setenforce 0`). this comes with its own risks, so inform yourself before turning it off
+if you want to use external storage like an SD card or USB stick, you need to get the mount path from the folder info in a file explorer (for example [CX explorer](https://play.google.com/store/apps/details?id=com.cxinventor.file.explorer) (closed source though))
 
-if you've rooted your phone, this is possible to permanently disable via a module like https://github.com/evdenis/selinux_permissive. if you find a cleaner solution, please share your findings.
+on newer versions of Android (11+), you also need to work around Android's file system safety, for example by turning off selinux enforcing (`su setenforce 0`). this will circumvent android's storage permission system and allow every app to see all the files though, which introduces vulnerabilities, so be careful and don't use this unless you have to.
+
+if you've rooted your phone, this is possible to permanently disable via a module like https://github.com/evdenis/selinux_permissive. if you find a cleaner solution, or one that doesn't require root, please share your findings.
 
 
 # install on iOS
