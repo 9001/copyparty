@@ -1292,7 +1292,7 @@ html:not(.e) #ggrid>a.thumbed.dir:before {
 	margin: -.2em;
 }
 #ggrid>a[tt] {
-	background: linear-gradient(135deg, var(--g-g1) 95%, var(--g-g2) 95%);
+	background: linear-gradient(135deg, var(--g-g1) 95%, var(--g-g2) 95%) no-repeat;
 }
 #ggrid>a[tt]:focus-visible,
 #ggrid>a[tt]:hover {
