@@ -9008,10 +9008,13 @@ var treectl = (function () {
 
 		if(location.hash == '' && QS('#bbox-overlay.visible')){
 			baguetteBox.hide();
+			baguetteBox.resetUserAction();
 			return;
 		}
-		if(baguetteBox.getUserAction())
+		if(baguetteBox.getUserAction()){
+			baguetteBox.resetUserAction();
 			return;
+		}
 
 		if (mdoc && hbase == cbase)
 			return showfile.show(hbase + showfile.sname(url.search), true);

@@ -155,6 +155,7 @@ window.baguetteBox = (function () {
 
     var userAction = false;
     function getUserAction(){return userAction}
+    function resetUserAction(){userAction = false}
     function bindImageClickListeners(selector, userOptions) {
         var galleryNodeList = QSA(selector);
         var selectorData = {
@@ -1430,6 +1431,7 @@ window.baguetteBox = (function () {
         hide: hideOverlay,
         destroy: destroyPlugin,
         getUserAction: getUserAction,
+        resetUserAction: resetUserAction,
     };
 })();
 
