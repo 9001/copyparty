@@ -303,7 +303,7 @@ Ls.nor = {
 	"mt_compact": "tettpakket avspillerpanel\">⟎",
 	"mt_uncache": "prøv denne hvis en sang ikke spiller riktig\">oppfrisk",
 	"mt_mloop": "repeter hele mappen",
-	"mt_mnext": "hopp til neste mappe og fortsett\">📂 neste",
+	"mt_mnext": "hopp til neste mappe og fortsett",
 	"mt_mstop": "stopp avspilling\">⏸ stopp",
 	"mt_cflac": "konverter flac / wav-filer til {0}\">flac",
 	"mt_caac": "konverter aac / m4a-filer til to {0}\">aac",

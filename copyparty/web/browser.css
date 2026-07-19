@@ -1266,6 +1266,7 @@ tr.play td:nth-child(1) a {
 	background-position: 0 0, 100% 0, 100% 100%, 0 100%;
 	background-image: linear-gradient(var(--a-hil), var(--a-hil)), linear-gradient(transparent, transparent), linear-gradient(var(--a-hil), var(--a-hil)), linear-gradient(transparent, transparent);
 	animation: rotate 10s linear infinite;
+	filter: blur(5px);
 }
 html:not(.e) #ggrid>a.thumbed.dir:before {
 	content: '📂';

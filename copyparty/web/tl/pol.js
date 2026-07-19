@@ -309,7 +309,7 @@ Ls.pol = {
 	"mt_compact": "kompaktowe sterowanie\">⟎",
 	"mt_uncache": "wyczyść pamięć podręczną &nbsp;(spróbuj jeśli przeglądarka$Nzachowała zepsutą kopię utworu, przez co nie odtwarza się ona)\">uncache",
 	"mt_mloop": "odtwarzaj utwory w folderze w pętli",
-	"mt_mnext": "wczytaj następny folder i kontynuuj\">📂 next",
+	"mt_mnext": "wczytaj następny folder i kontynuuj",
 	"mt_mstop": "zatrzymaj odtwarzanie\">⏸ stop",
 	"mt_cflac": "przekonwertuj format flac / wav na {0}\">flac",
 	"mt_caac": "przekonwertuj format aac / m4a na {0}\">aac",

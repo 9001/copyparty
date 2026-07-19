@@ -335,7 +335,7 @@ Ls.hmn = {
 	"mt_compact": "compact controls\">⟎",
 	"mt_uncache": "clear cache &nbsp;(try this if your browser cached$Na broken copy of a song so it refuses to play)\">uncache",
 	"mt_mloop": "loop the open folder\">🔁 loop",
-	"mt_mnext": "load the next folder and continue\">📂 next",
+	"mt_mnext": "load the next folder and continue",
 	"mt_mstop": "stop playback\">⏸ stop",
 	"mt_cflac": "convert flac / wav to {0}\">flac",
 	"mt_caac": "convert aac / m4a to {0}\">aac",

@@ -306,7 +306,7 @@ Ls.nld = {
 	"mt_compact": "Compacte bedieningselementen\">⟎",
 	"mt_uncache": "Cache wissen &nbsp;(Probeer dit als uw browser een kapotte kopie van een nummer heeft gecached, waardoor het niet afgespeeld kan worden)\">uncache",
 	"mt_mloop": "De open map herhalen",
-	"mt_mnext": "Laad de volgende map en ga verder\">📂 next",
+	"mt_mnext": "Laad de volgende map en ga verder",
 	"mt_mstop": "Stoppen met afspelen\">⏸ stop",
 	"mt_cflac": "flac / wav omzetten naar {0}\">flac",
 	"mt_caac": "aac / m4a omzetten naar {0}\">aac",

@@ -303,7 +303,7 @@ Ls.nno = {
 	"mt_compact": "tettpakka spelarpanel\">⟎",
 	"mt_uncache": "prøv denne viss ein song ikkje spelar riktig\">oppfrisk",
 	"mt_mloop": "repetér heile mappa",
-	"mt_mnext": "hopp åt neste mappe og fortsett\">📂 neste",
+	"mt_mnext": "hopp åt neste mappe og fortsett",
 	"mt_mstop": "stopp avspeling\">⏸ stopp",
 	"mt_cflac": "konvertér flac / wav-filer åt {0}\">flac",
 	"mt_caac": "konvertér aac / m4a-filer åt to {0}\">aac",

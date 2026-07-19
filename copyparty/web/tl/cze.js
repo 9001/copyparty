@@ -310,7 +310,7 @@ Ls.cze = {
 	"mt_compact": "kompaktní ovládání\">⟎",
 	"mt_uncache": "vymazat cache &nbsp;(zkuste to, pokud váš prohlížeč uložil$Nporušenou kopii písně a odmítá ji přehrát)\">uncache",
 	"mt_mloop": "opakovat otevřenou složku",
-	"mt_mnext": "načíst další složku a pokračovat\">📂 next",
+	"mt_mnext": "načíst další složku a pokračovat",
 	"mt_mstop": "zastavit přehrávání\">⏸ stop",
 	"mt_cflac": "převést flac / wav na {0}\">flac",
 	"mt_caac": "převést aac / m4a na {0}\">aac",

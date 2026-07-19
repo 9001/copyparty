@@ -306,7 +306,7 @@ Ls.epo = {
 	"mt_compact": "kompaktaj ruliloj\">⟎",
 	"mt_uncache": "malplenigi kaŝmemoron &nbsp;(uzinda, se via retumilo kaŝmemoris$Ndifektitan kopion de kanto, kaj ne povas ludi ĝin)\">🗑️ kaŝmem.",
 	"mt_mloop": "ripeti la nunan dosierujon",
-	"mt_mnext": "ŝargi la sekvan dosierujon kaj daŭrigi\">📂 sekva",
+	"mt_mnext": "ŝargi la sekvan dosierujon kaj daŭrigi",
 	"mt_mstop": "haltigi ludadon\">⏸ haltigi",
 	"mt_cflac": "konverti el flac / wav al {0}\">flac",
 	"mt_caac": "konverti el aac / m4a al {0}\">aac",

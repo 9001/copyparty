@@ -306,7 +306,7 @@ Ls.por = {
 	"mt_compact": "controles compactos\">⟎",
 	"mt_uncache": "limpar cache &nbsp;(tente isso se seu navegador armazenou em cache$Numa cópia quebrada de uma música e se recusa a tocar)\">uncache",
 	"mt_mloop": "loop na pasta aberta",
-	"mt_mnext": "carregar a próxima pasta e continuar\">📂 próximo",
+	"mt_mnext": "carregar a próxima pasta e continuar",
 	"mt_mstop": "parar reprodução\">⏸ parar",
 	"mt_cflac": "converter flac / wav para {0}\">flac",
 	"mt_caac": "converter aac / m4a para {0}\">aac",

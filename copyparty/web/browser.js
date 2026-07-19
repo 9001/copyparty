@@ -340,7 +340,7 @@ if (1)
 		"mt_compact": "compact controls\">⟎",
 		"mt_uncache": "clear cache &nbsp;(try this if your browser cached$Na broken copy of a song so it refuses to play)\">uncache",
 		"mt_mloop": "loop the open folder",
-		"mt_mnext": "load the next folder and continue\">📂 next",
+		"mt_mnext": "load the next folder and continue",
 		"mt_mstop": "stop playback\">⏸ stop",
 		"mt_cflac": "convert flac / wav to {0}\">flac",
 		"mt_caac": "convert aac / m4a to {0}\">aac",
@@ -1005,7 +1005,7 @@ ebi('widget').innerHTML = (
 	'			<span id="txtsongend"/>0:00</span>' +
 	'		</div>' +
 	'		<div id="au_tgls" style="display: contents;">' +
-	'			<a class="tgl btn" tabindex="0" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '">🔁</a>' +
+	'			<a class="tgl btn" tabindex="0" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '$N' + L.mt_mnext + '">🔁</a>' +
 	'			<a class="tgl btn" tabindex="0" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
 	'		</div>' +
 	'		<div id="pvolbg" tabindex="0">' + svg_vol + '<canvas id="pvol"></canvas></div>' +
@@ -1211,7 +1211,7 @@ var musicSettings = (
 
 	'<div class="sub"><h3 id="h_pbmode">📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
 	'<a class="tgl btn" m="loop" tt="' + L.mt_mloop + '">🔁</a>' +
-	'<a class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
+	'<a class="tgl btn" m="next" tt="' + L.mt_mnext + '">📂⏭️</a>' +
 	'<a class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
 	'</div></div>' +
 
@@ -1991,7 +1991,11 @@ var mpl = (function () {
 	}
 
 	ebi('cyclebtn_loopmode').onclick = function(){
-		if(r.pb_mode == 'loop'){
+		if(r.pb_mode == 'next'){
+			// #4: folder loop was set, switch to none / next folder
+			r.pb_mode = 'stop';
+		}
+		else if(r.pb_mode == 'loop'){
 			// #3: folder loop was set, switch to none / next folder
 			r.pb_mode = 'next';
 		}
@@ -2011,7 +2015,11 @@ var mpl = (function () {
 
 	function drawLoopStatus(){
 		var btn = ebi('cyclebtn_loopmode');
-		if(r.pb_mode == 'loop'){
+		if(r.pb_mode == 'next'){
+			btn.innerHTML = '⏭️';
+			clmod(btn, 'on', true);
+		}
+		else if(r.pb_mode == 'loop'){
 			btn.innerHTML = '🔁';
 			clmod(btn, 'on', true);
 		}

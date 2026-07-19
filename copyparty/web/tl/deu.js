@@ -306,7 +306,7 @@ Ls.deu = {
 	"mt_compact": "kompakte Steuerelemente\">⟎",
 	"mt_uncache": "Cache leeren &nbsp;(probier das, wenn dein Browser$Neine defekte Kopie eines Titels zwischenspeichert und sich weigert, ihn abzuspielen)\">Cache leeren",
 	"mt_mloop": "offenen Ordner wiederholen",
-	"mt_mnext": "nächsten Ordner laden und fortfahren\">📂 nächster",
+	"mt_mnext": "nächsten Ordner laden und fortfahren",
 	"mt_mstop": "Wiedergabe beenden\">⏸ Stop",
 	"mt_cflac": "FLAC / WAV zu {0} konvertierebn\">flac",
 	"mt_caac": "AAC / M4A zu {0} konvertieren\">aac",

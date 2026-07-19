@@ -306,7 +306,7 @@ Ls.tur = {
 	"mt_compact": "kompakt kontroller\">⟎",
 	"mt_uncache": "önbelleği temizle &nbsp;(bunu, tarayıcınızın bozuk bir şarkı kopyasını önbelleğe alması nedeniyle çalmayı reddettiğinde deneyin)\">önbelleği temizle",
 	"mt_mloop": "açık klasörü döngüye al",
-	"mt_mnext": "bir sonraki klasörü yükle ve devam et\">📂 sonraki",
+	"mt_mnext": "bir sonraki klasörü yükle ve devam et",
 	"mt_mstop": "oynatmayı durdur\">⏸ durdur",
 	"mt_cflac": "flac / wav'ı {0}'a dönüştür\">flac",
 	"mt_caac": "aac / m4a'yı {0}'a dönüştür\">aac",

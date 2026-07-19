@@ -306,7 +306,7 @@ Ls.fra = {
 	"mt_compact": "contrôles compacts\">⟎",
 	"mt_uncache": "effacer le cache &nbsp;(essayez ceci si votre navigateur a mis en cache$Nun copie défectueuse d'une chanson, ce qui empêche sa lecture)\">uncache",
 	"mt_mloop": "lire en boucle le dossier ouvert",
-	"mt_mnext": "charger le dossier suivant et continuer\">📂 next",
+	"mt_mnext": "charger le dossier suivant et continuer",
 	"mt_mstop": "arrêter la lecture\">⏸ stop",
 	"mt_cflac": "convertir flac / wav en {0}\">flac",
 	"mt_caac": "convertir aac / m4a en {0}\">aac",

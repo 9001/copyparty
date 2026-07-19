@@ -306,7 +306,7 @@ Ls.ita = {
 	"mt_compact": "controlli compatti\">⟎",
 	"mt_uncache": "pulisci cache &nbsp;(prova ad attivare se il tuo browser ha messo in cache$Nuna copia rotta di una canzone e si rifiuta di riprodurla)\">uncache",
 	"mt_mloop": "loop della cartella aperta",
-	"mt_mnext": "carica la prossima cartella e continua\">📂 succ",
+	"mt_mnext": "carica la prossima cartella e continua",
 	"mt_mstop": "ferma riproduzione\">⏸ stop",
 	"mt_cflac": "converti flac / wav in {0}\">flac",
 	"mt_caac": "converti aac / m4a in {0}\">aac",

@@ -310,7 +310,7 @@ Ls.vie = {
 	"mt_compact": "giao diện điều khiển thu gọn\">⟎",
 	"mt_uncache": "xoá bộ nhớ đệm &nbsp;(thử nếu trình duyệt lưu trữ đệm $Nmột bản nhạc bị lỗi và không thể phát)\">uncache",
 	"mt_mloop": "lặp trong thư mục đang mở",
-	"mt_mnext": "tải thư mục tiếp theo và tiếp tục\">📂 next",
+	"mt_mnext": "tải thư mục tiếp theo và tiếp tục",
 	"mt_mstop": "dừng phát\">⏸ stop",
 	"mt_cflac": "chuyển flac / wav sang {0}\">flac",
 	"mt_caac": "chuyển aac / m4a sang {0}\">aac",

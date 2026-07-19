@@ -307,7 +307,7 @@ Ls.hun = {
 	"mt_compact": 'kompakt vezérlők">⟎',
 	"mt_uncache": 'gyorsítótár ürítése (próbáld ezt, ha a böngésző hibás fájlt mentett el és nem játssza le)">uncache',
 	"mt_mloop": 'mappa ismétlése',
-	"mt_mnext": 'következő mappa betöltése és folytatás">📂 tovább',
+	"mt_mnext": 'következő mappa betöltése és folytatás',
 	"mt_mstop": 'stop">⏸ stop',
 	"mt_cflac": 'flac / wav konvertálása ide: {0}">flac',
 	"mt_caac": 'aac / m4a konvertálása ide: {0}">aac',

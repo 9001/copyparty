@@ -306,7 +306,7 @@ Ls.fin = {
 	"mt_compact": "kompaktit säätimet\">⟎",
 	"mt_uncache": "tyhjennä välimuisti &nbsp;(kokeile tätä jos selaimesi välimuistissa on$Nrikkinäinen kopio kappaleesta)\">uncache",
 	"mt_mloop": "toista avoinna olevaa hakemistoa loputtomasti",
-	"mt_mnext": "lataa seuraava hakemisto ja jatka\">📂 seuraava",
+	"mt_mnext": "lataa seuraava hakemisto ja jatka",
 	"mt_mstop": "pysäytä toisto\">⏸ pysäytä",
 	"mt_cflac": "muunna flac / wav {0}-muotoon\">flac",
 	"mt_caac": "muunna aac / m4a {0}-muotoon\">aac",

@@ -306,7 +306,7 @@ Ls.swe = {
 	"mt_compact": "kompakt kontrollpanel\">⟎",
 	"mt_uncache": "rensa cachen &nbsp;(prova detta om din webbläsare har cachat$Nen trasig kopia av en låt och den vägrar spela upp den)\">rensa",
 	"mt_mloop": "upprepa den öppna mappen",
-	"mt_mnext": "ladda nästa mapp och fortsätt\">📂 nästa",
+	"mt_mnext": "ladda nästa mapp och fortsätt",
 	"mt_mstop": "stoppa uppspelningen\">⏸ stopp",
 	"mt_cflac": "konvertera flac / wav till {0}\">flac",
 	"mt_caac": "konvertera aac / m4a till {0}\">aac",

@@ -305,7 +305,7 @@ Ls.spa = {
 	"mt_compact": 'controles compactos">⟎',
 	"mt_uncache": 'limpiar caché &nbsp;(prueba esto si tu navegador guardó en caché$Nuna copia rota de una canción que se niega a reproducir)">limpiar caché',
 	"mt_mloop": 'repetir la carpeta actual',
-	"mt_mnext": 'cargar la siguiente carpeta y continuar">📂 sig',
+	"mt_mnext": 'cargar la siguiente carpeta y continuar',
 	"mt_mstop": 'detener reproducción">⏸ parar',
 	"mt_cflac": 'convertir flac / wav a {0}">flac',
 	"mt_caac": 'convertir aac / m4a a {0}">aac',
