@@ -9984,7 +9984,7 @@ var msel = (function () {
 	r.evsel = function (e, fun) {
 		ev(e);
 		r.so = r.pr = null;
-		var trs = QSA('#files tbody tr');
+		var trs = QSA('#files tbody tr:not(.srch_hdr)');
 		for (var a = 0, aa = trs.length; a < aa; a++)
 			clmod(trs[a], 'sel', fun);
 		r.selui();
