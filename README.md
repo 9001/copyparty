@@ -3417,9 +3417,9 @@ if you want to use external storage like an SD card or USB stick, you need to ge
 on newer versions of Android (11+), you also need to work around Android's file system safety.
 
 ### root
-the simplest workaround relies on having root access being turning off selinux enforcing (`su setenforce 0`). this will circumvent android's storage permission system and allow every app to see all the files though, which introduces vulnerabilities, so consider the rootless variant instead...
+the simplest workaround is turning off selinux enforcing (`su setenforce 0`). this will circumvent android's storage permission system and allow every app to see all files though, which introduces vulnerabilities, so consider the rootless variant instead...
 
-this is possible to permanently disable via a module like https://github.com/evdenis/selinux_permissive. 
+to permanently set selinux to permissive, you can use a magisk module for example: https://github.com/evdenis/selinux_permissive. 
 
 ### no root
 for a solution without root, the setup is more complicated. it boils down to creating a symlink to the external storage and authorizing it via termux-usb.
@@ -3433,8 +3433,8 @@ while this will work temporarily, this will **break** if you restart your phone 
 for a more permanent solution, you might want to try the following setup
 
 requirements:
-- tasker (paid app)
-- termux:tasker (addon app)
+- [Tasker](https://tasker.joaoapps.com/) (paid app)
+- [Termux:Tasker](https://f-droid.org/packages/com.termux.tasker/)
 - `pkg install jq termux-usb`
 - termux permission: draw over other apps
 
