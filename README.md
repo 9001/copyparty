@@ -3414,9 +3414,51 @@ if you are suddenly unable to access storage (permission issues), try forcequitt
 
 if you want to use external storage like an SD card or USB stick, you need to get the mount path from the folder info in a file explorer (for example [CX explorer](https://play.google.com/store/apps/details?id=com.cxinventor.file.explorer) (closed source though))
 
-on newer versions of Android (11+), you also need to work around Android's file system safety, for example by turning off selinux enforcing (`su setenforce 0`). this will circumvent android's storage permission system and allow every app to see all the files though, which introduces vulnerabilities, so be careful and don't use this unless you have to.
+on newer versions of Android (11+), you also need to work around Android's file system safety.
 
-if you've rooted your phone, this is possible to permanently disable via a module like https://github.com/evdenis/selinux_permissive. if you find a cleaner solution, or one that doesn't require root, please share your findings.
+### root
+the simplest workaround relies on having root access being turning off selinux enforcing (`su setenforce 0`). this will circumvent android's storage permission system and allow every app to see all the files though, which introduces vulnerabilities, so consider the rootless variant instead...
+
+this is possible to permanently disable via a module like https://github.com/evdenis/selinux_permissive. 
+
+### no root
+for a solution without root, the setup is more complicated. it boils down to creating a symlink to the external storage and authorizing it via termux-usb.
+
+`ln -sf /mnt/external/storage/drive ~/storage/external-symlink`
+
+`termux-usb -l` -> `termux-usb -r /dev/bus/...`
+
+while this will work temporarily, this will **break** if you restart your phone or unplug the external storage
+
+for a more permanent solution, you might want to try the following setup
+
+requirements:
+- tasker (paid app)
+- termux:tasker (addon app)
+- `pkg install jq termux-usb`
+- termux permission: draw over other apps
+
+**step 1:** this script automatically creates a symlink to the external storage and authorizes it if necessary
+
+`nano ~/.termux/tasker/on-usb.sh`
+```
+#!/bin/bash
+CURRENT_USB=$(termux-usb -l | jq -r '.[0]')
+if [ -z "$CURRENT_USB" ]; then
+    exit 1
+fi
+ln -sf "$CURRENT_USB" ~/storage/external-symlink
+termux-usb -r "$CURRENT_USB"
+```
+`chmod +x ~/.termux/tasker/on-usb.sh`
+
+**step 2:** create a tasker task to run the script when a USB device gets plugged in
+- type: State -> Hardware -> USB connected
+- action: Plugin -> termux:tasker -> configuration
+  - select script: on-usb.sh
+  - check "execute in a terminal session" (termux: draw over other apps is needed)
+
+**step 3:** verify by running `ls ~/storage/external-symlink` and include it in copyparty
 
 
 # install on iOS
