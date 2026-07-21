@@ -2563,6 +2563,10 @@ function up2k_init(subtle) {
                 if (toast.tag === t)
                     toast.ok(5, L.u_fixed);
 
+                if (response.modq) {
+                    toast.inf(8, L.mq_queued.format(t.name), t);
+                }
+
                 if (!response.name) {
                     var msg = '',
                         smsg = '';

@@ -1522,6 +1522,9 @@ class HttpCli(object):
             if "idp" in self.uparam:
                 return self.tx_idp()
 
+        if "modq" in self.uparam:
+            return self.handle_modq()
+
         if "h" in self.uparam:
             return self.tx_mounts()
 
@@ -2317,6 +2320,9 @@ class HttpCli(object):
 
         if "fs_abrt" in self.uparam:
             return self.handle_fs_abrt()
+
+        if "modq" in self.uparam:
+            return self.handle_modq()
 
         if "application/octet-stream" in ctype:
             return self.handle_post_binary()
@@ -6612,6 +6618,90 @@ class HttpCli(object):
         )
         self.loud_reply(x.get(), status=201)
         return True
+
+    def handle_modq(self) -> bool:
+        """manage the upload moderation queue"""
+        if not self.can_admin:
+            raise Pebkac(403, "admin permission required for modq")
+
+        vn = self.vn
+        if not vn.flags.get("modq"):
+            raise Pebkac(405, "moderation queue is not enabled for this volume")
+
+        vtop = vn.realpath
+        modq_dir = os.path.join(vtop, ".modq")
+
+        if "modq" in self.uparam and not self.uparam["modq"]:
+            return self._modq_list(modq_dir)
+
+        action = self.uparam.get("modq")
+        fparam = self.uparam.get("f", "")
+
+        if not fparam:
+            raise Pebkac(400, "missing f= parameter")
+
+        if ".." in fparam:
+            raise Pebkac(400, "invalid path")
+
+        frel = fparam.lstrip("/")
+        modq_src = os.path.join(modq_dir, frel)
+        real_dst = os.path.join(vtop, frel)
+
+        modq_dir_real = os.path.realpath(fsenc(modq_dir))
+        modq_src_real = os.path.realpath(fsenc(modq_src))
+        if not modq_src_real.startswith(modq_dir_real + b"/"):
+            raise Pebkac(400, "path traversal detected")
+
+        vtop_real = os.path.realpath(fsenc(vtop))
+        real_dst_real = os.path.realpath(fsenc(real_dst))
+        if not real_dst_real.startswith(vtop_real + b"/"):
+            raise Pebkac(400, "path traversal detected")
+
+        if not os.path.isfile(fsenc(modq_src)):
+            raise Pebkac(404, "file not found in moderation queue")
+
+        if action == "approve":
+            os.makedirs(os.path.dirname(fsenc(real_dst)), exist_ok=True)
+            try:
+                os.replace(fsenc(modq_src), fsenc(real_dst))
+            except FileNotFoundError:
+                raise Pebkac(404, "file was already processed")
+            self.loud_reply("approved: %s" % (frel,))
+        elif action == "reject":
+            try:
+                os.unlink(fsenc(modq_src))
+            except FileNotFoundError:
+                raise Pebkac(404, "file was already processed")
+            self._modq_cleanup(os.path.dirname(modq_src), modq_dir)
+            self.loud_reply("rejected: %s" % (frel,))
+        else:
+            raise Pebkac(400, "invalid modq action; use approve or reject")
+
+        return True
+
+    def _modq_list(self, modq_dir: str) -> bool:
+        """list files pending moderation"""
+        if not os.path.isdir(modq_dir):
+            self.loud_reply('{"files":[]}')
+            return True
+
+        files = []
+        for dp, _, fns in os.walk(modq_dir):
+            for fn in fns:
+                fp = os.path.join(dp, fn)
+                files.append({"path": os.path.relpath(fp, modq_dir), "size": os.path.getsize(fp)})
+
+        self.loud_reply(json.dumps({"files": files}))
+        return True
+
+    def _modq_cleanup(self, dpath: str, modq_dir: str) -> None:
+        """remove empty parent dirs up to but not including modq_dir"""
+        while dpath != modq_dir and os.path.isdir(dpath):
+            try:
+                os.rmdir(dpath)
+                dpath = os.path.dirname(dpath)
+            except OSError:
+                break
 
     def handle_cp(self) -> bool:
         # full path of new loc (incl filename)

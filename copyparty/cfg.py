@@ -52,6 +52,7 @@ def vf_bmap() -> dict[str, str]:
         "hardlink",
         "magic",
         "md_no_br",
+        "modq",
         "no_db_ip",
         "no_logues",
         "no_readme",
@@ -248,6 +249,7 @@ flagcats = {
         "gz": "allows server-side gzip compression of uploads with ?gz",
         "xz": "allows server-side lzma compression of uploads with ?xz",
         "pk": "forces server-side compression, optional arg: xz,9",
+        "modq": "enable upload moderation queue;\ncompleted uploads land in .modq/ until approved by admin",
     },
     "upload rules": {
         "apnd_who=dw": "who can append? (aw/dw/w/no)",

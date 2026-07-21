@@ -3494,6 +3494,9 @@ class Up2k(object):
                 "wark": wark,
             }
 
+            if "modq" in vfs.flags:
+                ret["modq"] = True
+
             if (
                 not ret["hash"]
                 and "fk" in vfs.flags
@@ -3878,6 +3881,13 @@ class Up2k(object):
         vflags = self.flags[ptop]
 
         atomic_move(self.log, src, dst, vflags)
+
+        if "modq" in vflags:
+            modq_dst = djoin(ptop, ".modq", job["prel"], job["name"])
+            os.makedirs(os.path.dirname(fsenc(modq_dst)), exist_ok=True)
+            os.replace(fsenc(dst), fsenc(modq_dst))
+            self.log("modq: staged %s -> %s" % (dst, modq_dst))
+            return
 
         times = (int(time.time()), int(job["lmod"]))
         t = "no more chunks, setting times %s (%d) on %r"

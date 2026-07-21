@@ -1815,6 +1815,7 @@ html.y #tree.nowrap .ntree a+a:hover {
 }
 .opwide,
 #op_unpost,
+#op_modq,
 #srch_form {
 	max-width: none;
 	margin-right: 1.5em;
@@ -1887,19 +1888,39 @@ html.y #tree.nowrap .ntree a+a:hover {
 	display: inherit;
 	display: unset;
 }
-#op_unpost {
+#op_unpost,
+#op_modq {
 	padding: 1em;
 }
-#op_unpost td {
+#op_unpost td,
+#op_modq td {
 	padding: .2em .4em;
 }
-#op_unpost a {
+#op_unpost a,
+#op_modq a {
 	margin: 0;
 	padding: 0;
 }
 #unpost td:nth-child(3),
 #unpost td:nth-child(4) {
 	text-align: right;
+}
+#modq td:nth-child(2) {
+	text-align: right;
+}
+.modq_badge {
+	display: inline-block;
+	min-width: 1em;
+	padding: 0 .3em;
+	margin-left: .2em;
+	font-size: .7em;
+	font-weight: bold;
+	line-height: 1.4;
+	color: #fff;
+	background: #e44;
+	border-radius: .7em;
+	text-align: center;
+	vertical-align: super;
 }
 #shui,
 #rui {
@@ -2897,7 +2918,8 @@ html.b #u2conf a.b:hover {
 }
 #u2tab a>span,
 #docul .bn a>span,
-#unpost a>span {
+#unpost a>span,
+#modq a>span {
 	font-weight: bold;
 	font-style: italic;
 	color: var(--fg-max);
@@ -3207,7 +3229,8 @@ html.cy #u2tab a,
 html.cy #u2cards a {
 	color: #f00;
 }
-html.cy #unpost a {
+html.cy #unpost a,
+html.cy #modq a {
 	color: #ff0;
 }
 html.cy #barbuf {
@@ -3789,7 +3812,8 @@ html.e #srch_form {
   margin: 0;
   border-radius: var(--radius);
 }
-html.e #op_unpost {
+html.e #op_unpost,
+html.e #op_modq {
   max-width: 100vw;
   margin: 0;
 }

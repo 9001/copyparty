@@ -44,6 +44,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
     * [uploading](#uploading) - drag files/folders into the web-browser to upload
         * [file-search](#file-search) - dropping files into the browser also lets you see if they exist on the server
         * [unpost](#unpost) - undo/delete accidental uploads
+        * [moderation queue](#moderation-queue) - uploads are queued for admin approval
         * [self-destruct](#self-destruct) - uploads can be given a lifetime
         * [race the beam](#race-the-beam) - download files while they're still uploading ([demo video](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm))
         * [incoming files](#incoming-files) - the control-panel shows the ETA for all incoming files
@@ -971,6 +972,34 @@ clients can specify a shorter expiration time using the [up2k ui](#uploading) --
 specifying a custom expiration time client-side will affect the timespan in which unposts are permitted, so keep an eye on the estimates in the up2k ui
 
 
+### moderation queue
+
+uploads land in a hidden staging area (`.modq/`) and must be approved by an admin before they become visible to other users
+
+enable per-volume with the `modq` volflag, for example `-v /mnt/inc:inc:w:c,modq`
+
+once enabled:
+* uploaded files are moved to `.modq/<relative_path>` instead of their final location
+* admins can list pending files via `GET ?modq` (or the `[🛂] modqueue` tab in the control panel)
+* admins can approve a file with `POST ?modq=approve&f=<path>` which moves it to the real destination
+* admins can reject a file with `POST ?modq=reject&f=<path>` which deletes it
+
+the `.modq` directory is hidden from directory listings and search results
+
+config file example:
+
+```yaml
+[/inc]
+  /mnt/nas/uploads
+  accs:
+    w: *    # anyone can upload here
+    rw: ed  # only user "ed" can read-write and manage the queue
+  flags:
+    e2ds    # enable filesystem indexing
+    modq    # uploads land in .modq/ until approved
+```
+
+
 ### race the beam
 
 download files while they're still uploading ([demo video](http://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm))  -- it's almost like peer-to-peer
@@ -1831,6 +1860,7 @@ set upload rules using volflags,  some examples:
   * but the actual value is not verified, just the structure, so the uploader can choose any values which conform to the format string
     * just to avoid additional complexity in up2k which is enough of a mess already
 * `:c,lifetime=300` delete uploaded files when they become 5 minutes old
+* `:c,modq` uploads land in a hidden staging area (`.modq/`) until approved by an admin (see [moderation queue](#moderation-queue))
 
 you can also set transaction limits which apply per-IP and per-volume, but these assume `-j 1` (default) otherwise the limits will be messed up, for example `-j 4` would allow anywhere between 1x and 4x the limits you set depending on which processing node the client gets routed to
 

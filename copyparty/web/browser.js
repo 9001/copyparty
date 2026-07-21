@@ -123,6 +123,7 @@ if (1)
 		"ot_close": "close submenu",
 		"ot_search": "`search for files by attributes, path / name, music tags, or any combination of those$N$N`foo bar` = must contain both «foo» and «bar»,$N`foo -bar` = must contain «foo» but not «bar»,$N`^yana .opus$` = start with «yana» and be an «opus» file$N`&quot;try unite&quot;` = contain exactly «try unite»$N$Nthe date format is iso-8601, like$N`2009-12-31` or `2020-09-12 23:30:00`",
 		"ot_unpost": "unpost: delete your recent uploads, or abort unfinished ones",
+		"ot_modq": "modqueue: review and approve/reject pending uploads",
 		"ot_bup": "bup: basic uploader, even supports netscape 4.0",
 		"ot_mkdir": "mkdir: create a new directory",
 		"ot_md": "new-file: create a new textfile",
@@ -576,6 +577,17 @@ if (1)
 		"un_busy": "deleting {0} files...",
 		"un_clip": "{0} links copied to clipboard",
 
+		"mq_info": "files pending admin approval before they become visible",
+		"mq_empty": "no files pending moderation",
+		"mq_count": "{0} file(s) pending moderation",
+		"mq_act": "action",
+		"mq_size": "size",
+		"mq_file": "file",
+		"mq_approve": "approve",
+		"mq_reject": "reject",
+		"mq_queued": "\ud83d\udec2 {0}\n\nqueued for admin approval",
+		"mq_err": "moderation action failed: ",
+
 		"u_https1": "you should",
 		"u_https2": "switch to https",
 		"u_https3": "for better performance",
@@ -803,6 +815,7 @@ ebi('ops').innerHTML = (
 	'<a href="#" id="opa_x" data-dest="" tt="' + L.ot_close + '">--</a>' +
 	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
+	'<a href="#" id="opa_modq" data-perm="admin" data-dest="modq" tt="' + L.ot_modq + '">🛂<span id="opa_modq_badge" class="modq_badge" style="display:none"></span></a>' +
 	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
 	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
 	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂</a>' +
@@ -9615,9 +9628,151 @@ var unpost = (function () {
 })();
 
 
+var modq = (function () {
+	ebi('op_modq').innerHTML = (
+		'<p>' + L.mq_info + ' &ndash; <a id="modq_refresh" href="#">' + L.un_upd + '</a></p>' +
+		'<div id="modq"></div>'
+	);
+
+	var ct = ebi('modq'),
+		r = {};
+
+	r.load = function () {
+		var html = [];
+
+		function modq_load_cb() {
+			if (!xhrchk(this, L.fu_xe1, L.fu_xe2))
+				return ebi('op_modq').innerHTML = L.fu_xe1;
+
+			try {
+				var ores = JSON.parse(this.responseText);
+			}
+			catch (ex) {
+				return ebi('op_modq').innerHTML = '<p>' + L.badreply + ':</p>' + unpre(this.responseText);
+			}
+
+			var res = ores.files;
+			var badge = ebi('opa_modq_badge');
+
+			if (!res.length) {
+				html.push('-- <em>' + L.mq_empty + '</em>');
+				ct.innerHTML = html.join('\n');
+				if (badge) badge.style.display = 'none';
+				return;
+			}
+
+			if (badge) {
+				badge.textContent = res.length;
+				badge.style.display = '';
+			}
+
+			html.push('<p>' + L.mq_count.format(res.length) + '</p>');
+			html.push('<table><thead><tr><td>' + L.mq_act + '</td><td>' + L.mq_size + '</td><td>' + L.mq_file + '</td></tr></thead><tbody>');
+
+			for (var a = 0; a < res.length; a++) {
+				var sz = ('' + res[a].size).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+				var fp = uricom_enc(res[a].path, true);
+				html.push(
+					'<tr id="modq_' + a + '"><td>' +
+					'<a class="modq_approve" fp="' + fp + '" href="#">' + L.mq_approve + '</a> ' +
+					'<a class="modq_reject" fp="' + fp + '" href="#">' + L.mq_reject + '</a>' +
+					'<td>' + sz + '</td>' +
+					'<td>' + linksplit(res[a].path).join('<span> / </span>') + '</td></tr>');
+			}
+
+			html.push('</tbody></table>');
+			ct.innerHTML = html.join('\n');
+		}
+
+		var q = get_evpath() + '?modq';
+
+		var xhr = new XHR();
+		xhr.open('GET', q, true);
+		xhr.onload = xhr.onerror = modq_load_cb;
+		xhr.send();
+
+		ct.innerHTML = "<p><em>" + L.un_m3 + "</em></p>";
+	};
+
+	function modq_action_cb() {
+		if (this.status !== 200) {
+			var msg = unpre(this.responseText);
+			toast.err(9, L.mq_err + msg);
+			return;
+		}
+
+		var row = ebi('modq_' + this.n);
+		if (row)
+			row.parentNode.removeChild(row);
+
+		toast.ok(5, this.responseText);
+
+		if (!QS('#modq .modq_approve'))
+			modq.load();
+	}
+
+	function do_action(action, fp) {
+		var q = get_evpath() + '?modq=' + action + '&f=' + fp;
+		var xhr = new XHR();
+		xhr.open('POST', q, true);
+		xhr.n = this.closest('tr').rowIndex - 1;
+		xhr.onload = xhr.onerror = modq_action_cb;
+		xhr.send();
+	}
+
+	ebi('modq_refresh').onclick = function (e) {
+		modq.load();
+		return ev(e);
+	};
+
+	ebi('op_modq').onclick = function (e) {
+		var el = e.target.closest('a');
+		if (!el)
+			return;
+
+		if (el.classList.contains('modq_approve'))
+			do_action.call(el, 'approve', el.getAttribute('fp'));
+		else if (el.classList.contains('modq_reject'))
+			do_action.call(el, 'reject', el.getAttribute('fp'));
+	};
+
+	return r;
+})();
+
+
 function goto_unpost(e) {
 	unpost.load();
 }
+
+
+function goto_modq(e) {
+	modq.load();
+}
+
+modq.poll_badge = function () {
+	var xhr = new XHR();
+	xhr.open('GET', get_evpath() + '?modq', true);
+	xhr.onload = xhr.onerror = function () {
+		if (this.status !== 200)
+			return;
+		try {
+			var ores = JSON.parse(this.responseText);
+			var badge = ebi('opa_modq_badge');
+			if (!badge)
+				return;
+			if (ores.files && ores.files.length) {
+				badge.textContent = ores.files.length;
+				badge.style.display = '';
+			} else {
+				badge.style.display = 'none';
+			}
+		} catch (ex) {}
+	};
+	xhr.send();
+};
+
+setInterval(modq.poll_badge, 30000);
+modq.poll_badge();
 
 
 function wintitle(txt, noname) {
