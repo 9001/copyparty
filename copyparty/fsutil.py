@@ -263,3 +263,4 @@ def ramdisk_chk(asrv: AuthSrv) -> None:
         htm = json.loads(vol.js_htm)
         vol.flags["fsnt"] = vol.js_ls["fsnt"] = htm["fsnt"] = fs
         vol.js_htm = json_hesc(json.dumps(htm))
+        # md_htm is dontcare; only relevant for up2k request body

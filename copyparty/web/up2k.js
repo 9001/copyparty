@@ -1099,32 +1099,34 @@ function up2k_init(subtle) {
         }
     }
     function onovercmn(self, e, btn) {
+        var ok = false;
         try {
-            var ok = false, dt = e.dataTransfer.types;
+            var dt = e.dataTransfer.types;
+
             for (var a = 0; a < dt.length; a++)
                 if(dt[a] == 'application/copyparty'){
                     ev(e)
                     return;
                 }
-            for (var a = 0; a < dt.length; a++)
+
+            for (var a = 0; a < dt.length && !ok; a++)
                 if (dt[a] == 'Files')
                     ok = true;
-            if(!ok)
-                for (var a = 0; a < dt.length; a++)
-                    if (dt[a] == 'text/uri-list') {
-                        if (btn) {
-                            ok = true;
-                            if (toast.txt == L.u_uri)
-                                toast.hide();
-                        }
-                        else if (!window.drag || !drag.no_warn)
-                            return toast.inf(10, L.u_uri) || true;
-                    }
 
-            if (!ok)
-                return true;
+            for (var a = 0; a < dt.length && !ok; a++)
+                if (dt[a] == 'text/uri-list') {
+                    if (btn)
+                        ok = true;
+                    else if (!window.drag || !drag.no_warn)
+                        return toast.inf(10, L.u_uri) || true;
+                }
+
+            if (toast.txt == L.u_uri && ok)
+                toast.hide();
         }
         catch (ex) { }
+        if (!ok)
+            return true;
 
         ev(e);
         try {

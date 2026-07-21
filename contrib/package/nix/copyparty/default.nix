@@ -30,7 +30,7 @@
   # create thumbnails with Pillow; faster than FFmpeg / MediaProcessing
   withThumbnails ? true,
 
-  # create thumbnails with PyVIPS; even faster, uses more memory
+  # create thumbnails with PyVIPS; uses more memory, pillow is preferred
   # -- can be combined with Pillow to support more filetypes
   withFastThumbnails ? false,
 

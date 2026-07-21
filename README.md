@@ -797,7 +797,7 @@ press `g` or use the view mode buttons in the top left to toggle grid-view inste
 ![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
 
 it does static images with Pillow / pyvips / FFmpeg, and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
-* pyvips is 3x faster than Pillow, Pillow is 3x faster than FFmpeg
+* Pillow is 3x faster (and safer) than FFmpeg
 * disable thumbnails for specific volumes with volflag `dthumb` for all, or `dvthumb` / `dathumb` / `dithumb` for video/audio/images only
 * for installing FFmpeg on windows, see [optional dependencies](#optional-dependencies)
 
@@ -806,6 +806,7 @@ audio files are converted into spectrograms using FFmpeg unless you `--no-athumb
 images with the following names (see `--th-covers`) become the thumbnail of the folder they're in: `folder.png`, `folder.jpg`, `cover.png`, `cover.jpg`
 * the order is significant, so if both `cover.png` and `folder.jpg` exist in a folder, it will pick the first matching `--th-covers` entry (`folder.jpg`)
 * and, if you enable [file indexing](#file-indexing), it will also try those names as dotfiles (`.folder.jpg` and so), and then fallback on the first picture in the folder (if it has any pictures at all)
+* disable folderthumbs with `--th-covers no`
 
 enabling `multiselect` lets you click files to select them, and then shift-click another file for range-select
 * `multiselect` is mostly intended for phones/tablets, but the `sel` option in the `[⚙️] settings` tab is better suited for desktop use, allowing selection by CTRL-clicking and range-selection with SHIFT-click, all without affecting regular clicking
@@ -1367,7 +1368,8 @@ for the above example to work, add the commandline argument `-e2ts` to also scan
 # server config
 
 using arguments or config files, or a mix of both:
-* config files (`-c some.conf`) can set additional commandline arguments; see [./docs/example.conf](docs/example.conf) and [./docs/example2.conf](docs/example2.conf)
+* using a config-file (`-c some.conf`) is best, easier to read/maintain; see [./docs/example.conf](docs/example.conf)
+  * for complex and intricate setups, see how [./docs/example2.conf](docs/example2.conf) includes additional config-files/folders with `% copyparty.d` which loads [./docs/copyparty.d/some.conf](docs/copyparty.d/some.conf)
 * `kill -s USR1` (same as `systemctl reload copyparty`) to reload accounts and volumes from config files without restarting
   * or click the `[reload cfg]` button in the control-panel if the user has `a`/admin in any volume
   * changes to the `[global]` config section requires a restart to take effect
@@ -2605,6 +2607,7 @@ buggy feature? rip it out  by setting any of the following environment variables
 | `PRTY_NO_IPV6`       | disable some ipv6 support (should not be necessary since windows 2000) |
 | `PRTY_NO_LZMA`       | disable streaming xz compression of incoming uploads |
 | `PRTY_NO_MP`         | disable all use of the python `multiprocessing` module (actual multithreading, cpu-count for parsers/thumbnailers) |
+| `PRTY_NO_UNIDATA`    | disable loading the unicodedata c-extension; saves 400k ram, breaks `--srch-nfkc` |
 | `PRTY_NO_SQLITE`     | disable all database-related functionality (file indexing, metadata indexing, most file deduplication logic) |
 | `PRTY_NO_TLS`        | disable native HTTPS support; if you still want to accept HTTPS connections then TLS must now be terminated by a reverse-proxy |
 | `PRTY_NO_TPOKE`      | disable systemd-tmpfilesd avoider |
@@ -3281,7 +3284,7 @@ enable sending [zeromq messages](#zeromq) from event-hooks: `pyzmq`
 
 enable [smb](#smb-server) support (**not** recommended): `impacket==0.13.0`
 
-`pyvips` gives higher quality thumbnails than `Pillow` and is 320% faster, using 270% more ram
+`pyvips` adds support for some additional image formats, but can use extreme amounts of RAM
 * to install `pyvips` on Linux: `sudo apt install libvips42 && python3 -m pip install --user -U pyvips`
 * to install `pyvips` on windows: `pip install --user -U "pyvips[binary]"`
 

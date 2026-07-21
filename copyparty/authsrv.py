@@ -2612,6 +2612,13 @@ class AuthSrv(object):
                 t = "WARNING: volume [/%s]: invalid value specified for ext-th: %s"
                 self.log(t % (vol.vpath, etv), 3)
 
+            zsl = [x.strip() for x in vol.flags["th_covers"].split(",")]
+            zsl = [x for x in zsl if x not in ("", "no")]
+            vol.flags["th_coversl"] = zsl
+            vol.flags["th_coversd"] = zsl + ["." + x for x in zsl]
+            vol.flags["th_covers_set"] = set(vol.flags["th_coversl"])
+            vol.flags["th_coversd_set"] = set(vol.flags["th_coversd"])
+
             zsl = [x.strip() for x in vol.flags["rw_edit"].split(",")]
             zsl = [x for x in zsl if x]
             vol.flags["rw_edit"] = ",".join(zsl)
@@ -3037,6 +3044,10 @@ class AuthSrv(object):
                 t = "hint: enable upload deduplication with --dedup (but see readme for consequences)"
                 self.log(t, 6)
 
+            if MACOS and not self.args.srch_nfkc:
+                t = "hint: enable --srch-nfkc to improve unicode filename/path search on MacOS"
+                self.log(t, 6)
+
             zv, _ = vfs.get("/", "*", False, False)
             zs = zv.realpath.lower()
             if zs in ("/", "c:\\") or zs.startswith(r"c:\windows"):
@@ -3240,6 +3251,7 @@ class AuthSrv(object):
 
         self.js_ls = {}
         self.js_htm = ""
+        self.md_htm = ""
         for vp, vn in self.vfs.all_nodes.items():
             if enshare and vp.startswith(shrs):
                 continue  # propagates later in this func
@@ -3368,6 +3380,7 @@ class AuthSrv(object):
             dbv = vol.get_dbv("")[0]
             vol.js_ls = vol.js_ls or dbv.js_ls or {}
             vol.js_htm = vol.js_htm or dbv.js_htm or "{}"
+            vol.md_htm = vol.md_htm or dbv.md_htm or "{}"
 
             zs = str(vol.flags.get("tcolor") or self.args.tcolor)
             vol.flags["tcolor"] = zs.lstrip("#")
@@ -3795,12 +3808,12 @@ class AuthSrv(object):
             "",
         ]
 
-        csv = set("i p th_covers zm_on zm_off zs_on zs_off".split())
+        csv = set("i p zm_on zm_off zs_on zs_off".split())
         zs = "c ihead ohead mtm mtp on403 on404 xac xad xar xau xiu xban xbc xbd xbr xbu xm"
         lst = set(zs.split())
         askip = set("a v c vc cgen exp_lg exp_md theme".split())
 
-        t = "exp_lg exp_md ext_th_d mv_re_r mv_re_t rm_re_r rm_re_t srch_re_dots srch_re_nodot"
+        t = "emb_all emb_lgs emb_mds exp_lg exp_md ext_th_d ls_q_m mv_re_r mv_re_t rm_re_r rm_re_t oh_f oh_g rw_edit_set srch_re_dots srch_re_nodot th_coversd th_coversl th_covers_set th_coversd_set"
         fskip = set(t.split())
 
         # keymap from argv to vflag
@@ -3927,6 +3940,9 @@ class AuthSrv(object):
                 except:
                     pass
 
+                if k in ("chmod_d", "chmod_f"):
+                    v = "%o" % (v,)
+
                 try:
                     ak = vmap[k]
                     v2 = getattr(self.args, ak)
@@ -3936,7 +3952,7 @@ class AuthSrv(object):
                     except:
                         pass
 
-                    if v2 is v:
+                    if v2 == v:
                         continue
                 except:
                     pass

@@ -1159,7 +1159,7 @@ class Up2k(object):
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
         fv = "\033[0;36m{}:\033[90m{}"
-        zs = "bcasechk du_iwho emb_all emb_lgs emb_mds ext_th_d html_head html_head_d html_head_s ls_q_m put_name2 mv_re_r mv_re_t rm_re_r rm_re_t oh_f oh_g rw_edit_set srch_re_dots srch_re_nodot zipmax zipmaxn_v zipmaxs_v"
+        zs = "bcasechk du_iwho emb_all emb_lgs emb_mds ext_th_d html_head html_head_d html_head_s ls_q_m put_name2 mv_re_r mv_re_t rm_re_r rm_re_t oh_f oh_g rw_edit_set srch_re_dots srch_re_nodot th_coversd th_coversl th_covers_set th_coversd_set zipmax zipmaxn_v zipmaxs_v"
         fx = set(zs.split())
         fd = vf_bmap()
         fd.update(vf_cmap())
@@ -1431,6 +1431,8 @@ class Up2k(object):
                     rtop,
                     rei,
                     reh,
+                    vol.flags["th_coversd"],
+                    vol.flags["th_coversd_set"],
                     n4g,
                     ffat,
                     [],
@@ -1508,6 +1510,8 @@ class Up2k(object):
         rcdir: str,
         rei: Optional[Pattern[str]],
         reh: Optional[Pattern[str]],
+        th_cvd: list[str],
+        th_cvds: set[str],
         n4g: bool,
         ffat: bool,
         seen: list[str],
@@ -1533,8 +1537,6 @@ class Up2k(object):
         cv = vcv = acv = ""
         e_d = {}
 
-        th_cvd = self.args.th_coversd
-        th_cvds = self.args.th_coversd_set
         scan_pr_s = self.args.scan_pr_s
 
         assert self.pp and self.mem_cur  # !rm
@@ -1601,6 +1603,8 @@ class Up2k(object):
                         rap,
                         rei,
                         reh,
+                        th_cvd,
+                        th_cvds,
                         n4g,
                         fat32,
                         seen,
@@ -1631,7 +1635,7 @@ class Up2k(object):
 
                 rsz += sz
                 files.append((sz, lmod, iname))
-                if sz:
+                if sz and th_cvd:
                     liname = iname.lower()
                     ext = liname.rsplit(".", 1)[-1]
                     if (
@@ -4117,31 +4121,7 @@ class Up2k(object):
                 with self.rescan_cond:
                     self.rescan_cond.notify_all()
 
-        if rd and sz and fn.lower() in self.args.th_coversd_set:
-            # wasteful; db_add will re-index actual covers
-            # but that won't catch existing files
-            crd, cdn = rd.rsplit("/", 1) if "/" in rd else ("", rd)
-            try:
-                q = "select fn from cv where rd=? and dn=?"
-                db_cv = db.execute(q, (crd, cdn)).fetchone()[0]
-                db_lcv = db_cv.lower()
-                if db_lcv in self.args.th_coversd_set:
-                    idx_db = self.args.th_coversd.index(db_lcv)
-                    idx_fn = self.args.th_coversd.index(fn.lower())
-                    add_cv = idx_fn < idx_db
-                else:
-                    add_cv = True
-            except:
-                add_cv = True
-
-            if add_cv:
-                try:
-                    db.execute("delete from cv where rd=? and dn=?", (crd, cdn))
-                    db.execute("insert into cv values (?,?,?)", (crd, cdn, fn))
-                except:
-                    pass
-
-        if "nodirsz" not in vflags:
+        if vflags and "nodirsz" not in vflags:
             try:
                 q = "update ds set nf=nf+1, sz=sz+? where rd=?"
                 q2 = "insert into ds values(?,?,1)"

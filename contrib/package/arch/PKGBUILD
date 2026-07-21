@@ -16,7 +16,7 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
             "python-mutagen: music tags (alternative)"
             "python-paramiko: sftp server",
             "python-pillow: thumbnails for images"
-            "python-pyvips: thumbnails for images (higher quality, faster, uses more ram)"
+            "python-pyvips: thumbnails for images (eats ram, prefer pillow)"
             "libkeyfinder: detection of musical keys"
             "python-pyopenssl: ftps functionality"
             "python-pyzmq: send zeromq messages from event-hooks"

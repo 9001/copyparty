@@ -49,7 +49,7 @@ with image size after installation and when gzipped
 * [`min`](https://hub.docker.com/r/copyparty/min) (57 MiB, 20 gz) is just copyparty itself
 * [`im`](https://hub.docker.com/r/copyparty/im) (70 MiB, 25 gz) can thumbnail images with pillow, parse media files with mutagen
 * [`ac` (163 MiB, 56 gz)](https://hub.docker.com/r/copyparty/ac) is `im` plus ffmpeg for video/audio thumbs + audio transcoding + better tags
-* [`iv`](https://hub.docker.com/r/copyparty/iv) (211 MiB, 73 gz) is `ac` plus vips for faster heif / avic / jxl thumbnails
+* [`iv`](https://hub.docker.com/r/copyparty/iv) (211 MiB, 73 gz) is `ac` plus vips for more thumbnail formats
 * [`dj`](https://hub.docker.com/r/copyparty/dj) (309 MiB, 104 gz) is `iv` plus beatroot/keyfinder to detect musical keys and bpm
 
 [`ac` is recommended](https://hub.docker.com/r/copyparty/ac) since the additional features available in `iv` and `dj` are rarely useful
