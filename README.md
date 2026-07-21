@@ -3436,12 +3436,13 @@ while this will work temporarily, this will **break** if you restart your phone 
 for a more permanent solution, you might want to try the following setup
 
 requirements:
-- [Tasker](https://tasker.joaoapps.com/) (paid app)
-- [Termux:Tasker](https://f-droid.org/packages/com.termux.tasker/)
 - `pkg install jq termux-usb`
-- termux permission: draw over other apps
+- [Tasker](https://tasker.joaoapps.com/) (paid) (optional)
+- [Termux:Tasker](https://f-droid.org/packages/com.termux.tasker/) (optional)
+- termux permission: draw over other apps (optioal)
 
-**step 1:** this script automatically creates a symlink to the external storage and authorizes it if necessary
+**step 1:** this script automatically creates a symlink to the first USB device in the `termux-usb -l` list and authorizes it if necessary 
+>(careful, this depends on the order you plug in your devices. the first in the list is the last one you plugged in)
 
 `nano ~/.termux/tasker/on-usb.sh`
 ```
@@ -3455,13 +3456,17 @@ termux-usb -r "$CURRENT_USB"
 ```
 `chmod +x ~/.termux/tasker/on-usb.sh`
 
-**step 2:** create a tasker task to run the script when a USB device gets plugged in
+**step 2:** run this script when you launch copyparty
+
+`~/.termux/tasker/on-usb.sh && copyparty`
+
+**(step 2.5):** create a tasker task to run the script when a USB device gets plugged in
 - type: State -> Hardware -> USB connected
 - action: Plugin -> termux:tasker -> configuration
   - select script: on-usb.sh
   - check "execute in a terminal session" (termux: draw over other apps is needed)
 
-**step 3:** verify by running `ls ~/storage/external-symlink` and include it in copyparty
+**step 3:** include it in copyparty config! `-v=~/storage/external-symlink::`
 
 
 # install on iOS
