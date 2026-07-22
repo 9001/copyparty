@@ -988,15 +988,6 @@ window.baguetteBox = (function () {
             '<div class="bbox-double-bounce2"></div>' +
             '</div>';
 
-        var th = QS('.imgcontainer[ref=' + imageElement.id + '] img')
-        if(th && th.complete)
-            figure.innerHTML += 
-                '<div class="bbth_o1">' + 
-                    '<div class="bbth_o2">' + 
-                        '<img class="bbth" src="' + th.src + '"/>' + 
-                    '</div>' +
-                '</div>';
-
         if (options.captions && imageCaption) {
             var figcaption = mknod('figcaption', 'bbox-figcaption-' + index);
             figcaption.innerHTML = imageCaption;
@@ -1010,7 +1001,6 @@ window.baguetteBox = (function () {
         bind(image, 'error', lerr);
         bind(image, is_vid ? 'loadedmetadata' : 'load', function () {
             // Remove loader element
-            clmod(this.parentNode, 'loaded', true);
             qsr('#baguette-img-' + index + ' .bbox-spinner');
             if (!options.async && callback)
                 callback();

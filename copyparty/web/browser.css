@@ -3021,7 +3021,6 @@ html.noscroll .sbar::-webkit-scrollbar {
 	display: inline;
 	margin: 0;
 	height: 100%;
-	position: relative;
 }
 .full-image img,
 .full-image video {
@@ -3045,7 +3044,7 @@ html.noscroll .sbar::-webkit-scrollbar {
 .full-image video.asap {
 	transition: none;
 }
-#bbox-overlay.fill .full-image .loaded img,
+#bbox-overlay.fill .full-image img,
 #bbox-overlay.fill .full-image video {
     width: 100%;
     height: 100%;
@@ -3259,28 +3258,6 @@ html.y #bbox-overlay figcaption a {
 }
 .no-transition {
 	transition: none !important;
-}
-.bbth_o1{
-	position: absolute;
-	left: 0;
-	display: inline;
-	width: 100%;
-	height: calc(100vh - 1.4em);
-	z-index: -1;
-	transition: opacity .5s;
-	pointer-events: none;
-}
-.bbth_o2{
-	display: flex;
-  	height: 100%;
-}
-.bbth{
-	width: 100% !important;
-  	margin: auto !important;
-	object-fit: contain;
-}
-.loaded .bbth_o1{
-	opacity: 0;
 }
 
 
