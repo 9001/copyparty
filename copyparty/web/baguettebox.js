@@ -1010,7 +1010,7 @@ window.baguetteBox = (function () {
         bind(image, 'error', lerr);
         bind(image, is_vid ? 'loadedmetadata' : 'load', function () {
             // Remove loader element
-            clmod(this, 'loaded', true);
+            clmod(this.parentNode, 'loaded', true);
             qsr('#baguette-img-' + index + ' .bbox-spinner');
             if (!options.async && callback)
                 callback();

@@ -3045,7 +3045,7 @@ html.noscroll .sbar::-webkit-scrollbar {
 .full-image video.asap {
 	transition: none;
 }
-#bbox-overlay.fill .full-image img.loaded,
+#bbox-overlay.fill .full-image .loaded img,
 #bbox-overlay.fill .full-image video {
     width: 100%;
     height: 100%;
