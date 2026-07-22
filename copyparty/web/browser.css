@@ -3021,6 +3021,7 @@ html.noscroll .sbar::-webkit-scrollbar {
 	display: inline;
 	margin: 0;
 	height: 100%;
+	position: relative;
 }
 .full-image img,
 .full-image video {
@@ -3258,6 +3259,22 @@ html.y #bbox-overlay figcaption a {
 }
 .no-transition {
 	transition: none !important;
+}
+.bbth_o1{
+	position: absolute;
+	left: 0;
+	display: inline;
+	width: 100%;
+	height: calc(100vh - 1.4em);
+	z-index: -1;
+}
+.bbth_o2{
+	display: flex;
+  	height: 100%;
+}
+.full-image .bbth{
+	width: 100%;
+  	margin: auto;
 }
 
 
