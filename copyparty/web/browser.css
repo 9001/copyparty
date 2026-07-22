@@ -3267,6 +3267,8 @@ html.y #bbox-overlay figcaption a {
 	width: 100%;
 	height: calc(100vh - 1.4em);
 	z-index: -1;
+	transition: opacity .5s;
+	pointer-events: none;
 }
 .bbth_o2{
 	display: flex;
@@ -3275,9 +3277,10 @@ html.y #bbox-overlay figcaption a {
 .bbth{
 	width: 100% !important;
   	margin: auto !important;
+	object-fit: contain;
 }
 .loaded .bbth_o1{
-	display: none;
+	opacity: 0;
 }
 
 
