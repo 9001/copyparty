@@ -868,6 +868,11 @@ class HttpCli(object):
         if "html_head_s" in vn.flags:
             self.html_head += vn.flags["html_head_s"]
 
+        if self.args.pwa:
+            proto = "https" if self.is_https else "http"
+            url = "{}://{}/{}".format(proto, self.host, self.vpath)
+            self.html_head += '<link rel="manifest" href="{}?pwa" />'.format(url)
+
         try:
             cors_k = self._cors()
             if self.mode in ("GET", "HEAD"):
@@ -1532,6 +1537,9 @@ class HttpCli(object):
         if "rss" in self.uparam:
             return self.tx_rss()
 
+        if "pwa" in self.uparam:
+            return self.tx_pwa()
+
         return self.tx_browser()
 
     def tx_rss(self) -> bool:
@@ -1750,6 +1758,20 @@ class HttpCli(object):
             raise Pebkac(404, "no such file in archive")
         except (zipfile.BadZipfile, RuntimeError):
             raise Pebkac(404, "requested file is not a valid zip file")
+        return True
+
+    def tx_pwa(self) -> bool:
+        proto = "https" if self.is_https else "http"
+        url = "{}://{}/{}".format(proto, self.host, self.vpath)
+        name = "{} {} {}".format(self.args.favico.split(" ")[0], self.args.name, self.vpath)
+        ret = {
+            "name": name, "short_name": name,
+            "start_url": "{}".format(url),
+            "theme_color": "#000000", "background_color": "#000000",
+            "display": "standalone"
+        }
+        zs = json.dumps(ret, separators=(",\n", ": "))
+        self.reply(zs.encode("utf-8", "replace"), mime="application/json")
         return True
 
     def handle_propfind(self) -> bool:

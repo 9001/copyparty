@@ -1967,6 +1967,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--dothidden", action="store_true", help="hide specific files in a folder by listing them in a file named .hidden -- WARNING: Mostly cosmetic! Download-as-zip/tar will still download them. Do not rely on this for security (volflag=dothidden)")
     ap2.add_argument("--favico", metavar="TXT", type=u, default="c 000 none" if retry else "🎉 000 none", help="\033[33mfavicon-text\033[0m [ \033[33mforeground\033[0m [ \033[33mbackground\033[0m ] ], set blank to disable")
     ap2.add_argument("--ufavico", metavar="TXT", type=u, default="", help="URL to .ico/png/gif/svg file; \033[33m--favico\033[0m takes precedence unless disabled (volflag=ufavico)")
+    ap2.add_argument("--pwa", action="store_true", help="announce webmanifest; use folders as PWA")
     ap2.add_argument("--ext-th", metavar="E=VP", type=u, action="append", help="\033[34mREPEATABLE:\033[0m use thumbnail-image \033[33mVP\033[0m for file-extension \033[33mE\033[0m, example: [\033[32mexe=/.res/exe.png\033[0m] (volflag=ext_th)")
     ap2.add_argument("--mpmc", type=u, default="", help=argparse.SUPPRESS)
     ap2.add_argument("--notooltips", action="store_true", help="tooltips disabled as default")
