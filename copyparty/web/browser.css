@@ -3272,9 +3272,9 @@ html.y #bbox-overlay figcaption a {
 	display: flex;
   	height: 100%;
 }
-.full-image .bbth{
-	width: 100%;
-  	margin: auto;
+.bbth{
+	width: 100% !important;
+  	margin: auto !important;
 }
 
 
