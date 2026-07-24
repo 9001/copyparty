@@ -176,6 +176,27 @@ RSS_SORT = {"m": "mt", "u": "at", "n": "fn", "s": "sz"}
 ACODE2_FMT = set(["opus", "owa", "caf", "mp3", "flac", "wav"])
 IDX_HTML = set(["index.htm", "index.html"])
 
+# coolwsd-26.04.2.3 discovery editnew; browser.js wopi_set is superset of this
+WOPI_NEW = (
+    ".odt",
+    ".fodt",
+    ".ott",
+    ".docx",
+    ".dotx",
+    ".rtf",
+    ".odm",
+    ".ods",
+    ".fods",
+    ".ots",
+    ".xlsx",
+    ".odp",
+    ".fodp",
+    ".otp",
+    ".pptx",
+    ".fodg",
+    ".otg",
+)
+
 A_FILE = os.stat_result(
     (0o644, -1, -1, 1, 1000, 1000, 8, 0x39230101, 0x39230101, 0x39230101)
 )
@@ -3823,6 +3844,9 @@ class HttpCli(object):
                 self.uname,
                 True,
             )
+
+        if self.args.wopi and sanitized.endswith(WOPI_NEW):
+            return self.redirect(vjoin(vfs.vpath, rem), "?wopi=" + quotep(sanitized))
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         self.redirect(vpath, "?edit")

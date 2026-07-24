@@ -3343,6 +3343,8 @@ class AuthSrv(object):
                 zs2 = getattr(self.args, zs, "")
                 if zs2:
                     js_htm[zs] = zs2
+            if self.args.wopi:
+                js_htm["have_wopi"] = True
 
             zs = "have_emp md_no_br"
             md_htm = {x: js_htm[x] for x in zs.split(" ")}
@@ -3984,7 +3986,7 @@ class AuthSrv(object):
 
 def derive_args(args: argparse.Namespace) -> None:
     args.have_idp_hdrs = bool(args.idp_h_usr or args.idp_hm_usr)
-    args.have_ipu_or_ipr = bool(args.ipu or args.ipr)
+    args.have_ipu_or_ipr = bool(args.ipu or args.ipr or args.wopi)
 
 
 def n_du_who(s: str) -> int:

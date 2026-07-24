@@ -135,6 +135,7 @@ web/tl/vie.js
 web/ui.css
 web/up2k.js
 web/util.js
+web/wopi.html
 """
 RES = set(zs.strip().split("\n"))
 RESM = {
