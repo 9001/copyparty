@@ -1,6 +1,6 @@
-<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" style="max-width:40%" align="right"/>
+<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="220" align="right"/>
 
-### 💾🎉 copyparty
+### <nobr>💾🎉 copyparty</nobr>
 
 turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser
 
@@ -165,22 +165,28 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
 
 just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
 
-> ℹ️ the sfx is a [self-extractor](https://github.com/9001/copyparty/issues/270) which unpacks an embedded `tar.gz` into `$TEMP` -- if this looks too scary, you can use the [zipapp](#zipapp) which has slightly worse performance
+> ℹ️ the sfx is a [self-extractor](https://github.com/9001/copyparty/issues/270) which unpacks an embedded `tar.gz` into `$TEMP` -- if this looks too scary, you can use the [zipapp](#zipapp) which has slightly worse performance, or choose your preferred method below
 
-* or install through [pypi](https://pypi.org/project/copyparty/): `python3 -m pip install --user -U copyparty`
-* or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
-* or install [on arch](#arch-package) / [homebrew](#homebrew-formulae) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
-* or if you are on android, [install copyparty in termux](#install-on-android)
-* or maybe an iPhone or iPad? [install in a-Shell on iOS](#install-on-iOS)
-* or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
-* or if you have [uv](https://docs.astral.sh/uv/) installed, run `uv tool run copyparty`
-* or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
-* or if your OS is dead, give the [bootable flashdrive / cd-rom](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) a spin
+| alternative run methods: | |
+|-|-|
+| [**python** pypi](https://pypi.org/project/copyparty/) | `python3 -m pip install --user -U copyparty`
+| [**docker 🐋**](./scripts/docker/) | dependencies built-in
+| [**copyparty.exe**](#copypartyexe) | (if you cannot install python)
+| [**arch**](#arch-package) / [homebrew](#homebrew-formulae) / [NixOS](#nixos-module) / [nix](#nix-package) | btw
+| **[android](#install-on-android)**| install copyparty in termux
+| [**iOS** iPhone / iPad](#install-on-iOS) | install in a-Shell on iOS
+| [**synology** nas / dsm](./docs/synology-dsm.md)
+| [**uv**](https://docs.astral.sh/uv/) | `uv tool run copyparty`
+| [**zipapp** (pyz)](#zipapp) | if your computer is messed up and nothing else works
+| [**bootable flashdrive** / cd-rom](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) | if your OS is dead entirely
+
 * or if you don't trust copyparty yet and want to isolate it a little, then...
-  * ...maybe [prisonparty](./bin/prisonparty.sh) to create a tiny [chroot](https://wiki.archlinux.org/title/Chroot) (very portable),
-  * ...or [bubbleparty](./bin/bubbleparty.sh) to wrap it in [bubblewrap](https://github.com/containers/bubblewrap) (much better)
-* or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
-  * docker has all deps built-in, so skip this step:
+  * ...maybe [prisonparty](./bin/prisonparty.sh) to create a tiny [**chroot**](https://wiki.archlinux.org/title/Chroot) (very portable),
+  * ...or [bubbleparty](./bin/bubbleparty.sh) to wrap it in [**bubblewrap**](https://github.com/containers/bubblewrap) (much better)
+
+### dependencies
+
+if you're on **docker**, you can skip this step:
 
 enable thumbnails (images/audio/video), media indexing, and audio transcoding by installing some recommended deps:
 
@@ -195,11 +201,13 @@ enable thumbnails (images/audio/video), media indexing, and audio transcoding by
   * copyparty.exe comes with `Pillow` and only needs [ffmpeg](#optional-dependencies) for mediatags/videothumbs
 * see [optional dependencies](#optional-dependencies) to enable even more features
 
+### configuration
+
 running copyparty without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
-you can use the [config GUI](#config-gui) (recommended for beginners)
-
-or see [some usage examples](#complete-examples) for inspiration, or the [complete windows example](./docs/examples/windows.md)
+you can use the [**config GUI**](#config-gui) (recommended for beginners),
+or see [some usage examples](#complete-examples) for inspiration, 
+or the [complete windows example](./docs/examples/windows.md)
 
 some recommended options:
 * `-e2dsa` enables general [file indexing](#file-indexing)
@@ -3417,32 +3425,26 @@ if you are suddenly unable to access storage (permission issues), try forcequitt
 
 if you want to use external storage like an SD card or USB stick, you need to get the mount path from the folder info in a file explorer (for example [CX explorer](https://play.google.com/store/apps/details?id=com.cxinventor.file.explorer) (closed source though))
 
-on newer versions of Android (11+), you also need to work around Android's file system safety.
+your path will look something like `/mnt/[device-ID]/`
 
-### root
-the simplest workaround is turning off selinux enforcing (`su setenforce 0`). this will circumvent android's storage permission system and allow every app to see all files though, which introduces vulnerabilities, so consider the rootless variant instead...
+### permission errors
+first, try re-running the initial setup command from the [section above](#install-on-android)
 
-to permanently set selinux to permissive, you can use a magisk module for example: https://github.com/evdenis/selinux_permissive. 
+if you still get permission errors, it might be neccessary to create a symlink to the external storage and authorize it via termux-usb.
 
-### no root
-for a solution without root, the setup is more complicated. it boils down to creating a symlink to the external storage and authorizing it via termux-usb.
+(if you're rooted, you can skip this section and just set [selinux permissive](https://github.com/evdenis/selinux_permissive))
 
-`ln -sf /mnt/external/storage/drive ~/storage/external-symlink`
+>(careful, this depends on the order you plug in your devices. the first in the list is the last one you plugged in. the paths will also change when you re-connect a device)
 
 `termux-usb -l` -> `termux-usb -r /dev/bus/...`
 
-while this will work temporarily, this will **break** if you restart your phone or unplug the external storage
+`ln -sf /dev/bus/... ~/storage/external-symlink`
 
-for a more permanent solution, you might want to try the following setup
+while this will work temporarily, this will **break** if you restart your phone or unplug the external storage, because the path returned by termux-usb can change. to work around that, you need the following:
 
-requirements:
-- `pkg install jq termux-usb`
-- [Tasker](https://tasker.joaoapps.com/) (paid) (optional)
-- [Termux:Tasker](https://f-droid.org/packages/com.termux.tasker/) (optional)
-- termux permission: draw over other apps (optioal)
+**requirements**: `pkg install jq termux-usb`
 
 **step 1:** this script automatically creates a symlink to the first USB device in the `termux-usb -l` list and authorizes it if necessary 
->(careful, this depends on the order you plug in your devices. the first in the list is the last one you plugged in)
 
 `nano ~/.termux/tasker/on-usb.sh`
 ```
@@ -3460,13 +3462,20 @@ termux-usb -r "$CURRENT_USB"
 
 `~/.termux/tasker/on-usb.sh && copyparty`
 
-**(step 2.5):** create a tasker task to run the script when a USB device gets plugged in
+**step 2.5 (optional):** create a tasker task to run the script when a USB device gets plugged in
+
+requirements:
+- [Tasker](https://tasker.joaoapps.com/) (paid)
+- [Termux:Tasker](https://f-droid.org/packages/com.termux.tasker/)
+- termux permission: draw over other apps
+
+set up a task:
 - type: State -> Hardware -> USB connected
 - action: Plugin -> termux:tasker -> configuration
   - select script: on-usb.sh
   - check "execute in a terminal session" (termux: draw over other apps is needed)
 
-**step 3:** include it in copyparty config! `-v=~/storage/external-symlink::`
+**step 3:** include the symlink to the volume in your copyparty config! `-v=~/storage/external-symlink::`
 
 
 # install on iOS
