@@ -1248,6 +1248,9 @@ var img_re = APPLE ?
 	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
 	/\.(a?png|avif|bmp|gif|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
 
+var wopi_set = !window.have_wopi ? null :
+	new Set('odt fodt ott doc docx dotx rtf odm ods fods ots xls xlsx odp fodp otp ppt pptx ppsx odg fodg otg odf'.split(' '));
+
 
 function set_files_html(html) {
 	var files = ebi('files');
@@ -7685,6 +7688,11 @@ var treectl = (function () {
 				if (lang == 'md')
 					tn.href = addq(tn.href, 'v');
 			}
+
+
+			if (wopi_set && wopi_set.has(tn.ext))
+				tn.lead = '<a href="?wopi=' + bhref +
+					'" rel="nofollow" name="' + hname + '">📄</a>';
 
 			if (tn.lead == '-')
 				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +
