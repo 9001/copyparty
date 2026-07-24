@@ -3427,6 +3427,8 @@ if you want to use external storage like an SD card or USB stick, you need to ge
 
 your path will look something like `/mnt/[device-ID]/`
 
+⚠️ to prevent copyparty from shutting down when your external storage is disconnected, use `--dbpath=./` to prevent storing your database on the removable media when you use any of the `-e2d*` arguments. this might also prevent other related errors
+
 ### permission errors
 first, try re-running the initial setup command from the [section above](#install-on-android)
 
