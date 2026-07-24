@@ -180,6 +180,8 @@ class HttpSrv(object):
         self.u2idx_free: dict[str, U2idx] = {}
         self.u2idx_n = 0
 
+        self.wopi_files: dict[str, dict[str, str]] = {}
+
         assert jinja2  # type: ignore  # !rm
         env = jinja2.Environment()
         env.loader = jinja2.FunctionLoader(lambda f: load_jinja2_resource(self.E, f))
@@ -195,6 +197,7 @@ class HttpSrv(object):
             "shares",
             "splash",
             "svcs",
+            "wopi",
         ]
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
         self.j2["opds"] = env.get_template("opds.xml")
@@ -241,9 +244,6 @@ class HttpSrv(object):
 
         if (HAVE_PIL or HAVE_VIPS or HAVE_FFMPEG) and not self.args.no_thumb:
             Daemon(self.post_init, "hsrv-init2")
-
-        if self.args.wopi:
-            self.wopi_files: dict[str, dict[str, str]] = {}
 
     def post_init(self) -> None:
         try:
