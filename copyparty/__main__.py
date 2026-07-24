@@ -1579,9 +1579,13 @@ def add_opds(ap):
 
 def add_wopi(ap):
     ap2 = ap.add_argument_group("WOPI options")
-    ap2.add_argument("--wopi", action="store_true", help="allows for integrating with office suites using WOPI")
-    ap2.add_argument("--wopi-client", type=u, default="https://demo.eu.collaboraonline.com", help="where to find your WOPI client, this is what actually hosts e.g. Collabora Online")
-    ap2.add_argument("--wopi-ttl", type=int, default=1800, help="amount of seconds after which the session expires, defaults to 30 minutes")
+    ap2.add_argument("--wopi", action="store_true", help="enable integration with office suites using WOPI")
+    ap2.add_argument("--wopi-api", metavar="URL", type=u, default="", help="URL that the WOPI-client should use to communicate with copyparty; default is same as user's webbrowser. Example: [\033[32mhttps://party.example.com/\033[0m]")
+    ap2.add_argument("--wopi-url", metavar="URL", type=u, default="", help="URL to your WOPI client; the host of e.g. Collabora Online. Example: [\033[32mhttps://code.example.com/\033[0m]")
+    ap2.add_argument("--wopi-crt", metavar="TXT", type=u, default="", help="if \033[33m--wopi-url\033[0m is selfsigned: path to ca.pem or cert.pem to expect/verify (can be [\033[32mno\033[0m] for full-yolo)")
+    ap2.add_argument("--wopi-crt-icn", action="store_true", help="if \033[33m--wopi-url\033[0m is selfsigned: ignore the CN (server ip/name) in cert")
+    ap2.add_argument("--wopi-ttl", metavar="SEC", type=int, default=1800, help="session lifetime; allow editing for this many seconds (default is 30 min)")
+    ap2.add_argument("--wopi-wdel", action="store_true", help="require permissions read+write+delete for writing to file; default is just read+write")
 
 
 def add_handlers(ap):
