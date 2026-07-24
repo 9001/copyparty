@@ -407,11 +407,6 @@ flagcats = {
         "og_no_head": "you want to add tags manually with og_tpl",
         "og_ua": "if defined: only send OG html if useragent matches this regex",
     },
-    "wopi": {
-        "wopi": "enable WOPI support for integrating with online office suites",
-        "wopi-client": "address of WOPI client, e.g. Collabora Online",
-        "wopi-ttl": "amount of seconds after which the session expires"
-    },
     "opds": {
         "opds": "enable OPDS",
         "opds_exts": "file formats to list in OPDS feeds; leave empty to show everything",
