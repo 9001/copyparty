@@ -1248,6 +1248,9 @@ var img_re = APPLE ?
 	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
 	/\.(a?png|avif|bmp|gif|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
 
+var wopi_set = !window.have_wopi ? null :
+	new Set('odt fodt ott doc docx dotx rtf odm ods fods ots xls xlsx odp fodp otp ppt pptx ppsx odg fodg otg odf'.split(' '));
+
 
 function set_files_html(html) {
 	var files = ebi('files');
@@ -7681,20 +7684,12 @@ var treectl = (function () {
 					tn.href = addq(tn.href, 'v');
 			}
 
-            // https://en.wikipedia.org/wiki/OpenDocument
-            // https://help.collaboraoffice.com/latest/en-US/text/shared/guide/ms_user.html
-            var office_formats = [
-                "odt", "fodt", "doc", "docx",
-                "ods", "fods", "xls", "xlsx",
-                "odp", "fopd", "ppt", "pps", "pptx",
-                "odg", "fodg",
-                "odf",
-            ];
 
-            if (office_formats.includes(tn.ext)) {
-				tn.lead = '<a href="?wopi=' + bhref + '" id="t' + id +
-                    '" rel="nofollow" target="blank" name="' + hname + '">📄</a>';
-            } else if (tn.lead == '-') {
+			if (wopi_set && wopi_set.has(tn.ext))
+				tn.lead = '<a href="?wopi=' + bhref +
+					'" rel="nofollow" name="' + hname + '">📄</a>';
+
+			if (tn.lead == '-')
 				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +
 					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
