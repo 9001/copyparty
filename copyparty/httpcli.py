@@ -16,8 +16,6 @@ import sys
 import threading  # typechk
 import time
 import uuid
-import urllib.request
-import urllib.parse
 from datetime import datetime
 from operator import itemgetter
 
@@ -32,7 +30,7 @@ try:
 except:
     pass
 
-from .__init__ import ANYWIN, RES, RESM, TYPE_CHECKING, EnvParams, unicode
+from .__init__ import ANYWIN, PY2, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
@@ -150,6 +148,11 @@ if True:  # pylint: disable=using-constant-test
 
 if TYPE_CHECKING:
     from .httpconn import HttpConn
+
+if PY2:
+    from urllib2 import urlopen
+else:
+    from urllib.request import urlopen
 
 if not hasattr(socket, "AF_UNIX"):
     setattr(socket, "AF_UNIX", -9001)
@@ -807,12 +810,6 @@ class HttpCli(object):
                 else:
                     self.log("unknown username: %r" % (idp_usr,), 1)
 
-        try:
-            if self.args.wopi:
-                self.uname = self.conn.hsrv.wopi_files.get(self.uparam.get("access_token")).get("uname")
-        except:
-            pass
-
         if self.args.have_ipu_or_ipr:
             if self.args.ipu and (self.uname == "*" or self.args.ao_ipu_wins):
                 self.uname = self.conn.ipu_iu[self.conn.ipu_nm.map(self.ip)]
@@ -821,6 +818,22 @@ class HttpCli(object):
                 if not ipr[self.uname].map(self.ip):
                     self.log("username [%s] rejected by --ipr" % (self.uname,), 3)
                     self.uname = "*"
+            if self.args.wopi and "access_token" in self.uparam:
+                wopi_a = self.uparam["access_token"]
+                try:
+                    wopi_f = self.conn.hsrv.wopi_files[wopi_a]
+                    if wopi_f["expires"] < time.time():
+                        raise Exception("expired")
+                    uname = wopi_f["uname"]
+                    self.asrv.vfs.get(
+                        wopi_f["vp"], uname, True, True, False, self.args.wopi_wdel
+                    )
+                    self.uname = uname
+                except Exception as ex:
+                    self.conn.hsrv.wopi_files.pop(wopi_a, None)
+                    self.cbonk(self.conn.hsrv.gpwd, wopi_a, "wopi", "bad wopi tokens")
+                    self.loud_reply("bad wopi token %s (%s)" % (wopi_a, ex), status=400)
+                    return False
 
         self.rvol = self.asrv.vfs.aread[self.uname]
         self.wvol = self.asrv.vfs.awrite[self.uname]
@@ -1550,117 +1563,125 @@ class HttpCli(object):
         return self.tx_browser()
 
     def tx_wopi_api(self) -> bool:
-        path = self.vpath.split('/')
+        atoken = self.uparam["access_token"]
+        session = self.conn.hsrv.wopi_files[atoken]
+        if self.do_log:
+            self.log(" `-- wopi: %r" % (session["vp"],))
 
-        if "files" in path and self.conn.hsrv.wopi_files[self.uparam["access_token"]]["file_id"] in path:
-            real_path = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["path"]
-            vfs, _ = self.asrv.vfs.get(real_path, self.uname, False, True)
-            full_path = vfs.realpath + "/" + real_path
+        zs = "wopi/files/%s" % (session["file_id"],)
+        if not self.vpath.startswith(zs):
+            return self.tx_404()
+        query = self.vpath[len(zs) :]
 
-            if "contents" in path:
-                if self.do_log:
-                    self.log("WOPI GET 'contents': %s" % (full_path))
-
-                return self.tx_file("oh_f", full_path)
-            else:
-                if self.do_log:
-                    self.log("WOPI GET 'file_info': %s" % (full_path))
-
-                file_info = {
-                    "BaseFileName": real_path.split("/")[-1],
-                    "OwnerId": self.uname,
-                    "Size": os.path.getsize(full_path),
-                    "UserId": self.uname,
-                    "UserFriendlyName": self.uname,
-                    "UserCanWrite": True,
-                    "UserCanNotWriteRelative": True,
-                    "LastModifiedTime":
-                        time.strftime(
-                            "%Y-%m-%dT%H:%M:%SZ",
-                            time.gmtime(os.path.getmtime(full_path))
-                        ),
-                }
-                ret = json.dumps(file_info).encode("utf-8", "replace")
-                self.reply(ret, 200, "application/json; charset=utf-8")
-                return True
+        vfs, rem = self.asrv.vfs.get(session["vp"], self.uname, True, True)
+        vpath = vjoin(vfs.vpath, rem)
+        ap = vfs.canonical(rem)
+        if query.startswith("/contents"):
+            return self.tx_file("oh_f", ap)
+        else:
+            st = bos.stat(ap)
+            file_info = {
+                "BaseFileName": vpath.split("/")[-1],
+                "Size": st.st_size,
+                "OwnerId": self.uname,
+                "UserId": self.uname,
+                "UserFriendlyName": self.uname,
+                "UserCanWrite": True,
+                "UserCanNotWriteRelative": True,
+                "LastModifiedTime": time.strftime(
+                    "%Y-%m-%dT%H:%M:%SZ", time.gmtime(st.st_mtime)
+                ),
+            }
+            ret = json.dumps(file_info).encode("utf-8", "replace")
+            self.reply(ret, 200, "application/json; charset=utf-8")
+            return True
 
         return self.tx_404()
 
     def tx_wopi(self) -> bool:
-        from secrets import token_urlsafe
-        path = self.vpath + "/" + str(self.uparam["wopi"])
-        access_token = token_urlsafe(64)
-        file_id = token_urlsafe(64)
-        self.conn.hsrv.wopi_files[access_token] = {
-            "uname": self.uname,
-            "file_id": file_id,
-            "path": path,
-        }
+        vpath = vjoin(self.vpath, self.uparam["wopi"])
+        vfs, rem = self.asrv.vfs.get(
+            vpath, self.uname, True, True, False, self.args.wopi_wdel
+        )
+        if not bos.path.isfile(vfs.canonical(rem)):
+            return self.tx_404()
 
-        threading.Timer(
-            self.args.wopi_ttl,
-            lambda wopi_files, access_token : wopi_files.pop(access_token),
-            [self.conn.hsrv.wopi_files, access_token]
-        ).start()
+        wopi_files = self.conn.hsrv.wopi_files
+        found = None
+        rm = []
+        with self.conn.hsrv.mutex:
+            now = time.time()
+            for atoken, session in wopi_files.items():
+                if session["expires"] < now:
+                    rm.append(atoken)
+                    continue
+                if session["vp"] != vpath or session["uname"] != self.uname:
+                    continue
+                if session["expires"] - now < self.args.wopi_ttl * 0.9:
+                    rm.append(atoken)
+                    continue
+                found = session
+                break
+            for zs in rm:
+                del wopi_files[zs]
+            if len(wopi_files) > 9000:  # about 6 MiB
+                raise Pebkac(500, "too many wopi sessions")
+            if not found:
+                atoken = ub64enc(os.urandom(18)).decode("ascii")  #  18 = 144b = 24c
+                file_id = ub64enc(os.urandom(15)).decode("ascii")  # 15 = 120b = 20c
+                wopi_files[atoken] = session = {
+                    "vp": vpath,
+                    "uname": self.uname,
+                    "file_id": file_id,
+                    "expires": time.time() + self.args.wopi_ttl,
+                }
 
+        xml = "?"
         try:
             from .dxml import parse_xml
-            discovery = urllib.request.urlopen(self.args.wopi_client + "/hosting/discovery")
-            response = parse_xml(discovery.read())
-            ext = path.split('.')[-1]
-            wopi_url = response.find(".//action[@ext='%s'][@urlsrc]" % ext).get("urlsrc")
-            favicon_url = response.find(".//action[@ext='%s'].." % ext).get("favIconUrl")
-            url = wopi_url + urllib.parse.quote("WOPISrc=https://" + self.host + "/wopi/files/" + file_id, safe="=")
-            ttl = int((time.time() + self.args.wopi_ttl) * 1000)
-        except Exception as error:
-            self.log("Couldn't get urls from WOPI client: %s" % error)
-            return False
 
-        ret = [
-                """\
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="icon" href="%s" />
-    <title>%s</title>
-    <style>
-        body {
-            margin: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-        }
-        #viewer {
-            width: 100%%;
-            height: 100%%;
-            border: 0;
-        }
-    </style>
-</head>
-<body>
-    <div style="display: none">
-        <form action="%s" enctype="multipart/form-data" method="post" target="viewer" id="submit-form">
-            <input name="access_token" value="%s" type="hidden" id="access-token"/>
-            <input name="access_token_ttl" value="%s" type="hidden" id="access-token_ttl"/>
-            <input type="submit" value="" />
-        </form>
-    </div>
+            uo_kw = {}
+            if self.args.wopi_crt:
+                import ssl
 
-    <iframe id="viewer" name="viewer" allow="clipboard-read *; clipboard-write *; fullscreen *"></iframe>
+                if self.args.wopi_crt == "no":
+                    ctx = ssl._create_unverified_context()
+                else:
+                    ctx = ssl.create_default_context(cafile=self.args.wopi_crt)
+                    ctx.check_hostname = not self.args.wopi_crt_icn
 
-    <script nonce="%s">
-        document.getElementById("submit-form").submit();
-    </script>
-</body>
-</html>
-"""
-            % (favicon_url, self.uparam["wopi"], url, access_token, ttl, self.js_nonce)
-        ]
+                uo_kw["context"] = ctx
 
-        bret = "".join(ret).encode("utf-8", "replace")
-        self.reply(bret, 200, "text/html; charset=utf-8")
+            url = self.args.wopi_url.rstrip("/") + "/hosting/discovery"
+            buf = urlopen(url, **uo_kw).read()
+            xml = buf.decode("ascii", "replace").lower()
+            enc = self.get_xml_enc(xml)
+            xml = buf.decode(enc, "replace")
+            xroot = parse_xml(xml)
+            ext = vpath.split(".")[-1]
+            url = xroot.find(".//action[@ext='%s'][@urlsrc]" % (ext,)).get("urlsrc")
+            if not url.endswith(("?", "&")):
+                url += "&" if "?" in url else "?"
+            url += "WOPISrc="
+            if self.args.wopi_api:
+                zs = self.args.wopi_api.rstrip("/")
+            else:
+                zs = ("https://" if self.is_https else "http://") + self.host
+            url += quotep(zs + "/wopi/files/" + session["file_id"])
+        except:
+            del wopi_files[atoken]  # dont reuse an atoken wopi-client doesnt like
+            self.log("reading WOPI-client response failed; %s\n%s" % (min_ex(), xml), 3)
+            raise Pebkac(500, "wopi error (see fileserver log)")
+
+        html = self.j2s(
+            "wopi",
+            title=self.uparam["wopi"],
+            url=url,
+            atoken=atoken,
+            ttl=session["expires"],
+        ).encode("utf-8", "replace")
+
+        self.reply(html, 200, "text/html; charset=utf-8")
         return True
 
     def tx_rss(self) -> bool:
@@ -2516,6 +2537,9 @@ class HttpCli(object):
 
             raise Pebkac(405, "POST(%r) is disabled in server config" % (ctype,))
 
+        if self.args.wopi and self.vpath.startswith("wopi"):
+            return self.handle_post_binary()
+
         raise Pebkac(405, "don't know how to handle POST(%r)" % (ctype,))
 
     def handle_smsg(self) -> bool:
@@ -3286,7 +3310,7 @@ class HttpCli(object):
             raise Pebkac(400, "you must supply a content-length for binary POST")
 
         if self.args.wopi and self.vpath.startswith("wopi"):
-            return self.rx_wopi()
+            return self.rx_wopi(postsize)
 
         try:
             chashes = self.headers["x-up2k-hash"].split(",")
@@ -3499,46 +3523,46 @@ class HttpCli(object):
         self.reply(b"thank")
         return True
 
-    def rx_wopi(self) -> bool:
-        path = self.vpath.split('/')
+    def rx_wopi(self, postsize: int) -> bool:
+        atoken = self.uparam["access_token"]
+        session = self.conn.hsrv.wopi_files[atoken]
+        if self.do_log:
+            self.log(" `-- wopi: %r" % (session["vp"],))
 
-        if (
-            "files" in path and
-            "contents" in path and
-            self.conn.hsrv.wopi_files[self.uparam["access_token"]]["file_id"] in path
-        ):
-            real_path = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["path"]
-            vfs, _ = self.asrv.vfs.get(real_path, self.uname, False, True)
-            full_path = vfs.realpath + "/" + real_path
+        zs = "wopi/files/%s/contents" % (session["file_id"],)
+        if not self.vpath.startswith(zs):
+            return self.tx_404()
 
-            if self.do_log:
-                self.log("WOPI POST 'contents': %s" % (full_path))
+        vpath = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["vp"]
+        vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
+        vpath = vjoin(vfs.vpath, rem)
+        ap = vfs.canonical(rem)
+        st = bos.stat(ap)
 
-            last_mod_time = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path)))
-            if self.headers["x-cool-wopi-timestamp"] != last_mod_time:
+        if "x-cool-wopi-timestamp" in self.headers:
+            zs = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(st.st_mtime))
+            if self.headers["x-cool-wopi-timestamp"] != zs:
                 self.reply(json.dumps({"COOLStatusCode": 1010}).encode("utf-8"), 409)
                 return True
 
-            reader, _ = self.get_body_reader()
-            buf = b""
-            for rbuf in reader:
-                buf += rbuf
-                if not rbuf:
-                    break
+        buf = b""
+        for rbuf in self.get_body_reader()[0]:
+            buf += rbuf
+            if not rbuf:
+                break
 
-            if buf:
-                with open(full_path, "wb") as file:
-                    file.write(buf)
+        if len(buf) != postsize:
+            t = "wopi post with incorrect length; expected %d, got %d"
+            raise Pebkac(400, t % (postsize, len(buf)))
 
-                new_mod_time = {
-                    "LastModifiedTime": 
-                        time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(os.path.getmtime(full_path)))
-                }
-                ret = json.dumps(new_mod_time).encode("utf-8", "replace")
-                self.reply(ret, 200, "application/json; charset=utf-8")
-                return True
+        with open(ap, "wb") as file:
+            file.write(buf)
 
-        return self.tx_404(True)
+        st = bos.stat(ap)
+        zs = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(st.st_mtime))
+        ret = json.dumps({"LastModifiedTime": zs}).encode("utf-8", "replace")
+        self.reply(ret, 200, "application/json; charset=utf-8")
+        return True
 
     def handle_chpw(self) -> bool:
         assert self.parser  # !rm
