@@ -194,6 +194,12 @@ def au_unpk(
             log(t)
             fi = zf.open(using)
 
+        elif pk == "kra":
+            import zipfile
+
+            zf = zipfile.ZipFile(abspath, "r")
+            fi = zf.open("mergedimage.png")
+
         elif pk == "epub":
             fi = get_cover_from_epub(log, abspath)
             assert fi  # !rm
