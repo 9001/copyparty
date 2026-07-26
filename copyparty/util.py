@@ -2948,6 +2948,25 @@ def trystat_shutil_copy2(log: "NamedLogger", src: bytes, dst: bytes) -> bytes:
         raise
 
 
+def trystat_shutil_move(log: "NamedLogger", src: bytes, dst: bytes) -> bytes:
+    try:
+        return shutil.move(src, dst)
+    except:
+        # ignore failed mtime on linux+ntfs; for example:
+        # shutil.py:437 <copy2>: copystat(src, dst, follow_symlinks=follow_symlinks)
+        # shutil.py:376 <copystat>: lookup("utime")(dst, ns=(st.st_atime_ns, st.st_mtime_ns),
+        # [PermissionError] [Errno 1] Operation not permitted, '/windows/_videos'
+        _, _, tb = sys.exc_info()
+        for _, _, fun, _ in traceback.extract_tb(tb):
+            if fun == "copystat":
+                if log:
+                    t = "warning: failed to retain some file attributes (timestamp and/or permissions) during move from %r to %r:\n%s"
+                    log(t % (src, dst, min_ex()), 3)
+                os.unlink(src)
+                return dst  # close enough
+        raise
+
+
 def _fs_mvrm(
     log: "NamedLogger", src: str, dst: str, atomic: bool, flags: dict[str, Any]
 ) -> bool:
@@ -2999,7 +3018,9 @@ def _fs_mvrm(
             if not attempt and ex.errno == errno.EXDEV:
                 t = "using copy+delete (%s)\n  %s\n  %s"
                 log(t % (ex.strerror, src, dst))
-                osfun = shutil.move
+                if osfun in (os.replace, os.rename):
+                    args.insert(0, log)
+                osfun = trystat_shutil_move
                 continue
             if now - t0 > maxtime or attempt == 90209:
                 raise
@@ -3036,7 +3057,7 @@ def atomic_move(log: "NamedLogger", src: str, dst: str, flags: dict[str, Any]) -
                 os.unlink(bdst)
             except:
                 pass
-            shutil.move(bsrc, bdst)  # type: ignore
+            trystat_shutil_move(log, bsrc, bdst)  # type: ignore
 
 
 def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
