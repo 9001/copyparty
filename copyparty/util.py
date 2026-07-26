@@ -1355,7 +1355,7 @@ class MTHash(object):
             self.csz = chunksz
 
             chunks: dict[int, tuple[str, int, int]] = {}
-            nchunks = int(math.ceil(fsz / chunksz))
+            nchunks = -int(-fsz // chunksz)
             for nch in range(nchunks):
                 self.work_q.put(nch)
 
