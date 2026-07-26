@@ -233,10 +233,14 @@ class SvcHub(object):
 
         self.lo1 = self.lo2 = ""
         if args.lo:
+            do_xz = args.lo.replace("%R", "").lower().endswith(".xz")
             if "%R" not in args.lo:
                 args.lo += "%R"
             if args.rlo in ("", "no"):
                 args.rlo = ""
+            if do_xz and not args.rlo:
+                args.rlo = ".1"
+            if args.rlo in ("", "del", "over"):
                 args.lo = args.lo.replace("%R", "")
             try:
                 self.lo1, self.lo2 = args.lo.split("%R")
@@ -1443,7 +1447,7 @@ class SvcHub(object):
     def _setup_logfile(self) -> None:
         base_fn = fn = self._logname()
         sel_fn = fn + self.lo2
-        do_xz = sel_fn.lower().endswith(".xz")
+        do_xz = sel_fn.replace("%R", "").lower().endswith(".xz")
         if "%R" in self.args.lo:
             # yup this is a race; if started sufficiently concurrently, two
             # copyparties can grab the same logfile (considered and ignored)
@@ -1459,18 +1463,31 @@ class SvcHub(object):
         except:
             pass
 
+        if self.args.rlo in ("del", "over"):
+            tmode = "wt"
+            bmode = "w"
+        else:
+            tmode = "at"
+            bmode = "a"
+
+        if self.args.rlo == "del":
+            try:
+                bos.unlink(fn)
+            except:
+                pass
+
         try:
             if do_xz:
                 import lzma
 
-                lh = lzma.open(fn, "wt", encoding="utf-8", errors="replace", preset=0)
+                lh = lzma.open(fn, tmode, encoding="utf-8", errors="replace", preset=0)
                 self.args.no_logflush = True
             else:
-                lh = open(fn, "wt", encoding="utf-8", errors="replace")
+                lh = open(fn, tmode, encoding="utf-8", errors="replace")
         except:
             import codecs
 
-            lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
+            lh = codecs.open(fn, bmode, encoding="utf-8", errors="replace")
 
         if getattr(self.args, "free_umask", False):
             os.fchmod(lh.fileno(), 0o644)
@@ -1485,6 +1502,8 @@ class SvcHub(object):
         printed = "".join(lprinted) + msg
         t = "t0: {:.3f}\nargv: {}\n\n{}"
         lh.write(t.format(self.E.t0, " ".join(argv), printed))
+        if not self.args.no_logflush:
+            lh.flush()
         self.logf = lh
         self.logf_base_fn = base_fn
         print(msg, end="")
