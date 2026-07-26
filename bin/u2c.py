@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 S_VERSION = "2.22"
 S_BUILD_DT = "2026-06-13"

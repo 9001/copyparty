@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 """copyparty: http file sharing hub (py2/py3)"""
 __author__ = "ed <copyparty@ocv.me>"
