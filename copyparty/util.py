@@ -4523,6 +4523,18 @@ def hidedir(dp) -> None:
             pass
 
 
+def winsparse(f: typing.BinaryIO) -> None:
+    assert ctypes  # !rm
+    assert wk32  # !rm
+    import msvcrt
+
+    fh = msvcrt.get_osfhandle(f.fileno())
+    if not wk32.DeviceIoControl(
+        fh, 0x900C4, None, 0, None, 0, ctypes.byref(ctypes.c_ulong()), None
+    ):
+        raise ctypes.WinError(ctypes.get_last_error())
+
+
 _flocks = {}
 
 
