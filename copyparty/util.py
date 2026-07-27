@@ -4226,6 +4226,10 @@ def _runhook(
             if src in ("xm", "xban"):
                 ja["txt"] = txt[0]
                 ja["body"] = txt[1]
+            elif src == "xbr":
+                ja["ap_to"] = txt[0]
+            elif src in ("xar.ln", "xar.mv"):
+                ja["ap_from"] = txt[0]
             else:
                 ja["wark"] = txt[0]  # acshually the dwark but less confusing
         if imp:

@@ -4735,7 +4735,7 @@ class Up2k(object):
                 fsize,
                 ip,
                 time.time(),
-                None,
+                [dabs],
             )
             t = hr.get("rejectmsg") or ""
             if t or hr.get("rc") != 0:
@@ -4778,7 +4778,7 @@ class Up2k(object):
                     fsize,
                     ip,
                     time.time(),
-                    None,
+                    [sabs],
                 )
 
             return "k"
@@ -4908,7 +4908,7 @@ class Up2k(object):
                 fsize,
                 ip,
                 time.time(),
-                None,
+                [sabs],
             )
 
         return "k"
