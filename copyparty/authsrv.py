@@ -3059,6 +3059,8 @@ class AuthSrv(object):
             zv, _ = vfs.get("", "*", False, True, err=999)
             if self.warn_anonwrite and verbosity > 4 and os.getcwd() == zv.realpath:
                 t = "anyone can write to the current directory: {}\n"
+                if ANYWIN:
+                    t += "/!\\ NOTE: because you are using Windows, this is extra dangerous (DLL-hijacking)\n"
                 self.log(t.format(zv.realpath), c=1)
 
             self.warn_anonwrite = False
