@@ -1727,6 +1727,8 @@ def add_safety(ap):
     ap2.add_argument("--loris", metavar="B", type=int, default=60, help="if a client maxes out the server connection limit without sending headers, ban it for \033[33mB\033[0m minutes; disable with [\033[32m0\033[0m]")
     ap2.add_argument("--acao", metavar="V[,V]", type=u, default="*", help="Access-Control-Allow-Origin; list of origins (domains/IPs without port) to accept requests from; [\033[32mhttps://1.2.3.4\033[0m]. Default [\033[32m*\033[0m] allows requests from all sites but removes cookies and http-auth; only ?pw=hunter2 survives")
     ap2.add_argument("--acam", metavar="V[,V]", type=u, default="GET,HEAD", help="Access-Control-Allow-Methods; list of methods to accept from offsite ('*' behaves like \033[33m--acao\033[0m's description)")
+    if FULL_HELP or ANYWIN:
+        ap2.add_argument("--unsafe-tools", action="store_true", help="windows-only: allow running programs (ffmpeg, dcraw_emu, ...) when their location is inside a folder that can be uploaded to (dangerous due to DLL-hijacking)")
     if FULL_HELP or (not ANYWIN and not UNIX):
         ap2.add_argument("--th-bwrap", metavar="CMD", type=u, default=th_bwrap, help="optional bwrap sandbox command for FFmpeg and dcraw (Linux-only)")
         ap2.add_argument("--use-bwrap", metavar="TXT", type=u, default="n", help="a/n/f; [\033[32ma\033[0m]=auto (yes if the program 'bwrap' exists (assumes it works)), [\033[32mn\033[0m]=no (assumes bwrap is broken), [\033[32mf\033[0m]=force (disables FFmpeg if bwrap unavailable)")

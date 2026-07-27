@@ -81,6 +81,7 @@ from .util import (
     alltrace,
     build_netmap,
     expat_ver,
+    fsenc,
     gzip,
     html_escape,
     load_ipr,
@@ -399,6 +400,9 @@ class SvcHub(object):
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log, dargs=self.dargs)
         ramdisk_chk(self.asrv)
+
+        if ANYWIN and not self.args.unsafe_tools:
+            self._check_toolpaths()
 
         if args.cgen:
             self.asrv.cgen()
@@ -1024,6 +1028,18 @@ class SvcHub(object):
         zb = os.environ.get("S6_NOTIFY_FD")
         if zb:
             Daemon(self.s6_notify, "s6-notify", (zb,))
+
+    def _check_toolpaths(self) -> None:
+        for vol in self.asrv.vfs.all_vols.values():
+            if not vol.realpath or not vol.axs.uwrite:
+                continue
+            ap_vol = (vol.realpath + os.sep).encode("utf-8")
+            for zsl in (HAVE_FFMPEG, HAVE_FFPROBE, HAVE_DCRAW):
+                if zsl and zsl[0].startswith(ap_vol):
+                    zs = zsl[0].decode("utf-8", "replace")
+                    t = "will not use [%s] because it is inside a writable volume [/%s] => [%s] and --unsafe-tools is not enabled"
+                    self.log("root", t % (zs, vol.vpath, vol.realpath), 3)
+                    del zsl[0]
 
     def _feature_test(self) -> None:
         fok = []

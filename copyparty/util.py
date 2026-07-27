@@ -678,6 +678,12 @@ except:
     HAVE_BWRAP = ""
 
 
+if ANYWIN:
+    SCWD = os.environ["systemroot"]
+else:
+    SCWD = None
+
+
 def py_desc() -> str:
     interp = platform.python_implementation()
     py_ver = ".".join([str(x) for x in sys.version_info])
