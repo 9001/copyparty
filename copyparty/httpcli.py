@@ -3739,7 +3739,7 @@ class HttpCli(object):
     def _mkdir(self, vpath: str, dav: bool = False) -> bool:
         nullwrite = self.args.nw
         self.gctx = vpath
-        vpath = undot(vpath)
+        vpath = sanitize_vpath(undot(vpath))
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
         if "nosub" in vfs.flags:
             raise Pebkac(403, "mkdir is forbidden below this folder")
