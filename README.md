@@ -76,6 +76,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
         * [connecting to webdav from windows](#connecting-to-webdav-from-windows) - using the GUI
     * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
     * [smb server](#smb-server) - unsafe, slow, not recommended for wan
+    * [wopi server](#wopi-server) - edit office documents in the web-ui
     * [browser ux](#browser-ux) - tweaking the ui
     * [opengraph](#opengraph) - discord and social-media embeds
     * [file deduplication](#file-deduplication) - enable symlink-based upload deduplication
@@ -1629,6 +1630,15 @@ the smb protocol listens on TCP port 445, which is a privileged port on linux an
 authenticate with one of the following:
 * username `$username`, password `$password`
 * username `$password`, password `k`
+
+
+## wopi server
+
+edit office documents in the web-ui
+
+needs a wopi client to work, and the only supported wopi client is a selfhosted collabora online server; eventually onlyoffice will probably also be supported: [issue #1574](https://github.com/9001/copyparty/issues/1574)
+
+no further documentation or examples yet, [issue #1575](https://github.com/9001/copyparty/issues/1575)
 
 
 ## browser ux

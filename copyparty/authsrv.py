@@ -3060,7 +3060,7 @@ class AuthSrv(object):
             if self.warn_anonwrite and verbosity > 4 and os.getcwd() == zv.realpath:
                 t = "anyone can write to the current directory: {}\n"
                 if ANYWIN:
-                    t += "/!\\ NOTE: because you are using Windows, this is extra dangerous (DLL-hijacking)\n"
+                    t += "/!\\ NOTE: because you are using Windows, this is kinda dangerous (DLL-hijacking); you should configure accounts and volumes if this is accessible from an untrusted network\n"
                 self.log(t.format(zv.realpath), c=1)
 
             self.warn_anonwrite = False

@@ -1,4 +1,30 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0709-2254  `v1.20.18`  bwrap off
+
+## 🧪 new features
+
+* [shadowing](https://github.com/9001/copyparty/#shadowing): filesystem-path `//NULL` will fully unmap a volume from the server's filesystem (no more `/var/lib/empties/4` jank) 88846061
+
+## 🩹 bugfixes
+
+* fix a false-positive warning on startup 12878e6c1cbf4417da42d46230dff686dd48760b
+
+## 🔧 other changes
+
+* #1552 #1551 default-disabled the bwrap ffmpeg sandbox; 85a8cc99
+  * sandboxing can fail in too many creative ways (funky linux distros with funky filesystem layouts and policies) so autoconfiguring bwrap is not feasible
+  * to enable it, set `use-bwrap: y` after adjusting [th-bwrap](https://copyparty.eu/cli/#g-th-bwrap) to match your OS/env
+    * see the default `th-bwrap` value in `--help` on your server for a best-effort guess
+* always rotate (never overwrite) `-lo` logfiles on startup unless `--rlo no` 29e145f5
+* thumbnails: save a tiny bit of I/O by not refreshing expiration-times if `th-clean` (expiration) is disabled anyways e15f2927
+
+## 🌠 fun facts
+
+* no
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0706-1937  `v1.20.17`  SECURITY: fix dirkeys
 
 ## ⚠️ ATTN: this release fixes a dirkey vulnerability
