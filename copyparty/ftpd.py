@@ -483,6 +483,10 @@ class FtpFs(AbstractedFS):
     def get_group_by_uid(self, gid: int) -> str:
         return "root"
 
+    def mkstemp(self, *a, **ka):
+        self.log("mkstemp%r @%s" % (a, self.uname))
+        raise FSE("nope")
+
 
 class FtpHandler(FTPHandler):
     abstracted_fs = FtpFs
@@ -517,6 +521,9 @@ class FtpHandler(FTPHandler):
 
         # reduce non-debug logging
         self.log_cmds_list = [x for x in self.log_cmds_list if x not in ("CWD", "XCWD")]
+
+    def ftp_STOU(self, *a) -> None:
+        self.respond("550 nope", logging.warning)
 
     def ftp_STOR(self, file: str, mode: str = "w") -> Any:
         # Optional[str]
