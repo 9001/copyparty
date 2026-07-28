@@ -194,7 +194,7 @@ def au_unpk(
             log(t)
             fi = zf.open(using)
 
-        elif pk == "kra":
+        elif pk == "kra" or pk == "ora":
             import zipfile
 
             zf = zipfile.ZipFile(abspath, "r")
