@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 S_VERSION = "2.22"
 S_BUILD_DT = "2026-06-13"
@@ -398,7 +398,7 @@ class MTHash(object):
             self.csz = chunksz
 
             chunks = {}
-            nchunks = int(math.ceil(fsz / chunksz))
+            nchunks = -int(-fsz // chunksz)
             for nch in range(nchunks):
                 self.work_q.put(nch)
 
@@ -725,7 +725,7 @@ def up2k_chunksize(filesize):
     stepsize = 512 * 1024
     while True:
         for mul in [1, 2]:
-            nchunks = math.ceil(filesize * 1.0 / chunksize)
+            nchunks = -int(-filesize // chunksize)
             if nchunks <= 256 or (chunksize >= 32 * 1024 * 1024 and nchunks <= 4096):
                 return chunksize
 

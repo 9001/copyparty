@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 import hashlib
 import math
@@ -180,6 +180,8 @@ class HttpSrv(object):
         self.u2idx_free: dict[str, U2idx] = {}
         self.u2idx_n = 0
 
+        self.wopi_files: dict[str, dict[str, str]] = {}
+
         assert jinja2  # type: ignore  # !rm
         env = jinja2.Environment()
         env.loader = jinja2.FunctionLoader(lambda f: load_jinja2_resource(self.E, f))
@@ -196,6 +198,7 @@ class HttpSrv(object):
             "shares",
             "splash",
             "svcs",
+            "wopi",
         ]
         self.j2 = {x: env.get_template(x + ".html") for x in jn}
         self.j2["opds"] = env.get_template("opds.xml")
@@ -316,7 +319,7 @@ class HttpSrv(object):
 
         self.srvs.append(sck)
         self.bound.add((ip, port))
-        self.nclimax = math.ceil(self.args.nc * 1.0 / nlisteners)
+        self.nclimax = -int(-self.args.nc // nlisteners)
         Daemon(
             self.thr_listen,
             "httpsrv-n{}-listen-{}-{}".format(self.nid or "0", ip, port),

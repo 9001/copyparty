@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 import os
 import platform
@@ -141,6 +141,7 @@ web/tl/vie.js
 web/ui.css
 web/up2k.js
 web/util.js
+web/wopi.html
 """
 RES = set(zs.strip().split("\n"))
 RESM = {

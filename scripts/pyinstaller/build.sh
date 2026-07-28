@@ -58,6 +58,7 @@ rm -rf mods/magic/
     sed -ri '/(bccache|PackageLoader)/d' mods/jinja2/__init__.py
     af '/^class/{s=0}/^class PackageLoader/{s=1}!s' mods/jinja2/loaders.py
     sed -ri 's/from url.*Request, urlopen.*/pass/' mods/copyparty/svchub.py
+    sed -ri 's/from urllib.* import urlopen.*/pass/' mods/copyparty/httpcli.py
     sed -ri 's/(.*"--vc-.*, help=).*/\1argparse.SUPPRESS)/' mods/copyparty/__main__.py
 }
 [ $w10 ] && {

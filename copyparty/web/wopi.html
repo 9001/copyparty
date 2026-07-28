@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" id="ht_wopi">
+
+<head>
+    <meta charset="utf-8"/>
+    <title>{{ title|e }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="theme-color" content="#{{ tcolor }}">
+    <style>
+
+body,#w {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    height: 100%;
+}
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+</style></head><body>
+    <div style="display: none">
+        <form action="{{ url }}" enctype="multipart/form-data" method="post" target="w" id="submit-form">
+            <input name="access_token" value="{{ atoken }}" type="hidden" id="access-token"/>
+            <input name="access_token_ttl" value="{{ ttl }}000" type="hidden" id="access-token_ttl"/>
+            <input type="submit" value="" />
+        </form>
+    </div>
+
+    <iframe id="w" name="w" allow="clipboard-read *; clipboard-write *; fullscreen *"></iframe>
+
+    <script nonce="{{ js_nonce }}">
+        document.getElementById("submit-form").submit();
+    </script>
+</body>
+</html>
+

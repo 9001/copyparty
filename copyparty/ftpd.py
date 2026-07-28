@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 import argparse
 import errno
@@ -149,6 +149,7 @@ class FtpFs(AbstractedFS):
         self.hub: "SvcHub" = cmd_channel.hub
         self.args = cmd_channel.args
         self.uname = cmd_channel.uname
+        self.log_src = "%s:FTP" % (cmd_channel.cli_ip,)
 
         self.cwd = "/"  # pyftpdlib convention of leading slash
         self.root = "/var/lib/empty"
@@ -156,8 +157,8 @@ class FtpFs(AbstractedFS):
         self.listdirinfo = self.listdir
         self.chdir(".")
 
-    def log(self, msg: str, c: Union[int, str] = 0) -> None:
-        self.hub.log("ftpd", msg, c)
+    def clog(self, msg: str, c: Union[int, str] = 0) -> None:
+        self.hub.log(self.log_src, msg, c)
 
     def v2a(
         self,
@@ -238,6 +239,8 @@ class FtpFs(AbstractedFS):
         return True
 
     def open(self, filename: str, mode: str) -> typing.IO[Any]:
+        self.clog("open(%r,%r) @%s" % (filename, mode, self.uname))
+
         r = "r" in mode
         w = "w" in mode or "a" in mode or "+" in mode
 
@@ -255,7 +258,7 @@ class FtpFs(AbstractedFS):
             xbu = vfs.flags.get("xbu")
             if xbu:
                 hr = runhook(
-                    self.log,
+                    self.clog,
                     None,
                     self.hub.up2k,
                     "xbu.ftp",
@@ -275,7 +278,7 @@ class FtpFs(AbstractedFS):
                 if t or hr.get("rc") != 0:
                     if not t:
                         t = "upload blocked by xbu server config: %r" % (filename,)
-                    self.log(t, 3)
+                    self.clog(t, 3)
                     raise FSE(t)
 
         if w and need_unlink:  # type: ignore  # !rm
@@ -300,12 +303,13 @@ class FtpFs(AbstractedFS):
 
             # Don't unlink file for append mode
             elif "a" not in mode:
-                wunlink(self.log, ap, VF_CAREFUL)
+                wunlink(self.clog, ap, VF_CAREFUL)
 
         ret = open(fsenc(ap), mode, self.args.iobuf)
         if w and "fperms" in vfs.flags:
             set_fperms(ret, vfs.flags)
 
+        self.clog(" `-- %r" % (ap,))
         return ret
 
     def chdir(self, path: str) -> None:
@@ -331,10 +335,12 @@ class FtpFs(AbstractedFS):
         self.cwd = nwd
 
     def mkdir(self, path: str) -> None:
+        self.clog("mkdir(%r) @%s" % (path, self.uname))
         ap, vfs, _ = self.rv2a(path, w=True)
         bos.makedirs(ap, vf=vfs.flags)  # filezilla expects this
 
     def listdir(self, path: str) -> list[str]:
+        self.clog("ls(%r) @%s" % (path, self.uname))
         vpath = join(self.cwd, path)
         try:
             ap, vfs, rem = self.v2a(vpath, True, False)
@@ -384,6 +390,7 @@ class FtpFs(AbstractedFS):
             return ret
 
     def rmdir(self, path: str) -> None:
+        self.clog("rmdir(%r) @%s" % (path, self.uname))
         ap = self.rv2a(path, d=True)[0]
         try:
             bos.rmdir(ap)
@@ -392,6 +399,7 @@ class FtpFs(AbstractedFS):
                 raise
 
     def remove(self, path: str) -> None:
+        self.clog("rm(%r) @%s" % (path, self.uname))
         if self.args.no_del:
             raise FSE("The delete feature is disabled in server config")
 
@@ -402,6 +410,7 @@ class FtpFs(AbstractedFS):
             raise FSE(str(ex))
 
     def rename(self, src: str, dst: str) -> None:
+        self.clog("mv(%r,%r) @%s" % (src, dst, self.uname))
         if self.args.no_mv:
             raise FSE("The rename/move feature is disabled in server config")
 
@@ -431,12 +440,16 @@ class FtpFs(AbstractedFS):
             return st
 
     def utime(self, path: str, timeval: float) -> None:
+        self.clog("utime(%r,%r) @%s" % (path, timeval, self.uname))
         ap = self.rv2a(path, w=True)[0]
         bos.utime_c(logging.warning, ap, int(timeval), False)
 
     def lstat(self, path: str) -> os.stat_result:
         ap = self.rv2a(path)[0]
         return bos.stat(ap)
+
+    def readlink(self, *a) -> None:
+        raise OSError(errno.EINVAL, "nope")
 
     def isfile(self, path: str) -> bool:
         try:
@@ -480,8 +493,12 @@ class FtpFs(AbstractedFS):
     def get_user_by_uid(self, uid: int) -> str:
         return "root"
 
-    def get_group_by_uid(self, gid: int) -> str:
+    def get_group_by_gid(self, gid: int) -> str:
         return "root"
+
+    def mkstemp(self, *a, **ka):
+        self.clog("mkstemp%r @%s" % (a, self.uname))
+        raise FSE("nope")
 
 
 class FtpHandler(FTPHandler):
@@ -511,12 +528,22 @@ class FtpHandler(FTPHandler):
             return
 
         self.cli_ip = cip
+        self.log_src = "%s:FTP" % (cip,)
 
         # abspath->vpath mapping to resolve log_transfer paths
         self.vfs_map: dict[str, str] = {}
 
         # reduce non-debug logging
         self.log_cmds_list = [x for x in self.log_cmds_list if x not in ("CWD", "XCWD")]
+
+    def clog(self, msg: str, c: Union[int, str] = 0) -> None:
+        self.hub.log(self.log_src, msg, c)
+
+    def ftp_NOOP(self, *a) -> None:
+        self.respond("200 pong", logging.debug)
+
+    def ftp_STOU(self, *a) -> None:
+        self.respond("550 nope", logging.warning)
 
     def ftp_STOR(self, file: str, mode: str = "w") -> Any:
         # Optional[str]
@@ -530,7 +557,7 @@ class FtpHandler(FTPHandler):
         xbu = vfs.flags.get("xbu")
         if xbu:
             hr = runhook(
-                None,
+                self.clog,
                 None,
                 self.hub.up2k,
                 "xbu.ftpd",

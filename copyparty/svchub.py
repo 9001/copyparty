@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 import argparse
 import atexit
@@ -81,6 +81,7 @@ from .util import (
     alltrace,
     build_netmap,
     expat_ver,
+    fsenc,
     gzip,
     html_escape,
     load_ipr,
@@ -233,10 +234,14 @@ class SvcHub(object):
 
         self.lo1 = self.lo2 = ""
         if args.lo:
+            do_xz = args.lo.replace("%R", "").lower().endswith(".xz")
             if "%R" not in args.lo:
                 args.lo += "%R"
             if args.rlo in ("", "no"):
                 args.rlo = ""
+            if do_xz and not args.rlo:
+                args.rlo = ".1"
+            if args.rlo in ("", "del", "over"):
                 args.lo = args.lo.replace("%R", "")
             try:
                 self.lo1, self.lo2 = args.lo.split("%R")
@@ -395,6 +400,9 @@ class SvcHub(object):
         # initiate all services to manage
         self.asrv = AuthSrv(self.args, self.log, dargs=self.dargs)
         ramdisk_chk(self.asrv)
+
+        if ANYWIN and not self.args.unsafe_tools:
+            self._check_toolpaths()
 
         if args.cgen:
             self.asrv.cgen()
@@ -1021,6 +1029,18 @@ class SvcHub(object):
         if zb:
             Daemon(self.s6_notify, "s6-notify", (zb,))
 
+    def _check_toolpaths(self) -> None:
+        for vol in self.asrv.vfs.all_vols.values():
+            if not vol.realpath or not vol.axs.uwrite:
+                continue
+            ap_vol = (vol.realpath + os.sep).encode("utf-8")
+            for zsl in (HAVE_FFMPEG, HAVE_FFPROBE, HAVE_DCRAW):
+                if zsl and zsl[0].startswith(ap_vol):
+                    zs = zsl[0].decode("utf-8", "replace")
+                    t = "will not use [%s] because it is inside a writable volume [/%s] => [%s] and --unsafe-tools is not enabled"
+                    self.log("root", t % (zs, vol.vpath, vol.realpath), 3)
+                    del zsl[0]
+
     def _feature_test(self) -> None:
         fok = []
         fng = []
@@ -1107,14 +1127,19 @@ class SvcHub(object):
                 t = "not listening on any ip-addresses (only unix-sockets and/or FDs); cannot enable zeroconf/mdns/ssdp as requested"
                 self.log("root", t, 3)
 
-        if not self.args.no_dav:
+        if self.args.wopi or not self.args.no_dav:
             from .dxml import DXML_OK
 
             if not DXML_OK:
-                if not self.args.no_dav:
-                    self.args.no_dav = True
-                    t = "WARNING:\nDisabling WebDAV support because dxml selftest failed. Please report this bug;\n%s\n...and include the following information in the bug-report:\n%s | expat %s\n"
-                    self.log("root", t % (URL_BUG, VERSIONS, expat_ver()), 1)
+                self.args.wopi = False
+                self.args.no_dav = True
+                t = "WARNING:\nDisabling WebDAV and WOPI support because dxml selftest failed. Please report this bug;\n%s\n...and include the following information in the bug-report:\n%s | expat %s\n"
+                self.log("root", t % (URL_BUG, VERSIONS, expat_ver()), 1)
+
+        if self.args.wopi and self.args.j != 1:
+            self.args.wopi = False
+            t = "WARNING: Disabling --wopi because -j is not 1 (the default and recommended -j value)"
+            self.log("root", t, 1)
 
         if (
             not E.scfg
@@ -1438,7 +1463,7 @@ class SvcHub(object):
     def _setup_logfile(self) -> None:
         base_fn = fn = self._logname()
         sel_fn = fn + self.lo2
-        do_xz = sel_fn.lower().endswith(".xz")
+        do_xz = sel_fn.replace("%R", "").lower().endswith(".xz")
         if "%R" in self.args.lo:
             # yup this is a race; if started sufficiently concurrently, two
             # copyparties can grab the same logfile (considered and ignored)
@@ -1454,18 +1479,31 @@ class SvcHub(object):
         except:
             pass
 
+        if self.args.rlo in ("del", "over"):
+            tmode = "wt"
+            bmode = "w"
+        else:
+            tmode = "at"
+            bmode = "a"
+
+        if self.args.rlo == "del":
+            try:
+                bos.unlink(fn)
+            except:
+                pass
+
         try:
             if do_xz:
                 import lzma
 
-                lh = lzma.open(fn, "wt", encoding="utf-8", errors="replace", preset=0)
+                lh = lzma.open(fn, tmode, encoding="utf-8", errors="replace", preset=0)
                 self.args.no_logflush = True
             else:
-                lh = open(fn, "wt", encoding="utf-8", errors="replace")
+                lh = open(fn, tmode, encoding="utf-8", errors="replace")
         except:
             import codecs
 
-            lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
+            lh = codecs.open(fn, bmode, encoding="utf-8", errors="replace")
 
         if getattr(self.args, "free_umask", False):
             os.fchmod(lh.fileno(), 0o644)
@@ -1480,6 +1518,8 @@ class SvcHub(object):
         printed = "".join(lprinted) + msg
         t = "t0: {:.3f}\nargv: {}\n\n{}"
         lh.write(t.format(self.E.t0, " ".join(argv), printed))
+        if not self.args.no_logflush:
+            lh.flush()
         self.logf = lh
         self.logf_base_fn = base_fn
         print(msg, end="")

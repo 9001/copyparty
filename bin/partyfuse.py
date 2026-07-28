@@ -626,7 +626,7 @@ class Gateway(object):
             "st_atime": ts,
             "st_mtime": ts,
             "st_ctime": ts,
-            "st_blocks": int((sz + 511) / 512),
+            "st_blocks": -int(-sz // 512),
         }
 
     def stat_file(self, ts, sz):
@@ -638,7 +638,7 @@ class Gateway(object):
             "st_atime": ts,
             "st_mtime": ts,
             "st_ctime": ts,
-            "st_blocks": int((sz + 511) / 512),
+            "st_blocks": -int(-sz // 512),
         }
 
 

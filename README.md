@@ -77,6 +77,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
         * [connecting to webdav from windows](#connecting-to-webdav-from-windows) - using the GUI
     * [tftp server](#tftp-server) - a TFTP server (read/write) can be started using `--tftp 3969`
     * [smb server](#smb-server) - unsafe, slow, not recommended for wan
+    * [wopi server](#wopi-server) - edit office documents in the web-ui
     * [browser ux](#browser-ux) - tweaking the ui
     * [opengraph](#opengraph) - discord and social-media embeds
     * [file deduplication](#file-deduplication) - enable symlink-based upload deduplication
@@ -1669,6 +1670,15 @@ authenticate with one of the following:
 * username `$password`, password `k`
 
 
+## wopi server
+
+edit office documents in the web-ui
+
+needs a wopi client to work, and the only supported wopi client is a selfhosted collabora online server; eventually onlyoffice will probably also be supported: [issue #1574](https://github.com/9001/copyparty/issues/1574)
+
+no further documentation or examples yet, [issue #1575](https://github.com/9001/copyparty/issues/1575)
+
+
 ## browser ux
 
 tweaking the ui
@@ -2690,8 +2700,6 @@ the homebrew package is maintained by the homebrew team (thanks!)
 requires a [flake-enabled](https://nixos.wiki/wiki/Flakes) installation of nix
 
 some recommended dependencies are enabled by default; [override the package](https://github.com/9001/copyparty/blob/hovudstraum/contrib/package/nix/copyparty/default.nix#L3-L22) if you want to add/remove some features/deps
-
-`ffmpeg-full` was chosen over `ffmpeg-headless` mainly because we need `withWebp` (and `withOpenmpt` is also nice) and being able to use a cached build felt more important than optimizing for size at the time -- PRs welcome if you disagree 👍
 
 
 ## nixos module

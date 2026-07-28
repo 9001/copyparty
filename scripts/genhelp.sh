@@ -15,7 +15,7 @@ command -v gsort >/dev/null && {
 
 cd ../dist
 
-kwds='-bind -accounts -auth -auth-ord -flags -handlers -hooks -idp -urlform -exp -ls -dbd -chmod -pwhash -zm'
+kwds='-bind -accounts -auth -auth-ord -flags -handlers -hooks -idp -urlform -exp -rlo -ls -dbd -chmod -pwhash -zm'
 
 export PRTY_FULL_HELP=1
 export PRTY_NO_PARAMIKO=1

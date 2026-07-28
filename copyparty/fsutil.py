@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 import argparse
 import json
@@ -248,7 +248,7 @@ def ramdisk_chk(asrv: AuthSrv) -> None:
         t2 = ["\n  volume=[/%s], abspath=%r, type=%s, root=%r" % x for x in mods]
         log("vfs", t + "".join(t2) + "\n", 1)
 
-    assume = "mac" if MACOS else "lin"
+    assume = "mac" if MACOS else "win" if ANYWIN else "lin"
     for vol in asrv.vfs.all_nodes.values():
         if not vol.realpath or vol.flags.get("is_file"):
             continue

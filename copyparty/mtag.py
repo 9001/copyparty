@@ -1,5 +1,5 @@
 # coding: utf-8
-from __future__ import print_function, unicode_literals
+from __future__ import division, print_function, unicode_literals
 
 import argparse
 import json
@@ -17,7 +17,9 @@ from .util import (
     FFMPEG_URL,
     LOG,
     REKOBO_LKEY,
+    SCWD,
     VF_CAREFUL,
+    absreal,
     expand_osenv_c,
     fsenc,
     gzip,
@@ -47,10 +49,10 @@ except:
     HAVE_MUTAGEN = False
 
 
-def have_ff(name: str) -> bytes:
+def have_ff(name: str) -> list[bytes]:
     uname = name.upper()
     if os.environ.get("PRTY_NO_" + uname):
-        return b""
+        return []
 
     ebin = os.environ.get("PRTY_%s_BIN" % (uname,))
     try:
@@ -66,11 +68,12 @@ def have_ff(name: str) -> bytes:
         bcmd = scmd.encode("utf-8")
         try:
             sp.Popen([bcmd, b"-version"], stdout=sp.PIPE, stderr=sp.PIPE).communicate()
-            return bcmd
+            return [bcmd]
         except:
-            return b""
+            return []
     else:
-        return (shutil.which(scmd) or "").encode("utf-8")
+        ret = shutil.which(scmd)
+        return [absreal(ret).encode("utf-8")] if ret else []
 
 
 HAVE_FFMPEG = have_ff("ffmpeg")
@@ -247,14 +250,14 @@ def ffprobe(
 ) -> tuple[dict[str, tuple[int, Any]], dict[str, list[Any]], list[Any], dict[str, Any]]:
     # ffprobe -hide_banner -show_streams -show_format --
     bap = fsenc(abspath)
-    cmd = bwrap(HAVE_FFPROBE, bap, b"") + [
+    cmd = bwrap(HAVE_FFPROBE[0], bap, b"") + [
         b"-hide_banner",
         b"-show_streams",
         b"-show_format",
         b"--",
         bap,
     ]
-    rc, so, se = runcmd(cmd, timeout=timeout, nice=True, oom=200)
+    rc, so, se = runcmd(cmd, cwd=SCWD, timeout=timeout, nice=True, oom=200)
     if rc and TH_BWRAP:
         bwrap_fail(se)
     retchk(rc, cmd, se)
