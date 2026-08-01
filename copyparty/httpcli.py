@@ -7624,6 +7624,26 @@ class HttpCli(object):
                         (fe["sz"], fe["tags"][".files"]) = hit
                     except:
                         pass  # 404 or mojibake
+                if vfs_virt:
+                    q = "select sz, nf from ds where rd='' limit 1"
+                    try:
+                        for fe in [x for x in dirs if x["name"] in vfs_virt]:
+                            if ".files" not in fe["tags"]:
+                                fe["tags"][".files"] = 0
+                            vols = [vn.nodes[fe["name"]]]
+                            while vols:
+                                vn2 = vols.pop()
+                                if self.uname not in vn2.axs.uread:
+                                    continue
+                                vols += list(vn2.nodes.values())
+                                if vn2.dbv not in (vn2, None):
+                                    continue
+                                hit = idx.get_cur(vn2).execute(q).fetchone()
+                                if hit:
+                                    fe["sz"] += hit[0]
+                                    fe["tags"][".files"] += hit[1]
+                    except:
+                        pass
 
             taglist = [k for k in lmte if k in tagset]
         else:
