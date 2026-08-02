@@ -285,6 +285,7 @@ in
 
         environment = {
           PYTHONUNBUFFERED = "true";
+          NIX_SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
           XDG_CONFIG_HOME = externalStateDir;
         };
 
