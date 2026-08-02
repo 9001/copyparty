@@ -2512,6 +2512,7 @@ function up2k_init(subtle) {
             keepalive = t.keepalive,
             me = Date.now();
 
+        while (apop(st.todo.handshake, t));
         if (t.done)
             return console.log('done; skip hs', t.name, t);
 

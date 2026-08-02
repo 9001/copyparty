@@ -1199,8 +1199,10 @@ function has(haystack, needle) {
 
 function apop(arr, v) {
     var ofs = arr.indexOf(v);
-    if (ofs !== -1)
+    if (ofs !== -1) {
         arr.splice(ofs, 1);
+        return true;
+    }
 }
 
 
@@ -1466,7 +1468,7 @@ function Debounce(delay) {
     };
 
     r.rm = function (fun) {
-        apop(r.q, fun);
+        while (apop(r.q, fun));
     };
 
     r.run = function () {
@@ -1526,7 +1528,7 @@ var timer = (function () {
     };
 
     r.rm = function (fun) {
-        apop(r.q, fun);
+        while (apop(r.q, fun));
     };
 
     var doevents = function () {
