@@ -39,6 +39,7 @@ Ls.swe = {
 			["ctrl-V", "klistra in (kopiera/flytta) hit"],
 			["Y", "ladda ner urval"],
 			["F2", "byt namn på urval"],
+			["F4", "uppdatera"], //m
 
 			"välja filer",
 			["Blanksteg", "växla val av fil"],

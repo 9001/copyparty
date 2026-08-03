@@ -39,6 +39,7 @@ Ls.por = {
 			["ctrl-V", "colar (mover/copiar) aqui"],
 			["Y", "baixar selecionado"],
 			["F2", "renomear selecionado"],
+			["F4", "atualizar"], //m
 
 			"seleção de lista de arquivos",
 			["espaço", "alternar seleção de arquivo"],

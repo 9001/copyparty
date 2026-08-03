@@ -39,6 +39,7 @@ Ls.fin = {
 			["ctrl-V", "siirrä tai kopioi tähän"],
 			["Y", "lataa valitut"],
 			["F2", "uudelleennimeä valitut"],
+			["F4", "päivitä"], //m
 
 			"file-list-sel",
 			["space", "vaihda tiedostonvalintatilaan"],

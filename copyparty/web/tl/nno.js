@@ -36,6 +36,7 @@ Ls.nno = {
 			["ctrl-V", "lim inn (flytt/kopiér)"],
 			["Y", "last ned valde"],
 			["F2", "endre namn på valde"],
+			["F4", "oppdater"],
 
 			"filmarkering",
 			["space", "markér fil"],

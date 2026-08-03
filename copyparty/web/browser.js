@@ -46,6 +46,7 @@ if (1)
 				["ctrl-V", "paste (move/copy) here"],
 				["Y", "download selected"],
 				["F2", "rename selected"],
+				["F4", "update/refresh"],
 
 				"file-list-sel",
 				["space", "toggle file selection"],
@@ -6437,6 +6438,9 @@ var ahotkeys = function (e) {
 
 	if (k == 'F2')
 		return fileman.rename();
+
+	if (k == 'F4')
+		return treectl.goto();
 
 	if (!treectl.hidden && (!sh || !thegrid.en)) {
 		if (kl == 'a')

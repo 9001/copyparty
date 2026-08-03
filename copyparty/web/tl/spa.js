@@ -39,6 +39,7 @@ Ls.spa = {
 			["ctrl-V", "pegar (mover/copiar) aquí"],
 			["Y", "descargar seleccionados"],
 			["F2", "renombrar seleccionados"],
+			["F4", "actualizar"], //m
 
 			"selección en lista de archivos",
 			["space", "alternar selección de archivo"],

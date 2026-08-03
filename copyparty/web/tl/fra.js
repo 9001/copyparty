@@ -39,6 +39,7 @@ Ls.fra = {
 			["ctrl-V", "coller (déplacer/copier) ici"],
 			["Y", "télécharger la sélection"],
 			["F2", "renomer la sélection"],
+			["F4", "actualiser"], //m
 
 			"file-list-sel",
 			["Espace", "activer la sélection de fichiers"],

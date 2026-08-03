@@ -39,6 +39,7 @@ Ls.ita = {
 			["ctrl-V", "incolla (sposta/copia) qui"],
 			["Y", "scarica selezionati"],
 			["F2", "rinomina selezionati"],
+			["F4", "aggiorna"], //m
 
 			"file-list-sel",
 			["spazio", "alterna selezione file"],

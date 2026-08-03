@@ -39,6 +39,7 @@ Ls.epo = {
 			["stir-V", "alglui (movi/kopii) ĉi tien"],
 			["Y", "elŝuti elektitajn"],
 			["F2", "alinomi elektitajn"],
+			["F4", "refreŝigi"], //m
 
 			"file-list-sel",
 			["spacoklavo", "baskuli elektadon de dosieroj"],

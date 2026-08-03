@@ -39,6 +39,7 @@ Ls.nld = {
 			["ctrl-V", "Hier plakken (verplaatsen/kopieëren)"],
 			["Y", "Download geselecteerde"],
 			["F2", "Hernoem geselecteerde"],
+			["F4", "vernieuwen"], //m
 
 			"bestand-lijst-selectie",
 			["space", "wissel bestand selectie"],

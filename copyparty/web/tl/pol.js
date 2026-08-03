@@ -39,6 +39,7 @@ Ls.pol = {
 			["ctrl-V", "wklej (przenieś/skopiuj) tutaj"],
 			["Y", "pobierz zaznaczone"],
 			["F2", "zmień nazwę zaznaczonych"],
+			["F4", "odśwież"], //m
 
 			"file-list-sel",
 			["spacja", "przełącz zaznaczanie plików"],
