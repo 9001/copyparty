@@ -1672,8 +1672,10 @@ class HttpCli(object):
                     ctx.check_hostname = not self.args.wopi_crt_icn
 
                 uo_kw["context"] = ctx
-            wopi_urls = dict(pair.split('=', 1) for pair in self.args.wopi_urls) if self.args.wopi_urls else dict()
-            url = wopi_urls.get(self.host, self.args.wopi_url).rstrip("/") + "/hosting/discovery"
+
+            wopi_urls = dict(x.lower().split("=", 1) for x in self.args.wopi_urls or [])
+            url = wopi_urls.get(self.host.lower(), self.args.wopi_url).rstrip("/")
+            url += "/hosting/discovery"
             buf = urlopen(url, **uo_kw).read()
             xml = buf.decode("ascii", "replace").lower()
             enc = self.get_xml_enc(xml)
