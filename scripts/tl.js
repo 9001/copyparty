@@ -71,6 +71,7 @@ Ls.hmn = {
 			["ctrl-V", "paste (move/copy) here"],
 			["Y", "download selected"],
 			["F2", "rename selected"],
+			["F4", "update/refresh"],
 
 			"file-list-sel",
 			["space", "toggle file selection"],

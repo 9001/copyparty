@@ -39,6 +39,7 @@ Ls.cze = {
 			["ctrl-V", "vložit (přesunout/kopírovat) zde"],
 			["Y", "stáhnout vybrané"],
 			["F2", "přejmenovat vybrané"],
+			["F4", "obnovit"], //m
 
 			"výběr souborů",
 			["space", "přepnout výběr souboru"],

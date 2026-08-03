@@ -36,6 +36,7 @@ Ls.vie = {
 			["ctrl-V", "dán (di chuyển/sao chép) tại đây"],
 			["Y", "tải xuống mục đã chọn"],
 			["F2", "đổi tên mục đã chọn"],
+			["F4", "làm mới"], //m
 
 			"file-list-sel",
 			["space", "chuyển đổi chọn tệp"],

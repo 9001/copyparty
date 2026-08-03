@@ -79,6 +79,59 @@
 ## 😔 unfun facts
 
 * #1209 (partially), #711 added a setting that gets rid of (most) emojis
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0727-2202  `v1.20.19`  SECURITY: fix FTP upload outside volume
+
+## ⚠️ ATTN: this release fixes a vulnerability in FTP and FTPS (not SFTP)
+
+the FTP-server (default-disabled) would allow uploading to any folder that the copyparty process had permission to write to, but with certain limitations; see [GHSA-phv8-wgjp-g4p9](https://github.com/9001/copyparty/security/advisories/GHSA-phv8-wgjp-g4p9)
+
+## recent important news
+
+* [v1.20.19 (2026-07-27)](https://github.com/9001/copyparty/releases/tag/v1.20.19) fixed an FTP-server vuln (upload outside defined volumes)
+* [v1.20.17 (2026-07-06)](https://github.com/9001/copyparty/releases/tag/v1.20.17) fixed a vuln when a volume has both filekeys and dirkeys enabled
+* [v1.20.17 (2026-07-06)](https://github.com/9001/copyparty/releases/tag/v1.20.17) introduced csp nonces, possibly breaking some javascript-based plugins
+
+## 🧪 new features
+
+* #1495 wopi integration -- edit office documents in the web-ui (thx @brandon-doornbos!) d57bb0c7 10db4236
+  * currently only works with collabora online as wopi client #1574 and there's no docs/examples #1575
+* thumbnails: use embedded cover-image in videos when available 59524018
+* thumbnails: folder-thumbs can be disabled with `th-covers: no` (volflag or global) 856fada3
+* #1555 macos: add [--srch-nfkc](https://copyparty.eu/cli/#g-srch-nfkc) to fix searching for filenames / paths in CJK languages a7c99094
+  * reduces search performance to around 30% when enabled
+* hooks: `xbr` / `xar` did not include old/new abspath as parameters; now they do c122e103
+
+## 🩹 bugfixes
+
+* ftp: fix [GHSA-phv8-wgjp-g4p9](https://github.com/9001/copyparty/security/advisories/GHSA-phv8-wgjp-g4p9) b331bb1c
+* #1563 moving files between volumes could fail depending on OS and underlying filesystem c70dc7ac
+* fix drag-drop uploading in certain glitchy KDE environments (thx @tilse!) daf144af
+* hooks: `xiu` crashed if the fork-flag was set (thx @stackxp!) aa862353
+* hooks: `xau` without json-flag would be given the wark (file hash) instead of the abspath bae77b90
+* shares: fix markdown-viewer (`?v`) inside shares 6a9437b7
+* ftp: fix logging from `xbu` hooks 9912a951
+* fix slow boot if a volume had lots of files in its toplevel folder cdb474c8
+* python2.7: fix multithreaded file-hashing 0f2040c3
+
+## 🔧 other changes
+
+* #1556 the libvips thumbnailer was demoted to last-fallback due to frequently using excessive amounts of ram ed0be42a
+* if [-lo](https://copyparty.eu/cli/#g-lo) points to an existing file, it will now be appended to instead of overwritten depending on [--rlo](https://copyparty.eu/cli/#g-help-rlo) b6abc33f
+* #1530 nixos: the nix package now uses `ffmpeg-headless` instead of `ffmpeg-full` (thx @nyakase!) fface524
+* slightly longer session cookie (was 20, now 24 chars) 537a99df
+* Windows-specific:
+  * add a warning regarding the risks of DLL-hijacking when relevant bb40804f
+  * fix some trivial PATH-related footguns cea97ac6
+  * faster creation of sparse files bc45299b
+  * fix detection of filesystem characteristics 6226858b
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0709-2254  `v1.20.18`  bwrap off
 
 ## 🧪 new features

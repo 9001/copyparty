@@ -39,6 +39,7 @@ Ls.deu = {
 			["STRG-V", "Zwischenablage hier einfügen"],
 			["Y", "Auswahl herunterladen"],
 			["F2", "Auswahl umbenennen"],
+			["F4", "Aktualisieren"], //m
 
 			"file-list-sel",
 			["LEER", "Dateiauswahl aktivieren"],

@@ -36,6 +36,7 @@ Ls.nor = {
 			["ctrl-V", "lim inn (flytt/kopiér)"],
 			["Y", "last ned valgte"],
 			["F2", "endre navn på valgte"],
+			["F4", "oppdater"],
 
 			"filmarkering",
 			["space", "marker fil"],

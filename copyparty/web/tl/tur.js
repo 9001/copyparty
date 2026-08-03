@@ -39,6 +39,7 @@ Ls.tur = {
 			["ctrl-V", "buraya yapıştır (taşı/kopyala)"],
 			["Y", "seçileni indir"],
 			["F2", "seçileni yeniden adlandır"],
+			["F4", "yenile"], //m
 
 			"dosya yönetimi seçimleri",
 			["boşluk", "seçimi değiştir"],

@@ -2153,7 +2153,8 @@ class MultipartParser(object):
         boundary = get_boundary(self.headers)
         if boundary.startswith('"') and boundary.endswith('"'):
             boundary = boundary[1:-1]  # dillo uses quotes
-        self.log("boundary=%r" % (boundary,))
+        if len(boundary) > 72:  # rfc-2046 <=70
+            raise Pebkac(400, "boundary 2big: %d" % (len(boundary),))
 
         # spec says there might be junk before the first boundary,
         # can't have the leading \r\n if that's not the case

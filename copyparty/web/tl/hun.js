@@ -36,6 +36,7 @@ Ls.hun = {
 			['ctrl-V', 'beillesztés ide'],
 			['Y', 'kijelöltek letöltése'],
 			['F2', 'átnevezés'],
+			["F4", "frissítés"], //m
 
 			'kijelölés',
 			['space', 'fájl kijelölése'],
