@@ -1682,7 +1682,9 @@ class HttpCli(object):
             xml = buf.decode(enc, "replace")
             xroot = parse_xml(xml)
             ext = vpath.split(".")[-1]
-            url = xroot.find(".//action[@ext='%s'][@urlsrc]" % (ext,)).get("urlsrc")
+            url = xroot.find(
+                ".//action[@ext='%s'][@name='edit'][@urlsrc]" % (ext,)
+            ).get("urlsrc")
             if not url.endswith(("?", "&")):
                 url += "&" if "?" in url else "?"
             url += "WOPISrc="
