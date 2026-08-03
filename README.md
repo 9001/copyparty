@@ -137,6 +137,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
     * [client-side](#client-side) - when uploading files
 * [security](#security) - there is a [discord server](https://discord.gg/25J8CdTT6G) with announcements
     * [gotchas](#gotchas) - behavior that might be unexpected
+    * [csp nonce](#csp-nonce) - unauthorized javascript is blocked
     * [cors](#cors) - cross-site request config
     * [filekeys](#filekeys) - prevent filename bruteforcing
         * [dirkeys](#dirkeys) - share specific folders in a volume
@@ -3105,6 +3106,23 @@ behavior that might be unexpected
   * the directory-listing embed is sandboxed (so any malicious scripts can't do any damage) but the markdown editor is not 100% safe, see below
 * markdown documents can contain html and `<script>`s; attempts are made to prevent scripts from executing (unless `-emp` is specified) but this is not 100% bulletproof, so setting the `nohtml` volflag is still the safest choice
   * or eliminate the problem entirely by only giving write-access to trustworthy people :^)
+
+
+## csp nonce
+
+unauthorized javascript is blocked  by means of the default [content-security-policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP) which enforces "script nonces", to help prevent XSS and similar
+
+usually this Just Works and is correctly configured by default; you can stop reading this section and move on, nothing to see here
+
+but if you are the unlucky 0.1% with a hosting-setup funky enough for this to not work as intended, then you will also be seeing this message: `Looks like javascript is broken; see "csp nonce" in the readme`
+
+there is two possible reasons why this might happen:
+
+1. your browser is simply too old to understand the javascript, which is not likely, because just about every browser is supported, even internet explorer 11
+
+2. something in your hosting-setup is tampering with the responses from copyparty and destroying this security feature; the culprit is probably a misconfigured reverseproxy, a CDN, a WAF, or some other mitm, but a popular offender is **"cloudflare rocket loader"**
+
+you can try to **temporarily** set global-options `--csp-ui no` and `--csp-dl no` and restart copyparty to check whether it is due to reason #2. Remember to refresh the webbrowser with CTRL-SHIFT-R to check properly. If that makes the problem go away, then turn them back off (**never** keep them enabled), restart copyparty, open the `Network` tab in the webbrowser, and refresh the website; you should see the `content-security-policy` header including a nonce, for example `nonce-BxcJbvdu1z3S/ycPBjVWuA==` which should also appear inside the HTML of that response like this: `<script nonce="BxcJbvdu1z3S/ycPBjVWuA==">` -- if it doesn't then that's the problem; something in your hosting stack is dangerously misconfigured
 
 
 ## cors

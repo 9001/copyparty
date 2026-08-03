@@ -2660,10 +2660,11 @@ class AuthSrv(object):
             if head_s and not head_s.endswith("\n"):
                 head_s += "\n"
 
+            zs2 = "Content-Security-Policy: %s\r\n"
             zs = vol.flags.get("csp_ui", "")
-            csp_ui = "Content-Security-Policy: %s\r\n" % (zs,) if zs else ""
+            csp_ui = zs2 % (zs,) if zs.lower() not in ("", "no") else ""
             zs = vol.flags.get("csp_dl", "")
-            csp_dl = "Content-Security-Policy: %s\r\n" % (zs,) if zs else ""
+            csp_dl = zs2 % (zs,) if zs.lower() not in ("", "no") else ""
 
             zs = "X-Content-Type-Options: nosniff\r\n"
             if "norobots" in vol.flags:
