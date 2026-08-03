@@ -2762,7 +2762,8 @@ class AuthSrv(object):
 
                 for k in drop:
                     t = 'cannot enable [%s] for volume "/%s" because this requires one of the following: e2d / e2ds / e2dsa  (either as volflag or global-option)'
-                    self.log(t % (k, vol.vpath), 1)
+                    if not (enshare and vp.startswith(shrs)):
+                        self.log(t % (k, vol.vpath), 1)
                     vol.flags.pop(k)
 
             zi = vol.flags.get("lifetime") or 0
