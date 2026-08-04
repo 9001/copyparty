@@ -1703,7 +1703,7 @@ class HttpCli(object):
             title=self.uparam["wopi"],
             url=url,
             atoken=atoken,
-            ttl=session["expires"],
+            ttl=int(session["expires"] * 1000),
         ).encode("utf-8", "replace")
 
         self.reply(html, 200, "text/html; charset=utf-8")
