@@ -7445,20 +7445,18 @@ class HttpCli(object):
         dirs = []
         files = []
         ptn_hr = RE_HR
-        use_abs_url = is_opds or (
-            vpath and not is_ls and not is_js and not self.trailing_slash
-        )
+
+        base = ""
+        if is_opds or (vpath and not (is_ls or is_js or self.trailing_slash)):
+            if is_opds:
+                base = self.args.SRS
+                if vpath:
+                    base += vpath + "/"
+            else:
+                base = "/" + vpath + "/"
+
         for fn in ls_names:
-            base = ""
-            href = fn
-            if use_abs_url:
-                if is_opds:
-                    base = self.args.SRS
-                    if vpath:
-                        base += vpath + "/"
-                else:
-                    base = "/" + vpath + "/"
-                href = base + fn
+            href = base + fn
 
             if fn in vfs_virt:
                 fspath = vfs_virt[fn].realpath
