@@ -38,6 +38,7 @@ from .util import (
     afsenc,
     atomic_move,
     fsenc,
+    loadpy,
     min_ex,
     runcmd,
     statdir,
@@ -323,24 +324,12 @@ class ThumbSrv(object):
         if self.args.th_clean:
             Daemon(self.cleaner, "thumb.cln")
 
-        (
-            self.fmt_pil,
-            self.fmt_vips,
-            self.fmt_raw,
-            self.fmt_ffi,
-            self.fmt_ffv,
-            self.fmt_ffa,
-        ) = [
-            set(y.split(","))
-            for y in [
-                self.args.th_r_pil,
-                self.args.th_r_vips,
-                self.args.th_r_raw,
-                self.args.th_r_ffi,
-                self.args.th_r_ffv,
-                self.args.th_r_ffa,
-            ]
-        ]
+        self.fmt_pil = self.args.th_r_pil
+        self.fmt_vips = self.args.th_r_vips
+        self.fmt_raw = self.args.th_r_raw
+        self.fmt_ffi = self.args.th_r_ffi
+        self.fmt_ffv = self.args.th_r_ffv
+        self.fmt_ffa = self.args.th_r_ffa
 
         if not H_PIL_HEIF:
             for f in "heif heifs heic heics".split(" "):
@@ -549,10 +538,20 @@ class ThumbSrv(object):
             png_ok = False
             funs = []
 
-            if ext in self.args.au_unpk:
-                ap_unpk = au_unpk(self.log, self.args.au_unpk, abspath, vn)
+            ap_extr, ext_extr = abspath, ext
+            if ext in self.args.th_extract:
+                ext_out, extractor = self.args.th_extract[ext]
+                extracted = self.run_extractor(abspath, ext_out, vn, extractor)
+                if extracted:
+                    ap_extr, ext_extr = extracted, ext_out
+
+            if ext_extr in self.args.au_unpk:
+                ap_unpk = au_unpk(self.log, self.args.au_unpk, ap_extr, vn)
             else:
-                ap_unpk = abspath
+                ap_unpk = ap_extr
+
+            if ap_extr and ap_extr != ap_unpk and ap_extr != abspath:
+                wunlink(self.log, ap_extr, vn.flags)
 
             if ap_unpk and not bos.path.exists(tpath):
                 tex = tpath.rsplit(".", 1)[-1]
@@ -668,6 +667,51 @@ class ThumbSrv(object):
 
         with self.mutex:
             self.nthr -= 1
+
+    def run_extractor(self, abspath: str, outext: str, vn: VFS, extr: str) -> str:
+        try:
+            mod = loadpy(extr, self.args.hot_handlers)
+        except Exception as ex:
+            self.log("import failed: {!r}".format(ex))
+            return ""
+
+        stream = None
+        fd, ret = 0, ""
+        try:
+            stream, offset, whence, size = mod.main(abspath, outext, vn)
+            if stream is None:
+                self.log(
+                    "thumbnail extractor %r returned no data for file %r" %
+                    (extr, abspath)
+                )
+                return ""
+            stream.seek(offset, whence)
+
+            fsz = 0
+            fd, ret = tempfile.mkstemp("." + outext)
+            with os.fdopen(fd, "wb") as out:
+                fd = 0
+                while True:
+                    if size is None or size < 0:
+                        bufsz = 32768
+                    else:
+                        bufsz = min(32768, max(size - fsz, 0))
+                    buf = stream.read(bufsz)
+                    if not buf:
+                        break
+                    fsz += len(buf)
+                    out.write(buf)
+            return ret
+        except Exception as e:
+            if fd:
+                os.close(fd)
+            if ret:
+                self.log("failed to extract thumbnail from file %r: %r" % (abspath, e))
+                wunlink(self.log, ret, vn.flags)
+            return ""
+        finally:
+            if stream:
+                stream.close()
 
     def fancy_pillow(self, im: "Image.Image", fmt: str, vn: VFS) -> "Image.Image":
         # exif_transpose is expensive (loads full image + unconditional copy)
