@@ -538,8 +538,17 @@ class ThumbSrv(object):
             png_ok = False
             funs = []
 
+            tex = tpath.rsplit(".", 1)[-1]
+            want_mp3 = tex == "mp3"
+            want_opus = tex in ("opus", "owa", "caf")
+            want_flac = tex == "flac"
+            want_wav = tex == "wav"
+            want_png = tex == "png"
+            want_au = want_mp3 or want_opus or want_flac or want_wav
+            want_th = not want_au and not want_png
+
             ap_extr, ext_extr = abspath, ext
-            if ext in self.args.th_extract:
+            if want_th and ext in self.args.th_extract:
                 ext_out, extractor = self.args.th_extract[ext]
                 extracted = self.run_extractor(abspath, ext_out, vn, extractor)
                 if extracted:
@@ -554,13 +563,6 @@ class ThumbSrv(object):
                 wunlink(self.log, ap_extr, vn.flags)
 
             if ap_unpk and not bos.path.exists(tpath):
-                tex = tpath.rsplit(".", 1)[-1]
-                want_mp3 = tex == "mp3"
-                want_opus = tex in ("opus", "owa", "caf")
-                want_flac = tex == "flac"
-                want_wav = tex == "wav"
-                want_png = tex == "png"
-                want_au = want_mp3 or want_opus or want_flac or want_wav
                 for lib in self.args.th_dec:
                     can_au = lib == "ff" and (
                         ext in self.fmt_ffa or ext in self.fmt_ffv
