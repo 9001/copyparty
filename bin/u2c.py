@@ -1576,7 +1576,7 @@ NOTE: if server has --usernames enabled, then password is "username:password"
     ap.add_argument("url", type=unicode, help="server url, including destination folder")
     ap.add_argument("files", type=files_decoder, nargs="+", help="files and/or folders to process")
     ap.add_argument("-v", action="store_true", help="verbose")
-    ap.add_argument("-a", metavar="PASSWD", default="", help="password (or $filepath) for copyparty (is sent in header 'PW')")
+    ap.add_argument("-a", metavar="PASSWD", default="", help="password (or $filepath) for copyparty, if omitted uses env var PASSWD (is sent in header 'PW')")
     ap.add_argument("--ba", metavar="PASSWD", default="", help="password (or $filepath) for basic-auth (usually not necessary)")
     ap.add_argument("-s", action="store_true", help="file-search (disables upload)")
     ap.add_argument("-x", type=unicode, metavar="REGEX", action="append", help="skip file if filesystem-abspath matches REGEX (option can be repeated), example: '.*/\\.hist/.*'")
@@ -1728,6 +1728,9 @@ NOTE: if server has --usernames enabled, then password is "username:password"
             print("reading password from file [%s]" % (zs[1:],))
             with open(zs[1:], "rb") as f:
                 setattr(ar, k, f.read().decode("utf-8").strip())
+    
+    if not ar.a and os.getenv('PASSWD'):
+            ar.a = os.getenv('PASSWD')
 
     if ar.ba:
         ar.ba = "Basic " + base64.b64encode(ar.ba.encode("utf-8")).decode("utf-8")
