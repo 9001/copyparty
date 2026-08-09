@@ -1729,7 +1729,7 @@ NOTE: if server has --usernames enabled, then password is "username:password"
             with open(zs[1:], "rb") as f:
                 setattr(ar, k, f.read().decode("utf-8").strip())
     
-    if not ar.a and os.getenv('U2C_PWD'):
+    if not ar.a and os.getenv('U2C_PW'):
             ar.a = os.getenv('U2C_PW')
 
     if ar.ba:
