@@ -780,6 +780,54 @@ def get_sects():
             + build_flags_desc(),
         ],
         [
+            "thumb-extractors",
+            "extract thumbnails from custom file formats with python scripts",
+            dedent(
+                """
+            copyparty is able to extract thumbnails from various media formats:
+            images, audio, video, ebooks
+
+            if you want to extract thumbnails from unsupported file formats,
+            you can load a plugin, which extracts image data from custom formats
+
+            load the plugin using --args; for example \033[36m
+             --tx-extract iso,mdf,dmg=~/party-thumb-extractors/th_diskimg.py
+            \033[0m
+            the file must define the function \033[35mmain(abspath, **kwargs)\033[0m:
+             \033[35mabspath\033[0m: path to the file to extract thumbnail from
+             \033[35mkwargs\033[0m currently have:
+             \033[35mvn\033[0m: the VFS which contains the requested file
+             \033[35mrth_srv\033[0m: the copyparty ThumbSrv instance
+
+            if `main` couldn't extract a thumbnail, it must return None;
+            otherwise the return value must be a tuple:
+             \033[35mreturn fmt, stream, offset, whence, size\033[0m
+
+            > \033[32mfmt\033[0m: thumbnail format, should be one of the formats
+                supported by copyparty; e.g. "png", "jpg"
+
+            > \033[32mstream\033[0m: binary file-like object containing the thumbnail,
+                supporting seek(), read(), and close() methods
+
+            > \033[32moffset, whence\033[0m: arguments to seek() method;
+                stream.seek(offset, whence) will be called once before copyparty
+                starts reading from the stream
+
+            > \033[32msize\033[0m: number of bytes to read ftom the stream;
+                if negative, copyparty will read through the end of the stream;
+
+            you can also supply extractors for standard formats to override default
+            thumbnail extraction behaviour; for example \033[36m
+             --tx-extract mp3=~/party-thumb-extractors/th_mp3.py
+            \033[0mwill let you extract or generate custom thumbnails for mp3 files
+
+            \033[1;35mPS!\033[0m the folder that contains the python file should ideally
+              not contain many other python files, and especially nothing
+              with filenames that overlap with modules used by copyparty
+            """
+            ),
+        ],
+        [
             "handlers",
             "use plugins to handle certain events",
             dedent(
