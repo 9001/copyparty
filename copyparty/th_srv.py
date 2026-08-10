@@ -730,8 +730,8 @@ class ThumbSrv(object):
             if fd:
                 os.close(fd)
             if ret:
-                self.log("failed to extract thumbnail from file %r: %r" % (abspath, e))
                 wunlink(self.log, ret, vn.flags)
+            self.log("failed to extract thumbnail from file %r: %r" % (abspath, e))
             return ""
         finally:
             if stream:
