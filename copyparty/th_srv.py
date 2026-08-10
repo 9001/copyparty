@@ -352,23 +352,22 @@ class ThumbSrv(object):
         self._build_thumbable()
 
     def _build_thumbable(self) -> None:
-        self.thumbable.clear()
+        self.thumbable_native.clear()
 
         if "pil" in self.args.th_dec:
-            self.thumbable |= self.fmt_pil
+            self.thumbable_native |= self.fmt_pil
 
         if "vips" in self.args.th_dec:
-            self.thumbable |= self.fmt_vips
+            self.thumbable_native |= self.fmt_vips
 
         if "raw" in self.args.th_dec:
-            self.thumbable |= self.fmt_raw
+            self.thumbable_native |= self.fmt_raw
 
         if "ff" in self.args.th_dec:
             for zss in [self.fmt_ffi, self.fmt_ffv, self.fmt_ffa]:
-                self.thumbable |= zss
+                self.thumbable_native |= zss
 
-        self.thumbable_native = self.thumbable
-        self.thumbable |= set(self.args.th_extract)
+        self.thumbable = self.thumbable_native | set(self.args.th_extract)
 
     def _log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("thumb", msg, c)
