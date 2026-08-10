@@ -682,7 +682,7 @@ class ThumbSrv(object):
 
     def run_extractor(self, extr: str, abspath: str, vn: VFS) -> str:
         try:
-            mod = loadpy(extr, self.args.hot_handlers)
+            mod = loadpy(extr, self.args.hot_th_extract)
         except Exception as ex:
             self.log("import failed: {!r}".format(ex))
             return ""
