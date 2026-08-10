@@ -1849,7 +1849,7 @@ def add_thumbnail(ap):
 
     ap2.add_argument("--th-spec-cnv", metavar="T", type=u, default="it,itgz,itxz,itz,mdgz,mdxz,mdz,mo3,mod,s3m,s3gz,s3xz,s3z,xm,xmgz,xmxz,xmz,xpk", help="audio formats which provoke https://trac.ffmpeg.org/ticket/10797 (huge ram usage for s3xmodit spectrograms)")
     ap2.add_argument("--au-unpk", metavar="E=F.C", type=u, default="mdz=mod.zip, mdgz=mod.gz, mdxz=mod.xz, s3z=s3m.zip, s3gz=s3m.gz, s3xz=s3m.xz, xmz=xm.zip, xmgz=xm.gz, xmxz=xm.xz, itz=it.zip, itgz=it.gz, itxz=it.xz, cbz=jpg.cbz, epub=jpg.epub, kra=png.kra, ora=png.ora", help="audio/image formats to decompress before passing to ffmpeg")
-    ap2.add_argument("--th-extract", metavar="E[,E]=F:PY", type=u, action="append", help="custom script \033[33mPY\033[0m to extract thumbnail of format \033[33mF\033[0m from files of format \033[33mE\033[0m; example: [\033[32mpkg,mdf=png:/handlers/pkgthumb.py\033[0m]")
+    ap2.add_argument("--th-extract", metavar="E[,E]=PY", type=u, action="append", help="\033[34mREPEATABLE:\033[0m custom script \033[33mPY\033[0m to extract thumbnail from files of format \033[33mE\033[0m; example: [\033[32mmdf,iso,dmg=/handlers/th_diskimg.py\033[0m]")
 
 
 def add_transcoding(ap):

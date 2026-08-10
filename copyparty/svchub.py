@@ -464,11 +464,9 @@ class SvcHub(object):
         th_extract = args.th_extract or []
         args.th_extract = {}
         for arg in th_extract:
-            exts, value = arg.split('=', 1)
-            exts = (ext.strip() for ext in exts.split(','))
-            value = tuple(x.strip() for x in value.split(':', 1))
-            for ext in exts:
-                args.th_extract[ext] = value
+            exts, script = arg.split('=', 1)
+            for ext in exts.split(","):
+                args.th_extract[ext.strip().lower()] = script
 
         self.args.th_dec = list(decs.keys())
         self.thumbsrv = None
@@ -510,9 +508,6 @@ class SvcHub(object):
             zss = args.th_r_ffa | args.th_r_ffv
             args.au_unpk = {
                 k: v for k, v in args.au_unpk.items() if v.split(".")[0] not in zss
-            }
-            args.th_extract = {
-                k: v for k, v in args.th_extract.items() if v[0] not in zss
             }
 
         args.th_poke = min(args.th_poke, args.th_maxage, args.ac_maxage)

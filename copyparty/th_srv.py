@@ -549,10 +549,11 @@ class ThumbSrv(object):
 
             ap_extr, ext_extr = abspath, ext
             if want_th and ext in self.args.th_extract:
-                ext_out, extractor = self.args.th_extract[ext]
-                extracted = self.run_extractor(abspath, ext_out, vn, extractor)
+                extractor = self.args.th_extract[ext]
+                extracted = self.run_extractor(extractor, abspath, vn)
                 if extracted:
-                    ap_extr, ext_extr = extracted, ext_out
+                    extracted_f = extracted.rsplit('.', 1)[-1]
+                    ap_extr, ext_extr = extracted, extracted_f
 
             if ext_extr in self.args.au_unpk:
                 ap_unpk = au_unpk(self.log, self.args.au_unpk, ap_extr, vn)
@@ -670,7 +671,7 @@ class ThumbSrv(object):
         with self.mutex:
             self.nthr -= 1
 
-    def run_extractor(self, abspath: str, outext: str, vn: VFS, extr: str) -> str:
+    def run_extractor(self, extr: str, abspath: str, vn: VFS) -> str:
         try:
             mod = loadpy(extr, self.args.hot_handlers)
         except Exception as ex:
@@ -680,15 +681,23 @@ class ThumbSrv(object):
         stream = None
         fd, ret = 0, ""
         try:
-            stream, offset, whence, size = mod.main(abspath, outext, vn)
-            if stream is None:
+            res = mod.main(abspath, vn, self)
+            if res is None:
                 self.log(
                     "thumbnail extractor %r returned no data for file %r" %
                     (extr, abspath)
                 )
                 return ""
-            stream.seek(offset, whence)
 
+            outext, stream, offset, whence, size = res
+            if outext not in self.thumbable:
+                self.log(
+                    "thumbnail extractor %r returned unsupported format %r" %
+                    (extr, outext)
+                )
+                return ""
+
+            stream.seek(offset, whence)
             fsz = 0
             fd, ret = tempfile.mkstemp("." + outext)
             with os.fdopen(fd, "wb") as out:
