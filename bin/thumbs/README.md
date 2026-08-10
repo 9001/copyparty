@@ -13,8 +13,7 @@ the `--th-extract` argument is repeatable
 
 ### in
 
-each plugin must define a `main(abspath, **kwargs)` which takes 3 arguments;
-
+each plugin must define a function `main(abspath, **kwargs)`:
 - `abspath` is the path to a file to extract thumbnail for
 - `kwargs` currently receives these keyword arguments:
   - `vn` is the VFS which contains the requested file
@@ -26,7 +25,7 @@ the `main()` function must
 - return `None` or raise an `Exception` in case it is unable to extract thumbnail
 - return tuple `fmt, stream, offset, whence, size` otherwise:
   - `fmt: str` – format (filename extension) of the thumbnail; should be one of the image formats supported by copyparty (see `--th-r-*` options)
-  - `stream` – binary file-like object supporting `seek()`, `read()`, `close()` methods; should contain extracted thumbnail image
+  - `stream: IO[bytes]` – binary file-like object supporting `seek()`, `read()`, `close()` methods; should contain extracted thumbnail image
   - `offset: int, whence: int` – arguments to `stream.seek()`; copyparty will call `stream.seek(offset, whence)` once before starting reading the stream contents
   - `size: int | None` – number of bytes to read from the `stream`; if `size` is negative or `None`, copyparty will read until the end of the stream
 
