@@ -7893,6 +7893,10 @@ class HttpCli(object):
                         ext in self.thumbcli.fmt_pil
                         or ext in self.thumbcli.fmt_vips
                         or ext in self.thumbcli.fmt_ffi
+                        or (
+                            ext in self.thumbcli.thumbable
+                            and ext not in self.thumbcli.thumbable_native
+                        )
                     )
                     is_vid = ext in self.thumbcli.fmt_ffv
                     is_au = ext in self.thumbcli.fmt_ffa

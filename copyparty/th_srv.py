@@ -348,6 +348,7 @@ class ThumbSrv(object):
                 self.fmt_pil.discard(f)
 
         self.thumbable: set[str] = set()
+        self.thumbable_native: set[str] = set()
         self._build_thumbable()
 
     def _build_thumbable(self) -> None:
@@ -365,6 +366,9 @@ class ThumbSrv(object):
         if "ff" in self.args.th_dec:
             for zss in [self.fmt_ffi, self.fmt_ffv, self.fmt_ffa]:
                 self.thumbable |= zss
+
+        self.thumbable_native = self.thumbable
+        self.thumbable |= set(self.args.th_extract)
 
     def _log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("thumb", msg, c)
@@ -456,6 +460,7 @@ class ThumbSrv(object):
     def getcfg(self) -> dict[str, set[str]]:
         return {
             "thumbable": self.thumbable,
+            "thumbable_native": self.thumbable_native,
             "pil": self.fmt_pil,
             "vips": self.fmt_vips,
             "raw": self.fmt_raw,
@@ -547,16 +552,20 @@ class ThumbSrv(object):
             want_au = want_mp3 or want_opus or want_flac or want_wav
             want_th = not want_au and not want_png
 
-            ap_extr, ext_extr = abspath, ext
-            if want_th and ext in self.args.th_extract:
+            can_extr = ext in self.args.th_extract and "dethumb" not in vn.flags
+            ap_extr = ""
+            if want_th and can_extr:
                 extractor = self.args.th_extract[ext]
-                extracted = self.run_extractor(extractor, abspath, vn)
-                if extracted:
-                    extracted_f = extracted.rsplit('.', 1)[-1]
-                    ap_extr, ext_extr = extracted, extracted_f
+                ap_extr = self.run_extractor(extractor, abspath, vn)
+            if ap_extr:
+                ext = ap_extr.rsplit('.', 1)[-1]
+            else:
+                ap_extr = abspath
 
-            if ext_extr in self.args.au_unpk:
+            if ext in self.args.au_unpk:
                 ap_unpk = au_unpk(self.log, self.args.au_unpk, ap_extr, vn)
+            elif ext not in self.thumbable_native:
+                ap_unpk = ""
             else:
                 ap_unpk = ap_extr
 
@@ -681,7 +690,7 @@ class ThumbSrv(object):
         stream = None
         fd, ret = 0, ""
         try:
-            res = mod.main(abspath, vn, self)
+            res = mod.main(abspath, vn=vn, th_srv=self)
             if res is None:
                 self.log(
                     "thumbnail extractor %r returned no data for file %r" %
@@ -690,7 +699,11 @@ class ThumbSrv(object):
                 return ""
 
             outext, stream, offset, whence, size = res
-            if outext not in self.thumbable:
+            if (
+                outext not in self.thumbable_native
+                or outext in self.fmt_ffa
+                or outext in self.fmt_ffv
+            ):
                 self.log(
                     "thumbnail extractor %r returned unsupported format %r" %
                     (extr, outext)

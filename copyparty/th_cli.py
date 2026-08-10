@@ -34,6 +34,7 @@ class ThumbCli(object):
         self.cooldown = Cooldown(self.args.th_poke) if self.args.th_poke else None
 
         self.thumbable = c["thumbable"]
+        self.thumbable_native = c["thumbable_native"]
         self.fmt_pil = c["pil"]
         self.fmt_vips = c["vips"]
         self.fmt_raw = c["raw"]
@@ -59,6 +60,10 @@ class ThumbCli(object):
         if is_vid and "dvthumb" in dbv.flags:
             return None
 
+        is_custom = ext not in self.thumbable_native
+        if is_custom and "dethumb" in dbv.flags:
+            return None
+
         want_opus = fmt in EXTS_AC
         is_au = ext in self.fmt_ffa
         is_vau = want_opus and ext in self.fmt_ffv
@@ -76,7 +81,7 @@ class ThumbCli(object):
         elif want_opus:
             return None
 
-        is_img = not is_vid and not is_au
+        is_img = not is_vid and not is_au and not is_custom
         if is_img and "dithumb" in dbv.flags:
             return None
 
