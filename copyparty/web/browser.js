@@ -1832,7 +1832,7 @@ var x = '';
 if (!fullui) {
 	if (window.ui_nombar || /[?&]nombar\b/.exec(sloc0)) x += '#ops,';
 	if (window.ui_noacci || /[?&]noacci\b/.exec(sloc0)) x += '#acc_info,#opa_acc,';
-	if (window.ui_nosrvi || /[?&]nosrvi\b/.exec(sloc0)) x += '#srv_info,#srv_info2,#tree_footer';
+	if (window.ui_nosrvi || /[?&]nosrvi\b/.exec(sloc0)) x += '#srv_info,#srv_info2,#tree_footer,';
 	if (window.ui_nocpla || /[?&]nocpla\b/.exec(sloc0)) x += '#goh,';
 	if (window.ui_nolbar || /[?&]nolbar\b/.exec(sloc0)) x += '#wfp,';
 	if (nonav) x += '#path,';
