@@ -2185,6 +2185,23 @@ html.noscroll .sbar::-webkit-scrollbar {
     height: 100%;
     object-fit: contain;
 }
+#bbox-overlay.fitw .full-image {
+	overflow-y: auto;
+	overflow-x: hidden;
+	-webkit-overflow-scrolling: touch;
+}
+#bbox-overlay.fitw .full-image:before {
+	display: none;
+}
+#bbox-overlay.fitw .full-image img,
+#bbox-overlay.fitw .full-image video {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: none;
+    margin: 0 auto 1.4em;
+}
 html.bb_fsc .full-image img,
 html.bb_fsc .full-image video {
 	max-height: 100%;
