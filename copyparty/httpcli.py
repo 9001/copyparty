@@ -106,6 +106,7 @@ from .util import (
     read_utf8,
     relchk,
     ren_open,
+    runcmd,
     runhook,
     s2hms,
     s3enc,
@@ -1872,6 +1873,9 @@ class HttpCli(object):
         if self.args.no_zls:
             raise Pebkac(405, "zip browsing is disabled in server config")
 
+        if abspath.lower().endswith((".cbr", ".rar")):
+            return self._zls_rar(abspath)
+
         import zipfile
 
         try:
@@ -1882,6 +1886,22 @@ class HttpCli(object):
                 return True
         except (zipfile.BadZipfile, RuntimeError):
             raise Pebkac(404, "requested file is not a valid zip file")
+
+    def _zls_rar(self, abspath) -> bool:
+        try:
+            rc, sout, _ = runcmd(
+                ["unrar", "lb", "-p-", "-c-", "--", abspath], timeout=30
+            )
+        except FileNotFoundError:
+            raise Pebkac(500, "unrar is not installed on the server")
+
+        if rc != 0:
+            raise Pebkac(404, "requested file is not a valid rar file")
+
+        filelist = [{"fn": ln} for ln in sout.splitlines() if ln]
+        ret = json.dumps(filelist).encode("utf-8", "replace")
+        self.reply(ret, mime="application/json")
+        return True
 
     def tx_zget(self, abspath) -> bool:
         maxsz = 1024 * 1024 * 64
@@ -1895,6 +1915,9 @@ class HttpCli(object):
             )
         if self.args.no_zls:
             raise Pebkac(405, "zip browsing is disabled in server config")
+
+        if abspath.lower().endswith((".cbr", ".rar")):
+            return self._zget_rar(abspath, inner_path, maxsz)
 
         import zipfile
 
@@ -1925,6 +1948,47 @@ class HttpCli(object):
             raise Pebkac(404, "no such file in archive")
         except (zipfile.BadZipfile, RuntimeError):
             raise Pebkac(404, "requested file is not a valid zip file")
+        return True
+
+    def _zget_rar(self, abspath, inner_path, maxsz) -> bool:
+        import subprocess as sp
+
+        try:
+            p = sp.Popen(
+                ["unrar", "p", "-inul", "-p-", "-c-", "--", abspath, inner_path],
+                stdout=sp.PIPE,
+                stderr=sp.DEVNULL,
+            )
+        except FileNotFoundError:
+            raise Pebkac(500, "unrar is not installed on the server")
+
+        assert p.stdout
+        buf = b""
+        try:
+            while len(buf) <= maxsz:
+                chunk = p.stdout.read(256 * 1024)
+                if not chunk:
+                    break
+                buf += chunk
+        finally:
+            p.stdout.close()
+            try:
+                p.wait(timeout=30)
+            except sp.TimeoutExpired:
+                p.kill()
+                p.wait()
+
+        if p.returncode != 0:
+            raise Pebkac(404, "no such file in archive")
+
+        if len(buf) > maxsz:
+            raise Pebkac(404, "zip bomb defused")
+
+        mime = guess_mime(inner_path)
+        if mime not in SAFE_MIMES and "nohtml" in self.vn.flags:
+            mime = safe_mime(mime)
+
+        self.reply(buf, mime=mime)
         return True
 
     def handle_propfind(self) -> bool:
