@@ -383,6 +383,7 @@ window.baguetteBox = (function () {
         var list = [
             ['<b># hotkey</b>', '<b># operation</b>'],
             ['escape', 'close'],
+            ['up, down', 'scroll (fit-width mode)'],
             ['left, J', 'previous file'],
             ['right, L', 'next file'],
             ['home', 'first file'],
@@ -409,6 +410,7 @@ window.baguetteBox = (function () {
             html.push('<tr><td>' + list[a][0] + '</td><td>' + list[a][1] + '</td></tr>');
 
         html.push('<tr><td colspan="2">tap middle of img to hide btns</td></tr>');
+        html.push('<tr><td colspan="2">double-tap middle of img to toggle fit-width</td></tr>');
         html.push('<tr><td colspan="2">tap left/right sides for prev/next</td></tr>');
         d.innerHTML = html.join('\n') + '</tbody>';
         d.onclick = function () {
@@ -442,6 +444,10 @@ window.baguetteBox = (function () {
             setloop(2);
         else if (e.shiftKey && kl != "r")
             return;
+        else if ((k == "ArrowUp" || k == "Up") && options.bbwide)
+            scrollWide(-1);
+        else if ((k == "ArrowDown" || k == "Down") && options.bbwide)
+            scrollWide(1);
         else if (k == "ArrowLeft" || k == "Left" || kl == "j")
             showLeftImage();
         else if (k == "ArrowRight" || k == "Right" || kl == "l")
@@ -627,6 +633,14 @@ window.baguetteBox = (function () {
         }
         clmod(ebi('bbox-overlay'), 'fitw', sel);
         btnState(btnWide, sel);
+    }
+
+    function scrollWide(dir) {
+        var el = imagesElements[currentIndex];
+        if (!el)
+            return;
+
+        el.scrollBy({ top: dir * el.clientHeight * 0.85, behavior: 'smooth' });
     }
 
     function tglsel() {
@@ -1386,8 +1400,8 @@ window.baguetteBox = (function () {
 
             show_buttons('t');
 
-            if (Date.now() - ctime <= 500 && !IPHONE)
-                tglfull();
+            if (Date.now() - ctime <= 500)
+                btnWide.click();
 
             ctime = Date.now();
         };
