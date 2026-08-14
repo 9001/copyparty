@@ -689,6 +689,7 @@ Ls.hmn = {
 	"rc_pla": "play as audio",
 	"rc_txt": "open in textfile viewer",
 	"rc_md": "open in markdown viewer",
+	"rc_wopi": "open in office editor",
 	"rc_dl": "download",
 	"rc_zip": "download as archive",
 	"rc_cpl": "copy link",
