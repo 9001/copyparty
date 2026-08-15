@@ -1127,6 +1127,10 @@ class SvcHub(object):
                 t = "not listening on any ip-addresses (only unix-sockets and/or FDs); cannot enable zeroconf/mdns/ssdp as requested"
                 self.log("root", t, 3)
 
+        if al.wopi and not al.wopi_url and not al.wopi_urls:
+            self.log("root", "disabling wopi; need either wopi-url or wopi-urls", 1)
+            al.wopi = False
+
         if self.args.wopi or not self.args.no_dav:
             from .dxml import DXML_OK
 

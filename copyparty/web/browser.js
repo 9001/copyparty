@@ -7696,7 +7696,7 @@ var treectl = (function () {
 
 			if (wopi_set && wopi_set.has(tn.ext))
 				tn.lead = '<a href="?wopi=' + bhref +
-					'" rel="nofollow" name="' + hname + '">📄</a>';
+					'" rel="nofollow" target="_blank" name="' + hname + '">📄</a>';
 
 			if (tn.lead == '-')
 				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +

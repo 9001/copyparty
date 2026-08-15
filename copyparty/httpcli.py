@@ -1658,7 +1658,7 @@ class HttpCli(object):
                     "expires": time.time() + self.args.wopi_ttl,
                 }
 
-        xml = "?"
+        xml = url = "?"
         try:
             from .dxml import parse_xml
 
@@ -1696,7 +1696,8 @@ class HttpCli(object):
             url += quotep(zs + "/wopi/files/" + session["file_id"])
         except:
             del wopi_files[atoken]  # dont reuse an atoken wopi-client doesnt like
-            self.log("reading WOPI-client response failed; %s\n%s" % (min_ex(), xml), 3)
+            t = "reading WOPI-client response from %s failed; %s\n%s"
+            self.log(t % (url, min_ex(), xml), 3)
             raise Pebkac(500, "wopi error (see fileserver log)")
 
         html = self.j2s(
