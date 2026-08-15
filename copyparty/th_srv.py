@@ -549,24 +549,26 @@ class ThumbSrv(object):
             want_wav = tex == "wav"
             want_png = tex == "png"
             want_au = want_mp3 or want_opus or want_flac or want_wav
-            want_th = not want_au and not want_png
 
-            can_extr = ext in self.args.th_extract and "dethumb" not in vn.flags
-            ap_extr = ""
-            if want_th and can_extr:
-                extractor = self.args.th_extract[ext]
-                ap_extr = self.run_extractor(extractor, abspath, vn)
-            if ap_extr:
-                ext = ap_extr.rsplit('.', 1)[-1]
-            else:
-                ap_extr = abspath
+            ap_extr = abspath
+            if (
+                ext in self.args.th_extract
+                and not want_au
+                and not want_png
+                and "dethumb" not in vn.flags
+            ):
+                ap_extr = self.run_extractor(self.args.th_extract[ext], abspath, vn)
+                if ap_extr:
+                    ext = ap_extr.rsplit(".", 1)[-1]
 
             if ext in self.args.au_unpk:
+                ap_unpk = au_unpk(self.log, self.args.au_unpk, abspath, vn)
                 ap_unpk = au_unpk(self.log, self.args.au_unpk, ap_extr, vn)
-            elif ext not in self.thumbable_native:
-                ap_unpk = ""
-            else:
+            elif ext in self.thumbable_native:
                 ap_unpk = ap_extr
+            else:
+                ap_unpk = abspath
+                ap_unpk = ""
 
             if ap_extr and ap_extr != ap_unpk and ap_extr != abspath:
                 wunlink(self.log, ap_extr, vn.flags)
@@ -681,20 +683,19 @@ class ThumbSrv(object):
 
     def run_extractor(self, extr: str, abspath: str, vn: VFS) -> str:
         try:
-            mod = loadpy(extr, self.args.hot_th_extract)
+            mod = loadpy(extr, self.args.hot_th_extr)
         except Exception as ex:
-            self.log("import failed: {!r}".format(ex))
+            self.log("extractor import failed; " + min_ex(), 1)
             return ""
 
+        fd = 0
+        ret = ""
         stream = None
-        fd, ret = 0, ""
         try:
             res = mod.main(abspath, vn=vn, th_srv=self)
-            if res is None:
-                self.log(
-                    "thumbnail extractor %r returned no data for file %r" %
-                    (extr, abspath)
-                )
+            if not res:
+                t = "extractor %r returned no data for file %r"
+                self.log(t % (extr, abspath))
                 return ""
 
             outext, stream, offset, whence, size = res
@@ -703,34 +704,38 @@ class ThumbSrv(object):
                 or outext in self.fmt_ffa
                 or outext in self.fmt_ffv
             ):
-                self.log(
-                    "thumbnail extractor %r returned unsupported format %r" %
-                    (extr, outext)
-                )
+                t = "extractor %r returned unsupported format %r"
+                self.log(t % (extr, outext))
                 return ""
 
+            remains = size if size is not None and size >= 0 else -1
+
             stream.seek(offset, whence)
-            fsz = 0
             fd, ret = tempfile.mkstemp("." + outext)
-            with os.fdopen(fd, "wb") as out:
+            bufsz = rsz = self.args.iobuf
+            maxsz = self.args.th_extr_sz * 1048576
+            outsz = 0
+            with os.fdopen(fd, "wb", rsz) as f:
                 fd = 0
                 while True:
-                    if size is None or size < 0:
-                        bufsz = 32768
-                    else:
-                        bufsz = min(32768, max(size - fsz, 0))
+                    if remains < rsz and remains >= 0:
+                        bufsz = remains
                     buf = stream.read(bufsz)
                     if not buf:
                         break
-                    fsz += len(buf)
-                    out.write(buf)
+                    remains -= len(buf)
+                    outsz += len(buf)
+                    if outsz >= maxsz:
+                        raise Exception("too large")
+                    f.write(buf)
             return ret
         except Exception as e:
             if fd:
                 os.close(fd)
             if ret:
                 wunlink(self.log, ret, vn.flags)
-            self.log("failed to extract thumbnail from file %r: %r" % (abspath, e))
+            t = "failed to extract thumbnail from %r: %s"
+            self.log(t % (abspath, min_ex()))
             return ""
         finally:
             if stream:
