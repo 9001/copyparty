@@ -2379,6 +2379,7 @@ class AuthSrv(object):
                 vol.flags["dvthumb"] = True
                 vol.flags["dathumb"] = True
                 vol.flags["dithumb"] = True
+                vol.flags["dethumb"] = True
 
         have_fk = False
         for vol in vfs.all_nodes.values():
