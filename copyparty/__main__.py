@@ -23,6 +23,7 @@ import uuid
 
 from .__init__ import (
     ANYWIN,
+    CFG_DEF,
     CORES,
     EXE,
     MACOS,
@@ -63,6 +64,7 @@ from .util import (
     URL_BUG,
     URL_PRJ,
     Daemon,
+    absreal,
     align_tab,
     b64enc,
     ctypes,
@@ -104,10 +106,6 @@ except:
 
 u = unicode
 zsid = uuid.uuid4().urn[4:]
-
-CFG_DEF = [os.environ.get("PRTY_CONFIG", "")]
-if not CFG_DEF[0]:
-    CFG_DEF.pop()
 
 FULL_HELP = os.environ.get("PRTY_FULL_HELP", "")
 
@@ -2216,6 +2214,9 @@ def main(argv: Optional[list[str]] = None) -> None:
             Daemon(sfx_tpoke, "sfx-tpoke", (zs.split("=", 1)[1],))
             argv.pop(n)
             break
+
+    if CFG_DEF:
+        CFG_DEF[0] = absreal(CFG_DEF[0])
 
     ensure_locale()
 

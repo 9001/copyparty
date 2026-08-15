@@ -13,7 +13,7 @@ import threading
 import time
 from datetime import datetime
 
-from .__init__ import ANYWIN, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
+from .__init__ import ANYWIN, CFG_DEF, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash
@@ -25,6 +25,7 @@ from .util import (
     FN_EMB,
     HAVE_SQLITE3,
     IMPLICATIONS,
+    LOG,
     META_NOBOTS,
     MIMES,
     SQLITE_VER,
@@ -4077,6 +4078,11 @@ def expand_config_file(
         for fn in cnames:
             fp2 = os.path.join(fp, fn)
             if fp2 in ipath:
+                continue
+
+            if CFG_DEF and CFG_DEF[0] == fp2:
+                t = "ignoring PRTY_CONFIG because it was also autodiscovered by %s -> %s"
+                LOG[0]("root", t % (ipath, fp))
                 continue
 
             expand_config_file(log, shenvexp, ret, fp2, ipath)
