@@ -1792,7 +1792,7 @@ function MPlayer() {
 				continue;
 
 			tid = tid.slice(1);
-			if (r.tracks[tid]) 
+			if (r.tracks[tid])
 				order.push(tid);
 		}
 		r.order = order;
@@ -10030,19 +10030,19 @@ function reload_browser() {
 	var selbox = null;
 	var ttimer = null;
 
-	var lpdelay = 250; 
+	var lpdelay = 250;
 	var mvthresh = 44;
 
 	function unbox() {
 		qsr('.selbox');
 		ebi('gfiles').style.removeProperty('pointer-events')
 		ebi('wrap').style.removeProperty('user-select')
-		
+
 		if (selbox) {
 			console.log(selbox)
 			window.getSelection().removeAllRanges();
 		}
-		
+
 		is_selma = false;
 		dragging = false;
 		fwrap = null;
@@ -10085,7 +10085,7 @@ function reload_browser() {
 		starty = pos.y;
 		is_selma = true;
 		ttimer = null;
-		
+
 		if (e.type === 'touchstart') {
 			ttimer = setTimeout(function() {
 				ttimer = null;
@@ -10093,7 +10093,7 @@ function reload_browser() {
 			}, lpdelay);
 		}
 	}
-	
+
 	function start_drag() {
 		if (dragging) return;
 
@@ -10104,7 +10104,7 @@ function reload_browser() {
 
 		ebi('gfiles').style.pointerEvents = 'none';
 	}
-	
+
 	function sel_move(e) {
 		if (!is_selma) return;
 		var pos = getpp(e);
@@ -10121,7 +10121,7 @@ function reload_browser() {
 		if (!dragging && dist > mvthresh && !window.getSelection().toString()) {
 			if (e.target instanceof Element)
 				fwrap = e.target.closest('#wrap');
-			if (fwrap) 
+			if (fwrap)
 				fwrap.style.userSelect = 'none';
 			else return;
 			start_drag();
@@ -10170,7 +10170,7 @@ function reload_browser() {
 			}
 		});
 	}
-	
+
 	dsel_init();
 })();
 
@@ -10213,7 +10213,7 @@ var mpss = (function() {
 
 		var gain = afilt.ssg.gain;
 		var duration = ae.duration || 0;
-	
+
 		var slimit = duration * (config.sthresh / 100);
 		var elimit = duration * (1 - (config.etresh / 100));
 		var in_limits = ae.currentTime < slimit || ae.currentTime > elimit;
