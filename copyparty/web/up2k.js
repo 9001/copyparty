@@ -888,9 +888,8 @@ function up2k_init(subtle) {
     setmsg(suggest_up2k, 'msg');
 
     var u2szs = u2sz.split(','),
-        u2sz_min = parseInt(u2szs[0]),
-        u2sz_tgt = parseInt(u2szs[1]),
-        u2sz_max = parseInt(u2szs[2]);
+        u2sz_tgt = parseInt(u2szs[0]),
+        u2sz_max = parseInt(u2szs[1]);
 
     var parallel_uploads = ebi('nthread').value = icfg_get('nthread', u2j),
         stitch_tgt = ebi('u2szg').value = icfg_get('u2sz', u2sz_tgt),
@@ -2677,7 +2676,7 @@ function up2k_init(subtle) {
                             ccs += stp; stp *= 2;
                         }
                         ocs = Math.floor(ocs / 1024 / 1024);
-                        t.stitch_sz = Math.min(ocs, stitch_tgt);
+                        t.stitch_sz = Math.min(ocs, stitch_tgt || 1);
                     }
 
                     for (var a = 0; a < t.postlist.length; a++) {
@@ -2879,7 +2878,8 @@ function up2k_init(subtle) {
             nparts = upt.nparts,
             pcar = nparts[0],
             pcdr = nparts[nparts.length - 1],
-            maxsz = (u2sz_max > 1 ? u2sz_max : 2040) * 1024 * 1024;
+            maxmsz = stitch_tgt == u2sz_tgt ? u2sz_max : stitch_tgt,
+            maxsz = (maxmsz > 0 ? maxmsz : 2040) * 1024 * 1024;
 
         if (t.done)
             return console.log('done; skip chunk', t.name, t);
@@ -2950,6 +2950,9 @@ function up2k_init(subtle) {
                 t.cooldown = t.coolmul = 0;
                 st.etac.u++;
                 st.etac.t++;
+            }
+            else if (xhr.status == 413) {
+                modal.die('bad server config; see "u2sz" in readme');
             }
             else if (txt.indexOf('already got that') + 1) {
                 unqueue_up(t);
@@ -3163,7 +3166,7 @@ function up2k_init(subtle) {
         var el = ebi('u2szg'), n = parseInt(el.value);
         stitch_tgt = n = (
             isNaN(n) ? u2sz_tgt :
-            n < u2sz_min ? u2sz_min :
+            n < 0 ? 0 :
             n > u2sz_max ? u2sz_max : n
         );
         if (n == u2sz_tgt) sdrop('u2sz'); else swrite('u2sz', n);
@@ -3400,7 +3403,7 @@ function up2k_init(subtle) {
     function set_nosubtle(v) {
         if (!WebAssembly)
             return toast.err(10, L.u_nowork);
-        modal.confirm(L.lang_set, location.reload.bind(location), null);
+        modal.confirm(L.lang_set, relod, null);
     }
 
     function set_upnag(en) {
@@ -3471,6 +3474,9 @@ function up2k_init(subtle) {
 
 
 function warn_uploader_busy(e) {
+    if (window.gtfo)
+        return;
+
     e.preventDefault();
     e.returnValue = '';
     return "upload in progress, click abort and use the file-tree to navigate instead";

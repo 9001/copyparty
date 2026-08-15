@@ -1383,18 +1383,20 @@ class SvcHub(object):
         self.args.name_html = zs
 
         zs = al.u2sz
+        if zs in ("no", "1,1,1"):
+            zs = "0"
         zsl = [x.strip() for x in zs.split(",")]
-        if len(zsl) not in (1, 3):
-            t = "invalid --u2sz; must be either one number, or a comma-separated list of three numbers (min,default,max)"
+        if len(zsl) not in (1, 2):
+            t = "invalid --u2sz; must be either one number, or a comma-separated list of two numbers (target,max)"
             raise Exception(t)
-        if len(zsl) < 3:
-            zsl = ["1", zs, zs]
-        zi2 = 1
+        if len(zsl) < 2:
+            zsl = [zs, zs]
+        zi2 = 0
         for zs in zsl:
             zi = int(zs)
             # arbitrary constraint (anything above 2 GiB is probably unintended)
-            if zi < 1 or zi > 2047:
-                raise Exception("invalid --u2sz; minimum is 1, max is 2047")
+            if zi < 0 or zi > 2047:
+                raise Exception("invalid --u2sz; minimum is 0, max is 2047")
             if zi < zi2:
                 raise Exception("invalid --u2sz; values must be equal or ascending")
             zi2 = zi

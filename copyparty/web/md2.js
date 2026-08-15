@@ -325,6 +325,9 @@ var modpoll = new Modpoll();
 
 
 window.onbeforeunload = function (e) {
+    if (window.gtfo)
+        return;
+
     if ((ebi("save").className + '').indexOf('disabled') >= 0)
         return; //nice (todo)
 

@@ -758,7 +758,7 @@ if (window.glang && navigator.languages && !/\bcplng=/.test(document.cookie))
 				if (window.stop)
 					window.stop();
 				document.body.innerHTML = 'Loading ' + n;
-				setck("cplng=" + n, location.reload.bind(location));
+				setck("cplng=" + n, relod);
 				crashed = true;
 				throw 1;
 			}
@@ -8626,7 +8626,7 @@ var setfszf = (function () {
 		setck('cplng=' + lang);
 		freshen();
 		var t = L.tt == 'English' ? '' : Ls.eng.lang_set;
-		modal.confirm(L.lang_set + "\n\n" + t, location.reload.bind(location), null);
+		modal.confirm(L.lang_set + "\n\n" + t, relod, null);
 	}
 
 	freshen();
