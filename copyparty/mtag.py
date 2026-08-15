@@ -2,6 +2,7 @@
 from __future__ import division, print_function, unicode_literals
 
 import argparse
+import io
 import json
 import os
 import re
@@ -193,6 +194,51 @@ def au_unpk(
                 t += ", using " + using
             log(t)
             fi = zf.open(using)
+
+        elif pk == "cbr":
+            rc, sout, _ = runcmd(
+                ["unrar", "lb", "-p-", "-c-", "--", abspath], timeout=30
+            )
+            if rc != 0:
+                raise Exception("not a valid rar file")
+
+            names = [x for x in sout.splitlines() if x]
+            nf = len(names)
+            znil = [x for x in names if x.lower().split(".")[-1] in CBZ_PICS]
+            znil = [x for x in znil if "cover" in x.lower()] or znil
+            znil = [x for x in znil if CBZ_01.search(x.lower())] or znil
+            t = "cbr: %d files, %d hits" % (nf, len(znil))
+            if not znil:
+                raise Exception("no images inside cbr")
+            using = sorted(znil)[0]
+            t += ", using " + using
+            log(t)
+
+            rp = sp.Popen(
+                ["unrar", "p", "-inul", "-p-", "-c-", "--", abspath, using],
+                stdout=sp.PIPE,
+                stderr=sp.DEVNULL,
+            )
+            assert rp.stdout
+            rbuf = b""
+            try:
+                while len(rbuf) <= maxsz:
+                    rchunk = rp.stdout.read(32768)
+                    if not rchunk:
+                        break
+                    rbuf += rchunk
+            finally:
+                rp.stdout.close()
+                try:
+                    rp.wait(timeout=30)
+                except sp.TimeoutExpired:
+                    rp.kill()
+                    rp.wait()
+
+            if rp.returncode != 0:
+                raise Exception("unrar extraction failed")
+
+            fi = io.BytesIO(rbuf)
 
         elif pk == "kra" or pk == "ora":
             import zipfile

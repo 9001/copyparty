@@ -28,7 +28,7 @@ window.baguetteBox = (function () {
             onChange: null,
             readDirRtl: false,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnVmode, btnReadDir, btnGoPage, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnWide, btnVmode, btnReadDir, btnGoPage, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -40,7 +40,7 @@ window.baguetteBox = (function () {
             /^[^?]+\.(a?png|avif|bmp|gif|hei[cf]s?|jfif|jpe?g|jxl|svg|tiff?|webp)(\?|$)/i :
             /^[^?]+\.(a?png|avif|bmp|gif|jfif|jpe?g|jxl|svg|tiff?|webp)(\?|$)/i,
         re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i,
-        re_cbz = /^[^?]+\.(cbz)(\?|$)/i,
+        re_cbz = /^[^?]+\.(cbz|cbr|rar)(\?|$)/i,
         anims = ['slideIn', 'fadeIn', 'none'],
         data = {},  // all galleries
         imagesElements = [],
@@ -116,6 +116,19 @@ window.baguetteBox = (function () {
     var overlayWheelHandler = function (e) {
         if (!options.noScrollbars || anymod(e))
             return;
+
+        if (options.bbwide) {
+            var el = imagesElements[currentIndex];
+            if (el && Math.abs(e.deltaY) >= Math.abs(e.deltaX)) {
+                var atTop = el.scrollTop <= 0,
+                    atBot = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+
+                if (e.deltaY < 0 && !atTop)
+                    return;
+                if (e.deltaY > 0 && !atBot)
+                    return;
+            }
+        }
 
         ev(e);
 
@@ -266,7 +279,7 @@ window.baguetteBox = (function () {
                     return file["fn"];
                 }).filter(function (file) {
                     return re_i.test(file);
-                }).sort();
+                }).sort(NATSORT ? NATSORT.compare : undefined);
 
                 if (imagesList.length === 0) {
                     throw new Error("Archive does not contain any images");
@@ -330,6 +343,7 @@ window.baguetteBox = (function () {
                 '<button id="bbox-tsel" type="button">sel</button>' +
                 '<button id="bbox-full" type="button" tt="full-screen">⛶</button>' +
                 '<button id="bbzoom" type="button" tt="zoom/stretch">z</button>' +
+                '<button id="bbwide" type="button" tt="fit width, scroll">w</button>' +
                 '<button id="bbox-vmode" type="button" tt="a"></button>' +
                 '<button id="bbox-gopage" type="button" tt="go to page">pg</button>' +
                 '<button id="bbox-close" type="button" aria-label="Close">X</button>' +
@@ -350,12 +364,16 @@ window.baguetteBox = (function () {
         btnSel = ebi('bbox-tsel');
         btnFull = ebi('bbox-full');
         btnZoom = ebi('bbzoom');
+        btnWide = ebi('bbwide');
         btnVmode = ebi('bbox-vmode');
         btnGoPage = ebi('bbox-gopage');
         btnClose = ebi('bbox-close');
 
         bcfg_bind(options, 'bbzoom', 'bbzoom', false, setzoom);
         setzoom();
+
+        bcfg_bind(options, 'bbwide', 'bbwide', false, setwide);
+        setwide();
     }
 
     function halp() {
@@ -365,6 +383,7 @@ window.baguetteBox = (function () {
         var list = [
             ['<b># hotkey</b>', '<b># operation</b>'],
             ['escape', 'close'],
+            ['up, down', 'scroll (fit-width mode)'],
             ['left, J', 'previous file'],
             ['right, L', 'next file'],
             ['home', 'first file'],
@@ -372,6 +391,7 @@ window.baguetteBox = (function () {
             ['R', 'rotate (shift=ccw)'],
             ['F', 'toggle fullscreen'],
             ['Z', 'toggle zoom/stretch'],
+            ['W', 'toggle fit-width + scroll'],
             ['S', 'toggle file selection'],
             ['G', 'cbz: go to page'],
             ['space, P, K', 'video: play / pause'],
@@ -390,6 +410,7 @@ window.baguetteBox = (function () {
             html.push('<tr><td>' + list[a][0] + '</td><td>' + list[a][1] + '</td></tr>');
 
         html.push('<tr><td colspan="2">tap middle of img to hide btns</td></tr>');
+        html.push('<tr><td colspan="2">double-tap middle of img to toggle fit-width</td></tr>');
         html.push('<tr><td colspan="2">tap left/right sides for prev/next</td></tr>');
         d.innerHTML = html.join('\n') + '</tbody>';
         d.onclick = function () {
@@ -423,6 +444,10 @@ window.baguetteBox = (function () {
             setloop(2);
         else if (e.shiftKey && kl != "r")
             return;
+        else if ((k == "ArrowUp" || k == "Up") && options.bbwide)
+            scrollWide(-1);
+        else if ((k == "ArrowDown" || k == "Down") && options.bbwide)
+            scrollWide(1);
         else if (k == "ArrowLeft" || k == "Left" || kl == "j")
             showLeftImage();
         else if (k == "ArrowRight" || k == "Right" || kl == "l")
@@ -457,6 +482,8 @@ window.baguetteBox = (function () {
             tglfull();
         else if (kl == "z")
             btnZoom.click();
+        else if (kl == "w")
+            btnWide.click();
         else if (kl == "s")
             tglsel();
         else if (kl == "g" && isCbz)
@@ -586,8 +613,34 @@ window.baguetteBox = (function () {
 
     function setzoom() {
         var sel = clgot(btnZoom, 'on')
+        if (sel && clgot(btnWide, 'on')) {
+            options.bbwide = false;
+            bcfg_set('bbwide', false);
+            btnState(btnWide, false);
+            clmod(ebi('bbox-overlay'), 'fitw', false);
+        }
         clmod(ebi('bbox-overlay'), 'fill', sel);
         btnState(btnZoom, sel);
+    }
+
+    function setwide() {
+        var sel = clgot(btnWide, 'on');
+        if (sel && clgot(btnZoom, 'on')) {
+            options.bbzoom = false;
+            bcfg_set('bbzoom', false);
+            btnState(btnZoom, false);
+            clmod(ebi('bbox-overlay'), 'fill', false);
+        }
+        clmod(ebi('bbox-overlay'), 'fitw', sel);
+        btnState(btnWide, sel);
+    }
+
+    function scrollWide(dir) {
+        var el = imagesElements[currentIndex];
+        if (!el)
+            return;
+
+        el.scrollBy({ top: dir * el.clientHeight * 0.85, behavior: 'smooth' });
     }
 
     function tglsel() {
@@ -1347,8 +1400,8 @@ window.baguetteBox = (function () {
 
             show_buttons('t');
 
-            if (Date.now() - ctime <= 500 && !IPHONE)
-                tglfull();
+            if (Date.now() - ctime <= 500)
+                btnWide.click();
 
             ctime = Date.now();
         };
