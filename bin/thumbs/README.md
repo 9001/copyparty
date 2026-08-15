@@ -46,6 +46,8 @@ copyparty performs buffered reading, so expect multiple `read()` calls, respect 
 
 ## examples
 
+* [randomcolor](https://github.com/9001/copyparty/blob/hovudstraum/bin/thumbs/randomcolor.py) generates a random .gif image
+
 
 ## some other known plugins seen on the internets
 

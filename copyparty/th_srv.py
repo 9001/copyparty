@@ -562,12 +562,10 @@ class ThumbSrv(object):
                     ext = ap_extr.rsplit(".", 1)[-1]
 
             if ext in self.args.au_unpk:
-                ap_unpk = au_unpk(self.log, self.args.au_unpk, abspath, vn)
                 ap_unpk = au_unpk(self.log, self.args.au_unpk, ap_extr, vn)
             elif ext in self.thumbable_native:
                 ap_unpk = ap_extr
             else:
-                ap_unpk = abspath
                 ap_unpk = ""
 
             if ap_extr and ap_extr != ap_unpk and ap_extr != abspath:
