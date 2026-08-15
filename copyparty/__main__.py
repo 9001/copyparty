@@ -1888,17 +1888,18 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="3gp,asf,av1,avc,avi,flv,h264,h265,hevc,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,ts,vob,webm,wmv", help="video formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bcstm,bfstm,brstm,bonk,dfpwm,dts,flac,gsm,ilbc,it,itgz,itxz,itz,m4a,m4b,m4r,mdgz,mdxz,mdz,mka,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,oga,ogg,okt,opus,ra,s3m,s3gz,s3xz,s3z,tak,tta,ulaw,wav,wma,wv,xm,xmgz,xmxz,xmz,xpk", help="audio formats to decode using ffmpeg")
 
-    ap2.add_argument("--th-pil-add", metavar="T,-T", type=u, default="", help="add or remove image formats to decode using pillow listed in \033[33m--th-r-pil\033[0m; example: [\033[32mfb2,pdf,-psd,-bmp\033[0m] (add fb2 and pdf; remove psd and bmp)")
-    ap2.add_argument("--th-vips-add", metavar="T,-T", type=u, default="", help="same as \033[33m--th-pil-add\033[0m, but for pyvips")
-    ap2.add_argument("--th-raw-add", metavar="T,-T", type=u, default="", help="same as \033[33m--th-pil-add\033[0m, but for rawpy/libraw")
-    ap2.add_argument("--th-ffi-add", metavar="T,-T", type=u, default="", help="same as \033[33m--th-pil-add\033[0m, but for ffmpeg images")
-    ap2.add_argument("--th-ffv-add", metavar="T,-T", type=u, default="", help="same as \033[33m--th-pil-add\033[0m, but for ffmpeg videos")
-    ap2.add_argument("--th-ffa-add", metavar="T,-T", type=u, default="", help="same as \033[33m--th-pil-add\033[0m, but for ffmpeg audio")
+    ap2.add_argument("--th-pil-add", metavar="T", type=u, default="", help="add or remove image formats to decode using pillow listed in \033[33m--th-r-pil\033[0m; example: [\033[32mfb2,pdf,-psd,-bmp\033[0m] (add fb2 and pdf, remove psd and bmp)")
+    ap2.add_argument("--th-vips-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for pyvips")
+    ap2.add_argument("--th-raw-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for rawpy/libraw")
+    ap2.add_argument("--th-ffi-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for ffmpeg images")
+    ap2.add_argument("--th-ffv-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for ffmpeg videos")
+    ap2.add_argument("--th-ffa-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for ffmpeg audio")
 
     ap2.add_argument("--th-spec-cnv", metavar="T", type=u, default="it,itgz,itxz,itz,mdgz,mdxz,mdz,mo3,mod,s3m,s3gz,s3xz,s3z,xm,xmgz,xmxz,xmz,xpk", help="audio formats which provoke https://trac.ffmpeg.org/ticket/10797 (huge ram usage for s3xmodit spectrograms)")
     ap2.add_argument("--au-unpk", metavar="E=F.C", type=u, default="mdz=mod.zip, mdgz=mod.gz, mdxz=mod.xz, s3z=s3m.zip, s3gz=s3m.gz, s3xz=s3m.xz, xmz=xm.zip, xmgz=xm.gz, xmxz=xm.xz, itz=it.zip, itgz=it.gz, itxz=it.xz, cbz=jpg.cbz, epub=jpg.epub, kra=png.kra, ora=png.ora", help="audio/image formats to decompress before passing to ffmpeg")
-    ap2.add_argument("--th-extract", metavar="E[,E]=PY", type=u, action="append", help="\033[34mREPEATABLE:\033[0m custom script \033[33mPY\033[0m to extract thumbnail from files of format \033[33mE\033[0m; example: [\033[32mmdf,iso,dmg=/handlers/th_diskimg.py\033[0m]")
-    ap2.add_argument("--hot-th-extract", action="store_true", help="recompile extractors on each thumbnail extraction -- expensive but convenient when hacking on stuff")
+    ap2.add_argument("--th-extract", metavar="T", type=u, action="append", help="\033[34mREPEATABLE:\033[0m list of file extensions to thumbnail using a custom plugin (a python script); example: [\033[32mmdf,iso,dmg=/handlers/th_diskimg.py\033[0m]")
+    ap2.add_argument("--th-extr-sz", metavar="M", type=int, default=16, help="max num megabytes to allow \033[33m--th-extract\033[0m plugins to extract from each file")
+    ap2.add_argument("--hot-th-extr", action="store_true", help="recompile extractors on each thumbnail extraction -- expensive but convenient when hacking on stuff")
 
 
 def add_transcoding(ap):
