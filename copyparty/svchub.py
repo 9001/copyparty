@@ -134,12 +134,12 @@ CVE_SEVS = {"low": 1, "medium": 2, "moderate": 2, "high": 3, "critical": 4}
 
 
 def _build_th_fset(f: str, fadd: str) -> set[str]:
-    fset = {x for x in f.replace(' ', '').split(',')}
+    fset = {x for x in f.replace(" ", "").split(",")}
     rmset = {""}
 
-    for x in fadd.replace(' ', '').split(','):
+    for x in fadd.replace(" ", "").split(","):
         if x.startswith("-"):
-            rmset.add(x.lstrip('-'))
+            rmset.add(x.lstrip("-"))
         else:
             fset.add(x)
 
@@ -464,7 +464,7 @@ class SvcHub(object):
         th_extract = args.th_extract or []
         args.th_extract = {}
         for arg in th_extract:
-            exts, script = arg.split('=', 1)
+            exts, script = arg.split("=", 1)
             for ext in exts.split(","):
                 args.th_extract[ext.strip().lower()] = script
 
