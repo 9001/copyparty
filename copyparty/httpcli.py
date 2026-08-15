@@ -1649,9 +1649,8 @@ class HttpCli(object):
                 raise Pebkac(500, "too many wopi sessions")
             if not found:
                 atoken = ub64enc(os.urandom(18)).decode("ascii")  #  18 = 144b = 24c
-                vp_salted = (vpath + self.args.wopi_salt).encode("utf-8", "replace")
-                vp_hashed = hashlib.sha256(vp_salted).digest()[:15]  # 15 = 120b = 20c
-                file_id = ub64enc(vp_hashed).decode("ascii")
+                zb = (vpath + self.args.wopi_salt).encode("utf-8", "replace")
+                file_id = ub64enc(hashlib.sha512(zb).digest()[:15]).decode("ascii")
                 wopi_files[atoken] = session = {
                     "vp": vpath,
                     "uname": self.uname,
