@@ -10075,7 +10075,7 @@ function reload_browser() {
 	function sel_start(e) {
 		if (e.button !== 0 && e.type !== 'touchstart') return;
 		if (!thegrid.en || !treectl.dsel) return;
-		if (e.target.closest('#widget,#ops,.opview,.doc')) return;
+		if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open')) return;
 
 		if (e.target.closest('#gfiles'))
 			ebi('gfiles').style.userSelect = "none";
