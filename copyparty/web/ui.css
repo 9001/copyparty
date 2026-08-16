@@ -33,6 +33,7 @@
 
 	--bgg: var(--bg);
 
+	background: #191c1f;
 	background: var(--bg);
 	color: #b9bdc1;
     color: var(--fg);
