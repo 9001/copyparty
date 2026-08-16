@@ -158,13 +158,10 @@ html.b {
 		-5deg, 
 		color-mix(in oklab, var(--btn-bg-a) 30%, var(--a) 20%), 
 		color-mix(in oklab, var(--btn-bg-a) 30%, var(--b)));
-	
-  	text-shadow: 0px 0px 4px rgb(255, 255, 255);
 }
 html.bz {
 	--a: #5fb9b8;
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
-	text-shadow: 0px 0px 4px #000;
 	--fg-weak: var(--fg-max);
 
 	--bottom-glow: radial-gradient(
@@ -174,6 +171,14 @@ html.bz {
 	);
 	--btn-fg: var(--fg);
 	--btn-h-fg: var(--fg);
+}
+@supports(background: var(--bg)){
+	html.by{
+  		text-shadow: 0px 0px 4px #fff;
+	}
+	html.bz{
+  		text-shadow: 0px 0px 4px #000;
+	}
 }
 html.b #srchfolder_div,
 html.b #up_quick_more a,
@@ -1156,6 +1161,7 @@ tr.play td:nth-child(1) a {
 	margin: 0 auto;
 	display: block;
 	width: 100%;
+	max-height: 7.5em;
 	height: calc(var(--grid-sz) - 2.5em);
 	object-fit: cover;
 }
@@ -4532,30 +4538,31 @@ html.e #wrap.thin .ghead {
 		padding: .2em .2em .15em .2em;
 		user-select: text;
 	}
-		/*cropped gallery*/
-		#ggrid.gallery {
-			gap: 2px 3px;
-			margin: .2em -.5em;
-		}
+	/*cropped gallery*/
+	#ggrid.gallery {
+		gap: 2px 3px;
+		margin: .2em -.5em;
+	}
 
-			#ggrid.gallery a::before {
-				padding: .1em 0;
-				margin: .3em;
-			}
+	#ggrid.gallery a::before {
+		padding: .1em 0;
+		margin: .3em;
+	}
 
-			#ggrid.gallery a.img.thumbed {
-				max-height: none;
-			}
+	#ggrid .thumb,
+	#ggrid.gallery a.img.thumbed {
+		max-height: none;
+	}
 
-				#ggrid.gallery a.img.thumbed span:not(.th_ext) {
-					display: none;
-				}
+	#ggrid.gallery a.img.thumbed span:not(.th_ext) {
+		display: none;
+	}
 
-				#ggrid.gallery a.img.thumbed .thumb,
-				#ggrid.gallery a.img.thumbed img {
-					max-height: none;
-					height: calc(var(--grid-sz) - 8px);
-				}
+	#ggrid.gallery a.img.thumbed .thumb,
+	#ggrid.gallery a.img.thumbed img {
+		max-height: none;
+		height: calc(var(--grid-sz) - 8px);
+	}
 }
 
 /*uncropped gallery*/
