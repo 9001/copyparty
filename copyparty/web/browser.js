@@ -9337,6 +9337,7 @@ function sandbox(tgt, rules, allow, cls, html) {
 	fr.setAttribute('sandbox', rules ? 'allow-' + rules.replace(/ /g, ' allow-') : '');
 	fr.setAttribute('allow', allow);
 	fr.setAttribute('srcdoc', html);
+	tgt.innerHTML = '';
 	tgt.appendChild(fr);
 	treectl.sb_msg = true;
 	return true;
