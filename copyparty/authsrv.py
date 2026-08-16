@@ -3250,6 +3250,9 @@ class AuthSrv(object):
             # transplant shadowing into shares
             for vn in shv.nodes.values():
                 svn, srem = vn.shr_src  # type: ignore
+                if "show_hist" not in vn.flags:
+                    zvn = VFS(self.log_func, "", "", "", AXS(), self.vf0())
+                    vn.nodes[".hist"] = zvn
                 if srem:
                     continue  # free branch, safe
                 ap = svn.canonical(srem)
