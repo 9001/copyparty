@@ -3990,7 +3990,6 @@ html.b .opbox,
 html.b #path,
 html.b #srch_form,
 html.b .ghead {
-	background: #c1d1ed;
 	background: var(--btn-bg);
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
