@@ -2764,7 +2764,7 @@ class AuthSrv(object):
 
                 for k in drop:
                     t = 'cannot enable [%s] for volume "/%s" because this requires one of the following: e2d / e2ds / e2dsa  (either as volflag or global-option)'
-                    if not (enshare and vp.startswith(shrs)):
+                    if not (enshare and vol.vpath.startswith(shrs)):
                         self.log(t % (k, vol.vpath), 1)
                     vol.flags.pop(k)
 
@@ -3213,6 +3213,13 @@ class AuthSrv(object):
                 shn.flags = o_vn.flags.copy()
                 shn.dbpath = o_vn.dbpath
                 shn.histpath = o_vn.histpath
+
+                zs = "assert_root daw dk dks dky e2ds e2dsa e2ts e2tsr fk fka landmark opds rss scan th_pregen"
+                for zs2 in zs.split(" "):
+                    shn.flags.pop(zs2, None)
+                zs = "srch_excl srch_re_dots srch_re_nodot th_coversd th_coversl"
+                for zs2 in zs.split(" "):
+                    shn.flags[zs2] = []
 
                 # root.all_aps doesn't include any shares, so make a copy where the
                 # share appears in all abspaths it can provide (for example for chk_ap)

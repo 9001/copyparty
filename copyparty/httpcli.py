@@ -4378,7 +4378,7 @@ class HttpCli(object):
             mfile2 = "{}.{:.3f}.{}".format(fname, srv_lastmod, fext)
 
             dp = ""
-            hist_cfg = dbv.flags["md_hist"]
+            hist_cfg = vfs.flags["md_hist"]
             if hist_cfg == "v":
                 vrd = vsplit(vrem)[0]
                 zb = hashlib.sha512(afsenc(vrd)).digest()
@@ -4401,7 +4401,7 @@ class HttpCli(object):
                     pass
             if dp:
                 atomic_move(self.log, fp, os.path.join(dp, mfile2), vfs.flags)
-                nmax = dbv.flags["md_nhist"]
+                nmax = vfs.flags["md_nhist"]
                 if nmax:
                     zs = r"%s\.[0-9]+\.[0-9]{3}\.%s"
                     ptn = re.compile(zs % (re.escape(fname), re.escape(fext)))
@@ -7082,10 +7082,10 @@ class HttpCli(object):
             and (use_filekey or use_dirkey or (not is_dir and "fk" not in vn.flags))
         ):
             if th_fmt is not None:
-                nothumb = "dthumb" in dbv.flags
+                nothumb = "dthumb" in vn.flags
                 if is_dir:
                     vrem = vrem.rstrip("/")
-                    cvs = dbv.flags["th_coversl"]
+                    cvs = vn.flags["th_coversl"]
                     if nothumb or not cvs:
                         pass
                     elif icur and vrem:
@@ -7831,7 +7831,7 @@ class HttpCli(object):
                 ).urn
                 item["iso8601"] = "%sZ" % (item["dt"].replace(" ", "T"),)
 
-                if "rmagic" in self.vn.flags:
+                if "rmagic" in vf:
                     ap = "%s/%s" % (fsroot, item["name"])
                     item["mime"] = guess_mime(item["name"], ap)
                 else:
@@ -7841,8 +7841,8 @@ class HttpCli(object):
                 if (
                     not self.args.th_no_jpg
                     and self.thumbcli
-                    and "dthumb" not in dbv.flags
-                    and "dithumb" not in dbv.flags
+                    and "dthumb" not in vf
+                    and "dithumb" not in vf
                 ):
                     item["jpeg_thumb_href"] = href + "&th=jf"
                     item["jpeg_thumb_href_hires"] = item["jpeg_thumb_href"] + "3"
