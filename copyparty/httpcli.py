@@ -1658,6 +1658,8 @@ class HttpCli(object):
                     "expires": time.time() + self.args.wopi_ttl,
                 }
 
+        assert atoken and session  # type: ignore  # !rm
+
         xml = url = "?"
         try:
             from .dxml import parse_xml
