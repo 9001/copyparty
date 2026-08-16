@@ -3093,11 +3093,13 @@ html.bb_fsc figcaption {
 	color: var(--fg);
 	z-index: 1;
 	transition: opacity .15s;
+	pointer-events: none;
 }
 #bbox-overlay figcaption a {
 	background: rgba(0, 0, 0, 0.6);
 	border-radius: var(--radius);
 	padding: .3em .6em;
+	pointer-events: all;
 }
 html.y #bbox-overlay figcaption a {
 	color: #0bf;
