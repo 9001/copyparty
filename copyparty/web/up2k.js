@@ -1005,6 +1005,12 @@ function up2k_init(subtle) {
                 arr.splice(a, 1);
     }
 
+    function upq_has(q, t) {
+        for (var a = 0, aa = q.length; a < aa; a++)
+            if (q[a].nfile == t.n)
+                return true;
+    }
+
     var pvis = new U2pvis("bz", '#u2cards', uc, st),
         donut = new Donut(uc, st);
 
@@ -2865,9 +2871,8 @@ function up2k_init(subtle) {
         if (upf.sprs)
             return true;
 
-        for (var a = 0, aa = st.busy.upload.length; a < aa; a++)
-            if (st.busy.upload[a].nfile == upt.nfile)
-                return false;
+        if (upq_has(st.busy.upload, upf))
+            return false;
 
         return true;
     }
@@ -2977,7 +2982,7 @@ function up2k_init(subtle) {
             apop(st.busy.upload, upt);
             for (var a = pcar; a <= pcdr; a++)
                 apop(t.postlist, a);
-            if (!t.postlist.length) {
+            if (!t.postlist.length && !upq_has(st.busy.upload, t)) {
                 t.t_uploaded = Date.now();
                 if (!has(st.busy.handshake, t)) {
                     pvis.seth(t.n, 1, 'verifying');
