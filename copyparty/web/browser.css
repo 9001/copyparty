@@ -1161,7 +1161,6 @@ tr.play td:nth-child(1) a {
 	margin: 0 auto;
 	display: block;
 	width: 100%;
-	max-height: 7.5em;
 	height: calc(var(--grid-sz) - 2.5em);
 	object-fit: cover;
 }
@@ -1202,6 +1201,7 @@ tr.play td:nth-child(1) a {
 	margin: -3px -2px;
 	padding: 4px 3px;
 	justify-content: center;
+	max-height: 7.5em;
 }
 #files .imgcontainer img,
 #files .imgcontainer {
@@ -4548,7 +4548,7 @@ html.e #wrap.thin .ghead {
 		margin: .3em;
 	}
 
-	#ggrid .thumb,
+	.imgcontainer,
 	#ggrid.gallery a.img.thumbed {
 		max-height: none;
 	}
