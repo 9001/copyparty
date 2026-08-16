@@ -10135,18 +10135,25 @@ var msel = (function () {
 function fclick1(e) {
 	e.preventDefault ? e.preventDefault() : e.returnValue = false;
 
-	// pass copy of click event to list entry (can trigger bbox handler)
 	var td = ebi(this.getAttribute('ref'));
-	td.dispatchEvent(new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true,
-        clientX: e.clientX,
-        clientY: e.clientY,
-		ctrlKey: e.ctrlKey,
-        shiftKey: e.shiftKey,
-        altKey: e.altKey,
-        metaKey: e.metaKey,
-    }));
+	try{
+		// pass copy of click event to list entry (can trigger bbox handler)
+		td.dispatchEvent(new MouseEvent('click', {
+			bubbles: true,
+			cancelable: true,
+			clientX: e.clientX,
+			clientY: e.clientY,
+			ctrlKey: e.ctrlKey,
+			shiftKey: e.shiftKey,
+			altKey: e.altKey,
+			metaKey: e.metaKey,
+		}));
+	}
+	catch(ex){
+		console.log(ex);
+		// fallback method (can't activate bbox)
+		fclick.call(td, e);
+	}
 }
 
 function fclick(e, dbl) {
