@@ -127,7 +127,42 @@
 html.y {
 	--scrl-hint: var(--bg);
 }
+
 html.b {
+	--a: #eb6;
+	--a-hil: rgb(255, 232, 147);
+	--a-hil: hsl(from color-mix(in oklab, var(--a) 80%, var(--fg-max) 20%) h calc(s * 1.6) calc(l * 1.2));
+
+	--bg: #080915;
+	--bg-u2: #181a2c;
+	--bg: hsl(from var(--a) calc(h + 195) calc(s / 1.6) calc(l / 11));
+	--bg-u2: hsl(from var(--a) calc(h + 195) calc(s / 2.6) calc(l / 5));
+
+	--btn-1-bs: 0 .05em 0 var(--btn-1h-bg) inset;
+	--tree-bg: var(--bg-u2);
+
+	--g-g1: transparent;
+	--g-bg: transparent;
+	--g-b1: transparent;
+	--g-b2: transparent;
+}
+html.b #ggrid>a{
+	box-shadow: none;
+}
+html.b .btn{
+	border: none;
+}
+html.by{
+	--a: #d1451b;
+	--bg: #e2ecf5;
+	--bg-u2: #98b0c7;
+	--bg: hsl(from var(--a) calc(h + 195) calc(s / 1.6) calc(l * 2));
+	--bg-u2: hsl(from var(--a) calc(h + 195) calc(s / 2.6) calc(l * 1.5));
+	--scrl-hint: var(--bg-u2);
+	--srv-1: #666;
+}
+
+html.g {
 	--op-aa-sh: 0 0 .2em var(--bg-d3) inset;
 
 	--btn-bg: linear-gradient(-5deg, color-mix(in oklab, var(--btn-bg-a) 40%, transparent), color-mix(in oklab, var(--btn-bg-a)70%, var(--a-gray)));
@@ -159,7 +194,7 @@ html.b {
 		color-mix(in oklab, var(--btn-bg-a) 30%, var(--a) 20%), 
 		color-mix(in oklab, var(--btn-bg-a) 30%, var(--b)));
 }
-html.bz {
+html.gz {
 	--a: #5fb9b8;
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
 	--fg-weak: var(--fg-max);
@@ -173,57 +208,57 @@ html.bz {
 	--btn-h-fg: var(--fg);
 }
 @supports(background: var(--bg)){
-	html.by{
+	html.gy{
   		text-shadow: 0px 0px 4px #fff;
 	}
-	html.bz{
+	html.gz{
   		text-shadow: 0px 0px 4px #000;
 	}
 }
-html.b #srchfolder_div,
-html.b #up_quick_more a,
-html.b #spaceTotal_bar,
-html.b #s_list h3,
-html.b #wtico,
-html.b #wtoggle,
-html.b #ggrid>a,
-html.b #ops a,
-html.b #tree ul a.hl,
-html.b .btn {
+html.g #srchfolder_div,
+html.g #up_quick_more a,
+html.g #spaceTotal_bar,
+html.g #s_list h3,
+html.g #wtico,
+html.g #wtoggle,
+html.g #ggrid>a,
+html.g #ops a,
+html.g #tree ul a.hl,
+html.g .btn {
 	transition: all .15s;
 	background: var(--bottom-glow), var(--btn-bg);
 	border-radius: var(--radius);
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4) !important;
 }
-html.b .btn:not(.on){
+html.g .btn:not(.on){
 	color: var(--fg);
 	background-color: color-mix(in srgb, var(--bg) 70%, transparent);
 }
-html.b #files thead th {
+html.g #files thead th {
 	background: none;
 }
-html.b #s_list h3{
+html.g #s_list h3{
 	border-radius: var(--radius) var(--radius) 0 0;
 	position: relative;
 }
-html.b #wtico {
+html.g #wtico {
 	border-radius: var(--radius) 0 0 0;
 	position: relative;
 }
-html.b #up_quick_more a:hover,
-html.b #ggrid>a:hover,
-html.b #ops a:hover,
-html.b .btn:hover {
+html.g #up_quick_more a:hover,
+html.g #ggrid>a:hover,
+html.g #ops a:hover,
+html.g .btn:hover {
 	background: var(--bottom-glow), 
 	linear-gradient(
 		to bottom, 
 		color-mix(in oklab, transparent, var(--a-dark)),
 		color-mix(in oklab, transparent, var(--a)));
 }
-html.bz #up_quick_more a:hover,
-html.bz #ggrid>a:hover,
-html.bz #ops a:hover,
-html.bz .btn:hover {
+html.gz #up_quick_more a:hover,
+html.gz #ggrid>a:hover,
+html.gz #ops a:hover,
+html.gz .btn:hover {
 	background: 
 		var(--bottom-glow), 
 		linear-gradient( 
@@ -231,61 +266,61 @@ html.bz .btn:hover {
 			color-mix(in oklab, #0006, var(--a-dark)), 
 			color-mix(in oklab, transparent, #000b))
 }
-html.b #up_quick_more a:active,
-html.b #ggrid>a:active,
-html.b .btn:active {
+html.g #up_quick_more a:active,
+html.g #ggrid>a:active,
+html.g .btn:active {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 	transform: translateY(2px);
 }
-html.b #widgeti {
+html.g #widgeti {
 	background: color-mix(in srgb, var(--bg) 40%, var(--a));
 }
-html.b #mu_outer {
+html.g #mu_outer {
 	background: color-mix(in oklab, var(--b) 50%, transparent);
 }
-html.b .divider {
+html.g .divider {
 	display: none;
 }
-html.b summary {
+html.g summary {
 	color: var(--fg);
 }
-html.b #pvolbg {
+html.g #pvolbg {
 	color: var(--bg);
 }
-html.b #srchfolder_div,
-html.b .modalcontent,
-html.b,
-html.b #ops a.act,
-html.b #ggrid>a.sel,
-html.b #tree ul a.hl:hover,
-html.b #tree ul a.hl,
-html.b .tgl.btn.on {
+html.g #srchfolder_div,
+html.g .modalcontent,
+html.g,
+html.g #ops a.act,
+html.g #ggrid>a.sel,
+html.g #tree ul a.hl:hover,
+html.g #tree ul a.hl,
+html.g .tgl.btn.on {
 	background:
 		var(--bottom-glow),
 		linear-gradient(to bottom, var(--a-dark), var(--a));
 }
-html.b #wtoggle a {
+html.g #wtoggle a {
 	position: relative;
 }
-html.b #up_quick_more a{
+html.g #up_quick_more a{
 	position: relative;
 	margin: .5em 0;
 }
-html.b #up_quick_more{
+html.g #up_quick_more{
 	background: none;
 	border: none;
 }
-html.b #srchfolder_div::after,
-html.b #up_quick_more a::after,
-html.b #wtico::after,
-html.b #s_list h3::after,
-html.b #spaceUsed_bar::after,
-html.b #wtoggle a:after,
-html.b a:not(.play) .imgcontainer::before,
-html.b #ops a:after,
-html.b #path:after,
-html.b #tree ul a.hl:after,
-html.b .btn::after {
+html.g #srchfolder_div::after,
+html.g #up_quick_more a::after,
+html.g #wtico::after,
+html.g #s_list h3::after,
+html.g #spaceUsed_bar::after,
+html.g #wtoggle a:after,
+html.g a:not(.play) .imgcontainer::before,
+html.g #ops a:after,
+html.g #path:after,
+html.g #tree ul a.hl:after,
+html.g .btn::after {
   content: "" !important;
   position: absolute;
   top: 4%;
@@ -302,28 +337,28 @@ html.b .btn::after {
   transition: background 400ms ease;
   pointer-events: none;
 }
-html.b a:not(.play) .imgcontainer::before{
+html.g a:not(.play) .imgcontainer::before{
   	z-index: 2;
 }
-html.b #ops a {
+html.g #ops a {
 	position: relative;
 	margin-left: 4px;
 }
-html.b #srchfolder_div {
+html.g #srchfolder_div {
 	left: 3.2em;
 }
-html.b #spaceTotal_bar,
-html.b #spaceUsed_bar{
+html.g #spaceTotal_bar,
+html.g #spaceUsed_bar{
 	height: 1.6em;
 }
-html.b #files tbody tr:not(.sel):hover td, 
-html.b #files tbody tr:not(.sel):hover td+td {
+html.g #files tbody tr:not(.sel):hover td, 
+html.g #files tbody tr:not(.sel):hover td+td {
 	background: rgba(255, 255, 255, 0.6);
 }
-html.b #spaceMax {
+html.g #spaceMax {
 	display: none;
 }
-html.b #spaceFree {
+html.g #spaceFree {
 	position: absolute;
     z-index: 1;
     bottom: 2.1em;
@@ -331,7 +366,7 @@ html.b #spaceFree {
     width: calc(100% - 3em);
     text-align: center;
 }
-html.b #ops a.act {
+html.g #ops a.act {
 	margin-top: -.15em;
 	margin-bottom: -.15em;
 	padding-top: .3em;
@@ -926,7 +961,7 @@ html.y #files span.fsz_P { font-weight: bold }
 	border-right: var(--bg) solid 2px;
 	background: linear-gradient(70deg, transparent 40%, color-mix(in oklab, var(--bg-max) 25%, transparent) 75%, color-mix(in oklab, var(--bg-max) 35%, transparent));
 }
-html.b #path i {
+html.g #path i {
 	border-right: var(--bg) solid 1px;
 }
 #path a:hover {
@@ -934,7 +969,9 @@ html.b #path i {
 	background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,0.2), rgba(0,0,0,0));
 }
 html.a #ggrid>a.dir:before,
-html.a #path i {
+html.a #path i,
+html.b #ggrid>a.dir:before,
+html.b #path i {
 	background: none;
 }
 html.y #path a:hover {
@@ -1864,7 +1901,7 @@ html:not(.e):not(.d) #up_quick .btn.on {
 	cursor: pointer;
 }
 html.f #mu_outer,
-html.b #mu_outer {
+html.g #mu_outer {
 	background: color-mix(in oklab, color-mix(in oklab, var(--a) 10%, var(--bg-u2) 10%) 20%, transparent);
 	backdrop-filter: blur(32px);
 }
@@ -2305,6 +2342,16 @@ html {
 
 	scrollbar-color: var(--a) color-mix(in oklab, var(--bg-u3), transparent);
 }
+html.b #files,
+html.b #wtoggle,
+html.b #ghead,
+html.b #tree,
+html.b #path,
+html.b .splitsub,
+html.b .modalsplit,
+html.b html {
+	scrollbar-color: var(--a) var(--bg-u2);
+}
 #treesuperh {
 	position: sticky;
 	top: 0;
@@ -2391,7 +2438,7 @@ html {
 	cursor: pointer;
 }
 html.c .btn,
-html.b .btn {
+html.g .btn {
 	border-radius: var(--radius);
 }
 .btn:hover {
@@ -3067,11 +3114,11 @@ html.noscroll .sbar::-webkit-scrollbar {
 	-ms-interpolation-mode: nearest-neighbor;
 	image-rendering: pixelated;
 }
-html.bb_fsc .full-image img,
-html.bb_fsc .full-image video {
+html.gb_fsc .full-image img,
+html.gb_fsc .full-image video {
 	max-height: 100%;
 }
-html.bb_fsc figcaption {
+html.gb_fsc figcaption {
 	display: none;
 }
 .full-image img.nt,
@@ -3963,20 +4010,20 @@ html.dz .opview input.i {
 	background: var(--bg-u2);
 }
 html.c #treepar,
-html.b #treepar {
+html.g #treepar {
 	background: var(--bg-u2);
 }
 html.c #tree li,
-html.b #tree li {
+html.g #tree li {
 	border-top: 1px solid var(--bg-u5);
 	border-bottom: 1px solid var(--bg-d3);
 }
 html.c #tree li:last-child,
-html.b #tree li:last-child {
+html.g #tree li:last-child {
 	border-bottom: none;
 }
 html.c .opbox h3,
-html.b .opbox h3 {
+html.g .opbox h3 {
 	border-bottom: 1px solid var(--bg-u5);
 }
 html.c #ops,
@@ -3985,11 +4032,11 @@ html.c #path,
 html.c #srch_form,
 html.c .ghead,
 
-html.b #ops,
-html.b .opbox,
-html.b #path,
-html.b #srch_form,
-html.b .ghead {
+html.g #ops,
+html.g .opbox,
+html.g #path,
+html.g #srch_form,
+html.g .ghead {
 	background: var(--btn-bg);
 	border: 1px solid var(--bg-u3);
 	border-bottom: var(--btn-bb);
@@ -4011,24 +4058,24 @@ html.cz #up_quick_btn:not(:hover):not(.on) {
 html.c .modal .setting:hover {
 	background: color-mix(in oklab, var(--bg-u5) 30%, transparent);
 }
-html.b #u2btn {
+html.g #u2btn {
 	box-shadow: .4em .4em 0 #ccc;
 }
 html.dz #u2btn {
 	letter-spacing: -.033em;
 }
 html.c #u2etas,
-html.b #u2etas {
+html.g #u2etas {
 	background: var(--bg-d1);
 	border: 1px solid var(--bg-u1);
 	border-width: 2px;
 	border-radius: var(--radius);
 }
 html.c #u2foot:empty,
-html.b #u2foot:empty {
+html.g #u2foot:empty {
 	margin-bottom: -1em;
 }
-html.b #ops{
+html.g #ops{
 	background: none;
 	backdrop-filter: none;
 	border: none;
@@ -4037,48 +4084,48 @@ html.b #ops{
 	padding-left: 0;
 	padding-right: 0;
 }
-html.b .opbox,
-html.b #path,
-html.b #doc,
-html.b #srch_form,
-html.b .ghead,
-html.b #u2etas {
+html.g .opbox,
+html.g #path,
+html.g #doc,
+html.g #srch_form,
+html.g .ghead,
+html.g #u2etas {
 	border-color: var(--bg-u3);
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4);
 	background: var(--bottom-glow), var(--btn-bg);
 }
-html.b #path {
+html.g #path {
 	margin-right: .1em;
 }
-html.b #wfp a {
+html.g #wfp a {
 	margin-right: .3em;
 }
 html.fy #pathBar.shifted #hspace,
-html.b #pathBar.shifted #hspace{
+html.g #pathBar.shifted #hspace{
 	margin-right: -.3em;
 }
-html.b #up_quick_more a,
-html.b #spaceTotal_bar,
-html.b #ops>a {
+html.g #up_quick_more a,
+html.g #spaceTotal_bar,
+html.g #ops>a {
 	border: var(--bg-u3) solid 1px;
 }
-html.b #tree li,
-html.b #treepar {
+html.g #tree li,
+html.g #treepar {
 	border-color: var(--bg-u5) var(--bg-max) transparent var(--bg-max);
 }
-html.b #treesuperh,
-html.b #treepar {
+html.g #treesuperh,
+html.g #treepar {
 	backdrop-filter: blur(10px);
 	background: color-mix(in srgb, var(--bg) 40%, transparent);
 	border-color: #ddd;
 }
-html.b #tree {
+html.g #tree {
 	background: var(--b);
 }
-html.b #tree_footer {
+html.g #tree_footer {
 	 background: linear-gradient(to top, var(--b), color-mix(in oklab, var(--b) 80%, transparent), transparent);
 }
-html.b #pathBar {
+html.g #pathBar {
 	background: linear-gradient(to bottom, var(--a), transparent);
 }
 
@@ -4086,9 +4133,9 @@ html.b #pathBar {
 
 
 
-html.b #barpos,
-html.b #barbuf,
-html.b #pvol {
+html.g #barpos,
+html.g #barbuf,
+html.g #pvol {
 	border-radius: calc(var(--radius) * 3);
 }
 html.a #barpos {
@@ -4097,7 +4144,8 @@ html.a #barpos {
 html.ay #barpos {
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.2) inset;
 }
-html.a #pathBar {
+html.a #pathBar,
+html.b #pathBar {
 	background: var(--bg);
 }
 html.a #srch_q {
@@ -4113,14 +4161,18 @@ html.az #tree {
 	box-shadow: 0 -1px 0 var(--bg-d3);
 }
 html.a #treeh,
-html.a #tree li {
+html.a #tree li,
+html.b #treeh,
+html.b #tree li {
 	border: none;
 }
 html.a #tree li {
 	margin-left: .8em;
 }
 html.a #docul a,
-html.a .ntree a {
+html.a .ntree a,
+html.b #docul a,
+html.b .ntree a {
 	padding: .6em .2em;
 }
 html.dy *,
@@ -4139,6 +4191,7 @@ html.a #treepar {
 	border-bottom: .2em solid var(--f-h-b1);
 }
 html.d #path i,
+html.b #path i,
 html.a #path i {
 	border-right: #3584e4 solid 2px;
 	border-right: var(--a) solid 2px;
@@ -4269,6 +4322,9 @@ html:not(.e) #wrap.thin #ghead {
 html.cz #wrap.thin .ghead{
 	top: 7.4em;
 }
+html.b #wrap.thin .ghead{
+	top: 6.8em;
+}
 html.fy #wrap.thin .ghead,
 html.dy #wrap.thin .ghead,
 html.a #wrap.thin .ghead {
@@ -4310,6 +4366,9 @@ html.e #wrap.thin .ghead {
 		position: relative;
 		height: 2.2em;
 		margin: .5em 0 0 0;
+	}
+	html.b #wrap.thin .ghead{
+		top: 7.13em;
 	}
 	html.dy .ghead,
 	html.a .ghead,
@@ -4455,9 +4514,9 @@ html.e #wrap.thin .ghead {
 		top: 7em;
 	}
 	html.cy .ghead,
-	html.b .ghead,
+	html.g .ghead,
 	html.cy #wrap.thin .ghead,
-	html.b #wrap.thin .ghead {
+	html.g #wrap.thin .ghead {
 		top: 7.3em;
 	}
 	html.cz .ghead,
@@ -4478,7 +4537,7 @@ html.e #wrap.thin .ghead {
 	html:not(.e):not(.f) #mu_inner {
 		margin: -.5em;
 	}
-	html.b #tree::before {
+	html.g #tree::before {
 		content: "";
 		position: fixed;
 		backdrop-filter: blur(10px);
@@ -4497,7 +4556,7 @@ html.e #wrap.thin .ghead {
 	#srchfolder_div {
 		left: 3em;
 	}
-	html.b #srchfolder_div {
+	html.g #srchfolder_div {
 		left: 2.8em;
 	}
 }
@@ -5538,7 +5597,7 @@ html.e #wtc {
 	background: rgb(85, 144, 255);
 	background: var(--a);
 }
-html.b #spaceUsed_bar {
+html.g #spaceUsed_bar {
   	background: linear-gradient(to right, var(--a), var(--a-dark));
 }
 #spaceTotal_bar {

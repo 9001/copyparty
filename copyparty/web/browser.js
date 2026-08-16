@@ -2159,7 +2159,7 @@ var mpl = (function () {
 			o.onload = th_onload;
 			o.setAttribute('src', url);
 
-			o = QS('html.b #music, html.f #music');
+			o = QS('html.g #music, html.f #music');
 			if (o)
 				o.style.background = "url('" + url + "') no-repeat center / cover";
 			else
@@ -9663,7 +9663,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['flat dark', 'flat light', 'frutiger dark', 'frutiger light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'poison', 'wing', ];
+			names = ['flat dark', 'flat light', 'pm-monokai', 'athlete', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'poison', 'wing', 'frutiger dark', 'frutiger light', ];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));

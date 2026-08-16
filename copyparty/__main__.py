@@ -1963,7 +1963,7 @@ def add_og(ap):
 
 
 def add_ui(ap, retry: int):
-    THEMES = 12
+    THEMES = 14
     ap2 = ap.add_argument_group("ui options")
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
     ap2.add_argument("--bg-img", metavar="M,M,M", type=u, default="", help="URL to .jpg/png/gif/svg/webm/mp4/mkv/m4v/mov file to use as background, for example \033[32m/folder/image.jpg,opacity=0.5(optional),blur=5(optional)\033[0m supports relative paths. (volflag=bg_img)")
