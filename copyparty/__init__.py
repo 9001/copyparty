@@ -40,6 +40,9 @@ VT100 = "--ansi" in sys.argv or (
 )
 # introduced in anniversary update
 
+zs = os.environ.get("PRTY_CONFIG", "")
+CFG_DEF = [zs] if zs else []
+
 ANYWIN = WINDOWS or sys.platform in ["msys", "cygwin"]
 
 MACOS = platform.system() == "Darwin"

@@ -133,6 +133,19 @@ VER_SHARES_DB = 2
 CVE_SEVS = {"low": 1, "medium": 2, "moderate": 2, "high": 3, "critical": 4}
 
 
+def _build_th_fset(f: str, fadd: str) -> set[str]:
+    fset = {x for x in f.replace(" ", "").split(",")}
+    rmset = {""}
+
+    for x in fadd.replace(" ", "").split(","):
+        if x.startswith("-"):
+            rmset.add(x.lstrip("-"))
+        else:
+            fset.add(x)
+
+    return fset - rmset
+
+
 class SvcHub(object):
     """
     Hosts all services which cannot be parallelized due to reliance on monolithic resources.
@@ -441,6 +454,20 @@ class SvcHub(object):
         zlss = [x.strip().lower().split("=", 1) for x in args.au_unpk.split(",")]
         args.au_unpk = {x[0]: x[1] for x in zlss}
 
+        args.th_r_pil = _build_th_fset(args.th_r_pil, args.th_pil_add)
+        args.th_r_vips = _build_th_fset(args.th_r_vips, args.th_vips_add)
+        args.th_r_raw = _build_th_fset(args.th_r_raw, args.th_raw_add)
+        args.th_r_ffi = _build_th_fset(args.th_r_ffi, args.th_ffi_add)
+        args.th_r_ffv = _build_th_fset(args.th_r_ffv, args.th_ffv_add)
+        args.th_r_ffa = _build_th_fset(args.th_r_ffa, args.th_ffa_add)
+
+        th_extract = args.th_extract or []
+        args.th_extract = {}
+        for arg in th_extract:
+            exts, script = arg.split("=", 1)
+            for ext in exts.split(","):
+                args.th_extract[ext.strip().lower()] = script
+
         self.args.th_dec = list(decs.keys())
         self.thumbsrv = None
         want_ff = False
@@ -478,7 +505,7 @@ class SvcHub(object):
                 t = "invalid mp3 transcoding quality [%s] specified; only supports [0] to disable, a CBR value such as [192k], or a CQ/CRF value such as [v2]"
                 raise Exception(t % (args.q_mp3,))
         else:
-            zss = set(args.th_r_ffa.split(",") + args.th_r_ffv.split(","))
+            zss = args.th_r_ffa | args.th_r_ffv
             args.au_unpk = {
                 k: v for k, v in args.au_unpk.items() if v.split(".")[0] not in zss
             }
@@ -1127,6 +1154,10 @@ class SvcHub(object):
                 t = "not listening on any ip-addresses (only unix-sockets and/or FDs); cannot enable zeroconf/mdns/ssdp as requested"
                 self.log("root", t, 3)
 
+        if al.wopi and not al.wopi_url and not al.wopi_urls:
+            self.log("root", "disabling wopi; need either wopi-url or wopi-urls", 1)
+            al.wopi = False
+
         if self.args.wopi or not self.args.no_dav:
             from .dxml import DXML_OK
 
@@ -1383,18 +1414,20 @@ class SvcHub(object):
         self.args.name_html = zs
 
         zs = al.u2sz
+        if zs in ("no", "1,1,1"):
+            zs = "0"
         zsl = [x.strip() for x in zs.split(",")]
-        if len(zsl) not in (1, 3):
-            t = "invalid --u2sz; must be either one number, or a comma-separated list of three numbers (min,default,max)"
+        if len(zsl) not in (1, 2):
+            t = "invalid --u2sz; must be either one number, or a comma-separated list of two numbers (target,max)"
             raise Exception(t)
-        if len(zsl) < 3:
-            zsl = ["1", zs, zs]
-        zi2 = 1
+        if len(zsl) < 2:
+            zsl = [zs, zs]
+        zi2 = 0
         for zs in zsl:
             zi = int(zs)
             # arbitrary constraint (anything above 2 GiB is probably unintended)
-            if zi < 1 or zi > 2047:
-                raise Exception("invalid --u2sz; minimum is 1, max is 2047")
+            if zi < 0 or zi > 2047:
+                raise Exception("invalid --u2sz; minimum is 0, max is 2047")
             if zi < zi2:
                 raise Exception("invalid --u2sz; values must be equal or ascending")
             zi2 = zi

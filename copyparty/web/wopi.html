@@ -27,7 +27,7 @@ body {
     <div style="display: none">
         <form action="{{ url }}" enctype="multipart/form-data" method="post" target="w" id="submit-form">
             <input name="access_token" value="{{ atoken }}" type="hidden" id="access-token"/>
-            <input name="access_token_ttl" value="{{ ttl }}000" type="hidden" id="access-token_ttl"/>
+            <input name="access_token_ttl" value="{{ ttl }}" type="hidden" id="access-token_ttl"/>
             <input type="submit" value="" />
         </form>
     </div>

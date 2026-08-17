@@ -789,7 +789,7 @@ if (window.glang && navigator.languages && !/\bcplng=/.test(document.cookie))
 				if (window.stop)
 					window.stop();
 				document.body.innerHTML = 'Loading ' + n;
-				setck("cplng=" + n, location.reload.bind(location));
+				setck("cplng=" + n, relod);
 				crashed = true;
 				throw 1;
 			}
@@ -8728,7 +8728,7 @@ var treectl = (function () {
 
 			if (wopi_set && wopi_set.has(tn.ext))
 				tn.lead = '<a href="?wopi=' + bhref +
-					'" rel="nofollow" name="' + hname + '">📄</a>';
+					'" rel="nofollow" target="_blank" name="' + hname + '">📄</a>';
 
 			if (tn.lead == '-')
 				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +
@@ -9756,7 +9756,7 @@ var setfszf = (function () {
 		setck('cplng=' + lang);
 		freshen();
 		var t = L.tt == 'English' ? '' : Ls.eng.lang_set;
-		modal.confirm(L.lang_set + "\n\n" + t, location.reload.bind(location), null);
+		modal.confirm(L.lang_set + "\n\n" + t, relod, null);
 	}
 
 	freshen();
@@ -10604,6 +10604,7 @@ function sandbox(tgt, rules, allow, cls, html) {
 	fr.setAttribute('sandbox', rules ? 'allow-' + rules.replace(/ /g, ' allow-') : '');
 	fr.setAttribute('allow', allow);
 	fr.setAttribute('srcdoc', html);
+	tgt.innerHTML = '';
 	tgt.appendChild(fr);
 	treectl.sb_msg = true;
 	return true;
@@ -11509,7 +11510,7 @@ function reload_browser() {
 			}
 			if (e.button !== 0 && e.type !== 'touchstart') return;
 			if (!thegrid.en || !treectl.dsel) return;
-			if (e.target.closest('#widget,#ops,.opview,.doc,#ggrid>a,.modal,.normalrcm,#tree')) return;
+			if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open,#ggrid>a,.modal,.normalrcm,#tree')) return;
 		}
 		catch(ex){
 			console.log(ex);

@@ -83,6 +83,29 @@
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0803-2232  `v1.20.20`  more wopi
+
+## 🧪 new features
+
+* #1574 #1585 wopi: probably support onlyoffice as wopi-client (thx @kamaeff!) fdf52a8c 
+* #1580 wopi: `--wopi-urls` to choose a different wopi-client url based on current domain (thx @kamaeff!) 24a4090f
+* #634 #1033 #1390 correct size of volumes in directory listings (thx @vmattphillips!) 5c157be9
+* #1577 thumbnails for krita `.kra` and openraster `.ora` images (thx @Wuerfel21!) 9f5f9d88
+* hotkey F4 to reload/refresh the directory listing 2c6497b6
+
+## 🩹 bugfixes
+
+* #1581 ctrl-a in search results 28801172
+
+## 🔧 other changes
+
+* show an explanation in the web-UI if javascript is broken due to misconfigured hosting-stack (the ["csp nonce"](https://github.com/9001/copyparty/#csp-nonce) stuff) 6f924829
+* improve upload performance when running behind a buggy or bufferbloating reverseproxy c0c638c9
+* #1582 Nixos: fix version checker (thx @sylfn!) 63c61b67
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0727-2202  `v1.20.19`  SECURITY: fix FTP upload outside volume
 
 ## ⚠️ ATTN: this release fixes a vulnerability in FTP and FTPS (not SFTP)

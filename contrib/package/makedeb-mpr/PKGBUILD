@@ -2,7 +2,7 @@
 
 
 pkgname=copyparty
-pkgver=1.20.20
+pkgver=1.20.21
 pkgrel=1
 pkgdesc="File server with accelerated resumable uploads, dedup, WebDAV, SFTP, FTP, TFTP, zeroconf, media indexer, thumbnails++"
 arch=("any")
@@ -21,7 +21,7 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
 )
 source=("https://github.com/9001/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
 backup=("/etc/${pkgname}.d/init" )
-sha256sums=("a31f9e4a43e56608765e108353140784d50181c37e705e9ce8ed9f3899f57dfa")
+sha256sums=("654ef47555bb402e27d8905c900c99f54b7f1d6db874a749effdf9ab23cf4223")
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}/copyparty/web"

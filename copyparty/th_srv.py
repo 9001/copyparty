@@ -38,6 +38,7 @@ from .util import (
     afsenc,
     atomic_move,
     fsenc,
+    loadpy,
     min_ex,
     runcmd,
     statdir,
@@ -323,24 +324,12 @@ class ThumbSrv(object):
         if self.args.th_clean:
             Daemon(self.cleaner, "thumb.cln")
 
-        (
-            self.fmt_pil,
-            self.fmt_vips,
-            self.fmt_raw,
-            self.fmt_ffi,
-            self.fmt_ffv,
-            self.fmt_ffa,
-        ) = [
-            set(y.split(","))
-            for y in [
-                self.args.th_r_pil,
-                self.args.th_r_vips,
-                self.args.th_r_raw,
-                self.args.th_r_ffi,
-                self.args.th_r_ffv,
-                self.args.th_r_ffa,
-            ]
-        ]
+        self.fmt_pil = self.args.th_r_pil
+        self.fmt_vips = self.args.th_r_vips
+        self.fmt_raw = self.args.th_r_raw
+        self.fmt_ffi = self.args.th_r_ffi
+        self.fmt_ffv = self.args.th_r_ffv
+        self.fmt_ffa = self.args.th_r_ffa
 
         if not H_PIL_HEIF:
             for f in "heif heifs heic heics".split(" "):
@@ -359,23 +348,26 @@ class ThumbSrv(object):
                 self.fmt_pil.discard(f)
 
         self.thumbable: set[str] = set()
+        self.thumbable_native: set[str] = set()
         self._build_thumbable()
 
     def _build_thumbable(self) -> None:
-        self.thumbable.clear()
+        self.thumbable_native.clear()
 
         if "pil" in self.args.th_dec:
-            self.thumbable |= self.fmt_pil
+            self.thumbable_native |= self.fmt_pil
 
         if "vips" in self.args.th_dec:
-            self.thumbable |= self.fmt_vips
+            self.thumbable_native |= self.fmt_vips
 
         if "raw" in self.args.th_dec:
-            self.thumbable |= self.fmt_raw
+            self.thumbable_native |= self.fmt_raw
 
         if "ff" in self.args.th_dec:
             for zss in [self.fmt_ffi, self.fmt_ffv, self.fmt_ffa]:
-                self.thumbable |= zss
+                self.thumbable_native |= zss
+
+        self.thumbable = self.thumbable_native | set(self.args.th_extract)
 
     def _log(self, msg: str, c: Union[int, str] = 0) -> None:
         self.log_func("thumb", msg, c)
@@ -467,6 +459,7 @@ class ThumbSrv(object):
     def getcfg(self) -> dict[str, set[str]]:
         return {
             "thumbable": self.thumbable,
+            "thumbable_native": self.thumbable_native,
             "pil": self.fmt_pil,
             "vips": self.fmt_vips,
             "raw": self.fmt_raw,
@@ -549,19 +542,36 @@ class ThumbSrv(object):
             png_ok = False
             funs = []
 
+            tex = tpath.rsplit(".", 1)[-1]
+            want_mp3 = tex == "mp3"
+            want_opus = tex in ("opus", "owa", "caf")
+            want_flac = tex == "flac"
+            want_wav = tex == "wav"
+            want_png = tex == "png"
+            want_au = want_mp3 or want_opus or want_flac or want_wav
+
+            ap_extr = abspath
+            if (
+                ext in self.args.th_extract
+                and not want_au
+                and not want_png
+                and "dethumb" not in vn.flags
+            ):
+                ap_extr = self.run_extractor(self.args.th_extract[ext], abspath, vn)
+                if ap_extr:
+                    ext = ap_extr.rsplit(".", 1)[-1]
+
             if ext in self.args.au_unpk:
-                ap_unpk = au_unpk(self.log, self.args.au_unpk, abspath, vn)
+                ap_unpk = au_unpk(self.log, self.args.au_unpk, ap_extr, vn)
+            elif ext in self.thumbable_native:
+                ap_unpk = ap_extr
             else:
-                ap_unpk = abspath
+                ap_unpk = ""
+
+            if ap_extr and ap_extr != ap_unpk and ap_extr != abspath:
+                wunlink(self.log, ap_extr, vn.flags)
 
             if ap_unpk and not bos.path.exists(tpath):
-                tex = tpath.rsplit(".", 1)[-1]
-                want_mp3 = tex == "mp3"
-                want_opus = tex in ("opus", "owa", "caf")
-                want_flac = tex == "flac"
-                want_wav = tex == "wav"
-                want_png = tex == "png"
-                want_au = want_mp3 or want_opus or want_flac or want_wav
                 for lib in self.args.th_dec:
                     can_au = lib == "ff" and (
                         ext in self.fmt_ffa or ext in self.fmt_ffv
@@ -668,6 +678,66 @@ class ThumbSrv(object):
 
         with self.mutex:
             self.nthr -= 1
+
+    def run_extractor(self, extr: str, abspath: str, vn: VFS) -> str:
+        try:
+            mod = loadpy(extr, self.args.hot_th_extr)
+        except Exception as ex:
+            self.log("extractor import failed; " + min_ex(), 1)
+            return ""
+
+        fd = 0
+        ret = ""
+        stream = None
+        try:
+            res = mod.main(abspath, vn=vn, th_srv=self)
+            if not res:
+                t = "extractor %r returned no data for file %r"
+                self.log(t % (extr, abspath))
+                return ""
+
+            outext, stream, offset, whence, size = res
+            if (
+                outext not in self.thumbable_native
+                or outext in self.fmt_ffa
+                or outext in self.fmt_ffv
+            ):
+                t = "extractor %r returned unsupported format %r"
+                self.log(t % (extr, outext))
+                return ""
+
+            remains = size if size is not None and size >= 0 else -1
+
+            stream.seek(offset, whence)
+            fd, ret = tempfile.mkstemp("." + outext)
+            bufsz = rsz = self.args.iobuf
+            maxsz = self.args.th_extr_sz * 1048576
+            outsz = 0
+            with os.fdopen(fd, "wb", rsz) as f:
+                fd = 0
+                while True:
+                    if remains < rsz and remains >= 0:
+                        bufsz = remains
+                    buf = stream.read(bufsz)
+                    if not buf:
+                        break
+                    remains -= len(buf)
+                    outsz += len(buf)
+                    if outsz >= maxsz:
+                        raise Exception("too large")
+                    f.write(buf)
+            return ret
+        except Exception as e:
+            if fd:
+                os.close(fd)
+            if ret:
+                wunlink(self.log, ret, vn.flags)
+            t = "failed to extract thumbnail from %r: %s"
+            self.log(t % (abspath, min_ex()))
+            return ""
+        finally:
+            if stream:
+                stream.close()
 
     def fancy_pillow(self, im: "Image.Image", fmt: str, vn: VFS) -> "Image.Image":
         # exif_transpose is expensive (loads full image + unconditional copy)
