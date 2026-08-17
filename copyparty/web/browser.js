@@ -3963,7 +3963,7 @@ function play(tid, is_ev, seek) {
 
 	mp.au.osrc = mp.tracks[tid];
 
-	var tname = esc(uricom_dec(mp.au.osrc.split('/').pop()));
+	var tname = esc(uricom_dec(mp.au.osrc.split('/').pop().split('?')[0]));
 	var el = ebi('trackname');
 	el.innerHTML = tname;
 	el.setAttribute('tt', tname);
