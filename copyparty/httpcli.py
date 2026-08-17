@@ -5040,8 +5040,13 @@ class HttpCli(object):
         else:
             mime = guess_mime(cdis)
 
-        if mime not in SAFE_MIMES and "nohtml" in self.vn.flags and oh_k != "oh_g":
-            mime = safe_mime(mime)
+        if mime not in SAFE_MIMES:
+            if "nohtml" in self.vn.flags and oh_k != "oh_g":
+                mime = safe_mime(mime)
+            elif mime == "image/svg+xml" and "allow_svg_js" not in self.vn.flags:
+                oh_k = "oh_g"
+                if "nonce-" not in self.vn.flags[oh_k]:
+                    mime = safe_mime(mime)
 
         self.out_headers["Accept-Ranges"] = "bytes"
         logmsg += unicode(status) + logtail
