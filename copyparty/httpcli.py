@@ -849,6 +849,11 @@ class HttpCli(object):
                     self.asrv.vfs.get(
                         wopi_f["vp"], uname, True, True, False, self.args.wopi_wdel
                     )
+                    vn, rem = self.asrv.vfs.get(
+                        self.vpath, uname, True, True, False, self.args.wopi_wdel
+                    )
+                    if vn.vpath != "wopi":
+                        raise Exception("bad url")
                     self.uname = uname
                 except Exception as ex:
                     self.conn.hsrv.wopi_files.pop(wopi_a, None)
@@ -1578,13 +1583,17 @@ class HttpCli(object):
             if "wopi" in self.uparam:
                 return self.tx_wopi()
 
-            if self.vpath.startswith("wopi"):
+            if self.vn.vpath == "wopi":
                 return self.tx_wopi_api()
 
         return self.tx_browser()
 
     def tx_wopi_api(self) -> bool:
-        atoken = self.uparam["access_token"]
+        try:
+            atoken = self.uparam["access_token"]
+        except:
+            raise Pebkac(400, "wopi access_token is mandatory")
+
         session = self.conn.hsrv.wopi_files[atoken]
         if self.do_log:
             self.log(" `-- wopi: %r" % (session["vp"],))
@@ -1620,6 +1629,7 @@ class HttpCli(object):
         return self.tx_404()
 
     def tx_wopi(self) -> bool:
+        self.asrv.vfs.get("wopi", self.uname, True, True, False, self.args.wopi_wdel)
         vpath = vjoin(self.vpath, self.uparam["wopi"])
         vfs, rem = self.asrv.vfs.get(
             vpath, self.uname, True, True, False, self.args.wopi_wdel
@@ -3553,7 +3563,11 @@ class HttpCli(object):
         return True
 
     def rx_wopi(self, postsize: int) -> bool:
-        atoken = self.uparam["access_token"]
+        try:
+            atoken = self.uparam["access_token"]
+        except:
+            raise Pebkac(400, "wopi access_token is mandatory")
+
         session = self.conn.hsrv.wopi_files[atoken]
         if self.do_log:
             self.log(" `-- wopi: %r" % (session["vp"],))
@@ -3562,8 +3576,7 @@ class HttpCli(object):
         if not self.vpath.startswith(zs):
             return self.tx_404()
 
-        vpath = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["vp"]
-        vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(session["vp"], self.uname, False, True)
         vpath = vjoin(vfs.vpath, rem)
         ap = vfs.canonical(rem)
         st = bos.stat(ap)
@@ -6153,6 +6166,8 @@ class HttpCli(object):
                     continue
                 try:
                     dvn, drem = vfs.get(vjoin(top, x), self.uname, False, False)
+                    if not dvn.realpath and not dvn.nodes:
+                        continue
                     if (
                         self.uname not in dvn.axs.uread
                         and self.uname not in dvn.axs.uwrite

@@ -2040,6 +2040,15 @@ class AuthSrv(object):
                 umap[usr].sort()
             setattr(vfs, "a" + perm, umap)
 
+        if self.args.wopi:
+            zsl = unames[:]
+            if self.args.wopi_accs:
+                zsl = [x.strip() for x in self.args.wopi_accs.split(",")]
+            axs = AXS(zsl, zsl, None, zsl)
+            vn = VFS(self.log_func, "", "wopi", "", axs, self.vf0())
+            vn.flags["unlistcr"] = vn.flags["unlistcw"] = True
+            vfs.nodes["wopi"] = vfs.all_nodes["wopi"] = vn
+
         for vol in vfs.all_nodes.values():
             za = vol.axs
             vol.uaxs = {

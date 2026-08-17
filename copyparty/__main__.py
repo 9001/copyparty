@@ -1631,6 +1631,7 @@ def add_opds(ap):
 def add_wopi(ap):
     ap2 = ap.add_argument_group("WOPI options")
     ap2.add_argument("--wopi", action="store_true", help="enable integration with office suites using WOPI")
+    ap2.add_argument("--wopi-accs", metavar="TXT", type=u, default="", help="restrict wopi to this comma-separated list of usernames; default is everyone")
     ap2.add_argument("--wopi-api", metavar="URL", type=u, default="", help="URL that the WOPI-client should use to communicate with copyparty; default is same as user's webbrowser. Example: [\033[32mhttps://party.example.com/\033[0m]")
     ap2.add_argument("--wopi-url", metavar="URL", type=u, default="", help="URL to your WOPI client; the host of e.g. Collabora Online. Example: [\033[32mhttps://code.example.com/\033[0m]")
     ap2.add_argument("--wopi-urls", metavar="H=U", type=u, action="append", help="\033[34mREPEATABLE:\033[0m maps http \033[33mH\033[0mOST copyparty being accessed by to specific WOPI client instance \033[33mU\033[0mRL; falls back to \033[33m--wopi-url\033[0m; examples: [\033[32mparty.public.com=https://office.public.com/\033[0m], [\033[32mparty.internal.net:8443=https://office.internal.net:8443/\033[0m]")
