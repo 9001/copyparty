@@ -1246,8 +1246,8 @@ check_image_support('jxl', "data:image/jxl;base64,/woIAAAMABKIAgC4AF3lEgA=");
 
 
 var img_re = APPLE ?
-	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
-	/\.(a?png|avif|bmp|gif|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
+	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jfif|jxl|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
+	/\.(a?png|avif|bmp|gif|jpe?g|jfif|jxl|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
 
 var wopi_set = !window.have_wopi ? null :
 	new Set('odt fodt ott doc docx dotx rtf odm ods fods ots xls xlsx odp fodp otp ppt pptx ppsx odg fodg otg odf'.split(' '));
