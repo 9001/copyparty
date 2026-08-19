@@ -6765,6 +6765,7 @@ function get_thumb(ohref, ref, isdir, grid){
 		ihref = ohref;
 
 	if (need_ext && href != "#") {
+		href = href.match(/[^/]*$/)[0]
 		var ar = href.split('.');
 		if (ar.length > 1){
 			ar.shift();
