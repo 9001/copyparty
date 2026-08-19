@@ -3474,19 +3474,23 @@ your path will look something like `/mnt/[device-ID]/`
 ⚠️ to prevent copyparty from shutting down when your external storage is disconnected, use `--dbpath=./` to prevent storing your database on the removable media when you use any of the `-e2d*` arguments. this might also prevent other related errors
 
 ### permission errors
-first, try re-running the initial setup command from the [section above](#install-on-android)
+if you get read or write permission errors, try re-running the initial setup command from the [section above](#install-on-android)
 
 if you still get permission errors, it might be neccessary to create a symlink to the external storage and authorize it via termux-usb.
 
-(if you're rooted, you can skip this section and just set [selinux permissive](https://github.com/evdenis/selinux_permissive))
+if you're rooted, you can skip this section and just set [selinux permissive](https://github.com/evdenis/selinux_permissive), otherwise, continue below:
 
->(careful, this depends on the order you plug in your devices. the first in the list is the last one you plugged in. the paths will also change when you re-connect a device)
+the commands you need are as follows:
 
-`termux-usb -l` -> `termux-usb -r /dev/bus/...`
+list devices: `termux-usb -l`
 
-`ln -sf /dev/bus/... ~/storage/external-symlink`
+>(careful, this depends on the order you plug in your devices. the first in the list is the last one you plugged in. the paths may also change when you re-connect a device)
 
-while this will work temporarily, this will **break** if you restart your phone or unplug the external storage, because the path returned by termux-usb can change. to work around that, you need the following:
+authorize path: `termux-usb -r /dev/bus/...`
+
+create symlink: `ln -sf /dev/bus/... ~/storage/external-symlink`
+
+while this will work temporarily, this will **break** if you restart your phone or unplug the external storage, because the path returned by termux-usb can change. to work around that, you need to automate this:
 
 **requirements**: `pkg install jq termux-usb`
 
