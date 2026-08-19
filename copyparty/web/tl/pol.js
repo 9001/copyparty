@@ -662,6 +662,7 @@ Ls.pol = {
 	"rc_pla": "odtwórz jako dźwięk", //m
 	"rc_txt": "otwórz w przeglądarce plików", //m
 	"rc_md": "otwórz w edytorze tekstu", //m
+	"rc_wopi": "otwórz w edytorze office", //m
 	"rc_dl": "pobierz", //m
 	"rc_zip": "pobierz jako archiwum", //m
 	"rc_cpl": "kopiuj link", //m

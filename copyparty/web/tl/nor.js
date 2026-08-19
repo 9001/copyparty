@@ -656,6 +656,7 @@ Ls.nor = {
 	"rc_pla": "spill av som lyd",
 	"rc_txt": "åpne i filviser",
 	"rc_md": "åpne i teksteditor",
+	"rc_wopi": "åpne i office-editor", //m
 	"rc_dl": "Last ned",
 	"rc_zip": "Last ned som arkiv",
 	"rc_cpl": "kopier lenke",

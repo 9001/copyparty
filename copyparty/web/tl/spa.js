@@ -658,6 +658,7 @@ Ls.spa = {
 	"rc_pla": "reproducir como audio", //m
 	"rc_txt": "abrir en el visor de archivos", //m
 	"rc_md": "abrir en el editor de texto", //m
+	"rc_wopi": "abrir en el editor de office", //m
 	"rc_dl": "descargar", //m
 	"rc_zip": "descargar como archivo", //m
 	"rc_cpl": "copiar enlace", //m

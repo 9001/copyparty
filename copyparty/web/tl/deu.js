@@ -659,6 +659,7 @@ Ls.deu = {
 	"rc_pla": "als Audio abspielen",
 	"rc_txt": "als Text öffnen",
 	"rc_md": "im Texteditor öffnen",
+	"rc_wopi": "im office-editor öffnen", //m
 	"rc_dl": "herunterladen",
 	"rc_zip": "als Archiv herunterladen",
 	"rc_cpl": "Link kopieren", //m
