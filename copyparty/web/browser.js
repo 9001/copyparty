@@ -6766,15 +6766,15 @@ function get_thumb(ohref, ref, isdir, grid){
 
 	if (need_ext && href != "#") {
 		var ar = href.split('.');
-		if (ar.length > 1)
+		if (ar.length > 1){
 			ar.shift();
-
-		ar.reverse();
-		ext0 = ar[0];
-		for (var b = 0; b < Math.min(2, ar.length); b++) {
-			ext = ext ? (ar[b] + '.' + ext) : ar[b];
-			if (ar[b].length > 2)
-				break;
+			ar.reverse();
+			ext0 = ar[0];
+			for (var b = 0; b < Math.min(2, ar.length); b++) {
+				ext = ext ? (ar[b] + '.' + ext) : ar[b];
+				if (ext.length > 2)
+					break;
+			}
 		}
 		if (!ext)
 			ext = 'unk';
