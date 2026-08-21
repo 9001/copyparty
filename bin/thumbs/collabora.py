@@ -1,4 +1,9 @@
 """
+CAUTION!
+looks like collabora spawns separate jailed libreoffice instance to do the conversion
+this may eat up too much ram in folders with many docs or with --th-pregen enabled
+/CAUTION!
+
 if you use collabora office editor with copyparty, you already have a thumbnailer for office formats:
 https://sdk.collaboraonline.com/docs/conversion_api.html
 the 'convert-to' api accepts files in multipart/form-data format
