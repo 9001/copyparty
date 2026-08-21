@@ -47,6 +47,7 @@ copyparty performs buffered reading, so expect multiple `read()` calls, respect 
 ## examples
 
 * [randomcolor](https://github.com/9001/copyparty/blob/hovudstraum/bin/thumbs/randomcolor.py) generates a random .gif image
+* [collabora](https://github.com/9001/copyparty/blob/hovudstraum/bin/thumbs/collabora.py) uses external self-hosted service (collabora online) to generate previews for various office documents, pdf and fb2 books, html, markdown, text files and some image formats; collabora is also supported as office editor in copyparty, see [wopi](https://github.com/9001/copyparty#wopi-server)
 
 
 ## some other known plugins seen on the internets
