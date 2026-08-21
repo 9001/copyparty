@@ -92,13 +92,12 @@ class Wrapper:
             # - reading probably big file
             # - sending it over the network
             # - making collabora do some work
-            self.response = urlopen(self.request)
+            self.response = urlopen(self.request, timeout=10)
         except HTTPError as e:
             e.close()
             raise e
         except Exception as e:
-            if self.response:
-                self.response.close()
+            self.close()
             raise e
 
         # actual response is not seekable
@@ -109,4 +108,5 @@ class Wrapper:
         return self.response.read(amount)
 
     def close(self):
-        return self.response.close()
+        if self.response:
+            self.response.close()
