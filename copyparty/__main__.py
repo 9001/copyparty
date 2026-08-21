@@ -1900,6 +1900,7 @@ def add_thumbnail(ap):
     ap2.add_argument("--au-unpk", metavar="E=F.C", type=u, default="mdz=mod.zip, mdgz=mod.gz, mdxz=mod.xz, s3z=s3m.zip, s3gz=s3m.gz, s3xz=s3m.xz, xmz=xm.zip, xmgz=xm.gz, xmxz=xm.xz, itz=it.zip, itgz=it.gz, itxz=it.xz, cbz=jpg.cbz, epub=jpg.epub, kra=png.kra, ora=png.ora", help="audio/image formats to decompress before passing to ffmpeg")
     ap2.add_argument("--th-extract", metavar="T", type=u, action="append", help="\033[34mREPEATABLE:\033[0m list of file extensions to thumbnail using a custom plugin (a python script); example: [\033[32mmdf,iso,dmg=/thumbs/diskimg.py\033[0m], see --help-thumb-ex")
     ap2.add_argument("--th-extr-sz", metavar="M", type=int, default=16, help="max num megabytes to allow \033[33m--th-extract\033[0m plugins to extract from each file")
+    ap2.add_argument("--th-extr-cv", action="store_true", help="use extracted thumbnails as folder covers with \033[33m-e2t\033[0m")
     ap2.add_argument("--hot-th-extr", action="store_true", help="recompile extractors on each thumbnail extraction -- expensive but convenient when hacking on stuff")
 
 
