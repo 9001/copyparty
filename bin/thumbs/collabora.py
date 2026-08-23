@@ -2,6 +2,14 @@
 CAUTION!
 looks like collabora spawns separate jailed libreoffice instance to do the conversion
 this may eat up too much ram in folders with many docs or with --th-pregen enabled
+
+consider limiting resources available for collabora
+e.g. for me these lines in docker-compose.yml helped alot:
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '2G'
 /CAUTION!
 
 if you use collabora office editor with copyparty, you already have a thumbnailer for office formats:
