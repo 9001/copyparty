@@ -1,4 +1,88 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0428-0907 `v1.21.0` UI V1.5
+
+## 😴 tl;dr
+
+* the web UI changed a LOT
+* nice mobile layout
+* progressive web app (more of a real copyparty app)
+* config GUI: server.com?config
+* try setting an accent color in the theme settings
+* --bg-img can set a background picture or video
+* drag n drop within copyparty and between browser windows of same server
+* the used storage metric is now at the bottom of the folder tree
+* the account details and control panel link are now in the account popup (top right)
+* media player settings and normal settings have merged
+* new file / new folder have moved from the top bar to the [+] button / right click menu (also accessible via long press on mobile)
+
+## 🧪 new features
+
+* Progressive web app (PWA). you can install this from the browser when visiting your server if it has real https. this PWA allows you to share to copyparty on mobile for example, basically the successor of the Party UP! app.
+* [Add moving files into other folders by dragging](https://github.com/tilse/copyparty-uiV1.5/pull/1) within the browser window to move files or folders
+* extend drag n drop logic to work between browser windows
+* custom accent color setting added. works best for light and dark themes (the first 4 in the list)
+* custom corner rounding in settings
+* added 2 new themes: poison // wing
+* long press on mobile selects the element in grid view by default
+* long pressing selected items brings up the context menu
+* selection checkboxes on items in grid view
+* the tree and path can be visible at the same time
+* resize drag handle at the edge of the folder tree
+* new design for placeholder thumbnails
+* #386 gallery view toggle for smaller margins / bigger image previews
+* settings and upload are now a popup/modal by default (can be moved)
+* settings can be navigated via sections and former tooltip info is now always visible
+* new floating [+] button in bottom right for quickly creating files / folders / uploading
+* searching folders / subfolders is now possible, and is the new default when clicking the search button. old-school extended search options are accessible via down arrow in the search box
+* storage capacity progress bar at bottom of folder tree
+* account button with popup in the top right
+* search in "quotes with spaces" is now possible to find file names including spaces
+* new simpler audio progress bar slider added as option
+* quick setting for changing loop mode via bottom media player bar
+* a volume icon that works as a mute toggle
+* name of playing audio is now displayed
+* audio equalizer can be operated via sliders
+* image viewer has nearest neighbor scale mode toggle
+* toggle to scale up small grid thumbnails to fit
+* --bg-img allows setting pictures or videos as the background like --bg-img=/folder/picture.jpg,opacity=0.5,blur=10. (volflag=bg_img)
+* new config GUI can be accessed via server.com?config or via the "edit config" button in the admin control panel
+
+## 🩹 bugfixes
+
+* #1455 tooltips disappear more consistently when element is no longer hovered
+* scrollable tree header so all options are accessible independent of tree width
+* #1378 improved mobile layout
+* media player has "fade" option now to disable fade in / fade out, which fixes play / pause on iOS lockscreens
+* #1002 proper overflow handling for text files or readmes (svg editor still overflows, but it doesn't break the page layout anymore)
+
+## 🔧 other changes
+
+* media player settings have moved to the main settings modal
+* creating files / folders is now done via right click menu, or the plus button in the bottom right
+* grid view toggle is now in grid header
+* default file sizes in MB
+* control panel button now lives in the account popup in the top bar
+* searching for files via drag n drop is now only possible when the search mode is toggled in the up2k UI
+* bup is an optional dropdown in the up2k modal
+* many mobile layout usability improvements
+* more consistent areas for clicking to navigate left / right in the image viewer (they don't depend on image fill mode anymore)
+* "folder up" / "next sibling" / "previous sibling" are now icon buttons at the top
+* new look for the login screen
+* pm-monokai theme has become "flat dark"
+
+## 🌠 fun facts
+
+* full support for the new 3DS, except some emoji rendering issues
+* it was a lot of work to keep all themes intact
+* some UI elements have gained IDs, so it should be easier to style them
+
+## 😔 unfun facts
+
+* #1209 (partially), #711 added a setting that gets rid of (most) emojis
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0803-2232  `v1.20.20`  more wopi
 
 ## 🧪 new features
@@ -251,7 +335,6 @@ in volumes with **both** [dirkeys](https://github.com/9001/copyparty/#dirkeys) a
   * btw that pdp had an IPv6 lease and browsed the internet :^)
     * hasn't connected to copyparty though (yet...)
 * this release was powered by [一体いつから (TaKo Hardcore bootleg)](https://soundcloud.com/takomusiccc/tako-hardcore-bootleg) followed by [Fighting My Way (YUPPUN Hardcore Remix)](https://soundcloud.com/yuppun/fightingmyway) (shd is a good dj)
-
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  

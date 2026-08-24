@@ -28,7 +28,7 @@ window.baguetteBox = (function () {
             onChange: null,
             readDirRtl: false,
         },
-        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnVmode, btnReadDir, btnGoPage, btnClose,
+        overlay, slider, btnPrev, btnNext, btnHelp, btnAnim, btnRotL, btnRotR, btnSel, btnFull, btnZoom, btnPixelated, btnVmode, btnReadDir, btnGoPage, btnClose,
         currentGallery = [],
         currentIndex = 0,
         isOverlayVisible = false,
@@ -37,8 +37,8 @@ window.baguetteBox = (function () {
         scrollCSS = ['', ''],
         scrollTimer = 0,
         re_i = APPLE ?
-            /^[^?]+\.(a?png|avif|bmp|gif|hei[cf]s?|jfif|jpe?g|jxl|svg|tiff?|webp)(\?|$)/i :
-            /^[^?]+\.(a?png|avif|bmp|gif|jfif|jpe?g|jxl|svg|tiff?|webp)(\?|$)/i,
+            /^[^?]+\.(a?png|avif|bmp|gif|hei[cf]s?|jfif|jpe?g|jxl|svg|ico|tiff?|webp)(\?|$)/i :
+            /^[^?]+\.(a?png|avif|bmp|gif|jfif|jpe?g|jxl|svg|ico|tiff?|webp)(\?|$)/i,
         re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i,
         re_cbz = /^[^?]+\.(cbz)(\?|$)/i,
         anims = ['slideIn', 'fadeIn', 'none'],
@@ -153,6 +153,9 @@ window.baguetteBox = (function () {
         return bindImageClickListeners(selector, userOptions);
     }
 
+    var userAction = false;
+    function getUserAction(){return userAction}
+    function resetUserAction(){userAction = false}
     function bindImageClickListeners(selector, userOptions) {
         var galleryNodeList = QSA(selector);
         var selectorData = {
@@ -184,6 +187,12 @@ window.baguetteBox = (function () {
                         return true;
 
                     e.preventDefault ? e.preventDefault() : e.returnValue = false;
+                    var newHash = '#g' + this.getAttribute('id') + getsort();
+                    if(location.hash != newHash){
+                        console.log("opened bbox manually");
+                        userAction = true;
+                        hist_push(newHash);
+                    }
                     prepareOverlay(gallery, userOptions);
                     showOverlay(imageIndex);
                 };
@@ -317,22 +326,23 @@ window.baguetteBox = (function () {
         if (!overlay) {
             var ctr = mknod('div');
             ctr.innerHTML = (
-                '<div id="bbox-overlay" role="dialog">' +
+                '<div id="bbox-overlay" class="normalrcm" role="dialog">' +
                 '<div id="bbox-slider"></div>' +
-                '<button id="bbox-prev" class="bbox-btn" type="button" aria-label="Previous">&lt;</button>' +
-                '<button id="bbox-next" class="bbox-btn" type="button" aria-label="Next">&gt;</button>' +
+                '<div id="bbox-prev"><a class="btn" aria-label="Previous">◀</a></div>' +
+                '<div id="bbox-next"><a class="btn" aria-label="Next">▶</a></div>' +
                 '<div id="bbox-btns">' +
-                '<button id="bbox-help" type="button">?</button>' +
-                '<button id="bbox-anim" type="button" tt="a">-</button>' +
-                '<button id="bbox-readdir" type="button" tt="a">ltr</button>' +
-                '<button id="bbox-rotl" type="button">↶</button>' +
-                '<button id="bbox-rotr" type="button">↷</button>' +
-                '<button id="bbox-tsel" type="button">sel</button>' +
-                '<button id="bbox-full" type="button" tt="full-screen">⛶</button>' +
-                '<button id="bbzoom" type="button" tt="zoom/stretch">z</button>' +
-                '<button id="bbox-vmode" type="button" tt="a"></button>' +
-                '<button id="bbox-gopage" type="button" tt="go to page">pg</button>' +
-                '<button id="bbox-close" type="button" aria-label="Close">X</button>' +
+                    '<a id="bbox-close" class="btn" aria-label="Close"><span class="x">×</span></a>' +
+                    '<a id="bbox-gopage" type="button" tt="go to page">pg</a>' +
+                    '<a id="bbox-vmode" class="btn" tt="a"></a>' +
+                    '<a id="bbox-full" class="btn" tt="full-screen">⛶</a>' +
+                    '<a id="bbzoom" class="tgl btn" tt="zoom/stretch smaller images to fill screen">↕</a>' +
+                    '<a id="bbpixelated" class="tgl btn" tt="pixelated rendering (good for pixel art)">👾</a>' +
+                    '<a id="bbox-tsel" class="tgl btn">☑️sel</a>' +
+                    '<a id="bbox-rotr" class="btn">↷</a>' +
+                    '<a id="bbox-rotl" class="btn">↶</a>' +
+                    '<a id="bbox-readdir" class="btn" tt="a">ltr</a>' +
+                    '<a id="bbox-anim" class="btn" tt="a">-</a>' +
+                    '<a id="bbox-help" class="btn">?</a>' +
                 '</div></div>'
             );
             overlay = ctr.firstChild;
@@ -350,12 +360,15 @@ window.baguetteBox = (function () {
         btnSel = ebi('bbox-tsel');
         btnFull = ebi('bbox-full');
         btnZoom = ebi('bbzoom');
+        btnPixelated = ebi('bbpixelated');
         btnVmode = ebi('bbox-vmode');
         btnGoPage = ebi('bbox-gopage');
         btnClose = ebi('bbox-close');
 
         bcfg_bind(options, 'bbzoom', 'bbzoom', false, setzoom);
         setzoom();
+        bcfg_bind(options, 'bbpixelated', 'bbpixelated', false, setpixelated);
+        setpixelated();
     }
 
     function halp() {
@@ -372,6 +385,7 @@ window.baguetteBox = (function () {
             ['R', 'rotate (shift=ccw)'],
             ['F', 'toggle fullscreen'],
             ['Z', 'toggle zoom/stretch'],
+            ['X', 'toggle pixelated rendering'],
             ['S', 'toggle file selection'],
             ['G', 'cbz: go to page'],
             ['space, P, K', 'video: play / pause'],
@@ -457,6 +471,8 @@ window.baguetteBox = (function () {
             tglfull();
         else if (kl == "z")
             btnZoom.click();
+        else if (kl == "x")
+            btnPixelated.click();
         else if (kl == "s")
             tglsel();
         else if (kl == "g" && isCbz)
@@ -590,6 +606,12 @@ window.baguetteBox = (function () {
         btnState(btnZoom, sel);
     }
 
+    function setpixelated() {
+        var sel = clgot(btnPixelated, 'on')
+        clmod(ebi('bbox-overlay'), 'pixelated', sel);
+        btnState(btnPixelated, sel);
+    }
+
     function tglsel() {
         var o = findfile()[3];
         clmod(o.closest('tr'), 'sel', 't');
@@ -613,18 +635,14 @@ window.baguetteBox = (function () {
             if (vsplit(files[a].vp)[1] == name)
                 sel = true;
 
-        ebi('bbox-overlay').style.background = sel ?
-            'rgba(153,34,85,0.7)' : '';
+        clmod(ebi('bbox-overlay'), 'sel', sel);
 
         img.style.borderRadius = sel ? '1em' : '';
         btnState(btnSel, sel);
     }
 
     function btnState(btn, sel) {
-        btn.style.color = sel ? '#fff' : '';
-        btn.style.background = sel ? '#d48' : '';
-        btn.style.textShadow = sel ? '1px 1px 0 #b38' : '';
-        btn.style.boxShadow = sel ? '.15em .15em 0 #502' : '';
+        clmod(btn, 'on', sel);
     }
 
     function keyUpHandler(e) {
@@ -771,10 +789,12 @@ window.baguetteBox = (function () {
         if (options.buttons === 'auto' && ('ontouchstart' in window || currentGallery.length === 1))
             options.buttons = false;
 
-        btnPrev.style.display = btnNext.style.display = (options.buttons ? '' : 'none');
+        QS('#bbox-next .btn').style.display = QS('#bbox-prev .btn').style.display = (options.buttons ? '' : 'none');
     }
 
     function showOverlay(chosenImageIndex) {
+        clmod(ebi('wrap'), 'waiting', true);
+
         if (options.noScrollbars) {
             var a = document.documentElement.style.overflowY,
                 b = document.body.style.overflowY;
@@ -798,6 +818,7 @@ window.baguetteBox = (function () {
         loadImage(currentIndex, function () {
             preloadNext(currentIndex);
             preloadPrev(currentIndex);
+            clmod(ebi('wrap'), 'waiting', false);
         });
 
         show_buttons(0);
@@ -826,7 +847,6 @@ window.baguetteBox = (function () {
     function hideOverlay(e, dtor) {
         ev(e);
         playvid(false);
-        removeFromCache('#files');
         if (options.noScrollbars) {
             document.documentElement.style.overflowY = scrollCSS[0];
             document.body.style.overflowY = scrollCSS[1];
@@ -848,7 +868,13 @@ window.baguetteBox = (function () {
         if (options.duringHide)
             options.duringHide();
 
-        sethash('');
+        if(userAction){
+            console.log("closed bbox after manual open");
+            if(location.hash.startsWith('#gf-'))
+                history.back();
+        }
+        else
+            sethash('');
         unbindEvents();
 
         // Fade out and hide the overlay
@@ -1275,9 +1301,7 @@ window.baguetteBox = (function () {
     }
 
     function show_buttons(v) {
-        clmod(ebi('bbox-btns'), 'off', v);
-        clmod(btnPrev, 'off', v);
-        clmod(btnNext, 'off', v);
+        clmod(ebi('bbox-overlay'), 'immersive', v);
     }
 
     function bounceAnimation(direction) {
@@ -1339,11 +1363,11 @@ window.baguetteBox = (function () {
                 x = e.clientX - rc.left,
                 fx = x / (rc.right - rc.left);
 
-            if (fx < 0.3)
-                return showLeftImage();
+            // if (fx < 0.3)
+            //     return showLeftImage();
 
-            if (fx > 0.7)
-                return showRightImage();
+            // if (fx > 0.7)
+            //     return showRightImage();
 
             show_buttons('t');
 
@@ -1405,8 +1429,18 @@ window.baguetteBox = (function () {
         urltime: urltime,
         playpause: playpause,
         hide: hideOverlay,
-        destroy: destroyPlugin
+        destroy: destroyPlugin,
+        getUserAction: getUserAction,
+        resetUserAction: resetUserAction,
     };
 })();
+
+function bboxinit() {
+    if (msel && msel.bbox != true) {
+        timer.rm(bboxinit);
+        msel.bagit();
+    }
+}
+timer.add(bboxinit, true);
 
 J_BBX = 2;

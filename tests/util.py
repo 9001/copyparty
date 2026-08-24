@@ -166,7 +166,7 @@ class Cfg(Namespace):
         ex = "ctl_re db_act forget_ip gauto idp_cookie idp_store k304 loris md_nhist no304 nosubtle qr_pin qr_wait re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo u2ow zipmaxn zipmaxs"
         ka.update(**{k: 0 for k in ex.split()})
 
-        ex = "ah_alg bname chdir chmod_f chpw_db csp_dl csp_ui db_xattr doctitle df epilogues exit favico fika ipa ipar html_head html_head_d html_head_s idp_login idp_logout lg_sba lg_sbf log_date log_fk md_sba md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i opds_exts preadmes prologues readmes shr shr1 shr_site site smsg tcolor textfiles th_pregen txt_eol ufavico ufavico_h unlist up_site vc_url vname xff_src zipmaxt R RS SR"
+        ex = "ah_alg bname chdir chmod_f chpw_db csp_dl csp_ui db_xattr doctitle df epilogues exit favico fika ipa ipar html_head html_head_d html_head_s idp_login idp_logout lg_sba lg_sbf log_date log_fk md_sba md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i opds_exts preadmes prologues readmes shr shr1 shr_site site smsg tcolor textfiles th_pregen txt_eol ufavico ufavico_h unlist up_site vc_url vname xff_src zipmaxt R RS SR bg_img"
         ka.update(**{k: "" for k in ex.split()})
 
         ex = "apnd_who ban_403 ban_404 ban_422 ban_pw ban_pwc ban_url dont_ban cachectl http_vary rcm rss_fmt_d rss_fmt_t spinner"

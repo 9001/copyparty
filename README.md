@@ -1,12 +1,13 @@
-<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>
+<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="220" align="right"/>
 
-### 💾🎉 copyparty
+### <nobr>💾🎉 copyparty</nobr>
 
 turn almost any device into a file server with resumable uploads/downloads using [*any*](#browser-support) web browser
 
 * server only needs Python (2 or 3), all dependencies optional
 * 🔌 protocols: [http(s)](#the-browser) // [webdav](#webdav-server) // [sftp](#sftp-server) // [ftp(s)](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
-* 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
+* 📱 [progressive web app](#apps--integrations) // [android app](#party-up-android) // [iPhone shortcuts](#ios-shortcuts)
+* ⚙️ [config GUI](#config-gui)
 
 👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
 
@@ -132,8 +133,9 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
 * [client examples](#client-examples) - interact with copyparty using non-browser clients
     * [folder sync](#folder-sync) - sync folders to/from copyparty
     * [mount as drive](#mount-as-drive) - a remote copyparty server as a local filesystem
-* [android app](#android-app) - upload to copyparty with one tap
-* [iOS shortcuts](#iOS-shortcuts) - there is no iPhone app, but
+* [web app](#apps--integrations) - (almost) full OS integration (if you have https)
+* [android app](#party-up-android) - basic uploader (web app recommended)
+* [iOS shortcuts](#ios-shortcuts) - if you don't wanna use the web app
 * [performance](#performance) - defaults are usually fine - expect `8 GiB/s` download, `1 GiB/s` upload
     * [client-side](#client-side) - when uploading files
 * [security](#security) - there is a [discord server](https://discord.gg/25J8CdTT6G) with announcements
@@ -166,22 +168,28 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
 
 just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** -- that's it! 🎉
 
-> ℹ️ the sfx is a [self-extractor](https://github.com/9001/copyparty/issues/270) which unpacks an embedded `tar.gz` into `$TEMP` -- if this looks too scary, you can use the [zipapp](#zipapp) which has slightly worse performance
+> ℹ️ the sfx is a [self-extractor](https://github.com/9001/copyparty/issues/270) which unpacks an embedded `tar.gz` into `$TEMP` -- if this looks too scary, you can use the [zipapp](#zipapp) which has slightly worse performance, or choose your preferred method below
 
-* or install through [pypi](https://pypi.org/project/copyparty/): `python3 -m pip install --user -U copyparty`
-* or if you cannot install python, you can use [copyparty.exe](#copypartyexe) instead
-* or install [on arch](#arch-package) / [homebrew](#homebrew-formulae) ╱ [on NixOS](#nixos-module) ╱ [through nix](#nix-package)
-* or if you are on android, [install copyparty in termux](#install-on-android)
-* or maybe an iPhone or iPad? [install in a-Shell on iOS](#install-on-iOS)
-* or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
-* or if you have [uv](https://docs.astral.sh/uv/) installed, run `uv tool run copyparty`
-* or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
-* or if your OS is dead, give the [bootable flashdrive / cd-rom](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) a spin
+| alternative run methods: | |
+|-|-|
+| [**python** pypi](https://pypi.org/project/copyparty/) | `python3 -m pip install --user -U copyparty`
+| [**docker 🐋**](./scripts/docker/) | dependencies built-in
+| [**copyparty.exe**](#copypartyexe) | (if you cannot install python)
+| [**arch**](#arch-package) / [homebrew](#homebrew-formulae) / [NixOS](#nixos-module) / [nix](#nix-package) | btw
+| **[android](#install-on-android)**| install copyparty in termux
+| [**iOS** iPhone / iPad](#install-on-iOS) | install in a-Shell on iOS
+| [**synology** nas / dsm](./docs/synology-dsm.md)
+| [**uv**](https://docs.astral.sh/uv/) | `uv tool run copyparty`
+| [**zipapp** (pyz)](#zipapp) | if your computer is messed up and nothing else works
+| [**bootable flashdrive** / cd-rom](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) | if your OS is dead entirely
+
 * or if you don't trust copyparty yet and want to isolate it a little, then...
-  * ...maybe [prisonparty](./bin/prisonparty.sh) to create a tiny [chroot](https://wiki.archlinux.org/title/Chroot) (very portable),
-  * ...or [bubbleparty](./bin/bubbleparty.sh) to wrap it in [bubblewrap](https://github.com/containers/bubblewrap) (much better)
-* or if you prefer to [use docker](./scripts/docker/) 🐋 you can do that too
-  * docker has all deps built-in, so skip this step:
+  * ...maybe [prisonparty](./bin/prisonparty.sh) to create a tiny [**chroot**](https://wiki.archlinux.org/title/Chroot) (very portable),
+  * ...or [bubbleparty](./bin/bubbleparty.sh) to wrap it in [**bubblewrap**](https://github.com/containers/bubblewrap) (much better)
+
+### dependencies
+
+if you're on **docker**, you can skip this step:
 
 enable thumbnails (images/audio/video), media indexing, and audio transcoding by installing some recommended deps:
 
@@ -196,9 +204,13 @@ enable thumbnails (images/audio/video), media indexing, and audio transcoding by
   * copyparty.exe comes with `Pillow` and only needs [ffmpeg](#optional-dependencies) for mediatags/videothumbs
 * see [optional dependencies](#optional-dependencies) to enable even more features
 
+### configuration
+
 running copyparty without arguments (for example doubleclicking it on Windows) will give everyone read/write access to the current folder; you may want [accounts and volumes](#accounts-and-volumes)
 
-or see [some usage examples](#complete-examples) for inspiration, or the [complete windows example](./docs/examples/windows.md)
+you can use the [**config GUI**](#config-gui) (recommended for beginners),
+or see [some usage examples](#complete-examples) for inspiration, 
+or the [complete windows example](./docs/examples/windows.md)
 
 some recommended options:
 * `-e2dsa` enables general [file indexing](#file-indexing)
@@ -521,9 +533,25 @@ upgrade notes
     ```
 
 
+# config GUI
+
+to help you configure copyparty, you can use the config GUI ("guest list"), which is accessible via the `✏️ edit config` button (only visible on the control panel when you're logged in as an admin), or by visiting `http://[your-ip]:3923?config`
+
+the config helper page currently has no option to load your real config, but you can import your config from a start command at the bottom of the page. otherwise, all changes are local and use your browser cache
+
+you will probably want to replace your run prefix according to the [quickstart section](#quickstart)
+
+in the config GUI, you can search for [commands](https://copyparty.eu/cli/) and see their descriptions, easily configure [users, groups and volumes](#accounts-and-volumes), as well as getting suggestions for some of the recommended options
+
+once you're done with your configuration, just copy it to your clipboard and run it or save it as a bash file
+
+
 # accounts and volumes
 
-per-folder, per-user permissions  - if your setup is getting complex, consider making a [config file](./docs/example.conf) instead of using arguments
+per-folder, per-user permissions  - if your setup is getting complex, consider using the [config GUI](#config-gui), or making a [config file](./docs/example.conf) instead of using arguments
+
+advantages of a [config file](./docs/example.conf):
+
 * much easier to manage, and you can modify the config at runtime with `systemctl reload copyparty` or more conveniently using the `[reload cfg]` button in the control-panel (if the user has `a`/admin in any volume)
   * changes to the `[global]` config section requires a restart to take effect
 
@@ -681,11 +709,15 @@ the main tabs in the ui
 * `[🔎]` [search](#searching) by size, date, path/name, mp3-tags ...
 * `[🧯]` [unpost](#unpost): undo/delete accidental uploads
 * `[🚀]` and `[🎈]` are the [uploaders](#uploading)
+* `[📟]` send-msg: either to server-log or into textfiles if `--urlform save`
+* `[⚙️]` client config options
+
+
+## quick actions (+)
+
 * `[📂]` mkdir: create directories
 * `[📝]` new-file: create a new textfile
-* `[📟]` send-msg: either to server-log or into textfiles if `--urlform save`
-* `[🎺]` audio-player config options
-* `[⚙️]` general client config options
+* `[🚀]` upload: quick way to pick files for upload
 
 
 ## hotkeys
@@ -699,7 +731,7 @@ the browser has the following hotkeys  (always qwerty)
 * `G` toggle list / [grid view](#thumbnails) -- same as `田` bottom-right
 * `T` toggle thumbnails / icons
 * `ESC` close various things
-* `ctrl-K` delete selected files/folders
+* `ctrl-K/Del` delete selected files/folders
 * `ctrl-X` cut selected files/folders
 * `ctrl-C` copy selected files/folders to clipboard
 * `ctrl-V` paste (move/copy)
@@ -754,9 +786,9 @@ the browser has the following hotkeys  (always qwerty)
 
 ## navpane
 
-switching between breadcrumbs or navpane
+opening the navpane
 
-click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (default), or a navpane (tree-browser sidebar thing)
+clicking the `≡` or pressing the `B` hotkey toggles the navpane (tree-browser sidebar thing)
 
 * `[+]` and `[-]` (or hotkeys `A`/`D`) adjust the size
 * `[🎯]` jumps to the currently open folder
@@ -769,7 +801,7 @@ click the `🌲` or pressing the `B` hotkey to toggle between breadcrumbs path (
 
 ## thumbnails
 
-press `g` or `田` to toggle grid-view instead of the file listing  and `t` toggles icons / thumbnails
+press `g` or use the view mode buttons in the top left to toggle grid-view instead of the file listing  and `t` toggles icons / thumbnails
 * can be made default globally with `--grid` or per-volume with volflag `grid`
 * enable by adding `?imgs` to a link, or disable with `?imgs=0`
 
@@ -934,9 +966,7 @@ dropping files into the browser also lets you see if they exist on the server
 
 ![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/129635361-c79286f0-b8f1-440e-aaf4-6e929428fac9.png)
 
-when you drag/drop files into the browser, you will see two dropzones: `Upload` and `Search`
-
-> on a phone? toggle the `[🔎]` switch green before tapping the big yellow Search button to select your files
+toggle the `[🔎]` switch in the upload options to search for files instead of uploading
 
 the files will be hashed on the client-side, and each hash is sent to the server, which checks if that file exists somewhere
 
@@ -1005,6 +1035,8 @@ file selection: click somewhere on the line (not the link itself), then:
 * rename: `F2`
 
 you can copy/move files across browser tabs (cut/copy in one tab, paste in another)
+
+you can drag/drop selected files into other folders
 
 
 ## shares
@@ -1182,7 +1214,7 @@ some highlights:
 
 click the `play` link next to an audio file, or copy the link target to [share it](https://a.ocv.me/pub/demo/music/Ubiktune%20-%20SOUNDSHOCK%202%20-%20FM%20FUNK%20TERRROR!!/#af-1fbfba61&t=18) (optionally with a timestamp to start playing from, like that example does)
 
-open the `[🎺]` media-player-settings tab to configure it,
+open the `[⚙]` configuration options and go to the `[🎵]` media player section to configure it,
 * "switches":
   * `[🔁]` repeats one single song forever
   * `[🔀]` shuffles the files inside each folder
@@ -1234,7 +1266,7 @@ you can use foobar2000, deadbeef, just about any standalone player should work -
 
 alternatively, you can create the playlist using copyparty itself:
 
-* open the `[🎺]` media-player-settings tab and enable the `[📻]` create-playlist feature -- this adds two new buttons in the bottom-right tray, `[📻add]` and `[📻copy]` which appear when you listen to music, or when you select a few audiofiles
+* open the `[⚙]` configuration options, go to the `[🎵]` media player section and enable the `[📻]` create-playlist feature -- this adds two new buttons in the bottom-right tray, `[📻add]` and `[📻copy]` which appear when you listen to music, or when you select a few audiofiles
 
 * click the `📻add` button while a song is playing (or when you've selected some songs) and they'll be added to "the list" (you can't see it yet)
 
@@ -1322,6 +1354,12 @@ see [./srv/expand/](./srv/expand/) for usage and examples
 ## searching
 
 search by size, date, path/name, mp3-tags, ...
+
+by default, the `[🔍]` search button shows the folder search bar.
+
+search for files within a folder and optionally its subfolders.
+
+for extended search options, use the dropdown arrow to open the full search UI
 
 ![copyparty-search-fs8](https://user-images.githubusercontent.com/241032/129635365-c0ff2a9f-0ee5-4fc3-8bb6-006033cf67b8.png)
 
@@ -2991,20 +3029,32 @@ most clients will fail to mount the root of a copyparty server unless there is a
 if you have volumes that are accessible without a password, then some webdav clients (such as davfs2) require the global-option `--dav-auth` to access any password-protected areas
 
 
-# android app
+# apps & integrations
+### Progressive web app (all platforms)
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Progressive_Web_Apps_Logo.svg/3840px-Progressive_Web_Apps_Logo.svg.png" height="40">
 
+**HTTPS REQUIRED**
+
+install the app straight from the browser and access it in the share menu to upload files! it uses the normal web interface.
+
+you can install this from the browser when visiting your server if it has real https. this PWA allows you to share to copyparty on mobile for example, basically the successor of the Party UP! app.
+
+if you use this, you might want to consider setting [--cookie-lax](https://copyparty.eu/cli/#flags-help-page:~:text=lax), which lets you follow file/folder links without having to log in again.  
+this might increase the likelihood of success on an attack where an attacker uploads a malicious html file, which tries to run scripts with your privileges, since clicking a link from a chat service would be enough to succeed. if this concerns you, have a look at [--no-html](https://copyparty.eu/cli/#g-no-html)
+
+### Party UP! (android)
 upload to copyparty with one tap
 
 <a href="https://f-droid.org/packages/me.ocv.partyup/"><img src="https://ocv.me/fdroid.png" alt="Get it on F-Droid" height="50" /> '' <img src="https://img.shields.io/f-droid/v/me.ocv.partyup.svg" alt="f-droid version info" /></a> '' <a href="https://github.com/9001/party-up"><img src="https://img.shields.io/github/release/9001/party-up.svg?logo=github" alt="github version info" /></a>
 
-the app is **NOT** the full copyparty server! just a basic upload client, nothing fancy yet
+the app is **NOT** the full copyparty server! just a basic upload client. if you want the full experience, [use the PWA](#progressive-web-app-all-platforms). unlike the PWA, this app doesn't require https.
 
 if you want to run the copyparty server on your android device, see [install on android](#install-on-android)
 
 
-# iOS shortcuts
+### iOS shortcuts
 
-there is no iPhone app, but  the following shortcuts are almost as good:
+if you don't want to use the PWA, the following shortcuts are almost as good:
 
 * [upload to copyparty](https://www.icloud.com/shortcuts/41e98dd985cb4d3bb433222bc1e9e770) ([offline](https://github.com/9001/copyparty/raw/hovudstraum/contrib/ios/upload-to-copyparty.shortcut)) ([png](https://user-images.githubusercontent.com/241032/226118053-78623554-b0ed-482e-98e4-6d57ada58ea4.png)) based on the [original](https://www.icloud.com/shortcuts/ab415d5b4de3467b9ce6f151b439a5d7) by [Daedren](https://github.com/Daedren) (thx!)
   * can strip exif, upload files, pics, vids, links, clipboard
@@ -3412,6 +3462,70 @@ if you want thumbnails (photos+videos) and you're okay with spending another 132
 * or if you want to use `vips` for photo-thumbs instead, `pkg install libvips && python -m pip install --user -U wheel && python -m pip install --user -U pyvips && (cd /data/data/com.termux/files/usr/lib/; ln -s libgobject-2.0.so{,.0}; ln -s libvips.so{,.42})`
 
 if you are suddenly unable to access storage (permission issues), try forcequitting termux, revoke all of its permissions in android settings, and run the command `termux-setup-storage`
+
+## external storage on android
+
+**exFAT recommended!**
+
+if you want to use external storage like an SD card or USB stick, you need to get the mount path from the folder info in a file explorer (for example [CX explorer](https://play.google.com/store/apps/details?id=com.cxinventor.file.explorer) (closed source though))
+
+your path will look something like `/mnt/[device-ID]/`
+
+⚠️ to prevent copyparty from shutting down when your external storage is disconnected, use `--dbpath=./` to prevent storing your database on the removable media when you use any of the `-e2d*` arguments. this might also prevent other related errors
+
+### permission errors
+if you get read or write permission errors, try re-running the initial setup command from the [section above](#install-on-android)
+
+if you still get permission errors, it might be neccessary to create a symlink to the external storage and authorize it via termux-usb.
+
+if you're rooted, you can skip this section and just set [selinux permissive](https://github.com/evdenis/selinux_permissive), otherwise, continue below:
+
+the commands you need are as follows:
+
+list devices: `termux-usb -l`
+
+>(careful, this depends on the order you plug in your devices. the first in the list is the last one you plugged in. the paths may also change when you re-connect a device)
+
+authorize path: `termux-usb -r /dev/bus/...`
+
+create symlink: `ln -sf /dev/bus/... ~/storage/external-symlink`
+
+while this will work temporarily, this will **break** if you restart your phone or unplug the external storage, because the path returned by termux-usb can change. to work around that, you need to automate this:
+
+**requirements**: `pkg install jq termux-usb`
+
+**step 1:** this script automatically creates a symlink to the first USB device in the `termux-usb -l` list and authorizes it if necessary 
+
+`nano ~/.termux/tasker/on-usb.sh`
+```
+#!/bin/bash
+CURRENT_USB=$(termux-usb -l | jq -r '.[0]')
+if [ -z "$CURRENT_USB" ]; then
+    exit 1
+fi
+ln -sf "$CURRENT_USB" ~/storage/external-symlink
+termux-usb -r "$CURRENT_USB"
+```
+`chmod +x ~/.termux/tasker/on-usb.sh`
+
+**step 2:** run this script when you launch copyparty
+
+`~/.termux/tasker/on-usb.sh && copyparty`
+
+**step 2.5 (optional):** create a tasker task to run the script when a USB device gets plugged in
+
+requirements:
+- [Tasker](https://tasker.joaoapps.com/) (paid)
+- [Termux:Tasker](https://f-droid.org/packages/com.termux.tasker/)
+- termux permission: draw over other apps
+
+set up a task:
+- type: State -> Hardware -> USB connected
+- action: Plugin -> termux:tasker -> configuration
+  - select script: on-usb.sh
+  - check "execute in a terminal session" (termux: draw over other apps is needed)
+
+**step 3:** include the symlink to the volume in your copyparty config! `-v=~/storage/external-symlink::`
 
 
 # install on iOS

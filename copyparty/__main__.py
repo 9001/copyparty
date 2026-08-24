@@ -1982,8 +1982,8 @@ def add_db_metadata(ap):
     ap2.add_argument("--mtag-vv", action="store_true", help="debug mtp settings and mutagen/FFprobe parsers")
     ap2.add_argument("--db-xattr", metavar="t,t", type=u, default="", help="read file xattrs as metadata tags; [\033[32ma,b\033[0m] reads keys \033[33ma\033[0m and \033[33mb\033[0m as tags \033[33ma\033[0m and \033[33mb\033[0m, [\033[32ma=foo,b=bar\033[0m] reads keys \033[33ma\033[0m and \033[33mb\033[0m as tags \033[33mfoo\033[0m and \033[33mbar\033[0m, [\033[32m~~a,b\033[0m] does everything except \033[33ma\033[0m and \033[33mb\033[0m, [\033[32m~~\033[0m] does everything. NOTE: Each tag must also be enabled with \033[33m-mte\033[0m (volflag=db_xattr)")
     ap2.add_argument("-mtm", metavar="M=t,t,t", type=u, action="append", help="\033[34mREPEATABLE:\033[0m add/replace metadata mapping")
-    ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags to index/display (comma-sep.); either an entire replacement list, or add/remove stuff on the default-list with +foo or /bar", default=DEF_MTE)
-    ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags to hide by default (comma-sep.); assign/add/remove same as \033[33m-mte\033[0m", default=DEF_MTH)
+    ap2.add_argument("-mte", metavar="M,M,M", type=u, help="tags/file-columns to index/display (comma-sep.); either an entire replacement list, or add/remove stuff on the default-list with +foo or /bar", default=DEF_MTE)
+    ap2.add_argument("-mth", metavar="M,M,M", type=u, help="tags/file-columns to hide by default (comma-sep.); assign/add/remove same as \033[33m-mte\033[0m", default=DEF_MTH)
     ap2.add_argument("-mtp", metavar="M=[f,]BIN", type=u, action="append", help="\033[34mREPEATABLE:\033[0m read tag \033[33mM\033[0m using program \033[33mBIN\033[0m to parse the file")
     ap2.add_argument("--have-db-xattr", action="store_true", help=argparse.SUPPRESS)
 
@@ -2023,17 +2023,18 @@ def add_og(ap):
 
 
 def add_ui(ap, retry: int):
-    THEMES = 10
+    THEMES = 14
     ap2 = ap.add_argument_group("ui options")
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
-    ap2.add_argument("--gsel", action="store_true", help="select files in grid by ctrl-click (volflag=gsel)")
+    ap2.add_argument("--bg-img", metavar="M,M,M", type=u, default="", help="URL to .jpg/png/gif/svg/webm/mp4/mkv/m4v/mov file to use as background, for example \033[32m/folder/image.jpg,opacity=0.5(optional),blur=5(optional)\033[0m supports relative paths. (volflag=bg_img)")
+    ap2.add_argument("--no-gsel", action="store_true", help="ctrl-click in gridview will open-in-new-tab instead of select-file (volflag=-gsel)")
     ap2.add_argument("--localtime", action="store_true", help="default to local timezone instead of UTC")
-    ap2.add_argument("--ui-filesz", metavar="FMT", type=u, default="1", help="default filesize format; one of these: 0, 1, 2, 2c, 3, 3c, 4, 4c, 5, 5c, 6, 6c, 7, 7c, fuzzy (see UI)")
+    ap2.add_argument("--ui-filesz", metavar="FMT", type=u, default="4", help="default filesize format; one of these: 0, 1, 2, 2c, 3, 3c, 4, 4c, 5, 5c, 6, 6c, 7, 7c, fuzzy (see UI)")
     ap2.add_argument("--gauto", metavar="PERCENT", type=int, default=0, help="switch to gridview if more than \033[33mPERCENT\033[0m of files are pics/vids; 0=disabled")
     ap2.add_argument("--rcm", metavar="TXT", default="yy", help="rightclick-menu; two yes/no options: 1st y/n is enable-custom-menu, 2nd y/n is enable-double")
     ap2.add_argument("--lang", metavar="LANG", type=u, default="eng", help="language, for example \033[32meng\033[0m / \033[32mnor\033[0m / ...")
     ap2.add_argument("--glang", action="store_true", help="guess the browser's default language, otherwise fall back to \033[33m--lang\033[0m")
-    ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use (0..%d)" % (THEMES - 1,))
+    ap2.add_argument("--theme", metavar="NUM", type=int, default=0, help="default theme to use (0..%d) (volflag=theme)" % (THEMES - 1,))
     ap2.add_argument("--themes", metavar="NUM", type=int, default=THEMES, help="number of themes installed")
     ap2.add_argument("--au-vol", metavar="0-100", type=int, default=50, choices=range(0, 101), help="default audio/video volume percent")
     ap2.add_argument("--sort", metavar="C,C,C", type=u, default="href", help="default sort order, comma-separated column IDs (see header tooltips), prefix with '-' for descending. Examples: \033[32mhref -href ext sz ts tags/Album tags/.tn\033[0m (volflag=sort)")
@@ -2041,7 +2042,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--hsortn", metavar="N", type=int, default=2, help="number of sorting rules to include in media URLs by default (volflag=hsortn)")
     ap2.add_argument("--see-dots", action="store_true", help="default-enable seeing dotfiles; only takes effect if user has the necessary permissions")
     ap2.add_argument("--qdel", metavar="LVL", type=int, default=2, help="number of confirmations to show when deleting files (2/1/0)")
-    ap2.add_argument("--dlni", action="store_true", help="force download (don't show inline) when files are clicked (volflag:dlni)")
+    ap2.add_argument("--dlni", action="store_true", help="force download (don't show inline) when files are clicked (volflag=dlni)")
     ap2.add_argument("--unlist", metavar="REGEX", type=u, default="", help="don't show files/folders matching \033[33mREGEX\033[0m in file list. WARNING: Purely cosmetic! Does not affect API calls, just the browser. Example: [\033[32m\\.(js|css)$\033[0m] (volflag=unlist)")
     ap2.add_argument("--dothidden", action="store_true", help="hide specific files in a folder by listing them in a file named .hidden -- WARNING: Mostly cosmetic! Download-as-zip/tar will still download them. Do not rely on this for security (volflag=dothidden)")
     ap2.add_argument("--favico", metavar="TXT", type=u, default="c 000 none" if retry else "🎉 000 none", help="\033[33mfavicon-text\033[0m [ \033[33mforeground\033[0m [ \033[33mbackground\033[0m ] ], set blank to disable")
@@ -2089,6 +2090,8 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--ui-noctxb", action="store_true", help="hide context-buttons in the UI (volflag=ui_noctxb)")
     ap2.add_argument("--ui-norepl", action="store_true", help="hide repl-button in the UI (volflag=ui_norepl)")
     ap2.add_argument("--have-unlistc", action="store_true", help=argparse.SUPPRESS)
+    ap2.add_argument("--gsel", action="store_true", default=True, help=argparse.SUPPRESS)
+    ap2.add_argument("--unfun", action="store_true", help="hides many of the emojis in the UI")
 
 
 def add_debug(ap):

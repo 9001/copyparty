@@ -104,6 +104,7 @@ def vf_vmap() -> dict[str, str]:
     }
     for k in (
         "apnd_who",
+        "bg_img",
         "bup_ck",
         "cachectl",
         "casechk",
@@ -114,6 +115,7 @@ def vf_vmap() -> dict[str, str]:
         "dbd",
         "db_xattr",
         "du_who",
+        "theme",
         "epilogues",
         "ufavico",
         "forget_ip",
@@ -307,8 +309,8 @@ flagcats = {
         "db_xattr=user.foo,user.bar": "index file xattrs as media-tags",
     },
     'database, audio tags\n"mte", "mth", "mtp", "mtm" all work the same as -mte, -mth, ...': {
-        "mte=artist,title": "media-tags to index/display",
-        "mth=fmt,res,ac": "media-tags to hide by default",
+        "mte=artist,title": "media-tags/file-columns to index/display",
+        "mth=fmt,res,ac": "media-tags/file-columns to hide by default",
         "mtp=.bpm=f,audio-bpm.py": 'uses the "audio-bpm.py" program to\ngenerate ".bpm" tags from uploads (f = overwrite tags)',
         "mtp=ahash,vhash=media-hash.py": "collects two tags at once",
     },
@@ -350,6 +352,8 @@ flagcats = {
     },
     "client and ux": {
         "grid": "show grid/thumbnails by default",
+        "bg_img": "set a background image",
+        "theme": "set a default theme",
         "gsel": "select files in grid by ctrl-click",
         "sort": "default sort order",
         "nsort": "natural-sort of leading digits in filenames",

@@ -2,6 +2,20 @@
 
 var J_BRW = 1;
 
+import_mjs('baguettebox', 'J_BBX');
+import_mjs('up2k', 'J_U2K');
+
+// disables emojis
+var fun_tgl = sread('fun_tgl');
+if( fun_tgl == null)
+	fun_tgl = window.unfun != 'True';
+else
+	fun_tgl = fun_tgl != 0;
+console.log('fun_tgl: ' + fun_tgl);
+if(!fun_tgl){
+	clmod(document.documentElement, 'unfun', true);
+}
+
 if (window.dgauto === undefined)
 	alert('FATAL ERROR: receiving stale data from the server; this may be due to a broken reverse-proxy (stuck cache). Try restarting copyparty and press CTRL-SHIFT-R in the browser');
 
@@ -12,7 +26,7 @@ if (1)
 		"tt": "English",
 
 		"cols": {
-			"c": "action buttons",
+			"!": "action buttons",
 			"dur": "duration",
 			"q": "quality / bitrate",
 			"Ac": "audio codec",
@@ -21,7 +35,7 @@ if (1)
 			"Ahash": "audio checksum",
 			"Vhash": "video checksum",
 			"Res": "resolution",
-			"T": "filetype",
+			"Ext": "filetype",
 			"aq": "audio quality / bitrate",
 			"vq": "video quality / bitrate",
 			"pixfmt": "subsampling / pixel structure",
@@ -40,7 +54,7 @@ if (1)
 				["G", "toggle list / grid view"],
 				["T", "toggle thumbnails / icons"],
 				["⇧ A/D", "thumbnail size"],
-				["ctrl-K", "delete selected"],
+				["ctrl-K/Del", "delete selected"],
 				["ctrl-X", "cut selection to clipboard"],
 				["ctrl-C", "copy selection to clipboard"],
 				["ctrl-V", "paste (move/copy) here"],
@@ -115,12 +129,16 @@ if (1)
 		"ht_and": " and ",
 
 		"goh": "control-panel",
-		"gop": 'previous sibling">prev',
-		"gou": 'parent folder">up',
-		"gon": 'next folder">next',
+		"gop": 'previous sibling',
+		"gou": 'parent folder',
+		"gon": 'next folder',
 		"logout": "Logout ",
 		"login": "Login",
 		"access": " access",
+		"options": "options",
+		"more_options": "more options",
+		"bup": "basic uploader",
+		"up2k": "up2k",
 		"ot_close": "close submenu",
 		"ot_search": "`search for files by attributes, path / name, music tags, or any combination of those$N$N`foo bar` = must contain both «foo» and «bar»,$N`foo -bar` = must contain «foo» but not «bar»,$N`^yana .opus$` = start with «yana» and be an «opus» file$N`&quot;try unite&quot;` = contain exactly «try unite»$N$Nthe date format is iso-8601, like$N`2009-12-31` or `2020-09-12 23:30:00`",
 		"ot_unpost": "unpost: delete your recent uploads, or abort unfinished ones",
@@ -145,6 +163,7 @@ if (1)
 		"wt_del": "delete selected items$NHotkey: ctrl-K",
 		"wt_cut": "cut selected items &lt;small&gt;(then paste somewhere else)&lt;/small&gt;$NHotkey: ctrl-X",
 		"wt_cpy": "copy selected items to clipboard$N(to paste them somewhere else)$NHotkey: ctrl-C",
+		"wt_sav": "confirm upload location",
 		"wt_pst": "paste a previously cut / copied selection$NHotkey: ctrl-V",
 		"wt_selall": "select all files$NHotkey: ctrl-A (when file focused)",
 		"wt_selinv": "invert selection",
@@ -156,6 +175,7 @@ if (1)
 		"wt_m3ua": "add to m3u playlist (click <code>📻copy</code> later)",
 		"wt_m3uc": "copy m3u playlist to clipboard",
 		"wt_grid": "toggle grid / list view$NHotkey: G",
+		"wt_gallery": "toggle gallery view with larger image previews",
 		"wt_prev": "previous track$NHotkey: J",
 		"wt_play": "play / pause$NHotkey: P",
 		"wt_next": "next track$NHotkey: L",
@@ -165,7 +185,7 @@ if (1)
 		"ut_u2ts": "copy the last-modified timestamp$Nfrom your filesystem to the server\">📅",
 		"ut_ow": "overwrite existing files on the server?$N🛡️: never (will generate a new filename instead)$N🕒: overwrite if server-file is older than yours$N♻️: always overwrite if the files are different$N⏭️: unconditionally skip all existing files",
 		"ut_mt": "continue hashing other files while uploading$N$Nmaybe disable if your CPU or HDD is a bottleneck",
-		"ut_ask": 'ask for confirmation before upload starts">💭',
+		"ut_ask": 'ask for confirmation before upload starts',
 		"ut_pot": "improve upload speed on slow devices$Nby making the UI less complex",
 		"ut_srch": "don't actually upload, instead check if the files already $N exist on the server (will scan all folders you can read)",
 		"ut_par": "pause uploads by setting it to 0$N$Nincrease if your connection is slow / high latency$N$Nkeep it 1 on LAN or if the server HDD is a bottleneck",
@@ -213,12 +233,16 @@ if (1)
 		"u_nav_m": '<h6>aight, what do you have?</h6><code>Enter</code> = Files (one or more)\n<code>ESC</code> = One folder (including subfolders)',
 		"u_nav_b": '<a href="#" id="modal-ok">Files</a><a href="#" id="modal-ng">One folder</a>',
 
-		"cl_opts": "switches",
+		"cl_opts": "general",
 		"cl_hfsz": "filesize",
 		"cl_themes": "theme",
+		"cl_overr_thm": "override server theme. reload the page when turning this off",
+		"cl_accent": "accent color (keep empty for default)$Nsupports any css color, like rgba(255, 210, 0, 1)",
+		"cl_radius": "corner radius in pixels (keep empty for default)",
+		"cl_fun": "enables or disables the FUN (hides most emojis) 🎉🚀👽🐹🥳❗$Nreload the page after changing this setting.",
 		"cl_langs": "language",
 		"cl_ziptype": "folder download",
-		"cl_uopts": "up2k switches",
+		"cl_uopts": "upload",
 		"cl_favico": "favicon",
 		"cl_bigdir": "big dirs",
 		"cl_hsort": "#sort",
@@ -233,9 +257,10 @@ if (1)
 
 		"ct_grid": '田 the grid',
 		"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
-		"ct_thumb": 'in grid-view, toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
+		"ct_thumb": 'toggle icons or thumbnails$NHotkey: T">🖼️ thumbs',
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
 		"ct_dsel": 'use drag-selection in grid-view">dsel',
+		"ct_den": 'use dragging to move files into other folders">mvd',
 		"ct_dl": 'force download (don\'t display inline) when a file is clicked">dl',
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
@@ -246,6 +271,7 @@ if (1)
 		"ct_readme": 'show README.md in folder listings">📜 readme',
 		"ct_idxh": 'show index.html instead of folder listing">htm',
 		"ct_sbars": 'show scrollbars">⟊',
+		"ct_enbg": 'en-/disable custom backgrounds',
 
 		"cut_umod": "if a file already exists on the server, update the server's last-modified timestamp to match your local file (requires write+delete permissions)\">re📅",
 
@@ -296,10 +322,11 @@ if (1)
 		"ml_drc": "dynamic range compressor",
 		"ml_ss": "skip silence",
 
-		"mt_loop": "loop/repeat one song\">🔁",
+		"mt_loop": "loop/repeat one song",
 		"mt_one": "stop after one song\">1️⃣",
-		"mt_shuf": "shuffle the songs in each folder\">🔀",
+		"mt_shuf": "shuffle the songs in each folder",
 		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
+		"mt_afade": "fade in / out when pausing / unpausing audio\">fade",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
 		"mt_prescan": "go to the next folder before the last song$Nends, keeping the webbrowser happy$Nso it doesn't stop the playback\">nav",
 		"mt_fullpre": "try to preload the entire song;$N✅ enable on <b>unreliable</b> connections,$N❌ <b>disable</b> on slow connections probably\">full",
@@ -313,8 +340,8 @@ if (1)
 		"mt_follow": "keep the playing track scrolled into view\">🎯",
 		"mt_compact": "compact controls\">⟎",
 		"mt_uncache": "clear cache &nbsp;(try this if your browser cached$Na broken copy of a song so it refuses to play)\">uncache",
-		"mt_mloop": "loop the open folder\">🔁 loop",
-		"mt_mnext": "load the next folder and continue\">📂 next",
+		"mt_mloop": "loop the open folder",
+		"mt_mnext": "load the next folder and continue",
 		"mt_mstop": "stop playback\">⏸ stop",
 		"mt_cflac": "convert flac / wav to {0}\">flac",
 		"mt_caac": "convert aac / m4a to {0}\">aac",
@@ -382,6 +409,7 @@ if (1)
 		"fd_eperm": 'cannot delete:\nyou do not have “delete” permission in this folder',
 		"fc_eperm": 'cannot cut:\nyou do not have “move” permission in this folder',
 		"fp_eperm": 'cannot paste:\nyou do not have “write” permission in this folder',
+		"fp_esrch": 'cannot paste:\npasting disabled in search results',
 		"fr_emore": "select at least one item to rename",
 		"fd_emore": "select at least one item to delete",
 		"fc_emore": "select at least one item to cut",
@@ -491,6 +519,7 @@ if (1)
 		"gt_vau": "don't show videos, just play the audio\">🎧",
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
 		"gt_crop": "center-crop thumbnails\">crop",
+		"gt_upscale": "scale up small image previews to fit",
 		"gt_3x": "hi-res thumbnails\">3x",
 		"gt_zoom": "zoom",
 		"gt_chop": "chop",
@@ -503,7 +532,7 @@ if (1)
 		"gt_c2": "truncate filenames less (show more)",
 
 		"sm_w8": "searching...",
-		"sm_prev": "search results below are from a previous query:\n  ",
+		"sm_prev": "search results below are from a previous query:  ",
 		"sl_close": "close search results",
 		"sl_hits": "showing {0} hits",
 		"sl_moar": "load more",
@@ -525,6 +554,8 @@ if (1)
 		"s_f1": "name contains &nbsp; (negate with -nope)",
 		"s_t1": "tags contains &nbsp; (^=start, end=$)",
 		"s_a1": "specific metadata properties",
+		"s_dir": "search this folder",
+		"s_rec": "include subfolders",
 
 		"md_eshow": "cannot render ",
 		"md_off": "[📜<em>readme</em>] disabled in [⚙️] -- document hidden",
@@ -799,57 +830,188 @@ if (!Ls[lang])
 modal.load();
 
 
-// toolbar
-ebi('ops').innerHTML = (
-	'<a href="#" id="opa_x" data-dest="" tt="' + L.ot_close + '">--</a>' +
-	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
-	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
-	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
-	'<a href="#" id="opa_bup" data-perm="write" data-dest="bup" tt="' + L.ot_bup + '">🎈</a>' +
-	'<a href="#" id="opa_mkd" data-perm="write" data-dest="mkdir" tt="' + L.ot_mkdir + '">📂</a>' +
-	'<a href="#" id="opa_md" data-perm="read write" data-dest="new_md" tt="' + L.ot_md + '">📝</a>' +
-	'<a href="#" id="opa_msg" data-dest="msg" tt="' + L.ot_msg + '">📟</a>' +
-	'<a href="#" id="opa_auc" data-dest="player" tt="' + L.ot_mp + '">🎺</a>' +
-	'<a href="#" id="opa_cfg" data-dest="cfg" tt="' + L.ot_cfg + '">⚙️</a>' +
-	(IE ? '<span id="noie">' + L.ot_noie + '</span>' : '') +
-	'<div id="opdesc"></div>'
-);
+var opa = QSA('#ops>a, #wfp>a')
+for(var i = 0; i <opa.length; i++)
+	get_tt(opa[i])
 
+function get_tt(el) {
+	var tlid = 'tt_' + el.id
+	if(!L[tlid] && el.getAttribute('data-dest'))
+		tlid = 'ot_' + el.getAttribute('data-dest')
+	if(!L[tlid])
+		tlid = el.id
+	if(L[tlid])
+		el.setAttribute('tt', L[tlid])
+}
+if(!have_del)
+	ebi('opa_del').style.display = 'none'
+
+if(!fun_tgl){
+	ebi('opa_srch').innerHTML = 'search'
+	ebi('opa_del').innerHTML = 'undo'
+	ebi('opa_up').innerHTML = 'upload'
+	ebi('opa_bup').innerHTML = 'bup'
+	ebi('opa_msg').innerHTML = 'message'
+	ebi('opa_cfg').innerHTML = 'settings'
+	ebi('acc_pfp').innerHTML = 'account'
+}
+else if(!EMOJI){
+	ebi('opa_srch').innerHTML = 's?'
+	ebi('opa_del').innerHTML = 'un'
+	ebi('opa_up').innerHTML = 'u▲'
+	ebi('opa_bup').innerHTML = 'b▲'
+	ebi('opa_msg').innerHTML = 'msg'
+	ebi('opa_cfg').innerHTML = '★'
+	ebi('acc_pfp').innerHTML = 'acc'
+}
+
+// mkdir + md
+function mktemp(is_dir) {
+	if(!has(perms, 'read')){
+		if(is_dir)
+			goto('mkdir');
+		else
+			goto('new_md');
+	}
+	qsr('#rcm_tmp');
+	if (!thegrid.en) {
+		var row = mknod('tr', 'rcm_tmp',
+			'<td>-new-</td><td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></td>');
+		QS("#files tbody").appendChild(row);
+	}
+	else {
+		var row = mknod('a', 'rcm_tmp',
+			'<span class="dir" style="align-self:end"><input id="tempname" class="dir" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></span>');
+		if (is_dir)
+			row.className = 'dir';
+		row.style.display = 'flex';
+		QS("#ggrid").appendChild(row);
+	}
+
+	function sendit(name) {
+		name = ('' + name).trim();
+		if (!name)
+			return;
+		var data = new FormData();
+		data.append("act", is_dir ? "mkdir" : "new_md");
+		data.append("name", name);
+
+		var req = new XHR();
+		req.open("POST", get_evpath());
+		req.onload = req.onerror = function() {
+			if (req.status == 405 || req.status == 500)
+				return toast.err(3, "a " + (is_dir ? "folder" : "file") + " with that name already exists.");
+			if (req.status < 200 || req.status > 399)
+				return toast.err(3, "couldn't create " + (is_dir ? "folder" : "file") + ": <br><code>" + esc(req.responseText) + '</code>');
+			treectl.goto();
+		};
+		req.send(data);
+	}
+
+	var input = ebi("tempname");
+	input.onblur = function() {
+		sendit(input.value);
+		// Chrome blurs elements when calling remove for some reason
+		input.onblur = null;
+		if(row.remove)
+			row.remove();
+		else
+			row.style.display = 'none';
+	};
+	input.onkeydown = function(e) {
+		if (e.key == "Enter")
+			sendit(input.value);
+		if (e.key == "Enter" || e.key == "Escape") {
+			input.onblur = null;
+			if(row.remove)
+				row.remove();
+			else
+				row.style.display = 'none';
+			ev(e);
+		}
+	};
+	input.focus();
+}
 
 // media player
+
+// svg from https://www.svgrepo.com/collection/iconcino-interface-icons/8
+var svg_box = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+var svg_options = 'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+var svg_prev = svg_box + '<path d="M8 6V18M11.4761 12.7809L16.3753 16.7002C17.0301 17.2241 18 16.7579 18 15.9194V8.08062C18 7.24212 17.0301 6.77595 16.3753 7.29976L11.4761 11.2191C10.9757 11.6195 10.9757 12.3805 11.4761 12.7809Z" ' + svg_options + '/></svg>';
+var svg_next = svg_box + '<path d="M17 6V18M13.5239 12.7809L8.6247 16.7002C7.96993 17.2241 7 16.7579 7 15.9194V8.08062C7 7.24212 7.96993 6.77595 8.6247 7.29976L13.5239 11.2191C14.0243 11.6195 14.0243 12.3805 13.5239 12.7809Z" ' + svg_options + '/></svg>';
+var svg_play = svg_box + '<path fill-rule="evenodd" clip-rule="evenodd" d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" ' + svg_options + '/><path fill-rule="evenodd" clip-rule="evenodd" d="M10.4706 8.78431C9.80448 8.42906 9 8.91175 9 9.66667V14.3333C9 15.0883 9.80448 15.5709 10.4706 15.2157L15.6728 12.4412C16.0257 12.2529 16.0257 11.7471 15.6728 11.5588L10.4706 8.78431Z" ' + svg_options + '/></svg>'
+var svg_pause = svg_box + '<path d="M10 9V15M14 9V15M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z" ' + svg_options + '/></svg>'
+var svg_vol = svg_box + '<path d="M16.0004 9.00009C16.6281 9.83575 17 10.8745 17 12.0001C17 13.1257 16.6281 14.1644 16.0004 15.0001M18 5.29177C19.8412 6.93973 21 9.33459 21 12.0001C21 14.6656 19.8412 17.0604 18 18.7084M4.6 9.00009H5.5012C6.05213 9.00009 6.32759 9.00009 6.58285 8.93141C6.80903 8.87056 7.02275 8.77046 7.21429 8.63566C7.43047 8.48353 7.60681 8.27191 7.95951 7.84868L10.5854 4.69758C11.0211 4.17476 11.2389 3.91335 11.4292 3.88614C11.594 3.86258 11.7597 3.92258 11.8712 4.04617C12 4.18889 12 4.52917 12 5.20973V18.7904C12 19.471 12 19.8113 11.8712 19.954C11.7597 20.0776 11.594 20.1376 11.4292 20.114C11.239 20.0868 11.0211 19.8254 10.5854 19.3026L7.95951 16.1515C7.60681 15.7283 7.43047 15.5166 7.21429 15.3645C7.02275 15.2297 6.80903 15.1296 6.58285 15.0688C6.32759 15.0001 6.05213 15.0001 5.5012 15.0001H4.6C4.03995 15.0001 3.75992 15.0001 3.54601 14.8911C3.35785 14.7952 3.20487 14.6422 3.10899 14.4541C3 14.2402 3 13.9601 3 13.4001V10.6001C3 10.04 3 9.76001 3.10899 9.54609C3.20487 9.35793 3.35785 9.20495 3.54601 9.10908C3.75992 9.00009 4.03995 9.00009 4.6 9.00009Z" ' + svg_options + '/></svg>'
+var svg_dlzip = svg_box + '<path style="fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:butt;stroke-linejoin:round" d="M 9.3594717,18.427162 H 5.2685174 A 1.461412,1.461412 0 0 1 3.8071053,16.96575 V 4.2658445 A 1.3894971,1.3894971 0 0 1 5.1966025,2.8763474 h 4.9079295 l 2.640559,2.7481735 h 7.599855 A 1.3638132,1.3638132 0 0 1 21.70876,6.9883341 V 17.109258 a 1.2976047,1.2976047 0 0 1 -1.292207,1.297595 l -4.882326,0.02031" /> <path style="stroke:currentColor;stroke-width:3.78;stroke-linecap:butt" d="m 12.434773,17.545979 v 3.876985"  /> <path style="fill:currentColor" d="m 12.400955,23.183771 6.171837,-2.663485 -12.3007157,0 z" /></svg>'
+
 ebi('widget').innerHTML = (
-	'<div id="wtoggle">' +
-	'<span id="wfs"></span>' +
-	'<span id="wfm"><a' +
-	' href="#" id="fshr" tt="' + L.wt_shr + '">📨<span>share</span></a><a' +
-	' href="#" id="fren" tt="' + L.wt_ren + '">✎<span>name</span></a><a' +
-	' href="#" id="fdel" tt="' + L.wt_del + '">⌫<span>del.</span></a><a' +
-	' href="#" id="fcut" tt="' + L.wt_cut + '">✂<span>cut</span></a><a' +
-	' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
-	' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
-	'</span><span id="wzip1"><a' +
-	' href="#" id="zip1" tt="' + L.wt_zip1 + '">📦<span>zip</span></a>' +
-	'</span><span id="wzip"><a' +
-	' href="#" id="selall" tt="' + L.wt_selall + '">sel.<br />all</a><a' +
-	' href="#" id="selinv" tt="' + L.wt_selinv + '">sel.<br />inv.</a><a' +
-	' href="#" id="selzip" class="l1" tt="' + L.wt_selzip + '">zip</a><a' +
-	' href="#" id="seldl" class="l1" tt="' + L.wt_seldl + '">dl</a>' +
-	'</span><span id="wnp"><a' +
-	' href="#" id="npirc" tt="' + L.wt_npirc + '">📋<span>irc</span></a><a' +
-	' href="#" id="nptxt" tt="' + L.wt_nptxt + '">📋<span>txt</span></a>' +
-	'</span><span id="wm3u"><a' +
-	' href="#" id="m3ua" tt="' + L.wt_m3ua + '">📻<span>add</span></a><a' +
-	' href="#" id="m3uc" tt="' + L.wt_m3uc + '">📻<span>copy</span></a>' +
-	'</span><a' +
-	'	href="#" id="wtgrid" tt="' + L.wt_grid + '">田</a><a' +
-	'	href="#" id="wtico">♫</a>' +
+	'<div id="wstack">' +
+
+		'<div id="wtoggle">' +
+		'<span id="wfs"></span>' +
+			'<span id="wfm"><a' +
+				' href="#" id="fclr"><span class="x">×</span><span>cancel</span></a><a' +
+				' href="#" id="fshr" tt="' + L.wt_shr + '">📨<span>share</span></a><a' +
+				' href="#" id="fcpl" tt="' + L.rc_cpl + '">🔗<span>link</span></a><a' +
+				' href="#" id="fren" tt="' + L.wt_ren + '">' + (fun_tgl ? '✏️' : '✎') + '<span>name</span></a><a' +
+				' href="#" id="fdel" tt="' + L.wt_del + '">🗑️<span>del.</span></a><a' +
+				' href="#" id="fcut" tt="' + L.wt_cut + '">' + (fun_tgl ? '✂️' : '✂') + '<span>cut</span></a><a' +
+				' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
+				' href="#" id="fsav" tt="' + L.wt_sav + '">💾<span>save</span></a><a' +
+				' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
+			'</span><span id="wzip1"><a' +
+				' href="#" id="zip1" tt="' + L.wt_zip1 + '">' + svg_dlzip + '<span>zip</span></a>' +
+			'</span><span id="wzip"><a' +
+				' href="#" id="selall" tt="' + L.wt_selall + '">' + (fun_tgl ? '✅<br/>sel. ' : 'sel.<br/>') + 'all</a><a' +
+				' href="#" id="selinv" tt="' + L.wt_selinv + '">' + (fun_tgl ? '🔛<br/>sel. ' : 'sel.<br/>') + 'inv.</a><a' +
+	' href="#" id="selzip" class="l1" tt="' + L.wt_selzip + '">' + (fun_tgl ? '📦<br/>' : '') + 'zip</a><a' +
+				' href="#" id="seldl" class="l1" tt="' + L.wt_seldl + '">' + (fun_tgl ? '⬇️<br/>' : '') + 'files</a>' +
+			'</span><span id="wnp"><a' +
+				' href="#" id="npirc" tt="' + L.wt_npirc + '">📋<span>irc</span></a><a' +
+				' href="#" id="nptxt" tt="' + L.wt_nptxt + '">📋<span>txt</span></a>' +
+			'</span><span id="wm3u"><a' +
+				' href="#" id="m3ua" tt="' + L.wt_m3ua + '">📻<span>add</span></a><a' +
+				' href="#" id="m3uc" tt="' + L.wt_m3uc + '">📻<span>copy</span></a>' +
+			'</span>' +
+		'</div>' +
+
+		'<div id="up_quick">' +
+		'	<div id="up_quick_more">' +
+		'		<a id="uq_nd">' + L.rc_nfo + ' <span><p class="overlay_plus">+</p>📂</span></a>\n' +
+		'		<a id="uq_nf">' + L.rc_nfi + ' <span><p class="overlay_plus">+</p>📝</span></a>\n' +
+		'		<a id="uq_up">' + L.cl_uopts + ' <span>🚀<span></a>\n' +
+		'	</div>' +
+		'	<a id="up_quick_btn" class="tgl btn on"><div class="rotatable">+</div></a>' +
+		'</div>' +
+
+		'<a href="#" id="wtico">' + (EMOJI ? '♫' : '♪') + '</a>' +
+
 	'</div>' +
+
 	'<div id="widgeti">' +
-	'	<div id="pctl"><a href="#" id="bprev" tt="' + L.wt_prev + '">⏮</a><a href="#" id="bplay" tt="' + L.wt_play + '">▶</a><a href="#" id="bnext" tt="' + L.wt_next + '">⏭</a></div>' +
-	'	<canvas id="pvol" width="288" height="38"></canvas>' +
-	'	<canvas id="barpos"></canvas>' +
-	'	<canvas id="barbuf"></canvas>' +
-	'</div>' +
+	'	<div id="pbarthinpos"></div>' +
+	'	<div id="pctl" class="pctl">' +
+	'		<a href="#" id="bprev" class="icon btn on" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
+	'		<a href="#" id="bplay" class="icon btn on" tt="' + L.wt_play + '">' + svg_play + '</a>' +
+	'		<a href="#" id="bnext" class="icon btn on" tt="' + L.wt_next + '">' + svg_next + '</a>' +
+	'		<a id="trackname" href="#h_music"></a>' +
+	'		<div id="progbar" style="position: relative; height: 80%;">' +
+	'			<canvas id="barbuf"></canvas>' +
+	'			<canvas id="barpos"></canvas>' +
+	'		</div>' +
+	'		<div id="altprogbar" class="vis">' +
+	'			<span id="txtpos">0:00</span>' +
+	'			<input type="range" min="0" max="1" step="0.001" value="0" id="sliderpos"></input>' +
+	'			<span id="txtsongend"/>0:00</span>' +
+	'		</div>' +
+	'		<div id="au_tgls" style="display: contents;">' +
+	'			<a class="tgl btn" tabindex="0" id="cyclebtn_loopmode" tt="' + L.mt_loop + '$N' + L.mt_mloop + '$N' + L.mt_mnext + '">🔁</a>' +
+	'			<a class="tgl btn" tabindex="0" id="au_shuf" tt="' + L.mt_shuf + '">🔀</a>' +
+	'		</div>' +
+	'		<div id="pvolbg" tabindex="0">' + svg_vol + '<canvas id="pvol"></canvas></div>' +
+	'	</div>' +
+	'</div>'+
 	'<div id="np_inf">' +
 	'	<img id="np_img" />' +
 	'	<span id="np_url"></span>' +
@@ -863,45 +1025,39 @@ ebi('widget').innerHTML = (
 	'</div>'
 );
 
+ebi('mu_pbc').innerHTML = (
+	'<a href="#" id="bprev2" class="icon btn on" tt="' + L.wt_prev + '">' + svg_prev + '</a>' +
+	'<a href="#" id="bplay2" class="icon btn on" tt="' + L.wt_play + '">' + svg_play + '</a>' +
+	'<a href="#" id="bnext2" class="icon btn on" tt="' + L.wt_next + '">' + svg_next + '</a>'
+);
+
+ebi('wtoggle').addEventListener('wheel', function (e) {
+	scroll_v_to_h(e, this);
+});
+
+ebi('up_quick').onclick = function(){
+	if(!has(perms, 'write'))
+		return;
+	var btn = ebi('up_quick_btn');
+	clmod(btn, 'on', 't');
+	var isOff = clgot(btn, 'on'); // button has inverted display logic
+	clmod(ebi('up_quick_more'), 'vis', !isOff)
+	clmod(ebi('up_quick'), 'open', !isOff)
+}
+ebi('uq_nd').onclick = function(){
+	mktemp(true);
+};
+ebi('uq_nf').onclick = function(){
+	mktemp();
+};
+
 
 // up2k ui
+ebi('h_up2k').innerHTML = (fun_tgl ? '🚀 ' : '') + L.cl_uopts;
 ebi('op_up2k').innerHTML = (
 	'<form id="u2form" method="post" enctype="multipart/form-data"></form>\n' +
 
-	'<table id="u2conf">\n' +
-	'	<tr>\n' +
-	'		<td class="c" data-perm="read"><br />' + L.ul_par + '</td>\n' +
-	'		<td class="c" rowspan="2">\n' +
-	'			<input type="checkbox" id="multitask" />\n' +
-	'			<label for="multitask" tt="' + L.ut_mt + '">🏃</label>\n' +
-	'		</td>\n' +
-	'		<td class="c" rowspan="2">\n' +
-	'			<input type="checkbox" id="potato" />\n' +
-	'			<label for="potato" tt="' + L.ut_pot + '">🥔</label>\n' +
-	'		</td>\n' +
-	'		<td class="c" rowspan="2">\n' +
-	'			<input type="checkbox" id="u2rand" />\n' +
-	'			<label for="u2rand" tt="' + L.ut_rand + '">🎲</label>\n' +
-	'		</td>\n' +
-	'		<td class="c" rowspan="2">\n' +
-	'			<input type="checkbox" id="u2ow" />\n' +
-	'			<label for="u2ow" tt="' + L.ut_ow + '">?</a>\n' +
-	'		</td>\n' +
-	'		<td class="c" data-perm="read" data-dep="idx" rowspan="2">\n' +
-	'			<input type="checkbox" id="fsearch" />\n' +
-	'			<label for="fsearch" tt="' + L.ut_srch + '">🔎</label>\n' +
-	'		</td>\n' +
-	'		<td data-perm="read" rowspan="2" id="u2btn_cw"></td>\n' +
-	'		<td data-perm="read" rowspan="2" id="u2c3w"></td>\n' +
-	'	</tr>\n' +
-	'	<tr>\n' +
-	'		<td class="c" data-perm="read">\n' +
-	'			<a href="#" class="b" id="nthread_sub">&ndash;</a><input\n' +
-	'				class="txtbox" id="nthread" value="" tt="' + L.ut_par + '"/><a\n' +
-	'				href="#" class="b" id="nthread_add">+</a><br />&nbsp;\n' +
-	'		</td>\n' +
-	'	</tr>\n' +
-	'</table>\n' +
+	'	<div data-perm="read" rowspan="2" id="u2c3w"></div>\n' +
 
 	'<div id="u2notbtn"></div>\n' +
 
@@ -911,24 +1067,41 @@ ebi('op_up2k').innerHTML = (
 	'	</div>\n' +
 	'</div>\n' +
 
+	'	<div id="up2k_qs">' +
+	'		<label tabindex="0" for="fsearch" id="fsearch_copy" class="tgl btn" tt="' + L.ut_srch +'">🔎</label>\n' +
+	'		<label tabindex="0" for="u2ow" id="u2ow_copy" class="tgl btn on" tt="' + L.ut_ow +'"></label>\n' +
+	'		<label tabindex="0" for="u2rand" id="u2rand_copy" class="tgl btn" tt="' + L.ut_rand +'">🎲</label>\n' +
+	'		<label tabindex="0" for="multitask" id="multitask_copy" class="tgl btn" tt="' + L.ut_mt +'">🏃</label>\n' +
+	'		<a id="up_moreopts" class="btn" href="#h_up2kcfg">↗️ ' + L.more_options + '</a>\n' +
+	'	</div>\n' +
+
 	'<div id="u2c3t">\n' +
 
-	'<div id="u2etaw"><div id="u2etas"><div class="o">\n' +
+	'	<div id="u2etaw">' +
+	'		<div id="u2etas">' +
+	'			<div class="o">\n' +
 	L.ul_hash + ': <span id="u2etah" tt="' + L.ut_etah + '">(' + L.ul_idle1 + ')</span><br />\n' +
 	L.ul_send + ': <span id="u2etau" tt="' + L.ut_etau + '">(' + L.ul_idle1 + ')</span><br />\n' +
-	'	</div><span class="o">' +
+	'			</div><span class="o">' +
 	L.ul_done + ': </span><span id="u2etat" tt="' + L.ut_etat + '">(' + L.ul_idle1 + ')</span>\n' +
-	'</div></div>\n' +
+	'		</div>' +
+	'	</div>' +
+	'</div>' +
 
-	'<div id="u2cards">\n' +
+	'<details id="bup_tgl" href="#v=bup" data-dest="bup" data-perm="write" tt="' + L.ot_bup + '"><summary id="h_bup">' + (IE ? '>> ' : '') + L.bup + (IE ? ' <<' : '') + '</summary></details>'
+);
+
+ebi('up_info').innerHTML = (
+	'<h3 id="up_status_h">' + L.utl_stat + '</h3>' +
+
+	'</div>\n<div id="u2cards">\n' +
 	'	<a href="#" act="ok" tt="' + L.uct_ok + '">ok <span>0</span></a><a\n' +
 	'	href="#" act="ng" tt="' + L.uct_ng + '">ng <span>0</span></a><a\n' +
 	'	href="#" act="done" tt="' + L.uct_done + '">done <span>0</span></a><a\n' +
 	'	href="#" act="bz" tt="' + L.uct_bz + '" class="act">busy <span>0</span></a><a\n' +
 	'	href="#" act="q" tt="' + L.uct_q + '">que <span>0</span></a>\n' +
-	'</div>\n' +
-
-	'</div>\n' +
+	//'	href="#" style="pointer-events: none; width: 90%; display: inline-block; font-size: 1.1em;"><span style="opacity: 0">_</span></a>\n' +
+	'</div>\n</div>\n' +
 
 	'<div id="u2tabw" class="na"><table id="u2tab">\n' +
 	'	<thead>\n' +
@@ -949,6 +1122,30 @@ ebi('u2form').onsubmit = function () {
 	return false;
 };
 
+ebi('h_up2k').onclick = function(){
+	ebi('up_info').scrollTop =
+	ebi('op_up2k').scrollTop =
+	ebi('up_hor').scrollTop =
+	ebi('up_content').scrollTop =
+		0;
+}
+
+ebi('cl_up').onclick =
+ebi('up_outside').onclick =
+	function () {
+		hist_push('#')
+		modaltoggle('up2k', false);
+	}
+
+var up2k_lgcy = false;
+ebi('reloc_up').onclick = function(){
+	up2k_lgcy = !up2k_lgcy;
+	this.innerHTML = up2k_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+	clmod(ebi('up2k'), 'unmodal', up2k_lgcy);
+	swrite('up2k_lgcy', up2k_lgcy);
+}
+if(sread('up2k_lgcy') == 'true')
+	ebi('reloc_up').click();
 
 ebi('wrap').insertBefore(mknod('div', 'lazy'), ebi('epi'));
 
@@ -956,13 +1153,27 @@ var x = ebi('bbsw');
 x.parentNode.insertBefore(mknod('div', null,
 	'<input type="checkbox" id="uput" name="uput"><label for="uput">' + L.u_uput + '</label>'), x);
 
+var bup = ebi('op_bup');
+ebi('bup_tgl').appendChild(bup);
+ebi('h_bup').onclick = function() {
+	var open = !clgot(bup, 'act');
+	if(open){
+		location.hash = '#h_bup';
+		modaltoggle('bup', true);
+	}
+	else{
+		location.hash = '#h_up2k';
+		modaltoggle('up2k', true);
+	}
+	ebi('bup_tgl').open = !open;
+};
 
 (function () {
 	var o = mknod('div');
 	o.innerHTML = (
-		'<div id="drops">\n' +
-		'	<div class="dropdesc" id="up_zd"><div>🚀 ' + L.udt_up + '<br /><span></span><div>🚀<b>' + L.udt_up + '</b></div><div><b>' + L.udt_up + '</b>🚀</div></div></div>\n' +
-		'	<div class="dropdesc" id="srch_zd"><div>🔎 ' + L.udt_srch + '<br /><span></span><div>🔎<b>' + L.udt_srch + '</b></div><div><b>' + L.udt_srch + '</b>🔎</div></div></div>\n' +
+		'<div id="drops" class="modal">\n' +
+		'	<div class="dropdesc" id="up_zd"><div>🚀 ' + L.udt_up + '<br /><span></span></div></div>\n' +
+		'	<div class="dropdesc" id="srch_zd"><div>🔎 ' + L.udt_srch + '<br /><span></span></div></div>\n' +
 		'	<div class="dropzone" id="up_dz" v="up_zd"></div>\n' +
 		'	<div class="dropzone" id="srch_dz" v="srch_zd"></div>\n' +
 		'</div>'
@@ -970,38 +1181,97 @@ x.parentNode.insertBefore(mknod('div', null,
 	document.body.appendChild(o);
 })();
 
-
 // config panel
+
+var musicSettings = (
+	'<div class="sub_section"><h3 id="h_mp">🎵 ' + L.ot_mp + '</h3></div>' +
+
+	'<div class="sub"><h3 id="h_mpopts">🎧 ' + L.cl_opts + '</h3><div>' +
+	'<a class="tgl btn" id="au_loop" tt="' + L.mt_loop + '">🔂</a>' +
+	'<a class="tgl btn" id="au_shuf2" tt="' + L.mt_shuf + '">🔀</a>' +
+	'<a class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
+	'<a class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
+	'<a class="tgl btn" id="au_afade" tt="' + L.mt_afade + '</a>' +
+	'<a class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
+	'<a class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
+	'<a class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
+	'<a class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
+	'<a class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
+	'<a class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
+	'<a class="tgl btn" id="au_m3u_c" tt="' + L.mt_m3u_c + '</a>' +
+	'<a class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
+	'<a class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
+	'<a class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
+	'<a class="tgl btn" id="au_follow" tt="' + L.mt_follow + '</a>' +
+	'<a class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
+	'</div></div>' +
+
+	'<div class="sub"><h3 id="h_cmds">▶️ ' + L.ml_btns + '</h3><div>' +
+	'<a class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
+	'</div></div>' +
+
+	'<div class="sub"><h3 id="h_pbmode">📁 ' + L.ml_pmode + '</h3><div id="pb_mode">' +
+	'<a class="tgl btn" m="loop" tt="' + L.mt_mloop + '">🔁</a>' +
+	'<a class="tgl btn" m="next" tt="' + L.mt_mnext + '">📂⏭️</a>' +
+	'<a class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
+	'</div></div>' +
+
+	(have_acode ? (
+		'<div class="sub"><h3 id="h_transfrom">🏹 ' + L.ml_tcode + '</h3><div>' +
+		'<a id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
+		'<a id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
+		'<a id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
+		'</div></div>' +
+		'<div class="sub"><h3 id="h_transto">🎯 ' + L.ml_tcode2 + '</h3><div>' +
+		'<a id="ac2opus" class="tgl btn" tt="' + L.mt_c2opus + '</a>' +
+		'<a id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
+		'<a id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
+		'<a id="ac2mp3" class="tgl btn" tt="' + L.mt_c2mp3 + '</a>' +
+		'<a id="ac2flac" class="tgl btn" tt="' + L.mt_c2flac + '</a>' +
+		'<a id="ac2wav" class="tgl btn" tt="' + L.mt_c2wav + '</a>' +
+		'</div></div>'
+	) : '') +
+
+	'<div class="sub"><h3 id="h_tint">🕶️ ' + L.ml_tint + '</h3><div>' +
+	'<input type="text" id="pb_tint" value="0" ' + NOAC + ' style="width:2.4em" tt="' + L.mt_tint + '" />' +
+	'</div></div>' +
+
+	'<div class="sub"><h3 id="h_drc">🐘 ' + L.ml_drc + '</h3><div><div id="audio_drc"></div></div></div>' +
+	'<div class="sub"><h3 id="h_eq">📊 ' + L.ml_eq + '</h3><div><div id="audio_eq"></div></div></div>' +
+	'<div class="sub"><h3 id="h_silence">🔇 ' + L.ml_ss + '</h3><div><div id="audio_ss"></div></div></div>' +
+	'');
+
 ebi('op_cfg').innerHTML = (
 	'<div>\n' +
-	'	<h3>' + L.cl_opts + '</h3>\n' +
+	'	<h3 id="h_general">✅ ' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="tooltips" class="tgl btn" href="#" tt="' + L.ct_ttips + '</a>\n' +
-	'		<a id="griden" class="tgl btn" href="#" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
-	'		<a id="thumbs" class="tgl btn" href="#" tt="' + L.ct_thumb + '</a>\n' +
-	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '</a>\n' +
-	'		<a id="dsel" class="tgl btn" href="#" tt="' + L.ct_dsel + '</a>\n' +
-	'		<a id="dlni" class="tgl btn" href="#" tt="' + L.ct_dl + '</a>\n' +
-	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '</a>\n' +
-	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '</a>\n' +
-	'		<a id="qdel" class="tgl btn" href="#" tt="' + L.ct_qdel + '</a>\n' +
-	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '</a>\n' +
-	'		<a id="nsort" class="tgl btn" href="#" tt="' + L.ct_nsort + '</a>\n' +
-	'		<a id="utctid" class="tgl btn" href="#" tt="' + L.ct_utc + '</a>\n' +
-	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '</a>\n' +
-	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '</a>\n' +
-	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '</a>\n' +
+	'		<a id="tooltips" class="tgl btn" tt="' + L.ct_ttips + '</a>\n' +
+	'		<a id="thumbs" class="tgl btn" tt="' + L.ct_thumb + '</a>\n' +
+	'		<a id="griden" class="tgl btn" tt="' + L.wt_grid + '">' + L.ct_grid + '</a>\n' +
+	'		<a id="csel" class="tgl btn" tt="' + L.ct_csel + '</a>\n' +
+	'		<a id="dsel" class="tgl btn" tt="' + L.ct_dsel + '</a>\n' +
+	'		<a id="den" class="tgl btn" tt="' + L.ct_den + '</a>\n' +
+	'		<a id="dlni" class="tgl btn" tt="' + L.ct_dl + '</a>\n' +
+	'		<a id="ihop" class="tgl btn" tt="' + L.ct_ihop + '</a>\n' +
+	'		<a id="dotfiles" class="tgl btn" tt="' + L.ct_dots + '</a>\n' +
+	'		<a id="qdel" class="tgl btn" tt="' + L.ct_qdel + '</a>\n' +
+	'		<a id="dir1st" class="tgl btn" tt="' + L.ct_dir1st + '</a>\n' +
+	'		<a id="nsort" class="tgl btn" tt="' + L.ct_nsort + '</a>\n' +
+	'		<a id="utctid" class="tgl btn" tt="' + L.ct_utc + '</a>\n' +
+	'		<a id="ireadme" class="tgl btn" tt="' + L.ct_readme + '</a>\n' +
+	'		<a id="idxh" class="tgl btn" tt="' + L.ct_idxh + '</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
+	'<div><h3 id="h_mouse">🖱️ ' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" tt="' + L.cdt_rdb + '</a></div></div>' +
 	'<div>\n' +
-	'	<h3>' + L.cl_gauto + '</h3>\n' +
+	'	<h3 id="h_gauto">🅰️ ' + L.cl_gauto + '</h3>\n' +
 	'	<div>\n' +
-	'		<a id="gauto" class="tgl btn" href="#" tt="' + L.tt_gauto + '">' + L.enable + '</a>\n' +
+	'		<a id="gauto" class="tgl btn" tt="' + L.tt_gauto + '">' + L.enable + '</a>\n' +
 	'		<input type="text" id="ga_thresh" value="" ' + NOAC + ' style="width:1.5em" tt="' + L.tt_gathr + '" />' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_hfsz + '</h3>\n' +
+	'	<h3 id="h_filesize">🔢 ' + L.cl_hfsz + '</h3>\n' +
 	'	<div><select id="fszfmt">\n' +
 	'		<option value="0">0 ┃ 2345678</option>\n' +
 	'		<option value="1">1 ┃ 2 345 678</option>\n' +
@@ -1021,117 +1291,272 @@ ebi('op_cfg').innerHTML = (
 	'	</select></div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_themes + '</h3>\n' +
-	'	<div><select id="themes"></select></div>\n' +
+	'	<h3 id="h_theme">🎨 ' + L.cl_themes + '</h3>\n' +
+	'	<div>' +
+	'		<div id="thmdiv" tt="' + L.cl_overr_thm +'">' +
+	'			<a id="override_thm" class="tgl btn">override</a>\n' +
+	'			<select id="themes"></select>' +
+	'		</div>' +
+	'		<div id="colordiv" tt="' + L.cl_accent +'">' +
+	'			<input type="text" id="accent" placeholder="#color"></input>' +
+	'			<input type="color" id="accent_picker"></input>' +
+	'		</div>' +
+	'		<input tt="' + L.cl_radius +'" type="number" id="radius" min="-1" placeholder="[0-inf]"></input>' +
+	'		<a id="fun_tgl" class="tgl btn" tt="' + L.cl_fun + '">🥳</a>\n' +
+	'		<a id="sbars" class="tgl btn" tt="' + L.ct_sbars + '</a>\n' +
+	'		<a id="enbg" class="tgl btn" tt="' + L.ct_enbg + '">🖼️ bg</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_langs + '</h3>\n' +
-	'	<div><select id="langs"></select></div>\n' +
-	'</div>\n' +
-	(have_zip ? (
-		'<div><h3>' + L.cl_ziptype + '</h3><div id="arc_fmt"></div></div>\n'
-	) : '') +
-	'<div>\n' +
-	'	<h3>' + L.cl_uopts + '</h3>\n' +
-	'	<div>\n' +
-	'		<a id="ask_up" class="tgl btn" href="#" tt="' + L.ut_ask + '</a>\n' +
-	'		<a id="u2ts" class="tgl btn" href="#" tt="' + L.ut_u2ts + '</a>\n' +
-	'		<a id="umod" class="tgl btn" href="#" tt="' + L.cut_umod + '</a>\n' +
-	'		<a id="hashw" class="tgl btn" href="#" tt="' + L.cut_mt + '</a>\n' +
-	'		<a id="nosubtle" class="tgl btn" href="#" tt="' + L.cut_wasm + '</a>\n' +
-	'		<a id="u2turbo" class="tgl btn ttb" href="#" tt="' + L.cut_turbo + '</a>\n' +
-	'		<a id="u2tdate" class="tgl btn ttb" href="#" tt="' + L.cut_datechk + '</a>\n' +
-	'		<input type="text" id="u2szg" value="" ' + NOAC + ' style="width:3em" tt="' + L.cut_u2sz + '" />' +
-	'		<a id="flag_en" class="tgl btn" href="#" tt="' + L.cut_flag + '">💤</a>\n' +
-	'		<a id="u2sort" class="tgl btn" href="#" tt="' + L.cut_az + '">az</a>\n' +
-	'		<a id="upnag" class="tgl btn" href="#" tt="' + L.cut_nag + '">🔔</a>\n' +
-	'		<a id="upsfx" class="tgl btn" href="#" tt="' + L.cut_sfx + '">🔊</a>\n' +
-	'		</td>\n' +
-	'	</div>\n' +
-	'</div>\n' +
-	'<div>\n' +
-	'	<h3>' + L.cl_favico + ' <span id="ico1">🎉</span></h3>\n' +
+	'	<h3 id="h_favico">🎉 ' + L.cl_favico + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="icot" value="" ' + NOAC + ' style="width:1.3em" tt="' + L.cft_text + '" />' +
 	'		<input type="text" id="icof" value="" ' + NOAC + ' style="width:2em" tt="' + L.cft_fg + '" />' +
 	'		<input type="text" id="icob" value="" ' + NOAC + ' style="width:2em" tt="' + L.cft_bg + '" />' +
-	'		</td>\n' +
+	'		<a id="ico1" class="btn">🔄️</a>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_bigdir + '</h3>\n' +
+	'	<h3 id="h_language">🌐 ' + L.cl_langs + '</h3>\n' +
+	'	<div><select id="langs"></select></div>\n' +
+	'</div>\n' +
+	(have_zip ? (
+		'<div><h3 id="h_zip">⬇️ ' + L.cl_ziptype + '</h3><div><div id="arc_fmt"></div></div></div>\n'
+	) : '') +
+
+	'<div class="sub_section"><h3 id="h_up">☁️ ' + L.cl_uopts + '</h3></div>' +
+
+	'<div class="sub">\n' +
+	'	<h3 id="h_up2kcfg">🚀 ' + L.up2k + '</h3>\n' +
+	'	<div id="u2conf">\n' +
+	'		<div class="c" data-perm="read" data-dep="idx" tt="' + L.ut_srch +'">\n' +
+	'			<input type="checkbox" id="fsearch" />\n' +
+	'			<label class="tgl btn" for="fsearch">🔎</label>\n' +
+	'		</div>\n' +
+
+	'		<div class="c" tt="' + L.ut_ow +'">\n' +
+	'			<input type="checkbox" id="u2ow" />\n' +
+	'			<label class="tgl btn on" for="u2ow">?</label>\n' +
+	'		</div>\n' +
+
+	'		<div id="u2conft" tt="' + L.ut_par +'">\n' +
+	'			<tr>\n' +
+	'				<span class="c" data-perm="read" style="display: block; margin-bottom: .5em;">' + L.ul_par + '</span>\n' +
+	'			</tr>\n' +
+	'			<tr>\n' +
+	'				<div class="c" data-perm="read">\n' +
+	'					<a class="b btn" id="nthread_sub">&ndash;</a><input\n' +
+	'						class="txtbox" type="text" id="nthread" style="width: 3em;" value=""/><a\n' +
+	'						class="b btn" id="nthread_add">+</a>&nbsp;\n' +
+	'				</div>\n' +
+	'			</tr>\n' +
+	'		</div>\n' +
+
+	'		<div class="c" tt="' + L.ut_mt +'">\n' +
+	'			<input type="checkbox" id="multitask" />\n' +
+	'			<label class="tgl btn" for="multitask">🏃</label>\n' +
+	'		</div>\n' +
+
+	'		<div class="c" tt="' + L.ut_pot +'">\n' +
+	'			<input type="checkbox" id="potato" />\n' +
+	'			<label class="tgl btn" for="potato">🥔</label>\n' +
+	'		</div>\n' +
+
+	'		<div class="c" tt="' + L.ut_rand +'">\n' +
+	'			<input type="checkbox" id="u2rand" />\n' +
+	'			<label class="tgl btn" for="u2rand">🎲</label>\n' +
+	'		</div>\n' +
+	'	</div>\n' +
+	'</div>\n' +
+
+	'<div class="sub">\n' +
+	'	<h3 id="h_upload">🎈 ' + L.cl_opts + '</h3>\n' +
+	'	<div>\n' +
+	'		<a id="ask_up" class="tgl btn" tt="' + L.ut_ask + '">💭</a>\n' +
+	'		<a id="u2ts" class="tgl btn" tt="' + L.ut_u2ts + '</a>\n' +
+	'		<a id="umod" class="tgl btn" tt="' + L.cut_umod + '</a>\n' +
+	'		<a id="hashw" class="tgl btn" tt="' + L.cut_mt + '</a>\n' +
+	'		<a id="nosubtle" class="tgl btn" tt="' + L.cut_wasm + '</a>\n' +
+	'		<a id="u2turbo" class="tgl btn ttb" tt="' + L.cut_turbo + '</a>\n' +
+	'		<a id="u2tdate" class="tgl btn ttb" tt="' + L.cut_datechk + '</a>\n' +
+	'		<input type="text" id="u2szg" value="" ' + NOAC + ' style="width:3em" tt="' + L.cut_u2sz + '" />' +
+	'		<a id="flag_en" class="tgl btn" tt="' + L.cut_flag + '">💤</a>\n' +
+	'		<a id="u2sort" class="tgl btn" tt="' + L.cut_az + '">az</a>\n' +
+	'		<a id="upnag" class="tgl btn" tt="' + L.cut_nag + '">🔔</a>\n' +
+	'		<a id="upsfx" class="tgl btn" tt="' + L.cut_sfx + '">🔊</a>\n' +
+	'	</div>\n' +
+	'</div>\n' +
+
+	'<div>\n' +
+	'	<h3 id="h_bigdir">📁 ' + L.cl_bigdir + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="bd_lim" value="250" ' + NOAC + ' style="width:4em" tt="' + L.cdt_lim + '" />' +
-	'		<a id="bd_ask" class="tgl btn" href="#" tt="' + L.cdt_ask + '">ask</a>\n' +
+	'		<a id="bd_ask" class="tgl btn" tt="' + L.cdt_ask + '">ask</a>\n' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
 	'<div>\n' +
-	'	<h3>' + L.cl_hsort + '</h3>\n' +
+	'	<h3 id="h_sort">🔃 ' + L.cl_hsort + '</h3>\n' +
 	'	<div>\n' +
 	'		<input type="text" id="hsortn" value="" ' + NOAC + ' style="width:3em" tt="' + L.cdt_hsort + '" />' +
 	'		</td>\n' +
 	'	</div>\n' +
 	'</div>\n' +
-	'<div><h3>' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n' +
-	(!MOBILE ? '<div><h3>' + L.cl_rcm + '</h3><div><a id="rcm_en" class="tgl btn" href="#" tt="' + L.cdt_ren + '</a><a id="rcm_db" class="tgl btn" href="#" tt="' + L.cdt_rdb + '</a></div></div>' : '') +
-	'<div><h3>' + L.cl_hiddenc + ' &nbsp;' + (MOBILE ? '<a href="#" id="hcolsh">' + L.cl_hidec + '</a> / ' : '') + '<a href="#" id="hcolsr">' + L.cl_reset + '</a></h3><div id="hcols"></div></div>'
+	musicSettings +
+	'<div><h3 id="h_keytype">🎼 ' + L.cl_keytype + '</h3><div><select id="key_notation"></select></div></div>\n'
 );
 
+// modalize settings
+(function () {
+	ebi('h_cfg').innerHTML = (fun_tgl ? '⚙️ ' : '') + L.ot_cfg;
+	var sections = ebi('op_cfg').children;
+	for (var i = 0; i < sections.length; i++){
+		var h = sections[i].children[0];
+		var sName = h.innerHTML;
+		if(!fun_tgl){
+			if(sName && sName.match(' ') && sName[0] != '<')
+				sName = sName.split(' ').slice(1).join(' ');
+		}
+		var sId = h.id;
+		h.id = ''
+		var subSettings = sections[i].children[1];
+		var section = '<div id="' + sId + '" class="s_section ' + sections[i].classList +'"><h3>' + sName + '</h3>';
+		if(subSettings != null){
+			for (var ii = 0; ii < subSettings.children.length; ii++){
+				var s = subSettings.children[ii];
+				var info = tt.parse(s.getAttribute('tt'));
+				s.removeAttribute('tt');
+				section += '<div class="setting">' +
+					s.outerHTML +
+					((info != null && info.length > 0) ? '<p class="s_desc">' + info + '</p>' : '') +
+					'</div>';
+			}
+			subSettings.innerHTML = '';
+		}
+		section += '</div>'
+		ebi('s_list').innerHTML += section;
+		ebi('s_nav').innerHTML += '<a href="#' + sId + '" class="btn ' + sections[i].classList +'">' + sName + '</a>\n';
+	}
+
+	ebi('h_cfg').onclick = function(){
+		ebi('s_list').scrollTop =
+		ebi('s_hor').scrollTop =
+		ebi('s_nav').scrollTop =
+		ebi('s_content').scrollTop =
+			0;
+	}
+
+	ebi('cl_cfg').onclick =
+	ebi('s_outside').onclick =
+	function () {
+			hist_push('#')
+			modaltoggle('cfg');
+		}
+})();
+
+var cfg_lgcy = false;
+ebi('reloc_cfg').onclick = function(){
+	cfg_lgcy = !cfg_lgcy;
+	this.innerHTML = cfg_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+	clmod(ebi('cfg'), 'unmodal', cfg_lgcy);
+	swrite('cfg_lgcy', cfg_lgcy);
+}
+if(sread('cfg_lgcy') == 'true')
+	ebi('reloc_cfg').click();
+
+// accent color
+ebi('accent').oninput = ebi('accent_picker').oninput = function () {
+	var validcolor = parseColor(this.value);
+	console.log(this.value);
+
+	if(this == ebi('accent')){
+		ebi('accent_picker').value = this.value;
+	}
+	else if(this == ebi('accent_picker')){
+		if(this.value == '#000000')
+			return; // firefox submits the color picker value on browser startup
+		ebi('accent').value = this.value;
+	}
+
+	clmod(ebi('accent'), 'invalid', this.value.length != 0 && validcolor.length == 0);
+	if(validcolor == accent)
+		return;
+
+	setTimeout(function(){
+		setColor(validcolor);
+	}, 100);
+}
+if(accent && accent.length > 3){
+	ebi('accent').value = ebi('accent_picker').value = accent;
+}
+
+// corner radius
+ebi('radius').oninput = function () {
+	var r = parseFloat(this.value);
+
+	clmod(ebi('radius'), 'invalid', this.value.length != 0 && r.length == 0);
+	if(r === radius)
+		return;
+
+	var usefallback = isNaN(r) || r < 0 || r === '';
+	var setV = usefallback ? '' : (r + 'px');
+	swrite('radius', !usefallback ? r : '');
+	document.documentElement.style.setProperty('--radius', setV);
+	console.log(setV);
+}
+var radius = sread('radius');
+if(radius){
+	console.log('read radius from settings: ' + radius);
+	document.documentElement.style.setProperty('--radius', parseFloat(radius) + 'px');
+	ebi('radius').value = radius;
+}
+
+
+// no fun allowed
+bcfg_bind(this, 'fun_tgl', 'fun_tgl', fun_tgl);
 
 // navpane
-ebi('tree').innerHTML = (
-	'<div id="treeh">\n' +
-	'	<a href="#" id="detree" tt="' + L.tt_detree + '">🍞...</a>\n' +
-	'	<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
-	'	<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
-	'	<a href="#" class="btn" id="visdir" tt="' + L.tt_visdir + '">🎯</a>\n' +
-	'	<a href="#" class="tgl btn" id="filetree" tt="' + L.tt_ftree + '">📃</a>\n' +
-	'	<a href="#" class="tgl btn" id="parpane" tt="' + L.tt_pdock + '">📌</a>\n' +
-	'	<a href="#" class="tgl btn" id="dyntree" tt="' + L.tt_dynt + '">a</a>\n' +
-	'	<a href="#" class="tgl btn" id="wraptree" tt="' + L.tt_wrap + '">↵</a>\n' +
-	'	<a href="#" class="tgl btn" id="hovertree" tt="' + L.tt_hover + '">👀</a>\n' +
-	'</div>\n' +
-	'<ul id="docul"></ul>\n' +
-	'<ul class="ntree" id="treepar"></ul>\n' +
-	'<ul class="ntree" id="treeul"></ul>\n' +
-	'<div id="thx_ff">&nbsp;</div>'
+ebi('treeh').innerHTML += (
+	'<a href="#" class="btn" step="-2" id="twig" tt="Hotkey: A">&ndash;</a>\n' +
+	'<a href="#" class="btn" step="2" id="twobytwo" tt="Hotkey: D">+</a>\n' +
+	'<a href="#" class="btn" id="visdir" tt="' + L.tt_visdir + '">🎯</a>\n' +
+	'<a href="#" class="tgl btn" id="filetree" tt="' + L.tt_ftree + '">📃</a>\n' +
+	'<a href="#" class="tgl btn" id="parpane" tt="' + L.tt_pdock + '">📌</a>\n' +
+	'<a href="#" class="tgl btn" id="dyntree" tt="' + L.tt_dynt + '">a</a>\n' +
+	'<a href="#" class="tgl btn" id="wraptree" tt="' + L.tt_wrap + '">↵</a>\n' +
+	'<a href="#" class="tgl btn" id="hovertree" tt="' + L.tt_hover + '">👀</a>\n'
 );
-clmod(ebi('tree'), 'sbar', 1);
-ebi('entree').setAttribute('tt', L.tt_entree);
-ebi('goh').textContent = L.goh;
 QS('#op_mkdir input[type="submit"]').value = L.ab_mkdir;
 QS('#op_new_md input[type="submit"]').value = L.ab_mkdoc;
 QS('#op_msg input[type="submit"]').value = L.ab_msg;
 
 // right-click menu
 ebi('rcm').innerHTML = (
-	'<a href="#" id="ropn">' + L.rc_opn + '</a>' +
-	'<a href="#" id="rply">' + L.rc_ply + '</a>' +
-	'<a href="#" id="rpla">' + L.rc_pla + '</a>' +
-	'<a href="#" id="rtxt">' + L.rc_txt + '</a>' +
-	'<a href="#" id="rmd">' + L.rc_md + '</a>' +
+	'<a href="#" id="ropn">' + (fun_tgl ? '↗️ ' : '') + L.rc_opn + '</a>' +
+	'<a href="#" id="rply">' + (fun_tgl ? '▶ ' : '') + L.rc_ply + '</a>' +
+	'<a href="#" id="rpla">' + (fun_tgl ? '🎧 ' : '') + L.rc_pla + '</a>' +
+	'<a href="#" id="rtxt">' + (fun_tgl ? '📄 ' : '') + L.rc_txt + '</a>' +
+	'<a href="#" id="rmd">' + (fun_tgl ? '📜 ' : '') + L.rc_md + '</a>' +
 	'<div id="rs1" class="sep"></div>' +
-	'<a href="#" id="rcpl">' + L.rc_cpl + '</a>' +
-	'<a href="#" id="rdl">' + L.rc_dl + '</a>' +
+	'<a href="#" id="rcpl">' + (fun_tgl ? '🔗 ' : '') + L.rc_cpl + '</a>' +
+	'<a href="#" id="rdl">' + (fun_tgl ? '⬇️ ' : '') + L.rc_dl + '</a>' +
 	(have_zip ?
-		'<a href="#" id="rzip">' + L.rc_zip + '</a>'
+		'<a href="#" id="rzip">' + (fun_tgl ? '📦 ' : '') + L.rc_zip + '</a>'
 	: '') +
 	'<div id="rs2" class="sep"></div>' +
-	(have_del ? '<a href="#" id="rdel">' + L.rc_del + '</a>' : '') +
-	(have_mv ? '<a href="#" id="rcut">' + L.rc_cut + '</a>' : '') +
-	'<a href="#" id="rcpy">' + L.rc_cpy + '</a>' +
+	(have_del ? '<a href="#" id="rdel">' + (fun_tgl ? '🗑️ ' : '') + L.rc_del + '</a>' : '') +
+	(have_mv ? '<a href="#" id="rcut">' + (fun_tgl ? '✂️ ' : '') + L.rc_cut + '</a>' : '') +
+	'<a href="#" id="rcpy">' + (fun_tgl ? '⧉ ' : '') + L.rc_cpy + '</a>' +
 	(has(perms, "write") ?
-		'<a href="#" id="rpst">' + L.rc_pst + '</a>' +
-		(have_mv ? '<a href="#" id="rrnm">' + L.rc_rnm + '</a>' : '') +
+		'<a href="#" id="rpst">' + (fun_tgl ? '📋 ' : '') + L.rc_pst + '</a>' +
+		(have_mv ? '<a href="#" id="rrnm">' + (fun_tgl ? '✏️ ' : '') + L.rc_rnm + '</a>' : '') +
 		'<div id="rs3" class="sep"></div>' +
-		'<a href="#" id="rnfo">' + L.rc_nfo + '</a>' +
-		'<a href="#" id="rnfi">' + L.rc_nfi + '</a>'
+		'<a href="#" id="rnfo">' + (fun_tgl ? '📁 ' : '') + L.rc_nfo + '</a>' +
+		'<a href="#" id="rnfi">' + (fun_tgl ? '📄 ' : '') + L.rc_nfi + '</a>'
 	: '') +
 	'<div id="rs4" class="sep"></div>' +
-	'<a href="#" id="rsal">' + L.rc_sal + '</a>' +
-	'<a href="#" id="rsin">' + L.rc_sin + '</a>' +
+	'<a href="#" id="rsal">' + (fun_tgl ? '✅ ' : '') + L.rc_sal + '</a>' +
+	'<a href="#" id="rsin">' + (fun_tgl ? '🔛 ' : '') + L.rc_sin + '</a>' +
 	'<a id="rshr" href="#"></a>'
 );
 
@@ -1143,15 +1568,52 @@ ebi('rcm').innerHTML = (
 		if (v)
 			ops[a].href = '#v=' + v;
 	}
+
+	ebi('op_acc').onclick = function (e){
+		e.stopPropagation();
+	};
 })();
 
+// fallback in case href change method somehow doesn't work
+var closebtns = QSA('.close');
+for(var a = 0; a < closebtns.length; a++){
+	closebtns[a].onclick = function(){
+		var modal = QS('.modal.vis');
+		if(modal)
+			modaltoggle(modal.id, false);
+	}
+}
 
+function modaltoggle(dest, show){
+	if(show == null)
+		show = 't';
+	if (show == false || show == 't' && QS('#' + dest + '.vis'))
+		dest = '';
+
+	var layoutchange = dest == 'music' || QS('#music.vis');
+
+	swrite('opmode', dest || null);
+
+	goto(dest);
+
+	var input = QS('.opview.act input:not([type="hidden"])')
+	if (input && !TOUCH) {
+		tt.skip = true;
+		input.focus();
+	}
+
+	if(layoutchange) {
+		onwidgetresize();
+		mpl.set_mu_cv();
+	}
+}
 function opclick(e) {
 	var dest = this.getAttribute('data-dest');
 	if (QS('#op_' + dest + '.act'))
 		dest = '';
 
-	swrite('opmode', dest || null);
+	if(dest != 'acc')
+		swrite('opmode', dest || null);
 	if (ctrl(e))
 		return;
 
@@ -1159,6 +1621,8 @@ function opclick(e) {
 	goto(dest);
 
 	var input = QS('.opview.act input:not([type="hidden"])')
+	if(dest == 'search')
+		input = ebi('folder_search');
 	if (input && !TOUCH) {
 		tt.skip = true;
 		input.focus();
@@ -1175,9 +1639,13 @@ function goto(dest) {
 	for (var a = obj.length - 1; a >= 0; a--)
 		clmod(obj[a], 'act');
 
+	obj = QSA('.modal');
+	for (var a = obj.length - 1; a >= 0; a--)
+		clmod(obj[a], 'vis');
+
 	if (dest) {
 		var lnk = QS('#ops>a[data-dest=' + dest + ']'),
-			nps = lnk.getAttribute('data-perm');
+			nps = lnk && lnk.getAttribute('data-perm');
 
 		nps = nps && nps.length ? nps.split(' ') : [];
 
@@ -1189,21 +1657,90 @@ function goto(dest) {
 		if (!has(perms, 'read') && !has(perms, 'write') && (dest == 'up2k'))
 			return;
 
-		clmod(ebi('op_' + dest), 'act', 1);
+		var modal = ebi(dest);
+		if(modal != null){
+			clmod(modal, 'vis', true);
+			if(location.hash.length <= 1)
+				location.hash = '#h_' + dest;
+		}
+
+		var opd = ebi('op_' + dest);
+		var page = opd != null ? opd : QS('#' + dest + ' .opview')
+		if(page != null)
+			clmod(page, 'act', 1);
 		clmod(lnk, 'act', 1);
+
+		if(dest == 'bup'){
+			clmod(ebi('up2k'), 'vis', true);
+			location.hash = '#h_bup';
+		}
+		if(dest == 'bup' || dest == 'up2k')
+			ebi('bup_tgl').open = dest == 'bup';
 
 		var fn = window['goto_' + dest];
 		if (fn)
 			fn();
 	}
+	else{
+		if(location.hash.startsWith('#h_'))
+			location.hash = '#';
+	}
+
+	ebi('srchfolder_div').style.display = dest == 'search' ? 'block' : 'none';
 
 	clmod(document.documentElement, 'op_open', dest);
+	// enables the use of keyboard page nav on modals
+	//var a_modal = QS('.modal.vis');
+	//clmod(document.documentElement, 'noscroll', a_modal && window.getComputedStyle(a_modal).position == 'fixed');
 
 	if (treectl)
 		treectl.onscroll();
 }
 function go2bup() { goto('bup'); }
 function go2up2k() { goto('up2k'); }
+
+
+window.onhashchange = function() {
+	console.log('hash change: ' + location.hash)
+	// keep it clean
+	if(location.hash == '')
+		hist_replace(location.pathname + location.search);
+
+	var a_modal = QS('.modal.vis');
+	if(location.hash.length <= 1 && a_modal){
+		modaltoggle(a_modal.id);
+		console.log('closing modal due to hash');
+	}
+	if(a_modal && location.hash == '#h_' + a_modal.id){
+		if(a_modal.style.position != 'fixed')
+			return;
+		var m_header = QS('.modal.vis .modalheader');
+		if(m_header){
+			m_header.click();
+			console.log('going to top of modal');
+		}
+	}
+  	else if (location.hash.startsWith("#h_")){
+		var header = ebi(location.hash.slice(1));
+		if(!header)
+			return;
+		var p_modal = header.closest('.modal');
+		if(!p_modal)
+			return;
+		if(!clgot(p_modal, 'vis')){
+			console.log('forcing modal open due to subheader hash');
+			modaltoggle(p_modal.id, true);
+		}
+		ebi(location.hash.slice(1)).scrollIntoView();
+	}
+	else if (location.hash.startsWith('#gf-') && !baguetteBox.getUserAction()){
+		hash0 = location.hash;
+		eval_hash()
+	}
+	else if(location.hash == '' && QS('#bbox-overlay.visible')){
+		baguetteBox.hide();
+	}
+}
 
 
 var m = SPINNER.split(','),
@@ -1246,8 +1783,8 @@ check_image_support('jxl', "data:image/jxl;base64,/woIAAAMABKIAgC4AF3lEgA=");
 
 
 var img_re = APPLE ?
-	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov|svg)(\?|$)/i :
-	/\.(a?png|avif|bmp|gif|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov|svg)(\?|$)/i;
+	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jxl|jfif|svg|ico|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
+	/\.(a?png|avif|bmp|gif|jpe?g|jxl|jfif|svg|ico|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
 
 var wopi_set = !window.have_wopi ? null :
 	new Set('odt fodt ott doc docx dotx rtf odm ods fods ots xls xlsx odp fodp otp ppt pptx ppsx odg fodg otg odf'.split(' '));
@@ -1294,16 +1831,16 @@ var ACtx = !IPHONE && (window.AudioContext || window.webkitAudioContext),
 var x = '';
 if (!fullui) {
 	if (window.ui_nombar || /[?&]nombar\b/.exec(sloc0)) x += '#ops,';
-	if (window.ui_noacci || /[?&]noacci\b/.exec(sloc0)) x += '#acc_info,';
-	if (window.ui_nosrvi || /[?&]nosrvi\b/.exec(sloc0)) x += '#srv_info,#srv_info2,';
+	if (window.ui_noacci || /[?&]noacci\b/.exec(sloc0)) x += '#acc_info,#opa_acc,';
+	if (window.ui_nosrvi || /[?&]nosrvi\b/.exec(sloc0)) x += '#srv_info,#srv_info2,#tree_footer,';
 	if (window.ui_nocpla || /[?&]nocpla\b/.exec(sloc0)) x += '#goh,';
 	if (window.ui_nolbar || /[?&]nolbar\b/.exec(sloc0)) x += '#wfp,';
+	if (nonav) x += '#path,';
 	if (window.ui_noctxb || /[?&]noctxb\b/.exec(sloc0)) x += '#wtoggle,';
 	if (window.ui_norepl || /[?&]norepl\b/.exec(sloc0)) x += '#repl,';
 }
 if (x)
 	document.head.appendChild(mknod('style', '', x.slice(0, -1) + '{display:none!important}'));
-
 
 if (location.pathname.indexOf('//') === 0)
 	hist_replace(location.pathname.replace(/^\/+/, '/'));
@@ -1349,61 +1886,6 @@ ebi('hsortn').oninput = function (e) {
 var mpl = (function () {
 	var have_mctl = 'mediaSession' in navigator && window.MediaMetadata;
 
-	ebi('op_player').innerHTML = (
-		'<div><h3>' + L.cl_opts + '</h3><div>' +
-		'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '</a>' +
-		'<a href="#" class="tgl btn" id="au_one" tt="' + L.mt_one + '</a>' +
-		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
-		'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
-		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
-		'<a href="#" class="tgl btn" id="au_prescan" tt="' + L.mt_prescan + '</a>' +
-		'<a href="#" class="tgl btn" id="au_fullpre" tt="' + L.mt_fullpre + '</a>' +
-		'<a href="#" class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
-		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
-		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
-		'<a href="#" class="tgl btn" id="au_m3u_c" tt="' + L.mt_m3u_c + '</a>' +
-		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
-		'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
-		'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
-		'<a href="#" class="tgl btn" id="au_follow" tt="' + L.mt_follow + '</a>' +
-		'<a href="#" class="tgl btn" id="au_compact" tt="' + L.mt_compact + '</a>' +
-		'</div></div>' +
-
-		'<div><h3>' + L.ml_btns + '</h3><div>' +
-		'<a href="#" class="btn" id="au_uncache" tt="' + L.mt_uncache + '</a>' +
-		'</div></div>' +
-
-		'<div><h3>' + L.ml_pmode + '</h3><div id="pb_mode">' +
-		'<a href="#" class="tgl btn" m="loop" tt="' + L.mt_mloop + '</a>' +
-		'<a href="#" class="tgl btn" m="next" tt="' + L.mt_mnext + '</a>' +
-		'<a href="#" class="tgl btn" m="stop" tt="' + L.mt_mstop + '</a>' +
-		'</div></div>' +
-
-		(have_acode ? (
-			'<div><h3>' + L.ml_tcode + '</h3><div>' +
-			'<a href="#" id="ac_flac" class="tgl btn" tt="' + L.mt_cflac + '</a>' +
-			'<a href="#" id="ac_aac" class="tgl btn" tt="' + L.mt_caac + '</a>' +
-			'<a href="#" id="ac_oth" class="tgl btn" tt="' + L.mt_coth + '</a>' +
-			'</div></div>' +
-			'<div><h3>' + L.ml_tcode2 + '</h3><div>' +
-			'<a href="#" id="ac2opus" class="tgl btn" tt="' + L.mt_c2opus + '</a>' +
-			'<a href="#" id="ac2owa" class="tgl btn" tt="' + L.mt_c2owa + '</a>' +
-			'<a href="#" id="ac2caf" class="tgl btn" tt="' + L.mt_c2caf + '</a>' +
-			'<a href="#" id="ac2mp3" class="tgl btn" tt="' + L.mt_c2mp3 + '</a>' +
-			'<a href="#" id="ac2flac" class="tgl btn" tt="' + L.mt_c2flac + '</a>' +
-			'<a href="#" id="ac2wav" class="tgl btn" tt="' + L.mt_c2wav + '</a>' +
-			'</div></div>'
-		) : '') +
-
-		'<div><h3>' + L.ml_tint + '</h3><div>' +
-		'<input type="text" id="pb_tint" value="0" ' + NOAC + ' style="width:2.4em" tt="' + L.mt_tint + '" />' +
-		'</div></div>' +
-
-		'<div><h3 id="h_drc">' + L.ml_drc + '</h3><div id="audio_drc"></div></div>' +
-		'<div><h3>' + L.ml_eq + '</h3><div id="audio_eq"></div></div>' +
-		'<div><h3>' + L.ml_ss + '</h3><div id="audio_ss"></div></div>' +
-		'');
-
 	var r = {
 		"pb_mode": (sread('pb_mode', ['loop', 'next', 'stop']) || 'next').split('-')[0],
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
@@ -1421,8 +1903,11 @@ var mpl = (function () {
 	});
 	bcfg_bind(r, 'shuf', 'au_shuf', false, function () {
 		mp.read_order();  // don't bind
+		ebi('au_shuf2').classList = ebi('au_shuf').classList;
 	});
+	ebi('au_shuf2').onclick = ebi('au_shuf').onclick;
 	bcfg_bind(r, 'aplay', 'au_aplay', true);
+	bcfg_bind(r, 'afade', 'au_afade', true);
 	bcfg_bind(r, 'preload', 'au_preload', true);
 	bcfg_bind(r, 'prescan', 'au_prescan', true);
 	bcfg_bind(r, 'fullpre', 'au_fullpre', false);
@@ -1437,7 +1922,26 @@ var mpl = (function () {
 	});
 	bcfg_bind(r, 'waves', 'au_waves', true, function (v) {
 		if (!v) pbar.unwave();
+		r.selectprogbar();
 	});
+	r.selectprogbar = function(){
+		if (r.waves){
+			clmod(ebi('progbar'), 'vis', true)
+			clmod(ebi('altprogbar'), 'vis', false)
+			if(pbar){
+				pbar.unwave();
+				if (mpl.waves && mp && mp.au)
+					pbar.loadwaves(mp.au.src.replace(/\bth=(opus|mp3)&/, '') + '&th=p');
+				pbar.onresize();
+			}
+		}
+		else{
+			clmod(ebi('progbar'), 'vis', false)
+			clmod(ebi('altprogbar'), 'vis', true)
+		}
+	}
+	r.selectprogbar();
+
 	bcfg_bind(r, 'os_seek', 'au_os_seek', !IPHONE, announce);
 	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true, announce);
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
@@ -1475,7 +1979,7 @@ var mpl = (function () {
 	};
 
 	function draw_pb_mode() {
-		var btns = QSA('#pb_mode>a');
+		var btns = QSA('#h_pbmode a');
 		for (var a = 0, aa = btns.length; a < aa; a++) {
 			clmod(btns[a], 'on', btns[a].getAttribute("m") == r.pb_mode);
 			btns[a].onclick = set_pb_mode;
@@ -1490,12 +1994,56 @@ var mpl = (function () {
 		draw_pb_mode();
 	}
 
+	ebi('cyclebtn_loopmode').onclick = function(){
+		if(r.pb_mode == 'next'){
+			// #4: folder loop was set, switch to none / next folder
+			r.pb_mode = 'stop';
+		}
+		else if(r.pb_mode == 'loop'){
+			// #3: folder loop was set, switch to none / next folder
+			r.pb_mode = 'next';
+		}
+		else if(clgot(ebi('au_loop'), 'on')) {
+			// #2: single loop was set, switch to folder loop
+			ebi('au_loop').click();
+			r.pb_mode = 'loop';
+		}
+		else {
+			// #1: no loop set, click single loop btn
+			ebi('au_loop').click();
+		}
+		swrite('pb_mode', r.pb_mode);
+		draw_pb_mode();
+		drawLoopStatus();
+	}
+
+	function drawLoopStatus(){
+		var btn = ebi('cyclebtn_loopmode');
+		if(r.pb_mode == 'next'){
+			btn.innerHTML = '⏭️';
+			clmod(btn, 'on', true);
+		}
+		else if(r.pb_mode == 'loop'){
+			btn.innerHTML = '🔁';
+			clmod(btn, 'on', true);
+		}
+		else if(clgot(ebi('au_loop'), 'on')) {
+			btn.innerHTML = '🔂';
+			clmod(btn, 'on', true);
+		}
+		else {
+			btn.innerHTML = '🔁';
+			clmod(btn, 'on', false);
+		}
+	}
+	drawLoopStatus();
+
 	function set_tint() {
 		var tint = icfg_get('pb_tint', 0);
 		if (!tint)
 			ebi('barbuf').style.removeProperty('background');
 		else
-			ebi('barbuf').style.background = 'rgba(126,163,75,' + (tint / 100.0) + ')';
+			ebi('barbuf').style.background = 'rgba(126,126,126,' + (tint / 100.0) + ')';
 	}
 	ebi('pb_tint').oninput = function (e) {
 		swrite('pb_tint', this.value);
@@ -1562,9 +2110,9 @@ var mpl = (function () {
 			btns.push(btn);
 		}
 		if (!IPHONE)
-			btns[1].style.display = btns[2].style.display = 'none';
-		btns[4].style.display = have_c2flac ? '' : 'none';
-		btns[5].style.display = have_c2wav ? '' : 'none';
+			btns[1].parentElement.style.display = btns[2].parentElement.style.display = 'none';
+		btns[4].parentElement.style.display = have_c2flac ? '' : 'none';
+		btns[5].parentElement.style.display = have_c2wav ? '' : 'none';
 
 		if (v)
 			swrite('acode2', v);
@@ -1576,9 +2124,9 @@ var mpl = (function () {
 			clmod(btns[a], 'on', fmts[a] == v)
 
 		r.ac2 = v;
-		ebi('ac_flac').setAttribute('tt', L.mt_cflac.split('"')[0].format(v));
-		ebi('ac_aac').setAttribute('tt', L.mt_caac.split('"')[0].format(v));
-		ebi('ac_oth').setAttribute('tt', L.mt_coth.split('"')[0].format(v));
+		ebi('ac_flac').nextSibling.innerHTML = L.mt_cflac.split('"')[0].format(v);
+		ebi('ac_aac').nextSibling.innerHTML = L.mt_caac.split('"')[0].format(v);
+		ebi('ac_oth').nextSibling.innerHTML = L.mt_coth.split('"')[0].format(v);
 	};
 
 	r.pp = function () {
@@ -1602,6 +2150,23 @@ var mpl = (function () {
 	}
 	setaufollow();
 
+	r.set_mu_cv = function() {
+		var o = QS('#music.vis #mu_th>img');
+		if (o && r.cover) {
+			var url = r.cover.slice(0, -1) + 'wf3';
+
+			set_loaded(o, false);
+			o.onload = th_onload;
+			o.setAttribute('src', url);
+
+			o = QS('html.g #music, html.f #music');
+			if (o)
+				o.style.background = "url('" + url + "') no-repeat center / cover";
+			else
+				ebi('music').style.background = "";
+		}
+	}
+
 	function announce() {
 		if (!r.os_ctl || !mp.au)
 			return;
@@ -1620,7 +2185,7 @@ var mpl = (function () {
 			tags.album = np.album;
 
 		if (r.osd_cv) {
-			var files = QSA("#files tr>td:nth-child(2)>a[id]"),
+			var files = QSA("#files .flink"),
 				cover = null;
 
 			for (var a = 0, aa = files.length; a < aa; a++) {
@@ -1630,16 +2195,17 @@ var mpl = (function () {
 				}
 			}
 
-			cover = addq(cover || mp.au.osrc, 'th=j');
+			cover = addq(cover || mp.au.src, 'th=j');
 			tags.artwork = [{ "src": cover, type: "image/jpeg" }];
 		}
+		r.cover = cover;
 
 		ebi('np_circle').textContent = np.circle || '';
 		ebi('np_album').textContent = np.album || '';
 		ebi('np_tn').textContent = np['.tn'] || '';
 		ebi('np_artist').textContent = np.artist || (fns.length > 1 ? fns[0] : '');
 		ebi('np_title').textContent = np.title || '';
-		ebi('np_dur').textContent = np['.dur'] || '';
+		ebi('txtsongend').innerHTML = ebi('np_dur').textContent = np['.dur'] || '';
 		ebi('np_url').textContent = uricom_dec(get_evpath()) + np.file.split('?')[0];
 		if (!MOBILE && cover)
 			ebi('np_img').setAttribute('src', cover);
@@ -1654,6 +2220,7 @@ var mpl = (function () {
 		navigator.mediaSession.setActionHandler('previoustrack', prev_song);
 		navigator.mediaSession.setActionHandler('nexttrack', next_song);
 		r.pp();
+		r.set_mu_cv();
 	}
 	r.announce = announce;
 
@@ -1731,7 +2298,7 @@ function MPlayer() {
 
 	for (var a = 0, aa = trs.length; a < aa; a++) {
 		var tds = trs[a].getElementsByTagName('td'),
-			link = tds[1].getElementsByTagName('a');
+			link = trs[a].querySelectorAll('.flink');
 
 		link = link[link.length - 1];
 		var url = link.getAttribute('href'),
@@ -1812,7 +2379,14 @@ function MPlayer() {
 			r.ftid = r.au.tid;
 			r.au.play();
 			mpl.pp();
-			fader();
+			if(mpl.afade != false)
+				fader();
+			else{
+				// insta start
+				r.fvol = r.vol;
+				mpss.go();
+				r.au.volume = r.expvol(r.fvol);
+			}
 		}
 	};
 	r.fade_out = function () {
@@ -1820,7 +2394,13 @@ function MPlayer() {
 		r.fvol = r.vol;
 		r.fdir = -0.05 * r.vol * (CHROME ? 2 : 1);
 		r.ftid = r.au.tid;
-		fader();
+		if(mpl.afade != false)
+			fader();
+		else {
+			// insta stop
+			r.au.pause();
+			mpl.pp();
+		}
 	};
 	r.stopfade = function (hard) {
 		clearTimeout(r.ftimer);
@@ -1944,7 +2524,7 @@ function ft2dict(tr, skip) {
 
 	for (var a = 1, aa = th.length; a < aa; a++) {
 		var tv = tr.cells[a].textContent,
-			tk = a == 1 ? 'file' : th[a].getAttribute('name').split('/').pop().toLowerCase(),
+			tk = tr.cells[a].querySelector('.flink') ? 'file' : th[a].getAttribute('name').split('/').pop().toLowerCase(),
 			vis = th[a].className.indexOf('min') === -1;
 
 		if (!tv || skip[tk])
@@ -1980,7 +2560,6 @@ var widget = (function () {
 		if (r.is_open == is_open)
 			return false;
 
-		clmod(document.documentElement, 'np_open', is_open);
 		clmod(widget, 'open', is_open);
 		bcfg_set('au_open', r.is_open = is_open);
 		if (vbar) {
@@ -1997,11 +2576,17 @@ var widget = (function () {
 	r.paused = function (paused) {
 		if (was_paused != paused) {
 			was_paused = paused;
-			ebi('bplay').innerHTML = paused ? '▶' : '⏸';
+			ebi('bplay').innerHTML = ebi('bplay2').innerHTML = 
+				paused ? svg_play : svg_pause;
 		}
 	};
 	r.setvis = function () {
-		widget.style.display = !has(perms, "read") || showfile.abrt ? 'none' : '';
+		var display = !has(perms, "read") || showfile.abrt ? 'none' : '';
+		ebi('wtico').style.display =
+		ebi('wtoggle').style.display =
+		ebi('widgeti').style.display =
+		ebi('np_inf').style.display =
+			display;
 	};
 	wtico.onclick = function (e) {
 		if (!touchmode)
@@ -2094,13 +2679,25 @@ function canvas_cfg(can) {
 	return r;
 }
 
-
-function glossy_grad(can, h, s, l) {
+function auto_grad(can, color, color2) {
+	if(color2 == null)
+		color2 = '#000';
 	var g = can.ctx.createLinearGradient(0, 0, 0, can.h),
-		p = [0, 0.49, 0.50, 1];
+		p = [0, 0.49, 0.50, 1],
+		mix = [70, 100, 90, 70];
 
-	for (var a = 0; a < p.length; a++)
-		g.addColorStop(p[a], 'hsl(' + h + ',' + s[a] + '%,' + l[a] + '%)');
+	for (var a = 0; a < p.length; a++){
+		var c = 'color-mix(in oklab, ' + color + ' ' + mix[a] + '%, ' + color2 + ' ' + (100 - mix[a]) + '%)';
+		var pc = parseColor(c);
+        if (pc) {
+            try {
+				g.addColorStop(p[a], pc);
+            } catch (e) {
+				console.log(e);
+				g.addColorStop(p[a], color2);
+			}
+		}
+	}
 
 	return g;
 }
@@ -2125,7 +2722,7 @@ var pbar = (function () {
 		r.pos = canvas_cfg(ebi('barpos'));
 		r.buf.ctx.font = '.5em sans-serif';
 		r.pos.ctx.font = '.9em sans-serif';
-		r.pos.ctx.strokeStyle = 'rgba(24,56,0,0.5)';
+		r.pos.ctx.strokeStyle = 'rgba(40, 40, 40, 0.5)';
 		r.drawbuf();
 		r.drawpos();
 		if (!r.pos.can.onmouseleave)
@@ -2182,7 +2779,7 @@ var pbar = (function () {
 			bctx = bc.ctx,
 			apos, adur;
 
-		if (!widget.is_open)
+		if (!widget.is_open || !mpl.waves)
 			return;
 
 		bctx.clearRect(0, 0, bc.w, bc.h);
@@ -2192,17 +2789,19 @@ var pbar = (function () {
 
 		bau = mp.au;
 
+		var accent = getComputedStyle(document.body).getPropertyValue('--a');
+
 		var sm = bc.w * 1.0 / mp.au.duration,
-			gk = bc.h + '/' + themen,
+			gk = bc.h + '/' + themen + '/' + accent,
 			dz = themen == 'dz',
 			dy = themen == 'dy';
 
 		if (gradh != gk) {
 			gradh = gk;
-			grad = glossy_grad(bc, dz ? 120 : 85,
-				dy ? [0, 0, 0, 0] : [35, 40, 37, 35],
-				dy ? [20, 24, 22, 20] : light ? [45, 56, 50, 45] : [42, 51, 47, 42]);
+			grad = auto_grad(bc, accent);
 		}
+		if(IE)
+			grad = 'rgb(85, 144, 255)';
 		bctx.fillStyle = grad;
 		for (var a = 0; a < mp.au.buffered.length; a++) {
 			var x1 = sm * mp.au.buffered.start(a),
@@ -2219,20 +2818,21 @@ var pbar = (function () {
 		}
 
 		var step = sm > 1 ? 1 : sm > 0.4 ? 3 : sm > 0.05 ? 30 : 720;
-		bctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.15)' : 'rgba(204,255,128,0.15)';
-		for (var p = step, mins = adur / 10; p <= mins; p += step)
-			bctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
 
-		step = sm > 0.15 ? 1 : sm > 0.05 ? 10 : 360;
-		bctx.fillStyle = light && !dy ? 'rgba(0,64,0,0.5)' : 'rgba(192,255,96,0.5)';
-		for (var p = step, mins = adur / 60; p <= mins; p += step)
-			bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
+		//bctx.fillStyle = light && !dy ? 'rgba(0,0,0,0.15)' : 'rgba(255, 255, 255, 0.15)';
+		//for (var p = step, mins = adur / 10; p <= mins; p += step)
+		//	bctx.fillRect(Math.floor(sm * p * 10), 0, 2, pc.h);
 
-		step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
-		bctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0,64,0,0.9)' : 'rgba(192,255,96,1)';
-		for (var p = step, mins = adur / 60; p <= mins; p += step) {
-			bctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
-		}
+		//step = sm > 0.15 ? 1 : sm > 0.05 ? 10 : 360;
+		//bctx.fillStyle = light && !dy ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)';
+		//for (var p = step, mins = adur / 60; p <= mins; p += step)
+		//	bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
+
+		//step = sm > 0.33 ? 1 : sm > 0.15 ? 5 : sm > 0.05 ? 10 : sm > 0.01 ? 60 : 720;
+		//bctx.fillStyle = dz ? '#0f0' : dy ? '#999' : light ? 'rgba(0, 0, 0, 0.9)' : 'rgb(255, 255, 255)';
+		//for (var p = step, mins = adur / 60; p <= mins; p += step) {
+		//	bctx.fillText(p, Math.floor(sm * p * 60 + 3), pc.h / 3);
+		//}
 
 		step = sm > 0.2 ? 10 : sm > 0.1 ? 30 : sm > 0.01 ? 60 : sm > 0.005 ? 720 : 1440;
 		bctx.fillStyle = light ? 'rgba(0,0,0,1)' : 'rgba(255,255,255,1)';
@@ -2240,11 +2840,11 @@ var pbar = (function () {
 			bctx.fillRect(Math.floor(sm * p * 60), 0, 2, pc.h);
 	};
 
-	r.drawpos = function () {
+	r.drawpos = function (force) {
 		var bc = r.buf,
 			pc = r.pos,
 			pctx = pc.ctx,
-			w = 8,
+			w = 2,
 			apos, adur;
 
 		if (t_redraw) {
@@ -2282,8 +2882,12 @@ var pbar = (function () {
 			t2 = s2ms(apos),
 			x = sm * apos;
 
+		if(adur > 0)
+			ebi('sliderpos').value = apos / adur;
+
 		if (w && html_txt != t2) {
-			ebi('np_pos').textContent = html_txt = t2;
+			ebi('txtpos').innerHTML = ebi('np_pos').textContent = html_txt = t2;
+			ebi('txtsongend').innerHTML = t1;
 			if (mpl.os_ctl)
 				navigator.mediaSession.setPositionState({
 					'duration': adur,
@@ -2292,11 +2896,11 @@ var pbar = (function () {
 				});
 		}
 
-		if (!widget.is_open)
+		if (!widget.is_open || !mpl.waves && !force)
 			return;
 
-		pctx.fillStyle = '#573'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
-		pctx.fillStyle = '#dfc'; pctx.fillRect((x - w / 2), 0, w, pc.h);
+		pctx.fillStyle = '#bbb'; pctx.fillRect((x - w / 2) - 1, 0, w + 2, pc.h);
+		pctx.fillStyle = '#fff'; pctx.fillRect((x - w / 2), 0, w, pc.h);
 
 		pctx.lineWidth = 2.5;
 		pctx.fillStyle = '#fff';
@@ -2304,7 +2908,7 @@ var pbar = (function () {
 		var m1 = pctx.measureText(t1),
 			m1b = pctx.measureText(t1 + ":88"),
 			m2 = pctx.measureText(t2),
-			yt = pc.h * 0.94,
+			yt = pc.h * 0.65,
 			xt1 = pc.w - (m1.width + 12),
 			xt2 = x < m1.width * 1.4 ? (x + 12) : (Math.min(pc.w - m1b.width, x - 12) - m2.width);
 
@@ -2330,10 +2934,10 @@ var vbar = (function () {
 		gradh = -1,
 		lastv = -1,
 		untext = -1,
-		can, ctx, w, h, grad1, grad2;
+		can, ctx, w, h, style1, style2;
 
 	r.onresize = function () {
-		if (!widget.is_open && r.can)
+		if (!widget.is_open && r.can )
 			return;
 
 		r.can = canvas_cfg(ebi('pvol'));
@@ -2343,41 +2947,44 @@ var vbar = (function () {
 		ctx.fontVariantCaps = 'small-caps';
 		w = r.can.w;
 		h = r.can.h;
-		r.draw();
+		setTimeout(r.draw, 1);
 	}
 
 	r.draw = function () {
 		if (!mp)
 			return;
 
-		var gh = h + '' + light,
+		var accent = getComputedStyle(document.body).getPropertyValue('--a');
+		var bg = getComputedStyle(document.body).getPropertyValue('--bg-u2');
+
+		var gh = h + '' + light  + '/' + accent,
 			dz = themen == 'dz',
 			dy = themen == 'dy';
 
 		if (gradh != gh) {
 			gradh = gh;
-			grad1 = glossy_grad(r.can, dz ? 120 : 50,
-				dy ? [0, 0, 0, 0] : light ? [50, 55, 52, 48] : [45, 52, 47, 43],
-				dy ? [20, 24, 22, 20] : light ? [54, 60, 52, 47] : [42, 51, 47, 42]);
-			grad2 = glossy_grad(r.can, dz ? 120 : 205,
-				dz ? [100, 100, 100, 100] : dy ? [0, 0, 0, 0] : [10, 15, 13, 10],
-				dz ? [10, 14, 12, 10] : dy ? [90, 90, 90, 90] : [16, 20, 18, 16]);
+			style1 = auto_grad(r.can, accent, accent);
+			style2 = light ? 'color-mix(in oklab, ' + bg + ' 85%, #000 15%' : 'color-mix(in oklab, ' + bg + ' 85%, #fff 15%';
 		}
-		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
-		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
-
-		var vt = 'volume ' + Math.floor(mp.vol * 100),
-			tw = ctx.measureText(vt).width,
-			x = w * mp.vol - tw - 8,
-			li = dy;
-
-		if (mp.vol < 0.5) {
-			x += tw + 16;
-			li = !li;
+		if(IE){
+			style1 = 'rgb(60, 126, 248)';
+			style2 = 'rgb(75, 78, 82)'
 		}
+		ctx.fillStyle = style2; ctx.fillRect(0, 0, w, h);
+		ctx.fillStyle = style1; ctx.fillRect(0, 0, w * mp.vol, h);
 
-		ctx.fillStyle = li ? '#fff' : '#210';
-		ctx.fillText(vt, x, h / 3 * 2);
+		// var vt = Math.floor(mp.vol * 100) + '%',
+		// 	tw = ctx.measureText(vt).width,
+		// 	x = w * mp.vol - tw - 8,
+		// 	li = dy;
+
+		// if (mp.vol < 0.5) {
+		// 	x += tw + 16;
+		// 	li = !li;
+		// }
+
+		// ctx.fillStyle = li ? '#fff' : '#210';
+		// ctx.fillText(vt, x, h / 3 * 2);
 
 		clearTimeout(untext);
 		untext = setTimeout(r.draw, 1000);
@@ -2385,8 +2992,15 @@ var vbar = (function () {
 	onresize100.add(r.onresize, true);
 
 	var rect;
+	var cs;
+	var left, top, width, height;
 	function mousedown(e) {
 		rect = can.getBoundingClientRect();
+		cs = getComputedStyle(ebi('pvol'));
+		top = rect.top + parseFloat(cs.borderTopWidth);
+		left = rect.left + parseFloat(cs.borderLeftWidth);
+		height = rect.height - 2 * parseFloat(cs.borderTopWidth);
+		width = rect.width - 2 * parseFloat(cs.borderLeftWidth);
 		mousemove(e);
 	}
 	function mousemove(e) {
@@ -2398,8 +3012,14 @@ var vbar = (function () {
 			return;
 		}
 
-		var x = e.clientX - rect.left,
-			mul = x * 1.0 / rect.width;
+		var x = e.clientX - left,
+			mul = x * 1.0 / width;
+
+		if(height > width) {
+			// vertical
+			var y = e.clientY - top;
+			mul = 1 - y * 1.0 / height;
+		}
 
 		if (mul > 0.98)
 			mul = 1;
@@ -2413,20 +3033,30 @@ var vbar = (function () {
 				toast.inf(6, 'volume doesnt work because <a href="https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html#//apple_ref/doc/uid/TP40009523-CH5-SW11" target="_blank">apple says no</a>');
 		}, 1);
 	}
-	can.onmousedown = function (e) {
+	ebi('pvolbg').onmousedown = can.onmousedown = function (e) {
 		if (e.button !== 0)
 			return;
 
-		can.onmousemove = mousemove;
+		ebi('pvolbg').onmousemove = can.onmousemove = mousemove;
 		mousedown(e);
 	};
-	can.onmouseup = function (e) {
+	ebi('pvolbg').onmouseup = can.onmouseup = function (e) {
 		if (e.button === 0)
-			can.onmousemove = null;
+			ebi('pvolbg').onmousemove = can.onmousemove = null;
 	};
-	if (TOUCH) {
-		can.ontouchstart = mousedown;
-		can.ontouchmove = mousemove;
+	ebi('pvolbg').ontouchstart = can.ontouchstart = mousedown;
+	ebi('pvolbg').ontouchmove = can.ontouchmove = mousemove;
+	var mute = ebi('pvolbg').children[0];
+	mute.onclick = function (e) {
+		ev(e);
+		if(mp.vol > 0)
+			mp.setvol(0);
+		else
+			mp.setvol(1);
+		r.draw();
+	}
+	mute.onmousedown = function (e) {
+		ev(e);
 	}
 	return r;
 })();
@@ -2582,9 +3212,9 @@ function mpause(e) {
 
 // hook up the widget buttons
 (function () {
-	ebi('bplay').onclick = playpause;
-	ebi('bprev').onclick = prev_song;
-	ebi('bnext').onclick = next_song;
+	ebi('bplay').onclick = ebi('bplay2').onclick = playpause;
+	ebi('bprev').onclick = ebi('bprev2').onclick = prev_song;
+	ebi('bnext').onclick = ebi('bnext2').onclick = next_song;
 
 	var bar = ebi('barpos');
 
@@ -2599,33 +3229,38 @@ function mpause(e) {
 
 		seek_au_mul(x * 1.0 / rect.width);
 	};
-
-	if (!TOUCH) {
-		bar.onwheel = function (e) {
-			var dist = Math.sign(e.deltaY) * 10;
-			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
-				dist = e.deltaY;
-
-			if (!dist || !mp.au)
-				return true;
-
-			seek_au_rel(dist);
-			ev(e);
-		};
-		ebi('pvol').onwheel = function (e) {
-			var dist = Math.sign(e.deltaY) * 10;
-			if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
-				dist = e.deltaY;
-
-			if (!dist || !mp.au)
-				return true;
-
-			dist *= -1;
-			mp.setvol(Math.round((mp.vol + dist / 500) * 100) / 100 );
-			vbar.draw();
-			ev(e);
-		};
+	ebi('sliderpos').oninput = function(){
+		if (!mp.au) {
+			play(0, true);
+			return mp.fade_in();
+		}
+		seek_au_mul(this.value);
 	}
+
+	bar.onwheel = function (e) {
+		var dist = Math.sign(e.deltaY) * 10;
+		if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
+			dist = e.deltaY;
+
+		if (!dist || !mp.au)
+			return true;
+
+		seek_au_rel(dist);
+		ev(e);
+	};
+	ebi('pvolbg').onwheel = function (e) {
+		var dist = Math.sign(e.deltaY) * 10;
+		if (Math.abs(e.deltaY) < 30 && !e.deltaMode)
+			dist = e.deltaY;
+
+		if (!dist)
+			return true;
+
+		dist *= -1;
+		mp.setvol(Math.round((mp.vol + dist / 250) * 100) / 100 );
+		vbar.draw();
+		ev(e);
+	};
 })();
 
 
@@ -2880,12 +3515,14 @@ var afilt = (function () {
 		swrite('au_eq_amp', r.amp);
 		swrite('au_eq_chw', r.chw);
 
-		var txt = QSA('input.eq_gain');
+		var gains = QSA('input.eq_gain');
 		for (var a = 0; a < r.bands.length; a++)
-			txt[a].value = r.gains[a];
+			gains[a + gains.length / 2].value = gains[a].value = r.gains[a].toFixed(1);
 
-		QS('input.eq_gain[band="amp"]').value = r.amp;
-		QS('input.eq_gain[band="chw"]').value = r.chw;
+		var amps = QSA('input.eq_gain[band="amp"]');
+		amps[0].value = amps[1].value = r.amp;
+		var chws = QSA('input.eq_gain[band="chw"]');
+		chws[0].value = chws[1].value = r.chw;
 	};
 
 	r.stop = function () {
@@ -3073,7 +3710,7 @@ var afilt = (function () {
 				vs = that.value,
 				v = parseFloat(vs);
 
-			if (!isNum(v) || v + '' != vs)
+			if (!isNum(v) || (v + '' != vs && v.toFixed(1) != vs))
 				throw new Error('inval band');
 
 			if (sb == 'amp')
@@ -3157,9 +3794,11 @@ var afilt = (function () {
 		ebi('h_drc').textContent = f2f(r.drcn.reduction, 1);
 	}
 
-	var html = ['<table><tr><td rowspan="4">',
-		'<a id="au_eq" class="tgl btn" href="#" tt="' + L.mt_eq + '">' + L.enable + '</a></td>'],
-		h2 = [], h3 = [], h4 = [];
+	ebi('audio_eq').innerHTML = '<a id="au_eq" class="tgl btn" href="#">' + L.enable +
+		'</a><p class="s_desc">' + tt.parse(L.mt_eq) + '</p><br/>';
+
+	var html = ['<table><tr>'],
+		h2 = [], h3 = [], h4 = [], h5 = [];
 
 	var vs = [];
 	for (var a = 0; a < r.bands.length; a++) {
@@ -3175,20 +3814,23 @@ var afilt = (function () {
 
 	for (var a = 0; a < vs.length; a++) {
 		var b = vs[a][0];
-		html.push('<td><a href="#" class="eq_step" step="0.5" band="' + b + '">+</a></td>');
-		h2.push('<td>' + vs[a][1] + '</td>');
+		html.push('<td>' + vs[a][1] + '</td>');
+		h2.push('<td><a href="#" class="eq_step" step="0.5" band="' + b + '">+</a></td>');
+		h3.push('<td><input class="eq_gain" type="range" min="-6" max="6" step="0.5" orient="vertical" band="' + b + '" value="' + vs[a][2] + '" /></td>');
 		h4.push('<td><a href="#" class="eq_step" step="-0.5" band="' + b + '">&ndash;</a></td>');
-		h3.push('<td><input type="text" class="eq_gain" ' + NOAC + ' band="' + b + '" value="' + vs[a][2] + '" /></td>');
+		h5.push('<td><input class="eq_gain" type="text" ' + NOAC + ' band="' + b + '" value="' + vs[a][2] + '" /></td>');
 	}
 	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><tr>';
 	html += h3.join('\n') + '</tr><tr>';
-	html += h4.join('\n') + '</tr><table>';
-	ebi('audio_eq').innerHTML = html;
+	html += h4.join('\n') + '</tr><tr>';
+	html += h5.join('\n') + '</tr><table>';
+	ebi('audio_eq').innerHTML += html;
 
+	ebi('audio_drc').innerHTML = '<a id="au_drc" class="tgl btn" href="#">' + L.enable +
+		'</a><p class="s_desc">' + tt.parse(L.mt_drc) + '</p><br/>';
 	h2 = [];
-	html = ['<table><tr><td rowspan="2">',
-		'<a id="au_drc" class="tgl btn" href="#" tt="' + L.mt_drc + '">' + L.enable + '</a></td>'];
+	html = ['<table><tr>'];
 
 	for (var a = 0; a < r.drch.length; a++) {
 		html.push('<td>' + r.drch[a] + '</td>');
@@ -3196,11 +3838,12 @@ var afilt = (function () {
 	}
 	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><table>';
-	ebi('audio_drc').innerHTML = html;
+	ebi('audio_drc').innerHTML += html;
 
+	ebi('audio_ss').innerHTML = '<a id="au_ss" class="tgl btn" href="#">' + L.enable +
+		'</a><p class="s_desc">' + tt.parse(L.mt_ss) + '</p><br/>';
 	h2 = [];
-	html = ['<table><tr><td rowspan="2">',
-		'<a id="au_ss" class="tgl btn" href="#" tt="' + L.mt_ss + '">' + L.enable + '</a></td>'];
+	html = ['<table><tr>'];
 
 	for (var a = 0; a < r.sscl.length; a++) {
 		html.push('<td tt="' + r.sscl[a] + '</td>');
@@ -3209,7 +3852,7 @@ var afilt = (function () {
 
 	html = html.join('\n') + '</tr><tr>';
 	html += h2.join('\n') + '</tr><table>';
-	ebi('audio_ss').innerHTML = html;
+	ebi('audio_ss').innerHTML += html;
 
 	var stp = QSA('a.eq_step');
 	for (var a = 0, aa = stp.length; a < aa; a++)
@@ -3319,8 +3962,22 @@ function play(tid, is_ev, seek) {
 	}
 
 	mp.au.osrc = mp.tracks[tid];
+
+	var tname = esc(uricom_dec(mp.au.osrc.split('/').pop().split('?')[0]));
+	var el = ebi('trackname');
+	el.innerHTML = tname;
+	el.setAttribute('tt', tname);
+	tt.att(ebi('pctl'));
+
 	afilt.apply();
 
+	// popup player
+	ebi('mu_tn').innerHTML = tname.replace(/\.[0-9a-z]+$/i, '');
+	var m_ext = tname.match(/[^\.]*$/);
+	if(m_ext){
+		QS('#mu_th>svg').style.color = intToHSL(hashCode(m_ext[0]))
+		QS('#mu_th>span').innerHTML = m_ext[0];
+	}
 	setTimeout(function () {
 		mpl.unbuffer(url);
 	}, 500);
@@ -3342,6 +3999,7 @@ function play(tid, is_ev, seek) {
 	clmod(t_tr, 'play', 1);
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
 	clmod(ebi('wtoggle'), 'm3u', mpl.m3uen);
+
 	if (thegrid)
 		thegrid.loadsel();
 
@@ -3368,13 +4026,9 @@ function play(tid, is_ev, seek) {
 		}
 		mpl.np = ft2dict(t_tr, { 'up_ip': 1 });
 
-		pbar.unwave();
-		if (mpl.waves)
-			pbar.loadwaves(url.replace(/\bth=(opus|mp3)&/, '') + '&th=p');
-
 		mpss.go();
 		mpui.progress_updater();
-		pbar.onresize();
+		mpl.selectprogbar();
 		vbar.onresize();
 		mpl.announce();
 		return true;
@@ -3576,6 +4230,7 @@ function eval_hash() {
 
 	var media = scan_hash(v);
 	if (media) {
+		console.log('got media in hash')
 		var mtype = media[0],
 			id = media[1],
 			ts = media[2];
@@ -3588,16 +4243,13 @@ function eval_hash() {
 		}
 
 		if (mtype == 'g') {
-			if (!thegrid.en)
-				ebi('griden').click();
-
 			var t = setInterval(function () {
-				if (!thegrid.bbox)
+				if (!msel.bbox || !msel.ready)
 					return;
 
 				clearInterval(t);
 				baguetteBox.urltime(ts);
-				var im = QS('#ggrid a[ref="' + id + '"]');
+				var im = ebi(id);
 				if (!im)
 					return toast.warn(10, L.im_hnf);
 
@@ -3642,7 +4294,6 @@ function eval_hash() {
 			d.setAttribute('href', '#');
 			d.setAttribute('class', 'ayjump');
 			d.innerHTML = a ? L.ay_path : L.ay_files;
-			document.body.insertBefore(d, ebi('ops'));
 			d.onclick = function (e) {
 				ev(e);
 				if (a)
@@ -3654,13 +4305,16 @@ function eval_hash() {
 			};
 		})(a);
 
-	// account-info label
-	var d = mknod('div', 'acc_info');
-	document.body.insertBefore(d, ebi('ops'));
-
 	// folder nav
-	ebi('goh').parentElement.appendChild(mknod('span', null,
-		'<a href="#" id="gop" tt="' + L.gop + '</a>/<a href="#" id="gou" tt="' + L.gou + '</a>/<a href="#" id="gon" tt="' + L.gon + '</a>'));
+	// from https://www.svgrepo.com/collection/iconcino-interface-icons/
+	var svg_left = svg_box + '<path d="M11 6L5 12M5 12L11 18M5 12H19" ' + svg_options +'/>';
+	var svg_right = svg_box + '<path d="M13 6L19 12M19 12L13 18M19 12H5" ' + svg_options +'/>';
+	var svg_up = svg_box + '<path d="M12 19V5M18 11L12 5L6 11" ' + svg_options +'/>';
+
+	ebi('gop').innerHTML = svg_left;
+	ebi('gon').innerHTML = svg_right;
+	ebi('gou').innerHTML = svg_up;
+	
 	ebi('gop').onclick = function () { tree_neigh(-1); }
 	ebi('gon').onclick = function () { tree_neigh(1); }
 	ebi('gou').onclick = function () { tree_up(true); }
@@ -3671,6 +4325,8 @@ function eval_hash() {
 	}
 	bcfg_bind(props, 'sbars', 'sbars', true, setsb);
 	setsb();
+
+	bcfg_bind(props, 'enbg', 'enbg', true, function(){ setBg(props.enbg ? window.bg_img : '')});
 
 	// compact media player
 	function setacmp() {
@@ -3933,14 +4589,27 @@ function fs_abrt() {
 	xhr.send();
 }
 
+if(navigator.serviceWorker && caches){
+	caches.open('/media').then(function(cache){
+		return cache.match('/shared-file-count')
+	}).then(function(r){
+		return r && r.text();
+	}).then(function(count){
+		window.shr_target = count > 0;
+		fileman.render();
+	});
+}
 
 var fileman = (function () {
 	var bren = ebi('fren'),
 		bdel = ebi('fdel'),
 		bcut = ebi('fcut'),
 		bcpy = ebi('fcpy'),
+		bsav = ebi('fsav'),
 		bpst = ebi('fpst'),
 		bshr = ebi('fshr'),
+		bcpl = ebi('fcpl'),
+		bclr = ebi('fclr'),
 		t_paste,
 		r = {};
 
@@ -3967,11 +4636,14 @@ var fileman = (function () {
 			encut = nsel,
 			encpy = nsel,
 			enpst = r.clip && r.clip.length,
-			hren = !(have_mv && has(perms, 'write') && has(perms, 'move')),
-			hdel = !(have_del && has(perms, 'delete')),
-			hcut = !(have_mv && has(perms, 'move')),
-			hpst = !(have_mv && has(perms, 'write')),
-			hshr = !can_shr || !get_evpath().indexOf(have_shr);
+			hren = !(have_mv && has(perms, 'write') && has(perms, 'move')) || !nsel,
+			hdel = !(have_del && has(perms, 'delete')) || !nsel,
+			hcut = !(have_mv && has(perms, 'move')) || !nsel,
+			hpst = !(have_mv && has(perms, 'write')) || !enpst,
+			hshr = !can_shr || !get_evpath().indexOf(have_shr),
+			hcpl = !nsel,
+			hsav = !window.shr_target,
+			enclr = enpst || nsel || window.shr_target;
 
 		if (!(enren || endel || encut || enpst))
 			hren = hdel = hcut = hpst = true;
@@ -3981,13 +4653,20 @@ var fileman = (function () {
 		clmod(bcut, 'en', encut);
 		clmod(bcpy, 'en', encpy);
 		clmod(bpst, 'en', enpst);
+		clmod(bsav, 'en', 1);
 		clmod(bshr, 'en', 1);
+		clmod(bcpl, 'en', 1);
+		clmod(bclr, 'en', 1);
 
 		clmod(bren, 'hide', hren);
 		clmod(bdel, 'hide', hdel);
 		clmod(bcut, 'hide', hcut);
-		clmod(bpst, 'hide', hpst);
+		clmod(bcpy, 'hide', !encpy);
+		clmod(bpst, 'hide', !enpst);
+		clmod(bsav, 'hide', hsav);
 		clmod(bshr, 'hide', hshr);
+		clmod(bcpl, 'hide', hcpl);
+		clmod(bclr, 'hide', !enclr);
 
 		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
 		clmod(ebi('wtoggle'), 'm3u', mpl.m3uen && (nsel || (mp && mp.au)));
@@ -4001,6 +4680,9 @@ var fileman = (function () {
 
 		bpst.setAttribute('tt', L.ft_paste.format(r.clip.length));
 		bshr.setAttribute('tt', nsel ? L.fs_ss : L.fs_sc);
+
+		ebi('spaceFree').innerHTML = volspace[0] + ' free of ' + volspace[1];
+		ebi('spaceUsed_bar').style.width = (volspace[2] / 100) + '%';
 	};
 
 	r.fsi = function (sel) {
@@ -4037,6 +4719,33 @@ var fileman = (function () {
 
 		return ret;
 	};
+
+	r.clear = function (e) {
+		ev(e);
+
+		if(window.shr_target){
+			window.shr_target = false;
+			caches.open('/media').then(function(cache){
+				cache.match('/shared-file-count').then(function(r){
+					return r && r.text()
+				}).then(function(count){
+					if(count > 0){
+						cache.delete('/shared-file-count');
+						for(var i = 0; i < count; i++){
+							cache.delete('/shared-file-' + i);
+							cache.delete('/shared-filename-' + i);
+						}
+					}
+				});
+			});
+		}
+
+		var stamp = Date.now();
+		msel.evsel();
+		jwrite('fman_clip', [stamp]);
+		r.clip = [];
+		r.tx(stamp);
+	}
 
 	r.share = function (e) {
 		ev(e);
@@ -4227,6 +4936,21 @@ var fileman = (function () {
 		setTimeout(sh_pw.focus.bind(sh_pw), 1);
 	};
 
+	r.link = function (e) {
+		var sel = msel.getsel(),
+			vps = [];
+
+		for (var a = 0; a < sel.length; a++)
+			vps.push(ebi(sel[a].id).href);
+
+		if (!sel.length)
+			return toast.err(3, L.fd_emore);
+
+		ev(e);
+
+		cliptxt(vps.join(' \n'), function () { toast.ok(2, L.clipped) }); 
+	}
+
 	r.rename = function (e) {
 		ev(e);
 		var sel = msel.getsel(),
@@ -4256,7 +4980,7 @@ var fileman = (function () {
 
 			var vsp = vsplit(vp);
 			if (base != vsp[0])
-				return toast.err(0, esc('bug:\n' + base + '\n' + vsp[0]));
+				return toast.err(0, esc('batch rename not allowed for differing file paths:\n' + base + '\n' + vsp[0]));
 
 			var vars = ft2dict(ebi(sel[a].id).closest('tr'));
 			mkeys = [".n.d", ".n.s"].concat(vars[1], vars[2]);
@@ -4638,43 +5362,53 @@ var fileman = (function () {
 	};
 
 	r.cut = function (e) {
+		var useClip = r.clip.length > 0;
+
 		var sel = msel.getsel(),
 			stamp = Date.now(),
 			vps = [stamp];
 
-		if (!sel.length)
+		if (!useClip && !sel.length)
 			return toast.err(3, L.fc_emore);
 
 		ev(e);
 
-		if (clgot(bcut, 'hide'))
+		if (!useClip && clgot(bcut, 'hide'))
 			return toast.err(3, L.fc_eperm);
 
-		var els = [], griden = thegrid.en;
-		for (var a = 0; a < sel.length; a++) {
-			vps.push(sel[a].vp);
-			if (sel.length < 100)
-				try {
-					if (griden)
-						els.push(QS('#ggrid>a[ref="' + sel[a].id + '"]'));
-					else
-						els.push(ebi(sel[a].id).closest('tr'));
+		if(!useClip){
+			var els = [], griden = thegrid.en;
+			for (var a = 0; a < sel.length; a++) {
+				vps.push(sel[a].vp);
+				if (sel.length < 100)
+					try {
+						if (griden)
+							els.push(QS('#ggrid>a[ref="' + sel[a].id + '"]'));
+						else
+							els.push(ebi(sel[a].id).closest('tr'));
 
-					clmod(els[a], 'fcut');
+						clmod(els[a], 'fcut');
+					}
+					catch (ex) { }
+			}
+
+			setTimeout(function () {
+				try {
+					for (var a = 0; a < els.length; a++)
+						clmod(els[a], 'fcut', 1);
 				}
 				catch (ex) { }
+			}, 1);
+
+			r.clip = vps.slice(1);
+		}
+		else {
+			for (var a = 0; a < r.clip.length; a++) {
+				vps.push(r.clip[a]);
+			}
 		}
 
-		setTimeout(function () {
-			try {
-				for (var a = 0; a < els.length; a++)
-					clmod(els[a], 'fcut', 1);
-			}
-			catch (ex) { }
-		}, 1);
-
 		r.ccp = false;
-		r.clip = vps.slice(1);
 
 		try {
 			vps = JSON.stringify(vps);
@@ -4689,6 +5423,9 @@ var fileman = (function () {
 		catch (ex) {
 			toast.warn(30, L.fc_warn.format(sel.length));
 		}
+
+		if(thegrid.tempsel)
+			msel.evsel();
 	};
 
 	r.cpy = function (e) {
@@ -4749,6 +5486,9 @@ var fileman = (function () {
 		catch (ex) {
 			toast.warn(30, L.fcc_warn.format(sel.length));
 		}
+
+		if(thegrid.tempsel)
+			msel.evsel();
 	};
 
 	document.onpaste = function (e) {
@@ -4817,7 +5557,10 @@ var fileman = (function () {
 		t_paste = setTimeout(r.paste, 50);
 	};
 
-	r.paste = function () {
+	r.paste = function (justgo) {
+		if (ebi('unsearch'))
+			return toast.err(3, L.fp_esrch)
+
 		if (!r.clip.length)
 			return toast.err(5, L.fp_ecut);
 
@@ -4840,7 +5583,7 @@ var fileman = (function () {
 			f = [],
 			indir = [],
 			srcdir = vsplit(r.clip[0])[0],
-			links = QSA('#files tbody td:nth-child(2) a');
+			links = QSA('#files .flink');
 
 		r.f = f;
 
@@ -4911,6 +5654,8 @@ var fileman = (function () {
 			for (var a = 0; a < f.length; a++)
 				src.push(f[a].src);
 
+			if (justgo)
+				return okgo();
 			return modal.confirm((r.ccp ? L.fcp_confirm : L.fp_confirm).format(f.length) + '<ul>' + uricom_adec(src, true).join('') + '</ul>', okgo, null);
 		}
 
@@ -5002,6 +5747,8 @@ var fileman = (function () {
 				}
 			}
 			r.render();
+			if(('' + msg).startsWith(window.location.origin))
+				msg = msg.replace(window.location.origin, "");
 			if (msg == get_evpath())
 				treectl.goto(msg);
 		};
@@ -5028,7 +5775,10 @@ var fileman = (function () {
 	bcut.onclick = r.cut;
 	bcpy.onclick = r.cpy;
 	bpst.onclick = r.paste;
+	if(up2k) bsav.onclick = up2k.save_here; // just in case up2k ever inits first
 	bshr.onclick = r.share;
+	bcpl.onclick = r.link;
+	bclr.onclick = r.clear;
 
 	return r;
 })();
@@ -5541,31 +6291,70 @@ var showfile = (function () {
 })();
 
 
-var thegrid = (function () {
+window.thegrid = (function () {
 	var lfiles = ebi('files'),
 		gfiles = mknod('div', 'gfiles');
 
+	var svg_list = svg_box + '<path fill-rule="evenodd" clip-rule="evenodd" d="M9 6C9 4.34315 7.65685 3 6 3H4C2.34315 3 1 4.34315 1 6V8C1 9.65685 2.34315 11 4 11H6C7.65685 11 9 9.65685 9 8V6ZM7 6C7 5.44772 6.55228 5 6 5H4C3.44772 5 3 5.44772 3 6V8C3 8.55228 3.44772 9 4 9H6C6.55228 9 7 8.55228 7 8V6Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9 16C9 14.3431 7.65685 13 6 13H4C2.34315 13 1 14.3431 1 16V18C1 19.6569 2.34315 21 4 21H6C7.65685 21 9 19.6569 9 18V16ZM7 16C7 15.4477 6.55228 15 6 15H4C3.44772 15 3 15.4477 3 16V18C3 18.5523 3.44772 19 4 19H6C6.55228 19 7 18.5523 7 18V16Z" fill="currentColor"/><path d="M11 7C11 6.44772 11.4477 6 12 6H22C22.5523 6 23 6.44772 23 7C23 7.55228 22.5523 8 22 8H12C11.4477 8 11 7.55228 11 7Z" fill="currentColor"/><path d="M11 17C11 16.4477 11.4477 16 12 16H22C22.5523 16 23 16.4477 23 17C23 17.5523 22.5523 18 22 18H12C11.4477 18 11 17.5523 11 17Z" fill="currentColor"/></svg>'
+	var svg_grid = svg_box + '<rect x="4" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="4" y="13" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="4" width="7" height="7" rx="1" fill="currentColor"/><rect x="13" y="13" width="7" height="7" rx="1" fill="currentColor"/></svg>'
+	var svg_gallery = svg_box + '<path d="M4 17L7.58959 13.7694C8.38025 13.0578 9.58958 13.0896 10.3417 13.8417L11.5 15L15.0858 11.4142C15.8668 10.6332 17.1332 10.6332 17.9142 11.4142L20 13.5M11 9C11 9.55228 10.5523 10 10 10C9.44772 10 9 9.55228 9 9C9 8.44772 9.44772 8 10 8C10.5523 8 11 8.44772 11 9ZM6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z"' + svg_options + '/></svg>'
+	
 	gfiles.style.display = 'none';
 	gfiles.innerHTML = (
-		'<div id="ghead" class="ghead">' +
-		'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
-		'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
-		'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
-		'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
-		'<span>' + L.gt_zoom + ': ' +
-		'<a href="#" class="btn" z="-1.1" tt="Hotkey: shift-A">&ndash;</a> ' +
-		'<a href="#" class="btn" z="1.1" tt="Hotkey: shift-D">+</a></span> <span>' + L.gt_chop + ': ' +
-		'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
-		'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a></span> <span>' + L.gt_sort + ': ' +
-		'<a href="#" s="href">' + L.gt_name + '</a> ' +
-		'<a href="#" s="sz">' + L.gt_sz + '</a> ' +
-		'<a href="#" s="ts">' + L.gt_ts + '</a> ' +
-		'<a href="#" s="ext">' + L.gt_ext + '</a>' +
-		'</span></div>' +
+		'<div id="ghead" class="ghead normalrcm">' +
+			'<a href="#" id="listicon_template" class="grdbtn gb_lst svgIcon tgl btn" tt="' + L.wt_grid + '">' + svg_list + '</a>' +
+			'<a href="#" id="gridicon_template" class="grdbtn gb_grd svgIcon tgl btn on" tt="' + L.wt_grid + '">' + svg_grid + '</a>' +
+			'<a href="#" id="galleryicon_template" class="grdbtn gb_glr svgIcon tgl btn" tt="' + L.wt_gallery + '">' + svg_gallery + '</a>' +
+			'<a href="#" class="tgl btn" id="gridsel" tt="' + L.gt_msel + '</a> ' +
+			'<a href="#" class="tgl btn" id="gridvau" tt="' + L.gt_vau + '</a> ' +
+			'<a href="#" class="tgl btn" id="gridcrop" tt="' + L.gt_crop + '</a> ' +
+			'<a href="#" class="tgl btn" id="gridupscale" tt="' + L.gt_upscale + '">↕</a> ' +
+			'<a href="#" class="tgl btn" id="grid3x" tt="' + L.gt_3x + '</a> ' +
+			'<span id="gridzoom">' + L.gt_zoom + ': ' +
+				'<a href="#" class="btn" z="-1.1" tt="Hotkey: shift-A">&ndash;</a> ' +
+				'<a href="#" class="btn" z="1.1" tt="Hotkey: shift-D">+</a>' +
+			'</span> <span id="gridchop">' + L.gt_chop + ': ' +
+				'<a href="#" class="btn" l="-1" tt="' + L.gt_c1 + '">&ndash;</a> ' +
+				'<a href="#" class="btn" l="1" tt="' + L.gt_c2 + '">+</a>' +
+			'</span> <span id="gridsort">' + L.gt_sort + ': ' +
+				'<a href="#" s="href">' + L.gt_name + '</a> ' +
+				'<a href="#" s="sz">' + L.gt_sz + '</a> ' +
+				'<a href="#" s="ts">' + L.gt_ts + '</a> ' +
+				'<a href="#" s="ext">' + L.gt_ext + '</a>' +
+			'</span>' +
+		'</div>' +
 		'<div id="ggrid"></div>'
 	);
 	lfiles.parentNode.insertBefore(gfiles, lfiles);
 	var ggrid = ebi('ggrid');
+
+	var ico1 = ebi('listicon_template').cloneNode(true);
+	var ico2 = ebi('gridicon_template').cloneNode(true);
+	clmod(ico1, 'on', true);
+	clmod(ico2, 'on', false);
+
+	// file list header
+	ebi('wtc').innerHTML = (
+		ico1.outerHTML +
+		ico2.outerHTML +
+		'<details id="hcol_dd">' +
+			'<summary id="h_hidden">' + L.cl_hiddenc + '</summary>' +
+		'<div id="hcol_content" class="setting">' +
+			'<a class="btn tgl" href="#" id="hcolsh">' + L.cl_hidec + '</a>' +
+			'<a class="btn" id="hcolsr">' + L.cl_reset + '</a>' +
+			'<div class="divider_h"></div>' +
+			'<div id="hcols"></div>' +
+		'</div>' +
+		'</details>'
+	);
+
+	ebi('h_hidden').onclick = function () {
+		clmod(this.parentElement, 'open', 't');
+		if(!clgot(this.parentElement, 'open') && filecols.picking){
+			filecols.unpick();
+			clmod(ebi('hcolsh'), 'on', r.picking)
+		}
+	}
 
 	var r = {
 		'sz': clamp(fcfg_get('gridsz', 10), 4, 80),
@@ -5578,7 +6367,11 @@ var thegrid = (function () {
 		ev(e);
 		var s = this.getAttribute('s'),
 			z = this.getAttribute('z'),
-			l = this.getAttribute('l');
+			l = this.getAttribute('l'),
+			grdbtn = clgot(this, 'grdbtn');
+
+		if(grdbtn)
+			return;
 
 		if (z)
 			return setsz(z > 0 ? r.sz * z : r.sz / (-z));
@@ -5616,8 +6409,11 @@ var thegrid = (function () {
 		var vis = has(perms, "read");
 		gfiles.style.display = vis && r.en ? '' : 'none';
 		lfiles.style.display = vis && !r.en ? '' : 'none';
+		ebi('wtc').style.display = lfiles.style.display;
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
+		clmod(ggrid, 'gallery', r.gallery);
+		clmod(ggrid, 'noupscale', !r.upscale);
 		ebi('pro').style.display = ebi('epi').style.display = ebi('lazy').style.display = ebi('treeul').style.display = ebi('treepar').style.display = '';
 		ebi('bdoc').style.display = 'none';
 		clmod(ebi('wrap'), 'doc');
@@ -5625,10 +6421,12 @@ var thegrid = (function () {
 		if (treectl)
 			treectl.textmode(false);
 
-		if (filecols)
-			filecols.uivis();
+		var imgs = QSA('#ggrid>a img');
+		for (var a = 0, aa = imgs.length; a < aa; a++) {
+			set_loaded(imgs[a], r.thumbs && imgs[a].complete, true);
+		}
 
-		aligngriditems();
+		setTimeout(aligngriditems, 1);
 		restore_scroll();
 	};
 
@@ -5669,84 +6467,20 @@ var thegrid = (function () {
 			setTimeout(r.tippen, 20);
 		}
 		setcvar('--grid-sz', r.sz + 'em');
-		aligngriditems();
+		setTimeout(aligngriditems, 1);
 	}
 	setsz();
 
-	function gclick1(e) {
-		if (ctrl(e) && !treectl.csel && !r.sel)
-			return true;
-
-		return gclick.call(this, e, false);
-	}
-
 	function gclick2(e) {
-		if (ctrl(e) || !r.sel)
+		if (ctrl(e) || !r.sel && !r.tempsel)
 			return true;
 
-		return gclick.call(this, e, true);
-	}
-
-	function gclick(e, dbl) {
-		var oth = ebi(this.getAttribute('ref')),
-			qhref = this.getAttribute('href'),
-			href = qhref.split('?')[0],
-			fid = oth.getAttribute('id'),
-			aplay = ebi('a' + fid),
-			atext = ebi('t' + fid),
-			is_img = img_re.test(href),
-			is_txt = atext && !is_img && !/\.ts$/.test(href) && showfile.getlang(href),
-			is_dir = href.endsWith('/'),
-			is_srch = !!ebi('unsearch'),
-			in_tree = is_dir && treectl.find(oth.textContent.slice(0, -1)),
-			have_sel = QS('#files tr.sel'),
-			td = oth.closest('td').nextSibling,
-			tr = td.parentNode;
-
-		if (!is_srch && ((r.sel && !dbl && !ctrl(e)) || (treectl.csel && (e.shiftKey || ctrl(e))))) {
-			td.onclick.call(td, e);
-			if (e.shiftKey)
-				return r.loadsel();
-			clmod(this, 'sel', clgot(tr, 'sel'));
-		}
-		else if (in_tree && !have_sel)
-			in_tree.click();
-
-		else if (oth.hasAttribute('download'))
-			oth.click();
-
-		else if (aplay && (r.vau || !is_img))
-			aplay.click();
-
-		else if (is_dir && !have_sel)
-			treectl.reqls(qhref, true);
-
-		else if (is_txt && !has(['md', 'htm', 'html'], is_txt))
-			atext.click();
-
-		else if (!is_img && have_sel)
-			window.open(qhref, '_blank');
-
-		else {
-			if (!dbl)
-				return true;
-
-			setTimeout(function () {
-				r.sel = true;
-			}, 1);
-			r.sel = false;
-			this.click();
-		}
-		ev(e);
+		var td = ebi(this.getAttribute('ref'));
+		return fclick.call(td, e, true);
 	}
 
 	r.imshow = function (url) {
-		var sel = '#ggrid>a'
-		if (!thegrid.en) {
-			thegrid.bagit('#files');
-			sel = '#files a[id]';
-		}
-		var ims = QSA(sel);
+		var ims = QSA('#files a[id]');
 		for (var a = 0, aa = ims.length; a < aa; a++) {
 			var iu = ims[a].getAttribute('href').split('?')[0].split('/').slice(-1)[0];
 			if (iu == url)
@@ -5755,22 +6489,26 @@ var thegrid = (function () {
 		baguetteBox.hide();
 	};
 
+	r.tempsel = false;
 	r.loadsel = function () {
 		if (r.dirty)
 			return;
 
 		var ths = QSA('#ggrid>a');
+		var anysel = false;
 
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			var ref = ths[a].getAttribute('ref');
 			if (!ref)
 				continue;
 			var cl = ebi(ref).closest('tr').className || '';
-
-			if (noq_href(ths[a]).endsWith('/'))
-				cl += ' dir';
-
 			ths[a].className = cl;
+
+			var chk = ths[a].getElementsByTagName('input')[0];
+			if(chk) {
+				chk.checked = cl.match(/\bsel\b/);
+				anysel = anysel || chk.checked;
+			}
 		}
 
 		var sp = ['unsearch', 'moar'];
@@ -5783,6 +6521,9 @@ var thegrid = (function () {
 						ebi(sp[a]).click();
 					};
 			})(a);
+
+		r.tempsel = TOUCH && anysel;
+		clmod(ebi('gridsel'), 'temp', r.tempsel);
 	};
 
 	r.tippen = function () {
@@ -5834,138 +6575,60 @@ var thegrid = (function () {
 		var html = [],
 			svgs = new Set(),
 			max_svgs = CHROME ? 500 : 5000,
-			need_ext = !r.thumbs || !!ext_th,
-			use_ext_th = r.thumbs && ext_th,
-			files = QSA('#files>tbody>tr>td:nth-child(2) a[id]');
+			files = QSA('#files .flink');
 
 		for (var a = 0, aa = files.length; a < aa; a++) {
 			var ao = files[a],
 				ohref = esc(ao.getAttribute('href')),
 				href = ohref.split('?')[0],
-				ext = '',
-				ext0 = '',
 				name = uricom_dec(vsplit(href)[1]),
 				ref = ao.getAttribute('id'),
-				isdir = href.endsWith('/'),
-				ac = isdir ? ' class="dir"' : '',
-				ihref = ohref;
-
-			if (need_ext && href != "#") {
-				var ar = href.split('.');
-				if (ar.length > 1)
-					ar.shift();
-
-				ar.reverse();
-				ext0 = ar[0];
-				for (var b = 0; b < Math.min(2, ar.length); b++) {
-					if (ar[b].length > 7)
-						break;
-
-					ext = ext ? (ar[b] + '.' + ext) : ar[b];
-				}
-				if (!ext)
-					ext = 'unk';
-			}
-
-			if (use_ext_th && (ext_th[ext] || ext_th[ext0])) {
-				ihref = ext_th[ext] || ext_th[ext0];
-			}
-			else if (r.thumbs) {
-				ihref = addq(ihref, 'th=' + (
-					have_jxl  ? 'x' :
-					have_webp ? 'w' :
-					'j'
-				));
-				if (!r.crop)
-					ihref += 'f';
-				if (r.x3)
-					ihref += '3';
-				if (href == "#")
-					ihref = SR + '/.cpr/ico/' + (ref == 'moar' ? '++' : 'exit');
-			}
-			else if (isdir) {
-				ihref = SR + '/.cpr/ico/folder';
-			}
-			else {
-				if (!svgs.has(ext)) {
-					if (svgs.size < max_svgs)
-						svgs.add(ext);
-					else
-						ext = "unk";
-				}
-				ihref = SR + '/.cpr/ico/' + ext;
-			}
-			ihref = addq(ihref, 'cache=i&_=' + ACB + TS);
-			if (CHROME)
-				ihref += "&raster";
+				isdir = clgot(ao.parentElement.parentElement, 'dir'),
+				ac = ao.parentElement.parentElement.classList;
 
 			html.push('<a href="' + ohref + '" ref="' + ref +
-				'"' + ac + ' ttt="' + esc(name) + '"><img style="height:' +
-				(r.sz / 1.25) + 'em" loading="lazy" fetchPriority="low" src="' +
-				ihref + '" /><span' + ac + '>' + ao.innerHTML + '</span></a>');
+				'" class="flink ' + ac + '" ttt="' + esc(name) + '">' +
+				get_thumb(ohref, ref, isdir, true) +
+				'<span class="' + ac + '">' + ao.innerHTML + '</span></a>');
 		}
 		ggrid.innerHTML = html.join('\n');
 
-		var ths = QSA('#ggrid>a>img');
+		var ths = QSA('#ggrid .imgcontainer>img');
 		for (var a = 0, aa = ths.length; a < aa; a++)
 			ths[a].onload = th_onload;
 
 		clmod(ggrid, 'crop', r.crop);
 		clmod(ggrid, 'nocrop', !r.crop);
 
-		var srch = ebi('unsearch'),
-			gsel = ebi('gridsel');
-
-		gsel.style.display = srch ? 'none' : '';
-		if (srch && r.sel)
-			gsel.click();
-
-		ths = QSA('#ggrid>a');
+		var ths = QSA('#ggrid>a');
 		for (var a = 0, aa = ths.length; a < aa; a++) {
 			ths[a].ondblclick = gclick2;
-			ths[a].onclick = gclick1;
+			ths[a].onclick = fclick1;
+		}
+
+		var imgs = QSA('#ggrid>a img');
+		for (var a = 0, aa = imgs.length; a < aa; a++) {
+			set_loaded(imgs[a], r.thumbs && imgs[a].complete, true);
+		}
+
+		var chks = QSA('.gselchk');
+		for (var a = 0, aa = chks.length; a < aa; a++) {
+			chks[a].onclick = function (e) {
+				var oth = ebi(this.closest('a').getAttribute('ref')),
+					td = oth.closest('td').nextSibling;
+				if(td && td.onclick)
+					td.onclick.call(td, e);
+				else
+					rcm.show(e);
+			}
 		}
 
 		r.dirty = false;
-		r.bagit('#ggrid');
 		r.loadsel();
-		aligngriditems();
+		setTimeout(aligngriditems, 1);
 		setTimeout(r.tippen, 20);
+		drag.initgrid();
 	}
-
-	r.bagit = function (isrc) {
-		if (!window.baguetteBox)
-			return;
-
-		if (r.bbox)
-			baguetteBox.destroy();
-
-		var br = baguetteBox.run(isrc, {
-			noScrollbars: true,
-			duringHide: r.onhide,
-			afterShow: function () {
-				r.bbox_opts.refocus = true;
-			},
-			captions: function (g, idx) {
-				var h = '' + g;
-
-				return '<a download href="' + h +
-					'">' + (idx + 1) + ' / ' + this.length + ' -- ' +
-					esc(uricom_dec(h.split('/').pop())) + '</a>';
-			},
-			onChange: function (i, maxIdx) {
-				if (this[i].imageElement) {
-					var h = 'g' + this[i].imageElement.getAttribute('ref');
-					if (this[i].page)
-						h += ',p' + this[i].page;
-					h += getsort();
-					sethash(h);
-				}
-			}
-		});
-		r.bbox = true;
-		r.bbox_opts = br[1];
-	};
 
 	r.onhide = function () {
 		afilt.apply();
@@ -6037,18 +6700,30 @@ var thegrid = (function () {
 			swrite('thumbs', 1);
 	}
 
-	bcfg_bind(r, 'thumbs', 'thumbs', true, r.setdirty);
+	bcfg_bind(r, 'thumbs', 'thumbs', true, function(e){
+		r.setdirty(); 
+		msel.render();
+	});
 	bcfg_bind(r, 'ihop', 'ihop', true);
 	bcfg_bind(r, 'vau', 'gridvau', false);
 	bcfg_bind(r, 'crop', 'gridcrop', !dcrop.endsWith('n'), r.set_crop);
+	bcfg_bind(r, 'upscale', 'gridupscale', true, function (v) {
+		clmod(ggrid, 'noupscale', !v)
+	});
 	bcfg_bind(r, 'x3', 'grid3x', dth3x.endsWith('y'), r.set_x3);
-	bcfg_bind(r, 'sel', 'gridsel', false, r.loadsel);
+	bcfg_bind(r, 'sel', 'gridsel', false, function (e) {
+		if (r.tempsel) {
+			r.tempsel = false;
+			clmod(ebi('gridsel'), 'temp', false);
+		}
+		r.loadsel();
+	});
 	bcfg_bind(r, 'en', 'griden', dgrid, function (v) {
 		v ? loadgrid() : r.setvis(true);
 		pbar.onresize();
 		vbar.onresize();
 	});
-	bcfg_bind(r, 'gaen', 'gauto', !!dgauto, function(v) {
+	bcfg_bind(r, 'gaen', 'gauto', !!dgauto, function (v) {
 		if (r.en && sread("griden") != 1) {
 			r.en = false;
 			r.setvis(true);
@@ -6059,16 +6734,156 @@ var thegrid = (function () {
 		var n = parseInt(this.value);
 		swrite('ga_thresh', r.gathr = (isNum(n) ? n : 0) || 70);
 	};
-	ebi('wtgrid').onclick = ebi('griden').onclick;
+
+	var gbtn = QSA('.gb_grd');
+	for(var a = 0; a < gbtn.length; a++)
+		gbtn[a].onclick = function(){
+			if(!thegrid.en)
+				ebi('griden').click();
+		}
+
+	var lsbtn = QSA('.gb_lst');
+	for(var a = 0; a < lsbtn.length; a++)
+		lsbtn[a].onclick = function(){
+			if(thegrid.en)
+				ebi('griden').click();
+		}
+
+	bcfg_bind(r, 'gallery', 'galleryicon_template', false, function (v) {
+		clmod(ebi('ggrid'), 'gallery', v);
+	});
 
 	return r;
 })();
 
+function get_thumb(ohref, ref, isdir, grid){
+	var href = ohref.split('?')[0],
+		ext = '',
+		ext0 = '',
+		need_ext = !thegrid.thumbs || !!ext_th,
+		use_ext_th = thegrid.thumbs && ext_th,
+		ihref = ohref;
 
-function th_onload() {
-	this.style.height = '';
+	if (need_ext && href != "#") {
+		href = href.match(/[^/]*$/)[0]
+		var ar = href.split('.');
+		if (ar.length > 1){
+			ar.shift();
+			ar.reverse();
+			ext0 = ar[0];
+			for (var b = 0; b < Math.min(2, ar.length); b++) {
+				ext = ext ? (ar[b] + '.' + ext) : ar[b];
+				if (ext.length > 2)
+					break;
+			}
+		}
+		if (!ext)
+			ext = 'unk';
+	}
+
+	if (use_ext_th && (ext_th[ext] || ext_th[ext0])) {
+		ihref = ext_th[ext] || ext_th[ext0];
+	}
+	else if (thegrid.thumbs) {
+		ihref = addq(ihref, 'th=' + (
+			have_jxl ? 'x' :
+			have_webp ? 'w' :
+			'j'
+		));
+		if (grid && !thegrid.crop)
+			ihref += 'f';
+		if (grid && thegrid.x3)
+			ihref += '3';
+		if (href == "#")
+			ihref = SR + '/.cpr/ico/' + (ref == 'moar' ? '++' : 'exit');
+	}
+	else {
+		ihref = '';
+	}
+
+	if(ihref){
+		ihref = addq(ihref, 'cache=i&_=' + ACB + TS);
+
+		var accent = getComputedStyle(document.body).getPropertyValue('--a');
+		if (!accent)
+			accent = '#07c';
+		ihref += '&a=' + parseColor(accent).replace(/ /g, '');
+	}
+
+	var svg = '<use href="#' +
+		(isdir ? 'folder' : 'file') + '-icon" color="' +
+		(ext == 'unk' || ext.startsWith('/') ? '#0000' : intToHSL(hashCode(ext))) + '"/>';
+	svg = '<svg class="thumb" width="100%" height="100%">' + svg + '</svg>';
+
+	if (N3DS){
+		// 3DS / unsupported: use fallback
+		svg = '<span class="thumb">' + (isdir ? '📁[FOLDER]' : '📄[FILE:' + ext + ']') + '</span>';
+		ext = 'unk';
+	}
+
+	var container = '<div class="imgcontainer" ref="' + ref + '">' +
+		(grid ? '<input type="checkbox" class="gselchk"></input>' : '') +
+		svg +
+		(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
+			'<span class="th_ext" style="font-size: ' + 
+			(grid ? 
+				(thegrid.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' + (ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')' :
+				'.8em') + 
+			'"><span class="inner">' + ext + '</span></span>') +
+		'<img loading="lazy" fetchPriority="low" src="' +
+		ihref + '" /></div>'
+		// onload needs to be set afterwards due to nonces
+	return container;
 }
 
+function th_onload() {
+	set_loaded(this, true, false)
+}
+
+function set_loaded(el, state, dblcheck) {
+	if(state && dblcheck) {
+		testImage(el);
+		return;
+	}
+	if(el.parentElement == null || el.parentElement.parentElement == null)
+		return;
+	var p = el.parentElement.parentElement
+	clmod(p, 'thumbed', state)
+	var a = p.getAttribute('ref')
+	if(a){
+		var b = ebi(a)
+		if(b){
+			var c = b.closest('tr')
+			if(c)
+				clmod(c, 'thumbed', state)
+		}
+	}
+}
+
+function testImage(el) {
+	var URL = el.src
+    var tester=new Image();
+    tester.onload=
+		function imageFound() {
+			set_loaded(el, true, false)
+		};
+    tester.onerror=
+		function imageFound() {
+			set_loaded(el, false, false)
+		};
+    tester.src=URL;
+}
+
+function hashCode (str) {
+	var hash = 0;
+	for(var i = 0; i < str.length; i++){
+		hash = str.charCodeAt(i) + 130 * ((hash << 5) - hash);
+	}
+	return hash
+}
+function intToHSL(i){
+	return 'hsl(' + i % 360 + 'deg 100% 50%)'
+}
 
 function tree_scrollto(e) {
 	ev(e);
@@ -6218,7 +7033,7 @@ function fselfunw(e, ae, d, rem) {
 	}
 	selfun();
 }
-var konmai = 0, konmak = (function() {
+var konmai = 0, konmak = (function () {
 	var u = "arrowup",
 		d = "arrowdown",
 		l = "arrowleft",
@@ -6235,7 +7050,8 @@ var ahotkeys = function (e) {
 	var k = (e.key || e.code) + '', pos = -1, n,
 		sh = e.shiftKey,
 		ae = document.activeElement,
-		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '';
+		aet = ae && ae != document.body ? ae.nodeName.toLowerCase() : '',
+		aett = aet ? ae.type : '';
 
 	if (k.startsWith('Key'))
 		k = k.slice(3);
@@ -6250,15 +7066,16 @@ var ahotkeys = function (e) {
 	if (konmai < 0)
 		noop();
 	else if (konmak[konmai] != kl)
-		konmai = konmai && kl == konmak[0] ? (konmai<3?konmai:1):0;
+		konmai = konmai && kl == konmak[0] ? (konmai < 3 ? konmai : 1) : 0;
 	else if (++konmai >= konmak.length) {
 		konmai = -1;
 		document.documentElement.scrollTop = 0;
 		settheme.go(6);
 		start_actx();
 		sfx_nice();
+		treectl.entree();
 		toast.inf(9, 'omega clearance granted', null, 'top');
-		setTimeout(function() {
+		setTimeout(function () {
 			apply_perms(treectl.lsc);
 			fileman.render();
 		}, 573);
@@ -6284,6 +7101,12 @@ var ahotkeys = function (e) {
 		if (ebi('sh_abrt'))
 			return ebi('sh_abrt').click();
 
+		if (QS('#music.vis'))
+			return ebi('cl_mu').click();
+
+		if (!clgot(ebi('fclr'), 'hide'))
+			return fileman.clear();
+
 		if (QS('.opview.act'))
 			return QS('#ops>a').click();
 
@@ -6303,7 +7126,7 @@ var ahotkeys = function (e) {
 			return ebi('griden').click();
 	}
 
-	if (aet == 'input')
+	if (aet == 'input' && aett != 'checkbox')
 		return;
 
 	var in_ftab = (aet == 'tr' || aet == 'td') && ae.closest('#files');
@@ -6356,13 +7179,13 @@ var ahotkeys = function (e) {
 	if (k.endsWith('Enter') && ae && (ae.onclick || ae.hasAttribute('tabIndex')))
 		return ev(e) && ae.click() || true;
 
-	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre')
+	if (aet && aet != 'a' && aet != 'tr' && aet != 'td' && aet != 'div' && aet != 'pre' && aett != 'checkbox')
 		return;
 
 	if (k == '?')
 		return hkhelp();
 
-	if (!sh && ctrl(e)) {
+	if (!sh && ctrl(e) || k.endsWith('Delete')) {
 		var sel = window.getSelection && window.getSelection() || {};
 		sel = sel && !sel.isCollapsed && sel.direction != 'none';
 
@@ -6375,7 +7198,7 @@ var ahotkeys = function (e) {
 		if (kl == 'v')
 			return fileman.d_paste(e);
 
-		if (kl == 'k')
+		if (kl == 'k' || (k.endsWith('Delete') && !ctrl(e)))
 			return fileman.delete(e);
 
 		return;
@@ -6472,35 +7295,35 @@ var ahotkeys = function (e) {
 var search_ui = (function () {
 	var sconf = [
 		[
-			L.s_sz,
-			["szl", "sz_min", L.s_s1, "14", ""],
-			["szu", "sz_max", L.s_s2, "14", ""]
-		],
-		[
-			L.s_dt,
-			["dtl", "dt_min", L.s_d1, "14", "1997-08-15, 01:00"],
-			["dtu", "dt_max", L.s_d2, "14", "2020"]
+			L.s_fn,
+			["name", "name", L.s_f1, "td_s", ".exe$"]
 		],
 		[
 			L.s_rd,
-			["path", "path", L.s_r1, "30", "windows  -system32"]
+			["path", "path", L.s_r1, "td_w", "windows  -system32"]
 		],
 		[
-			L.s_fn,
-			["name", "name", L.s_f1, "30", ".exe$"]
+			L.s_sz,
+			["szl", "sz_min", L.s_s1, "td_s", ""],
+			["szu", "sz_max", L.s_s2, "td_s", ""]
+		],
+		[
+			L.s_dt,
+			["dtl", "dt_min", L.s_d1, "td_s", "1997-08-15, 01:00", "date"],
+			["dtu", "dt_max", L.s_d2, "td_s", "2020", "date"]
 		],
 		[
 			L.s_ta,
-			["tags", "tags", L.s_t1, "30", "^irui$"]
+			["tags", "tags", L.s_t1, "td_w", "^irui$"]
 		],
 		[
 			L.s_ad,
-			["adv", "adv", L.s_a1, "30", "key>=1A  key<=2B  .bpm>165"]
+			["adv", "adv", L.s_a1, "td_w", "key>=1A  key<=2B  .bpm>165"]
 		],
 		[
 			L.s_ua,
-			["utl", "ut_min", L.s_u1, "14", "2007-04-08"],
-			["utu", "ut_max", L.s_u2, "14", "2038-01-19"]
+			["utl", "ut_min", L.s_u1, "td_s", "2007-04-08", "date"],
+			["utu", "ut_max", L.s_u2, "td_s", "2038-01-19", "date"]
 		]
 	];
 
@@ -6514,13 +7337,14 @@ var search_ui = (function () {
 		var html = ['<tr id="tsrch_' + sconf[a][1][0] + '"><td><br />' + sconf[a][0] + '</td>'];
 		for (var b = 1; b < 3; b++) {
 			var hn = "srch_" + sconf[a][b][0],
-				csp = (sconf[a].length == 2) ? 2 : 1;
+				csp = (sconf[a].length == 2) ? 2 : 1,
+				type = sconf[a][b].length >= 6 ? sconf[a][b][5] : "text";
 
 			html.push(
 				'<td colspan="' + csp + '"><input id="' + hn + 'c" type="checkbox">\n' +
 				'<label for="' + hn + 'c">' + sconf[a][b][2] + '</label>\n' +
-				'<br /><input id="' + hn + 'v" type="text" style="width:' + sconf[a][b][3] +
-				'em" name="' + sconf[a][b][1] + '" placeholder="' + sconf[a][b][4] + '" /></td>');
+				'<br /><input id="' + hn + 'v" type="' + type + '" class="' + sconf[a][b][3] +
+				'" name="' + sconf[a][b][1] + '" placeholder="' + sconf[a][b][4] + '" /></td>');
 			if (csp == 2)
 				break;
 		}
@@ -6539,6 +7363,58 @@ var search_ui = (function () {
 		o[a].oninput = ev_search_input;
 		o[a].onkeydown = ev_search_keydown;
 	}
+
+	var folderSearch = ebi('folder_search');
+	folderSearch.placeholder = L.s_dir;
+	folderSearch.onfocus = function(){
+		ebi('srch_pathc').checked = true;
+		var path = decodeURI(get_evpath());
+		ebi('srch_pathv').value = path.slice(1) || '/';
+	}
+	if(IE)
+		folderSearch.onclick = function() {
+			clmod(ebi('srch_quickopts'), 'act', 't');
+		}
+	folderSearch.oninput = function(){
+		var v = unsmart(this.value);
+		if(IE && !v)
+			return;
+		var nsearch = ebi('srch_namev');
+		nsearch.value = v;
+		nsearch.oninput();
+	}
+	folderSearch.onkeydown = ev_search_keydown;
+
+	var expand = sread('s_ex') == 'true';
+	exp_search(expand);
+	function exp_search (e) {
+		clmod(ebi('op_search'), 'vis', e);
+
+		var ms = ebi('moresearch');
+		if(e){
+			window.scrollTo(0, 0);
+			ms.innerHTML = '<span>▲</span>';
+		}
+		else{
+			ms.innerHTML = '<span>▼</span>';
+		}
+	}
+	ebi('moresearch').onclick = function () {
+		expand = !expand;
+		swrite('s_ex', expand);
+		exp_search(expand);
+	};
+
+	ebi('closesearch').onclick = function (e) {
+		ebi('opa_srch').click();
+		folderSearch.value = '';
+		if(ebi('unsearch'))
+			ebi('unsearch').click();
+	}
+
+	var recur_c = ebi('srch_recursivec');
+	recur_c.oninput = ev_search_input;
+	ebi('srch_recursivelbl').innerHTML = L.s_rec;
 
 	function srch_msg(err, txt) {
 		var o = ebi('srch_q');
@@ -6599,7 +7475,12 @@ var search_ui = (function () {
 		srch_msg(false, (q == vq) ? '' : L.sm_prev + (vq ? vq : '(*)'));
 	}
 
+	function onlyUnique(value, index, array) {
+		return array.indexOf(value) == index && value.length > 0;
+	}
+
 	function encode_query() {
+		var recursive = ebi('srch_recursivec').checked;
 		var q = '';
 		for (var a = 0; a < sconf.length; a++) {
 			for (var b = 1; b < sconf[a].length; b++) {
@@ -6608,8 +7489,23 @@ var search_ui = (function () {
 					vs = unsmart(ebi('srch_' + k + 'v').value),
 					tvs = [];
 
-				if (a == 1)
-					vs = vs.trim().replace(/ +/, 'T');
+				if(k == 'path' && vs.endsWith('/') && !vs.match('"')){
+					vs = vs.slice(0, -1);
+					vs = '"' + vs + (recursive ? '*' : '') + '"';
+					tvs.push(vs);
+					vs = '';
+				}
+
+				var match = vs.match(/\B("(?:[^"]|\\")*[^\\]")\B/g);
+				if(match != null){
+					var immune = match.filter(onlyUnique)
+					for(var i = 0; i < immune.length; i++){
+						if(immune[i].length > 0){
+							tvs.push(immune[i]);
+							vs = vs.replace(immune[i], '')
+						}
+					}
+				}
 
 				while (vs) {
 					vs = vs.trim();
@@ -6628,7 +7524,8 @@ var search_ui = (function () {
 						}
 					}
 					else {
-						var vp = vs.split(/ +(.*)/);
+						// split at spaces
+						var vp = vs.split(/\s+(.*)/);
 						v = vp[0].replace(/\\"/g, '"');
 						vs = vp[1] || '';
 					}
@@ -6638,12 +7535,17 @@ var search_ui = (function () {
 				if (!ebi(chk).checked)
 					continue;
 
+				if(q.length > 0)
+					q += ' and ';
+
+				q += ' ( ';
 				for (var c = 0; c < tvs.length; c++) {
 					var tv = tvs[c];
 					if (!tv.length)
 						break;
 
-					q += ' and ';
+					if(c > 0)
+						q += ' or ';
 
 					if (k == 'adv') {
 						q += tv.replace(/ +/g, " and ").replace(/([=!><]=?)/, " $1 ");
@@ -6665,27 +7567,38 @@ var search_ui = (function () {
 						if (tv.slice(0, 1) == '^') {
 							tv = tv.slice(1);
 						}
-						else {
+						else if (!tv.match(' ') && !tv.startsWith('"')){
 							tv = '*' + tv;
 						}
 
 						if (tv.slice(-1) == '$') {
 							tv = tv.slice(0, -1);
 						}
-						else {
+						else if(!tv.match(' ') && !tv.endsWith('"')){
 							tv += '*';
 						}
 
-						if (tv.indexOf(' ') + 1) {
+						if (tv.match(' ') && !tv.match('"')) {
 							tv = '"' + tv + '"';
+						}
+
+						var quote = tv.match('"') ? '"' : '';
+						var match;
+						while ( (match = tv.match(/[^\*\"\s]\*[^\*\"\s]/)) && match[0]){
+							console.log(match)
+							tv = tv.replace(
+								match[0],
+								match[0].replace('*', '*' + quote + ' and ' + k + ' like ' + quote + '*')
+							)
 						}
 
 						q += not + k + ' like ' + tv;
 					}
 				}
+				q += ' ) ';
 			}
 		}
-		ebi('q_raw').value = q.slice(5);
+		ebi('q_raw').value = q.trim();
 	}
 
 	function do_search() {
@@ -6732,7 +7645,7 @@ var search_ui = (function () {
 
 		var html = mk_files_header(tagord), seen = {};
 		html.push('<tbody>');
-		html.push('<tr class="srch_hdr"><td>-</td><td><a href="#" id="unsearch"><big style="font-weight:bold">[❌] ' + L.sl_close + '</big></a> -- ' + L.sl_hits.format(res.hits.length) + (res.trunc ? ' -- <a href="#" id="moar">' + L.sl_moar + '</a>' : '') + '</td></tr>');
+		html.push('<tr class="srch_hdr"><td>-</td><td></td><td><a href="#" id="unsearch" class="flink"><big style="font-weight:bold">[❌] ' + L.sl_close + '</big></a> -- ' + L.sl_hits.format(res.hits.length) + (res.trunc ? ' -- <a href="#" id="moar" class="flink">' + L.sl_moar + '</a>' : '') + '</td></tr>');
 
 		for (var a = 0; a < res.hits.length; a++) {
 			var r = res.hits[a],
@@ -6750,8 +7663,8 @@ var search_ui = (function () {
 			if (ext.length > 8)
 				ext = '%';
 
-			var links = linksplit(r.rp + '', null, id).join('<span>/</span>'),
-				nodes = ['<tr><td>-</td><td><div>' + links +
+			var links = linksplit(r.rp + '', null, id, true).join('<span>/</span>'),
+				nodes = ['<tr class="' + (img_re.exec(r.rp) ? 'img ' : '') + '"><td>-</td><td></td><td><div>' + links +
 					'</div></td><td sortv="' + sz + '">' + hsz];
 
 			for (var b = 0; b < tagord.length; b++) {
@@ -6850,7 +7763,7 @@ function render_m3u() {
 		dur = 1,
 		artist = '',
 		title = '',
-		ret = {'hits': [], 'tag_order': ['artist', 'title', '.dur'], 'trunc': false};
+		ret = { 'hits': [], 'tag_order': ['artist', 'title', '.dur'], 'trunc': false };
 
 	for (var a = 0; a < lines.length; a++) {
 		var ln = lines[a].trim();
@@ -6886,7 +7799,7 @@ function render_m3u() {
 			"ts": 946684800 + n,
 			"sz": 100000 + n,
 			"rp": url,
-			"tags": {".dur": dur, "artist": artist, "title": title}
+			"tags": { ".dur": dur, "artist": artist, "title": title }
 		});
 		dur = 1;
 		artist = title = '';
@@ -6900,7 +7813,6 @@ function render_m3u() {
 	if (el)
 		el.click();
 }
-
 
 function aligngriditems() {
 	if (!treectl)
@@ -6925,10 +7837,12 @@ function aligngriditems() {
 	if (((griditemcount * em2px) * gridsz) + totalgapwidth < gridwidth) {
 		val = 'left';
 	} else {
-		val = treectl.hidden ? 'center' : 'space-between';
+		val = 'center';// treectl.hidden ? 'center' : 'space-between';
 	}
 	if (st.justifyContent != val)
 		st.justifyContent = val;
+
+	onwidgetresize();
 }
 onresize100.add(aligngriditems);
 
@@ -6949,6 +7863,79 @@ var filecolwidth = (function () {
 })();
 onresize100.add(filecolwidth, true);
 
+function onwidgetresize(){
+	var mumodal = QS('#music.vis');
+	var widget = ebi('widget');
+	var bar = ebi('pctl');
+	var pbarthinpos = ebi('pbarthinpos');
+
+	if(mumodal){
+		var pb_container = ebi('mu_pbb');
+		pb_container.appendChild(ebi('progbar'));
+		pb_container.appendChild(ebi('altprogbar'));
+		ebi('mu_toggles').appendChild(ebi('cyclebtn_loopmode'));
+		ebi('mu_toggles').appendChild(ebi('au_shuf'));
+		ebi('altprogbar').maxWidth = '';
+		ebi('mu_vol').appendChild(ebi('pvolbg'));
+		pbar.onresize();
+		return;
+	}
+
+	var width = widget.offsetWidth;
+
+	var thin = width < 800; //px
+
+	clmod(ebi('pathBar'), 'thin', thin);
+	clmod(ebi('wrap'), 'thin', thin);
+
+	thin = thin || IE;
+
+	var gtc = 'max-content max-content max-content ' + (thin ? '' : '20%') + ' auto max-content max-content max-content';
+	if(!thin && bar.children.length < gtc.split(' ').length){
+		try{
+			//wide
+			ebi('trackname').after(ebi('progbar'));
+			ebi('trackname').after(ebi('altprogbar'));
+			
+			bar.style.paddingTop = '0';
+		}
+		catch (e) {
+			// unnacounted old browser fallback
+			console.log(e);
+			thin = true;
+		}
+	}
+	if(thin && pbarthinpos.children.length < 2){
+		//thin
+		pbarthinpos.appendChild(ebi('progbar'));
+		pbarthinpos.appendChild(ebi('altprogbar'));
+		bar.style.paddingTop = '.3em';
+	}
+	ebi('altprogbar').maxWidth = thin ? '' : '40vw'
+	bar.style.gridTemplateColumns = gtc;
+
+	clmod(widget, 'thin', thin);
+
+	if(ebi('mu_vol').children.length > 0){
+		bar.appendChild(ebi('pvolbg'));
+	}
+	var inmu = ebi('mu_toggles').children.length
+	if(!thin && inmu){
+		ebi('au_tgls').appendChild(ebi('cyclebtn_loopmode'));
+		ebi('au_tgls').appendChild(ebi('au_shuf'));
+	}
+	else if(thin && !inmu){
+		ebi('mu_toggles').appendChild(ebi('cyclebtn_loopmode'));
+		ebi('mu_toggles').appendChild(ebi('au_shuf'));
+	}
+
+	pbar.onresize();
+
+	// keep path scrolled right
+	ebi('path').onresize = keep_right(ebi('path'));
+}
+window.addEventListener('resize', onwidgetresize);
+onwidgetresize();
 
 var treectl = (function () {
 	var r = {
@@ -6974,7 +7961,7 @@ var treectl = (function () {
 	};
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
-	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
+	bcfg_bind(r, 'dyn', 'dyntree', false, onresize); // dyntree size offset needs to be considered when drag-resizing before considering to re-enable this default
 	bcfg_bind(r, 'csel', 'csel', dgsel);
 	bcfg_bind(r, 'dsel', 'dsel', !MOBILE);
 	bcfg_bind(r, 'dlni', 'dlni', dlni, resort);
@@ -6989,7 +7976,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'nsort', 'nsort', dnsort, resort);
 	bcfg_bind(r, 'dir1st', 'dir1st', true, resort);
 	setwrap(bcfg_bind(r, 'wtree', 'wraptree', true, setwrap));
-	setwrap(bcfg_bind(r, 'parpane', 'parpane', true, onscroll));
+	setwrap(bcfg_bind(r, 'parpane', 'parpane', !N3DS, onscroll));
 	bcfg_bind(r, 'htree', 'hovertree', false, reload_tree);
 	bcfg_bind(r, 'ask', 'bd_ask', MOBILE && FIREFOX);
 	ebi('bd_lim').value = r.lim = icfg_get('bd_lim');
@@ -7028,22 +8015,39 @@ var treectl = (function () {
 			swrite('entreed', 'tree');
 
 		get_tree("", get_evpath(), true);
-		r.show();
+		r.show(nostore);
+
+		clmod(ebi('treeToggleBtn'), 'on', true)
 	}
 
-	r.show = function () {
+	r.show = function (instant) {
 		r.hidden = false;
 		if (!entreed) {
-			ebi('path').style.display = nonav ? 'none' : 'inline-block';
 			return;
 		}
 
-		ebi('path').style.display = 'none';
-		ebi('tree').style.display = 'block';
+		var tree = ebi('tree')
+		tree.style.display = 'block';
+		tree.style.width = 0;
+		clmod(ebi('pathBar'), 'shifted', false);
 		window.addEventListener('scroll', onscroll);
 		window.addEventListener('resize', onresize);
-		onresize();
-		aligngriditems();
+
+		if(!instant){
+			// makes animation work by waiting for next frame
+			setTimeout(function () {
+				onresize();
+				aligngriditems();
+			}, 10);
+		}
+		else {
+			tree.style.transition = 'none';
+			onresize();
+			setTimeout(function(){
+				aligngriditems();
+				tree.style.transition = '';
+			}, 1)
+		}
 	};
 
 	r.detree = function (e, nw) {
@@ -7055,16 +8059,34 @@ var treectl = (function () {
 		r.hide();
 		if (!nonav)
 			ebi('path').style.display = '';
+
+		clmod(ebi('treeToggleBtn'), 'on', false)
+	};
+
+	r.toggleTree = function (e, nostore) {
+		if(entreed){
+			r.detree(e, nostore);
+		}
+		else{
+			r.entree(e, nostore);
+		}
 	};
 
 	r.hide = function () {
 		r.hidden = true;
-		ebi('path').style.display = 'none';
-		ebi('tree').style.display = 'none';
+		ebi('tree').style.width = ebi('tree_footer').style.width = '0';
+		ebi('tree_footer').style.display = 'none';
+		ebi('widget').style.marginLeft = '0';
 		ebi('wrap').style.marginLeft = '';
+		clmod(ebi('pathBar'), 'shifted', true);
 		window.removeEventListener('resize', onresize);
 		window.removeEventListener('scroll', onscroll);
 		aligngriditems();
+
+		// wait for animation to finish (.15s), then set display to none if width still 0
+		setTimeout(function () {
+			onresize();
+		}, 170);
 	};
 
 	function unmenter() {
@@ -7115,7 +8137,7 @@ var treectl = (function () {
 			compy();
 		}
 
-		if (!r.parpane || !r.pdir.length || y >= r.pdir.slice(-1)[0][0] || y <= r.pdir[0][0]) {
+		if (!r.parpane || !r.pdir.length) {
 			clmod(parp, 'off', 1);
 			r.pdirh = null;
 		}
@@ -7139,48 +8161,21 @@ var treectl = (function () {
 				for (var a = 0, aa = els.length; a < aa; a++)
 					els[a].onclick = bad_proxy;
 			}
-			y = ebi('treeh').offsetHeight;
-			if (!fixedpos)
-				y += tree.offsetTop - yscroll();
-
-			y = (y - 3) + 'px';
+			y = ebi('treesuperh').offsetHeight + 'px';
 			if (parp.style.top != y)
 				parp.style.top = y;
-		}
-
-		if (wraptop === null)
-			return;
-
-		prev_atop = atop;
-		prev_winh = winh;
-
-		if (fixedpos && atop >= 0) {
-			tree.style.position = 'absolute';
-			tree.style.bottom = '';
-			fixedpos = false;
-		}
-		else if (!fixedpos && atop < 0) {
-			tree.style.position = 'fixed';
-			tree.style.height = 'auto';
-			fixedpos = true;
-		}
-
-		if (fixedpos) {
-			tree.style.top = Math.max(0, parseInt(atop)) + 'px';
-		}
-		else {
-			var top = Math.max(0, wraptop),
-				treeh = winh - atop;
-
-			tree.style.top = top + 'px';
-			tree.style.height = treeh < 10 ? '' : Math.floor(treeh) + 'px';
 		}
 	}
 	timer.add(onscroll2, true);
 
 	function onresize(e) {
-		if (!entreed || r.hidden)
+		if (!entreed || r.hidden){
+			if(ebi('tree').style.width == '0px')
+				ebi('tree').style.display = 'none';
+			ebi('reszbar').style.left = '2px';
+			setcvar('--nav-sz', 0);
 			return;
+		}
 
 		var q = '#tree',
 			nq = -3;
@@ -7191,15 +8186,21 @@ var treectl = (function () {
 			if (!QS(q))
 				break;
 		}
-		nq = Math.max(nq, get_evpath().split('/').length - 2);
+		if(r.dyn)
+			nq = Math.max(nq, get_evpath().split('/').length - 2);
 		var iw = (treesz + Math.max(0, nq)),
 			w = iw + 'em',
-			w2 = (iw + 2) + 'em';
+			w2 = (iw + 1) + 'em';
 
 		setcvar('--nav-sz', w);
 		ebi('tree').style.width = w;
-		ebi('wrap').style.marginLeft = w2;
-		onscroll();
+		ebi('tree_footer').style.width = (iw - 2) + 'em';
+		ebi('tree_footer').style.display = 'block';
+		ebi('wrap').style.marginLeft = w;
+		ebi('reszbar').style.left = w;
+		ebi('widget').style.marginLeft = (iw /1.4) + 'em';
+		onwidgetresize();
+		setTimeout(onscroll, 1);
 	}
 
 	r.find = function (txt) {
@@ -7321,6 +8322,10 @@ var treectl = (function () {
 				console.log("dir_cb failed", ex);
 			}
 		}
+
+		var dirs = QSA("#treeul li a:nth-child(2)");
+		for (var i = 0; i < dirs.length; i++)
+			drag.mktarget(dirs[i]);
 	};
 
 	function reload_tree() {
@@ -7355,6 +8360,7 @@ var treectl = (function () {
 		links = QSA('#treeul li>a:first-child');
 		for (var a = 0, aa = links.length; a < aa; a++) {
 			links[a].setAttribute('dst', links[a].nextSibling.getAttribute('href'));
+			clmod(links[a], 'ld', false);
 			links[a].onclick = treegrow;
 		}
 		ebi('tree').onscroll = nowrap ? unmenter : null;
@@ -7385,16 +8391,21 @@ var treectl = (function () {
 	function menter(e) {
 		var p = this.offsetParent,
 			pp = p.offsetParent,
-			ppy = pp.offsetTop,
-			y = this.offsetTop + p.offsetTop + ppy - p.scrollTop - pp.scrollTop - (ppy ? document.documentElement.scrollTop : 0);
+			ppy = pp ? pp.offsetTop : 0,
+			y = this.offsetTop + p.offsetTop + ppy - p.scrollTop - (pp ? pp.scrollTop : 0) - (ppy ? document.documentElement.scrollTop : 0);
 
 		this.style.top = y + 'px';
 		this.style.position = 'fixed';
+		this.style.width = 'auto';
+		this.style.minWidth = ebi('tree').offsetWidth + p.offsetLeft - 5 + 'px';
 		mentered = this;
 	}
 
 	function mleave(e) {
+		this.style.top = '';
 		this.style.position = '';
+		this.style.minWidth = '';
+		this.style.width = '';
 		mentered = null;
 	}
 
@@ -7427,7 +8438,7 @@ var treectl = (function () {
 		r.reqls(href, true);
 		r.dir_cb = tree_scrollto;
 		thegrid.setvis(true);
-		clmod(this, 'ld', 1);
+		clmod(this.previousSibling, 'ld', 1);
 	}
 
 	r.reqls = function (url, hpush, back, hydrate) {
@@ -7538,10 +8549,16 @@ var treectl = (function () {
 		if (!sread('griden'))
 			clmod(ebi('griden'), 'on', thegrid.en = dgrid);
 
-		srvinf = res.srvinf;
-		if (rtt !== null)
-			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
+		var accent = parseColor(sread('paccent'))
+		if(!accent && (res.tcolor || tcolor))
+			setColor(parseColor(res.tcolor ? res.tcolor : tcolor), true);
 
+		srvinf = res.srvinf;
+		volspace = res.volspace;
+		if (rtt !== null){
+			srvinf += (srvinf ? '</span> // <span>rtt: ' : 'rtt: ') + rtt;
+			ebi('rtt_latency').innerHTML = 'latency: ' + rtt + 'ms';
+		}
 		var o = ebi('srv_info2');
 		if (o)
 			o.innerHTML = ebi('srv_info').innerHTML = '<span>' + srvinf + '</span>';
@@ -7549,6 +8566,7 @@ var treectl = (function () {
 		if (res.ufavico && (!favico.en || !ebi('icot').value)) {
 			while (qsr('head>link[rel~="icon"]')) { }
 			document.head.insertAdjacentHTML('beforeend', res.ufavico);
+            ebi('favico_onpage').innerHTML = res.ufavico;
 		}
 
 		if (this.hpush && !showfile.active())
@@ -7586,7 +8604,7 @@ var treectl = (function () {
 		if (lg1 === Ls.eng.f_empty)
 			lg1 = L.f_empty;
 
-		sandbox(ebi('pro'), sb_lg, sba_lg,'', lg0);
+		sandbox(ebi('pro'), sb_lg, sba_lg, '', lg0);
 		if (dirchg)
 			sandbox(ebi('epi'), sb_lg, sba_lg, '', lg1);
 
@@ -7614,8 +8632,20 @@ var treectl = (function () {
 			fun();
 		}
 
+		if (drag.is_dragging) {
+			fileman.paste(true);
+			drag.is_dragging = false;
+		}
+		drag.initfiles();
+
 		if (can_shr && in_shr && QS('#op_unpost.act'))
 			goto('unpost');
+
+		setBg(res.bg_img);
+
+		if(!override_thm && res.dtheme){
+			settheme.init(res.dtheme)
+		}
 	}
 
 	r.chk_index_html = function (top, res) {
@@ -7631,6 +8661,9 @@ var treectl = (function () {
 
 	r.gentab = function (top, res) {
 		showfile.untail();
+		for (var a = 0; a < res.dirs.length; a++)
+			res.dirs[a].cls = 'dir';
+
 		var nodes = res.dirs.concat(res.files),
 			html = mk_files_header(res.taglist),
 			sel = msel.hist[top],
@@ -7703,9 +8736,10 @@ var treectl = (function () {
 					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
-			var cl = /\.PARTIAL$/.exec(fname) ? ' class="fade"' : '',
-				ln = ['<tr' + cl + '><td>' + tn.lead + '</td><td><a href="' +
-					top + tn.href + '" id="' + id + '">' + hname +
+			var cl = (/\.PARTIAL$/.exec(fname) ? 'fade ' : '') + (img_re.exec(fname) ? 'img ' : '') + (tn.cls || ''),
+				ln = ['<tr class="' + cl + '"><td>' + tn.lead + '</td><td>' + 
+					get_thumb(tn.href, id, (/\bdir\b/i).test(cl), false) + 
+					'</td><td><a href="' + top + tn.href + '" id="' + id + '" class="flink">' + hname +
 					'</a></td><td sortv="' + tn.sz + '">' + filesizefun(tn.sz)];
 
 			for (var b = 0; b < res.taglist.length; b++) {
@@ -7729,6 +8763,11 @@ var treectl = (function () {
 		html.push('</tbody>');
 		html = html.join('\n');
 		set_files_html(html);
+
+		var ths = QSA('#files .imgcontainer>img');
+		for (var a = 0, aa = ths.length; a < aa; a++)
+			ths[a].onload = th_onload;
+
 		if (r.dlni) {
 			var o = QSA('#files a[id]');
 			for (var a = 0, aa = o.length; a < aa; a++)
@@ -7809,6 +8848,11 @@ var treectl = (function () {
 		pbar.onresize();
 		vbar.onresize();
 		showfile.addlinks();
+		drag.initfiles();
+			
+		var media = scan_hash(location.hash);
+		if(media && media[0] == 'g')
+			clmod(ebi('wrap'), 'waiting', true);
 		setTimeout(eval_hash, 1);
 	};
 
@@ -7942,16 +8986,24 @@ var treectl = (function () {
 	function scaletree(e) {
 		ev(e);
 		treesz += parseInt(this.getAttribute("step"));
+		r.settreesize(treesz);
+	}
+
+	r.settreesize = function(width){
+		treesz = width;
 		if (!isNum(treesz))
 			treesz = 16;
 
-		treesz = clamp(treesz, 2, 120);
+		treesz = clamp(treesz, 6, 120);
 		swrite('treesz', treesz);
 		onresize();
 	}
 
-	ebi('entree').onclick = r.entree;
-	ebi('detree').onclick = r.detree;
+	var svg_hamburger = svg_box + '<g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g id="Menu"><rect id="Rectangle" fill-rule="nonzero" x="0" y="0" width="24" height="24"></rect><line x1="5" y1="7" x2="19" y2="7" id="Path" ' + svg_options + '></line><line x1="5" y1="17" x2="19" y2="17" id="Path" ' + svg_options + '></line><line x1="5" y1="12" x2="19" y2="12" id="Path" ' + svg_options + '></line></g></g></svg>'
+	ebi('treeToggleBtn').innerHTML = svg_hamburger;
+	ebi('treeToggleBtn').setAttribute('tt', L.tt_entree);
+
+	ebi('treeToggleBtn').onclick = r.toggleTree;
 	ebi('visdir').onclick = tree_scrollto;
 	ebi('twig').onclick = scaletree;
 	ebi('twobytwo').onclick = scaletree;
@@ -7962,6 +9014,8 @@ var treectl = (function () {
 	if (notree) {
 		cs = 'na';
 		r.detree(null, 1);
+		ebi('treeToggleBtn').style.display = ebi('reszbar').style.display = 'none';
+		clmod(ebi('pathBar'), 'shifted', false);
 	}
 
 	if (cs == 'tree' || (cs != 'na' && vw >= 60))
@@ -7978,6 +9032,16 @@ var treectl = (function () {
 			cbase = location.pathname,
 			mdoc = /[?&]doc=/.exec('' + url),
 			mdk = /[?&](k=[^&#]+)/.exec('' + url);
+
+		if(location.hash == '' && QS('#bbox-overlay.visible')){
+			baguetteBox.hide();
+			baguetteBox.resetUserAction();
+			return;
+		}
+		if(baguetteBox.getUserAction()){
+			baguetteBox.resetUserAction();
+			return;
+		}
 
 		if (mdoc && hbase == cbase)
 			return showfile.show(hbase + showfile.sname(url.search), true);
@@ -8018,7 +9082,7 @@ var wfp_debounce = (function () {
 			r.n = 1;
 			clearTimeout(r.t);
 			r.t = setTimeout(r.reset, 300);
-			ebi('wfp').style.opacity = 0.1;
+			//ebi('wfp').style.opacity = 0.1;
 		}
 	};
 	r.show = function () {
@@ -8048,7 +9112,8 @@ function apply_perms(res) {
 
 	if (konmai < 0) {
 		acct = 'Ted Faro';
-		srvinf = 'FAS Nexus</span> // <span>57.3 EiB free of 127 EiB';
+		ebi('srv_name').innerHTML = 'FAS Nexus';
+		volspace = ['57.3 EiB', '127 EiB', 4512];
 		res.shr_who = 'auth';
 		perms = res.perms = chk;
 		have_up2k_idx = have_tags_idx = 1;
@@ -8088,24 +9153,46 @@ function apply_perms(res) {
 	if (idp_login && acct == "*")
 		dst = idp_login.replace(/\{dst\}/g, get_evpath());
 
-	ebi('acc_info').innerHTML = '<span id="srv_info2"><span>' + srvinf +
-		'</span></span><span' + aclass + axs + L.access + '</span>' + (acct != '*' ?
-			'<form id="flogout" method="post" enctype="multipart/form-data"><input type="hidden" name="act" value="logout" /><input id="blogout" type="submit" value="' + L.logout + acct + '"></form>' :
-			'<a href="' + dst + '">' + L.login + '</a>');
+	function goHome(){
+		window.location.href = dst;
+	}
 
-	var o = QSA('#ops>a[data-perm]');
+	if(acct != '*'){
+		ebi('acc_name').innerHTML = acct;
+		ebi('acc_pfp').innerHTML = acct.substring(0, 1).toUpperCase();
+		ebi('accessType').innerHTML = '<span' + aclass + axs + L.access + '</span>';
+		ebi('blogout').value = L.logout;
+	}
+	else{
+		ebi('blogout').style.display = 'none';
+		ebi('acc_name').innerHTML = L.login;
+		ebi('acc_pfp').innerHTML = fun_tgl && EMOJI ? '👤' : 'acc';
+	}
+	clmod(ebi('acc_pfp'), 'placeholder', acct == '*');
+
+	var o = QSA('#ops>a');
 	for (var a = 0; a < o.length; a++) {
+		if(!o[a].hasAttribute('data-perm')){
+			clmod(o[a], 'disabled', false);
+			continue;
+		}
 		var display = '';
+		var enabled = true;
 		var needed = o[a].getAttribute('data-perm').split(' ');
 		for (var b = 0; b < needed.length; b++) {
 			if (!has(perms, needed[b])) {
-				display = 'none';
+				enabled = false;
+				if(needed[b] != 'write')
+					display = 'none';
 			}
 		}
+		clmod(o[a], 'disabled', !enabled);
 		o[a].style.display = display;
 	}
+	clmod(ebi('up_quick'), 'disabled', !has(perms, 'write'));
+	ebi('bup_tgl').style.display = has(perms, 'write') ? '' : 'none';
 
-	var o = QSA('#ops>a[data-dep], #u2conf td[data-dep]');
+	var o = QSA('#ops>a[data-dep], #u2conf div[data-dep]');
 	for (var a = 0; a < o.length; a++)
 		o[a].style.display = (
 			o[a].getAttribute('data-dep') != 'idx' || have_up2k_idx
@@ -8122,7 +9209,7 @@ function apply_perms(res) {
 
 	var have_write = has(perms, "write"),
 		de = document.documentElement,
-		tds = QSA('#u2conf td');
+		tds = QSA('#u2conf div');
 
 	shr_who = res.shr_who || shr_who;
 	can_shr = acct != '*' && (have_read || have_write) && (
@@ -8143,8 +9230,9 @@ function apply_perms(res) {
 		ebi('u2rand').parentNode.style.display = 'none';
 
 	u2ts = res.u2ts;
-	if (up2k)
-		up2k.set_fsearch();
+
+	if(up2k)
+		wait_set_fsearch();
 
 	if (res.cfg)
 		rw_edit = res.rw_edit;
@@ -8153,14 +9241,35 @@ function apply_perms(res) {
 
 	widget.setvis();
 	thegrid.setvis();
-	if (!have_read && have_write)
+
+	var up_only = !have_read && have_write;
+	if (up_only){
 		goto('up2k');
+		clmod(document.documentElement, 'noscroll', false);
+	}
+	if(up_only && !up2k_lgcy){
+		up2k_lgcy = !up2k_lgcy;
+		ebi('reloc_up').innerHTML = up2k_lgcy ? '<span>▲</span>' : '<span>▼</span>';
+		clmod(ebi('up2k'), 'unmodal', up2k_lgcy);
+	}
+	if(EMOJI)
+		clmod(ebi('opa_mkd'), 'vis', up_only);
+}
+
+function wait_set_fsearch(){
+	var t = setInterval(function () {
+		if (!up2k || !up2k.set_fsearch)
+			return;
+
+		clearInterval(t);
+		up2k.set_fsearch();
+	}, 50);
 }
 
 
 function tr2id(tr) {
 	try {
-		return tr.cells[1].querySelector('a[id]').getAttribute('id');
+		return tr.querySelector('.flink').getAttribute('id');
 	}
 	catch (ex) {
 		return null;
@@ -8192,7 +9301,8 @@ function find_file_col(txt) {
 function mk_files_header(taglist) {
 	var html = [
 		'<thead><tr>',
-		'<th name="lead"><span>c</span></th>',
+		'<th name="lead"><span>!</span></th>',
+		'<th name="thumb"><span>th</span></th>',
 		'<th name="href"><span>File Name</span></th>',
 		'<th name="sz" sort="int"><span>Size</span></th>'
 	];
@@ -8209,7 +9319,7 @@ function mk_files_header(taglist) {
 		html.push(tag + '</span></th>');
 	}
 	html = html.concat([
-		'<th name="ext"><span>T</span></th>',
+		'<th name="ext"><span>Ext</span></th>',
 		'<th name="ts"><span>Date</span></th>',
 		'</tr></thead>',
 	]);
@@ -8250,11 +9360,6 @@ var filecols = (function () {
 		r.toggle(t.textContent);
 	}
 
-	r.uivis = function () {
-		var hcols = ebi('hcols');
-		hcols.previousSibling.style.display = hcols.style.display = ((!thegrid || !thegrid.en) && (hidden.length || MOBILE)) ? 'block' : 'none';
-	};
-
 	r.set_style = function (unhide) {
 		hidden.sort();
 
@@ -8272,7 +9377,6 @@ var filecols = (function () {
 		}
 		hcols.innerHTML = html.join('\n');
 		hcols.onclick = hcols_click;
-		r.uivis();
 		r.add_btns();
 
 		var ohidden = [],
@@ -8331,26 +9435,28 @@ var filecols = (function () {
 		r.reset(true);
 	};
 
-	if (MOBILE)
-		ebi('hcolsh').onclick = function (e) {
-			ev(e);
-			if (r.picking)
-				return r.unpick();
+	ebi('hcolsh').onclick = function (e) {
+		clmod(this, 'on', !r.picking)
+		if (r.picking)
+			return r.unpick();
 
-			var lbs = QSA('#files>thead th');
-			for (var a = 0; a < lbs.length; a++) {
-				lbs[a].onclick = function (e) {
-					ev(e);
-					if (toast.tag == 'pickhide')
-						toast.hide();
+		var lbs = QSA('#files>thead th');
+		for (var a = 0; a < lbs.length; a++) {
+			lbs[a].onclick = function (e) {
+				ev(e);
+				if (toast.tag == 'pickhide')
+					toast.hide();
 
+				if(e.target.lastChild)
+					r.hide(e.target.lastChild.textContent)
+				else
 					r.hide(e.target.textContent);
-				};
 			};
-			r.picking = true;
-			clmod(ebi('files'), 'hhpick', 1);
-			toast.inf(0, L.cl_hpick, 'pickhide');
 		};
+		r.picking = true;
+		clmod(ebi('files'), 'hhpick', 1);
+		toast.inf(0, L.cl_hpick, 'pickhide');
+	};
 
 	r.unpick = function () {
 		r.picking = false;
@@ -8507,7 +9613,7 @@ var mukey = (function () {
 })();
 
 
-var light, theme, themen;
+var light, theme, themen, override_thm = false;
 var settheme = (function () {
 	var r = {},
 		ax = 'abcdefghijklmnopqrstuvwx',
@@ -8515,18 +9621,34 @@ var settheme = (function () {
 		chldr = !SPINNER_CSS && SPINNER == tre;
 
 	r.ldr = {
-		'4':['🌴'],
-		'5':['🌭', 'padding:0 0 .7em .7em;filter:saturate(3)'],
-		'6':['📞', 'padding:0;filter:brightness(2) sepia(1) saturate(3) hue-rotate(60deg)'],
-		'7':['▲', 'font-size:3em'], //cp437
+		'4': ['🌴'],
+		'5': ['🌭', 'padding:0 0 .7em .7em;filter:saturate(3)'],
+		'6': ['📞', 'padding:0;filter:brightness(2) sepia(1) saturate(3) hue-rotate(60deg)'],
+		'7': ['▲', 'font-size:3em'], //cp437
 	};
 
-	theme = sread('cpp_thm') || 'a';
-	if (!/^[a-x][yz]/.exec(theme))
-		theme = dtheme;
+	r.init = function(t){
+		theme = sread('cpp_thm');
+		if(!theme)
+			theme = 'a';
+		else
+			override_thm = true;
+		if (!/^[a-x][yz]/.exec(theme))
+			theme = dtheme;
+		if(t)
+			theme = t;
 
-	themen = theme.split(/ /)[0];
-	light = !!(theme.indexOf('y') + 1);
+		console.log('theme: ' + theme)
+
+		themen = theme.split(/ /)[0];
+		light = !!(theme.indexOf('y') + 1);
+
+		var m = /[?&]theme=([0-9]+)/.exec(sloc0);
+		if (m)
+			r.go(parseInt(m[1]));
+		else
+			freshen();
+	}
 
 	function freshen() {
 		var cl = document.documentElement.className;
@@ -8542,12 +9664,12 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
+			names = ['flat dark', 'flat light', 'pm-monokai', 'athlete', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'poison', 'wing', 'frutiger dark', 'frutiger light', ];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));
 
-		ebi('themes').innerHTML = html.join('');
+		cb.innerHTML = html.join('');
 		cb.value = itheme;
 		cb.onchange = r.onsel;
 
@@ -8561,7 +9683,10 @@ var settheme = (function () {
 	}
 
 	r.onsel = function () {
-		r.go(parseInt(ebi('themes').value));
+		if(!override_thm)
+			ebi('override_thm').click();
+		else
+			r.go(parseInt(ebi('themes').value));
 	};
 
 	r.go = function (i) {
@@ -8574,11 +9699,17 @@ var settheme = (function () {
 		freshen();
 	};
 
-	var m = /[?&]theme=([0-9]+)/.exec(sloc0);
-	if (m)
-		r.go(parseInt(m[1]));
-	else
-		freshen();
+	r.init();
+
+	ebi('override_thm').onclick = function(){
+		clmod(this, 'on', 't');
+		override_thm = !override_thm;
+		if(override_thm)
+			r.onsel();
+		else
+			sdrop('cpp_thm');
+	}
+	clmod(ebi('override_thm'), 'on', override_thm)
 
 	return r;
 })();
@@ -8682,12 +9813,12 @@ var arcfmt = (function () {
 			o.setAttribute("href", m[1] + arg + m[4]);
 			o.textContent = fmt.split('_')[0];
 		}
-		ebi('selzip').textContent = fmt.split('_')[0];
+		ebi('selzip').innerHTML = (fun_tgl ? '📦<br />' : '') + fmt.split('_')[0];
 		ebi('selzip').setAttribute('fmt', arg);
 
 		QS('#zip1 span').textContent = fmt.split('_')[0];
 		ebi('zip1').setAttribute("href",
-			get_evpath() + (dk ? '?k=' + dk + '&': '?') + arg);
+			get_evpath() + (dk ? '?k=' + dk + '&' : '?') + arg);
 
 		if (!have_zip) {
 			ebi('zip1').style.display = 'none';
@@ -8747,7 +9878,7 @@ var msel = (function () {
 		}
 
 		r.all = [];
-		var links = QSA('#files tbody td:nth-child(2) a:last-child'),
+		var links = QSA('#files .flink'),
 			is_srch = !!ebi('unsearch'),
 			vbase = get_evpath();
 
@@ -8774,8 +9905,7 @@ var msel = (function () {
 			if (item.sel)
 				r.sel.push(item);
 
-			if (!is_srch)
-				links[a].closest('tr').setAttribute('tabindex', '0');
+			links[a].closest('tr').setAttribute('tabindex', '0');
 		}
 	};
 
@@ -8815,6 +9945,7 @@ var msel = (function () {
 			r.all = null;
 
 		clmod(ebi('wtoggle'), 'sel', r.getsel().length);
+		clmod(ebi('wstack'), 'sel', r.getsel().length);
 		thegrid.loadsel();
 		fileman.render();
 		showfile.updtree();
@@ -8825,11 +9956,12 @@ var msel = (function () {
 			delete r.hist[get_evpath()];
 	};
 	r.seltgl = function (e) {
-		ev(e);
+		e.stopPropagation();
+
 		var tr = this.parentNode,
 			id = tr2id(tr);
 
-		if ((treectl.csel || !thegrid.en || thegrid.sel) && e.shiftKey && r.so && id && r.so != id) {
+		if ((treectl.csel || !thegrid.en || thegrid.sel || thegrid.tempsel) && e.shiftKey && r.so && id && r.so != id) {
 			var o1 = -1, o2 = -1;
 			for (a = 0; a < r.all.length; a++) {
 				var ai = r.all[a].id;
@@ -8865,6 +9997,11 @@ var msel = (function () {
 			r.origin_tr(tr);
 		}
 		r.selui();
+
+		if (thegrid.tempsel && msel.getsel().length == 0){
+			thegrid.tempsel = false;
+			clmod(ebi('gridsel'), 'temp', false);
+		}
 	};
 	r.origin_tr = function (tr) {
 		r.so = tr2id(tr);
@@ -8928,13 +10065,28 @@ var msel = (function () {
 				dl_file(sel[a].vp + sel[a].q);
 	};
 	r.render = function () {
-		var tds = QSA('#files tbody td+td+td'),
+		var tds = QSA('#files tbody td+td+td+td'),
 			is_srch = !!ebi('unsearch');
 
-		if (!is_srch)
-			for (var a = 0, aa = tds.length; a < aa; a++)
-				tds[a].onclick = r.seltgl;
+		for (var a = 0, aa = tds.length; a < aa; a++)
+			tds[a].onclick = r.seltgl;
 
+		var links = QSA('#files .flink')
+		for (var a = 0, aa = links.length; a < aa; a++)
+			links[a].onclick = fclick;
+
+		var thumbs = QSA('#files .imgcontainer')
+		for (var a = 0, aa = thumbs.length; a < aa; a++)
+			thumbs[a].onclick = fclick1;
+
+		var imgs = QSA('#files img');
+		for (var a = 0, aa = imgs.length; a < aa; a++) {
+			set_loaded(imgs[a], thegrid.thumbs && imgs[a].complete, true);
+		}
+
+		if(window.baguetteBox != undefined)
+			r.bagit();
+		
 		r.selui(true);
 		arcfmt.render();
 		fileman.render();
@@ -8942,9 +10094,125 @@ var msel = (function () {
 		var zipvis = (is_srch || !have_zip) ? 'none' : '';
 		ebi('selzip').style.display = zipvis;
 		ebi('zip1').style.display = zipvis;
+
+		r.ready = true;
 	}
+
+	r.bagit = function (isrc) {
+		console.log('init image viewer');
+		
+		if (r.bbox)
+			baguetteBox.destroy();
+
+		if(!isrc)
+			isrc = '#files'
+
+		var br = baguetteBox.run(isrc, {
+			noScrollbars: true,
+			duringHide: r.onhide,
+			afterShow: function () {
+				r.bbox_opts.refocus = true;
+			},
+			captions: function (g, idx) {
+				var h = '' + g;
+
+				return '<a download href="' + h +
+					'">' + (idx + 1) + ' / ' + this.length + ' -- ' +
+					esc(uricom_dec(h.split('/').pop())) + '</a>';
+			},
+			onChange: function (i, maxIdx) {
+				if (this[i].imageElement) {
+					sethash('g' + this[i].imageElement.getAttribute('id') + getsort());
+				}
+			}
+		});
+		r.bbox_opts = br[1];
+		r.bbox = true;
+	};
+
 	return r;
 })();
+
+function fclick1(e) {
+	e.preventDefault ? e.preventDefault() : e.returnValue = false;
+
+	var td = ebi(this.getAttribute('ref'));
+	try{
+		// pass copy of click event to list entry (can trigger bbox handler)
+		td.dispatchEvent(new MouseEvent('click', {
+			bubbles: true,
+			cancelable: true,
+			clientX: e.clientX,
+			clientY: e.clientY,
+			ctrlKey: e.ctrlKey,
+			shiftKey: e.shiftKey,
+			altKey: e.altKey,
+			metaKey: e.metaKey,
+		}));
+	}
+	catch(ex){
+		console.log(ex);
+		// fallback method (can't activate bbox)
+		fclick.call(td, e);
+	}
+}
+
+function fclick(e, dbl) {
+	if (e.altKey){
+		ev(e);
+		return;
+	}
+	var qhref = this.getAttribute('href'),
+		href = qhref.split('?')[0],
+		fid = this.getAttribute('id'),
+		aplay = ebi('a' + fid),
+		atext = ebi('t' + fid),
+		is_txt = atext && !/\.ts$/.test(href) && showfile.getlang(href),
+		is_img = img_re.test(href),
+		is_dir = href.endsWith('/'),
+		is_srch = !!ebi('unsearch'),
+		in_tree = is_dir && treectl.find(this.textContent.slice(0, -1)),
+		have_sel = QS('#files tr.sel'),
+		td = this.closest('td').nextSibling,
+		tr = td.parentNode;
+
+	if (thegrid.en && (thegrid.sel || thegrid.tempsel) && !dbl && !ctrl(e) || treectl.csel && (e.shiftKey || ctrl(e))) {
+		ev(e);
+		msel.seltgl.call(td, e);
+		if (e.shiftKey)
+			return thegrid.loadsel();
+		clmod(this, 'sel', clgot(tr, 'sel'));
+	}
+	else if (in_tree)
+		in_tree.click();
+
+	else if (this.hasAttribute('download'))
+		this.click();
+
+	else if (aplay && (thegrid.vau || !is_img))
+		aplay.click();
+
+	else if (is_dir)
+		treectl.reqls(qhref, true);
+
+	else if (!is_img && is_txt && !has(['md', 'htm', 'html'], is_txt))
+		atext.click();
+
+	else if (!is_img && !is_dir && have_sel)
+		window.open(qhref, '_blank');
+
+	else {
+		if (!dbl)
+			return true;
+
+		setTimeout(function () {
+			thegrid.sel = true;
+		}, 1);
+		thegrid.sel = false;
+		this.click();
+	}
+	ev(e);
+}
 
 
 (function () {
@@ -9184,7 +10452,7 @@ function show_md(md, name, div, url, depth) {
 		if (depth) {
 			clmod(div, 'raw', 1);
 			div.textContent = "--[ " + name + " ]---------\r\n" + md;
-			return toast.warn(10, errmsg + (WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
+			return toast.warn(3, errmsg + (WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
 		}
 
 		wfp_debounce.n--;
@@ -9398,7 +10666,7 @@ if (sb_lg && logues.length) {
 			var td = tr[a].cells[1],
 				ao = td.firstChild,
 				href = noq_href(ao),
-				isdir = href.endsWith('/'),
+				isdir = clgot(tr[a], 'dir'),
 				txt = ao.textContent;
 
 			td.setAttribute('sortv', (isdir ? '\t' : '') + txt);
@@ -9660,6 +10928,34 @@ ebi('path').onclick = function (e) {
 	return ev(e);
 };
 
+function scroll_v_to_h (e, o) {
+  ev(e);
+  var delta = e.deltaY || e.deltaX;
+  var maxScrollLeft = o.scrollWidth - o.clientWidth;
+
+  o.scrollLeft = Math.max(0, Math.min(maxScrollLeft, o.scrollLeft + delta));
+}
+function keep_right (o) {
+	o.scrollLeft = o.scrollWidth - o.clientWidth;
+}
+
+ebi('path').addEventListener('wheel', function (e) {
+	scroll_v_to_h(e, this);
+});
+
+ebi('ghead').addEventListener('wheel', function (e) {
+	scroll_v_to_h(e, this);
+});
+
+ebi('treeh').addEventListener('wheel', function (e) {
+	scroll_v_to_h(e, this);
+});
+
+if(FIREFOX && MOBILE){
+	// disable glitchy ::after gradient (scrollhint) (2026-04-26)
+	clmod(ebi('ghead'), 'noa', true);
+	clmod(ebi('treeh'), 'noa', true);
+}
 
 var scroll_y = -1;
 var scroll_vp = '\n';
@@ -9726,8 +11022,9 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 		if (sz < 1024 * 1024 || showfile.taildoc)
 			fun();
 		else
-			modal.confirm(L.f_bigtxt.format(f2f(sz / 1024 / 1024, 1)), fun, function() {
-				modal.confirm(L.f_bigtxt2, tfun, null)});
+			modal.confirm(L.f_bigtxt.format(f2f(sz / 1024 / 1024, 1)), fun, function () {
+				modal.confirm(L.f_bigtxt2, tfun, null)
+			});
 
 		return ev(e);
 	}
@@ -9743,12 +11040,9 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 
 
 var rcm = (function () {
-	if (MOBILE)
-		return {enabled: false}
-
 	var r = {};
-	bcfg_bind(r, 'enabled', 'rcm_en', drcm.charAt(0)=='y');
-	bcfg_bind(r, 'double', 'rcm_db', drcm.charAt(1)=='y');
+	bcfg_bind(r, 'enabled', 'rcm_en', drcm.charAt(0) == 'y');
+	bcfg_bind(r, 'double', 'rcm_db', drcm.charAt(1) == 'y');
 
 	var menu = ebi('rcm');
 	var nsFile = {
@@ -9763,64 +11057,9 @@ var rcm = (function () {
 	};
 	var selFile = jcp(nsFile);
 
-	function mktemp(is_dir) {
-		qsr('#rcm_tmp');
-		if (!thegrid.en) {
-			var row = mknod('tr', 'rcm_tmp',
-				'<td>-new-</td><td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></td>');
-			QS("#files tbody").appendChild(row);
-		}
-		else {
-			var row = mknod('a', 'rcm_tmp',
-				'<span class="dir" style="align-self:end"><input id="tempname" class="dir" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></span>');
-			if (is_dir)
-				row.className = 'dir';
-			row.style.display = 'flex';
-			QS("#ggrid").appendChild(row);
-		}
-
-		function sendit(name) {
-			name = ('' + name).trim();
-			if (!name)
-				return;
-			var data = new FormData();
-			data.set("act", is_dir ? "mkdir" : "new_md");
-			data.set("name", name);
-
-			var req = new XHR();
-			req.open("POST", get_evpath());
-			req.onload = req.onerror = function() {
-				if (req.status == 405 || req.status == 500)
-					return toast.err(3, "a " + (is_dir ? "folder" : "file") + " with that name already exists.");
-				if (req.status < 200 || req.status > 399)
-					return toast.err(3, "couldn't create " + (is_dir ? "folder" : "file") + ": <br><code>" + esc(req.responseText) + '</code>');
-				treectl.goto();
-			};
-			req.send(data);
-		}
-
-		var input = ebi("tempname");
-		input.onblur = function() {
-			sendit(input.value);
-			// Chrome blurs elements when calling remove for some reason
-			input.onblur = null;
-			row.remove();
-		};
-		input.onkeydown = function(e) {
-			if (e.key == "Enter")
-				sendit(input.value);
-			if (e.key == "Enter" || e.key == "Escape") {
-				input.onblur = null;
-				row.remove();
-				ev(e);
-			}
-		};
-		input.focus();
-	}
-
 	var opts = QSA('#rcm a');
 	for (var i = 0; i < opts.length; i++) {
-		opts[i].onclick = function(e) {
+		opts[i].onclick = function (e) {
 			ev(e);
 			switch(e.target.id.slice(1)) {
 				case 'opn':
@@ -9833,7 +11072,7 @@ var rcm = (function () {
 				case 'pla': play('f-' + selFile.id); break;
 				case 'txt': showfile.show(selFile.name); break;
 				case 'md': location = selFile.path + (has(selFile.path, '?') ? '&v' : '?v'); break;
-				case 'cpl': cliptxt(selFile.url, function() {toast.ok(2, L.clipped)}); break;
+				case 'cpl': fileman.link(); break;
 				case 'dl': ebi('seldl').click(); break;
 				case 'zip': ebi('selzip').click(); break;
 				case 'del': fileman.delete(); break;
@@ -9865,9 +11104,9 @@ var rcm = (function () {
 				var ref = ebi(target.getAttribute('ref'));
 				file = ref && ref.closest('#files tbody tr');
 			}
-			var fa = file && file.children[1].querySelector('a[id]');
+			var fa = file && file.querySelector('.flink');
 			if (fa && fa.id != 'unsearch') {
-				selFile.no_dsel = clgot(file, "sel");
+				selFile.no_dsel = TOUCH || clgot(file, "sel");
 				clmod(file, "sel", true);
 				selFile.elem = file;
 				selFile.url = fa.href;
@@ -9915,16 +11154,44 @@ var rcm = (function () {
 		clmod(shr, 'hide', !can_shr || !get_evpath().indexOf(have_shr));
 		shr.innerHTML = has_sel ? L.rc_shs : L.rc_shf;
 
-		menu.style.left = x + 5 + 'px';
-		menu.style.top = y + 5 + 'px';
+		clmod(menu, 'large', TOUCH);
+		if (TOUCH && target && !forceopen && !thegrid.sel){
+			thegrid.tempsel = true;
+			clmod(ebi('gridsel'), 'temp', true);
+			return;
+		}
+		var vh = document.documentElement.clientHeight;
+		var vw = document.documentElement.clientWidth;
+
+		var maxh = Math.min(y, vh / 2);
+		menu.style.maxHeight = 'calc(100% - ' + maxh + 'px - 2em)';
+
+		if(y > vh / 2){
+			// low click => menu upwards
+			menu.style.top = '';
+			menu.style.bottom = (vh - y) + 'px';
+		}
+		else{
+			menu.style.top = y + 'px';
+			menu.style.bottom = '';
+		}
+		if(x > vw / 2){
+			// far right click => menu leftwards
+			menu.style.left = '';
+			menu.style.right = (vw - x) + 'px';
+		}
+		else{
+			menu.style.left = x + 'px';
+			menu.style.right = '';
+		}
 		menu.style.display = 'block';
 		menu.focus();
 	}
 
-	r.hide = function(force) {
+	r.hide = function (force) {
 		if (!menu.style.display || (!force && menu.contains(document.activeElement)))
 			return;
-		if (selFile.elem && !selFile.no_dsel) {
+		if (selFile.elem && !selFile.no_dsel && !thegrid.tempsel) {
 			clmod(selFile.elem, "sel", false);
 			msel.selui();
 		}
@@ -9932,22 +11199,173 @@ var rcm = (function () {
 		menu.style.display = '';
 	}
 
-	ebi('wrap').oncontextmenu = function(e) {
+	var forceopen;
+	r.show = function (e) {
 		if (!r.enabled || e.shiftKey || (r.double && menu.style.display) || /doc=/.exec(location.search)) {
 			r.hide(true);
 			return true;
 		}
+		var gfile = thegrid.en && e.target && e.target.closest('#ggrid > a');
+		var target = gfile || e.target;
+
 		r.hide(true);
+		if (TOUCH)
+			forceopen = !gfile || clgot(gfile, 'sel');
 		if (selFile.elem && !selFile.no_dsel) {
 			clmod(selFile.elem, "sel", false);
 			msel.selui();
 		}
 		ev(e);
-		var gfile = thegrid.en && e.target && e.target.closest('#ggrid > a');
-		show(xscroll() + e.clientX, yscroll() + e.clientY, gfile || e.target, gfile);
+		show(e.clientX, e.clientY, target, gfile);
 		return false;
+	}
+
+	ebi('wrap').oncontextmenu = function (e) {
+		if (!e.target.closest('.normalrcm'))
+			r.show(e);
 	};
-	menu.onblur = function() {setTimeout(r.hide)};
+	menu.onblur = function () { setTimeout(r.hide) };
+
+	return r;
+})();
+
+var drag = (function() {
+	var r = {is_dragging: false, no_warn: false};
+	bcfg_bind(r, "enabled", "den", true, function() {setTimeout(reload_browser, 1)});
+	var current = null, currLink = null;
+
+	r.mktarget = function(elem) {
+		if (!r.enabled) return;
+
+		elem.ondragenter = elem.ondragleave = elem.ondragover = function(e) {
+			if (!r.enabled) return;
+			var elemHref = basenames((elem.tagName == "A" ? elem : elem.querySelector(".flink")).href.split("?")[0])
+			if (current == elem || elemHref == get_evpath() || currLink == elemHref) // Prevent folders being dragged into themselves
+				return;
+			ev(e);
+			clmod(elem, "dtarget", e.type != "dragleave");
+		};
+
+		elem.ondrop = function(e) {
+			if (!r.enabled) return;
+			ev(e);
+			if (e.dataTransfer && e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
+				currLink = e.dataTransfer.getData("text");
+				console.log("elem.ondrop: " + currLink);
+				fileman.clip = currLink.split("\n");
+
+				fileman.cut();
+				msel.evsel();
+
+				if (fileman.clip.length) {
+					r.is_dragging = true;
+					(elem.tagName == "TR" ? elem.querySelector("a[id]") : elem).click();
+				}
+			}
+			else{
+				// wrong source location
+				return
+			}
+		};
+	}
+
+	r.initfiles = function() {
+		if (!r.enabled) return;
+
+		var files = QSA("#files tbody tr");
+		for (var i = 0; i < files.length; i++) {
+			var f = files[i];
+			f.draggable = true;
+			f.ondragstart = function(e) {
+				try{
+					currLink = basenames(e.target.querySelector(".flink").href.split("?"));
+					current = e.target;
+					r.no_warn = true;
+
+					if(!clgot(current, "sel"))
+					{
+						msel.so = msel.pr = null;
+						var trs = QSA('#files tbody tr');
+						for (var a = 0, aa = trs.length; a < aa; a++)
+							clmod(trs[a], 'sel', false);
+						clmod(current, "sel", true);
+						msel.selui();
+					}
+					r.setDataForTransfer(e);
+				}
+				catch(ex){
+					console.log(e.target)
+					console.log(ex)
+				}
+			};
+			f.ondragend = function() {
+				r.no_warn = false;
+			};
+
+			var links = f.querySelectorAll("a");
+			for (var j = 0; j < links.length; j++)
+				links[j].draggable = false;
+
+			if (clgot(f, 'dir'))
+				r.mktarget(f);
+		}
+	};
+
+	r.initgrid = function() {
+		if (!r.enabled) return;
+
+		var files = QSA("#ggrid a");
+		for (var i = 0; i < files.length; i++) {
+			var f = files[i];
+			f.draggable = true;
+			f.ondragstart = function(e) {
+				try{
+					var a = ebi(e.target.getAttribute("ref"));
+					current = a.closest("tr");
+					currLink = basenames(a.href.split("?"));
+					r.no_warn = true;
+
+					if(!clgot(current, "sel"))
+					{
+						msel.so = msel.pr = null;
+						var trs = QSA('#files tbody tr');
+						for (var a = 0, aa = trs.length; a < aa; a++)
+							clmod(trs[a], 'sel', false);
+						clmod(current, "sel", true);
+						msel.selui();
+					}
+					r.setDataForTransfer(e);
+				}
+				catch(ex){
+					console.log(e.target)
+					console.log(ex)
+				}
+			}
+			f.ondragend = function() {
+				r.no_warn = false;
+			};
+
+			if (clgot(f, 'dir'))
+				r.mktarget(f);
+		}
+	};
+	r.setDataForTransfer = function(e){
+		var sel = msel.getsel(),
+			vps = [];
+
+		for (var a = 0; a < sel.length; a++) {
+			var link = sel[a].vp;
+			if(!link.startsWith(window.location.origin))
+				link = window.location.origin + link;
+			vps.push(link);
+		}
+
+		var payload = vps.join('\n')
+		e.dataTransfer.setData("text", payload);
+		e.dataTransfer.setData("text/plain", payload);
+		e.dataTransfer.setData("text/uri-list", payload);
+		e.dataTransfer.setData("application/copyparty", true);
+	}
 
 	return r;
 })();
@@ -9984,12 +11402,10 @@ function reload_browser() {
 	filecols.set_style();
 
 	var parts = get_evpath().split('/'),
-		rm = ebi('entree'),
 		ftab = ebi('files'),
 		link = '', o;
 
-	while (rm.nextSibling)
-		rm.parentNode.removeChild(rm.nextSibling);
+	ebi('path').innerHTML = "";
 
 	for (var a = 0; a < parts.length - 1; a++) {
 		link += parts[a] + '/';
@@ -9997,10 +11413,15 @@ function reload_browser() {
 
 		o = mknod('a');
 		o.setAttribute('href', link2);
-		o.textContent = uricom_dec(parts[a]) || '/';
-		ebi('path').appendChild(mknod('i'));
+		o.textContent = uricom_dec(parts[a]) || (fun_tgl && EMOJI ? '🏠' : 'home');
 		ebi('path').appendChild(o);
+		ebi('path').appendChild(mknod('i'));
+		drag.mktarget(o);
 	}
+
+	setTimeout(function () {
+		ebi('path').scrollLeft = ebi('path').scrollWidth - ebi('path').clientWidth;
+	}, 100);
 
 	reload_mp();
 	try { showsort(ftab); } catch (ex) { }
@@ -10015,14 +11436,14 @@ function reload_browser() {
 	for (var a = 0; a < ns.length; a++)
 		clmod(ebi(ns[a]), 'hidden', ebi('unsearch'));
 
-	if (up2k)
-		up2k.set_fsearch();
+	if(up2k)
+		wait_set_fsearch();
 
 	thegrid.setdirty();
 	msel.render();
 }
 
-(function() {
+(function () {
 	var is_selma = false;
 	var dragging = false;
 
@@ -10064,6 +11485,9 @@ function reload_browser() {
 			if (ehidden) {
 				var tr = ehidden.closest('tr');
 				if (tr) clmod(tr, 'sel', m);
+
+				var chk = el.getElementsByTagName('input')[0];
+				if(chk) chk.checked = m;
 			}
 		}
 	}
@@ -10073,10 +11497,26 @@ function reload_browser() {
 				 b1.bottom < b2.top || b1.top > b2.bottom);
 	}
 
+	var resizing = false;
 	function sel_start(e) {
-		if (e.button !== 0 && e.type !== 'touchstart') return;
-		if (!thegrid.en || !treectl.dsel) return;
-		if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open')) return;
+		try{
+			if(e.target.id == "reszbar"){
+				if(sread('entreed') != "tree"){
+					treectl.entree();
+					return;
+				}
+				resizing = true;
+				clmod(ebi('tree'), 'resz', true);
+				return;
+			}
+			if (e.button !== 0 && e.type !== 'touchstart') return;
+			if (!thegrid.en || !treectl.dsel) return;
+			if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open,#ggrid>a,.modal,.normalrcm,#tree')) return;
+		}
+		catch(ex){
+			console.log(ex);
+			return;
+		}
 
 		if (e.target.closest('#gfiles'))
 			ebi('gfiles').style.userSelect = "none";
@@ -10088,7 +11528,7 @@ function reload_browser() {
 		ttimer = null;
 
 		if (e.type === 'touchstart') {
-			ttimer = setTimeout(function() {
+			ttimer = setTimeout(function () {
 				ttimer = null;
 				start_drag();
 			}, lpdelay);
@@ -10107,6 +11547,11 @@ function reload_browser() {
 	}
 
 	function sel_move(e) {
+		if(resizing){
+			var em2px = parseFloat(getComputedStyle(document.body).fontSize);
+			treectl.settreesize(getpp(e).x / em2px);
+			return;
+		}
 		if (!is_selma) return;
 		var pos = getpp(e);
 		var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
@@ -10141,6 +11586,10 @@ function reload_browser() {
 	}
 
 	function sel_end(e) {
+		if(resizing){
+			resizing = false;
+			clmod(ebi('tree'), 'resz', false);
+		}
 		clearTimeout(ttimer);
 		if (dragging && selbox) {
 			var sbrect = selbox.getBoundingClientRect();
@@ -10164,7 +11613,7 @@ function reload_browser() {
 		window.addEventListener('touchmove', sel_move, { passive: false });
 		window.addEventListener('touchend', sel_end, { passive: true });
 
-		window.addEventListener('dragstart', function(e) {
+		window.addEventListener('dragstart', function (e) {
 			if (treectl.dsel && (is_selma || dragging)) {
 				if (!QS('body.bbox-open'))
 					ev(e);
@@ -10176,7 +11625,7 @@ function reload_browser() {
 })();
 
 
-var mpss = (function() {
+var mpss = (function () {
 	var r = {}, config, ssint, npaint = 0;
 
 	r.load = function () {
@@ -10262,5 +11711,43 @@ var mpss = (function() {
 })();
 
 treectl.hydrate();
+
+// https://stackoverflow.com/questions/49084718/how-exactly-add-service-worker-allowed-to-register-service-worker-scope-in-upp
+if(PWA){
+	import_mjs('sw');
+	window.addEventListener('load', function() {
+		try {
+			var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
+				scope: "/",
+			});
+			if (registration.installing) {
+				console.log("Service worker installing");
+			} else if (registration.waiting) {
+				console.log("Service worker installed");
+			} else if (registration.active) {
+				console.log("Service worker active");
+			}
+		} catch (error) {
+			console.error("Registration failed with " + error);
+		}
+	});
+}
+else if (!PWA && navigator.serviceWorker && caches){
+	var installPrompt = null;
+	window.addEventListener("beforeinstallprompt", function(e) {
+		e.preventDefault();
+		installPrompt = e;
+		ebi('inst').removeAttribute("hidden");
+	});
+	ebi('inst').onclick = function(){
+		if (!installPrompt) {
+			return;
+		}
+		var result = installPrompt.prompt();
+		console.log("Install prompt was: " + result.outcome);
+		installPrompt = null;
+		ebi('inst').setAttribute("hidden", "");
+	}
+}
 
 J_BRW = 2;

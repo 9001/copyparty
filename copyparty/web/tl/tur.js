@@ -5,7 +5,7 @@ Ls.tur = {
 	"tt": "Türkçe",
 
 	"cols": {
-		"c": "işlem butonları",
+		"!": "işlem butonları",
 		"dur": "süre",
 		"q": "kalite / bitrate",
 		"Ac": "ses kodlaması",
@@ -14,7 +14,7 @@ Ls.tur = {
 		"Ahash": "ses denetim toplamı",
 		"Vhash": "video denetim toplamı",
 		"Res": "çözünürlük",
-		"T": "dosya türü",
+		"Ext": "dosya türü",
 		"aq": "ses kalitesi / bitrate",
 		"vq": "video kalitesi / bitrate",
 		"pixfmt": "subsampling / pixel yapısı",
@@ -33,7 +33,7 @@ Ls.tur = {
 			["G", "liste / ızgara görünümü arasında geçiş yap"],
 			["T", "küçük resimler / simgeler arasında geçiş yap"],
 			["⇧ A/D", "küçük resim boyutu"],
-			["ctrl-K", "seçileni sil"],
+			["ctrl-K/Del", "seçileni sil"],
 			["ctrl-X", "seçimi panoya kes"],
 			["ctrl-C", "seçimi panoya kopyala"],
 			["ctrl-V", "buraya yapıştır (taşı/kopyala)"],
@@ -108,9 +108,9 @@ Ls.tur = {
 	"ht_and": " ve ",
 
 	"goh": "kontrol paneli",
-	"gop": 'önceki kardeş">önceki',
-	"gou": 'üst klasör">üst',
-	"gon": 'sonraki klasör">sonraki',
+	"gop": 'önceki kardeş',
+	"gou": 'üst klasör',
+	"gon": 'sonraki klasör',
 	"logout": "Çıkış ",
 	"login": "Giriş",
 	"access": " erişim",
@@ -158,7 +158,7 @@ Ls.tur = {
 	"ut_u2ts": "kendi dosyalarınızdan sunucuya$Nzaman damgasını kopyala\">📅",
 	"ut_ow": "sunucudaki mevcut dosyaları üzerine yazmak mı?$N🛡️: asla (yerine yeni bir dosya adı oluşturur)$N🕒: sunucu dosyası sizinkinden daha eskiyse üzerine yaz$N♻️: dosyalar farklıysa her zaman üzerine yaz$N⏭️: mevcut tüm dosyaları koşulsuz atla", //m
 	"ut_mt": "yükleme yaparken diğer dosyaların hash'lenmesini durdur$N$kötü bir CPU veya HDD'ye sahipseniz kullanabilirsiniz.",
-	"ut_ask": 'yüklemeye başlamadan önce doğrulama mesajı göster">💭',
+	"ut_ask": 'yüklemeye başlamadan önce doğrulama mesajı göster',
 	"ut_pot": "arayüzü daha az karmaşık hale getirerek$Nyükleme hızını yavaş cihazlarda artır",
 	"ut_srch": "gerçekten yükleme yapma, bunun yerine dosyaların $N sunucuda var olup olmadığını kontrol et (okuma izniniz olan tüm klasörleri tarar)",
 	"ut_par": "0'a ayarlayarak yüklemeleri durdur$N$Nbağlantınız yavaşsa değeri artırın$N$NLAN'daysanız veya sunucu HDD'si darboğaz yapıyorsa 1'de tutun",
@@ -226,7 +226,7 @@ Ls.tur = {
 
 	"ct_grid": '田 ızgara',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ ipuçları',
-	"ct_thumb": 'ızgara görünümünde, simgeler ve küçük resimler arasında geçiş yapın$NKısayol: T">🖼️ küçük resimler',
+	"ct_thumb": 'simgeler ve küçük resimler arasında geçiş yapın$NKısayol: T">🖼️ küçük resimler',
 	"ct_csel": 'ızgara görünümünde dosya seçimi için CTRL ve SHIFT tuşlarını kullanın">seç',
 	"ct_dsel": 'ızgara görünümünde sürükleyerek seçimi kullanın">sürükle', //m
 	"ct_dl": 'dosyaya tıklandığında indirmeyi zorla (satır içinde görüntüleme)">dl', //m
@@ -289,9 +289,9 @@ Ls.tur = {
 	"ml_drc": "dinamik aralık sıkıştırıcı",
 	"ml_ss": "sessizliği atla", //m
 
-	"mt_loop": "bir şarkıyı döngüye al / tekrar et\">🔁",
+	"mt_loop": "bir şarkıyı döngüye al / tekrar et",
 	"mt_one": "bir şarkıdan sonra dur\">1️⃣",
-	"mt_shuf": "klasörlerdeki şarkıları karıştır\">🔀",
+	"mt_shuf": "klasörlerdeki şarkıları karıştır",
 	"mt_aplay": "sunucuya erişmek için kullandığın bağlantıda geçerli bir şarkı varsa otomatik oynat$N$Nbunu etkisiz kılmak aynı zamanda müzik oynatıldığında sayfa URL'nin değişmesini de engeller\">a▶",
 	"mt_preload": "aralıksız oynatma için sıradaki şarkıyı önceden yüklemeye başla\">ön yükleme",
 	"mt_prescan": "son şarkı bitmeden önce bir sonraki klasöre git$Nweb tarayıcısını mutlu tutar$Nbu nedenle oynatmayı durdurmaz\">nav",
@@ -306,8 +306,8 @@ Ls.tur = {
 	"mt_follow": "oynatılan müzik ibaresini görünümde tut\">🎯",
 	"mt_compact": "kompakt kontroller\">⟎",
 	"mt_uncache": "önbelleği temizle &nbsp;(bunu, tarayıcınızın bozuk bir şarkı kopyasını önbelleğe alması nedeniyle çalmayı reddettiğinde deneyin)\">önbelleği temizle",
-	"mt_mloop": "açık klasörü döngüye al\">🔁 döngü",
-	"mt_mnext": "bir sonraki klasörü yükle ve devam et\">📂 sonraki",
+	"mt_mloop": "açık klasörü döngüye al",
+	"mt_mnext": "bir sonraki klasörü yükle ve devam et",
 	"mt_mstop": "oynatmayı durdur\">⏸ durdur",
 	"mt_cflac": "flac / wav'ı {0}'a dönüştür\">flac",
 	"mt_caac": "aac / m4a'yı {0}'a dönüştür\">aac",

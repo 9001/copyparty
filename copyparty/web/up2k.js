@@ -50,8 +50,21 @@ catch (ex) {
         up2k = up2k_init(false);
     }
     catch (ex) {
+        ebi('h_up2kcfg').style.display = 
+        ebi('u2btn_ct').style.display = 
+        ebi('u2c3t').style.display = 
+        ebi('up_info').style.display = 
+        ebi('opa_up').style.display = 
+            'none'
+
+        ebi('uq_up').onclick = function(){
+            modaltoggle('bup', true);
+            ebi('bup_btn').click();
+        }
+
         console.log('up2k init failed:', ex);
         toast.err(10, 'could not initialize up2k\n\n' + basenames(ex));
+
     }
 }
 treectl.onscroll();
@@ -838,6 +851,7 @@ function up2k_init(subtle) {
 
     var loading_deps = false;
     function init_deps() {
+        console.log('up2k init deps');
         if (!loading_deps && !got_deps()) {
             var fn = 'sha512.' + sha_js + '.js',
                 m = L.u_https1 + ' <a href="' + (location + '').replace(':', 's:') + '">' + L.u_https2 + '</a> ' + L.u_https3;
@@ -885,7 +899,7 @@ function up2k_init(subtle) {
         return false;
     }
 
-    setmsg(suggest_up2k, 'msg');
+    //setmsg(suggest_up2k, 'msg');
 
     var u2szs = u2sz.split(','),
         u2sz_tgt = parseInt(u2szs[0]),
@@ -917,7 +931,9 @@ function up2k_init(subtle) {
     uc.ow = parseInt(sread('u2ow', ['0', '1', '2', '3']) || u2ow);
     uc.owt = ['🛡️', '🕒', '♻️', '⏭️'];
     function set_ow() {
-        QS('label[for="u2ow"]').innerHTML = uc.owt[uc.ow];
+        var lbls = QSA('label[for="u2ow"]');
+        for(var i=0; i<lbls.length; i++)
+            lbls[i].innerHTML = uc.owt[uc.ow];
         ebi('u2ow').checked  = true; //cosmetic
     }
     ebi('u2ow').onclick = function (e) {
@@ -1042,7 +1058,7 @@ function up2k_init(subtle) {
 
         modal.confirm(L.u_nav_m, uf, ud, null, L.u_nav_b);
     }
-    ebi('u2btn').onclick = nav;
+    ebi('uq_up').onclick = ebi('u2btn').onclick = nav;
 
     var nenters = 0;
     function ondrag(e) {
@@ -1081,10 +1097,30 @@ function up2k_init(subtle) {
     function onoverbtn(e) {
         return onovercmn(this, e, true);
     }
+    function checkDropMode(){
+        if(ebi('fsearch').checked){
+            ebi('srch_zd').style.display = '';
+            ebi('up_zd').style.display = 'none';
+            ebi('srch_dz').style.display = '';
+            ebi('up_dz').style.display = 'none';
+        }
+        else{
+            ebi('srch_zd').style.display = 'none';
+            ebi('up_zd').style.display = '';
+            ebi('srch_dz').style.display = 'none';
+            ebi('up_dz').style.display = '';
+        }
+    }
     function onovercmn(self, e, btn) {
         var ok = false;
         try {
             var dt = e.dataTransfer.types;
+
+            for (var a = 0; a < dt.length; a++)
+                if(dt[a] == 'application/copyparty'){
+                    ev(e)
+                    return;
+                }
 
             for (var a = 0; a < dt.length && !ok; a++)
                 if (dt[a] == 'Files')
@@ -1094,7 +1130,7 @@ function up2k_init(subtle) {
                 if (dt[a] == 'text/uri-list') {
                     if (btn)
                         ok = true;
-                    else
+                    else if (!window.drag || !drag.no_warn)
                         return toast.inf(10, L.u_uri) || true;
                 }
 
@@ -1117,6 +1153,7 @@ function up2k_init(subtle) {
         if (btn)
             return;
 
+        checkDropMode();
         clmod(ebi('drops'), 'vis', 1);
         var v = self.getAttribute('v');
         if (v)
@@ -1130,6 +1167,7 @@ function up2k_init(subtle) {
             clmod(ebi(v), 'hl');
 
         if (--nenters <= 0) {
+            checkDropMode();
             clmod(ebi('drops'), 'vis');
             clmod(ebi('up_dz'), 'hl');
             clmod(ebi('srch_dz'), 'hl');
@@ -1144,6 +1182,8 @@ function up2k_init(subtle) {
     document.body.ondrop = gotfile;
     ebi('u2btn').ondrop = gotfile;
     ebi('u2btn').ondragover = onoverbtn;
+    ebi('wrap').ondrop = gotfile;
+    ebi('wrap').ondragover = onover;
 
     var drops = [ebi('up_dz'), ebi('srch_dz')];
     for (var a = 0; a < 2; a++) {
@@ -1186,12 +1226,24 @@ function up2k_init(subtle) {
 
     function gotfile(e) {
         ev(e);
+
+        if (e.dataTransfer && e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
+			var currLink = e.dataTransfer.getData("text");
+			console.log("wrap.ondrop: " + currLink);
+			fileman.clip = currLink.split("\n");
+			
+			fileman.cut();
+			msel.evsel();
+            fileman.paste(true);
+            return
+		}
+
         nenters = 0;
         offdrag.call(this);
-        var dz = this && this.getAttribute('id');
-        if (!dz && e && e.clientY)
-            // cuo2duo fallback
-            dz = e.clientY < window.innerHeight / 2 ? 'up_dz' : 'srch_dz';
+        // var dz = this && this.getAttribute('id');
+        // if (!dz && e && e.clientY)
+        //     // cuo2duo fallback
+        //     dz = e.clientY < window.innerHeight / 2 ? 'up_dz' : 'srch_dz';
 
         var err = this.getAttribute('err');
         if (err)
@@ -1199,11 +1251,11 @@ function up2k_init(subtle) {
 
         toast.inf(0, L.u_scan);
 
-        if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
-            tgl_fsearch();
+        // if ((dz == 'up_dz' && uc.fsearch) || (dz == 'srch_dz' && !uc.fsearch))
+        //     tgl_fsearch();
 
-        if (!QS('#op_up2k.act'))
-            goto('up2k');
+        if(!uc.fsearch)
+            up2k.init_deps();
 
         var files,
             is_itemlist = false;
@@ -2012,7 +2064,7 @@ function up2k_init(subtle) {
             ng = pvis.ctr.ng,
             spd = Math.floor(st.bytes.finished / st.time.busy),
             suf = '\n\n{0} @ {1}/s'.format(shumantime(st.time.busy), humansize(spd)),
-            t = uc.ask_up ? 0 : 10;
+            t = 10; // uc.ask_up ? 0 : 10;
 
         console.log('toast', ok, ng);
 
@@ -3067,41 +3119,6 @@ function up2k_init(subtle) {
     ///   config ui
     //
 
-    function onresize(e) {
-        // 10x faster than matchMedia('(min-width
-        var bar = ebi('ops'),
-            wpx = window.innerWidth,
-            fpx = parseInt(getComputedStyle(bar)['font-size']),
-            wem = wpx * 1.0 / fpx,
-            wide = wem > 57 ? 'w' : '',
-            parent = ebi(wide ? 'u2btn_cw' : 'u2btn_ct'),
-            btn = ebi('u2btn');
-
-        if (btn.parentNode !== parent) {
-            parent.appendChild(btn);
-            ebi('u2conf').className = ebi('u2cards').className = ebi('u2etaw').className = wide;
-        }
-
-        wide = wem > 86 ? 'ww' : wide;
-        parent = ebi(wide == 'ww' ? 'u2c3w' : 'u2c3t');
-        var its = [ebi('u2etaw'), ebi('u2cards')];
-        if (its[0].parentNode !== parent) {
-            ebi('u2conf').className = wide;
-            for (var a = 0; a < 2; a++) {
-                parent.appendChild(its[a]);
-                its[a].className = wide;
-            }
-        }
-    }
-    onresize100.add(onresize, true);
-
-    if (MOBILE) {
-        // android-chrome wobbles for a bit; firefox / iOS-safari are OK
-        setTimeout(onresize, 20);
-        setTimeout(onresize, 100);
-        setTimeout(onresize, 500);
-    }
-
     var o = QSA('#u2conf .c *[tt]');
     for (var a = o.length - 1; a >= 0; a--) {
         o[a].parentNode.getElementsByTagName('input')[0].setAttribute('tt', o[a].getAttribute('tt'));
@@ -3332,7 +3349,10 @@ function up2k_init(subtle) {
 
         try {
             clmod(ebi('u2c3w'), 's', !can_write);
-            QS('label[for="fsearch"]').style.display = QS('#fsearch').style.display = fixed ? 'none' : '';
+            QS('#fsearch').style.display = fixed ? 'none' : '';
+            var lbls = QSA('label[for="fsearch"]');
+            for(var i=0; i<lbls.length; i++)
+                lbls[i].style.display = fixed ? 'none' : '';
         }
         catch (ex) { }
 
@@ -3341,6 +3361,7 @@ function up2k_init(subtle) {
                 desc = uc.fsearch ? L.ul_btns : L.ul_btnu;
 
             clmod(ebi('op_up2k'), 'srch', uc.fsearch);
+            clmod(ebi('u2conf'), 'srch', uc.fsearch);
             ebi('u2bm').innerHTML = ico + '&nbsp; <sup>' + desc + '</sup>';
         }
         catch (ex) { }
@@ -3356,7 +3377,6 @@ function up2k_init(subtle) {
 
         draw_turbo();
         draw_life();
-        onresize();
     }
 
     function apply_flag_cfg() {
@@ -3474,6 +3494,52 @@ function up2k_init(subtle) {
             up2k_hooks[a]();
     }, 1);
 
+
+    r.save_here = function () {
+        try{
+            window.shr_target = false
+            fileman.render();
+            // get data from sw.js
+            caches.open('/media').then(function(cache){
+				cache.match('/shared-file-count').then(function(r){
+                    return r && r.text()
+                }).then(function(count){
+                    if(!(count > 0)) return;
+                    cache.delete('/shared-file-count');
+
+                    var files = []
+                    function load_from_cache(i){
+                        if(i >= count){
+                            up_them(files);
+                            return;
+                        }
+                        cache.match('/shared-file-' + i).then(function(file){
+                            return file.blob()
+                        }).then(function(blob){
+                            cache.match('/shared-filename-' + i).then(function(nameR){
+                                return nameR && nameR.text()
+                            }).then(function(name){
+                                return name || 'shared_file_' + i
+                            }).then(function(name){
+                                var realFile = new File([blob], name, { type: blob.type });
+                                files.push([realFile, name]);
+                                load_from_cache(i + 1);
+                            }).then(function(){
+                                cache.delete('/shared-file-' + i);
+                                cache.delete('/shared-filename-' + i);
+                            });
+                        });
+                    }
+                    load_from_cache(0);
+                });
+			});
+        }
+        catch(e){
+            alert(e)
+        }
+    };
+    if(ebi('fsav')) ebi('fsav').onclick = r.save_here;
+
     return r;
 }
 
@@ -3491,8 +3557,8 @@ function warn_uploader_busy(e) {
 tt.init();
 favico.init();
 ebi('ico1').onclick = function () {
-    var a = favico.txt == this.textContent;
-    swrite('icot', a ? 'c' : this.textContent);
+    var a = favico.txt == '🎉';
+    swrite('icot', a ? 'c' : '🎉');
     swrite('icof', a ? 'fc5' : '000');
     swrite('icob', a ? '222' : '');
     favico.init();

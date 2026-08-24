@@ -405,8 +405,17 @@ git describe --tags >/dev/null 2>/dev/null && {
 		printf 'unexpected git version format: [%s]\n' "$git_ver"
 		exit 1
 	}
-
 	dt="$(git log -1 --format=%cd --date=short | sed -E 's/-0?/, /g')"
+}
+
+[ "$PRTY_SFX_VER" ] && {
+	# PRTY_SFX_VER='1.20.14-5-g139ef185' PRTY_SFX_DT='2026, 5, 8'
+	# PRTY_SFX_VER='2026-0510-2303' PRTY_SFX_DT='2026, 5, 10'
+	ver="$PRTY_SFX_VER"
+	dt="$PRTY_SFX_DT"
+}
+
+[ "$ver" ] && {
 	printf 'git %3s: \033[36m%s\033[0m\n' ver "$ver" dt "$dt"
 	sed -ri '
 		s/^(VERSION =)(.*)/#\1\2\n\1 ('"$t_ver"')/;

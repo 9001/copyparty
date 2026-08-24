@@ -5,7 +5,7 @@ Ls.cze = {
 	"tt": "Čeština",
 
 	"cols": {
-		"c": "tlačítka akcí",
+		"!": "tlačítka akcí",
 		"dur": "doba trvání",
 		"q": "kvalita / bitrate",
 		"Ac": "audio kodek",
@@ -14,7 +14,7 @@ Ls.cze = {
 		"Ahash": "kontrolní součet audia",
 		"Vhash": "kontrolní součet videa",
 		"Res": "rozlišení",
-		"T": "typ souboru",
+		"Ext": "typ souboru",
 		"aq": "kvalita zvuku / bitrate",
 		"vq": "kvalita videa / bitrate",
 		"pixfmt": "podvzorkování / struktura pixelů",
@@ -33,7 +33,7 @@ Ls.cze = {
 			["G", "přepnout seznam / zobrazení mřížky"],
 			["T", "přepnout náhledy / ikony"],
 			["⇧ A/D", "velikost náhledů"],
-			["ctrl-K", "smazat vybrané"],
+			["ctrl-K/Del", "smazat vybrané"],
 			["ctrl-X", "vyjmout výběr do schránky"],
 			["ctrl-C", "kopírovat výběr do schránky"],
 			["ctrl-V", "vložit (přesunout/kopírovat) zde"],
@@ -112,9 +112,9 @@ Ls.cze = {
 	"ht_and": " a ",
 
 	"goh": "ovládací panel",
-	"gop": 'předchozí sourozenec">předchozí',
-	"gou": 'nadřazená složka">nahoru',
-	"gon": 'následující složka">následující',
+	"gop": 'předchozí sourozenec',
+	"gou": 'nadřazená složka',
+	"gon": 'následující složka',
 	"logout": "Odhlásit ",
 	"login": "Přihlásit se", //m
 	"access": " přístup",
@@ -162,7 +162,7 @@ Ls.cze = {
 	"ut_u2ts": "kopírovat časovou značku poslední změny$Nz vašeho souborového systému na server\">📅",
 	"ut_ow": "přepsat existující soubory na serveru?$N🛡️: nikdy (místo toho vytvoří nový název souboru)$N🕒: přepsat pokud je soubor na serveru starší než váš$N♻️: vždy přepsat pokud se soubory liší$N⏭️: bezpodmínečně přeskočit všechny existující soubory", //m
 	"ut_mt": "pokračovat v hashování ostatních souborů během nahrávání$N$Nmožná zakázat pokud je vaše CPU nebo HDD bottleneckem",
-	"ut_ask": 'požádat o potvrzení před zahájením nahrávání">💭',
+	"ut_ask": 'požádat o potvrzení před zahájením nahrávání',
 	"ut_pot": "zlepšit rychlost nahrávání na pomalých zařízeních$Nzjednodušením UI",
 	"ut_srch": "skutečně nenahrávat, místo toho zkontrolovat zda soubory již $N existují na serveru (prohledá všechny složky které můžete číst)",
 	"ut_par": "pozastavit nahrávání nastavením na 0$N$Nzvýšit pokud je vaše připojení pomalé / vysoká latence$N$Nponechat na 1 v LAN nebo pokud je HDD serveru bottleneckem",
@@ -230,7 +230,7 @@ Ls.cze = {
 
 	"ct_grid": '田 mřížka',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ nápovědy',
-	"ct_thumb": 'v zobrazení mřížky přepnout ikony nebo náhledy$NKlávesová zkratka: T">🖼️ náhledy',
+	"ct_thumb": 'přepnout ikony nebo náhledy$NKlávesová zkratka: T">🖼️ náhledy',
 	"ct_csel": 'použít CTRL a SHIFT pro výběr souborů v zobrazení mřížky">výběr',
 	"ct_dsel": 'použít tažený výběr v zobrazení mřížky">tažení', //m
 	"ct_dl": 'vynutit stažení (nezobrazovat inline) při kliknutí na soubor">dl', //m
@@ -293,9 +293,9 @@ Ls.cze = {
 	"ml_drc": "kompresor dynamického rozsahu",
 	"ml_ss": "přeskočit ticho", //m
 
-	"mt_loop": "smyčka/opakovat jednu skladbu\">🔁",
+	"mt_loop": "smyčka/opakovat jednu skladbu",
 	"mt_one": "zastavit po jedné skladbě\">1️⃣",
-	"mt_shuf": "zamíchat skladby v každé složce\">🔀",
+	"mt_shuf": "zamíchat skladby v každé složce",
 	"mt_aplay": "automatické přehrávání pokud je ID skladby v odkazu kterým jste přišli na server$N$Nzakázání toho také zastaví aktualizaci URL stránky s ID skladby při přehrávání hudby, aby se zabránilo automatickému přehrávání pokud se tato nastavení ztratí ale URL zůstane\">a▶",
 	"mt_preload": "začít načítat následující skladbu před koncem pro plynulé přehrávání\">přednahrání",
 	"mt_prescan": "přejít do následující složky před tím než$Nskončí poslední skladba, aby byl webprohlížeč$Nspokojen aby nezastavil přehrávání\">nav",
@@ -310,8 +310,8 @@ Ls.cze = {
 	"mt_follow": "udržet přehrávanou stopu v zobrazení\">🎯",
 	"mt_compact": "kompaktní ovládání\">⟎",
 	"mt_uncache": "vymazat cache &nbsp;(zkuste to, pokud váš prohlížeč uložil$Nporušenou kopii písně a odmítá ji přehrát)\">uncache",
-	"mt_mloop": "opakovat otevřenou složku\">🔁 loop",
-	"mt_mnext": "načíst další složku a pokračovat\">📂 next",
+	"mt_mloop": "opakovat otevřenou složku",
+	"mt_mnext": "načíst další složku a pokračovat",
 	"mt_mstop": "zastavit přehrávání\">⏸ stop",
 	"mt_cflac": "převést flac / wav na {0}\">flac",
 	"mt_caac": "převést aac / m4a na {0}\">aac",

@@ -119,7 +119,7 @@ body.untz {
         if (--uofs >= 0) {
             document.body.style.marginLeft = hrand() * uofs + 'px';
             ebi('tree').style.marginLeft = hrand() * uofs + 'px';
-            for (var a of QSA('#ops>a, #path>a, #pctl>a'))
+            for (var a of QSA('#ops>a, #path>a, .pctl>a'))
                 a.style.transform = 'translate(' + hrand() * uofs * 1 + 'px, ' + hrand() * uofs * 0.7 + 'px) rotate(' + Math.random() * uofs * 0.7 + 'deg)'
         }
 

@@ -5,7 +5,7 @@ Ls.nld = {
 	"tt": "Nederlands",
 
 	"cols": {
-		"c": "Action knoppen",
+		"!": "Action knoppen",
 		"dur": "Duratie",
 		"q": "Kwaliteit / bitrate",
 		"Ac": "Audio codec",
@@ -14,7 +14,7 @@ Ls.nld = {
 		"Ahash": "Audio checksum",
 		"Vhash": "Video checksum",
 		"Res": "Resolution",
-		"T": "Bestandstype",
+		"Ext": "Bestandstype",
 		"aq": "Audio kwaliteit / bitrate",
 		"vq": "Video kwaliteit / bitrate",
 		"pixfmt": "Subsampling / pixel structure",
@@ -33,7 +33,7 @@ Ls.nld = {
 			["G", "Verwissel tussen list / grid weergave"],
 			["T", "Verwissel tussen miniaturen / iconen"],
 			["⇧ A/D", "Thumbnail formaat"],
-			["ctrl-K", "Verwijder geselecteerde"],
+			["ctrl-K/Del", "Verwijder geselecteerde"],
 			["ctrl-X", "Knip selectie naar klembord"],
 			["ctrl-C", "Kopieer selectie naar klembord"],
 			["ctrl-V", "Hier plakken (verplaatsen/kopieëren)"],
@@ -108,9 +108,9 @@ Ls.nld = {
 	"ht_and": " en ",
 
 	"goh": "Beheer-paneel",
-	"gop": 'Vorige map">Vorige',
-	"gou": 'Bovenligende map">Omhoog',
-	"gon": 'Volgende map">Volgende',
+	"gop": 'Vorige map',
+	"gou": 'Bovenligende map',
+	"gon": 'Volgende map',
 	"logout": "Uitloggen ",
 	"login": "Inloggen", //m
 	"access": " Toegang",
@@ -158,7 +158,7 @@ Ls.nld = {
 	"ut_u2ts": "Kopieer de laatste-gewijzigde tijdstamp$Nvan je bestandsysteem naar de server\">📅",
 	"ut_ow": "Overschrijf bestaande bestanden op de server?$N🛡️: nooit (zal in plaats daarvan een nieuwe bestandsnaam genereren)$N🕒: overschrijven als de server-bestand ouder is dan het geüploade bestand$N♻️: altijd overschrijven als de bestanden verschillend zijn$N⏭️: alle bestaande bestanden onvoorwaardelijk overslaan", //m
 	"ut_mt": "Ga door met hashen van andere bestanden tijdens het uploaden$N$Moet je misschien uitschakelen als je CPU of HDD het niet aan kan",
-	"ut_ask": 'Vraag voor bevestiging voordat het uploaden start">💭',
+	"ut_ask": 'Vraag voor bevestiging voordat het uploaden start',
 	"ut_pot": "Verbeter de uploadsnelheid voor langzame apparaten$Ndoor de interface minder complex te maken",
 	"ut_srch": "Niet uploaden, maar check of de bestanden als op de server bestaan$N (checkt alle mappen die waar jij toegang op hebt)",
 	"ut_par": "Pauzeer bij zetten het op 0$N$Nverhoog als je verbinding traag is$N$Nhou het op 1 als je netwerk of server HDD het niet aankan",
@@ -226,7 +226,7 @@ Ls.nld = {
 
 	"ct_grid": '田 grid',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
-	"ct_thumb": 'In grid-overzicht, wissel tussen iconen of thumbnails$NHotkey: T">🖼️ thumbs',
+	"ct_thumb": 'wissel tussen iconen of thumbnails$NHotkey: T">🖼️ thumbs',
 	"ct_csel": 'Gebruik CTRL en SHIFT voor de bestand selectie in grid-overzicht>sel',
 	"ct_dsel": 'Gebruik slepen om te selecteren in grid-overzicht>slepen', //m
 	"ct_dl": 'download afdwingen (niet inline weergeven) wanneer op een bestand wordt geklikt">dl', //m
@@ -289,9 +289,9 @@ Ls.nld = {
 	"ml_drc": "Dynamisch bereikcompressor",
 	"ml_ss": "Stiltes overslaan", //m
 
-	"mt_loop": "Loop/herhaal een nummer\">🔁",
+	"mt_loop": "Loop/herhaal een nummer",
 	"mt_one": "Stop na een nummer\">1️⃣",
-	"mt_shuf": "Shuffle alle muziek in alle mappen\">🔀",
+	"mt_shuf": "Shuffle alle muziek in alle mappen",
 	"mt_aplay": "Autoplay als er een song-ID staat in de link waarop je hebt geklikt om naar de server te gaan$N$NAls u dit uitschakelt, wordt de pagina-URL ook niet meer bijgewerkt met nummer-ID's tijdens het afspelen van muziek. Dit voorkomt automatisch afspelen als deze instellingen verloren gaan, maar de URL behouden blijft.\">a▶",
 	"mt_preload": "Begin het laden van de volgende nummer vlak voordat de huidige nummer het einde bereikt voor gapless playback\">preload",
 	"mt_prescan": "Ga naar de volgende map voordat de laatste nummer eindigd$NMaakt de webbrower blij$NZo het afspelen van muziek niet gestopt word\">nav",
@@ -306,8 +306,8 @@ Ls.nld = {
 	"mt_follow": "Het afgespeelde nummer in beeld houden\">🎯",
 	"mt_compact": "Compacte bedieningselementen\">⟎",
 	"mt_uncache": "Cache wissen &nbsp;(Probeer dit als uw browser een kapotte kopie van een nummer heeft gecached, waardoor het niet afgespeeld kan worden)\">uncache",
-	"mt_mloop": "De open map herhalen\">🔁 loop",
-	"mt_mnext": "Laad de volgende map en ga verder\">📂 next",
+	"mt_mloop": "De open map herhalen",
+	"mt_mnext": "Laad de volgende map en ga verder",
 	"mt_mstop": "Stoppen met afspelen\">⏸ stop",
 	"mt_cflac": "flac / wav omzetten naar {0}\">flac",
 	"mt_caac": "aac / m4a omzetten naar {0}\">aac",

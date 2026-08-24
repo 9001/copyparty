@@ -5,7 +5,7 @@ Ls.fra = {
 	"tt": "français",
 
 	"cols": {
-		"c": "bouton d'action",
+		"!": "bouton d'action",
 		"dur": "durée",
 		"q": "qualité / débit binaire",
 		"Ac": "codec audio",
@@ -14,7 +14,7 @@ Ls.fra = {
 		"Ahash": "somme de contrôle audio",
 		"Vhash": "somme de contrôle vidéo",
 		"Res": "résolution",
-		"T": "type de fichier",
+		"Ext": "type de fichier",
 		"aq": "qualité audio / débit binaire",
 		"vq": "qualité vidéo / débit binaire",
 		"pixfmt": "sous-échantillonnage / structure de pixel",
@@ -33,7 +33,7 @@ Ls.fra = {
 			["G", "activer vue en liste / vue en grille"],
 			["T", "activer les miniatures / icônes"],
 			["⇧ A/D", "taille des miniatures"],
-			["ctrl-K", "suprimer la sélection"],
+			["ctrl-K/Del", "suprimer la sélection"],
 			["ctrl-X", "couper la sélection au presse-papier"],
 			["ctrl-C", "copier la sélection au presse-papier"],
 			["ctrl-V", "coller (déplacer/copier) ici"],
@@ -108,9 +108,9 @@ Ls.fra = {
 	"ht_and": " et ",
 
 	"goh": "panneau-de-commande",
-	"gop": 'élément "frère" précédent">précédent',
-	"gou": 'dossier parent">haut',
-	"gon": 'dossier suivant">suivant',
+	"gop": 'élément "frère" précédent',
+	"gou": 'dossier parent',
+	"gon": 'dossier suivant',
 	"logout": "Déconnexion ",
 	"login": "Se connecter", //m
 	"access": " accès",
@@ -158,7 +158,7 @@ Ls.fra = {
 	"ut_u2ts": "copier l'horodatage de dernière modification$Nde votre système de fichiers vers le serveur\">📅",
 	"ut_ow": "écraser les fichiers existants sur le serveur?$N🛡️: jamais (générera un nouveau nom de fichier à la place)$N🕒: écraser si le fichier sur le serveur est plus ancien que le vôtre$N♻️: toujours écraser si les fichiers sont différents$N⏭️: ignorer systématiquement tous les fichiers existants", //m
 	"ut_mt": "continuer à calculer la somme de contrôle d'autres fichiers pendant le téléversement$N$Npeut-être désactiver si votre CPU ou HDD est la cause de perte de performances",
-	"ut_ask": 'demander confirmation avant le début du téléversement">💭',
+	"ut_ask": 'demander confirmation avant le début du téléversement',
 	"ut_pot": "améliorer la vitesse de téléversement sur les appareils lents$Nen simplifiant l'interface utilisateur",
 	"ut_srch": "ne pas réellement téléverser, mais vérifier si les fichiers existent déjà$N sur le serveur (scannera tous les dossiers que vous pouvez lire)",
 	"ut_par": "mettre en pause les téléversements en le réglant sur 0$N$Naugmenter si votre connexion est lente / à forte latence$N$Nle garder à 1 sur le LAN ou si le HDD du serveur est un goulot d'étranglement",
@@ -226,7 +226,7 @@ Ls.fra = {
 
 	"ct_grid": '田 grille',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ infobulles',
-	"ct_thumb": 'vue en grille, activer les icônes ou les miniatures$NHotkey: T">🖼️ minia',
+	"ct_thumb": 'activer les icônes ou les miniatures$NHotkey: T">🖼️ minia',
 	"ct_csel": 'utiliser CTRL et MAJ pour selectioner des fichiers en vue en grille">sel',
 	"ct_dsel": 'utiliser la sélection par glisser en vue en grille">glisser', //m
 	"ct_dl": 'forcer le téléchargement (ne pas afficher en ligne) lorsqu’un fichier est cliqué">dl', //m
@@ -289,9 +289,9 @@ Ls.fra = {
 	"ml_drc": "compresseur de plage dynamique",
 	"ml_ss": "ignorer les silences", //m
 
-	"mt_loop": "répéter en boucle une musique\">🔁",
+	"mt_loop": "répéter en boucle une musique",
 	"mt_one": "stopper après une musique\">1️⃣",
-	"mt_shuf": "mélanger les musiques dans chaque dossiers\">🔀",
+	"mt_shuf": "mélanger les musiques dans chaque dossiers",
 	"mt_aplay": "jouer automatiquement si le lien utilisé pour accéder au serveur a un song-ID $N$N, désactiver cela arrêtera également la mise à jour de l'URL de la page avec les song-IDs lors de la lecture de la musique, pour éviter la lecture automatique si ces paramètres sont perdus mais que l'URL reste\">a▶",
 	"mt_preload": "commencer à charger la prochaine chanson près de la fin pour une lecture sans interruption\">preload",
 	"mt_prescan": "explorer le dossier suivant avant la dernière musique$Nne finisse, pour garder le navigateur content$Npour qu'il n'arrête pas la lecture\">nav",
@@ -306,8 +306,8 @@ Ls.fra = {
 	"mt_follow": "garder la piste en cours défilée dans la vue\">🎯",
 	"mt_compact": "contrôles compacts\">⟎",
 	"mt_uncache": "effacer le cache &nbsp;(essayez ceci si votre navigateur a mis en cache$Nun copie défectueuse d'une chanson, ce qui empêche sa lecture)\">uncache",
-	"mt_mloop": "lire en boucle le dossier ouvert\">🔁 loop",
-	"mt_mnext": "charger le dossier suivant et continuer\">📂 next",
+	"mt_mloop": "lire en boucle le dossier ouvert",
+	"mt_mnext": "charger le dossier suivant et continuer",
 	"mt_mstop": "arrêter la lecture\">⏸ stop",
 	"mt_cflac": "convertir flac / wav en {0}\">flac",
 	"mt_caac": "convertir aac / m4a en {0}\">aac",
