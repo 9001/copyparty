@@ -1776,8 +1776,10 @@ function getVolFromStr(s){
         }
         else{
             var p = o.split(',')[0]
-            var n = o.slice(p.length + 1)
+            var n = o.slice(p.length + 1).split(',')
             for(var j = 0; j < n.length; j++){
+                if(n[j].startsWith('@'))
+                    continue
                 console.log('user: ' + n[j] + ' gets perms: ' + p)
                 perms.push({user: n[j], perms: p})
 
