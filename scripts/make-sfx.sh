@@ -323,7 +323,7 @@ necho() {
 			exit 1
 		}
 		rm "$f1"
-		cp -p "$f2" "$f1"
+		cp -rp "$f2" "$f1"
 	); done
 
 	# resolve symlinks on windows

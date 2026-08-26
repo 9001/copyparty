@@ -499,6 +499,7 @@ if (1)
 		"gt_sz": "size",
 		"gt_ts": "date",
 		"gt_ext": "type",
+		"gt_rand": "random",
 		"gt_c1": "truncate filenames more (show less)",
 		"gt_c2": "truncate filenames less (show more)",
 
@@ -4072,7 +4073,7 @@ var fileman = (function () {
 			'<table>',
 			'<tr><td colspan="2">',
 			'<button id="sh_abrt">' + L.fs_abrt + '</button>',
-			'<button id="sh_rand">' + L.fs_rand + '</button>',
+			'<button id="sh_rand"> ' + L.fs_rand + '</button>',
 			'<button id="sh_apply">' + L.fs_go + '</button>',
 			'</td></tr>',
 			'<tr><td>' + L.fs_name + '</td><td><input type="text" id="sh_k" ' + NOAC + ' placeholder="  ' + L.fs_pname + '" /></td></tr>',
@@ -5561,6 +5562,7 @@ var thegrid = (function () {
 		'<a href="#" s="sz">' + L.gt_sz + '</a> ' +
 		'<a href="#" s="ts">' + L.gt_ts + '</a> ' +
 		'<a href="#" s="ext">' + L.gt_ext + '</a>' +
+		'<a href="#" s="rand">' + L.gt_rand + '</a>' +
 		'</span></div>' +
 		'<div id="ggrid"></div>'
 	);
@@ -8194,7 +8196,8 @@ function mk_files_header(taglist) {
 		'<thead><tr>',
 		'<th name="lead"><span>c</span></th>',
 		'<th name="href"><span>File Name</span></th>',
-		'<th name="sz" sort="int"><span>Size</span></th>'
+		'<th name="sz" sort="int"><span>Size</span></th>',
+		'<th name="rand" sort="random"><span>Random</span></th>'
 	];
 	for (var a = 0; a < taglist.length; a++) {
 		var tag = taglist[a],

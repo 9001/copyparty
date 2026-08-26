@@ -737,15 +737,30 @@ function sortTable(table, col, cb) {
         vl.push([v, a]);
     }
 
-    if (stype == 'int')
+    if (stype == 'random') {
+        // Fisher-Yates shuffle for true randomization
+        for (var i = vl.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = vl[i];
+            vl[i] = vl[j];
+            vl[j] = temp;
+        }
+    }
+    else if (stype == 'int') {
         vl.sort(st_cmp_num);
-    else if (ENATSORT)
+        if (reverse < 0)
+            vl.reverse();
+    }
+    else if (ENATSORT) {
         vl.sort(st_cmp_nat);
-    else
+        if (reverse < 0)
+            vl.reverse();
+    }
+    else {
         vl.sort(st_cmp_gen);
-
-    if (reverse < 0)
-        vl.reverse();
+        if (reverse < 0)
+            vl.reverse();
+    }
 
     if (sread('dir1st') !== '0') {
         var r1 = [], r2 = [];
