@@ -9,6 +9,8 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/ui.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/browser.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/feather.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/layout.css?_={{ ts }}">
 {{ html_head }}
 	{%- if css %}
 	<link rel="stylesheet" media="screen" href="{{ css }}_={{ ts }}">
@@ -18,6 +20,13 @@
 <body>
 	<div id="ops"></div>
 
+	<div id="opside">
+		<div id="opside_head">
+			<span id="opside_title"></span>
+			<a href="#" id="opside_x">✕</a>
+		</div>
+		<div id="opside_body">
+
 	<div id="op_search" class="opview">
 		{%- if have_tags_idx %}
 		<div id="srch_form" class="tags opbox"></div>
@@ -26,8 +35,6 @@
 		{%- endif %}
 		<div id="srch_q"></div>
 	</div>
-
-	<div id="op_player" class="opview opbox opwide"></div>
 
 	<div id="op_bup" class="opview opbox {% if not ls0 %}act{% endif %}">
 		<div id="u2err"></div>
@@ -68,6 +75,11 @@
 	<div id="op_up2k" class="opview"></div>
 
 	<div id="op_cfg" class="opview opbox opwide"></div>
+
+	<div id="op_player" class="opview opbox opwide"></div>
+
+		</div>
+	</div>
 
 	<h1 id="path">
 		<a href="#" id="entree">🌲</a>
@@ -154,6 +166,7 @@
 	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/tl/{{ lang }}.js?_={{ ts }}"></script>
 	{%- endif %}
 	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/baguettebox.js?_={{ ts }}"></script>
+	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/feather.js?_={{ ts }}"></script>
 	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/browser.js?_={{ ts }}"></script>
 	<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/up2k.js?_={{ ts }}"></script>
 	{%- if js %}

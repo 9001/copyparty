@@ -10,6 +10,7 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/shares.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/ui.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/feather.css?_={{ ts }}">
 {{ html_head }}
 </head>
 
@@ -76,6 +77,7 @@ document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme
 
 </script>
 <script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
+<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/feather.js?_={{ ts }}"></script>
 <script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/shares.js?_={{ ts }}"></script>
 {%- if js %}
 <script nonce="{{ js_nonce }}" src="{{ js }}_={{ ts }}"></script>

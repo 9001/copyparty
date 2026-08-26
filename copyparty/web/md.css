@@ -450,3 +450,21 @@ blink {
 		color: #940;
 	}
 }
+\thtml.fz .mdo a,
+\thtml.gz .mdo a {
+\t\tcolor: #000;
+\t}
+\thtml.fz .mdo pre,
+\thtml.fz .mdo code,
+\thtml.gz .mdo pre,
+\thtml.gz .mdo code {
+\t\tcolor: #240;
+\t}
+\thtml.fz .mdo p>em,
+\thtml.fz .mdo li>em,
+\thtml.fz .mdo td>em,
+\thtml.gz .mdo p>em,
+\thtml.gz .mdo li>em,
+\thtml.gz .mdo td>em {
+\t\tcolor: #940;
+\t}

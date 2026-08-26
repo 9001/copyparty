@@ -97,3 +97,31 @@ html.bz {
 html.bz th {
 	background: #223;
 }
+html.fz {
+	color: #FAFAF7;
+	background: #1A1A1A;
+}
+html.fz th {
+	background: #222;
+}
+html.fy {
+	color: #1A1A1A;
+	background: #FAFAF7;
+}
+html.fy th {
+	background: #F0EFEA;
+}
+html.gz {
+	color: #E8ECF4;
+	background: #0B0E14;
+}
+html.gz th {
+	background: #11161F;
+}
+html.gy {
+	color: #1A1E2A;
+	background: #F0F2F8;
+}
+html.gy th {
+	background: #E0E4ED;
+}

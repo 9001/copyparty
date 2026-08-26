@@ -76,6 +76,10 @@ web/browser.js
 web/browser2.html
 web/cf.html
 web/copyparty.gif
+web/feather.css
+web/feather.js
+web/layout.css
+web/logo.svg
 web/deps/busy.mp3
 web/deps/easymde.css
 web/deps/easymde.js
@@ -146,6 +150,19 @@ RESM = {
     "web/a/u2c.txt": "web/a/u2c.py",
     "web/a/webdav-cfg.bat": "web/a/webdav-cfg.txt",
 }
+
+THEME_NAMES = [
+    "classic dark", "classic light",
+    "pm-monokai", "flat light",
+    "vice", "hotdog stand",
+    "hacker", "hi-con",
+    "phi95 dark", "phi95",
+    "paper dark", "paper light",
+    "vibrant dark", "vibrant light",
+    "CRT terminal", "CRT terminal light",
+    "vaporwave", "vaporwave light",
+    "Yandesign", "Yandesign light",
+]
 
 
 class EnvParams(object):

@@ -1,0 +1,509 @@
+/* ============================================================
+   Layout skeleton — OpenAI-inspired top bar & balanced shell
+   ------------------------------------------------------------
+   Two layers:
+   1. NEUTRAL SKELETON  (all themes, structural only)
+      - sticky top bar built around #ops (brand / toolbar /
+        server-info / account), breadcrumb row, centered content
+        column, file table as a rounded card, hairline spacing
+   2. PAPER & VIBRANT    (html.fz/fy/gz/gy): fonts, radius,
+        hover states, focus rings, frosted header
+
+   Pure CSS + one DOM move (srv_info/acc_info into #ops) done in
+   browser.js apply_perms(). No HTML template changes.
+   ============================================================ */
+
+/* ------------------------------------------------------------------
+   shared design tokens (fallbacks keep the skeleton usable in every
+   theme; f/g themes re-define them below)
+------------------------------------------------------------------- */
+:root {
+	--bar: 3rem;                      /* top bar height (rem: stable across font contexts) */
+	--hairline: var(--bg-u4, rgba(127, 127, 127, .22));
+	--hairline-soft: rgba(127, 127, 127, .09);
+	--panel: var(--bg-u1, var(--bg));   /* raised surface */
+	--panel-2: var(--bg-u2, var(--bg-u1));
+	--hover: var(--bg-d1, var(--bg-u1));
+	--cr: .7em;                      /* card radius */
+	--r: .4em;                       /* small radius */
+}
+
+/* ------------------------------------------------------------------
+   1. TOP BAR  (sticky, full-width, flex)
+------------------------------------------------------------------- */
+#ops {
+	position: sticky;
+	top: 0;
+	z-index: 50;
+	display: flex;
+	align-items: center;
+	gap: .1em;
+	min-height: var(--bar);
+	box-sizing: border-box;
+	padding: .35em .8em;
+	white-space: nowrap;
+	background: var(--bg);
+	border-bottom: 1px solid var(--hairline);
+}
+
+/* brand logo (official copyparty cassette); margin-right:auto keeps
+   it pinned left while the toolbar icons bunch up right */
+#ops::before {
+	content: "";
+	width: 2.55em;
+	height: 1.76em;
+	margin: 0 auto 0 .2em;
+	flex: none;
+	background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjA3Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImxnMSIgeDE9IjE1IiB5MT0iMTUiIHgyPSIxNSIgeTI9IjE0MyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wCiAgICAgc3R5bGU9InN0b3AtY29sb3I6I2ZmY2M1NTtzdG9wLW9wYWNpdHk6MSIKICAgICBvZmZzZXQ9IjAiCiAgICAgaWQ9InN0b3AxIiAvPjxzdG9wCiAgICAgc3R5bGU9InN0b3AtY29sb3I6I2ZmY2MwMDtzdG9wLW9wYWNpdHk6MSIKICAgICBvZmZzZXQ9IjAuMiIKICAgICBpZD0ic3RvcDIiIC8+PHN0b3AKICAgICBzdHlsZT0ic3RvcC1jb2xvcjojZmY4ODAwO3N0b3Atb3BhY2l0eToxIgogICAgIG9mZnNldD0iMSIKICAgICBpZD0ic3RvcDMiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PGc+PHJlY3QKICAgIHN0eWxlPSJmaWxsOiMzMzMzMzMiCiAgICBpZD0icmVjdDEiCiAgICB3aWR0aD0iMzAwIgogICAgaGVpZ2h0PSIyMDUiCiAgICB4PSIwIgogICAgeT0iMCIKICAgIHJ4PSIxMiIKICAgIHJ5PSIxMiIgLz48cmVjdAogICAgc3R5bGU9ImZpbGw6dXJsKCNsZzEpIgogICAgaWQ9InJlY3QyIgogICAgd2lkdGg9IjI3MCIKICAgIGhlaWdodD0iMTI4IgogICAgeD0iMTUiCiAgICB5PSIxNSIKICAgIHJ4PSI4IgogICAgcnk9IjgiIC8+PHJlY3QKICAgIHN0eWxlPSJmaWxsOiMzMzMzMzMiCiAgICBpZD0icmVjdDMiCiAgICB3aWR0aD0iMTcyIgogICAgaGVpZ2h0PSI1MiIKICAgIHg9IjY0IgogICAgeT0iNzIiCiAgICByeD0iMjYiCiAgICByeT0iMjYiIC8+PGNpcmNsZQogICAgc3R5bGU9ImZpbGw6I2NjY2NjYyIKICAgIGlkPSJjaXJjbGUxIgogICAgY3g9IjkxIgogICAgY3k9Ijk4IgogICAgcj0iMTgiIC8+PGNpcmNsZQogICAgc3R5bGU9ImZpbGw6I2NjY2NjYyIKICAgIGlkPSJjaXJjbGUyIgogICAgY3g9IjIwOSIKICAgIGN5PSI5OCIKICAgIHI9IjE4IiAvPjxwYXRoCiAgICBzdHlsZT0iZmlsbDojNzM3MzczO3N0cm9rZS13aWR0aDoxcHgiCiAgICBkPSJtIDQ4LDIwNyAxMCwtMzkgYyAxLjc5LC02LjIgNS42LC03LjggMTIsLTggNjAsLTEgMTAwLC0xIDE2MCwwIDYuNCwwLjIgMTAsMS44IDEyLDggbCAxMCwzOSB6IgogICAgaWQ9InBhdGgxIiAvPjwvZz48Zz48cGF0aAogICAgZD0ibSA2My41LDUwLjkgcSAtMC44NSwwLjkzIC00LjczLDIuMyAtMy42LDEuMyAtNC40LDEuMyAtMy4zLDAgLTUuMSwtMi4xIC0xLjc1LC0yIC0xLjc1LC01LjM2IDAsLTQuNiAzLjc2LC03LjY0IDMuMywtMi43IDcuMywtMi43IDAuNCwwIDAuOTMsMC43NCAwLjU0LDAuNyAwLjU0LDEuMTYgMCwyLjA2IC0yLjIsMi43IC0xLjM2LDAuNCAtNC4wNCwxLjE2IC0yLjIsMS4xNiAtMi4yLDQuNCAwLDMuMiAyLjksMy4yIDAuODUsMCAwLjg1LDAgMC41NCwwIDEuNDQsLTAuMTYgMS4xLC0wLjIzIDIuOSwtMC43NCAxLjgsLTAuNTQgMi4xMywtMC41NCAwLjQsMCAxLjc1LDAuNiB6IgogICAgc3R5bGU9ImZpbGw6IzMzMzMzMyIKICAgIGlkPSJwYXRoMTEiIC8+PHBhdGgKICAgIGQ9Im0gODcuNiw0NSBxIDAsNC4yIC0zLjcsNi45NSAtMy4yLDIuMyAtNi44NywyLjMgLTMuNCwwIC02LC0yLjYgLTIuNSwtMi42IC0yLjUsLTYgMCwtMy42IDMuMTQsLTYuNjQgMy4yLC0zIDYuOCwtMyAzLjUsMCA2LjMsMi43NiAyLjgzLDIuNzYgMi44Myw2LjI1IHogbSAtMy40LDAuMTYgcSAwLC0yLjI1IC0xLjc1LC0zLjcgLTEuNywtMS41IC00LC0xLjUgLTAuMSwwIC0xLjYsMS42IC0xLjQ0LDEuNTUgLTIuNDQsMS41NSAtMC42LDAgLTAuOCwtMC4zIC0xLjE2LDIuMyAtMS4xNiwzIDAsMi4yNSAyLjEzLDMuNCAxLjYsMC45IDMuNiwwLjkgMiwwIDMuNzYsLTEuMSAyLjI1LC0xLjQgMi4yNSwtMy44NCB6IgogICAgc3R5bGU9ImZpbGw6IzMzMzMzMyIKICAgIGlkPSJwYXRoMTIiIC8+PHBhdGgKICAgIGQ9Im0gMTEyLjgsNDYuOCBxIDAsMi44IC0xLjksNC40IC0xLjgsMS41IC00LjcsMS41IC0wLjcsMCAtMi43LC0wLjQgLTEuOSwtMC40IC0yLjYsLTAuNCAtMi4xLDAgLTIuMSwyLjY0IDAsMC44NSAwLjIzLDIuNiAwLjIsMS43NSAwLjIsMi42IDAsMS45IC0wLjc3LDIuODMgLTEuNDQsMCAtMywtMC44NSAtMS40NiwtOS41IC0xLjQ2LC0xMiAwLC0zLjY1IDEuNzUsLTguMSAyLjM3LC02LjA1IDYuNDUsLTYuMDUgMy43LDAgNy4zLDQuMSAzLjMsMy44NCAzLjMsNy4xNCB6IG0gLTMuOCwwLjIgcSAtMC42LC0yLjIgLTIuNiwtNC40IC0yLjMsLTIuNSAtNC4zLC0yLjUgLTEuMywwIC0yLjMzLDIuMiAtMC45LDEuOCAtMC45LDMuMjYgMCwwLjQ3IDAuMzgsMS4yNCAwLjQzLDAuOCAwLjg1LDAuOCAxLjEsMCAzLjIsMC4zIDIuMSwwLjMgMy4yLDAuMyAwLjMsMCAxLjMsLTAuNCAxLC0wLjQ3IDEuMywtMC43NCB6IgogICAgc3R5bGU9ImZpbGw6IzMzMzMzMyIKICAgIGlkPSJwYXRoMTMiIC8+PHBhdGgKICAgIGQ9Im0gMTMzLDQwIHEgLTIuMSw0LjEgLTMuMiw3IC0wLjEsMC4zIC0xLjYsNC41IC0wLjQsMS4zNiAtMSw0LjIgLTAuNSwyLjgzIC0xLDQuMiAtMSwyLjgzIC0yLjMsMi42NCAtMS40LC0wLjIgLTEuNiwtMS42IDAsLTAuMiAwLC0wLjUgMCwtMC4xNiAwLjMsLTEuNSAxLC01LjA0IDEsLTYuNDQgMCwtMC41NCAtMC4xLC0wLjc0IC0xLjQsLTIuNDQgLTQuMSwtNy40IC0yLjcsLTQuOTcgLTIuNCwtNy43IDEuNSwtMS4zNiAyLjEsLTEuMzYgMC40LDAgMS4xLDAuNiAwLjYsMC42IDAuNywxLjEgMC44LDYuMiA0LjksMTEuMSAxLC0xLjggMS44LC00LjA0IDAuNSwtMS40IDEuNiwtNC4xNSAxLjksLTQuNDYgMy40LC00LjQ2IDAuMiwwIDAuNCwwLjEgMC45LDAuMyAxLjMsMi44IHoiCiAgICBzdHlsZT0iZmlsbDojMzMzMzMzIgogICAgaWQ9InBhdGgxNCIgLz48cGF0aAogICAgZD0ibSAxNTcuNSw0OCBxIDAsMi44IC0xLjksNC40IC0xLjgsMS41IC00LjcsMS41IC0wLjcsMCAtMi43LC0wLjQgLTEuOSwtMC40IC0yLjYsLTAuNCAtMiwwIC0yLDIuNjQgMCwwLjg1IDAuMiwyLjYgMC4yLDEuNzUgMC4yLDIuNiAwLDEuOSAtMC43LDIuODMgLTEuNSwwIC0zLC0wLjg1IC0xLjUsLTkuNSAtMS41LC0xMS45NSAwLC0zLjY1IDEuOCwtOC4xIDIuMywtNi4wNSA2LjQsLTYuMDUgMy43LDAgNy4yLDQuMSAzLjMsMy44NCAzLjMsNy4xNCB6IG0gLTMuOCwwLjIgcSAtMC42LC0yLjIgLTIuNiwtNC40IC0yLjMsLTIuNSAtNC4zLC0yLjUgLTEuMywwIC0yLjMsMi4yIC0wLjksMS44IC0wLjksMy4yNiAwLDAuNDcgMC40LDEuMjQgMC40LDAuOCAwLjgsMC44IDEuMSwwIDMuMiwwLjMgMi4xLDAuMyAzLjIsMC4zIDAuMywwIDEuMywtMC40IDEsLTAuNDcgMS4zLC0wLjc0IHoiCiAgICBzdHlsZT0iZmlsbDojMzMzMzMzIgogICAgaWQ9InBhdGgxNSIgLz48cGF0aAogICAgZD0ibSAxODIsNTMuMyBxIDAsMC45IC0wLjYsMS41IC0wLjYsMC42IC0xLjQsMC42IC0xLjYsMCAtMywtMC45IC0xLjQsLTAuOTMgLTIuMSwtMi4zIC0wLjcsLTAuMSAtMS41LDAuODUgLTAuOSwxLjE2IC0xLjEsMS4yNCAtMS4yLDAuNTQgLTMuOSwwLjU0IC0yLjIsMCAtMy45LC0yLjQ0IC0xLjUsLTIuMTMgLTEuNSwtNCAwLC0zLjQgMy40LC02LjQgMy4yLC0yLjkgNi43LC0yLjkgMC45LDAgMS43LDAuNiAwLjgsMC42IDAuOCwxLjQ0IDAsMC41NCAtMC40LDEuMSAyLjQsMC45IDIuNCwyLjgzIDAsMC4zNSAtMC4xLDEuMDUgLTAuMSwwLjcgLTAuMSwxLjA1IDAsMC40IDAuMSwwLjYgMC41LDEuMyAyLjUsMy40IDEuOSwxLjkgMS45LDIuMiB6IG0gLTguMSwtMTAuMSBxIC0wLjQsMCAtMS4xLC0wLjEgLTAuOCwtMC4xNiAtMS4xLC0wLjE2IC0xLjMsMCAtMy4yLDEuOTQgLTEuOSwxLjk0IC0xLjksMy4zIDAsMC44IDAuNywxLjggMC45LDEuMyAyLjIsMS4zIDIuNiwwIDMuNSwtMi45IDAuNSwtMi42IDEsLTUuMTYgeiIKICAgIHN0eWxlPSJmaWxsOiMzMzMzMzMiCiAgICBpZD0icGF0aDE2IiAvPjxwYXRoCiAgICBkPSJtIDIwMy44LDQyLjQgcSAtMC40LDAuNCAtMS41LDAuNCAtMC45LDAgLTIuNSwtMC4zIC0xLjcsLTAuMyAtMi41LC0wLjMgLTQuNywwIC01LjUsNi45IC0wLjMsMy4xIC0wLjQsMy4zIC0wLjQsMSAtMS43LDIuMyBoIC0xLjEgcSAtMC43LC0xLjIgLTEuMywtNC4xIC0wLjYsLTIuNzYgLTAuNiwtNC4yNyAwLC0xLjE2IDAuMSwtMS41IDAuMiwtMC41NCAxLC0wLjU0IDAuMywwIDAuNiwwLjMgMC40LDAuMyAwLjQsMC4zIDEuOSwtMy41MyAzLjEsLTQuNiAxLjgsLTEuNyA1LjEsLTEuNyAxLjQsMCAzLjYsMC45IDIuOCwxLjE2IDMuMywyLjggeiIKICAgIHN0eWxlPSJmaWxsOiMzMzMzMzMiCiAgICBpZD0icGF0aDE3IiAvPjxwYXRoCiAgICBkPSJtIDIyOS41LDM3LjE2IHEgMC4zLDAuOCAwLjMsMS40NCAwLDEuODYgLTIuNCwxLjg2IC0xLDAgLTMuNSwtMC41IC0yLjUsLTAuNTQgLTMuNCwtMC41NCAtMS4zLDAgLTEuNSwwLjEgLTAuNCwwLjIgLTAuNCwxLjIgMCwyLjIgMC42LDYuOSAwLjcsNS44NiAxLjYsNi4xMyAtMC40LDAuMzUgLTAuNCwxLjEgLTEuMiwwLjcgLTIuNiwwLjcgLTEuNCwwIC0yLC0zLjkgLTAuMiwtMS4zNiAtMC41LC03Ljc2IC0wLjIsLTQuNiAtMC44LC01LjUgLTAuMywtMC40NyAtNC4zLC0wLjM1IC0xLDAgLTEuNiwwLjEgLTAuNSwwIC0wLjMsMCAtMC44LDAgLTEuMiwtMC43IC0wLjUsLTEuMyAtMC41LC0xLjQgMCwtMS40NCA0LjEsLTIgMS42LC0wLjE2IDQuNywtMC41IDAsLTAuODUgLTAuMSwtMi41NiAwLC0xLjc1IDAsLTIuNiAwLC00LjM1IDIuMSwtNC4zNSAwLjUsMCAxLjEsMC42IDAuNiwwLjYgMC42LDEuMSB2IDcuOSBxIDEuMSwxLjIgNSwxLjcgMy45LDAuNSA1LjMsMS44NiB6IgogICAgc3R5bGU9ImZpbGw6IzMzMzMzMyIKICAgIGlkPSJwYXRoMTgiIC8+PHBhdGgKICAgIGQ9Im0gMjUxLjIsNDAuMiBxIC0yLDQuMSAtMy4yLDcgLTAuMSwwLjMgLTEuNSw0LjUgLTAuNSwxLjM2IC0xLDQuMiAtMC41LDIuODMgLTEsNC4yIC0xLDIuODMgLTIuNCwyLjY0IC0xLjQsLTAuMiAtMS41LC0xLjYgLTAuMSwtMC4yIC0wLjEsLTAuNSAwLC0wLjE2IDAuMywtMS41IDEuMSwtNS4wNCAxLjEsLTYuNDQgMCwtMC41NCAtMC4xLC0wLjc0IC0xLjQsLTIuNDQgLTQuMSwtNy40IC0yLjcsLTQuOTcgLTIuNCwtNy43IDEuNCwtMS4zNiAyLjEsLTEuMzYgMC40LDAgMSwwLjYgMC42LDAuNiAwLjcsMS4xIDAuOSw2LjIgNC45LDExLjEgMSwtMS44IDEuOSwtNC4wNCAwLjUsLTEuNCAxLjYsLTQuMTUgMS44LC00LjQ2IDMuNCwtNC40NiAwLjIsMCAwLjQsMC4xIDAuOCwwLjMgMS4yLDIuOCB6IgogICAgc3R5bGU9ImZpbGw6IzMzMzMzMyIKICAgIGlkPSJwYXRoMTkiIC8+PC9nPjxnPjxnCiAgICBpZD0iZzEiPjxwYXRoCiAgICAgaWQ9InBhdGg0IgogICAgIHN0eWxlPSJmaWxsOiMzMzMzMzMiCiAgICAgZD0ibSAxMTEuNCw4My4zMzUgLTkuNTI2LDUuNSAyLjUsNC4zMyA5LjUyNiwtNS41IHogbSAtMzMuNzc1LDE5LjUgLTkuNTI2LDUuNSAyLjUsNC4zMyA5LjUyNiwtNS41IHoiIC8+PHBhdGgKICAgICBpZD0icGF0aDUiCiAgICAgc3R5bGU9ImZpbGw6IzMzMzMzMyIKICAgICBkPSJNIDg4LjUsNzMgViA4NCBoIDUgViA3MyBaIG0gMCwzOSB2IDExIGggNSBWIDExMiBaIiAvPjxwYXRoCiAgICAgaWQ9InBhdGg2IgogICAgIHN0eWxlPSJmaWxsOiMzMzMzMzMiCiAgICAgZD0ibSA2OC4xLDg3LjY2NSA5LjUyNiw1LjUgMi41LC00LjMzIC05LjUyNiwtNS41IHogbSAzMy43NzUsMTkuNSA5LjUyNyw1LjUgMi41LC00LjMzIC05LjUyNywtNS41IHoiIC8+PC9nPjxnCiAgICBpZD0iZzIiCiAgICB0cmFuc2Zvcm09InJvdGF0ZSgzMCwxNTAsMzE4LjE5KSI+PHBhdGgKICAgICBpZD0icGF0aDciCiAgICAgc3R5bGU9ImZpbGw6IzMzMzMzMyIKICAgICBkPSJtIDExMS40LDgzLjMzNSAtOS41MjYsNS41IDIuNSw0LjMzIDkuNTI2LC01LjUgeiBtIC0zMy43NzUsMTkuNSAtOS41MjYsNS41IDIuNSw0LjMzIDkuNTI2LC01LjUgeiIgLz48cGF0aAogICAgIGlkPSJwYXRoOCIKICAgICBzdHlsZT0iZmlsbDojMzMzMzMzIgogICAgIGQ9Ik0gODguNSw3MyBWIDg0IGggNSBWIDczIFogbSAwLDM5IHYgMTEgaCA1IFYgMTEyIFoiIC8+PHBhdGgKICAgICBpZD0icGF0aDkiCiAgICAgc3R5bGU9ImZpbGw6IzMzMzMzMyIKICAgICBkPSJtIDY4LjEsODcuNjY1IDkuNTI2LDUuNSAyLjUsLTQuMzMgLTkuNTI2LC01LjUgeiBtIDMzLjc3NSwxOS41IDkuNTI3LDUuNSAyLjUsLTQuMzMgLTkuNTI3LC01LjUgeiIgLz48L2c+PC9nPjwvc3ZnPg==") center/contain no-repeat;
+}
+
+/* toolbar buttons as ghost icon-chips */
+#ops a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	z-index: 1;
+	min-width: 2.15em;
+	height: 2.15em;
+	padding: 0 .35em;
+	font-size: 1.12em;
+	color: var(--fg-weak, var(--fg));
+	text-shadow: none;
+	border-radius: var(--r);
+	transition: background .12s ease, color .12s ease;
+}
+#ops a:hover {
+	background: var(--panel-2);
+	color: var(--fg);
+	text-shadow: none;
+}
+#ops a.act {
+	background: var(--panel-2);
+	color: var(--a);
+	border-radius: var(--r);
+	box-shadow: inset 0 -2px 0 var(--a);
+	border-bottom: none;
+}
+
+/* server info: centered in the bar, below the icons so it never
+   swallows their clicks; purely informational -> never intercept pointer events */
+#ops #srv_info {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	padding: 0;
+	font-size: .82em;
+	letter-spacing: .02em;
+	white-space: nowrap;
+	color: var(--fg-weak, var(--fg));
+	pointer-events: none;
+}
+#ops #srv_info span {
+	color: var(--fg-weak, var(--fg));
+}
+
+/* account info: pill on the right edge of the bar */
+#ops #acc_info {
+	position: static;
+	display: inline-flex;
+	align-items: center;
+	gap: .45em;
+	padding: .28em .8em;
+	font-size: .84em;
+	border: 1px solid var(--hairline);
+	border-radius: 999px;
+	background: var(--panel);
+	color: var(--fg-weak, var(--fg));
+}
+#ops #acc_info form {
+	margin: 0;
+	display: inline-flex;
+}
+#ops #acc_info input[type="submit"],
+#ops #acc_info #blogout {
+	margin: 0;
+	padding: .15em .6em;
+	border: none;
+	background: none;
+	color: var(--fg-weak, var(--fg));
+	border-radius: 999px;
+	cursor: pointer;
+	font-size: .95em;
+}
+#ops #acc_info input[type="submit"]:hover,
+#ops #acc_info #blogout:hover {
+	background: var(--panel-2);
+	color: var(--fg);
+}
+
+/* ------------------------------------------------------------------
+    BREADCRUMB ROW
+------------------------------------------------------------------- */
+#path {
+	position: relative;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: .1em;
+	margin: .7em 1.3em .5em;
+	padding: 0 0 .55em;
+	font-size: 1.08em;
+	font-weight: normal;
+	border-bottom: 1px solid var(--hairline);
+}
+
+#path #entree {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2em;
+	height: 2em;
+	margin-right: .35em;
+	border-radius: var(--r);
+	color: var(--fg-weak, var(--fg));
+}
+#path #entree:hover {
+	background: var(--panel-2);
+	color: var(--fg);
+}
+
+#path a:not(:first-child) {
+	padding: .12em .4em;
+	margin: 0;
+	border-radius: var(--r);
+	color: var(--fg-weak, var(--fg));
+}
+#path a:not(:first-child)::before {
+	content: "›";
+	margin-right: .45em;
+	opacity: .35;
+}
+#path a:not(:first-child):hover {
+	background: var(--panel-2);
+	color: var(--fg);
+}
+#path a:last-child {
+	color: var(--fg);
+	font-weight: 550;
+}
+
+/* ------------------------------------------------------------------
+    CONTENT COLUMN — centered, balanced
+----------------------------------------------------------------- */
+#wrap {
+	max-width: 1180px;
+	margin: 1.1em auto 0;
+	padding: .4em 1.5em 9em;
+	min-height: 70vh;
+}
+
+/* navpane starts below the header stack and gets a hairline */
+#tree {
+	top: calc(var(--bar) + 2.6em);
+	border-right: 1px solid var(--hairline);
+	box-shadow: none;
+}
+
+/* ------------------------------------------------------------------
+    FILE TABLE — rounded card
+---------------------------------------------------------------- */
+#files {
+	width: 100%;
+	border: 1px solid var(--hairline);
+	border-radius: var(--cr);
+	border-spacing: 0;
+	background: var(--panel);
+}
+#files thead th {
+	position: sticky;
+	top: var(--bar);
+	z-index: 4;
+	background: var(--panel-2);
+	color: var(--fg-weak, var(--fg));
+	font-size: .7em;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: .09em;
+	padding: .95em 1em;
+	border-bottom: 1px solid var(--hairline);
+	box-shadow: none;
+}
+#files thead th:first-child { border-radius: var(--r) 0 0 0; }
+#files thead th:last-child { border-radius: 0 var(--r) 0 0; }
+#files tbody td {
+	padding: .85em 1em;
+	border-bottom: 1px solid var(--hairline-soft, rgba(127, 127, 127, .08));
+	background: var(--bg);
+	box-shadow: none;
+}
+#files tbody tr:hover td,
+#files tbody tr:hover td+td {
+	background: var(--hover);
+	box-shadow: none;
+}
+#files tbody tr:last-child td { border-bottom: none; }
+#files tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--r); }
+#files tbody tr:last-child td:last-child { border-radius: 0 0 var(--r) 0; }
+#files td+td,
+#files tr:nth-child(2n+1) td+td {
+	box-shadow: none;
+}
+#files thead th:after {
+	margin-right: 0;
+}
+
+/* grid view: same card language */
+#ggrid {
+	border: 1px solid var(--hairline);
+	border-radius: var(--r);
+	background: var(--panel);
+	padding: .7em;
+}
+#ggrid > * {
+	border-radius: calc(var(--r) * .8);
+}
+
+/* ------------------------------------------------------------------
+    MISC LAYER FIXES
+---------------------------------------------------------------- */
+#rcm { z-index: 60; }
+
+/* server-info is secondary: drop it on narrow viewports so it
+   never collides with the toolbar buttons */
+@media (max-width: 64em) {
+	#ops #srv_info { display: none; }
+}
+
+/* bottom player bar gets the same hairline language */
+#widget.open { border-top: 1px solid var(--hairline); }
+
+/* ------------------------------------------------------------------
+   SIDE PANEL — Zed-style right panel for the utility panels
+   (search / upload / mkdir / new file / msg / unpost / settings).
+   Hidden by default; html.op_open slides it in. The media-player
+   panel (#op_player) stays outside and never opens it.
+------------------------------------------------------------------- */
+#opside {
+	position: fixed;
+	top: var(--bar, 3rem);
+	right: 0;
+	bottom: 0;
+	width: 30em;
+	max-width: 92vw;
+	z-index: 40;
+	display: flex;
+	flex-direction: column;
+	background: var(--panel, var(--bg));
+	border-left: 1px solid var(--hairline, var(--bg-u3));
+	transform: translateX(100%);
+	transition: transform .18s ease;
+	box-shadow: -1em 0 3em rgba(0, 0, 0, .18);
+}
+html.op_open #opside {
+	transform: translateX(0);
+}
+#opside_head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .5em;
+	padding: .55em .9em;
+	border-bottom: 1px solid var(--hairline, var(--bg-u3));
+	font-size: .95em;
+	font-weight: 600;
+	letter-spacing: .02em;
+}
+#opside_title {
+	color: var(--fg);
+	text-transform: capitalize;
+}
+#opside_x {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.9em;
+	height: 1.9em;
+	border-radius: var(--r, .4em);
+	color: var(--fg-weak, var(--fg));
+}
+#opside_x:hover {
+	background: var(--panel-2, var(--bg-u2));
+	color: var(--fg);
+}
+#opside_body {
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: auto;   /* up2k's wide options table scrolls horizontally */
+	padding: 1em 1.1em;
+	overscroll-behavior-y: contain;
+}
+
+/* neutralize inherited panel styling inside the side panel */
+#opside .opview,
+#opside .opbox {
+	max-width: none;
+	border: none;
+	border-radius: 0;
+	margin: 0;
+	padding: 0;
+	background: none;
+	box-shadow: none;
+}
+#opside .opview.act {
+	display: block;
+}
+/* stack the wide panel columns vertically so they fit the panel */
+#opside .opwide>div {
+	display: block;
+	border-left: none;
+	margin: .7em 0;
+	padding-left: 0;
+}
+
+/* ================================================================
+   PAPER & VIBRANT REFINEMENT
+   ================================================================ */
+
+/* --- Paper dark --- */
+html.fz {
+	--hairline: rgba(250, 250, 247, .10);
+	--panel: #232323;
+	--panel-2: #2d2d2d;
+	--hover: #262626;
+	--bar: 3.4rem;
+	--cr: .8em;
+	--r: .55em;
+}
+/* --- Paper light --- */
+html.fy {
+	--hairline: rgba(26, 26, 26, .12);
+	--panel: #FFFFFF;
+	--panel-2: #F2F1EB;
+	--hover: #F5F4EF;
+	--bar: 3.4rem;
+	--cr: .8em;
+	--r: .55em;
+}
+/* --- Vibrant Dark --- */
+html.gz {
+	--hairline: rgba(232, 236, 244, .09);
+	--panel: #12171f;
+	--panel-2: #1a2130;
+	--hover: #171d29;
+	--bar: 3.4rem;
+	--cr: .8em;
+	--r: .55em;
+}
+/* --- Vibrant Light --- */
+html.gy {
+	--hairline: rgba(26, 30, 42, .12);
+	--panel: #FFFFFF;
+	--panel-2: #E9ECF3;
+	--hover: #F2F4F9;
+	--bar: 3.4rem;
+	--cr: .8em;
+	--r: .55em;
+}
+
+/* frosted sticky bar + brand typography */
+html.fz #ops,
+html.fy #ops,
+html.gz #ops,
+html.gy #ops {
+	background: color-mix(in srgb, var(--bg) 88%, transparent);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+
+/* ghost buttons hover with accent hint */
+html.fz #ops a:hover,
+html.fy #ops a:hover,
+html.gz #ops a:hover,
+html.gy #ops a:hover {
+	background: var(--panel-2);
+	color: var(--fg);
+}
+
+/* controls: consistent inputs + accent pills */
+html.fz .opview select,
+html.fz .opview input[type="text"],
+html.fz .opview input[type="password"],
+html.fy .opview select,
+html.fy .opview input[type="text"],
+html.fy .opview input[type="password"],
+html.gz .opview select,
+html.gz .opview input[type="text"],
+html.gz .opview input[type="password"],
+html.gy .opview select,
+html.gy .opview input[type="text"],
+html.gy .opview input[type="password"] {
+	border-radius: .6em;
+	border: 1px solid var(--hairline);
+	background: var(--panel);
+	color: var(--fg);
+	box-shadow: none;
+	padding: .55em .8em;
+}
+html.fz .opview select:focus,
+html.fz .opview input[type="text"]:focus,
+html.fz .opview input[type="password"]:focus,
+html.fy .opview select:focus,
+html.fy .opview input[type="text"]:focus,
+html.fy .opview input[type="password"]:focus,
+html.gz .opview select:focus,
+html.gz .opview input[type="text"]:focus,
+html.gz .opview input[type="password"]:focus,
+html.gy .opview select:focus,
+html.gy .opview input[type="text"]:focus,
+html.gy .opview input[type="password"]:focus {
+	outline: none;
+	border-color: var(--a);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--a) 22%, transparent);
+}
+html.fz .opview input[type="submit"],
+html.fz .opview button[type="submit"],
+html.fy .opview input[type="submit"],
+html.fy .opview button[type="submit"],
+html.gz .opview input[type="submit"],
+html.gz .opview button[type="submit"],
+html.gy .opview input[type="submit"],
+html.gy .opview button[type="submit"] {
+	border-radius: 999px;
+	border: none;
+	background: var(--a);
+	color: var(--bg);
+	font-weight: 650;
+	padding: .5em 1.3em;
+	cursor: pointer;
+	transition: filter .12s ease;
+}
+html.fz .opview input[type="submit"]:hover,
+html.fz .opview button[type="submit"]:hover,
+html.fy .opview input[type="submit"]:hover,
+html.fy .opview button[type="submit"]:hover,
+html.gz .opview input[type="submit"]:hover,
+html.gz .opview button[type="submit"]:hover,
+html.gy .opview input[type="submit"]:hover,
+html.gy .opview button[type="submit"]:hover {
+	filter: brightness(1.1);
+}
+
+/* player widget: round the controls, keep it quiet */
+html.fz #widget a,
+html.fy #widget a,
+html.gz #widget a,
+html.gy #widget a {
+	border-radius: var(--r);
+}
+
+/* file name link gets the accent on hover (modern feel) */
+html.fz #files tbody a:hover,
+html.fy #files tbody a:hover,
+html.gz #files tbody a:hover,
+html.gy #files tbody a:hover {
+	text-decoration: none;
+	color: var(--a);
+	background: none;
+}

@@ -151,13 +151,13 @@ html.y {
 	--bg-d3: #fff;
 	--bg-d2: #fff;
 	--bg-d1: #fff;
-	--bg: #eaeaea;
+	--bg: #ffffff;
 	--bg-u1: #fff;
-	--bg-u2: #f7f7f7;
-	--bg-u3: #eaeaea;
+	--bg-u2: #ffffff;
+	--bg-u3: #ffffff;
 	--bg-u4: #fff;
-	--bg-u5: #ccc;
-	--bg-u6: #ddd;
+	--bg-u5: #f8f8f8;
+	--bg-u6: #f0f0f0;
 	--bg-max: #fff;
 
 	--tab-alt: #c07;
@@ -1108,7 +1108,7 @@ html.dz #flogout {
 	font-size: 1.4em;
 	left: 0;
 	right: 0;
-	bottom: -6em;
+	bottom: 0;
 	height: 6em;
 	width: 100%;
 	z-index: 3;
@@ -1279,52 +1279,249 @@ html.y #widget.open {
 	top: -.6em;
 	padding: .4em .3em;
 }
-#barpos,
-#barbuf {
+/* ===== music player (design minimal) ===== */
+
+/* now-playing info: album art + title/artist on the left */
+#widget #np_inf {
 	position: absolute;
-	bottom: 1em;
+	top: 0;
+	bottom: 0;
 	left: 1em;
+	display: flex;
+	align-items: center;
+	gap: .7em;
+	width: min(18em, 30vw);
+	max-width: 18em;
+	min-width: 0;
+	pointer-events: none;
+	z-index: 12;
+}
+#widget #np_img {
+	width: 2.4em;
+	height: 2.4em;
+	border-radius: .25em;
+	flex: none;
+	box-shadow: 0 .2em .8em rgba(0,0,0,.4);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	overflow: hidden;
+	background: var(--bg-d2);
+}
+#widget #np_img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: .25em;
+}
+#widget #np_img svg {
+	width: 100%;
+	height: 100%;
+}
+#widget #np_inf > #np_url,
+#widget #np_inf > #np_circle,
+#widget #np_inf > #np_album,
+#widget #np_inf > #np_tn,
+#widget #np_inf > #np_pos,
+#widget #np_inf > #np_dur {
+	display: none;
+}
+#widget #np_meta {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: .15em;
+	min-width: 0;
+	flex: 1;
+	padding-bottom: .35em;
+}
+#widget #np_meta #np_title {
+	font-size: .8em;
+	font-weight: 600;
+	color: var(--fg-max);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	letter-spacing: -0.01em;
+}
+#widget #np_meta #np_artist {
+	font-size: .68em;
+	color: var(--fg-weak);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	letter-spacing: -0.01em;
+}
+
+/* progress bar under the track info - design minimal */
+#widget #np_meta #barpos,
+#widget #np_meta #barbuf {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	bottom: -0.3em;
+	height: .2em;
+	border-radius: .1em;
+	pointer-events: auto;
+	cursor: pointer;
+	box-shadow: none;
+	transition: height 0.2s ease;
+}
+#widget #np_meta #barbuf {
+	background: rgba(255,255,255,0.15);
+	z-index: 2;
+}
+#widget #np_meta #barpos {
+	border: none;
+	background: var(--a);
+	z-index: 3;
+	border-radius: .1em;
+}
+
+/* centered circular controls - design minimal */
+#widget #widgeti #pctl {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	align-items: center;
+	gap: .5em;
+	z-index: 15;
+}
+#widget #widgeti #pctl a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.5em;
+	height: 1.5em;
+	margin: 0;
+	color: var(--fg);
+	background: transparent;
+	border-radius: 50%;
+	transition: all .2s ease;
+	box-shadow: 0 0 0 0 rgba(255,255,255,0.1);
+}
+#widget #widgeti #pctl a svg {
+	width: 1em;
+	height: 1em;
+}
+#widget #widgeti #pctl a:hover {
+	background: rgba(255,255,255,0.1);
+	transform: scale(1.08);
+	box-shadow: 0 0 0.5em rgba(0,0,0,0.3);
+}
+#widget #widgeti #pctl a:active {
+	transform: scale(0.95);
+}
+#widget #widgeti #pctl a#bplay {
+	width: 2em;
 	height: 2em;
-	border-radius: 9em;
-	width: calc(100% - 2em);
+	margin: 0 .25em;
+	background: var(--a);
+	color: var(--fg-max);
+	box-shadow: 0 .2em .6em rgba(0,0,0,.4);
 }
-#barbuf {
-	background: var(--mp-b-bg);
-	z-index: 21;
+#widget #widgeti #pctl a#bplay:hover {
+	background: var(--a);
+	transform: scale(1.07);
+	box-shadow: 0 .3em .8em rgba(0,0,0,.5);
 }
-#barpos {
-	box-shadow: -.03em -.03em .7em rgba(0,0,0,0.5) inset;
-	z-index: 22;
+
+/* monochrome themes (Yandesign): --a and --fg-max are the same color,
+   so the play button needs inverted colors to be visible */
+html.j #widget #widgeti #pctl a#bplay {
+	background: var(--sel-bg);
+	color: var(--sel-fg);
 }
-#pctl {
+html.j #widget #widgeti #pctl a#bplay:hover {
+	background: var(--sel-bg);
+}
+
+/* volume control - design minimal */
+#widget #volctl {
 	position: absolute;
-	top: .5em;
-	left: 1em;
+	top: 50%;
+	right: 1.2em;
+	transform: translateY(-50%);
+	display: flex;
+	align-items: center;
+	gap: .5em;
+	z-index: 15;
 }
-#pctl a {
-	display: inline-block;
-	font-size: 1.25em;
-	width: 1.3em;
-	height: 1.2em;
-	text-align: center;
-	border-radius: .3em;
+
+#widget #bmute {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.5em;
+	height: 1.5em;
+	color: var(--fg);
+	background: transparent;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: all .2s ease;
+	font-size: 1em;
+	z-index: 16;
 }
-#pvol {
-	position: absolute;
-	top: .7em;
-	right: 1em;
-	height: 1.6em;
-	border-radius: 9em;
-	max-width: 12em;
-	width: calc(100% - 10.5em);
-	background: rgba(0,0,0,0.2);
+
+#widget #bmute:hover {
+	background: rgba(255,255,255,0.15);
+	transform: scale(1.15);
+	box-shadow: 0 0 0.5em rgba(0,0,0,0.4);
+	color: var(--a);
 }
+
+#widget #bmute:active {
+	transform: scale(0.95);
+}
+
+#widget #bmute.muted {
+	color: var(--a);
+	background: rgba(255,255,255,0.1);
+	box-shadow: 0 0 0.3em rgba(0,0,0,0.3);
+}
+
+#widget #pvol {
+	position: relative;
+	top: 0;
+	transform: none;
+	height: .35em;
+	width: 8em;
+	border-radius: .2em;
+	background: rgba(255,255,255,0.1);
+	z-index: 15;
+	transition: all .3s ease;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+#widget #volctl:hover #pvol,
+#widget #pvol:hover {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+	background: rgba(255,255,255,0.15);
+}
+
+#widget #pvol:hover {
+	box-shadow: 0 0 0.5em rgba(0,0,0,0.3);
+}
+
+/* compact mode - design minimal */
 #widget.cmp {
 	height: 1.6em;
-	bottom: -1.6em;
+	bottom: 0;
+	background: rgba(0,0,0,0.8);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border-top: 1px solid rgba(255,255,255,0.1);
 }
 #widget.cmp.open {
 	bottom: 0;
+	border-top: none;
+	border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 #widget.cmp #wtoggle {
 	font-size: 1.2em;
@@ -1333,27 +1530,56 @@ html.y #widget.open {
 #widget.cmp #wtgrid {
 	display: none;
 }
+#widget.cmp #np_inf {
+	left: .4em;
+	gap: .5em;
+	max-width: 40%;
+}
+#widget.cmp #np_img {
+	width: 1.2em;
+	height: 1.2em;
+	border-radius: .2em;
+	overflow: hidden;
+	background: var(--bg-d2);
+}
+#widget.cmp #np_img img,
+#widget.cmp #np_img svg {
+	width: 100%;
+	height: 100%;
+}
+#widget.cmp #np_meta {
+	padding-bottom: 0;
+}
+#widget.cmp #np_meta #np_title {
+	font-size: .7em;
+	font-weight: 600;
+}
+#widget.cmp #np_meta #np_artist {
+	display: none;
+}
 #widget.cmp #pctl {
-	top: 0;
-	left: 0;
-	font-size: .75em;
+	font-size: .6em;
+	gap: .5em;
 }
 #widget.cmp #pctl a {
-	margin: 0;
+	width: 1.4em;
+	height: 1.4em;
 }
-#widget.cmp #barpos,
-#widget.cmp #barbuf {
-	height: 1.6em;
-	width: calc(100% - 11em);
-	border-radius: 0;
-	left: 5em;
-	top: 0;
+#widget.cmp #pctl a#bplay {
+	width: 1.7em;
+	height: 1.7em;
+}
+#widget.cmp #np_meta #barpos,
+#widget.cmp #np_meta #barbuf {
+	height: .12em;
+	bottom: -0.12em;
+	border-radius: .06em;
 }
 #widget.cmp #pvol {
-	top: 0;
-	right: 0;
-	max-width: 5.8em;
-	border-radius: 0;
+	width: 5em;
+	right: .2em;
+	height: .3em;
+	border-radius: .15em;
 }
 .opview {
 	display: none;
@@ -3242,21 +3468,6 @@ html.d #treepar {
 	}
 }
 @media (min-width: 70em) {
-	#barpos,
-	#barbuf {
-		width: calc(100% - 21em);
-		left: 9.8em;
-		top: .7em;
-		height: 1.6em;
-		bottom: auto;
-	}
-	html.d #barpos,
-	html.b #barpos,
-	html.d #barbuf,
-	html.b #barbuf {
-		width: calc(100% - 19em);
-		left: 8em;
-	}
 	#widget {
 		bottom: -3.2em;
 		height: 3.2em;
@@ -3343,8 +3554,265 @@ html.d #treepar {
 	#bbox-btns {
 		transition: background-color .3s ease, color .3s ease;
 	}
+	html.hz body::before,
+	html.hy body::before,
+	html.jz body::before,
+	html.jy body::before,
+	html.iz body::before,
+	html.iz #ggrid > a.play,
+	html.iy #ggrid > a.play,
+	html.iz #bplay,
+	html.iy #bplay,
+	html.iz #files {
+		animation: none;
+	}
 }
-html.ey {
+/* ---- Paper Theme (f) dark ---- */
+html.fz {
+  color-scheme: dark;
+  --font-family: 'Inter', sans-serif;
+  --font-serif: 'EB Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --fg: #FAFAF7;
+  --fg-max: #FFF;
+  --fg2-max: #FFF;
+  --fg-weak: #CCCCBB;
+  --bg-u6: #4C4C4C;
+  --bg-u5: #444;
+  --bg-u4: #383838;
+  --bg-u3: #333;
+  --bg-u2: #2B2B2B;
+  --bg-u1: #282828;
+  --bg: #1A1A1A;
+  --bgg: var(--bg);
+  --bg-d1: #111;
+  --bg-d2: #0A0A0A;
+  --bg-d3: #000;
+  --bg-max: #000;
+  --tab-alt: #C2212F;
+  --row-alt: #282828;
+  --scroll: #C2212F;
+  --sel-fg: #1A1A1A;
+  --sel-bg: #FAFAF7;
+  --a: #C2212F;
+  --a-b: #D43A48;
+  --a-hil: #E5555F;
+  --a-dark: #A01B26;
+  --a-gray: #666;
+  --btn-fg: #C2212F;
+  --btn-bg: rgba(255,255,255,0.08);
+  --btn-h-fg: #FFF;
+  --btn-h-bg: rgba(194,33,47,0.3);
+  --btn-1-fg: #FFF;
+  --btn-1-bg: #C2212F;
+  --btn-h-bs: var(--btn-bs);
+  --btn-h-bb: var(--btn-bb);
+  --btn-1-bs: var(--btn-bs);
+  --btn-1-bb: var(--btn-bb);
+  --btn-1h-fg: #FFF;
+  --btn-1h-bg: #D43A48;
+  --btn-1h-bs: var(--btn-1-bs);
+  --btn-1h-bb: var(--btn-1-bb);
+  --chk-fg: #C2212F;
+  --txt-sh: #000;
+  --txt-bg: rgba(0,0,0,0.3);
+  --op-aa-fg: #FFF;
+  --op-aa-bg: #C2212F;
+  --op-a-sh: rgba(0,0,0,0.5);
+  --u2-btn-b1: #999;
+  --u2-sbtn-b1: #999;
+  --u2-txt-bg: var(--bg-u5);
+  --u2-tab-bg: var(--bg-u1);
+  --u2-tab-b1: rgba(128,128,128,0.8);
+  --u2-tab-1-fg: #FFF;
+  --u2-tab-1-bg: #C2212F;
+  --u2-tab-1-b1: #C2212F;
+  --u2-tab-1-b2: #A01B26;
+  --u2-tab-1-sh: #C2212F;
+  --u2-b-fg: #FFF;
+  --u2-b1-bg: #C2212F;
+  --u2-b2-bg: #D43A48;
+  --u2-inf-bg: #C2212F;
+  --u2-inf-b1: #D43A48;
+  --u2-ok-bg: #2E7D32;
+  --u2-ok-b1: #4CAF50;
+  --u2-err-bg: #C2212F;
+  --u2-err-b1: #E53935;
+  --ud-b1: #888;
+  --sort-1: #C2212F;
+  --sort-2: #D43A48;
+  --sz-b: #AAA;
+  --sz-k: #4CAF50;
+  --sz-m: #C2212F;
+  --sz-g: #C2212F;
+  --sz-t: #C2212F;
+  --sz-p: #C2212F;
+  --srv-1: #AAA;
+  --srv-2: #C2212F;
+  --srv-3: #C2212F;
+  --srv-3b: rgba(194,33,47,0.6);
+  --tree-bg: #2B2B2B;
+  --g-play-bg: #C2212F;
+  --g-play-b1: #D43A48;
+  --g-play-b2: #E5555F;
+  --g-play-sh: transparent;
+  --g-sel-fg: #FFF;
+  --g-sel-bg: #C2212F;
+  --g-sel-b1: #D43A48;
+  --g-sel-sh: transparent;
+  --g-fsel-bg: #D43A48;
+  --g-fsel-b1: #E5555F;
+  --g-fsel-ts: #A01B26;
+  --g-dfg: var(--srv-3);
+  --g-fg: var(--a-hil);
+  --g-bg: var(--bg-u2);
+  --g-b1: var(--bg-u4);
+  --g-b2: var(--bg-u5);
+  --g-g1: var(--bg-u2);
+  --g-g2: var(--bg-u5);
+  --g-f-bg: var(--bg-u4);
+  --g-f-b1: var(--bg-u5);
+  --g-f-fg: var(--a-hil);
+  --g-sh: rgba(0,0,0,0.3);
+  --f-sh1: 0.33;
+  --f-sh2: 0.02;
+  --f-sh3: 0.2;
+  --f-h-b1: rgba(128,128,128,0.7);
+  --f-play-bg: #C2212F;
+  --f-play-fg: #FFF;
+  --f-sel-sh: transparent;
+  --f-gray: #999;
+  --fm-off: #C2212F;
+  --mp-sh: #000;
+  --mp-b-bg: rgba(0,0,0,0.2);
+  --err-fg: #FFF;
+  --err-bg: #C2212F;
+  --err-b1: #E53935;
+  --err-ts: #500;
+}
+html.fy {
+  color-scheme: light;
+  --font-family: 'Inter', sans-serif;
+  --font-serif: 'EB Garamond', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --fg: #1A1A1A;
+  --fg-max: #000;
+  --fg2-max: #000;
+  --fg-weak: #555;
+  --bg-d3: #FFF;
+  --bg-d2: #FFF;
+  --bg-d1: #FFF;
+  --bg: #FAFAF7;
+  --bgg: var(--bg);
+  --bg-u1: #F5F5F0;
+  --bg-u2: #F0EFEA;
+  --bg-u3: #EAE8E0;
+  --bg-u4: #E5E3D8;
+  --bg-u5: #D0CFC5;
+  --bg-u6: #C8C6BB;
+  --bg-max: #FFF;
+  --tab-alt: #C2212F;
+  --row-alt: #F0EFEA;
+  --scroll: #C2212F;
+  --sel-fg: #FFF;
+  --sel-bg: #C2212F;
+  --a: #C2212F;
+  --a-b: #A01B26;
+  --a-hil: #D43A48;
+  --a-dark: #C2212F;
+  --a-gray: #9A9A8E;
+  --btn-fg: #555;
+  --btn-bg: rgba(194,33,47,0.08);
+  --btn-h-fg: #1A1A1A;
+  --btn-h-bg: rgba(194,33,47,0.15);
+  --btn-1-fg: #FFF;
+  --btn-1-bg: #C2212F;
+  --btn-h-bs: var(--btn-bs);
+  --btn-h-bb: var(--btn-bb);
+  --btn-1-bs: var(--btn-bs);
+  --btn-1-bb: var(--btn-bb);
+  --btn-1h-fg: #FFF;
+  --btn-1h-bg: #D43A48;
+  --btn-1h-bs: var(--btn-1-bs);
+  --btn-1h-bb: var(--btn-1-bb);
+  --chk-fg: #C2212F;
+  --txt-sh: #B0AFA5;
+  --txt-bg: rgba(255,255,255,0.7);
+  --op-aa-fg: #FFF;
+  --op-aa-bg: #C2212F;
+  --op-a-sh: rgba(0,0,0,0.12);
+  --u2-btn-b1: #999;
+  --u2-sbtn-b1: #999;
+  --u2-txt-bg: var(--bg-max);
+  --u2-tab-bg: var(--bg-u1);
+  --u2-tab-b1: rgba(128,128,128,0.5);
+  --u2-tab-1-fg: #FFF;
+  --u2-tab-1-bg: #C2212F;
+  --u2-tab-1-b1: #C2212F;
+  --u2-tab-1-b2: #A01B26;
+  --u2-tab-1-sh: #C2212F;
+  --u2-b-fg: #FFF;
+  --u2-b1-bg: #C2212F;
+  --u2-b2-bg: #D43A48;
+  --u2-inf-bg: #C2212F;
+  --u2-inf-b1: #D43A48;
+  --u2-ok-bg: #2E7D32;
+  --u2-ok-b1: #4CAF50;
+  --u2-err-bg: #C2212F;
+  --u2-err-b1: #E53935;
+  --ud-b1: #BBB;
+  --sort-1: #C2212F;
+  --sort-2: #D43A48;
+  --sz-b: #777;
+  --sz-k: #2E7D32;
+  --sz-m: #C2212F;
+  --sz-g: #C2212F;
+  --sz-t: #C2212F;
+  --sz-p: #C2212F;
+  --srv-1: #555;
+  --srv-2: #C2212F;
+  --srv-3: #C2212F;
+  --srv-3b: rgba(194,33,47,0.6);
+  --tree-bg: #F5F5F0;
+  --g-play-bg: #C2212F;
+  --g-play-b1: #D43A48;
+  --g-play-b2: #E5555F;
+  --g-play-sh: transparent;
+  --g-sel-fg: #FFF;
+  --g-sel-bg: #C2212F;
+  --g-sel-b1: #D43A48;
+  --g-sel-sh: transparent;
+  --g-fsel-bg: #D43A48;
+  --g-fsel-b1: #E5555F;
+  --g-fsel-ts: #A01B26;
+  --g-dfg: var(--srv-3);
+  --g-fg: var(--a-hil);
+  --g-bg: var(--bg-u2);
+  --g-b1: var(--bg-u4);
+  --g-b2: var(--bg-u5);
+  --g-g1: var(--bg-u2);
+  --g-g2: var(--bg-u5);
+  --g-f-bg: var(--bg-u4);
+  --g-f-b1: var(--bg-u5);
+  --g-f-fg: var(--a-hil);
+  --g-sh: rgba(0,0,0,0.07);
+  --f-sh1: 0.3;
+  --f-sh2: 0.5;
+  --f-sh3: 0.02;
+  --f-h-b1: rgba(128,128,128,0.5);
+  --f-play-bg: #C2212F;
+  --f-play-fg: #FFF;
+  --f-sel-sh: transparent;
+  --f-gray: #999;
+  --fm-off: #C2212F;
+  --mp-sh: #B0AFA5;
+  --mp-b-bg: transparent;
+  --err-fg: #FFF;
+  --err-bg: #C2212F;
+  --err-b1: #E53935;
+  --err-ts: #500;
+  text-shadow: none;
+}
   --negative-space: 0em; /* Use this to change the global spacing of the 95 theme */
   --font-main: consolas;
   --font-serif: consolas;
@@ -3413,7 +3881,7 @@ html.ey {
   --focus-outline: 1px dashed var(--black);
   --hover-outline: 1px dotted var(--black);
   --fm-off: var(--w3);
-  --ttlbar: linear-gradient(90deg, navy, #1084d0);
+  --ttlbar: navy;
   --inset-bg: var(--white);
   --scroll-bkg: var(--white);
 
@@ -3512,7 +3980,7 @@ html.ez {
   --focus-outline: 1px dashed var(--white);
   --hover-outline: 1px dotted var(--white);
   --fm-off: var(--w3);
-  --ttlbar: linear-gradient(90deg, var(--shadow-color-1) 20%, #888888);
+  --ttlbar: var(--shadow-color-1);
   --inset-bg: #3f3f3f;
   --tree-bg: var(--inset-bg);
   --txt-bg: var(--inset-bg);
@@ -3765,18 +4233,6 @@ html.e :focus + label {
   border-radius: var(--radius) !important;
   box-shadow: inherit;
 }
-html.e #opa_x {
-  text-shadow: 0 0 0 var(--transparent) !important;
-  color: var(--bg) !important;
-  display: flex;
-}
-html.e #opa_x:before {
-  content: "⨯";
-  color: var(--fg) !important;
-  margin-top: -0.1em;
-  font-size: 1.75em;
-  position: absolute;
-}
 html.e .opbox {
   margin: -1.2em 0 0;
   box-shadow: var(--shadow-inset-bottom), var(--shadow-inset-left),
@@ -3949,6 +4405,250 @@ html.e #treeh {
   display: flex;
   align-items: center;
   gap: 0.6em;
+}
+/* ---- Vibrant Theme (g) ---- */
+html.gz {
+  color-scheme: dark;
+  --font-family: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --fg: #E8ECF4;
+  --fg-max: #FFF;
+  --fg2-max: #FFF;
+  --fg-weak: #8A93A6;
+  --bg-u6: #2A3345;
+  --bg-u5: #232B3A;
+  --bg-u4: #1E2638;
+  --bg-u3: #1A2130;
+  --bg-u2: #151B26;
+  --bg-u1: #11161F;
+  --bg: #0B0E14;
+  --bgg: var(--bg);
+  --bg-d1: #080A10;
+  --bg-d2: #05070C;
+  --bg-d3: #020308;
+  --bg-max: #000;
+  --tab-alt: #22D3EE;
+  --row-alt: #11161F;
+  --scroll: #22D3EE;
+  --sel-fg: #0B0E14;
+  --sel-bg: #22D3EE;
+  --a: #22D3EE;
+  --a-b: #0EA5E9;
+  --a-hil: #67E8F9;
+  --a-dark: #0E7490;
+  --a-gray: #4B5563;
+  --btn-fg: #22D3EE;
+  --btn-bg: rgba(34,211,238,0.1);
+  --btn-h-fg: #FFF;
+  --btn-h-bg: rgba(34,211,238,0.2);
+  --btn-1-fg: #0B0E14;
+  --btn-1-bg: #22D3EE;
+  --btn-h-bs: var(--btn-bs);
+  --btn-h-bb: var(--btn-bb);
+  --btn-1-bs: var(--btn-bs);
+  --btn-1-bb: var(--btn-bb);
+  --btn-1h-fg: #0B0E14;
+  --btn-1h-bg: #67E8F9;
+  --btn-1h-bs: var(--btn-1-bs);
+  --btn-1h-bb: var(--btn-1-bb);
+  --chk-fg: #22D3EE;
+  --txt-sh: #000;
+  --txt-bg: rgba(0,0,0,0.4);
+  --op-aa-fg: #0B0E14;
+  --op-aa-bg: #22D3EE;
+  --op-a-sh: rgba(0,0,0,0.5);
+  --u2-btn-b1: #8A93A6;
+  --u2-sbtn-b1: #8A93A6;
+  --u2-txt-bg: var(--bg-u5);
+  --u2-tab-bg: var(--bg-u1);
+  --u2-tab-b1: rgba(138,147,166,0.5);
+  --u2-tab-1-fg: #0B0E14;
+  --u2-tab-1-bg: #22D3EE;
+  --u2-tab-1-b1: #22D3EE;
+  --u2-tab-1-b2: #0EA5E9;
+  --u2-tab-1-sh: #22D3EE;
+  --u2-b-fg: #0B0E14;
+  --u2-b1-bg: #22D3EE;
+  --u2-b2-bg: #67E8F9;
+  --u2-inf-bg: #22D3EE;
+  --u2-inf-b1: #67E8F9;
+  --u2-ok-bg: #A3E635;
+  --u2-ok-b1: #BEF264;
+  --u2-err-bg: #F43F5E;
+  --u2-err-b1: #FB7185;
+  --ud-b1: #555;
+  --sort-1: #22D3EE;
+  --sort-2: #F43F5E;
+  --sz-b: #8A93A6;
+  --sz-k: #A3E635;
+  --sz-m: #22D3EE;
+  --sz-g: #FB923C;
+  --sz-t: #FB923C;
+  --sz-p: #F43F5E;
+  --srv-1: #8A93A6;
+  --srv-2: #22D3EE;
+  --srv-3: #F43F5E;
+  --srv-3b: rgba(244,63,94,0.6);
+  --tree-bg: #151B26;
+  --g-play-bg: #22D3EE;
+  --g-play-b1: #67E8F9;
+  --g-play-b2: #A5F3FC;
+  --g-play-sh: transparent;
+  --g-sel-fg: #FFF;
+  --g-sel-bg: #F43F5E;
+  --g-sel-b1: #FB7185;
+  --g-sel-sh: transparent;
+  --g-fsel-bg: #FB7185;
+  --g-fsel-b1: #FDA4AF;
+  --g-fsel-ts: #9F1239;
+  --g-dfg: var(--srv-3);
+  --g-fg: var(--a-hil);
+  --g-bg: var(--bg-u2);
+  --g-b1: var(--bg-u4);
+  --g-b2: var(--bg-u5);
+  --g-g1: var(--bg-u2);
+  --g-g2: var(--bg-u5);
+  --g-f-bg: var(--bg-u4);
+  --g-f-b1: var(--bg-u5);
+  --g-f-fg: var(--a-hil);
+  --g-sh: rgba(0,0,0,0.4);
+  --f-sh1: 0.4;
+  --f-sh2: 0.02;
+  --f-sh3: 0.2;
+  --f-h-b1: rgba(138,147,166,0.3);
+  --f-play-bg: #22D3EE;
+  --f-play-fg: #0B0E14;
+  --f-sel-sh: transparent;
+  --f-gray: #555;
+  --fm-off: #F43F5E;
+  --mp-sh: #000;
+  --mp-b-bg: rgba(0,0,0,0.3);
+  --err-fg: #FFF;
+  --err-bg: #F43F5E;
+  --err-b1: #FB7185;
+  --err-ts: #500;
+}
+html.gy {
+  color-scheme: light;
+  --font-family: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --fg: #1A1E2A;
+  --fg-max: #000;
+  --fg2-max: #000;
+  --fg-weak: #5B6478;
+  --bg-d3: #FFF;
+  --bg-d2: #FFF;
+  --bg-d1: #F8F9FC;
+  --bg: #F0F2F8;
+  --bgg: var(--bg);
+  --bg-u1: #E8EBF2;
+  --bg-u2: #E0E4ED;
+  --bg-u3: #D8DDE8;
+  --bg-u4: #D0D6E3;
+  --bg-u5: #B8C0D2;
+  --bg-u6: #A0A9BE;
+  --bg-max: #FFF;
+  --tab-alt: #0E7490;
+  --row-alt: #E8EBF2;
+  --scroll: #0E7490;
+  --sel-fg: #FFF;
+  --sel-bg: #0E7490;
+  --a: #0E7490;
+  --a-b: #0EA5E9;
+  --a-hil: #0891B2;
+  --a-dark: #155E75;
+  --a-gray: #9CA3AF;
+  --btn-fg: #1A1E2A;
+  --btn-bg: rgba(14,116,144,0.08);
+  --btn-h-fg: #1A1E2A;
+  --btn-h-bg: rgba(14,116,144,0.15);
+  --btn-1-fg: #FFF;
+  --btn-1-bg: #0E7490;
+  --btn-h-bs: var(--btn-bs);
+  --btn-h-bb: var(--btn-bb);
+  --btn-1-bs: var(--btn-bs);
+  --btn-1-bb: var(--btn-bb);
+  --btn-1h-fg: #FFF;
+  --btn-1h-bg: #0891B2;
+  --btn-1h-bs: var(--btn-1-bs);
+  --btn-1h-bb: var(--btn-1-bb);
+  --chk-fg: #0E7490;
+  --txt-sh: #9CA3AF;
+  --txt-bg: rgba(255,255,255,0.7);
+  --op-aa-fg: #FFF;
+  --op-aa-bg: #0E7490;
+  --op-a-sh: rgba(0,0,0,0.1);
+  --u2-btn-b1: #5B6478;
+  --u2-sbtn-b1: #5B6478;
+  --u2-txt-bg: var(--bg-max);
+  --u2-tab-bg: var(--bg-u1);
+  --u2-tab-b1: rgba(91,100,120,0.4);
+  --u2-tab-1-fg: #FFF;
+  --u2-tab-1-bg: #0E7490;
+  --u2-tab-1-b1: #0E7490;
+  --u2-tab-1-b2: #0EA5E9;
+  --u2-tab-1-sh: #0E7490;
+  --u2-b-fg: #FFF;
+  --u2-b1-bg: #0E7490;
+  --u2-b2-bg: #0891B2;
+  --u2-inf-bg: #0E7490;
+  --u2-inf-b1: #0891B2;
+  --u2-ok-bg: #4D7C0F;
+  --u2-ok-b1: #65A30D;
+  --u2-err-bg: #BE185D;
+  --u2-err-b1: #E11D48;
+  --ud-b1: #BBB;
+  --sort-1: #0E7490;
+  --sort-2: #BE185D;
+  --sz-b: #5B6478;
+  --sz-k: #4D7C0F;
+  --sz-m: #0E7490;
+  --sz-g: #C2410C;
+  --sz-t: #C2410C;
+  --sz-p: #BE185D;
+  --srv-1: #5B6478;
+  --srv-2: #0E7490;
+  --srv-3: #BE185D;
+  --srv-3b: rgba(190,24,93,0.5);
+  --tree-bg: #E8EBF2;
+  --g-play-bg: #0E7490;
+  --g-play-b1: #0891B2;
+  --g-play-b2: #06B6D4;
+  --g-play-sh: transparent;
+  --g-sel-fg: #FFF;
+  --g-sel-bg: #BE185D;
+  --g-sel-b1: #E11D48;
+  --g-sel-sh: transparent;
+  --g-fsel-bg: #E11D48;
+  --g-fsel-b1: #F43F5E;
+  --g-fsel-ts: #9F1239;
+  --g-dfg: var(--srv-3);
+  --g-fg: var(--a-hil);
+  --g-bg: var(--bg-u2);
+  --g-b1: var(--bg-u4);
+  --g-b2: var(--bg-u5);
+  --g-g1: var(--bg-u2);
+  --g-g2: var(--bg-u5);
+  --g-f-bg: var(--bg-u4);
+  --g-f-b1: var(--bg-u5);
+  --g-f-fg: var(--a-hil);
+  --g-sh: rgba(0,0,0,0.06);
+  --f-sh1: 0.3;
+  --f-sh2: 0.5;
+  --f-sh3: 0.02;
+  --f-h-b1: rgba(91,100,120,0.3);
+  --f-play-bg: #0E7490;
+  --f-play-fg: #FFF;
+  --f-sel-sh: transparent;
+  --f-gray: #999;
+  --fm-off: #BE185D;
+  --mp-sh: #9CA3AF;
+  --mp-b-bg: transparent;
+  --err-fg: #FFF;
+  --err-bg: #BE185D;
+  --err-b1: #E11D48;
+  --err-ts: #500;
+  text-shadow: none;
 }
 html.e #treeh .btn {
   margin: 0px;
@@ -4188,3 +4888,1446 @@ html.e #detree {
     pointer-events: none;
 	z-index: 99;
 }
+/* ============================================================
+   V3 Retro Themes for copyparty
+   ------------------------------------------------------------
+   Theme h = CRT Terminal 80s  (hz = dark, hy = light)
+   Theme i = Vaporwave 90s     (iz = dark, iy = light)
+
+   These blocks are designed to be appended to browser.css.
+   They override the :root / html.y defaults with retro
+   aesthetics: CRT phosphor glow, scanlines, neon gradients,
+   and Windows-95-style 3D relief borders.
+   ============================================================ */
+
+
+/* ============================================================
+   Theme h — CRT Terminal 80s
+   Amber/green phosphor on black, monospace, CRT glow + scanlines
+   ============================================================ */
+
+html.h {
+	--font-main: var(--font-mono);
+	--font-serif: var(--font-mono);
+
+	--btn-bs: 0 0 0 .1em var(--bg-u3) inset;
+	--btn-1-bs: 0 0 .15em var(--a) inset;
+	--btn-bb: .1em solid var(--bg-u4);
+	--btn-1-bb: .1em solid var(--a);
+
+	--op-aa-sh: 0 0 .3em var(--bg-max);
+	--op-aa-bg: rgba(0,0,0,0.6);
+
+	--u2-tab-1-bg: linear-gradient(to bottom, var(--bg-u1), var(--bg) 80%);
+	--u2-tab-1-sh: var(--bg);
+	--mp-b-bg: transparent;
+
+	--f-sh1: 0;
+	--f-sh2: 0;
+	--f-sh3: 0;
+}
+
+html.hz {
+	color-scheme: dark;
+
+	--fg: #ffb000;
+	--fg-max: #ffd060;
+	--fg-weak: #cc8800;
+	--fg2-max: #ffd060;
+
+	--bg-u6: #1a1200;
+	--bg-u5: #151000;
+	--bg-u4: #100b00;
+	--bg-u3: #0a0700;
+	--bg-u2: #0d0900;
+	--bg-u1: #0a0600;
+	--bg: #050300;
+	--bgg: #050300;
+	--bg-d1: #1a1200;
+	--bg-d2: #100b00;
+	--bg-d3: #000;
+	--bg-max: #000;
+
+	--tab-alt: #ff6600;
+	--row-alt: #0a0700;
+
+	--scroll: #ffb000;
+
+	--sel-fg: #050300;
+	--sel-bg: #ffb000;
+
+	--a: #ffd700;
+	--a-b: #ffb000;
+	--a-hil: #ffff80;
+	--a-dark: #cc8800;
+	--a-gray: #664400;
+
+	--btn-fg: var(--fg);
+	--btn-bg: rgba(255,176,0,0.08);
+	--btn-h-fg: var(--a-hil);
+	--btn-h-bg: rgba(255,176,0,0.15);
+	--btn-1-fg: #050300;
+	--btn-1-bg: #ffb000;
+	--btn-1h-fg: #050300;
+	--btn-1h-bg: #ffd700;
+
+	--chk-fg: var(--tab-alt);
+	--txt-sh: #000;
+	--txt-bg: rgba(255,176,0,0.05);
+
+	--sort-1: #ffb000;
+	--sort-2: #ff6600;
+
+	--sz-b: #885500;
+	--sz-k: #ffb000;
+	--sz-m: #ff6600;
+	--sz-g: #ffd700;
+	--sz-t: var(--sz-g);
+	--sz-p: var(--sz-t);
+
+	--srv-1: #cc8800;
+	--srv-2: #ff6600;
+	--srv-3: #ffb000;
+	--srv-3b: rgba(255,176,0,0.6);
+
+	--tree-bg: #050300;
+
+	--g-bg: var(--bg-u2);
+	--g-b1: var(--bg-u4);
+	--g-b2: var(--bg-u5);
+	--g-g1: var(--bg-u2);
+	--g-g2: var(--bg-u5);
+	--g-f-bg: var(--bg-u4);
+	--g-f-b1: var(--bg-u5);
+	--g-fg: var(--a-hil);
+	--g-sh: rgba(255,176,0,0.1);
+	--g-sel-fg: #050300;
+	--g-sel-bg: #ffb000;
+	--g-sel-b1: #ffd700;
+	--g-sel-sh: #cc8800;
+	--g-fsel-bg: #ffd700;
+	--g-fsel-b1: #ffff80;
+	--g-fsel-ts: #cc8800;
+	--g-dfg: var(--srv-3);
+	--g-play-bg: #ffb000;
+	--g-play-b1: #ffd700;
+	--g-play-b2: #ffff80;
+	--g-play-sh: #cc8800;
+
+	--f-h-b1: rgba(255,176,0,0.3);
+	--f-play-bg: #ffb000;
+	--f-play-fg: #050300;
+	--f-sel-sh: #ffd700;
+	--f-gray: #885500;
+
+	--fm-off: #ff6600;
+	--mp-sh: #000;
+
+	--err-fg: #fff;
+	--err-bg: #c00;
+	--err-b1: #f44;
+	--err-ts: #600;
+
+	/* CRT glow: text-shadow creates the phosphor bloom */
+	text-shadow: 0 0 2px var(--fg), 0 0 6px rgba(255,176,0,0.4);
+	font-family: var(--font-mono), 'scp', monospace, monospace;
+}
+
+/* CRT scanline overlay — a repeating linear gradient on body */
+html.hz body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9999;
+	background: repeating-linear-gradient(
+		to bottom,
+		transparent 0,
+		transparent 2px,
+		rgba(0,0,0,0.15) 2px,
+		rgba(0,0,0,0.15) 3px
+	);
+	animation: crt-scan-drift 8s linear infinite;
+}
+
+@keyframes crt-scan-drift {
+	from { background-position: 0 0; }
+	to { background-position: 0 100px; }
+}
+
+/* CRT screen curvature vignette */
+html.hz body::after {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9998;
+	background: radial-gradient(
+		ellipse at center,
+		transparent 60%,
+		rgba(0,0,0,0.4) 100%
+	);
+}
+
+html.hz #tt {
+	text-shadow: 0 0 2px var(--fg);
+	border-color: #cc8800;
+}
+
+html.hz #files tbody tr:hover td,
+html.hz #files tbody tr:hover td+td {
+	box-shadow: 0 0 0 .05em var(--a) inset;
+}
+
+html.hz #files thead th {
+	border-bottom: .1em solid var(--a);
+}
+
+html.hz #path {
+	text-shadow: 0 0 4px var(--fg);
+}
+
+html.hz a:hover {
+	text-shadow: 0 0 4px var(--a-hil), 0 0 8px var(--a);
+}
+
+/* Green phosphor variant toggle — users can switch via custom CSS */
+html.hz.green-phosphor {
+	--fg: #00ff66;
+	--fg-max: #80ffaa;
+	--fg-weak: #00cc44;
+	--fg2-max: #80ffaa;
+	--bg-u6: #001a0a;
+	--bg-u5: #001500;
+	--bg-u4: #001000;
+	--bg-u3: #000a00;
+	--bg-u2: #000d00;
+	--bg-u1: #000a00;
+	--bg: #000500;
+	--bgg: #000500;
+	--bg-d1: #001a0a;
+	--scroll: #00ff66;
+	--a: #66ff99;
+	--a-b: #00ff66;
+	--a-hil: #ccffdd;
+	--a-dark: #00cc44;
+	--a-gray: #004422;
+	--btn-fg: #00ff66;
+	--btn-bg: rgba(0,255,102,0.08);
+	--btn-h-bg: rgba(0,255,102,0.15);
+	--btn-1-fg: #000500;
+	--btn-1-bg: #00ff66;
+	--btn-1h-bg: #66ff99;
+	--tab-alt: #00cc44;
+	--sort-1: #00ff66;
+	--sort-2: #00cc44;
+	--sz-k: #00ff66;
+	--sz-g: #66ff99;
+	--srv-1: #00cc44;
+	--srv-2: #00ff66;
+	--srv-3: #66ff99;
+	--tree-bg: #000500;
+	--g-sel-bg: #00ff66;
+	--g-sel-b1: #66ff99;
+	--g-play-bg: #00ff66;
+	--f-play-bg: #00ff66;
+	--f-sel-sh: #66ff99;
+	text-shadow: 0 0 2px #00ff66, 0 0 6px rgba(0,255,102,0.4);
+}
+
+/* Light variant — cream terminal with terracotta phosphor (yandesign.fr palette) */
+html.hy {
+	color-scheme: light;
+
+	--fg: #0D100F;
+	--fg-max: #000;
+	--fg-weak: #333;
+	--fg2-max: #000;
+
+	--bg-d3: #C4C4C4;
+	--bg-d2: #DAD5D4;
+	--bg-d1: #E4DFDE;
+	--bg: #F5F0EF;
+	--bg-u1: #F5F0EF;
+	--bg-u2: #EDE8E7;
+	--bg-u3: #E4DFDE;
+	--bg-u4: #DAD5D4;
+	--bg-u5: #D0CBCA;
+	--bg-u6: #C6C1C0;
+	--bg-max: #fff;
+	--bgg: #F5F0EF;
+
+	--tab-alt: #c07a45;
+	--row-alt: #E4DFDE;
+
+	--scroll: #c07a45;
+
+	--sel-fg: #F5F0EF;
+	--sel-bg: #c07a45;
+
+	--a: #c07a45;
+	--a-b: #a86638;
+	--a-hil: #d4884f;
+	--a-gray: #888;
+	--a-dark: #8a5530;
+
+	--btn-fg: #c07a45;
+	--btn-bg: rgba(192,122,69,0.08);
+	--btn-h-fg: #a86638;
+	--btn-h-bg: rgba(192,122,69,0.12);
+	--btn-1-fg: #F5F0EF;
+	--btn-1-bg: #c07a45;
+	--btn-1h-fg: #F5F0EF;
+	--btn-1h-bg: #d4884f;
+
+	--chk-fg: var(--fg);
+	--txt-sh: #aaa;
+	--txt-bg: rgba(192,122,69,0.04);
+
+	--sort-1: #c07a45;
+	--sort-2: #d4884f;
+
+	--sz-b: #666;
+	--sz-k: #c07a45;
+	--sz-m: #d4884f;
+	--sz-g: #a86638;
+
+	--srv-1: #333;
+	--srv-2: #c07a45;
+	--srv-3: #d4884f;
+
+	--tree-bg: #F5F0EF;
+
+	--g-bg: var(--bg-u2);
+	--g-b1: var(--bg-u5);
+	--g-b2: var(--bg-u6);
+	--g-g1: var(--bg-u2);
+	--g-g2: var(--bg-u5);
+	--g-f-bg: var(--bg-u4);
+	--g-f-b1: var(--bg-u5);
+	--g-fg: var(--a);
+	--g-sh: rgba(192,122,69,0.07);
+	--g-sel-fg: #F5F0EF;
+	--g-sel-bg: #c07a45;
+	--g-sel-b1: #d4884f;
+	--g-sel-sh: #a86638;
+	--g-fsel-bg: #d4884f;
+	--g-fsel-b1: #c07a45;
+	--g-fsel-ts: #a86638;
+	--g-play-bg: #c07a45;
+	--g-play-b1: #d4884f;
+	--g-play-b2: #a86638;
+	--g-play-sh: #a86638;
+
+	--f-h-b1: rgba(192,122,69,0.2);
+	--f-play-bg: #c07a45;
+	--f-play-fg: #F5F0EF;
+	--f-sel-sh: #d4884f;
+	--f-gray: #888;
+
+	--fm-off: #d4884f;
+	--mp-sh: #C6C1C0;
+	--mp-b-bg: transparent;
+
+	/* CRT glow: subtle terracotta phosphor bloom on light bg */
+	text-shadow: 0 0 1px rgba(192,122,69,0.35), 0 0 4px rgba(192,122,69,0.15);
+	font-family: var(--font-mono), 'scp', monospace, monospace;
+}
+
+/* CRT scanline overlay — lighter on the bright phosphor screen */
+html.hy body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9999;
+	background: repeating-linear-gradient(
+		to bottom,
+		transparent 0,
+		transparent 2px,
+		rgba(0,0,0,0.06) 2px,
+		rgba(0,0,0,0.06) 3px
+	);
+	animation: crt-scan-drift 8s linear infinite;
+}
+
+/* CRT screen curvature vignette — gentle on the light screen */
+html.hy body::after {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9998;
+	background: radial-gradient(
+		ellipse at center,
+		transparent 60%,
+		rgba(0,0,0,0.18) 100%
+	);
+}
+
+html.hy #tt {
+	text-shadow: 0 0 2px rgba(192,122,69,0.4);
+	border-color: #a86638;
+}
+
+html.hy #files tbody tr:hover td,
+html.hy #files tbody tr:hover td+td {
+	box-shadow: 0 0 0 .05em var(--a) inset;
+}
+
+html.hy #files thead th {
+	border-bottom: .1em solid var(--a);
+}
+
+html.hy #path {
+	text-shadow: 0 0 3px rgba(192,122,69,0.3);
+}
+
+html.hy a:hover {
+	text-shadow: 0 0 3px var(--a-hil), 0 0 6px rgba(192,122,69,0.25);
+}
+
+
+/* ============================================================
+   Theme i — Vaporwave 90s
+   Neon magenta/cyan on deep purple, gradients, grid backgrounds
+   ============================================================ */
+
+html.i {
+	--btn-bs: 0 .05em .3em rgba(255,0,200,0.3);
+	--btn-1-bs: 0 .05em .4em rgba(0,229,255,0.4);
+	--btn-bb: .15em solid transparent;
+	--btn-1-bb: .15em solid transparent;
+
+	--op-aa-sh: 0 0 .4em rgba(255,0,200,0.3);
+	--op-aa-bg: rgba(20,0,40,0.8);
+
+	--u2-tab-1-bg: linear-gradient(to bottom, #2a004a, var(--bg) 80%);
+	--u2-tab-1-sh: #1a0030;
+	--u2-tab-1-fg: #00e9ff;
+	--u2-tab-1-b1: #ff00cc;
+	--u2-tab-1-b2: #00e9ff;
+	--mp-b-bg: rgba(255,0,200,0.05);
+
+	--f-sh1: 0.2;
+	--f-sh2: 0.1;
+	--f-sh3: 0.15;
+}
+
+html.iz {
+	color-scheme: dark;
+
+	--fg: #e0d0ff;
+	--fg-max: #fff;
+	--fg-weak: #a090c0;
+	--fg2-max: #fff;
+
+	--bg-u6: #2a004a;
+	--bg-u5: #220040;
+	--bg-u4: #1a0030;
+	--bg-u3: #150028;
+	--bg-u2: #100020;
+	--bg-u1: #0d0018;
+	--bg: #080010;
+	--bgg: linear-gradient(180deg, #0d0018 0%, #1a0030 50%, #0d0018 100%);
+	--bg-d1: #2a004a;
+	--bg-d2: #1a0030;
+	--bg-d3: #050008;
+	--bg-max: #000;
+
+	--tab-alt: #00e9ff;
+	--row-alt: #150028;
+
+	--scroll: #ff00cc;
+
+	--sel-fg: #080010;
+	--sel-bg: #00e9ff;
+
+	--a: #ff00cc;
+	--a-b: #cc00aa;
+	--a-hil: #00e9ff;
+	--a-dark: #aa0088;
+	--a-gray: #6644aa;
+
+	--btn-fg: #00e9ff;
+	--btn-bg: rgba(255,0,200,0.1);
+	--btn-h-fg: #fff;
+	--btn-h-bg: rgba(255,0,200,0.2);
+	--btn-1-fg: #080010;
+	--btn-1-bg: #ff00cc;
+	--btn-1h-fg: #080010;
+	--btn-1h-bg: #00e9ff;
+
+	--chk-fg: var(--tab-alt);
+	--txt-sh: #1a0030;
+	--txt-bg: rgba(255,0,200,0.06);
+
+	--sort-1: #ff00cc;
+	--sort-2: #00e9ff;
+
+	--sz-b: #a090c0;
+	--sz-k: #00e9ff;
+	--sz-m: #ff00cc;
+	--sz-g: #ff66dd;
+	--sz-t: var(--sz-g);
+	--sz-p: var(--sz-t);
+
+	--srv-1: #a090c0;
+	--srv-2: #ff00cc;
+	--srv-3: #00e9ff;
+	--srv-3b: rgba(0,229,255,0.6);
+
+	--tree-bg: #0d0018;
+
+	--g-bg: var(--bg-u2);
+	--g-b1: var(--bg-u4);
+	--g-b2: var(--bg-u5);
+	--g-g1: var(--bg-u2);
+	--g-g2: var(--bg-u5);
+	--g-f-bg: var(--bg-u4);
+	--g-f-b1: var(--bg-u5);
+	--g-fg: var(--a-hil);
+	--g-sh: rgba(255,0,200,0.1);
+	--g-sel-fg: #080010;
+	--g-sel-bg: #ff00cc;
+	--g-sel-b1: #00e9ff;
+	--g-sel-sh: #aa0088;
+	--g-fsel-bg: #00e9ff;
+	--g-fsel-b1: #ff00cc;
+	--g-fsel-ts: #006688;
+	--g-dfg: var(--srv-3);
+	--g-play-bg: #ff00cc;
+	--g-play-b1: #00e9ff;
+	--g-play-b2: #ff66dd;
+	--g-play-sh: #aa0088;
+
+	--f-h-b1: rgba(255,0,200,0.3);
+	--f-play-bg: #ff00cc;
+	--f-play-fg: #080010;
+	--f-sel-sh: #00e9ff;
+	--f-gray: #a090c0;
+
+	--fm-off: #00e9ff;
+	--mp-sh: #050008;
+
+	--err-fg: #fff;
+	--err-bg: #c00480;
+	--err-b1: #ff00cc;
+	--err-ts: #600040;
+
+	text-shadow: 0 0 3px rgba(255,0,200,0.3), 0 0 6px rgba(0,229,255,0.15);
+}
+
+/* Vaporwave perspective grid + sun background */
+html.iz body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: -1;
+	background:
+		/* sun glow at bottom */
+		linear-gradient(0deg, rgba(255,0,200,0.12) 0%, rgba(255,100,0,0.06) 20%, rgba(255,200,0,0.03) 35%, transparent 50%),
+		/* top fade */
+		linear-gradient(180deg, transparent 0%, transparent 50%, rgba(255,0,200,0.03) 100%),
+		/* vertical grid lines */
+		repeating-linear-gradient(
+			90deg,
+			transparent 0,
+			transparent 39px,
+			rgba(0,229,255,0.06) 39px,
+			rgba(0,229,255,0.06) 40px
+		),
+		/* horizontal grid lines */
+		repeating-linear-gradient(
+			0deg,
+			transparent 0,
+			transparent 39px,
+			rgba(255,0,200,0.06) 39px,
+			rgba(255,0,200,0.06) 40px
+		);
+}
+
+html.iz #tt {
+	border-color: #ff00cc;
+	box-shadow: 0 .2em .5em #1a0030, 0 0 .3em rgba(255,0,200,0.2);
+}
+
+html.iz #files thead th {
+	border-bottom: .15em solid var(--a);
+}
+
+html.iz #files tbody tr:hover td,
+html.iz #files tbody tr:hover td+td {
+	box-shadow: 0 0 .1em var(--a) inset;
+}
+
+html.iz #path {
+	text-shadow: 0 0 4px var(--a), 0 0 8px var(--a-hil);
+}
+
+html.iz a:hover {
+	text-shadow: 0 0 4px var(--a-hil), 0 0 8px var(--a);
+}
+
+html.iz #toast {
+	border-color: var(--a);
+}
+
+/* --- Neon glow effects --- */
+
+/* Neon keyframes */
+@keyframes vw-neon-flicker {
+	0%, 100% { opacity: 1; }
+	92% { opacity: 1; }
+	93% { opacity: 0.8; }
+	94% { opacity: 1; }
+	96% { opacity: 0.9; }
+	97% { opacity: 1; }
+}
+@keyframes vw-grid-scroll {
+	from { background-position: 0 0, 0 0, 0 0; }
+	to { background-position: 0 0, 0 40px, 0 0; }
+}
+@keyframes vw-pulse {
+	0%, 100% { box-shadow: 0 0 .4em var(--a), 0 0 .8em rgba(255,0,200,0.3); }
+	50% { box-shadow: 0 0 .6em var(--a), 0 0 1.2em rgba(255,0,200,0.5); }
+}
+@keyframes vw-border-flow {
+	0% { border-image-source: linear-gradient(0deg, #ff00cc, #00e9ff, #ff00cc); }
+	100% { border-image-source: linear-gradient(360deg, #ff00cc, #00e9ff, #ff00cc); }
+}
+
+/* Neon border glow on file table */
+html.iz #files {
+	box-shadow: 0 0 .5em rgba(255,0,200,0.15), 0 0 1em rgba(0,229,255,0.08);
+}
+
+/* Neon header glow */
+html.iz #files thead th {
+	text-shadow: 0 0 4px var(--a), 0 0 8px rgba(255,0,200,0.3);
+}
+
+/* Neon row hover */
+html.iz #files tbody tr:hover td,
+html.iz #files tbody tr:hover td+td {
+	box-shadow: 0 0 .15em var(--a) inset, 0 0 .3em rgba(255,0,200,0.2) inset;
+}
+
+/* Neon selected row */
+html.iz #files tbody tr.sel td {
+	box-shadow: 0 0 .15em var(--a-hil) inset, 0 0 .4em rgba(0,229,255,0.2) inset;
+}
+
+/* Neon grid items */
+html.iz #ggrid > a {
+	box-shadow: 0 0 .3em rgba(255,0,200,0.15), 0 0 .6em rgba(0,229,255,0.08);
+	transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+html.iz #ggrid > a:hover {
+	box-shadow: 0 0 .5em var(--a), 0 0 1em rgba(0,229,255,0.3);
+	transform: translateY(-2px);
+}
+
+html.iz #ggrid > a.sel {
+	box-shadow: 0 0 .5em var(--a-hil), 0 0 1em rgba(0,229,255,0.4);
+}
+
+html.iz #ggrid > a.play {
+	box-shadow: 0 0 .5em var(--a), 0 0 1em rgba(255,0,200,0.3);
+	animation: vw-neon-flicker 4s infinite;
+}
+
+/* Neon buttons */
+html.iz .btn,
+html.iz button,
+html.iz input[type="submit"] {
+	text-shadow: 0 0 3px currentColor;
+}
+
+html.iz .btn:hover,
+html.iz button:hover,
+html.iz input[type="submit"]:hover {
+	box-shadow: 0 0 .4em var(--a), 0 0 .8em rgba(255,0,200,0.3);
+}
+
+html.iz .tgl.btn.on {
+	box-shadow: 0 0 .4em var(--a), 0 0 .8em rgba(255,0,200,0.4);
+}
+
+/* Neon ops toolbar */
+html.iz #ops a {
+	text-shadow: 0 0 3px currentColor;
+	transition: text-shadow 0.2s ease;
+}
+
+html.iz #ops a:hover {
+	text-shadow: 0 0 5px var(--a-hil), 0 0 10px var(--a);
+}
+
+/* Neon tooltip */
+html.iz #tt {
+	box-shadow: 0 .2em .5em #1a0030, 0 0 .5em rgba(255,0,200,0.3), 0 0 1em rgba(0,229,255,0.15);
+}
+
+/* Neon toast */
+html.iz #toast {
+	box-shadow: 0 0 .4em var(--a), 0 0 .8em rgba(255,0,200,0.2);
+}
+
+/* Neon scrollbar */
+html.iz ::-webkit-scrollbar-thumb {
+	box-shadow: 0 0 .3em var(--a);
+}
+
+/* Animated grid background */
+html.iz body::before {
+	animation: vw-grid-scroll 3s linear infinite;
+}
+
+/* Neon music player */
+html.iz #bplay {
+	box-shadow: 0 0 .4em var(--a), 0 0 .8em rgba(255,0,200,0.3);
+}
+
+html.iz #bplay:hover {
+	box-shadow: 0 0 .6em var(--a-hil), 0 0 1.2em rgba(0,229,255,0.4);
+}
+
+/* --- Additional neon effects --- */
+
+/* VHS scanlines overlay */
+html.iz body::after {
+	content: '';
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	pointer-events: none;
+	z-index: 9999;
+	background: repeating-linear-gradient(
+		0deg,
+		rgba(0,0,0,0.04) 0px,
+		rgba(0,0,0,0.04) 1px,
+		transparent 1px,
+		transparent 3px
+	);
+}
+
+/* Chromatic aberration on links */
+html.iz a:hover {
+	text-shadow:
+		-1px 0 rgba(255,0,100,0.5),
+		1px 0 rgba(0,229,255,0.5),
+		0 0 4px var(--a-hil), 0 0 8px var(--a);
+}
+
+/* Neon underline on links */
+html.iz #files a {
+	text-decoration: none;
+	border-bottom: 1px solid transparent;
+	transition: border-color 0.2s ease, text-shadow 0.2s ease;
+}
+
+html.iz #files a:hover {
+	border-bottom-color: var(--a);
+	text-shadow: 0 0 3px var(--a);
+}
+
+/* Pulsing play button */
+html.iz #bplay {
+	animation: vw-pulse 2s ease-in-out infinite;
+}
+
+/* Neon focus rings on inputs */
+html.iz input[type="text"]:focus,
+html.iz input[type="search"]:focus,
+html.iz input[type="submit"]:focus,
+html.iz select:focus {
+	outline: none;
+	box-shadow: 0 0 .3em var(--a), 0 0 .6em rgba(255,0,200,0.3);
+	border-color: var(--a);
+}
+
+/* Neon tree sidebar hover */
+html.iz .ntree a {
+	transition: text-shadow 0.2s ease, color 0.2s ease;
+}
+
+html.iz .ntree a:hover {
+	text-shadow: 0 0 4px var(--a), 0 0 8px rgba(255,0,200,0.3);
+}
+
+/* Grid thumbnail glow */
+html.iz #ggrid > a img {
+	filter: drop-shadow(0 0 .2em rgba(255,0,200,0.2));
+	transition: filter 0.2s ease;
+}
+
+html.iz #ggrid > a:hover img {
+	filter: drop-shadow(0 0 .4em rgba(0,229,255,0.4)) saturate(1.2);
+}
+
+/* Neon path breadcrumb */
+html.iz #path a {
+	transition: text-shadow 0.2s ease;
+}
+
+html.iz #path a:hover {
+	text-shadow: 0 0 4px var(--a-hil), 0 0 8px var(--a);
+}
+
+/* Animated border on file table */
+html.iz #files {
+	border-image: linear-gradient(0deg, #ff00cc, #00e9ff, #ff00cc) 1;
+	animation: vw-border-flow 4s linear infinite;
+}
+
+/* Neon panel headers (opbox) */
+html.iz .opbox {
+	box-shadow: 0 0 .3em rgba(255,0,200,0.1), 0 0 .6em rgba(0,229,255,0.05);
+}
+
+/* Neon checkbox glow */
+html.iz input[type="checkbox"]:checked {
+	box-shadow: 0 0 .3em var(--a), 0 0 .6em rgba(255,0,200,0.3);
+}
+
+/* Neon selection text */
+html.iz ::selection {
+	background: rgba(255,0,200,0.3);
+	text-shadow: 0 0 4px var(--a);
+}
+
+/* Glow on drag-over zone */
+html.iz #wrap.drop {
+	box-shadow: 0 0 .5em var(--a), 0 0 1em rgba(0,229,255,0.3) inset;
+}
+
+/* Light variant — pastel vaporwave / Miami sunset */
+html.iy {
+	color-scheme: light;
+
+	--fg: #4a0040;
+	--fg-max: #2a0020;
+	--fg-weak: #8a0070;
+	--fg2-max: #2a0020;
+
+	--bg-d3: #fff0f8;
+	--bg-d2: #ffe0f0;
+	--bg-d1: #ffd0e8;
+	--bg: #fff5fb;
+	--bg-u1: #fff5fb;
+	--bg-u2: #ffe8f4;
+	--bg-u3: #ffd8ec;
+	--bg-u4: #ffc8e4;
+	--bg-u5: #ffb8dc;
+	--bg-u6: #ffa8d4;
+	--bg-max: #fff;
+	--bgg: linear-gradient(180deg, #fff5fb 0%, #ffe0f0 50%, #fff5fb 100%);
+
+	--tab-alt: #c000a0;
+	--row-alt: #ffe8f4;
+
+	--scroll: #c000a0;
+
+	--sel-fg: #fff5fb;
+	--sel-bg: #c000a0;
+
+	--a: #c000a0;
+	--a-b: #a00080;
+	--a-hil: #00a0c0;
+	--a-dark: #800060;
+	--a-gray: #aaa;
+
+	--btn-fg: #c000a0;
+	--btn-bg: rgba(192,0,160,0.08);
+	--btn-h-fg: #fff;
+	--btn-h-bg: rgba(192,0,160,0.15);
+	--btn-1-fg: #fff5fb;
+	--btn-1-bg: #c000a0;
+	--btn-1h-fg: #fff5fb;
+	--btn-1h-bg: #00a0c0;
+
+	--chk-fg: var(--fg);
+	--txt-sh: #ccc;
+	--txt-bg: rgba(192,0,160,0.04);
+
+	--sort-1: #c000a0;
+	--sort-2: #00a0c0;
+
+	--sz-b: #888;
+	--sz-k: #00a0c0;
+	--sz-m: #c000a0;
+	--sz-g: #e000b0;
+
+	--srv-1: #8a0070;
+	--srv-2: #c000a0;
+	--srv-3: #00a0c0;
+
+	--tree-bg: #fff5fb;
+
+	--g-bg: var(--bg-u2);
+	--g-b1: var(--bg-u5);
+	--g-b2: var(--bg-u6);
+	--g-g1: var(--bg-u2);
+	--g-g2: var(--bg-u5);
+	--g-f-bg: var(--bg-u4);
+	--g-f-b1: var(--bg-u5);
+	--g-fg: var(--a);
+	--g-sh: rgba(192,0,160,0.07);
+	--g-sel-fg: #fff5fb;
+	--g-sel-bg: #c000a0;
+	--g-sel-b1: #00a0c0;
+	--g-sel-sh: #a00080;
+	--g-fsel-bg: #00a0c0;
+	--g-fsel-b1: #c000a0;
+	--g-fsel-ts: #006080;
+	--g-play-bg: #c000a0;
+	--g-play-b1: #00a0c0;
+	--g-play-b2: #e000b0;
+	--g-play-sh: #a00080;
+
+	--f-h-b1: rgba(192,0,160,0.2);
+	--f-play-bg: #c000a0;
+	--f-play-fg: #fff5fb;
+	--f-sel-sh: #00a0c0;
+	--f-gray: #888;
+
+	--fm-off: #00a0c0;
+	--mp-sh: #ffd0e8;
+	--mp-b-bg: transparent;
+
+	text-shadow: none;
+}
+
+html.iy body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: -1;
+	background:
+		/* sun glow at bottom */
+		linear-gradient(0deg, rgba(192,0,160,0.08) 0%, rgba(255,100,0,0.04) 20%, transparent 40%),
+		/* vertical grid lines */
+		repeating-linear-gradient(
+			90deg,
+			transparent 0,
+			transparent 39px,
+			rgba(192,0,160,0.04) 39px,
+			rgba(192,0,160,0.04) 40px
+		),
+		/* horizontal grid lines */
+		repeating-linear-gradient(
+			0deg,
+			transparent 0,
+			transparent 39px,
+			rgba(0,160,192,0.04) 39px,
+			rgba(0,160,192,0.04) 40px
+		);
+}
+
+/* Light variant neon — softer glows */
+html.iy #files {
+	box-shadow: 0 0 .5em rgba(192,0,160,0.1), 0 0 1em rgba(0,160,192,0.06);
+}
+
+html.iy #files thead th {
+	text-shadow: 0 0 3px rgba(192,0,160,0.2);
+}
+
+html.iy #ggrid > a {
+	box-shadow: 0 0 .3em rgba(192,0,160,0.1), 0 0 .6em rgba(0,160,192,0.06);
+	transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+html.iy #ggrid > a:hover {
+	box-shadow: 0 0 .5em var(--a), 0 0 1em rgba(0,160,192,0.2);
+	transform: translateY(-2px);
+}
+
+html.iy #ggrid > a.sel {
+	box-shadow: 0 0 .5em var(--a-hil), 0 0 1em rgba(0,160,192,0.25);
+}
+
+html.iy #ggrid > a.play {
+	box-shadow: 0 0 .5em var(--a), 0 0 1em rgba(192,0,160,0.2);
+	animation: vw-neon-flicker 4s infinite;
+}
+
+html.iy .btn:hover,
+html.iy button:hover,
+html.iy input[type="submit"]:hover {
+	box-shadow: 0 0 .4em var(--a), 0 0 .8em rgba(192,0,160,0.2);
+}
+
+html.iy #ops a {
+	transition: text-shadow 0.2s ease;
+}
+
+html.iy #ops a:hover {
+	text-shadow: 0 0 4px var(--a-hil), 0 0 8px var(--a);
+}
+
+html.iy #tt {
+	box-shadow: 0 .2em .5em rgba(192,0,160,0.15), 0 0 .5em rgba(192,0,160,0.2);
+}
+
+html.iy #bplay {
+	box-shadow: 0 0 .4em var(--a), 0 0 .8em rgba(192,0,160,0.2);
+}
+
+html.iy #bplay:hover {
+	box-shadow: 0 0 .6em var(--a-hil), 0 0 1.2em rgba(0,160,192,0.3);
+}
+
+/* Light variant — additional neon (softer) */
+html.iy body::after {
+	content: '';
+	position: fixed;
+	top: 0; left: 0; right: 0; bottom: 0;
+	pointer-events: none;
+	z-index: 9999;
+	background: repeating-linear-gradient(
+		0deg,
+		rgba(0,0,0,0.02) 0px,
+		rgba(0,0,0,0.02) 1px,
+		transparent 1px,
+		transparent 3px
+	);
+}
+
+html.iy a:hover {
+	text-shadow:
+		-1px 0 rgba(192,0,80,0.3),
+		1px 0 rgba(0,160,192,0.3),
+		0 0 3px var(--a-hil);
+}
+
+html.iy #files a:hover {
+	border-bottom-color: var(--a);
+	text-shadow: 0 0 2px var(--a);
+}
+
+html.iy #bplay {
+	animation: vw-pulse 2s ease-in-out infinite;
+}
+
+html.iy input[type="text"]:focus,
+html.iy input[type="search"]:focus,
+html.iy input[type="submit"]:focus,
+html.iy select:focus {
+	outline: none;
+	box-shadow: 0 0 .3em var(--a), 0 0 .6em rgba(192,0,160,0.2);
+	border-color: var(--a);
+}
+
+html.iy .ntree a {
+	transition: text-shadow 0.2s ease;
+}
+
+html.iy .ntree a:hover {
+	text-shadow: 0 0 3px var(--a);
+}
+
+html.iy #ggrid > a img {
+	filter: drop-shadow(0 0 .2em rgba(192,0,160,0.15));
+	transition: filter 0.2s ease;
+}
+
+html.iy #ggrid > a:hover img {
+	filter: drop-shadow(0 0 .4em rgba(0,160,192,0.3)) saturate(1.1);
+}
+
+html.iy #path a:hover {
+	text-shadow: 0 0 3px var(--a-hil), 0 0 6px var(--a);
+}
+
+html.iy .opbox {
+	box-shadow: 0 0 .3em rgba(192,0,160,0.08), 0 0 .6em rgba(0,160,192,0.04);
+}
+
+html.iy input[type="checkbox"]:checked {
+	box-shadow: 0 0 .3em var(--a), 0 0 .6em rgba(192,0,160,0.2);
+}
+
+html.iy ::selection {
+	background: rgba(192,0,160,0.2);
+	text-shadow: 0 0 3px var(--a);
+}
+
+html.iy #wrap.drop {
+	box-shadow: 0 0 .5em var(--a), 0 0 1em rgba(0,160,192,0.2) inset;
+}
+
+
+/* ============================================================
+   Theme j — Yandesign
+   Noir & Blanc minimaliste, scanlines CRT
+   Inspired by portfolio-site (YanLords/portfolio-site)
+   Pure monochrome — no accent color, white/cream is the accent
+   jz = dark (black bg, cream text), jy = light (cream bg, black text)
+   ============================================================ */
+
+html.j {
+	--font-main: var(--font-mono);
+	--font-serif: var(--font-mono);
+
+	--btn-bs: 0 0 0 1px var(--bg-u4) inset;
+	--btn-1-bs: 0 0 0 1px var(--fg) inset;
+	--btn-bb: 1px solid var(--bg-u4);
+	--btn-1-bb: 1px solid var(--fg);
+
+	--op-aa-sh: 0 24px 80px rgba(0,0,0,0.45);
+	--op-aa-bg: rgba(13,16,15,0.92);
+
+	--u2-tab-1-bg: linear-gradient(to bottom, var(--bg-u2), transparent 80%);
+	--u2-tab-1-sh: transparent;
+	--mp-b-bg: transparent;
+
+	--f-sh1: 0;
+	--f-sh2: 0;
+	--f-sh3: 0;
+}
+
+html.jz {
+	color-scheme: dark;
+
+	--fg: #F3E7E6;
+	--fg-max: #fff;
+	--fg-weak: #888;
+	--fg2-max: #fff;
+
+	--bg-u6: #1a1a1a;
+	--bg-u5: #161616;
+	--bg-u4: #2a2a2a;
+	--bg-u3: #131313;
+	--bg-u2: #101010;
+	--bg-u1: #0a0a0a;
+	--bg: #0D100F;
+	--bgg: #0D100F;
+	--bg-d1: #1a1a1a;
+	--bg-d2: #222;
+	--bg-d3: #2a2a2a;
+	--bg-max: #000;
+
+	--tab-alt: #888;
+	--row-alt: #131313;
+
+	--scroll: #888;
+
+	--sel-fg: #0D100F;
+	--sel-bg: #F3E7E6;
+
+	--a: #F3E7E6;
+	--a-b: #ddd;
+	--a-hil: #fff;
+	--a-gray: #555;
+	--a-dark: #888;
+
+	--btn-fg: #F3E7E6;
+	--btn-bg: rgba(255,255,255,0.045);
+	--btn-h-fg: #fff;
+	--btn-h-bg: rgba(255,255,255,0.08);
+	--btn-1-fg: #0D100F;
+	--btn-1-bg: #F3E7E6;
+	--btn-1h-fg: #0D100F;
+	--btn-1h-bg: #fff;
+
+	--chk-fg: var(--fg);
+	--txt-sh: #000;
+	--txt-bg: rgba(255,255,255,0.045);
+
+	--sort-1: #F3E7E6;
+	--sort-2: #888;
+
+	--sz-b: #555;
+	--sz-k: #888;
+	--sz-m: #aaa;
+	--sz-g: #F3E7E6;
+	--sz-t: var(--sz-g);
+	--sz-p: var(--sz-t);
+
+	--srv-1: #888;
+	--srv-2: #aaa;
+	--srv-3: #F3E7E6;
+	--srv-3b: rgba(243,231,230,0.6);
+
+	--tree-bg: #0D100F;
+
+	--g-bg: var(--bg-u2);
+	--g-b1: var(--bg-u4);
+	--g-b2: var(--bg-u5);
+	--g-g1: var(--bg-u2);
+	--g-g2: var(--bg-u5);
+	--g-f-bg: var(--bg-u4);
+	--g-f-b1: var(--bg-u5);
+	--g-fg: var(--fg);
+	--g-sh: rgba(255,255,255,0.06);
+	--g-sel-fg: #0D100F;
+	--g-sel-bg: #F3E7E6;
+	--g-sel-b1: #fff;
+	--g-sel-sh: #888;
+	--g-fsel-bg: #fff;
+	--g-fsel-b1: #F3E7E6;
+	--g-fsel-ts: #888;
+	--g-dfg: var(--srv-3);
+	--g-play-bg: #F3E7E6;
+	--g-play-b1: #fff;
+	--g-play-b2: #ddd;
+	--g-play-sh: #888;
+
+	--f-h-b1: rgba(255,255,255,0.2);
+	--f-play-bg: #F3E7E6;
+	--f-play-fg: #0D100F;
+	--f-sel-sh: #fff;
+	--f-gray: #555;
+
+	--fm-off: #888;
+	--mp-sh: #000;
+
+	--err-fg: #fff;
+	--err-bg: #c00;
+	--err-b1: #f44;
+	--err-ts: #600;
+
+	text-shadow: none;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
+}
+
+/* CRT scanlines — white on black, 1px/4px like portfolio */
+html.jz body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9999;
+	background: repeating-linear-gradient(
+		0deg,
+		rgba(255,255,255,0.06) 0px,
+		rgba(255,255,255,0.06) 1px,
+		transparent 1px,
+		transparent 4px
+	);
+	background-size: 100% 4px;
+	animation: crt-scan-drift 8s linear infinite;
+}
+
+/* subtle vignette */
+html.jz body::after {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9998;
+	background: radial-gradient(
+		ellipse at center,
+		transparent 55%,
+		rgba(0,0,0,0.5) 100%
+	);
+}
+
+html.jz #tt {
+	border-color: #333;
+	box-shadow: 0 24px 80px rgba(0,0,0,0.16);
+}
+
+html.jz #files tbody tr:hover td,
+html.jz #files tbody tr:hover td+td {
+	box-shadow: 0 0 0 1px var(--fg) inset;
+}
+
+html.jz #files thead th {
+	border-bottom: 1px solid var(--fg);
+}
+
+html.jz #path {
+	color: var(--fg-max);
+}
+
+html.jz a:hover {
+	color: var(--a-hil);
+}
+
+/* Light variant — cream bg, black text, pure monochrome */
+html.jy {
+	color-scheme: light;
+
+	--fg: #0D100F;
+	--fg-max: #000;
+	--fg-weak: #6B6560;
+	--fg2-max: #000;
+
+	--bg-d3: #B0AA9F;
+	--bg-d2: #C4BEB3;
+	--bg-d1: #D4CFC4;
+	--bg: #F0ECE3;
+	--bg-u1: #F0ECE3;
+	--bg-u2: #E8E3D8;
+	--bg-u3: #DDD8CF;
+	--bg-u4: #B0AA9F;
+	--bg-u5: #C4BEB3;
+	--bg-u6: #D4CFC4;
+	--bg-max: #fff;
+	--bgg: #F0ECE3;
+
+	--tab-alt: #6B6560;
+	--row-alt: #E8E3D8;
+
+	--scroll: #6B6560;
+
+	--sel-fg: #F0ECE3;
+	--sel-bg: #0D100F;
+
+	--a: #0D100F;
+	--a-b: #333;
+	--a-hil: #000;
+	--a-gray: #888;
+	--a-dark: #6B6560;
+
+	--btn-fg: #0D100F;
+	--btn-bg: rgba(0,0,0,0.045);
+	--btn-h-fg: #000;
+	--btn-h-bg: rgba(0,0,0,0.08);
+	--btn-1-fg: #F0ECE3;
+	--btn-1-bg: #0D100F;
+	--btn-1h-fg: #F0ECE3;
+	--btn-1h-bg: #000;
+
+	--chk-fg: var(--fg);
+	--txt-sh: #aaa;
+	--txt-bg: rgba(0,0,0,0.045);
+
+	--sort-1: #0D100F;
+	--sort-2: #6B6560;
+
+	--sz-b: #888;
+	--sz-k: #6B6560;
+	--sz-m: #444;
+	--sz-g: #0D100F;
+
+	--srv-1: #6B6560;
+	--srv-2: #444;
+	--srv-3: #0D100F;
+
+	--tree-bg: #F0ECE3;
+
+	--g-bg: var(--bg-u2);
+	--g-b1: var(--bg-u5);
+	--g-b2: var(--bg-u6);
+	--g-g1: var(--bg-u2);
+	--g-g2: var(--bg-u5);
+	--g-f-bg: var(--bg-u4);
+	--g-f-b1: var(--bg-u5);
+	--g-fg: var(--fg);
+	--g-sh: rgba(0,0,0,0.06);
+	--g-sel-fg: #F0ECE3;
+	--g-sel-bg: #0D100F;
+	--g-sel-b1: #333;
+	--g-sel-sh: #6B6560;
+	--g-fsel-bg: #333;
+	--g-fsel-b1: #0D100F;
+	--g-fsel-ts: #6B6560;
+	--g-play-bg: #0D100F;
+	--g-play-b1: #333;
+	--g-play-b2: #000;
+	--g-play-sh: #6B6560;
+
+	--f-h-b1: rgba(0,0,0,0.2);
+	--f-play-bg: #0D100F;
+	--f-play-fg: #F0ECE3;
+	--f-sel-sh: #000;
+	--f-gray: #888;
+
+	--fm-off: #6B6560;
+	--mp-sh: #B0AA9F;
+	--mp-b-bg: transparent;
+
+	text-shadow: none;
+	font-family: var(--font-mono), 'scp', monospace, monospace;
+}
+
+/* CRT scanlines — black on light, 1px/4px */
+html.jy body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9999;
+	background: repeating-linear-gradient(
+		0deg,
+		rgba(0,0,0,0.05) 0px,
+		rgba(0,0,0,0.05) 1px,
+		transparent 1px,
+		transparent 4px
+	);
+	background-size: 100% 4px;
+	animation: crt-scan-drift 8s linear infinite;
+}
+
+/* gentle vignette */
+html.jy body::after {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	z-index: 9998;
+	background: radial-gradient(
+		ellipse at center,
+		transparent 60%,
+		rgba(0,0,0,0.12) 100%
+	);
+}
+
+html.jy #tt {
+	border-color: #B0AA9F;
+	box-shadow: 0 24px 80px rgba(0,0,0,0.08);
+}
+
+html.jy #files tbody tr:hover td,
+html.jy #files tbody tr:hover td+td {
+	box-shadow: 0 0 0 1px var(--fg) inset;
+}
+
+html.jy #files thead th {
+	border-bottom: 1px solid var(--fg);
+}
+
+html.jy #path {
+	color: var(--fg-max);
+}
+
+html.jy a:hover {
+	color: var(--a-hil);
+}
+

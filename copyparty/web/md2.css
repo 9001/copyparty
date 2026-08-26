@@ -117,3 +117,17 @@ html.z #helpbox {
 	border: 1px solid #079;
 	border-width: 1px 0;
 }
+html.fz #helpbox,
+html.gz #helpbox {
+	box-shadow: 0 .5em 2em #444;
+	background: #222;
+	border: 1px solid #079;
+	border-width: 1px 0;
+}
+html.fy #helpbox,
+html.gy #helpbox {
+	box-shadow: 0 .5em 2em #777;
+	background: #f7f7f7;
+	border: 1px solid #079;
+	border-width: 1px 0;
+}

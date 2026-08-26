@@ -1,0 +1,125 @@
+/* ============================================================
+   Feather Icons CSS — Paper & Vibrant themes
+   Complements feather.js: the CSS-content emojis (grid folder
+   icons, sort arrows) become Feather SVG icons via masks, and
+   the .cpr-ico SVGs injected by feather.js are aligned nicely.
+   ============================================================ */
+
+/* ------------------------------------------------------------------
+   Feather SVGs injected by feather.js (toolbars, buttons, player)
+   -- inherit size from the surrounding text, align to baseline
+------------------------------------------------------------------- */
+html.fz svg.cpr-ico,
+html.fy svg.cpr-ico,
+html.gz svg.cpr-ico,
+html.gy svg.cpr-ico,
+html.hz svg.cpr-ico,
+html.hy svg.cpr-ico,
+html.iz svg.cpr-ico,
+html.iy svg.cpr-ico,
+html.jz svg.cpr-ico,
+html.jy svg.cpr-ico {
+  vertical-align: -0.18em;
+  display: inline-block;
+  flex: none;
+  pointer-events: none;
+}
+
+/* keep feather icons at 1em regardless of the up2k progress-circle
+   sizing rule that targets generic #ops a svg elements */
+html.fz #ops a svg.cpr-ico,
+html.fy #ops a svg.cpr-ico,
+html.gz #ops a svg.cpr-ico,
+html.gy #ops a svg.cpr-ico,
+html.hz #ops a svg.cpr-ico,
+html.hy #ops a svg.cpr-ico,
+html.iz #ops a svg.cpr-ico,
+html.iy #ops a svg.cpr-ico,
+html.jz #ops a svg.cpr-ico,
+html.jy #ops a svg.cpr-ico,
+html.fz a svg.cpr-ico,
+html.fy a svg.cpr-ico,
+html.gz a svg.cpr-ico,
+html.gy a svg.cpr-ico,
+html.hz a svg.cpr-ico,
+html.hy a svg.cpr-ico,
+html.iz a svg.cpr-ico,
+html.iy a svg.cpr-ico,
+html.jz a svg.cpr-ico,
+html.jy a svg.cpr-ico {
+  width: 1em;
+  height: 1em;
+  margin: 0;
+}
+
+/* server info (hostname + disk usage) centered at the top */
+html.fz #srv_info,
+html.fy #srv_info,
+html.gz #srv_info,
+html.gy #srv_info {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ------------------------------------------------------------------
+   Folder icon in grid view (CSS content "📂" on .dir:before)
+------------------------------------------------------------------- */
+html.fz #ggrid>a.dir:before,
+html.fy #ggrid>a.dir:before,
+html.gz #ggrid>a.dir:before,
+html.gy #ggrid>a.dir:before {
+  content: "";
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z'/%3E%3C/svg%3E") center/contain no-repeat;
+  font-size: 2em;
+  display: block;
+  padding: .3em 0;
+}
+
+/* Vaporwave + Yandesign — no folder icon */
+html.iz #ggrid>a.dir:before,
+html.iy #ggrid>a.dir:before,
+html.jz #ggrid>a.dir:before,
+html.jy #ggrid>a.dir:before {
+  content: none;
+}
+
+/* ------------------------------------------------------------------
+   Sort indicators on column headers (CSS content "⌃" / "⌄")
+   -- Feather chevron-down / chevron-up
+------------------------------------------------------------------- */
+html.fz .s0:after,
+html.fy .s0:after,
+html.gz .s0:after,
+html.gy .s0:after,
+html.fz .s1:after,
+html.fy .s1:after,
+html.gz .s1:after,
+html.gy .s1:after {
+  content: "";
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") center/contain no-repeat;
+  font-size: .8em;
+  width: .95em;
+  height: .95em;
+  margin-left: .25em;
+}
+html.fz .s0r:after,
+html.fy .s0r:after,
+html.gz .s0r:after,
+html.gy .s0r:after,
+html.fz .s1r:after,
+html.fy .s1r:after,
+html.gz .s1r:after,
+html.gy .s1r:after {
+  content: "";
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='18 15 12 9 6 15'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpolyline points='18 15 12 9 6 15'/%3E%3C/svg%3E") center/contain no-repeat;
+  font-size: .8em;
+  width: .95em;
+  height: .95em;
+  margin-left: .25em;
+}

@@ -159,6 +159,7 @@ if (1)
 		"wt_prev": "previous track$NHotkey: J",
 		"wt_play": "play / pause$NHotkey: P",
 		"wt_next": "next track$NHotkey: L",
+		"wt_mute": "mute / unmute volume",
 
 		"ul_par": "parallel uploads:",
 		"ut_rand": "randomize filenames",
@@ -786,6 +787,11 @@ for (var a = 0; a < LANGS.length; a++) {
 				console.log("E missing TL", LANGS[i2], k);
 				t2[k] = t1[k];
 			}
+		for (var k in t2)
+			if (!t1[k] && !/^ht_.5$/.test(k)) {
+				console.log("E missing TL", LANGS[i1], k);
+				t1[k] = t2[k];
+			}
 	}
 }
 }
@@ -801,7 +807,6 @@ modal.load();
 
 // toolbar
 ebi('ops').innerHTML = (
-	'<a href="#" id="opa_x" data-dest="" tt="' + L.ot_close + '">--</a>' +
 	'<a href="#" id="opa_srch" data-perm="read" data-dep="idx" data-dest="search" tt="' + L.ot_search + '">🔎</a>' +
 	(have_del ? '<a href="#" id="opa_del" data-perm="write" data-dest="unpost" tt="' + L.ot_unpost + '">🧯</a>' : '') +
 	'<a href="#" id="opa_up" data-dest="up2k">🚀</a>' +
@@ -815,6 +820,31 @@ ebi('ops').innerHTML = (
 	'<div id="opdesc"></div>'
 );
 
+function setDefaultCover() {
+	var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	svg.setAttribute('viewBox', '0 0 100 100');
+	svg.setAttribute('width', '100%');
+	svg.setAttribute('height', '100%');
+	var circle1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+	circle1.setAttribute('cx', '50');
+	circle1.setAttribute('cy', '50');
+	circle1.setAttribute('r', '48');
+	circle1.setAttribute('fill', 'var(--a)');
+	circle1.setAttribute('stroke', 'var(--a-dark)');
+	circle1.setAttribute('stroke-width', '.5');
+	var circle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+	circle2.setAttribute('cx', '50');
+	circle2.setAttribute('cy', '50');
+	circle2.setAttribute('r', '12');
+	circle2.setAttribute('fill', 'var(--fg-max)');
+	svg.appendChild(circle1);
+	svg.appendChild(circle2);
+	var np_img = ebi('np_img');
+	if (np_img) {
+		np_img.innerHTML = '';
+		np_img.appendChild(svg);
+	}
+}
 
 // media player
 ebi('widget').innerHTML = (
@@ -846,23 +876,26 @@ ebi('widget').innerHTML = (
 	'</div>' +
 	'<div id="widgeti">' +
 	'	<div id="pctl"><a href="#" id="bprev" tt="' + L.wt_prev + '">⏮</a><a href="#" id="bplay" tt="' + L.wt_play + '">▶</a><a href="#" id="bnext" tt="' + L.wt_next + '">⏭</a></div>' +
-	'	<canvas id="pvol" width="288" height="38"></canvas>' +
-	'	<canvas id="barpos"></canvas>' +
-	'	<canvas id="barbuf"></canvas>' +
+	'	<div id="volctl"><a href="#" id="bmute" tt="' + L.wt_mute + '">🔊</a><canvas id="pvol" width="288" height="38"></canvas></div>' +
 	'</div>' +
 	'<div id="np_inf">' +
-	'	<img id="np_img" />' +
+	'	<div id="np_img"></div>' +
 	'	<span id="np_url"></span>' +
 	'	<span id="np_circle"></span>' +
 	'	<span id="np_album"></span>' +
 	'	<span id="np_tn"></span>' +
-	'	<span id="np_artist"></span>' +
-	'	<span id="np_title"></span>' +
+	'	<span id="np_meta">' +
+	'		<span id="np_title"></span>' +
+	'		<span id="np_artist"></span>' +
+	'		<canvas id="barpos"></canvas>' +
+	'		<canvas id="barbuf"></canvas>' +
+	'	</span>' +
 	'	<span id="np_pos"></span>' +
 	'	<span id="np_dur"></span>' +
 	'</div>'
 );
 
+	setDefaultCover();
 
 // up2k ui
 ebi('op_up2k').innerHTML = (
@@ -1145,6 +1178,44 @@ ebi('rcm').innerHTML = (
 	}
 })();
 
+/* side-panel close (✕ in the panel header) */
+(function () {
+	var x = ebi('opside_x');
+	if (x)
+		x.onclick = function (e) { ev(e); goto(''); swrite('oppanel', '0'); };
+})();
+
+/* keep the panel below the top bar: the bar's height varies by
+   theme (classic themes float it with a margin) and its sticky
+   offset changes on scroll, so track its real bottom edge */
+(function () {
+	var bar = ebi('ops'), side = ebi('opside');
+	function place() {
+		if (bar && side)
+			side.style.top = bar.getBoundingClientRect().bottom + 'px';
+	}
+	place();
+	window.addEventListener('resize', place);
+	window.addEventListener('scroll', place, true);
+	window.addEventListener('load', place);
+})();
+
+var panel_names = {
+	'search': 'Search', 'unpost': 'Unpost', 'up2k': 'Upload', 'bup': 'Upload',
+	'mkdir': 'New folder', 'new_md': 'New file', 'msg': 'Server log', 'cfg': 'Settings', 'player': 'Player',
+};
+
+/* open the panel on a specific tab without the full goto() chain
+   (safe to call during early page init) */
+function open_panel(dest) {
+	var lnk = QS('#ops>a[data-dest=' + dest + ']');
+	if (lnk) clmod(lnk, 'act', 1);
+	clmod(ebi('op_' + dest), 'act', 1);
+	clmod(document.documentElement, 'op_open', 1);
+	panel_title(dest);
+	swrite('oppanel', '1');
+}
+
 
 function opclick(e) {
 	var dest = this.getAttribute('data-dest');
@@ -1163,8 +1234,16 @@ function opclick(e) {
 		tt.skip = true;
 		input.focus();
 	}
+
+	swrite('oppanel', dest ? '1' : '0');
 }
 
+
+function panel_title(dest) {
+	var o = ebi('opside_title');
+	if (o)
+		o.textContent = dest ? panel_names[dest] || dest : '';
+}
 
 function goto(dest) {
 	var obj = QSA('.opview.act');
@@ -1197,7 +1276,8 @@ function goto(dest) {
 			fn();
 	}
 
-	clmod(document.documentElement, 'op_open', dest);
+	clmod(document.documentElement, 'op_open', dest ? dest : '');
+	panel_title(dest);
 
 	if (treectl)
 		treectl.onscroll();
@@ -1641,10 +1721,11 @@ var mpl = (function () {
 		ebi('np_title').textContent = np.title || '';
 		ebi('np_dur').textContent = np['.dur'] || '';
 		ebi('np_url').textContent = uricom_dec(get_evpath()) + np.file.split('?')[0];
-		if (!MOBILE && cover)
-			ebi('np_img').setAttribute('src', cover);
-		else
-			ebi('np_img').removeAttribute('src');
+		if (!MOBILE && cover) {
+			ebi('np_img').innerHTML = '<img src="' + cover + '" alt="cover" />';
+		} else {
+			setDefaultCover();
+		}
 
 		navigator.mediaSession.metadata = new MediaMetadata(tags);
 		navigator.mediaSession.setActionHandler('play', mplay);
@@ -1725,6 +1806,7 @@ function MPlayer() {
 	r.tracks = {};
 	r.order = [];
 	r.cd_pause = 0;
+	r.muted = false;
 
 	var re_audio = have_acode && mpl.ac_oth ? re_au_all : re_au_native,
 		trs = QSA('#files tbody tr');
@@ -1766,6 +1848,13 @@ function MPlayer() {
 
 		if (r.au)
 			r.au.volume = r.expvol(r.vol);
+
+		// Update mute button icon and style if it exists
+		if (ebi('bmute')) {
+			ebi('bmute').innerHTML = r.muted ? '🔇' : '🔊';
+			if (window.feather) feather.walk();
+			clmod(ebi('bmute'), 'muted', r.muted ? 1 : 0);
+		}
 	};
 
 	r.shuffle = function () {
@@ -1998,6 +2087,7 @@ var widget = (function () {
 		if (was_paused != paused) {
 			was_paused = paused;
 			ebi('bplay').innerHTML = paused ? '▶' : '⏸';
+		if (window.feather) feather.walk();
 		}
 	};
 	r.setvis = function () {
@@ -2199,9 +2289,7 @@ var pbar = (function () {
 
 		if (gradh != gk) {
 			gradh = gk;
-			grad = glossy_grad(bc, dz ? 120 : 85,
-				dy ? [0, 0, 0, 0] : [35, 40, 37, 35],
-				dy ? [20, 24, 22, 20] : light ? [45, 56, 50, 45] : [42, 51, 47, 42]);
+			grad = 'rgba(128,128,128,0.4)';
 		}
 		bctx.fillStyle = grad;
 		for (var a = 0; a < mp.au.buffered.length; a++) {
@@ -2329,7 +2417,6 @@ var vbar = (function () {
 	var r = {},
 		gradh = -1,
 		lastv = -1,
-		untext = -1,
 		can, ctx, w, h, grad1, grad2;
 
 	r.onresize = function () {
@@ -2339,8 +2426,6 @@ var vbar = (function () {
 		r.can = canvas_cfg(ebi('pvol'));
 		can = r.can.can;
 		ctx = r.can.ctx;
-		ctx.font = '.7em sans-serif';
-		ctx.fontVariantCaps = 'small-caps';
 		w = r.can.w;
 		h = r.can.h;
 		r.draw();
@@ -2352,35 +2437,20 @@ var vbar = (function () {
 
 		var gh = h + '' + light,
 			dz = themen == 'dz',
-			dy = themen == 'dy';
+			dy = themen == 'dy',
+			rootStyles = getComputedStyle(document.documentElement);
 
 		if (gradh != gh) {
 			gradh = gh;
-			grad1 = glossy_grad(r.can, dz ? 120 : 50,
-				dy ? [0, 0, 0, 0] : light ? [50, 55, 52, 48] : [45, 52, 47, 43],
-				dy ? [20, 24, 22, 20] : light ? [54, 60, 52, 47] : [42, 51, 47, 42]);
-			grad2 = glossy_grad(r.can, dz ? 120 : 205,
-				dz ? [100, 100, 100, 100] : dy ? [0, 0, 0, 0] : [10, 15, 13, 10],
-				dz ? [10, 14, 12, 10] : dy ? [90, 90, 90, 90] : [16, 20, 18, 16]);
+			grad1 = rootStyles.getPropertyValue('--a').trim();
+			grad2 = 'rgba(150,150,150,0.4)';
 		}
 		ctx.fillStyle = grad2; ctx.fillRect(0, 0, w, h);
 		ctx.fillStyle = grad1; ctx.fillRect(0, 0, w * mp.vol, h);
 
-		var vt = 'volume ' + Math.floor(mp.vol * 100),
-			tw = ctx.measureText(vt).width,
-			x = w * mp.vol - tw - 8,
-			li = dy;
+		// Texte du volume retiré comme demandé
 
-		if (mp.vol < 0.5) {
-			x += tw + 16;
-			li = !li;
-		}
-
-		ctx.fillStyle = li ? '#fff' : '#210';
-		ctx.fillText(vt, x, h / 3 * 2);
-
-		clearTimeout(untext);
-		untext = setTimeout(r.draw, 1000);
+		// Plus besoin de timeout puisque le texte n'est plus affiché
 	};
 	onresize100.add(r.onresize, true);
 
@@ -2560,6 +2630,31 @@ function playpause(e) {
 	mpl.pp();
 };
 
+function toggle_mute(e) {
+	ev(e);
+	if (!mp)
+		return;
+
+	mp.muted = !mp.muted;
+	if (mp.au)
+		mp.au.muted = mp.muted;
+
+	var muteBtn = ebi('bmute');
+	if (!muteBtn)
+		return;
+
+	muteBtn.innerHTML = mp.muted ? '🔇' : '🔊';
+	if (window.feather) feather.walk();
+
+	// Update button style
+	clmod(muteBtn, 'muted', mp.muted ? 1 : 0);
+
+	// Update volume bar visibility
+	var volBar = ebi('pvol');
+	if (volBar)
+		volBar.style.opacity = mp.muted ? '0.5' : '1';
+}
+
 
 function mplay(e) {
 	if (mp.au && !mp.au.paused)
@@ -2585,6 +2680,7 @@ function mpause(e) {
 	ebi('bplay').onclick = playpause;
 	ebi('bprev').onclick = prev_song;
 	ebi('bnext').onclick = next_song;
+	ebi('bmute').onclick = toggle_mute;
 
 	var bar = ebi('barpos');
 
@@ -3330,6 +3426,7 @@ function play(tid, is_ev, seek) {
 	mp.au.pt0 = Date.now();
 	mp.au.evp = get_evpath();
 	mp.au.volume = mp.expvol(mp.vol);
+	mp.au.muted = mp.muted;
 	var trs = QSA('#files tr.play');
 	for (var a = 0, aa = trs.length; a < aa; a++)
 		clmod(trs[a], 'play');
@@ -6285,7 +6382,7 @@ var ahotkeys = function (e) {
 			return ebi('sh_abrt').click();
 
 		if (QS('.opview.act'))
-			return QS('#ops>a').click();
+			return QS('#ops>a.act').click();
 
 		if (widget.is_open)
 			return widget.close();
@@ -8093,6 +8190,12 @@ function apply_perms(res) {
 			'<form id="flogout" method="post" enctype="multipart/form-data"><input type="hidden" name="act" value="logout" /><input id="blogout" type="submit" value="' + L.logout + acct + '"></form>' :
 			'<a href="' + dst + '">' + L.login + '</a>');
 
+	/* move server-info + account into the top bar (#ops) so the
+	   sticky header keeps them visible; idempotent on re-run */
+	var tb = ebi('ops'), ts = ebi('srv_info'), ta = ebi('acc_info');
+	if (tb && ts && ts.parentNode != tb) tb.appendChild(ts);
+	if (tb && ta && ta.parentNode != tb) tb.appendChild(ta);
+
 	var o = QSA('#ops>a[data-perm]');
 	for (var a = 0; a < o.length; a++) {
 		var display = '';
@@ -8522,8 +8625,19 @@ var settheme = (function () {
 	};
 
 	theme = sread('cpp_thm') || 'a';
-	if (!/^[a-x][yz]/.exec(theme))
-		theme = dtheme;
+	if (!/^[a-x][yz]/.exec(theme)) {
+		/* dtheme is an integer (0-13 from --theme), convert to letter class */
+		var n = parseInt(dtheme);
+		if (!isNaN(n) && n >= 0) {
+			light = n % 2 == 1;
+			var c = ax[Math.floor(n / 2)];
+			var l = light ? 'y' : 'z';
+			theme = c + l + ' ' + c + ' ' + l;
+			themen = c + l;
+		} else {
+			theme = dtheme;
+		}
+	}
 
 	themen = theme.split(/ /)[0];
 	light = !!(theme.indexOf('y') + 1);
@@ -8542,7 +8656,7 @@ var settheme = (function () {
 		var html = [],
 			cb = ebi('themes'),
 			itheme = ax.indexOf(theme[0]) * 2 + (light ? 1 : 0),
-			names = ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95'];
+			names = window.theme_names || ['classic dark', 'classic light', 'pm-monokai', 'flat light', 'vice', 'hotdog stand', 'hacker', 'hi-con', 'phi95 dark', 'phi95', 'paper dark', 'paper light', 'vibrant dark', 'vibrant light', 'CRT terminal', 'CRT terminal light', 'vaporwave', 'vaporwave light', 'Yandesign', 'Yandesign light'];
 
 		for (var a = 0; a < themes; a++)
 			html.push('<option value="{0}">{0} ┃ {1}</option>'.format(a, names[a] || 'custom'));
@@ -8558,6 +8672,23 @@ var settheme = (function () {
 		}
 
 		bcfg_set('light', light);
+
+		/* update favicon per theme */
+		var favs = {
+			'f': ['p', 'FAFAF7', 'C2212F'],
+			'g': ['v', '0B0E14', '22D3EE'],
+		};
+		var fv = favs[themen[0]];
+		if (fv && favico) {
+			favico.txt = fv[0];
+			favico.fg = fv[1];
+			favico.bg = fv[2];
+			favico.upd();
+		}
+
+		/* feather icons */
+		if (window.feather) feather.walk();
+
 	}
 
 	r.onsel = function () {
@@ -9975,6 +10106,13 @@ function reload_mp() {
 		if (el)
 			clmod(el, 'play', 1);
 	}
+	
+	// Initialize mute button icon and style
+	if (ebi('bmute') && mp) {
+		ebi('bmute').innerHTML = mp.muted ? '🔇' : '🔊';
+		if (window.feather) feather.walk();
+		clmod(ebi('bmute'), 'muted', mp.muted ? 1 : 0);
+	}
 
 	setTimeout(pbar.onresize, 1);
 }
@@ -10262,5 +10400,23 @@ var mpss = (function() {
 })();
 
 treectl.hydrate();
+
+/* show the side panel by default on first visit; remember the
+   user's open/close choice afterwards. Retries briefly because
+   up2k.js resets panel state during its own init. */
+(function () {
+	var n = 0;
+	function attempt() {
+		if (document.documentElement.classList.contains('op_open'))
+			return;
+		if (sread('oppanel') == '0')
+			return;
+		if (ebi('opside'))
+			open_panel(sread('opmode') || 'cfg');
+		if (++n < 20)
+			setTimeout(attempt, 250);
+	}
+	setTimeout(attempt, 150);
+})();
 
 J_BRW = 2;

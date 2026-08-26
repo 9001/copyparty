@@ -154,3 +154,11 @@ html.z .editor-toolbar::before {
 html.z .mdo {
 	background: #1c1c1c;
 }
+html.fz .mdo,
+html.gz .mdo {
+	background: #1c1c1c;
+}
+html.fy .mdo,
+html.gy .mdo {
+	background: #f7f7f7;
+}

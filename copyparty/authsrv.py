@@ -13,7 +13,7 @@ import threading
 import time
 from datetime import datetime
 
-from .__init__ import ANYWIN, CFG_DEF, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
+from .__init__ import ANYWIN, CFG_DEF, MACOS, PY2, THEME_NAMES, TYPE_CHECKING, WINDOWS, E
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
 from .pwhash import PWHash
@@ -3346,6 +3346,7 @@ class AuthSrv(object):
                 "dfszf": self.args.ui_filesz.strip("-"),
                 "dgauto": self.args.gauto,
                 "themes": self.args.themes,
+                "theme_names": THEME_NAMES,
                 "turbolvl": self.args.turbo,
                 "nosubtle": self.args.nosubtle,
                 "u2j": self.args.u2j,

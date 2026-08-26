@@ -257,3 +257,19 @@ html.bz {
 html.bz .vols img {
 	filter: sepia(0.8) hue-rotate(180deg);
 }
+html.fz {
+	color: #FAFAF7;
+	background: #1A1A1A;
+}
+html.fy {
+	color: #1A1A1A;
+	background: #FAFAF7;
+}
+html.gz {
+	color: #E8ECF4;
+	background: #0B0E14;
+}
+html.gy {
+	color: #1A1E2A;
+	background: #F0F2F8;
+}

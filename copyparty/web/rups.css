@@ -105,3 +105,56 @@ html.bz #wrap th {
 html.z #wrap tr:hover td {
 	background: #000;
 }
+html.fz {
+	background: #1A1A1A;
+	color: #FAFAF7;
+}
+html.fy {
+	background: #FAFAF7;
+	color: #1A1A1A;
+}
+html.gz {
+	background: #0B0E14;
+	color: #E8ECF4;
+}
+html.gy {
+	background: #F0F2F8;
+	color: #1A1E2A;
+}
+html.fz a,
+html.gz a {
+	color: #fff;
+	background: #057;
+	border-color: #37a;
+}
+html.fy a,
+html.gy a {
+	color: #047;
+	background: #fff;
+	border-color: #8ab;
+}
+html.fz input[type=text],
+html.gz input[type=text] {
+	color: #ddd;
+	background: #223;
+	border: none;
+	border-bottom: 1px solid #fc5;
+	border-radius: .2em;
+	padding: .2em .3em;
+}
+html.fz #wrap th,
+html.gz #wrap th {
+	background: #222;
+}
+html.fy #wrap th,
+html.gy #wrap th {
+	background: #eaeaea;
+}
+html.fz #wrap tr:hover td,
+html.gz #wrap tr:hover td {
+	background: #000;
+}
+html.fy #wrap tr:hover td,
+html.gy #wrap tr:hover td {
+	background: #fff;
+}

@@ -3,19 +3,30 @@
 	--font-serif: serif;
 	--font-mono: 'scp';
 
-	--fg: #ccc;
-	--fg-max: #fff;
-	--bg-u2: #2b2b2b;
-	--bg-u5: #444;
+	--fg: #333;
+	--fg-max: #000;
+	--bg-u2: #ffffff;
+	--bg-u5: #f8f8f8;
 }
 html.y {
 	--fg: #222;
 	--fg-max: #000;
-	--bg-u2: #f7f7f7;
-	--bg-u5: #ccc;
+	--bg-u2: #ffffff;
+	--bg-u5: #f8f8f8;
 }
 html.bz {
-	--bg-u2: #202231;
+	--bg-u2: #f0f0f0;
+}
+html.fz {
+	--bg-u2: #ffffff;
+	--font-family: 'Inter', sans-serif;
+	--font-serif: 'EB Garamond', Georgia, serif;
+	--font-mono: 'JetBrains Mono', monospace;
+}
+html.gz {
+	--bg-u2: #ffffff;
+	--font-family: 'Space Grotesk', sans-serif;
+	--font-mono: 'JetBrains Mono', monospace;
 }
 @font-face {
 	font-family: 'scp';
@@ -432,7 +443,11 @@ html.y textarea:focus {
 	font-size: .96em;
 }
 html.z .mdo a>code,
-html.y .mdo a>code {
+html.y .mdo a>code,
+html.fz .mdo a>code,
+html.fy .mdo a>code,
+html.gz .mdo a>code,
+html.gy .mdo a>code {
 	color: inherit;
 	background: inherit;
 	background: rgba(0, 0, 0, 0.2);

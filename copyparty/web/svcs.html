@@ -9,6 +9,7 @@
 	<meta name="theme-color" content="#{{ tcolor }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/splash.css?_={{ ts }}">
 	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/ui.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/feather.css?_={{ ts }}">
 	<style>ul{padding-left:1.3em}li{margin:.4em 0}.txa{float:right;margin:0 0 0 1em}</style>
 {{ html_head }}
 </head>
@@ -355,10 +356,11 @@ var SR="{{ r }}",
 	dfavico="{{ favico }}";
 
 var STG = window.localStorage;
-document.documentElement.className = (STG && STG.cpp_thm) || "{{ args.theme }}";
+document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme }}";
 
 </script>
 <script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
+<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/feather.js?_={{ ts }}"></script>
 <script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/svcs.js?_={{ ts }}"></script>
 {%- if js %}
 <script nonce="{{ js_nonce }}" src="{{ js }}_={{ ts }}"></script>

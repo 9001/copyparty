@@ -29,6 +29,7 @@ from .__init__ import (
     MACOS,
     PY2,
     PY36,
+    THEME_NAMES,
     UNIX,
     VT100,
     WINDOWS,
@@ -2023,7 +2024,7 @@ def add_og(ap):
 
 
 def add_ui(ap, retry: int):
-    THEMES = 10
+    THEMES = len(THEME_NAMES)
     ap2 = ap.add_argument_group("ui options")
     ap2.add_argument("--grid", action="store_true", help="show grid/thumbnails by default (volflag=grid)")
     ap2.add_argument("--gsel", action="store_true", help="select files in grid by ctrl-click (volflag=gsel)")
