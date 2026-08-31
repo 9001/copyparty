@@ -659,6 +659,7 @@ Ls.tur = {
 	"rc_pla": "ses olarak oynat", //m
 	"rc_txt": "dosya görüntüleyicide aç", //m
 	"rc_md": "metin düzenleyicide aç", //m
+	"rc_wopi": "office düzenleyicide aç", //m
 	"rc_dl": "i̇ndir", //m
 	"rc_zip": "arşiv olarak indir", //m
 	"rc_cpl": "bağlantıyı kopyala", //m

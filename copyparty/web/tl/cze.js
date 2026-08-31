@@ -663,6 +663,7 @@ Ls.cze = {
 	"rc_pla": "přehrát jako zvuk", //m
 	"rc_txt": "otevřít v prohlížeči souborů", //m
 	"rc_md": "otevřít v textovém editoru", //m
+	"rc_wopi": "otevřít v office editoru", //m
 	"rc_dl": "stáhnout", //m
 	"rc_zip": "stáhnout jako archiv", //m
 	"rc_cpl": "kopírovat odkaz", //m

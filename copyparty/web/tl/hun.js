@@ -660,6 +660,7 @@ Ls.hun = {
 	"rc_pla": 'lejátszás audióként',
 	"rc_txt": 'megnyitás szövegként',
 	"rc_md": 'megnyitás markdownként',
+	"rc_wopi": "megnyitás office szerkesztőben", //m
 	"rc_dl": 'letöltés',
 	"rc_zip": 'letöltés archívumként',
 	"rc_cpl": 'link másolása',
