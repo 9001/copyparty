@@ -51,4 +51,4 @@ copyparty performs buffered reading, so expect multiple `read()` calls, respect 
 
 ## some other known plugins seen on the internets
 
-* [fpkg_thumb](https://github.com/kamaeff/copyparty-dumb-fpkgi-handler/blob/master/fpkg_thumb.py) extracts cover images from playstation4 software installation packages ("pkg" and "fpkg" files)
+* [fpkg_thumb](https://github.com/kamaeff/fpkg-vault/blob/1c248de62a9ff9c4088d4b3e7962023cde9d6426/old/fpkg_thumb.py) extracts cover images from playstation4 software installation packages ("pkg" and "fpkg" files)
