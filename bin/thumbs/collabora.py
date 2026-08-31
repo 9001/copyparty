@@ -34,49 +34,49 @@ import mimetypes
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-COLLABORA_INSTANCE_URL = 'http://collabora:9980'
+COLLABORA_INSTANCE_URL = "http://collabora:9980"
 BOUNDARY_CHARS = string.ascii_letters + string.digits
 
 
 def main(abspath, **kwargs):
-    boundary = 'CopypartyFormData' + ''.join(random.choices(BOUNDARY_CHARS, k=53))
+    boundary = "CopypartyFormData" + "".join(random.choices(BOUNDARY_CHARS, k=53))
     start, end = make_headers(abspath, boundary)
     size = len(start) + os.path.getsize(abspath) + len(end)
     request = Request(
-        COLLABORA_INSTANCE_URL + '/cool/convert-to/png',
-        method='POST',
+        COLLABORA_INSTANCE_URL + "/cool/convert-to/png",
+        method="POST",
         data=iterate(start, abspath, end),
         headers={
-            'Content-Type': f'multipart/form-data; boundary={boundary}',
-            'Content-Length': str(size)
-        }
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+            "Content-Length": str(size),
+        },
     )
 
     file_like = Wrapper(request)
     offset, whence, length = 0, 0, None
 
-    return 'png', file_like, offset, whence, length
+    return "png", file_like, offset, whence, length
 
 
 def make_headers(abspath, boundary):
     """stuff to wrap file contents by for multipart"""
 
-    fname = 'file.' + abspath.rsplit('.', 1)[-1]
-    ftype = mimetypes.guess_file_type(fname)[0] or 'application/octet-stream'
+    fname = "file." + abspath.rsplit(".", 1)[-1]
+    ftype = mimetypes.guess_file_type(fname)[0] or "application/octet-stream"
     start = (
-        f'--{boundary}\r\n'
+        f"--{boundary}\r\n"
         f'Content-Disposition: form-data; name="data"; filename="{fname}"\r\n'
-        f'Content-Type: {ftype}\r\n\r\n'
+        f"Content-Type: {ftype}\r\n\r\n"
     )
-    end = f'\r\n--{boundary}--'
-    return bytes(start, 'ascii'), bytes(end, 'ascii')
+    end = f"\r\n--{boundary}--"
+    return bytes(start, "ascii"), bytes(end, "ascii")
 
 
 def iterate(start, fpath, end):
     """docs may be big so read and send them in chunks"""
 
     yield start
-    with open(fpath, 'rb') as f:
+    with open(fpath, "rb") as f:
         while True:
             b = f.read(32768)
             if not b:
@@ -101,7 +101,7 @@ class Wrapper:
             return 0
 
         try:
-            # the heavy part: 
+            # the heavy part:
             # - reading probably big file
             # - sending it over the network
             # - making collabora do some work
