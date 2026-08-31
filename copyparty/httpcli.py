@@ -4974,14 +4974,15 @@ class HttpCli(object):
 
                 a, b = hrange.split("=", 1)[1].split("-")
 
+                if b.strip():
+                    upper = 1 + int(b.strip())
+                else:
+                    upper = file_sz
+
                 if a.strip():
                     lower = int(a.strip())
                 else:
-                    lower = 0
-
-                if b.strip():
-                    upper = int(b.strip()) + 1
-                else:
+                    lower = 1 + file_sz - upper
                     upper = file_sz
 
                 if upper > file_sz:
