@@ -108,6 +108,13 @@ function qsr(sel) {
 }
 
 
+function relod() {
+    crashed = 1;
+    window.gtfo = 1;
+    location.href = location.href;
+}
+
+
 // error handler for mobile devices
 function esc(txt) {
     return txt.replace(/[&"<>]/g, function (c) {
@@ -289,7 +296,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     var x = ebi('exh_wipecfg');
     if (x) x.onclick = function () {
         localStorage.clear();
-        location.reload();
+        relod();
     };
     x = ebi('exh_ignex'); if (x) x.onclick = ignex;
     x = ebi('exh_ignexa'); if (x) x.onclick = ignexa;
@@ -2021,6 +2028,12 @@ var modal = (function () {
             q.shift()();
     }
 
+    r.die = function (html) {
+        crashed = 1;
+        if (r.busy)
+            r.hide();
+        _alert(lf2br(html), relod);
+    };
     r.alert = function (html, cb, fun) {
         q.push(function () {
             _alert(lf2br(html), cb, fun);

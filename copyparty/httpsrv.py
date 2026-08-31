@@ -180,7 +180,7 @@ class HttpSrv(object):
         self.u2idx_free: dict[str, U2idx] = {}
         self.u2idx_n = 0
 
-        self.wopi_files: dict[str, dict[str, str]] = {}
+        self.wopi_files: dict[str, dict[str, Any]] = {}
 
         assert jinja2  # type: ignore  # !rm
         env = jinja2.Environment()

@@ -84,6 +84,7 @@ built in Norway 🇳🇴 with contributions from [not-norway](https://github.com
         * [exclude-patterns](#exclude-patterns) - to save some time
         * [filesystem guards](#filesystem-guards) - avoid traversing into other filesystems
         * [periodic rescan](#periodic-rescan) - filesystem monitoring
+    * [u2sz](#u2sz) - configure upload-chunking
     * [upload rules](#upload-rules) - set upload rules using volflags
     * [compress uploads](#compress-uploads) - files can be autocompressed on upload
     * [chmod and chown](#chmod-and-chown) - per-volume filesystem-permissions and ownership
@@ -922,7 +923,7 @@ note that since up2k has to read each file twice, `[🎈] bup` can *theoreticall
 
 if you are resuming a massive upload and want to skip hashing the files which already finished, you can enable `turbo` in the `[⚙️] config` tab, but please read the tooltip on that button
 
-if the server is behind a proxy which imposes a request-size limit, you can configure up2k to sneak below the limit with server-option `--u2sz` (the default is 96 MiB to support Cloudflare)
+if the server is behind a proxy which imposes a request-size limit, you can configure up2k to sneak below the limit with server-option [--u2sz](#u2sz)
 
 if you want to replace existing files on the server with new uploads by default, run with `--u2ow 2` (only works if users have the delete-permission, and can still be disabled with `🛡️` in the UI)
 
@@ -1824,6 +1825,23 @@ config file example:
   flags:
     scan: 900
 ```
+
+
+## u2sz
+
+configure upload-chunking;  the default `64,96` is optimal for nearly every scenario, however:
+
+* if you are seeing the message `bad server config; see "u2sz" in readme` then you have a proxy/CDN/whatever with a `max-request-body-size` which is too small, and you must either increase the limit in the reverseproxy config to at least 96 MiB (recommended) or reduce the target chunksize in copyparty (continue reading)
+
+the global-option `--u2sz` is two numbers, `target,max` MiB of each chunk to send, aiming for `target` MiB and allowing up-to-and-including `max` MiB [depending on filesize](./docs/devnotes.md#list-of-chunk-sizes), and if you only specify one number then it sets that for both
+
+cloudflare max is 96 MiB, but if you have a reverseproxy (or CDN/WAF/whatever) which is more restrictive, then try some of the following:
+
+* `u2sz: 32` is still acceptable performance in most cases
+* `u2sz: 8` is the lowest recommended value; anything lower will reduce performance over long physical distances and/or shitty routes
+* `u2sz: 1` is the absolute minimum, and will be slow in many cases
+
+the setting can also be changed in the web-UI; the textbox next to `date-chk` in the settings tab
 
 
 ## upload rules

@@ -34,7 +34,7 @@ from .__init__ import ANYWIN, PY2, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
-from .qrkode import QrCode, qr2svg, qrgen
+from .qrkode import qr2svg, qrgen
 from .star import StreamTar
 from .sutil import StreamArc, gfilter
 from .szip import StreamZip
@@ -849,6 +849,11 @@ class HttpCli(object):
                     self.asrv.vfs.get(
                         wopi_f["vp"], uname, True, True, False, self.args.wopi_wdel
                     )
+                    vn, rem = self.asrv.vfs.get(
+                        self.vpath, uname, True, True, False, self.args.wopi_wdel
+                    )
+                    if vn.vpath != "wopi":
+                        raise Exception("bad url")
                     self.uname = uname
                 except Exception as ex:
                     self.conn.hsrv.wopi_files.pop(wopi_a, None)
@@ -1578,13 +1583,17 @@ class HttpCli(object):
             if "wopi" in self.uparam:
                 return self.tx_wopi()
 
-            if self.vpath.startswith("wopi"):
+            if self.vn.vpath == "wopi":
                 return self.tx_wopi_api()
 
         return self.tx_browser()
 
     def tx_wopi_api(self) -> bool:
-        atoken = self.uparam["access_token"]
+        try:
+            atoken = self.uparam["access_token"]
+        except:
+            raise Pebkac(400, "wopi access_token is mandatory")
+
         session = self.conn.hsrv.wopi_files[atoken]
         if self.do_log:
             self.log(" `-- wopi: %r" % (session["vp"],))
@@ -1620,6 +1629,7 @@ class HttpCli(object):
         return self.tx_404()
 
     def tx_wopi(self) -> bool:
+        self.asrv.vfs.get("wopi", self.uname, True, True, False, self.args.wopi_wdel)
         vpath = vjoin(self.vpath, self.uparam["wopi"])
         vfs, rem = self.asrv.vfs.get(
             vpath, self.uname, True, True, False, self.args.wopi_wdel
@@ -1649,7 +1659,8 @@ class HttpCli(object):
                 raise Pebkac(500, "too many wopi sessions")
             if not found:
                 atoken = ub64enc(os.urandom(18)).decode("ascii")  #  18 = 144b = 24c
-                file_id = ub64enc(os.urandom(15)).decode("ascii")  # 15 = 120b = 20c
+                zb = (vpath + self.args.wopi_salt).encode("utf-8", "replace")
+                file_id = ub64enc(hashlib.sha512(zb).digest()[:15]).decode("ascii")
                 wopi_files[atoken] = session = {
                     "vp": vpath,
                     "uname": self.uname,
@@ -1657,7 +1668,9 @@ class HttpCli(object):
                     "expires": time.time() + self.args.wopi_ttl,
                 }
 
-        xml = "?"
+        assert atoken and session  # type: ignore  # !rm
+
+        xml = url = "?"
         try:
             from .dxml import parse_xml
 
@@ -1695,7 +1708,8 @@ class HttpCli(object):
             url += quotep(zs + "/wopi/files/" + session["file_id"])
         except:
             del wopi_files[atoken]  # dont reuse an atoken wopi-client doesnt like
-            self.log("reading WOPI-client response failed; %s\n%s" % (min_ex(), xml), 3)
+            t = "reading WOPI-client response from %s failed; %s\n%s"
+            self.log(t % (url, min_ex(), xml), 3)
             raise Pebkac(500, "wopi error (see fileserver log)")
 
         html = self.j2s(
@@ -1703,7 +1717,7 @@ class HttpCli(object):
             title=self.uparam["wopi"],
             url=url,
             atoken=atoken,
-            ttl=session["expires"],
+            ttl=int(session["expires"] * 1000),
         ).encode("utf-8", "replace")
 
         self.reply(html, 200, "text/html; charset=utf-8")
@@ -3332,7 +3346,7 @@ class HttpCli(object):
         try:
             postsize = remains = int(self.headers["content-length"])
         except:
-            raise Pebkac(400, "you must supply a content-length for binary POST")
+            raise Pebkac(411)
 
         if self.args.wopi and self.vpath.startswith("wopi"):
             return self.rx_wopi(postsize)
@@ -3549,7 +3563,11 @@ class HttpCli(object):
         return True
 
     def rx_wopi(self, postsize: int) -> bool:
-        atoken = self.uparam["access_token"]
+        try:
+            atoken = self.uparam["access_token"]
+        except:
+            raise Pebkac(400, "wopi access_token is mandatory")
+
         session = self.conn.hsrv.wopi_files[atoken]
         if self.do_log:
             self.log(" `-- wopi: %r" % (session["vp"],))
@@ -3558,8 +3576,7 @@ class HttpCli(object):
         if not self.vpath.startswith(zs):
             return self.tx_404()
 
-        vpath = self.conn.hsrv.wopi_files[self.uparam["access_token"]]["vp"]
-        vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
+        vfs, rem = self.asrv.vfs.get(session["vp"], self.uname, False, True)
         vpath = vjoin(vfs.vpath, rem)
         ap = vfs.canonical(rem)
         st = bos.stat(ap)
@@ -4374,7 +4391,7 @@ class HttpCli(object):
             mfile2 = "{}.{:.3f}.{}".format(fname, srv_lastmod, fext)
 
             dp = ""
-            hist_cfg = dbv.flags["md_hist"]
+            hist_cfg = vfs.flags["md_hist"]
             if hist_cfg == "v":
                 vrd = vsplit(vrem)[0]
                 zb = hashlib.sha512(afsenc(vrd)).digest()
@@ -4397,7 +4414,7 @@ class HttpCli(object):
                     pass
             if dp:
                 atomic_move(self.log, fp, os.path.join(dp, mfile2), vfs.flags)
-                nmax = dbv.flags["md_nhist"]
+                nmax = vfs.flags["md_nhist"]
                 if nmax:
                     zs = r"%s\.[0-9]+\.[0-9]{3}\.%s"
                     ptn = re.compile(zs % (re.escape(fname), re.escape(fext)))
@@ -4957,14 +4974,15 @@ class HttpCli(object):
 
                 a, b = hrange.split("=", 1)[1].split("-")
 
+                if b.strip():
+                    upper = 1 + int(b.strip())
+                else:
+                    upper = file_sz
+
                 if a.strip():
                     lower = int(a.strip())
                 else:
-                    lower = 0
-
-                if b.strip():
-                    upper = int(b.strip()) + 1
-                else:
+                    lower = 1 + file_sz - upper
                     upper = file_sz
 
                 if upper > file_sz:
@@ -5023,8 +5041,13 @@ class HttpCli(object):
         else:
             mime = guess_mime(cdis)
 
-        if mime not in SAFE_MIMES and "nohtml" in self.vn.flags and oh_k != "oh_g":
-            mime = safe_mime(mime)
+        if mime not in SAFE_MIMES:
+            if "nohtml" in self.vn.flags and oh_k != "oh_g":
+                mime = safe_mime(mime)
+            elif mime == "image/svg+xml" and "allow_svg_js" not in self.vn.flags:
+                oh_k = "oh_g"
+                if "nonce-" not in self.vn.flags[oh_k]:
+                    mime = safe_mime(mime)
 
         self.out_headers["Accept-Ranges"] = "bytes"
         logmsg += unicode(status) + logtail
@@ -6149,6 +6172,8 @@ class HttpCli(object):
                     continue
                 try:
                     dvn, drem = vfs.get(vjoin(top, x), self.uname, False, False)
+                    if not dvn.realpath and not dvn.nodes:
+                        continue
                     if (
                         self.uname not in dvn.axs.uread
                         and self.uname not in dvn.axs.uwrite
@@ -7078,10 +7103,10 @@ class HttpCli(object):
             and (use_filekey or use_dirkey or (not is_dir and "fk" not in vn.flags))
         ):
             if th_fmt is not None:
-                nothumb = "dthumb" in dbv.flags
+                nothumb = "dthumb" in vn.flags
                 if is_dir:
                     vrem = vrem.rstrip("/")
-                    cvs = dbv.flags["th_coversl"]
+                    cvs = vn.flags["th_coversl"]
                     if nothumb or not cvs:
                         pass
                     elif icur and vrem:
@@ -7445,20 +7470,18 @@ class HttpCli(object):
         dirs = []
         files = []
         ptn_hr = RE_HR
-        use_abs_url = is_opds or (
-            vpath and not is_ls and not is_js and not self.trailing_slash
-        )
+
+        base = ""
+        if is_opds or (vpath and not (is_ls or is_js or self.trailing_slash)):
+            if is_opds:
+                base = self.args.SRS
+                if vpath:
+                    base += vpath + "/"
+            else:
+                base = "/" + vpath + "/"
+
         for fn in ls_names:
-            base = ""
-            href = fn
-            if use_abs_url:
-                if is_opds:
-                    base = self.args.SRS
-                    if vpath:
-                        base += vpath + "/"
-                else:
-                    base = "/" + vpath + "/"
-                href = base + fn
+            href = base + fn
 
             if fn in vfs_virt:
                 fspath = vfs_virt[fn].realpath
@@ -7829,7 +7852,7 @@ class HttpCli(object):
                 ).urn
                 item["iso8601"] = "%sZ" % (item["dt"].replace(" ", "T"),)
 
-                if "rmagic" in self.vn.flags:
+                if "rmagic" in vf:
                     ap = "%s/%s" % (fsroot, item["name"])
                     item["mime"] = guess_mime(item["name"], ap)
                 else:
@@ -7839,8 +7862,8 @@ class HttpCli(object):
                 if (
                     not self.args.th_no_jpg
                     and self.thumbcli
-                    and "dthumb" not in dbv.flags
-                    and "dithumb" not in dbv.flags
+                    and "dthumb" not in vf
+                    and "dithumb" not in vf
                 ):
                     item["jpeg_thumb_href"] = href + "&th=jf"
                     item["jpeg_thumb_href_hires"] = item["jpeg_thumb_href"] + "3"
@@ -7893,6 +7916,10 @@ class HttpCli(object):
                         ext in self.thumbcli.fmt_pil
                         or ext in self.thumbcli.fmt_vips
                         or ext in self.thumbcli.fmt_ffi
+                        or (
+                            ext in self.thumbcli.thumbable
+                            and ext not in self.thumbcli.thumbable_native
+                        )
                     )
                     is_vid = ext in self.thumbcli.fmt_ffv
                     is_au = ext in self.thumbcli.fmt_ffa

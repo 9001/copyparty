@@ -352,7 +352,7 @@ RE_MEMAVAIL = re.compile("^MemAvailable:.* kB")
 
 if PY2:
 
-    def umktrans(s1, s2):
+    def umktrans(s1: str, s2: str):
         return {ord(c1): ord(c2) for c1, c2 in zip(s1, s2)}
 
 else:

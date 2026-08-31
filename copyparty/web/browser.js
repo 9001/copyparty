@@ -759,7 +759,7 @@ if (window.glang && navigator.languages && !/\bcplng=/.test(document.cookie))
 				if (window.stop)
 					window.stop();
 				document.body.innerHTML = 'Loading ' + n;
-				setck("cplng=" + n, location.reload.bind(location));
+				setck("cplng=" + n, relod);
 				crashed = true;
 				throw 1;
 			}
@@ -1248,8 +1248,8 @@ check_image_support('jxl', "data:image/jxl;base64,/woIAAAMABKIAgC4AF3lEgA=");
 
 
 var img_re = APPLE ?
-	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
-	/\.(a?png|avif|bmp|gif|jpe?g|jfif|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
+	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jfif|jxl|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
+	/\.(a?png|avif|bmp|gif|jpe?g|jfif|jxl|svg|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
 
 var wopi_set = !window.have_wopi ? null :
 	new Set('odt fodt ott doc docx dotx rtf odm ods fods ots xls xlsx odp fodp otp ppt pptx ppsx odg fodg otg odf'.split(' '));
@@ -1794,7 +1794,7 @@ function MPlayer() {
 				continue;
 
 			tid = tid.slice(1);
-			if (r.tracks[tid]) 
+			if (r.tracks[tid])
 				order.push(tid);
 		}
 		r.order = order;
@@ -5696,8 +5696,8 @@ var thegrid = (function () {
 			fid = oth.getAttribute('id'),
 			aplay = ebi('a' + fid),
 			atext = ebi('t' + fid),
-			is_txt = atext && !/\.ts$/.test(href) && showfile.getlang(href),
 			is_img = img_re.test(href),
+			is_txt = atext && !is_img && !/\.ts$/.test(href) && showfile.getlang(href),
 			is_dir = href.endsWith('/'),
 			is_srch = !!ebi('unsearch'),
 			in_tree = is_dir && treectl.find(oth.textContent.slice(0, -1)),
@@ -7698,7 +7698,7 @@ var treectl = (function () {
 
 			if (wopi_set && wopi_set.has(tn.ext))
 				tn.lead = '<a href="?wopi=' + bhref +
-					'" rel="nofollow" name="' + hname + '">📄</a>';
+					'" rel="nofollow" target="_blank" name="' + hname + '">📄</a>';
 
 			if (tn.lead == '-')
 				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +
@@ -8628,7 +8628,7 @@ var setfszf = (function () {
 		setck('cplng=' + lang);
 		freshen();
 		var t = L.tt == 'English' ? '' : Ls.eng.lang_set;
-		modal.confirm(L.lang_set + "\n\n" + t, location.reload.bind(location), null);
+		modal.confirm(L.lang_set + "\n\n" + t, relod, null);
 	}
 
 	freshen();
@@ -9339,6 +9339,7 @@ function sandbox(tgt, rules, allow, cls, html) {
 	fr.setAttribute('sandbox', rules ? 'allow-' + rules.replace(/ /g, ' allow-') : '');
 	fr.setAttribute('allow', allow);
 	fr.setAttribute('srcdoc', html);
+	tgt.innerHTML = '';
 	tgt.appendChild(fr);
 	treectl.sb_msg = true;
 	return true;
@@ -10040,19 +10041,19 @@ function reload_browser() {
 	var selbox = null;
 	var ttimer = null;
 
-	var lpdelay = 250; 
+	var lpdelay = 250;
 	var mvthresh = 44;
 
 	function unbox() {
 		qsr('.selbox');
 		ebi('gfiles').style.removeProperty('pointer-events')
 		ebi('wrap').style.removeProperty('user-select')
-		
+
 		if (selbox) {
 			console.log(selbox)
 			window.getSelection().removeAllRanges();
 		}
-		
+
 		is_selma = false;
 		dragging = false;
 		fwrap = null;
@@ -10085,7 +10086,7 @@ function reload_browser() {
 	function sel_start(e) {
 		if (e.button !== 0 && e.type !== 'touchstart') return;
 		if (!thegrid.en || !treectl.dsel) return;
-		if (e.target.closest('#widget,#ops,.opview,.doc')) return;
+		if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open')) return;
 
 		if (e.target.closest('#gfiles'))
 			ebi('gfiles').style.userSelect = "none";
@@ -10095,7 +10096,7 @@ function reload_browser() {
 		starty = pos.y;
 		is_selma = true;
 		ttimer = null;
-		
+
 		if (e.type === 'touchstart') {
 			ttimer = setTimeout(function() {
 				ttimer = null;
@@ -10103,7 +10104,7 @@ function reload_browser() {
 			}, lpdelay);
 		}
 	}
-	
+
 	function start_drag() {
 		if (dragging) return;
 
@@ -10114,7 +10115,7 @@ function reload_browser() {
 
 		ebi('gfiles').style.pointerEvents = 'none';
 	}
-	
+
 	function sel_move(e) {
 		if (!is_selma) return;
 		var pos = getpp(e);
@@ -10131,7 +10132,7 @@ function reload_browser() {
 		if (!dragging && dist > mvthresh && !window.getSelection().toString()) {
 			if (e.target instanceof Element)
 				fwrap = e.target.closest('#wrap');
-			if (fwrap) 
+			if (fwrap)
 				fwrap.style.userSelect = 'none';
 			else return;
 			start_drag();
@@ -10180,7 +10181,7 @@ function reload_browser() {
 			}
 		});
 	}
-	
+
 	dsel_init();
 })();
 
@@ -10223,7 +10224,7 @@ var mpss = (function() {
 
 		var gain = afilt.ssg.gain;
 		var duration = ae.duration || 0;
-	
+
 		var slimit = duration * (config.sthresh / 100);
 		var elimit = duration * (1 - (config.etresh / 100));
 		var in_limits = ae.currentTime < slimit || ae.currentTime > elimit;

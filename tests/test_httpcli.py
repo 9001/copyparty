@@ -104,6 +104,22 @@ class TestHttpCli(unittest.TestCase):
                     eprint("\033[33m{}\n# {}\033[0m".format(ret, furl))
                     self.fail()
 
+                if tctr == 1:
+                    # http206
+                    full = ret
+                    self.hcurl(furl, "Range: bytes=0-0", full[:1])
+                    self.hcurl(furl, "Range: bytes=0-4", full[0:5])
+                    self.hcurl(furl, "Range: bytes=1-4", full[1:5])
+                    self.hcurl(furl, "Range: bytes=-1", full[-1:])
+                    self.hcurl(furl, "Range: bytes=-7", full[-7:])
+                    self.hcurl(furl, "Range: bytes=0-", full)
+                    self.hcurl(furl, "Range: bytes=1-", full[1:])
+                    self.hcurl(furl, "Range: bytes=2-", full[2:])
+                    for zs in ("0--1", "--1", "-0", ""):
+                        h, _ = self.hcurl(furl, "Range: bytes=" + zs, None)
+                        self.assertEqual(h.split(" ")[1], "416")
+                    return
+
                 # file browser: html
                 h, ret = self.curl(durl)
                 res = "'{}'".format(self.fn) in ret
@@ -242,6 +258,15 @@ class TestHttpCli(unittest.TestCase):
             return [h.decode("utf-8"), b]
 
         return conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
+
+    def hcurl(self, url, hdr, expected):
+        zs = "GET /%s HTTP/1.1\r\n%s\r\nCookie: cppwd=o\r\nConnection: close\r\n\r\n"
+        conn = self.conn.setbuf((zs % (url, hdr)).encode("utf-8"))
+        HttpCli(conn).run()
+        h, rsp = conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
+        if expected is not None:
+            self.assertEqual(rsp, expected)
+        return h, rsp
 
     def propfind(self, url, depth=1):
         zs = "PROPFIND /%s HTTP/1.1\r\nDepth: %d\r\nPW: o\r\nConnection: close\r\n\r\n"

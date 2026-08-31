@@ -33,6 +33,7 @@ def vf_bmap() -> dict[str, str]:
         "vol_or_crash": "assert_root",
     }
     for k in (
+        "allow_svg_js",
         "dedup",
         "dlni",
         "dothidden",
@@ -316,6 +317,7 @@ flagcats = {
         "dvthumb": "disables video thumbnails",
         "dathumb": "disables audio thumbnails (spectrograms)",
         "dithumb": "disables image thumbnails",
+        "dethumb": "disables custom thumbnails (--th-extract)",
         "pngquant": "compress audio waveforms 33% better",
         "thsize": "thumbnail res; WxH",
         "crop": "center-cropping (y/n/fy/fn)",
@@ -385,6 +387,7 @@ flagcats = {
         "csp_dl": "content-security-policy for static files",
         "nohtml": "return html and markdown as text/html",
         "noscript": "disable most javascript by use of CSP",
+        "allow_svg_js": "allow javascript in svg images",
         "ui_noacci": "hide account-info in the UI",
         "ui_nocpla": "hide cpanel-link in the UI",
         "ui_nolbar": "hide link-bar in the UI",

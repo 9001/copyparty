@@ -23,6 +23,7 @@ import uuid
 
 from .__init__ import (
     ANYWIN,
+    CFG_DEF,
     CORES,
     EXE,
     MACOS,
@@ -63,6 +64,7 @@ from .util import (
     URL_BUG,
     URL_PRJ,
     Daemon,
+    absreal,
     align_tab,
     b64enc,
     ctypes,
@@ -104,10 +106,6 @@ except:
 
 u = unicode
 zsid = uuid.uuid4().urn[4:]
-
-CFG_DEF = [os.environ.get("PRTY_CONFIG", "")]
-if not CFG_DEF[0]:
-    CFG_DEF.pop()
 
 FULL_HELP = os.environ.get("PRTY_FULL_HELP", "")
 
@@ -780,6 +778,54 @@ def get_sects():
             + build_flags_desc(),
         ],
         [
+            "thumb-ex",
+            "extract thumbnails from custom file formats with python scripts",
+            dedent(
+                """
+            copyparty is able to extract thumbnails from various media formats:
+            images, audio, video, ebooks
+
+            if you want to extract thumbnails from unsupported file formats,
+            you can load a plugin, which extracts image data from custom formats
+
+            load the plugin using --args; for example \033[36m
+             --tx-extract iso,mdf,dmg=~/party-thumb-extractors/th_diskimg.py
+            \033[0m
+            the file must define the function \033[35mmain(abspath, **kwargs)\033[0m:
+             \033[35mabspath\033[0m: path to the file to extract thumbnail from
+             \033[35mkwargs\033[0m currently have:
+             \033[35mvn\033[0m: the VFS which contains the requested file
+             \033[35mrth_srv\033[0m: the copyparty ThumbSrv instance
+
+            if `main` couldn't extract a thumbnail, it must return None;
+            otherwise the return value must be a tuple:
+             \033[35mreturn fmt, stream, offset, whence, size\033[0m
+
+            > \033[32mfmt\033[0m: thumbnail format, should be one of the formats
+                supported by copyparty; e.g. "png", "jpg"
+
+            > \033[32mstream\033[0m: binary file-like object containing the thumbnail,
+                supporting seek(), read(), and close() methods
+
+            > \033[32moffset, whence\033[0m: arguments to seek() method;
+                stream.seek(offset, whence) will be called once before copyparty
+                starts reading from the stream
+
+            > \033[32msize\033[0m: number of bytes to read ftom the stream;
+                if negative, copyparty will read through the end of the stream;
+
+            you can also supply extractors for standard formats to override default
+            thumbnail extraction behaviour; for example \033[36m
+             --tx-extract mp3=~/party-thumb-extractors/th_mp3.py
+            \033[0mwill let you extract or generate custom thumbnails for mp3 files
+
+            \033[1;35mPS!\033[0m the folder that contains the python file should ideally
+              not contain many other python files, and especially nothing
+              with filenames that overlap with modules used by copyparty
+            """
+            ),
+        ],
+        [
             "handlers",
             "use plugins to handle certain events",
             dedent(
@@ -1338,7 +1384,7 @@ def add_upload(ap):
     ap2.add_argument("--turbo", metavar="LVL", type=int, default=0, help="configure turbo-mode in up2k client; [\033[32m-1\033[0m] = forbidden/always-off, [\033[32m0\033[0m] = default-off and warn if enabled, [\033[32m1\033[0m] = default-off, [\033[32m2\033[0m] = on, [\033[32m3\033[0m] = on and disable datecheck")
     ap2.add_argument("--nosubtle", metavar="N", type=int, default=0, help="when to use a wasm-hasher instead of the browser's builtin; faster on chrome, but buggy in older chrome versions. [\033[32m0\033[0m] = only when necessary (non-https), [\033[32m1\033[0m] = always (all browsers), [\033[32m2\033[0m] = always on chrome/firefox, [\033[32m3\033[0m] = always on chrome, [\033[32mN\033[0m] = chrome-version N and newer (recommendation: 137)")
     ap2.add_argument("--u2j", metavar="JOBS", type=int, default=2, help="web-client: number of file chunks to upload in parallel; 1 or 2 is good when latency is low (same-country), 2~4 for android-clients, 2~6 for cross-atlantic. Max is 6 in most browsers. Big values increase network-speed but may reduce HDD-speed")
-    ap2.add_argument("--u2sz", metavar="N,N,N", type=u, default="1,64,96", help="web-client: default upload chunksize (MiB); sets \033[33mmin,default,max\033[0m in the settings gui. Each HTTP POST will aim for \033[33mdefault\033[0m, and never exceed \033[33mmax\033[0m. Cloudflare max is 96. Big values are good for cross-atlantic but may increase HDD fragmentation on some FS. Disable this optimization with [\033[32m1,1,1\033[0m]")
+    ap2.add_argument("--u2sz", metavar="N,N", type=u, default="64,96", help="web-client: default upload chunksize in MiB, either \033[33mtarget,max\033[0m or just \033[33mtarget\033[0m (sets both); this is \033[33mtarget\033[0m in the web-UI. Each HTTP POST will aim for \033[33mtarget\033[0m and never exceed \033[33mmax\033[0m. Cloudflare max is 96. Minimum is [\033[32m1\033[0m] and will be slow. Lowest recommended is [\033[32m8\033[0m]. Big values are good for cross-atlantic but may increase HDD fragmentation on some FS. Disable this optimization with [\033[32mno\033[0m]")
     ap2.add_argument("--u2ow", metavar="NUM", type=int, default=0, help="web-client: default setting for when to replace/overwrite existing files; [\033[32m0\033[0m]=never, [\033[32m1\033[0m]=if-client-newer, [\033[32m2\033[0m]=always (volflag=u2ow)")
     ap2.add_argument("--u2sort", metavar="TXT", type=u, default="s", help="upload order; [\033[32ms\033[0m]=smallest-first, [\033[32mn\033[0m]=alphabetical, [\033[32mfs\033[0m]=force-s, [\033[32mfn\033[0m]=force-n -- alphabetical is a bit slower on fiber/LAN but makes it easier to eyeball if everything went fine")
     ap2.add_argument("--write-uplog", action="store_true", help="write POST reports to textfiles in working-directory")
@@ -1585,9 +1631,10 @@ def add_opds(ap):
 def add_wopi(ap):
     ap2 = ap.add_argument_group("WOPI options")
     ap2.add_argument("--wopi", action="store_true", help="enable integration with office suites using WOPI")
+    ap2.add_argument("--wopi-accs", metavar="TXT", type=u, default="", help="restrict wopi to this comma-separated list of usernames; default is everyone")
     ap2.add_argument("--wopi-api", metavar="URL", type=u, default="", help="URL that the WOPI-client should use to communicate with copyparty; default is same as user's webbrowser. Example: [\033[32mhttps://party.example.com/\033[0m]")
     ap2.add_argument("--wopi-url", metavar="URL", type=u, default="", help="URL to your WOPI client; the host of e.g. Collabora Online. Example: [\033[32mhttps://code.example.com/\033[0m]")
-    ap2.add_argument("--wopi-urls", metavar="HOST=URL", type=u, action="append", help="\033[34mREPEATABLE:\033[0m maps http \033[33mHOST\033[0m copyparty being accessed by to specific WOPI client instance \033[33mURL\033[0m; falls back to \033[33m--wopi-url\033[0m; examples: [\033[32mparty.public.com=https://office.public.com/\033[0m], [\033[32mparty.internal.net:8443=https://office.internal.net:8443/\033[0m]")
+    ap2.add_argument("--wopi-urls", metavar="H=U", type=u, action="append", help="\033[34mREPEATABLE:\033[0m maps http \033[33mH\033[0mOST copyparty being accessed by to specific WOPI client instance \033[33mU\033[0mRL; falls back to \033[33m--wopi-url\033[0m; examples: [\033[32mparty.public.com=https://office.public.com/\033[0m], [\033[32mparty.internal.net:8443=https://office.internal.net:8443/\033[0m]")
     ap2.add_argument("--wopi-crt", metavar="TXT", type=u, default="", help="if \033[33m--wopi-url\033[0m is selfsigned: path to ca.pem or cert.pem to expect/verify (can be [\033[32mno\033[0m] for full-yolo)")
     ap2.add_argument("--wopi-crt-icn", action="store_true", help="if \033[33m--wopi-url\033[0m is selfsigned: ignore the CN (server ip/name) in cert")
     ap2.add_argument("--wopi-ttl", metavar="SEC", type=int, default=1800, help="session lifetime; allow editing for this many seconds (default is 30 min)")
@@ -1632,6 +1679,7 @@ def add_yolo(ap):
     ap2 = ap.add_argument_group("yolo options")
     ap2.add_argument("--allow-csrf", action="store_true", help="disable csrf protections; let other domains/sites impersonate you through cross-site requests; \033[1;31mDANGEROUS\033[0m / LAN-only")
     ap2.add_argument("--cookie-lax", action="store_true", help="allow cookies from other domains (if you follow a link from another website into your server, you will arrive logged-in); this reduces protection against CSRF")
+    ap2.add_argument("--allow-svg-js", action="store_true", help="allow svg images to execute javascript; default-disabled because ~nobody wants it (volflag=allow_svg_js)")
     ap2.add_argument("--no-fnugg", action="store_true", help="disable the smoketest for caching-related issues in the web-UI")
     ap2.add_argument("--getmod", action="store_true", help="permit ?move=[...] and ?delete as GET -- \033[1;31mDANGEROUS\033[0m, removes csrf protection")
     ap2.add_argument("--wo-up-readme", action="store_true", help="allow users with write-only access to upload logues and readmes without adding the _wo_ filename prefix (volflag=wo_up_readme)")
@@ -1737,7 +1785,7 @@ def add_safety(ap):
         ap2.add_argument("--use-bwrap", metavar="TXT", type=u, default="n", help=argparse.SUPPRESS)
 
 
-def add_salt(ap, fk_salt, dk_salt, ah_salt):
+def add_salt(ap, fk_salt, dk_salt, ah_salt, wopi_salt):
     ap2 = ap.add_argument_group("salting options")
     ap2.add_argument("--ah-alg", metavar="ALG", type=u, default="none", help="account-pw hashing algorithm; one of these, best to worst: \033[32margon2 scrypt sha2 none\033[0m (each optionally followed by alg-specific comma-sep. config)")
     ap2.add_argument("--ah-salt", metavar="SALT", type=u, default=ah_salt, help="account-pw salt; ignored if \033[33m--ah-alg\033[0m is none (default)")
@@ -1746,6 +1794,7 @@ def add_salt(ap, fk_salt, dk_salt, ah_salt):
     ap2.add_argument("--fk-salt", metavar="SALT", type=u, default=fk_salt, help="per-file accesskey salt; used to generate unpredictable URLs for hidden files")
     ap2.add_argument("--dk-salt", metavar="SALT", type=u, default=dk_salt, help="per-directory accesskey salt; used to generate unpredictable URLs to share folders with users who only have the 'get' permission")
     ap2.add_argument("--warksalt", metavar="SALT", type=u, default="hunter2", help="up2k file-hash salt; serves no purpose, no reason to change this (but delete all databases if you do)")
+    ap2.add_argument("--wopi-salt", metavar="TXT", type=u, default=wopi_salt, help="WOPI file ID salt; used by \033[33m--wopi\033[0m for persistent file IDs")
     ap2.add_argument("--show-ah-salt", action="store_true", help="on startup, print the effective value of \033[33m--ah-salt\033[0m (the autogenerated value in $XDG_CONFIG_HOME unless otherwise specified)")
     ap2.add_argument("--show-fk-salt", action="store_true", help="on startup, print the effective value of \033[33m--fk-salt\033[0m (the autogenerated value in $XDG_CONFIG_HOME unless otherwise specified)")
     ap2.add_argument("--show-dk-salt", action="store_true", help="on startup, print the effective value of \033[33m--dk-salt\033[0m (the autogenerated value in $XDG_CONFIG_HOME unless otherwise specified)")
@@ -1839,8 +1888,19 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,cbz,dds,dib,epub,fit,fits,fts,gif,hdr,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,kra,ora,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,qoi,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="3gp,asf,av1,avc,avi,flv,h264,h265,hevc,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,ts,vob,webm,wmv", help="video formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bcstm,bfstm,brstm,bonk,dfpwm,dts,flac,gsm,ilbc,it,itgz,itxz,itz,m4a,m4b,m4r,mdgz,mdxz,mdz,mka,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,oga,ogg,okt,opus,ra,s3m,s3gz,s3xz,s3z,tak,tta,ulaw,wav,wma,wv,xm,xmgz,xmxz,xmz,xpk", help="audio formats to decode using ffmpeg")
+
+    ap2.add_argument("--th-pil-add", metavar="T", type=u, default="", help="add or remove image formats to decode using pillow listed in \033[33m--th-r-pil\033[0m; example: [\033[32mfb2,pdf,-psd,-bmp\033[0m] (add fb2 and pdf, remove psd and bmp)")
+    ap2.add_argument("--th-vips-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for pyvips")
+    ap2.add_argument("--th-raw-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for rawpy/libraw")
+    ap2.add_argument("--th-ffi-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for ffmpeg images")
+    ap2.add_argument("--th-ffv-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for ffmpeg videos")
+    ap2.add_argument("--th-ffa-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for ffmpeg audio")
+
     ap2.add_argument("--th-spec-cnv", metavar="T", type=u, default="it,itgz,itxz,itz,mdgz,mdxz,mdz,mo3,mod,s3m,s3gz,s3xz,s3z,xm,xmgz,xmxz,xmz,xpk", help="audio formats which provoke https://trac.ffmpeg.org/ticket/10797 (huge ram usage for s3xmodit spectrograms)")
     ap2.add_argument("--au-unpk", metavar="E=F.C", type=u, default="mdz=mod.zip, mdgz=mod.gz, mdxz=mod.xz, s3z=s3m.zip, s3gz=s3m.gz, s3xz=s3m.xz, xmz=xm.zip, xmgz=xm.gz, xmxz=xm.xz, itz=it.zip, itgz=it.gz, itxz=it.xz, cbz=jpg.cbz, epub=jpg.epub, kra=png.kra, ora=png.ora", help="audio/image formats to decompress before passing to ffmpeg")
+    ap2.add_argument("--th-extract", metavar="T", type=u, action="append", help="\033[34mREPEATABLE:\033[0m list of file extensions to thumbnail using a custom plugin (a python script); example: [\033[32mmdf,iso,dmg=/thumbs/diskimg.py\033[0m], see --help-thumb-ex")
+    ap2.add_argument("--th-extr-sz", metavar="M", type=int, default=16, help="max num megabytes to allow \033[33m--th-extract\033[0m plugins to extract from each file")
+    ap2.add_argument("--hot-th-extr", action="store_true", help="recompile extractors on each thumbnail extraction -- expensive but convenient when hacking on stuff")
 
 
 def add_transcoding(ap):
@@ -2078,6 +2138,7 @@ def run_argparse(
     fk_salt = get_salt("fk", 18)
     dk_salt = get_salt("dk", 30)
     ah_salt = get_salt("ah", 18)
+    wopi_salt = get_salt("wopi", 18)
 
     # alpine peaks at 5 threads for some reason,
     # all others scale past that (but try to avoid SMT),
@@ -2114,7 +2175,7 @@ def run_argparse(
     add_opds(ap)
     add_wopi(ap)
     add_safety(ap)
-    add_salt(ap, fk_salt, dk_salt, ah_salt)
+    add_salt(ap, fk_salt, dk_salt, ah_salt, wopi_salt)
     add_optouts(ap)
     add_shutdown(ap)
     add_yolo(ap)
@@ -2216,6 +2277,9 @@ def main(argv: Optional[list[str]] = None) -> None:
             Daemon(sfx_tpoke, "sfx-tpoke", (zs.split("=", 1)[1],))
             argv.pop(n)
             break
+
+    if CFG_DEF:
+        CFG_DEF[0] = absreal(CFG_DEF[0])
 
     ensure_locale()
 

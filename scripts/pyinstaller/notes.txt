@@ -29,21 +29,21 @@ uname -s | grep NT-10 && w10=1 || {
   w7=1; uname -s | grep WOW64 && w7x64=1 || w7x32=1
 }
 fns=(
-  altgraph-0.17.4-py2.py3-none-any.whl
+  altgraph-0.17.5-py2.py3-none-any.whl
   pefile-2023.2.7-py3-none-any.whl
   pywin32_ctypes-0.2.3-py3-none-any.whl
-  upx-5.0.2-win32.zip
+  upx-5.2.0-win32.zip
 )
 [ $w10 ] && fns+=(
   jinja2-3.1.6-py3-none-any.whl
-  MarkupSafe-3.0.2-cp313-cp313-win_amd64.whl
-  mutagen-1.47.0-py3-none-any.whl
-  packaging-25.0-py3-none-any.whl
-  pillow-12.3.0-cp313-cp313-win_amd64.whl
-  pyinstaller-6.15.0-py3-none-win_amd64.whl
-  pyinstaller_hooks_contrib-2025.8-py3-none-any.whl
-  python-3.13.14-amd64.exe
-  setuptools-80.9.0-py3-none-any.whl
+  markupsafe-3.0.3-cp314-cp314-win_amd64.whl
+  mutagen-1.48.1-py3-none-any.whl
+  packaging-26.3-py3-none-any.whl
+  pillow-12.3.0-cp314-cp314-win_amd64.whl
+  pyinstaller-6.21.0-py3-none-win_amd64.whl
+  pyinstaller_hooks_contrib-2026.6-py3-none-any.whl
+  python-3.14.7-amd64.exe
+  setuptools-83.0.0-py3-none-any.whl
 )
 [ $w7 ] && fns+=(
   future-1.0.0-py3-none-any.whl
@@ -83,7 +83,7 @@ close and reopen git-bash so python is in PATH
 
 ===[ copy-paste into git-bash ]================================
 uname -s | grep NT-10 && w10=1 || w7=1
-[ $w7 ] && pyv=37 || pyv=313
+[ $w7 ] && pyv=37 || pyv=314
 appd=$(cygpath.exe "$APPDATA")
 cd ~/Downloads &&
 yes | unzip upx-*-win32.zip &&
@@ -91,7 +91,7 @@ mv upx-*/upx.exe . &&
 python -m ensurepip &&
 { [ $w10 ] || python -m pip install --user -U pip-*.whl; } &&
 python -m pip install --user -U packaging-*.whl &&
-{ [ $w7 ] || python -m pip install --user -U {setuptools,mutagen,pillow,jinja2,MarkupSafe}-*.whl; } &&
+{ [ $w7 ] || python -m pip install --user -U {setuptools,mutagen,pillow,jinja2,markupsafe}-*.whl; } &&
 { [ $w10 ] || python -m pip install --user -U future-*.whl importlib_metadata-*.whl typing_extensions-*.whl zipp-*.whl; } &&
 python -m pip install --user -U pyinstaller-*.whl pefile-*.whl pywin32_ctypes-*.whl pyinstaller_hooks_contrib-*.whl altgraph-*.whl &&
 sed -ri 's/--lzma/--best/' $appd/Python/Python$pyv/site-packages/pyinstaller/building/utils.py &&

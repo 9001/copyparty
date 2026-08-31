@@ -1,0 +1,54 @@
+drop tcp mid-chunk and force browser to re-hs before it can be retried
+
+ok with subchunks as of writing; 6thr, u2sz=1
+303M file: --s-wr-slp 0.02 --iobuf 131072
+33.5M file: --s-wr-slp 0.1 --iobuf 131072
+
+--- a/copyparty/httpcli.py
++++ b/copyparty/httpcli.py
+@@ -234,2 +234,3 @@ ZIP_XCODE_L = _build_zip_xcode()
+ ZIP_XCODE_S = set(ZIP_XCODE_L)
++hcblk = ""
+ 
+@@ -3154,2 +3155,3 @@ class HttpCli(object):
+     def handle_post_json(self) -> bool:
++        global hcblk
+         try:
+@@ -3248,2 +3250,3 @@ class HttpCli(object):
+         # not to protect u2fh, but to prevent handshakes while files are closing
++        hcblk = ""
+         with self.u2mutex:
+@@ -3335,2 +3338,3 @@ class HttpCli(object):
+     def handle_post_binary(self) -> bool:
++        global hcblk
+         try:
+@@ -3452,2 +3456,4 @@ class HttpCli(object):
+                     )
++                    if chash == hcblk:
++                        raise Exception("fhdsafhad re")
+                     post_sz, _, sha_b64 = hashcopy(
+@@ -3513,3 +3519,6 @@ class HttpCli(object):
+                         self.u2fh.put(path, f)
+-            except:
++            except Exception as ex:
++                if "fhdsafhad" in str(ex):
++                    hcblk = chashes[0]
++                    self.sr.s.close()
+                 # maybe busted handle (eg. disk went full)
+--- a/copyparty/util.py
++++ b/copyparty/util.py
+@@ -3414,2 +3414,3 @@ def eol_conv(
+ 
++hcn = 0
+ def hashcopy(
+@@ -3421,2 +3422,4 @@ def hashcopy(
+ ) -> tuple[int, str, str]:
++    global hcn
++    print(hcn)
+     if not hashobj:
+@@ -3429,2 +3432,5 @@ def hashcopy(
+ 
++        hcn += 1
++        if hcn in (24, 121, 300, 600, 900):
++            raise Exception("fhdsafhad " + str(tlen))
+         hashobj.update(buf)
