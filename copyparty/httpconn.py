@@ -2,7 +2,6 @@
 from __future__ import division, print_function, unicode_literals
 
 import argparse  # typechk
-import os
 import re
 import socket
 import threading  # typechk

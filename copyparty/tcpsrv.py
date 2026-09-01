@@ -22,7 +22,6 @@ from .util import (
     Netdev,
     atomic_move,
     chkcmd,
-    get_adapters,
     list_nics,
     min_ex,
     sunpack,

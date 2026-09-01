@@ -4,12 +4,9 @@ from __future__ import division, print_function, unicode_literals
 import errno
 import hashlib
 import json
-import math
 import os
 import re
-import shutil
 import stat
-import subprocess as sp
 import sys
 import tempfile
 import threading

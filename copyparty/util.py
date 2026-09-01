@@ -10,7 +10,6 @@ import hashlib
 import hmac
 import json
 import logging
-import math
 import mimetypes
 import os
 import platform

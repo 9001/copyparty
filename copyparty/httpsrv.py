@@ -2,7 +2,6 @@
 from __future__ import division, print_function, unicode_literals
 
 import hashlib
-import math
 import os
 import re
 import socket

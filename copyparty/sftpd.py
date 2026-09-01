@@ -8,7 +8,6 @@ import os
 import select
 import socket
 import time
-from threading import ExceptHookArgs
 
 import paramiko
 import paramiko.common

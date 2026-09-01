@@ -12,7 +12,7 @@ from types import SimpleNamespace
 from .__init__ import ANYWIN, EXE, TYPE_CHECKING
 from .authsrv import LEELOO_DALLAS, VFS
 from .bos import bos
-from .util import Daemon, absreal, min_ex, pybin, runhook, vjoin
+from .util import Daemon, absreal, min_ex, pybin, runhook
 
 if True:  # pylint: disable=using-constant-test
     from typing import Any, Union
