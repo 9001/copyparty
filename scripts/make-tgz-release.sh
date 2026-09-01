@@ -68,7 +68,7 @@ scripts/genlic.py "$rls_dir/copyparty/res/COPYING.txt"
 
 cd "$rls_dir"
 find -type d -exec chmod 755 '{}' \+
-find -type f -exec chmod 644 '{}' \+
+find -type f -exec chmod u+rw,go+r '{}' \+
 
 commaver="$(
 	printf '%s\n' "$ver" |
@@ -98,6 +98,12 @@ rm -f \
 
 cp -pv LICENSE LICENSE.txt
 mv setup.py{,.disabled}
+
+( cd copyparty/web
+make -j$(nproc)
+rm Makefile*
+printf 'all:\n\t@echo "NOTE: no longer necessary to run copyparty/web/Makefile when building from source tarball"\n' >Makefile
+)
 
 # the regular cleanup memes
 find -name '*.pyc' -delete
