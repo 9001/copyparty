@@ -8,6 +8,7 @@ import time
 from .__init__ import ANYWIN
 from .util import Netdev, atomic_move, load_resource, runcmd, wunlink
 
+NO_TLS = bool(os.environ.get("PRTY_NO_TLS"))
 HAVE_CFSSL = not os.environ.get("PRTY_NO_CFSSL")
 
 if True:  # pylint: disable=using-constant-test
@@ -70,8 +71,9 @@ def ensure_cert(log: "RootLogger", args) -> None:
         with open(args.cert, "rb") as f:
             active_cert = f.read()
         if active_cert == cert_insec:
-            t = "using default TLS certificate; https will be insecure:\033[36m {}"
-            log("cert", t.format(args.cert), 3)
+            t = "using default TLS certificate; %s will be insecure:\033[36m %s"
+            t2 = "https" if not args.ftps else "ftps"
+            log("cert", t % (t2, args.cert), 3)
     except:
         pass
 
@@ -252,7 +254,7 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
 def gencert(log: "RootLogger", args, netdevs: dict[str, Netdev]):
     global HAVE_CFSSL
 
-    if args.http_only:
+    if args.http_only and not args.ftps:
         return
 
     if args.no_crt or args.certkey or not HAVE_CFSSL:

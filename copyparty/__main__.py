@@ -39,6 +39,7 @@ from .__init__ import (
 from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import expand_config_file, split_cfg_ln, upgrade_cfg_fmt
 from .bos import bos
+from .cert import NO_TLS
 from .cfg import flagcats, onedash
 from .mdns import DNS_VND
 from .qrkode import VENDORED as QR_VND
@@ -100,11 +101,12 @@ if PY2:
     range = xrange  # type: ignore
 
 try:
-    if os.environ.get("PRTY_NO_TLS"):
+    if NO_TLS:
         raise Exception()
 
-    HAVE_SSL = True
     import ssl
+
+    HAVE_SSL = True
 except:
     HAVE_SSL = False
 
@@ -2491,7 +2493,8 @@ def main(argv: Optional[list[str]] = None) -> None:
         if al.ciphers:
             configure_ssl_ciphers(al)
     else:
-        warn("ssl module does not exist; cannot enable https")
+        if not al.http_only and not NO_TLS:
+            warn("ssl module does not exist; cannot enable https")
         al.http_only = True
 
     if PY2 and WINDOWS and al.e2d:

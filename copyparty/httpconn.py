@@ -8,21 +8,23 @@ import socket
 import threading  # typechk
 import time
 
-try:
-    if os.environ.get("PRTY_NO_TLS"):
-        raise Exception()
-
-    HAVE_SSL = True
-    import ssl
-except:
-    HAVE_SSL = False
-
 from . import util as Util
 from .__init__ import TYPE_CHECKING, EnvParams
 from .authsrv import AuthSrv  # typechk
+from .cert import NO_TLS
 from .httpcli import HttpCli
 from .u2idx import U2idx
 from .util import HMaccas, NetMap, min_ex, shut_socket
+
+try:
+    if NO_TLS:
+        raise Exception()
+
+    import ssl
+
+    HAVE_SSL = True
+except:
+    HAVE_SSL = False
 
 if True:  # pylint: disable=using-constant-test
     from typing import Optional, Pattern, Union
