@@ -51,7 +51,6 @@ except ImportError:
         SRV,
         TXT,
         A,
-        Bimap,
         DNSHeader,
         DNSQuestion,
         DNSRecord,

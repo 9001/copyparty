@@ -180,7 +180,10 @@ try:
             raise ImportError()
 
         from .stolen.ifaddr import get_adapters
+
+        IFADDR_VND = True
     except ImportError:
+        IFADDR_VND = False
         from ifaddr import get_adapters
 
     HAVE_IFADDR = True
@@ -195,10 +198,10 @@ try:
     if os.environ.get("PRTY_NO_SQLITE"):
         raise Exception()
 
-    HAVE_SQLITE3 = True
     import sqlite3
 
     assert hasattr(sqlite3, "connect")  # graalpy
+    HAVE_SQLITE3 = True
 except:
     HAVE_SQLITE3 = False
 
@@ -213,8 +216,9 @@ try:
     if os.environ.get("PRTY_NO_PSUTIL"):
         raise Exception()
 
-    HAVE_PSUTIL = True
     import psutil
+
+    HAVE_PSUTIL = True
 except:
     HAVE_PSUTIL = False
 
@@ -225,8 +229,10 @@ try:
         raise Exception()
 
     import magic
+
+    HAVE_MAGIC = True
 except:
-    pass
+    HAVE_MAGIC = False
 
 if os.environ.get("PRTY_MODSPEC"):
     from inspect import getsourcefile

@@ -40,6 +40,8 @@ from .__version__ import CODENAME, S_BUILD_DT, S_VERSION
 from .authsrv import expand_config_file, split_cfg_ln, upgrade_cfg_fmt
 from .bos import bos
 from .cfg import flagcats, onedash
+from .mdns import DNS_VND
+from .qrkode import VENDORED as QR_VND
 from .svchub import SvcHub
 from .util import (
     APPLESAN_TXT,
@@ -49,6 +51,8 @@ from .util import (
     DEF_MTH,
     HAVE_BWRAP,
     HAVE_IPV6,
+    HAVE_MAGIC,
+    IFADDR_VND,
     IMPLICATIONS,
     JINJA_VER,
     MIKO_VER,
@@ -594,11 +598,63 @@ def showlic() -> None:
     except:
         buf = b""
 
-    if buf:
-        print(buf.decode("utf-8", "replace"))
-    else:
+    if not buf:
         print("no relevant license info to display")
         return
+
+    lic = buf.decode("utf-8", "replace")
+
+    try:
+        import site
+        from importlib import import_module
+        from inspect import getsourcefile
+
+        bases = site.PREFIXES + [site.USER_BASE]
+        bases = [x.replace(os.sep, "/") + "/" for x in list(set(bases)) if x]
+    except:
+        bases = []
+
+    # remove missing and/or non-vendored
+    for url, zi, zx in (
+        ("/dnslib/", 1, DNS_VND),
+        ("/ifaddr/", 1, IFADDR_VND),
+        ("/nayuki/QR", 1, QR_VND),
+        ("/partftpy", 2, PARTFTPY_VER),
+        ("/jinja/", 3, "jinja2"),
+        ("/markupsafe/", 3, "jinja2"),  # jinja2 sic
+        ("/pyftpdlib/", 2, PYFTPD_VER),  # heed PRTY_NO
+        ("/pyftpdlib/", 3, "pyftpdlib"),
+        ("/python-magic/", 1, HAVE_MAGIC),  # heed PRTY_NO
+        ("/python-magic/", 3, "magic"),
+    ):
+        if url not in lic:
+            continue
+        elif zi == 1:
+            if zx:
+                continue
+        elif zi == 2:
+            if zx != "(None)":
+                continue
+        elif zi == 3:
+            mod = None
+            try:
+                assert bases and getsourcefile and import_module  # type: ignore  # !rm
+                mod = import_module(zx)  # type: ignore
+                mp = getsourcefile(mod) or ""
+                for zs in bases:
+                    if mp.startswith(zs):
+                        mp = ""
+                if mp:
+                    continue
+            except:
+                if mod:
+                    continue
+        zs1, zs2 = lic.split(url, 1)
+        zs1 = zs1.rsplit("\n", 1)[0]
+        zs2 = zs2.split("\n\n", 1)[1]
+        lic = zs1 + "\n" + zs2
+
+    print(lic)
 
 
 def get_sects():
