@@ -1535,7 +1535,19 @@ class Up2k(object):
         unreg: list[str] = []
         files: list[tuple[int, int, str]] = []
         fat32 = True
-        cv = vcv = acv = ""
+
+        ecv_exts = set()
+        if self.args.th_extr_cv and self.args.th_extract:
+            th_extr_cv = self.args.th_extr_cv.replace(' ', '')
+            th_extr_exts = set(self.args.th_extract)
+            if th_extr_cv == '*':
+                ecv_exts |= th_extr_exts
+            elif th_extr_cv.startswith('!'):
+                ecv_exts |= th_extr_exts - set(th_extr_cv[1:].split(','))
+            else:
+                ecv_exts |= th_extr_exts & set(th_extr_cv.split(','))
+
+        cv = vcv = acv = ecv = ""
         e_d = {}
 
         scan_pr_s = self.args.scan_pr_s
@@ -1653,9 +1665,11 @@ class Up2k(object):
                         vcv = iname
                     elif not acv and ext in ACV_EXTS and not iname.startswith("."):
                         acv = iname
+                    elif not ecv and ext in ecv_exts and not iname.startswith("."):
+                        ecv = iname
 
         if not cv:
-            cv = vcv or acv
+            cv = vcv or acv or ecv
 
         if not self.args.no_dirsz:
             tnf += len(files)
