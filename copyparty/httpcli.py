@@ -1425,6 +1425,9 @@ class HttpCli(object):
             if "%" in self.req:
                 self.log(" `-- %r" % (self.vpath,))
 
+        if self.vpath == "favicon.ico":
+            return self.tx_favico()
+
         # "embedded" resources
         if self.vpath.startswith(".cpr"):
             if self.vpath.startswith(".cpr/ico/"):
@@ -5558,6 +5561,24 @@ class HttpCli(object):
             ext = "~" + ext[-9:]
 
         return self.tx_svg(ext, exact)
+
+    def tx_favico(self) -> bool:
+        dv = (self.args.favico or "🎉").split()
+        txt = html_escape(dv[0], True)
+        fg = dv[1] if len(dv) > 1 and dv[1].lower() != "none" else "fc5"
+        bg = dv[2] if len(dv) > 2 and dv[2].lower() != "none" else ""
+        bg_rect = '<rect width="100%%" height="100%%" rx="16" fill="#%s" />\n' % (bg,) if bg else ""
+        svg = (
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">'
+            "%s"
+            '<text x="50%%" y="55%%" dominant-baseline="middle" text-anchor="middle"'
+            ' font-family="sans-serif" font-weight="bold" font-size="64px"'
+            ' fill="#%s">%s</text></svg>'
+        ) % (bg_rect, fg, txt)
+        self.permit_caching()
+        self.reply(svg.encode("utf-8"), mime="image/svg+xml")
+        return True
 
     def tx_svg(self, txt: str, small: bool = False) -> bool:
         # chrome cannot handle more than ~2000 unique SVGs
