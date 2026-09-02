@@ -6896,11 +6896,17 @@ class HttpCli(object):
         return True
 
     def handle_fs_abrt(self):
+        rk = self.uparam["fs_abrt"]
+        if rk == "ping":
+            self.conn.hsrv.broker.ask("up2k.handle_fs_abrt", rk)
+            self.reply(b"pong")
+            return True
+
         if self.args.no_fs_abrt:
             t = "aborting an ongoing copy/move is disabled in server config"
             raise Pebkac(403, t)
 
-        self.conn.hsrv.broker.say("up2k.handle_fs_abrt", self.uparam["fs_abrt"])
+        self.conn.hsrv.broker.say("up2k.handle_fs_abrt", rk)
         self.loud_reply("aborting", status=200)
         return True
 

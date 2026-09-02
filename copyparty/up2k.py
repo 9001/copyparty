@@ -4133,6 +4133,9 @@ class Up2k(object):
                 pass
 
     def handle_fs_abrt(self, akey: str) -> None:
+        if akey == "ping":
+            with self.mutex, self.reg_mutex:
+                return
         self.abrt_key = akey
 
     def handle_rm(
