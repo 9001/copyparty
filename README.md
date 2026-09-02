@@ -2234,7 +2234,7 @@ you can disable the built-in password-based login system, and instead replace it
 
   * `--auth-ord` configured auth precedence, for example to allow overriding the IdP with a copyparty password
 
-* the login/logout links/buttons can be replaced with links to your IdP with `--idp-login` and `--idp-logout` , for example `--idp-login /idp/login/?redir={dst}` will expand `{dst}` to the page the user was on when clicking Login
+* the login/logout links/buttons can be replaced with links to your IdP (or your reverse proxy, that will route request to your IdP, [example](./docs/examples/docker/idp-authelia-caddy)) with `--idp-login` and `--idp-logout` , for example `--idp-login /idp/login/?redir={dst}` will expand `{dst}` to the page the user was on when clicking Login
 
 * if your IdP-server is slow, consider `--idp-cookie` and let requests with the cookie `cppws` bypass the IdP; experimental sessions-based feature added for a party
 
