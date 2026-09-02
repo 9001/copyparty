@@ -979,6 +979,7 @@ function up2k_init(subtle) {
             "u": 0,
             "t": 0
         },
+        "xhr": [],
         "car": 0,
         "nre": 0,
         "slow_io": null,
@@ -1913,6 +1914,32 @@ function up2k_init(subtle) {
                     }
                 }
 
+                for (var a = st.xhr.length - 1; a >= 0; a--) {
+                    var xhr = st.xhr[a];
+                    if (!xhr.status || !xhr.responseText)
+                        continue;
+
+                    if (xhr.is_js)
+                        try {
+                            JSON.parse(xhr.responseText);
+                        }
+                        catch (ex) {
+                            continue;
+                        }
+
+                    xhr.tdeaf = xhr.tdeaf || now;
+                    if (!st.deaf && now - xhr.tdeaf < 3000)
+                        continue;
+
+                    if (!st.deaf)
+                        console.log('xhr: bad apple');
+
+                    xhr.onerror = xhr.ontimeout = null;
+                    xhr.onload();
+                    xhr.abort();
+                    st.deaf = true;
+                }
+
                 if (st.bytes.inflight && (st.bytes.inflight < 0 || !st.busy.upload.length)) {
                     console.log('insane inflight ' + st.bytes.inflight);
                     st.bytes.inflight = 0;
@@ -2465,16 +2492,18 @@ function up2k_init(subtle) {
 
         st.busy.head.push(t);
 
-        var xhr = new XMLHttpRequest();
+        var xhr = new XHR();
         xhr.onerror = xhr.ontimeout = function () {
             console.log('head onerror, retrying', t.name, t);
             if (!toast.visible)
                 toast.warn(9.98, L.u_enethd + "\n\nfile: " + esc(t.name), t);
 
+            apop(st.xhr, xhr);
             apop(st.busy.head, t);
             st.todo.head.unshift(t);
         };
         function orz(e) {
+            apop(st.xhr, xhr);
             if (t.done)
                 return console.log('done; skip head2', t.name, t);
 
@@ -2513,6 +2542,7 @@ function up2k_init(subtle) {
         xhr.open('HEAD', t.purl + uricom_enc(t.name), true);
         xhr.timeout = 34000;
         xhr.send();
+        st.xhr.push(xhr);
     }
 
     /////
@@ -2539,8 +2569,9 @@ function up2k_init(subtle) {
         if (!t.srch && !t.t_handshake)
             pvis.seth(t.n, 2, L.u_hs);
 
-        var xhr = new XMLHttpRequest();
+        var xhr = new XHR();
         xhr.onerror = xhr.ontimeout = function () {
+            apop(st.xhr, xhr);
             if (t.t_busied != me)  // t.done ok
                 return console.log('zombie handshake onerror', t.name, t);
 
@@ -2553,6 +2584,7 @@ function up2k_init(subtle) {
             t.keepalive = keepalive;
         };
         var orz = function (e) {
+            apop(st.xhr, xhr);
             if (t.t_busied != me || t.done)
                 return console.log('zombie handshake onload', t.name, t);
 
@@ -2838,9 +2870,11 @@ function up2k_init(subtle) {
 
         xhr.open('POST', t.purl, true);
         xhr.responseType = 'text';
+        xhr.is_js = true;
         xhr.timeout = 42000 + (t.srch || t.t_uploaded ? 0 :
             (t.size / (1048 * 20))); // safededup 20M/s hdd
         xhr.send(JSON.stringify(req));
+        st.xhr.push(xhr);
     }
 
     /////
@@ -2929,6 +2963,7 @@ function up2k_init(subtle) {
                 pcar == pcdr ? pcar : ('' + pcar + '~' + pcdr);
 
         var orz = function (xhr) {
+            apop(st.xhr, xhr);
             st.bytes.inflight -= xhr.bsent;
             var txt = unpre((xhr.response && xhr.response.err) || xhr.responseText);
             if (txt.indexOf('upload blocked by x') + 1) {
@@ -2979,6 +3014,7 @@ function up2k_init(subtle) {
             orz2(xhr);
         }
         var orz2 = function (xhr) {
+            apop(st.xhr, xhr);
             apop(st.busy.upload, upt);
             for (var a = pcar; a <= pcdr; a++)
                 apop(t.postlist, a);
@@ -2992,7 +3028,7 @@ function up2k_init(subtle) {
             tasker();
         }
         function do_send() {
-            var xhr = new XMLHttpRequest(),
+            var xhr = new XHR(),
                 bfin = Math.floor(st.bytes.finished / 1024 / 1024),
                 btot = Math.floor(st.bytes.total / 1024 / 1024);
 
@@ -3005,8 +3041,13 @@ function up2k_init(subtle) {
 
                 st.bytes.inflight += db;
                 xhr.bsent = nb;
+
+                var n = 64;
+                if (nb == xhr.bsize)
+                    n = st.deaf ? 5 : 9;
                 if (!IE)
-                    xhr.timeout = 64000 + Date.now() - xhr.t0;
+                    xhr.timeout = n * 1000 + Date.now() - xhr.t0;
+
                 pvis.prog(t, pcar, nb);
             };
             xhr.onload = function (xev) {
@@ -3018,6 +3059,9 @@ function up2k_init(subtle) {
 
                 st.bytes.inflight -= (xhr.bsent || 0);
                 xhr.bsent = 0;
+
+                if (st.deaf)
+                    t.cooldown = t.coolmul = 0;
 
                 if (!toast.visible)
                     toast.warn(9.98, L.u_cuerr.format(snpart, Math.ceil(t.size / chunksize), esc(t.name)), t);
@@ -3053,11 +3097,21 @@ function up2k_init(subtle) {
             if (xhr.overrideMimeType)
                 xhr.overrideMimeType('Content-Type', 'application/octet-stream');
 
+            if (st.deaf)
+                xhr.onreadystatechange = function (xev) {
+                    if (xhr.status == 200) {
+                        xhr.onreadystatechange = null;
+                        xhr.onload(xev);
+                    }
+                };
+
             xhr.bsent = 0;
+            xhr.bsize = cdr - car;
             xhr.t0 = Date.now();
             xhr.timeout = 1000 * (IE ? 1234 : 42);
             xhr.responseType = 'text';
             xhr.send(t.fobj.slice(car, cdr));
+            st.xhr.push(xhr);
         }
         do_send();
     }
