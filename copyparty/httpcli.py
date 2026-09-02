@@ -212,6 +212,7 @@ RE_HR = re.compile(r"[<>\"'&]")
 RE_MDV = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[Mm][Dd])$")
 RE_RSS_KW = re.compile(r"(\{[^} ]+\})")
 RE_SETCK = re.compile(r"[^0-9a-z=]")
+RE_NO_HVAL = re.compile(r"[\x00-\x08\x0a-\x1f\x7f]")
 
 UPARAM_CC_OK = set("doc move tree".split())
 
@@ -390,7 +391,13 @@ class HttpCli(object):
                 # outgoing headers however are Correct-Case
                 for header_line in headerlines[1:]:
                     k, zs = header_line.split(":", 1)
-                    self.headers[k.lower()] = zs.strip()
+                    k = k.lower()
+                    if k != k.strip():
+                        raise Exception()
+                    zs = zs.strip()
+                    if RE_NO_HVAL.search(zs):
+                        raise Exception()
+                    self.headers[k] = zs
                     if zs.endswith(" HTTP/1.1") and RE_HTTP1.search(zs):
                         raise Exception()
             except:
