@@ -1096,6 +1096,11 @@ or a mix of both:
 * `format` = `(1). (artist) - (title).(ext)`
 * `output` = `07. meganeko - Sirius A.mp3`
 
+or if you want to put it in sub folders (this will create the required subdirectories)
+* `regex` = `(.*) - (.*) - (.*)`
+* `format` = `(1)/(2)/(3)`
+* `output` = `meganeko/Eclipse/07 Sirius A.mp3`
+
 the metadata keys you can use in the format field are the ones in the file-browser table header (whatever is collected with `-mte` and `-mtp`)
 
 
