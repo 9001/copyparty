@@ -5927,7 +5927,7 @@ class HttpCli(object):
                 else ""
             ),
             ver=S_VERSION if show_ver else "",
-            chpw=self.args.chpw and self.uname != "*",
+            chpw=self.args.chpw and self.uname != "*" and self.uname not in self.args.chpw_no,
             ahttps="" if self.is_https else "https://" + self.host + self.req,
         )
         self.reply(html.encode("utf-8"))
