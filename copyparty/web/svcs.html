@@ -54,7 +54,7 @@
         <div class="os win">
             <p>if you can, install <a href="https://winfsp.dev/rel/">winfsp</a>+<a href="https://downloads.rclone.org/rclone-current-windows-amd64.zip">rclone</a> and then paste this in cmd:</p>
             <pre>
-                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user={{ b_un }} pass=<b>{{ pw }}</b>{% endif %}
+                rclone config create --obscure {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user={{ b_un }} pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s --network-mode {{ aname }}-dav:{{ rvp }} <b>W:</b>
             </pre>
             <ul>
@@ -77,7 +77,7 @@
         <div class="os lin">
             <p>rclone (v1.63 or later) is recommended:</p>
             <pre>
-                rclone config create {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user={{ b_un }} pass=<b>{{ pw }}</b>{% endif %}
+                rclone config create --obscure {{ aname }}-dav webdav url=http{{ s }}://{{ rip }}{{ hport }} vendor=owncloud pacer_min_sleep=0.01ms{% if accs %} user={{ b_un }} pass=<b>{{ pw }}</b>{% endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-dav:{{ rvp }} <b>mp</b>
             </pre>
             <ul>
@@ -145,9 +145,9 @@
             <p>connect with plaintext FTP:</p>
             <pre>
                 {%- if un %}
-                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false
+                rclone config create --obscure {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false
                 {%- else %}
-                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false
+                rclone config create --obscure {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false
                 {%- endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s --network-mode {{ aname }}-ftp:{{ rvp }} <b>W:</b>
             </pre>
@@ -156,9 +156,9 @@
             <p>connect with TLS-encrypted FTPS:</p>
             <pre>
                 {%- if un %}
-                rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false explicit_tls=true
+                rclone config create --obscure {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false explicit_tls=true
                 {%- else %}
-                rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
+                rclone config create --obscure {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
                 {%- endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s --network-mode {{ aname }}-ftps:{{ rvp }} <b>W:</b>
             </pre>
@@ -184,9 +184,9 @@
             <p>connect with plaintext FTP:</p>
             <pre>
                 {%- if un %}
-                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false
+                rclone config create --obscure {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false
                 {%- else %}
-                rclone config create {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false
+                rclone config create --obscure {{ aname }}-ftp ftp host={{ rip }} port={{ args.ftp }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false
                 {%- endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftp:{{ rvp }} <b>mp</b>
             </pre>
@@ -195,9 +195,9 @@
             <p>connect with TLS-encrypted FTPS:</p>
             <pre>
                 {%- if un %}
-                rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false explicit_tls=true
+                rclone config create --obscure {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} user={% if accs %}{{ b_un }} pass=<b>{{ pw }}</b>{% else %}anonymous pass=k{% endif %} tls=false explicit_tls=true
                 {%- else %}
-                rclone config create {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
+                rclone config create --obscure {{ aname }}-ftps ftp host={{ rip }} port={{ args.ftps }} pass=k user={% if accs %}<b>{{ pw }}</b>{% else %}anonymous{% endif %} tls=false explicit_tls=true
                 {%- endif %}
                 rclone mount --vfs-cache-mode writes --dir-cache-time 5s {{ aname }}-ftps:{{ rvp }} <b>mp</b>
             </pre>
