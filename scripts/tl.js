@@ -606,6 +606,7 @@ Ls.hmn = {
 	"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" id="u2nah">use bup instead</a>',
 	"u_nowork": "need firefox 53+ or chrome 57+ or iOS 11+",
 	"tail_2old": "need firefox 105+ or chrome 71+ or iOS 14.5+",
+	"b2old": 'your browser is too old',
 	"u_nodrop": 'your browser is too old for drag-and-drop uploading',
 	"u_notdir": "that's not a folder!\n\nyour browser is too old,\nplease try dragdrop instead",
 	"u_uri": "to dragdrop images from other browser windows,\nplease drop it onto the big upload button",

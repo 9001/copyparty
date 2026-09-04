@@ -3419,7 +3419,7 @@ function up2k_init(subtle) {
                 flag = up2k_flagbus();
             }
             catch (ex) {
-                toast.err(5, "not supported on your browser:\n" + esc(basenames(ex)));
+                toast.err(5, L.b2old + ";\n" + esc(basenames(ex)));
                 bcfg_set('flag_en', uc.flag_en = false);
             }
         }

@@ -576,6 +576,7 @@ Ls.swe = {
 	"u_ancient": 'din webbläsare är imponerande uråldrig -- du kanske borde <a href="#" id="u2nah">använda bup istället</a>',
 	"u_nowork": "firefox 53+ eller chrome 57+ eller iOS 11+ krävs",
 	"tail_2old": "firefox 105+ eller chrome 71+ eller iOS 14.5+ krävs",
+	"b2old": 'din webbläsare är för gammal',
 	"u_nodrop": 'din webbläsare är för gammal för dra-och-släpp-uppladdning',
 	"u_notdir": "det där är ingen mapp!\n\ndin webbläsare är för gammal,\nprova dra-och-släpp istället",
 	"u_uri": "släpp bilder från andra webbläsarfönster på den stora\nuppladdningsknappen för att ladda upp dem",

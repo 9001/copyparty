@@ -576,6 +576,7 @@ Ls.grc = {
 	"u_ancient": 'ο browser σου είναι εντυπωσιακά απαρχαιωμένος — ίσως να <a href="#" id="u2nah">χρησιμοποιήσεις το bup αντί γι\' αυτό</a>',
 	"u_nowork": "χρειάζεται firefox 53+ ή chrome 57+ ή iOS 11+",
 	"tail_2old": "χρειάζεται firefox 105+ ή chrome 71+ ή iOS 14.5+",
+	"b2old": 'ο browser σου είναι πολύ παλιός', //m
 	"u_nodrop": "ο browser σου είναι πολύ παλιός για drag&amp;drop μεταφορτώσεις",
 	"u_notdir": "αυτός δεν είναι φάκελος!\n\nο browser σου είναι πολύ παλιός,\nδοκίμασε drag&amp;drop αντ' αυτού",
 	"u_uri": "για να κάνεις drag&amp;drop εικόνων από άλλα παράθυρα browser,\nρίξ' τες πάνω στο μεγάλο κουμπί μεταφόρτωσης",

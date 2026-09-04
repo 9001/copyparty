@@ -576,6 +576,7 @@ Ls.epo = {
 	"u_ancient": 'via retumilo estas vere antikva -- eble vi devus <a href="#" id="u2nah">uzi alŝutilon bup anstataŭe</a>',
 	"u_nowork": "Firefox 53+ aŭ Chrome 57+ aŭ iOS 11+ necesas",
 	"tail_2old": "Firefox 105+ aŭ Chrome 71+ aŭ iOS 14.5+ necesas",
+	"b2old": 'via retumilo estas tro malnova', //m
 	"u_nodrop": 'via retumilo estas tro malnova por ŝova-kaj-demeta alŝutado',
 	"u_notdir": "tio ne estas dosierujo!\n\nvia retumilo estas tro malnova,\nbonvolu ŝovu kaj demetu anstataŭe",
 	"u_uri": "por ŝovi-kaj-demeti bildon de aliaj fenestroj de retumiloj,\nbonvolu demeti ĝin sur la grandan alŝut-butonon",
