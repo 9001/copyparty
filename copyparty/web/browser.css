@@ -1768,6 +1768,10 @@ html.y #tree.nowrap .ntree a+a:hover {
 	top: .3em;
 	z-index: 9;
 }
+.dumb_loader_thing.ns {
+	animation: none;
+	opacity: 1;
+}
 #dlt_t {
 	left: 0;
 }

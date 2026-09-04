@@ -6441,8 +6441,10 @@ var ahotkeys = function (e) {
 	if (k == 'F2')
 		return fileman.rename();
 
-	if (k == 'F4')
+	if (k == 'F4') {
+		enspin('t', 1);
 		return treectl.goto();
+	}
 
 	if (!treectl.hidden && (!sh || !thegrid.en)) {
 		if (kl == 'a')
@@ -7997,12 +7999,12 @@ var treectl = (function () {
 })();
 
 
-function enspin(i) {
+function enspin(i, ns) {
 	i = 'dlt_' + i;
 	if (ebi(i))
 		return;
 	var d = mknod('div', i, SPINNER);
-	d.className = 'dumb_loader_thing';
+	d.className = 'dumb_loader_thing' + ( ns? ' ns' : '');
 	if (SPINNER_CSS)
 		d.style.cssText = SPINNER_CSS;
 	document.body.appendChild(d);
