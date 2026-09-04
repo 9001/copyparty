@@ -202,12 +202,13 @@ A_FILE = os.stat_result(
 )
 
 RE_CC = re.compile(r"[\x00-\x1f\x7f]")  # search always faster
+RE_CCM = re.compile(r"^[^\x00-\x1f\x7f]*$")  # except when it isnt
 RE_USAFE = re.compile(r'[\x00-\x1f\x7f<>"]')  # search always faster
 RE_HSAFE = re.compile(r"[\x00-\x1f\x7f<>\"'&]")  # search always much faster
 RE_HOST = re.compile(r"[^][0-9a-zA-Z.:_-]")  # search faster <=17ch
 RE_MHOST = re.compile(r"^[][0-9a-zA-Z.:_-]+$")  # match faster >=18ch
 RE_K = re.compile(r"[^0-9a-zA-Z_-]")  # search faster <=17ch
-RE_HTTP1 = re.compile(r"(GET|HEAD|POST|PUT) [^ ]+ HTTP/1.1$")
+RE_HTTP1 = re.compile(r"(GET|HEAD|POST|PUT) /[^ ]* HTTP/1.1$")
 RE_HR = re.compile(r"[<>\"'&]")
 RE_MDV = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[Mm][Dd])$")
 RE_RSS_KW = re.compile(r"(\{[^} ]+\})")
@@ -384,14 +385,17 @@ class HttpCli(object):
                 return False
 
             try:
+                if not RE_CCM.match("".join(headerlines)):
+                    raise Exception()
+
                 self.mode, self.req, self.http_ver = headerlines[0].split(" ")
 
                 # normalize incoming headers to lowercase;
                 # outgoing headers however are Correct-Case
-                for header_line in headerlines[1:]:
-                    k, zs = header_line.split(":", 1)
+                for ln in headerlines[1:]:
+                    k, zs = ln.split(":", 1)
                     self.headers[k.lower()] = zs.strip()
-                    if zs.endswith(" HTTP/1.1") and RE_HTTP1.search(zs):
+                    if ln.endswith(" HTTP/1.1") and RE_HTTP1.search(ln):
                         raise Exception()
             except:
                 headerlines = [repr(x) for x in headerlines]
@@ -1160,14 +1164,17 @@ class HttpCli(object):
         for k, zs in list(self.out_headers.items()) + self.out_headerlist:
             response.append("%s: %s" % (k, zs))
 
-        ptn_cc = RE_CC
-        for zs in response:
-            m = ptn_cc.search(zs)
-            if m:
-                t = "malicious user; Cc in out-hdr; req(%r) hdr(%r) => %r"
-                self.log(t % (self.req, zs, zs[m.span()[0] :]), 1)
-                self.cbonk(self.conn.hsrv.gmal, zs, "cc_hdr", "Cc in out-hdr")
-                raise Pebkac(999)
+        if not RE_CCM.match("".join(response)):
+            ta = (self.req, response, "?")
+            for zs in response:
+                m = RE_CC.search(zs)
+                if m:
+                    ta = (self.req, zs, zs[m.span()[0] :])
+                    break
+            t = "malicious user; Cc in out-hdr; req(%r) hdr(%r) => %r"
+            self.log(t % ta, 1)
+            self.cbonk(self.conn.hsrv.gmal, zs, "cc_hdr", "Cc in out-hdr")
+            raise Pebkac(999)
 
         response.append(self.vn.flags[oh_k].replace("{{ js_nonce }}", self.js_nonce))
 

@@ -2222,7 +2222,7 @@ def read_header(sr: Unrecv, t_idle: int, t_tot: int) -> list[str]:
             raise Pebkac(
                 400,
                 "protocol error while reading headers",
-                log=ret.decode("utf-8", "replace"),
+                log=repr(ret.decode("utf-8", "replace")),
             )
 
         ofs = ret.find(b"\r\n\r\n")
