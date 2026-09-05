@@ -52,6 +52,7 @@ from .util import (
     ren_open,
     rmdirs,
     rmdirs_up,
+    runcmd,
     runhook,
     runihook,
     s2hms,
@@ -1295,6 +1296,14 @@ class Up2k(object):
             t = "failed to initialize volume '/%s': %s"
             self.log(t % (vpath, ex), 1)
             return None
+
+        if dir_is_empty(self.log_func, not self.args.no_scandir, histpath) and not (
+            ANYWIN or UNIX or "hist_cow" in flags
+        ):
+            try:
+                runcmd([b"chattr", b"+C", fsenc(histpath)], 1)
+            except:
+                pass
 
         try:
             cur = self._open_db_wd(db_path)
