@@ -7416,10 +7416,10 @@ class HttpCli(object):
         for k in ["zip", "tar"]:
             v = self.uparam.get(k)
             if v is not None and (not add_og or not og_fn):
+                filt = []
                 if is_dk and "dks" not in vn.flags:
-                    t = "server config does not allow download-as-zip/tar; only dk is specified, need dks too"
-                    raise Pebkac(403, t)
-                return self.tx_zip(k, v, self.vpath, vn, rem, [])
+                    filt = set(vn_ls_regfile(self.args, vn, rem))
+                return self.tx_zip(k, v, self.vpath, vn, rem, filt)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
             rem,
@@ -8069,3 +8069,13 @@ class HttpCli(object):
         html = self.j2s(tpl, **j2a)
         self.reply(html.encode("utf-8", "replace"))
         return True
+
+
+def vn_ls_regfile(args: argparse.Namespace, vn: VFS, rem: str) -> list[str]:
+    _, ls, _ = vn.ls(
+        rem,
+        "",
+        not args.no_scandir,
+        [[False, False]],
+    )
+    return [x[0] for x in ls if stat.S_ISREG(x[1].st_mode)]
