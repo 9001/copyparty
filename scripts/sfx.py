@@ -41,17 +41,20 @@ the archive data is attached after the b"\n# eof\n" archive marker,
 """
 
 
-# set by make-sfx.sh
+# fmt: # set by make-sfx.sh
 VER = None
 SIZE = None
 CKSUM = None
 STAMP = None
 
-PY2 = sys.version_info < (3,)
-PY37 = sys.version_info > (3, 7)
-WINDOWS = sys.platform in ["win32", "msys"]
 sys.dont_write_bytecode = True
-me = os.path.abspath(os.path.realpath(__file__))
+OP = os.path
+ENV = os.environ
+v = sys.version_info
+PY2 = v < (3,)
+PY37 = v > (3, 7)
+WINDOWS = sys.platform in ["win32", "msys"]
+me = OP.abspath(OP.realpath(__file__))
 
 
 def eprint(*a, **ka):
@@ -234,7 +237,7 @@ def encode(data, size, cksum, ver, ts):
 
 
 def makesfx(tar_src, ver, ts):
-    sz = os.path.getsize(tar_src)
+    sz = OP.getsize(tar_src)
     cksum = hashfile(tar_src)
     encode(yieldfile(tar_src), sz, cksum, ver, ts)
 
@@ -253,7 +256,7 @@ def u8(gen):
 
 
 def yieldfile(fn):
-    s = 64 * 1024
+    s = 0x10000
     with open(fn, "rb", s * 4) as f:
         for block in iter(lambda: f.read(s), b""):
             yield block
@@ -268,17 +271,16 @@ def hashfile(fn):
 
 
 def unpack():
-    """unpacks the tar yielded by `data`"""
+    """extracts the archive"""
     name = "pe-copyparty"
     try:
-        name += "." + str(os.geteuid())
+        name += ".%s" % os.geteuid()
     except:
         pass
 
-    tag = "v" + str(STAMP)
-    top = tempfile.gettempdir()
-    opj = os.path.join
-    ofe = os.path.exists
+    tag = "v%s" % STAMP
+    opj = OP.join
+    ofe = OP.exists
     final = opj(top, name)
     san = opj(final, "copyparty/up2k.py")
     for suf in range(0, 9001):
@@ -309,7 +311,7 @@ def unpack():
         raise Exception(t % (CKSUM, SIZE, ck, sz))
 
     with tarfile.open(tar, "r:bz2") as tf:
-        # this is safe against traversal
+        # this is traversal-safe
         # skip 1
         # since it will never process user-provided data;
         # the only possible input is a single tar.bz2
@@ -333,21 +335,12 @@ def unpack():
         pass
 
     try:
-        if os.path.islink(final):
+        if OP.islink(final):
             os.remove(final)
         else:
             shutil.rmtree(final)
     except:
         pass
-
-    for fn in u8(os.listdir(top)):
-        if fn.startswith(name) and fn != withpid:
-            try:
-                old = opj(top, fn)
-                if time.time() - os.path.getmtime(old) > 86400:
-                    shutil.rmtree(old)
-            except:
-                pass
 
     try:
         os.symlink(mine, final)
@@ -362,14 +355,14 @@ def unpack():
 
 
 def get_payload():
-    """yields the binary data attached to script"""
+    """decodes the binary data"""
     with open(me, "rb") as f:
         buf = f.read().rstrip(b"\r\n")
 
     ptn = b"\n# eof\n#"
     a = buf.find(ptn)
     if a < 0:
-        raise Exception("could not find archive marker")
+        raise Exception("corrupt sfx: no eof marker")
 
     esc = {b"??": b"?", b"?r": b"\r", b"?n": b"\n", b"?0": b"\x00"}
     buf = buf[a + len(ptn) :].replace(b"\n#", b"")
@@ -409,7 +402,7 @@ def run(tmp, j2, ftp):
     sys.argv.append("--sfx-tpoke=" + tmp)
 
     ld = (("", ""), (j2, "j2"), (ftp, "ftp"), (not PY2, "py2"), (PY37, "py37"))
-    ld = [os.path.join(tmp, b) for a, b in ld if not a]
+    ld = [OP.join(tmp, b) for a, b in ld if not a]
 
     # skip 1
     # enable this to dynamically remove type hints at startup,
@@ -432,8 +425,7 @@ def run_i(ld):
     for x in ld:
         sys.path.insert(0, x)
 
-    e = os.environ
-    e["PRTY_NO_IMPRESO"] = "1"
+    ENV["PRTY_NO_IMPRESO"] = "1"
 
     from copyparty.__main__ import main as p
 

@@ -14,6 +14,7 @@ import locale
 import os
 import re
 import select
+import shutil
 import socket
 import sys
 import threading
@@ -589,6 +590,17 @@ def sfx_tpoke(top: str):
             except Exception as ex:
                 lprint("<TPOKE> [%s] %r" % (f, ex))
                 files.remove(f)
+
+        r = os.path.dirname(top)
+        for d in os.listdir(r):
+            try:
+                p = r + "/" + d
+                f = p + "/copyparty/up2k.py"
+                t2 = os.path.getmtime(f)
+                if t - t2 > 777777 and d.startswith("pe-copyparty"):
+                    shutil.rmtree(p)
+            except:
+                pass
 
         time.sleep(78123)
 
