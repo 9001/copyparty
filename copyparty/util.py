@@ -4399,6 +4399,36 @@ def gzip_file_orig_sz(f) -> int:
     return sunpack(b"I", rv)[0]  # type: ignore
 
 
+def zip_fi(zf, fp, max_sz):
+    zi = zf.getinfo(fp)
+    if max_sz and zi.file_size > max_sz:
+        raise Pebkac(404, "zip bomb defused")
+    return zi
+
+
+def zip_lim(zi, max_sz):
+    if zi.file_size > max_sz:
+        raise Pebkac(404, "zip bomb defused")
+    return zi
+
+
+def zip_read(zf, zi, max_sz):
+    ret = b""
+    with zf.open(zi) as f:
+        while True:
+            buf = f.read(max_sz)
+            if not buf:
+                break
+            ret += buf
+            if len(ret) >= max_sz:
+                raise Pebkac(404, "zip bomb defused")
+    return ret
+
+
+def zip_readf(zf, zp, max_sz):
+    return zip_read(zf, zip_fi(zf, zp, max_sz), max_sz)
+
+
 def align_tab(lines: list[str]) -> list[str]:
     rows = []
     ncols = 0

@@ -30,6 +30,9 @@ from .util import (
     sfsenc,
     uncyg,
     wunlink,
+    zip_fi,
+    zip_lim,
+    zip_readf,
 )
 
 if True:  # pylint: disable=using-constant-test
@@ -174,7 +177,7 @@ def au_unpk(
             zil = [x for x in zil if x.filename.lower().split(".")[-1] == au]
             if not zil:
                 raise Exception("no audio inside zip")
-            fi = zf.open(zil[0])
+            fi = zf.open(zip_lim(zil[0], maxsz))
 
         elif pk == "cbz":
             import zipfile
@@ -188,17 +191,18 @@ def au_unpk(
             t = "cbz: %d files, %d hits" % (nf, len(znil))
             if not znil:
                 raise Exception("no images inside cbz")
-            using = sorted(znil)[0][1].filename
+            zi = sorted(znil)[0][1]
             if znil:
-                t += ", using " + using
+                t += ", using " + zi.filename
             log(t)
-            fi = zf.open(using)
+            fi = zf.open(zip_lim(zi, maxsz))
 
         elif pk == "kra" or pk == "ora":
             import zipfile
 
             zf = zipfile.ZipFile(abspath, "r")
-            fi = zf.open("mergedimage.png")
+            zi = zip_fi(zf, "mergedimage.png", maxsz)
+            fi = zf.open(zi)
 
         elif pk == "epub":
             fi = get_cover_from_epub(log, abspath)
@@ -438,7 +442,8 @@ def get_cover_from_epub(log: "NamedLogger", abspath: str) -> Optional[IO[bytes]]
     with zipfile.ZipFile(abspath, "r") as z:
         # First open the container file to find the package document (.opf file)
         try:
-            container_root = parse_xml(z.read("META-INF/container.xml").decode())
+            zb = zip_readf(z, "META-INF/container.xml", 2 << 20)
+            container_root = parse_xml(zb.decode())
         except KeyError:
             log("epub: no container file found in %s" % (abspath,))
             return None
@@ -452,7 +457,8 @@ def get_cover_from_epub(log: "NamedLogger", abspath: str) -> Optional[IO[bytes]]
 
         # Then open the first package document to find the path of the cover image
         try:
-            package_root = parse_xml(z.read(rootfile_path).decode())
+            zb = zip_readf(z, rootfile_path, 2 << 20)
+            package_root = parse_xml(zb.decode())
         except KeyError:
             log("epub: no package document found in %s" % (abspath,))
             return None
@@ -476,7 +482,8 @@ def get_cover_from_epub(log: "NamedLogger", abspath: str) -> Optional[IO[bytes]]
         adjusted_cover_path = urljoin(rootfile_path, coverimage_path)
 
         try:
-            return z.open(adjusted_cover_path)
+            zi = zip_fi(z, adjusted_cover_path, 2 << 24)
+            return z.open(zi)
         except KeyError:
             t = "epub: cover specified in package document, but doesn't exist: %s"
             log(t % (adjusted_cover_path,))

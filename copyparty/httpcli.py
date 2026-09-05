@@ -130,6 +130,7 @@ from .util import (
     vsplit,
     wunlink,
     yieldfile,
+    zip_fi,
 )
 
 if True:  # pylint: disable=using-constant-test
@@ -1921,9 +1922,7 @@ class HttpCli(object):
 
         try:
             with zipfile.ZipFile(abspath, "r") as zf:
-                zi = zf.getinfo(inner_path)
-                if zi.file_size >= maxsz:
-                    raise Pebkac(404, "zip bomb defused")
+                zi = zip_fi(zf, inner_path, maxsz)
                 with zf.open(zi, "r") as fi:
                     mime = guess_mime(inner_path)
                     if mime not in SAFE_MIMES and "nohtml" in self.vn.flags:
