@@ -45,6 +45,8 @@ if (1)
 				["ctrl-C", "copy selection to clipboard"],
 				["ctrl-V", "paste (move/copy) here"],
 				["Y", "download selected"],
+				["N", "upload file(s)"],
+				["ctrl-N", "upload folder"],
 				["F2", "rename selected"],
 				["F4", "update/refresh"],
 
@@ -6391,6 +6393,12 @@ var ahotkeys = function (e) {
 		if (sh && kl == 'j')
 			return showfile.ppj(e) || true;
 	}
+
+	if (kl == 'n' && sh)
+		return up2k.up('dir')
+
+	if (kl == 'n')
+		return up2k.up('file')
 
 	if (sh && kl != 'a' && kl != 'd')
 		return;

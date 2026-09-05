@@ -808,7 +808,8 @@ function up2k_init(subtle) {
         "tact": Date.now(),
         "init_deps": init_deps,
         "set_fsearch": set_fsearch,
-        "gotallfiles": [gotallfiles]  // hooks
+        "gotallfiles": [gotallfiles],  // hooks
+        "up": up,
     };
 
     setTimeout(function () {
@@ -1025,7 +1026,7 @@ function up2k_init(subtle) {
     apply_flag_cfg();
     set_fsearch();
 
-    function nav() {
+    function up(t) {
         start_actx();
 
         var uf = function () { ebi('file' + fdom_ctr).click(); },
@@ -1040,9 +1041,11 @@ function up2k_init(subtle) {
         if (MOBILE)
             return uf();
 
-        modal.confirm(L.u_nav_m, uf, ud, null, L.u_nav_b);
+        if (t == 'file') return uf();
+        else if (t == 'dir') return ud();
+        else modal.confirm(L.u_nav_m, uf, ud, null, L.u_nav_b);
     }
-    ebi('u2btn').onclick = nav;
+    ebi('u2btn').onclick = up;
 
     var nenters = 0;
     function ondrag(e) {

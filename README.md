@@ -707,6 +707,8 @@ the browser has the following hotkeys  (always qwerty)
 * `ctrl-C` copy selected files/folders to clipboard
 * `ctrl-V` paste (move/copy)
 * `Y` download selected files
+* `N` upload file(s)
+* `shift-N` upload folder
 * `F2` [rename](#batch-rename) selected file/folder
 * when a file/folder is selected (in not-grid-view):
   * `Up/Down` move cursor
