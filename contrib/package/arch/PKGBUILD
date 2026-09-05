@@ -13,12 +13,13 @@ depends=("bash" "python" "lsof" "python-jinja")
 makedepends=("python-wheel" "python-setuptools" "python-build" "python-installer" "make" "pigz")
 optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tags"
             "cfssl: generate TLS certificates on startup"
-            "python-mutagen: music tags (alternative)"
-            "python-paramiko: sftp server",
+            "python-mutagen: music tags (fast/inaccurate)"
             "python-pillow: thumbnails for images"
             "python-pyvips: thumbnails for images (eats ram, prefer pillow)"
+            "python-paramiko: sftp server"
+            "python-pyftpdlib: ftp server"
+            "python-pyopenssl: ftps server (needs pyftpdlib too)"
             "libkeyfinder: detection of musical keys"
-            "python-pyopenssl: ftps functionality"
             "python-pyzmq: send zeromq messages from event-hooks"
             "python-argon2-cffi: hashed passwords in config"
 )
