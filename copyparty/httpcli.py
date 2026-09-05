@@ -5041,7 +5041,7 @@ class HttpCli(object):
 
         if "txt" in self.uparam:
             mime = "text/plain; charset={}".format(self.uparam["txt"] or "utf-8")
-        elif "mime" in self.uparam:
+        elif "mime" in self.uparam and "nomime" not in self.vn.flags:
             mime = str(self.uparam.get("mime"))
         elif "rmagic" in self.vn.flags:
             mime = guess_mime(req_path, fs_path)

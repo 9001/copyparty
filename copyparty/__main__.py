@@ -1813,6 +1813,7 @@ def add_safety(ap):
     ap2.add_argument("--csp-dl", metavar="TXT", default="", help="content-security-policy to apply for static files (volflag=csp_dl)")
     ap2.add_argument("--no-script", action="store_true", help="disables javascript in html files; helps prevent XSS but kills interactive websites; this will override \033[33m--csp-dl\033[0m with [\033[32mscript-src 'none'\033[0m] (volflag=noscript)")
     ap2.add_argument("--no-html", action="store_true", help="show html-files as plain text; helps prevent XSS but kills websites/blogs, also enables --no-script (volflag=nohtml)")
+    ap2.add_argument("--no-mime", action="store_true", help="disallow changing the response mimetype with url-parameter ?mime=... (volflag=nomime)")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise). \033[1;31mWARNING:\033[0m Not compatible with WebDAV")
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore \033[33m--no-robots\033[0m")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything (volflag=norobots)")
