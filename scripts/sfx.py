@@ -270,7 +270,7 @@ def hashfile(fn):
     return h.hexdigest()[:24]
 
 
-def unpack():
+def unpack(top):
     """extracts the archive"""
     name = "pe-copyparty"
     try:
@@ -281,6 +281,8 @@ def unpack():
     tag = "v%s" % STAMP
     opj = OP.join
     ofe = OP.exists
+    if not ofe(top):
+        os.mkdir(top)
     final = opj(top, name)
     san = opj(final, "copyparty/up2k.py")
     for suf in range(0, 9001):
@@ -482,7 +484,13 @@ def main():
 
     # skip 0
 
-    tmp = os.path.realpath(unpack())
+    try:
+        if WINDOWS:
+            x
+        z = unpack(ENV.get("PRTY_XD") or OP.expanduser("~/.cache"))
+    except:
+        z = unpack(tempfile.gettempdir())
+    tmp = OP.realpath(z)
 
     try:
         from jinja2 import __version__ as j2

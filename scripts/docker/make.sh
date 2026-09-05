@@ -29,7 +29,7 @@ done
 
 getver() {
     ver=$(
-        python3 ../../dist/copyparty-sfx.py --version 2>/dev/null |
+        PRTY_XD=/tmp python3 ../../dist/copyparty-sfx.py --version 2>/dev/null |
         awk '/^copyparty v/{sub(/-.*/,"");sub(/v/,"");print$2;exit}'
     )
     echo $ver | grep -E '[0-9]\.[0-9]' || {

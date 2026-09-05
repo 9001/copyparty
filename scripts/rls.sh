@@ -19,6 +19,8 @@ v=$1; shift
 [ "$v" = sfx ] &&
     rls= || rls=1
 
+export PRTY_XD=/tmp
+
 [ $rls ] && {
     printf '%s\n' "$v" | grep -qE '^[0-9\.]+$' || exit 1
     grep -E "(${v//./, })" ../copyparty/__version__.py || exit 1

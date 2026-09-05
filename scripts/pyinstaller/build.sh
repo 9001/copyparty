@@ -42,6 +42,7 @@ dl https://192.168.123.1:3923/cpp/scripts/pyinstaller/loader.rc
     [ $st_en ] && [ $st_en -ge $st_sfx ] || sfx=sfx
 }
 
+export PRTY_XD=$TEMP
 rm -rf $TEMP/pe-copyparty*
 python copyparty-$sfx.py --version
 
