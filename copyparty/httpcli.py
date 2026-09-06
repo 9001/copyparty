@@ -3151,7 +3151,8 @@ class HttpCli(object):
 
         v = self.uparam[k]
 
-        if self._use_dirkey(self.vn, ""):
+        is_dk = self._use_dirkey(self.vn, "")
+        if is_dk:
             vn = self.vn
             rem = self.rem
         else:
@@ -3163,6 +3164,9 @@ class HttpCli(object):
 
         items = zs.replace("\r", "").split("\n")
         items = [unquotep(x) for x in items if items]
+        if is_dk:
+            zss = set(vn_ls_regfile(self.args, vn, rem))
+            items = [x for x in items if x in zss]
 
         self.parser.drop()
         return self.tx_zip(k, v, "", vn, rem, items)
