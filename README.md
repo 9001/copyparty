@@ -11,7 +11,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 
 👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
 
-📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
+📷 **screenshots:** [browser](#the-browser) // [themes](#themes) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
 🎬 **videos:** [upload](https://a.ocv.me/pub/demo/pics-vids/up2k.webm) // [cli-upload](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm) // [race-the-beam](https://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm) // 👉 **[feature-showcase](https://a.ocv.me/pub/demo/showcase-hq.webm)** ([youtube](https://www.youtube.com/watch?v=15_-hgsX2V0))
 
@@ -703,8 +703,7 @@ config file example, where the same permission to see dotfiles is given in two d
 
 accessing a copyparty server using a web-browser
 
-![copyparty-browser-fs8](https://user-images.githubusercontent.com/241032/192042695-522b3ec7-6845-494a-abdb-d1c0d0e23801.png)
-
+![copyparty-browser-fs8](./docs/images/browser.webp)
 
 ## tabs
 
@@ -808,7 +807,7 @@ press `g` or use the view mode buttons in the top left to toggle grid-view inste
 * can be made default globally with `--grid` or per-volume with volflag `grid`
 * enable by adding `?imgs` to a link, or disable with `?imgs=0`
 
-![copyparty-thumbs-fs8](https://user-images.githubusercontent.com/241032/129636211-abd20fa2-a953-4366-9423-1c88ebb96ba9.png)
+![copyparty-thumbs-fs8](./docs/images/grid.webp)
 
 it does static images with Pillow / pyvips / FFmpeg, and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
 * Pillow is 3x faster (and safer) than FFmpeg
@@ -885,7 +884,7 @@ select which type of archive you want in the `[⚙️] config` tab:
 
 you can also zip a selection of files or folders by clicking them in the browser, that brings up a selection editor and zip button in the bottom right
 
-![copyparty-zipsel-fs8](https://user-images.githubusercontent.com/241032/129635374-e5136e01-470a-49b1-a762-848e8a4c9cdc.png)
+![copyparty-zipsel-fs8](./docs/images/zip-dl.webp)
 
 cool trick: download a folder by appending url-params `?tar&opus` or `?tar&mp3` to transcode all audio files (except aac|m4a|mp3|ogg|opus|wma) to opus/mp3 before they're added to the archive
 * super useful if you're 5 minutes away from takeoff and realize you don't have any music on your phone but your server only has flac files and downloading those will burn through all your data + there wouldn't be enough time anyways
@@ -928,7 +927,7 @@ up2k has several advantages:
 
 see [up2k](./docs/devnotes.md#up2k) for details on how it works, or watch a [demo video](https://a.ocv.me/pub/demo/pics-vids/#gf-0f6f5c0d)
 
-![copyparty-upload-fs8](https://user-images.githubusercontent.com/241032/129635371-48fc54ca-fa91-48e3-9b1d-ba413e4b68cb.png)
+![copyparty-upload-fs8](./docs/images/upload.webp)
 
 **protip:** you can avoid scaring away users with [contrib/plugins/minimal-up2k.js](contrib/plugins/minimal-up2k.js) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png)
 
@@ -967,7 +966,7 @@ if you want to replace existing files on the server with new uploads by default,
 
 dropping files into the browser also lets you see if they exist on the server
 
-![copyparty-fsearch-fs8](https://user-images.githubusercontent.com/241032/129635361-c79286f0-b8f1-440e-aaf4-6e929428fac9.png)
+![copyparty-fsearch-fs8](./docs/images/file-search.webp)
 
 toggle the `[🔎]` switch in the upload options to search for files instead of uploading
 
@@ -983,7 +982,7 @@ if you have a "wark" (file-identifier/checksum) then you can also search for tha
 
 undo/delete accidental uploads  using the `[🧯]` tab in the UI
 
-![copyparty-unpost-fs8](https://user-images.githubusercontent.com/241032/129635368-3afa6634-c20f-418c-90dc-ec411f3b3897.png)
+![copyparty-unpost-fs8](./docs/images/unpost.webp)
 
 you can unpost even if you don't have regular move/delete access, however only for files uploaded within the past `--unpost` seconds (default 12 hours) and the server must be running with `-e2d`
 
@@ -1360,11 +1359,13 @@ search by size, date, path/name, mp3-tags, ...
 
 by default, the `[🔍]` search button shows the folder search bar.
 
+![copyparty-search-compact-fs8](./docs/images/search-compact.webp)
+
 search for files within a folder and optionally its subfolders.
 
 for extended search options, use the dropdown arrow to open the full search UI
 
-![copyparty-search-fs8](https://user-images.githubusercontent.com/241032/129635365-c0ff2a9f-0ee5-4fc3-8bb6-006033cf67b8.png)
+![copyparty-search-fs8](./docs/images/search.webp)
 
 when started with `-e2dsa` copyparty will scan/index all your files. This avoids duplicates on upload, and also makes the volumes searchable through the web-ui:
 * make search queries by `size`/`date`/`directory-path`/`filename`, or...
@@ -1380,6 +1381,8 @@ for the above example to work, add the commandline argument `-e2ts` to also scan
 
 
 # server config
+
+> see also: [config GUI](#config-gui)
 
 using arguments or config files, or a mix of both:
 * using a config-file (`-c some.conf`) is best, easier to read/maintain; see [./docs/example.conf](docs/example.conf)
@@ -2352,16 +2355,34 @@ also, `--force-js` disables the plain HTML folder listing, making things harder 
 
 ## themes
 
-you can change the default theme with `--theme 2`, and add your own themes by modifying `browser.css` or providing your own css to `--css-browser`, then telling copyparty they exist by increasing `--themes`
+you can set default theme server wide with `--theme 2`, or for each volume
 
-<table><tr><td width="33%" align="center"><a href="https://user-images.githubusercontent.com/241032/165864907-17e2ac7d-319d-4f25-8718-2f376f614b51.png"><img src="https://user-images.githubusercontent.com/241032/165867551-fceb35dd-38f0-42bb-bef3-25ba651ca69b.png"></a>
-0. classic dark</td><td width="33%" align="center"><a href="https://user-images.githubusercontent.com/241032/168644399-68938de5-da9b-445f-8d92-b51c74b5f345.png"><img src="https://user-images.githubusercontent.com/241032/168644404-8e1a2fdc-6e59-4c41-905e-ba5399ed686f.png"></a>
-2. flat pm-monokai</td><td width="33%" align="center"><a href="https://user-images.githubusercontent.com/241032/165864901-db13a429-a5da-496d-8bc6-ce838547f69d.png"><img src="https://user-images.githubusercontent.com/241032/165867560-aa834aef-58dc-4abe-baef-7e562b647945.png"></a>
-4. vice</td></tr><tr><td align="center"><a href="https://user-images.githubusercontent.com/241032/165864905-692682eb-6fb4-4d40-b6fe-27d2c7d3e2a7.png"><img src="https://user-images.githubusercontent.com/241032/165867555-080b73b6-6d85-41bb-a7c6-ad277c608365.png"></a>
-1. classic light</td><td align="center"><a href="https://user-images.githubusercontent.com/241032/168645276-fb02fd19-190a-407a-b8d3-d58fee277e02.png"><img src="https://user-images.githubusercontent.com/241032/168645280-f0662b3c-9764-4875-a2e2-d91cc8199b23.png"></a>
-3. flat light
-</td><td align="center"><a href="https://user-images.githubusercontent.com/241032/165864898-10ce7052-a117-4fcf-845b-b56c91687908.png"><img src="https://user-images.githubusercontent.com/241032/165867562-f3003d45-dd2a-4564-8aae-fed44c1ae064.png"></a>
-5. <a href="https://blog.codinghorror.com/a-tribute-to-the-windows-31-hot-dog-stand-color-scheme/">hotdog stand</a></td></tr></table>
+you can also add your own themes by modifying `browser.css` or providing your own css to `--css-browser`, then telling copyparty they exist by increasing `--themes`
+
+other customization options include a custom accent color `--tcolor`, corner radius, setting background images/videos `--bg-img` and disabling emojis `--unfun`  
+the [config GUI](#config-gui) provides an easy way to configure the background image (and more), including opacity and blur
+
+<table><tr>
+<td width="33%" align="center"><a href="./docs/images/theme-0.webp"><img src="./docs/images/theme-0.webp"></a>0. flat dark</td>
+<td width="33%" align="center"><a href="./docs/images/theme-1.webp"><img src="./docs/images/theme-1.webp"></a>1. flat light</td>
+<td width="33%" align="center"><a href="./docs/images/theme-2.webp"><img src="./docs/images/theme-2.webp"></a>2. pm monokai</td>
+</tr><tr>
+<td align="center"><a href="./docs/images/theme-3.webp"><img src="./docs/images/theme-3.webp"></a>3. athlete</td>
+<td align="center"><a href="./docs/images/theme-4.webp"><img src="./docs/images/theme-4.webp"></a>4. vice</td>
+<td align="center"><a href="./docs/images/theme-5.webp"><img src="./docs/images/theme-5.webp"></a>5. <a href="https://blog.codinghorror.com/a-tribute-to-the-windows-31-hot-dog-stand-color-scheme/">hotdog stand</a></td>
+</tr><tr>
+<td align="center"><a href="./docs/images/theme-6.webp"><img src="./docs/images/theme-6.webp"></a>6. hacker</td>
+<td align="center"><a href="./docs/images/theme-7.webp"><img src="./docs/images/theme-7.webp"></a>7. high contrast</td>
+<td align="center"><a href="./docs/images/theme-8.webp"><img src="./docs/images/theme-8.webp"></a>8. phi 95 dark</td>
+</tr><tr>
+<td align="center"><a href="./docs/images/theme-9.webp"><img src="./docs/images/theme-9.webp"></a>9. phi 95</td>
+<td align="center"><a href="./docs/images/theme-10.webp"><img src="./docs/images/theme-10.webp"></a>10. poison</td>
+<td align="center"><a href="./docs/images/theme-11.webp"><img src="./docs/images/theme-11.webp"></a>11. wing</td>
+</tr><tr>
+<td align="center"><a href="./docs/images/theme-12.webp"><img src="./docs/images/theme-12.webp"></a>12. frutiger dark</td>
+<td align="center"><a href="./docs/images/theme-13.webp"><img src="./docs/images/theme-13.webp"></a>13. frutiger light</td>
+<td align="center"><a href="./docs/images/theme-nofun.webp"><img src="./docs/images/theme-nofun.webp"></a>white accent, no emojis, bg img</td>
+</tr></table>
 
 the classname of the HTML tag is set according to the selected theme, which is used to set colors as css variables ++
 
@@ -2910,7 +2931,7 @@ quick summary of more eccentric web-browsers trying to view a directory index:
 | **ncsa mosaic** 2.7       | does not get a pass, [pic1](https://user-images.githubusercontent.com/241032/174189227-ae816026-cf6f-4be5-a26e-1b3b072c1b2f.png) - [pic2](https://user-images.githubusercontent.com/241032/174189225-5651c059-5152-46e9-ac26-7e98e497901b.png) |
 | **SerenityOS** (7e98457)  | hits a page fault, works with `?b=u`, file upload not-impl |
 | **sony psp** 5.50         | can browse, upload/mkdir/msg (thx dwarf) [screenshot](https://github.com/user-attachments/assets/9d21f020-1110-4652-abeb-6fc09c533d4f) |
-| **nintendo 3ds**          | can browse, upload, view thumbnails (thx bnjmn) |
+| **nintendo 3ds**          | can browse, login (requires a dns url), upload, view thumbnails (thx bnjmn) |
 | **Nintendo Wii (Opera 9.0 "Internet Channel")**          | can browse, can't upload or download (no local storage), can view images - works best with `?b=u`, default view broken |
 
 <p align="center"><img src="https://github.com/user-attachments/assets/88deab3d-6cad-4017-8841-2f041472b853" /></p>
@@ -3040,9 +3061,9 @@ if you have volumes that are accessible without a password, then some webdav cli
 
 install the app straight from the browser and access it in the share menu to upload files! it uses the normal web interface.
 
-you can install this from the browser when visiting your server if it has real https. this PWA allows you to share to copyparty on mobile for example, basically the successor of the Party UP! app.
+you can install this from the browser when visiting your server if it has real https. this PWA allows you to share to copyparty on mobile for example. basically the successor of the Party UP! app.
 
-if you use this, you might want to consider setting [--cookie-lax](https://copyparty.eu/cli/#flags-help-page:~:text=lax), which lets you follow file/folder links without having to log in again.  
+if you use this, you might want to consider setting [--cookie-lax](https://copyparty.eu/cli/#flags-help-page:~:text=lax), which lets you follow file/folder links from chat apps without having to log in again.  
 this might increase the likelihood of success on an attack where an attacker uploads a malicious html file, which tries to run scripts with your privileges, since clicking a link from a chat service would be enough to succeed. if this concerns you, have a look at [--no-html](https://copyparty.eu/cli/#g-no-html)
 
 ### Party UP! (android)
