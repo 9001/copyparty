@@ -15,7 +15,7 @@ Description=copyparty file server
 Type=notify
 SyslogIdentifier=copyparty
 Environment=PYTHONUNBUFFERED=x
-WorkingDirectory=/var/lib/copyparty-jail
+WorkingDirectory=/var/lib/copyparty-jail/srv
 ExecReload=/bin/kill -s USR1 $MAINPID
 
 # user to run as + where the TLS certificate is (if any)

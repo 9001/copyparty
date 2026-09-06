@@ -81,6 +81,42 @@
 * #1209 (partially), #711 added a setting that gets rid of (most) emojis
 
 
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0817-2157  `v1.20.21`  thumbex
+
+## 🧪 new features
+
+* #1602 custom thumbnail extractors; [docs/example](https://github.com/9001/copyparty/tree/hovudstraum/bin/thumbs) (thx @kamaeff!) 18648050 dbc6df81
+* #1604 [u2c](https://github.com/9001/copyparty/tree/hovudstraum/bin#u2cpy): password can be provided in env-var `U2C_PW` (thx @shermanhlc!) 47297475
+* wopi: option [--wopi-accs](https://copyparty.eu/cli/#g-wopi-accs) to limit who's able to use the feature 78a4ee49
+  * also fixes wopi on servers where user does not have read/write-access to root volume
+  * also restricts the token to just that one file; good if the wopi-client is some cloud thing that shouldn't be trusted
+* #1591 wopi: use persistent file-ID which is necessary for real-time collab (thx @kamaeff!) efcf96e3
+* #1605 the lightbox can show svg images now 825f1c94
+
+## 🩹 bugfixes
+
+* up2k: client could waste a little bandwidth while recovering from a network glitch 18791c57
+* if `PRTY_CONFIG` is set to a config-file that is also autodetected, then explain the misconfiguration instead of crashing like before 14e2d79b
+* wopi: fix session-timeout hint to clients (thx @kamaeff!) 92c3f32e
+* js: fix chance of duplicate prologue on very first page visit eeb399e3
+* js: fix panic on image dragdrop out of the browser window dcc0abd6
+
+## 🔧 other changes
+
+* up2k: client now detects when server or reverseproxy is incorrectly configured with an impractically small request-body-size-limit, crashing the website with [an explanation](https://github.com/9001/copyparty/#u2sz) how to fix it f19ef033
+  * also allows setting the chunksize all the way down to 1 megabyte when absolutely necessary (bad idea, slow)
+* new option [--allow-svg-js](https://copyparty.eu/cli/#g-allow-svg-js) if you really want that 566de65f
+* shares: harden single-file shares some more 21c2c728 9ff6a71a
+  * just removing footguns (motivated by a bug-report that was a false-positive)
+* copyparty.exe: upgrade to python 3.14.7 from 3.13.14 8b6e8972
+  * larger and slightly faster (compensated for the size bloat by making the text-image-generator more shitty)
+
+## 🌠 fun facts
+
+* the [thumbex example](https://github.com/9001/copyparty/blob/hovudstraum/bin/thumbs/randomcolor.py) is also a cool example how relevant the "pseudo" in PRNG can be; with `random.randrange` instead of `os.urandom`, [first run](https://a.ocv.me/pub/g/2026/08/Screenshot_2026-08-15_19-56-35.png?cache) followed by restarting copyparty and [another run](https://a.ocv.me/pub/g/2026/08/Screenshot_2026-08-15_19-56-38.png?cache)...heh
+
+
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0803-2232  `v1.20.20`  more wopi

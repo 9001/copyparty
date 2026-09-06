@@ -576,6 +576,7 @@ Ls.fin = {
 	"u_ancient": 'selaimesi on ns. vaikuttavan ikivanha --  kannattais varmaan <a href="#" id="u2nah">käyttää bup:ia tän sijaan</a>',
 	"u_nowork": "tarvitaan firefox 53+ tai chrome 57+ tai iOS 11+",
 	"tail_2old": "tarvitaan firefox 105+ tai chrome 71+ tai iOS 14.5+",
+	"b2old": 'selaimesi on liian vanha', //m
 	"u_nodrop": 'selaimesi on liian vanha vedä-ja-pudota lataamiseen',
 	"u_notdir": "tuo ei ole hakemisto!\n\nselaimesi on liian vanha,\nkokeile sen sijaan 'vedä-pudota'-tekniikkaa.",
 	"u_uri": "'vedä-pudottaaksesi' kuvia muista selainikkunoista,\npudota se isoon latausnapppiin",

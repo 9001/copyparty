@@ -2578,6 +2578,10 @@ html.g .btn {
 	top: .3em;
 	z-index: 31;
 }
+.dumb_loader_thing.ns {
+	animation: none;
+	opacity: 1;
+}
 #dlt_t {
 	left: 0;
 }

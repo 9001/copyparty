@@ -17,7 +17,7 @@ Description=copyparty file server
 [Service]
 SyslogIdentifier=prisonparty
 Environment=PYTHONUNBUFFERED=x
-WorkingDirectory=/var/lib/copyparty-jail
+WorkingDirectory=/var/lib/copyparty-jail/srv
 ExecReload=/bin/kill -s USR1 $MAINPID
 
 # stop systemd-tmpfiles-clean.timer from deleting copyparty while it's running

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import division, print_function, unicode_literals
 
-S_VERSION = "2.22"
-S_BUILD_DT = "2026-06-13"
+S_VERSION = "2.23"
+S_BUILD_DT = "2026-09-06"
 
 """
 u2c.py: upload to copyparty

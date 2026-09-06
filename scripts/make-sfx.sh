@@ -193,6 +193,8 @@ tmpdir="$(
 	printf '%s\n' "$TMPDIR" /tmp |
 	awk '/./ {print; exit}'
 )"
+[ -e ~/.cache ] && tmpdir=~/.cache
+[ "$PRTY_XD" ] && tmpdir="$PRTY_XD"
 
 necho() {
 	printf '\033[G%s ... \033[K' "$*"
@@ -522,7 +524,6 @@ unhelpg() {
 [ $no_hl ] &&
 	rm -rf copyparty/web/deps/prism*
 
-rm -f copyparty/web/deps/orbitron.woff2  # todo:uiv15
 [ $no_fnt ] && {
 	rm -f copyparty/web/deps/scp.woff2
 	f=copyparty/web/ui.css

@@ -585,6 +585,7 @@ Ls.vie = {
 	"u_ancient": "trình duyệt của bạn quá cũ; bạn có thể <a href=\"#\" id=\"u2nah\">dùng bup</a> thay thế",
 	"u_nowork": "cần Firefox 53+, Chrome 57+ hoặc iOS 11+",
 	"tail_2old": "cần Firefox 105+, Chrome 71+ hoặc iOS 14.5+",
+	"b2old": 'trình duyệt của bạn quá cũ', //m
 	"u_nodrop": "trình duyệt của bạn quá cũ để dùng kéo thả khi tải lên",
 	"u_notdir": "đây không phải thư mục\n\ntrình duyệt của bạn quá cũ,\nvui lòng thử dùng dragdrop",
 

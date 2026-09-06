@@ -579,6 +579,7 @@ Ls.pol = {
 	"u_ancient": 'twoja przeglądarka jest niezwykle zabytkowa -- powinieneś zamiast tego <a href="#" id="u2nah">użyć bup</a>',
 	"u_nowork": "wymaga Firefox 53+, Chrome 57+ lub iOS 11+",
 	"tail_2old": "wymaga Firefox 105+, Chrome 71+ lub iOS 14.5+",
+	"b2old": 'ta przeglądarka jest za stara', //m
 	"u_nodrop": 'ta przeglądarka jest za stara, nie wspiera przesyłania "przeciągnij i upuść"',
 	"u_notdir": "to nie jest folder!\n\nta przeglądarka jest za stara\nspróbuj przeciągnąć i upuścić",
 	"u_uri": "aby przeciągnąć i upuścić obrazy z innych okien przeglądarki,\nupuść je na duży przycisk przesyłania",

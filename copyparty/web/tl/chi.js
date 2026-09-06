@@ -577,6 +577,7 @@ Ls.chi = {
 	"u_ancient": '你还在用远古浏览器，也许你应该 <a href="#" id="u2nah">改用 bup</a>',
 	"u_nowork": "需要 Firefox 53+ 或 Chrome 57+ 或 iOS 11+",
 	"tail_2old": "需要 Firefox 105+ 或 Chrome 71+ 或 iOS 14.5+",
+	"b2old": '浏览器版本太低', //m
 	"u_nodrop": '浏览器版本低，不支持通过拖动文件到窗口来上传文件',
 	"u_notdir": "这不是文件夹！\n\n你的浏览器太老了，\n请尝试将文件夹拖入窗口",
 	"u_uri": "要从其他浏览器窗口拖放图片，\n请将其拖放到大上传按钮上",

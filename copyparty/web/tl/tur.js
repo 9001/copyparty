@@ -576,6 +576,7 @@ Ls.tur = {
 	"u_ancient": 'tarayıcınız resmen fosilleşmiş -- belki de <a href="#" id="u2nah">bup kullanmalısınız</a>',
 	"u_nowork": "firefox 53+ veya chrome 57+ veya iOS 11+ gerekiyor",
 	"tail_2old": "firefox 105+ veya chrome 71+ veya iOS 14.5+ gerekiyor",
+	"b2old": 'tarayıcınız çok eski', //m
 	"u_nodrop": 'tarayıcınız sürükleyip bırakmak için çok eski',
 	"u_notdir": "bu bir klasör değil!\n\ntarayıcınız çok eski,\nlütfen bunun yerine sürükleyip bırakmayı deneyin",
 	"u_uri": "başka tarayıcı pencerelerinden sürükle-bırak ile yükleme yapmak için,\nlütfen büyük yükleme düğmesinin üstüne bırakın",

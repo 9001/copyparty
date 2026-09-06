@@ -614,6 +614,7 @@ if (1)
 		"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" id="u2nah">use bup instead</a>',
 		"u_nowork": "need firefox 53+ or chrome 57+ or iOS 11+",
 		"tail_2old": "need firefox 105+ or chrome 71+ or iOS 14.5+",
+		"b2old": 'your browser is too old',
 		"u_nodrop": 'your browser is too old for drag-and-drop uploading',
 		"u_notdir": "that's not a folder!\n\nyour browser is too old,\nplease try dragdrop instead",
 		"u_uri": "to dragdrop images from other browser windows,\nplease drop it onto the big upload button",
@@ -6235,7 +6236,7 @@ var showfile = (function () {
 	r.tgltail = function () {
 		if (!window.TextDecoderStream) {
 			bcfg_set('taildoc', r.taildoc = false);
-			return toast.err(10, L.tail_2old);
+			return toast.err(10, L.b2old + ';\n' + L.tail_2old);
 		}
 		r.show(r.url, true);
 	};
@@ -7264,8 +7265,10 @@ var ahotkeys = function (e) {
 	if (k == 'F2')
 		return fileman.rename();
 
-	if (k == 'F4')
+	if (k == 'F4') {
+		enspin('t', 1);
 		return treectl.goto();
+	}
 
 	if (!treectl.hidden && (!sh || !thegrid.en)) {
 		if (kl == 'a')
@@ -9061,12 +9064,12 @@ var treectl = (function () {
 })();
 
 
-function enspin(i) {
+function enspin(i, ns) {
 	i = 'dlt_' + i;
 	if (ebi(i))
 		return;
 	var d = mknod('div', i, SPINNER);
-	d.className = 'dumb_loader_thing';
+	d.className = 'dumb_loader_thing' + ( ns? ' ns' : '');
 	if (SPINNER_CSS)
 		d.style.cssText = SPINNER_CSS;
 	document.body.appendChild(d);
@@ -10454,7 +10457,7 @@ function show_md(md, name, div, url, depth) {
 		if (depth) {
 			clmod(div, 'raw', 1);
 			div.textContent = "--[ " + name + " ]---------\r\n" + md;
-			return toast.warn(3, errmsg + (WebAssembly ? 'failed to load marked.js' : 'your browser is too old'));
+			return toast.warn(10, errmsg + (WebAssembly ? 'failed to load marked.js' : L.b2old));
 		}
 
 		wfp_debounce.n--;

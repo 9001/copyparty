@@ -130,6 +130,7 @@ from .util import (
     vsplit,
     wunlink,
     yieldfile,
+    zip_fi,
 )
 
 if True:  # pylint: disable=using-constant-test
@@ -202,12 +203,13 @@ A_FILE = os.stat_result(
 )
 
 RE_CC = re.compile(r"[\x00-\x1f\x7f]")  # search always faster
+RE_CCM = re.compile(r"^[^\x00-\x1f\x7f]*$")  # except when it isnt
 RE_USAFE = re.compile(r'[\x00-\x1f\x7f<>"]')  # search always faster
 RE_HSAFE = re.compile(r"[\x00-\x1f\x7f<>\"'&]")  # search always much faster
 RE_HOST = re.compile(r"[^][0-9a-zA-Z.:_-]")  # search faster <=17ch
 RE_MHOST = re.compile(r"^[][0-9a-zA-Z.:_-]+$")  # match faster >=18ch
 RE_K = re.compile(r"[^0-9a-zA-Z_-]")  # search faster <=17ch
-RE_HTTP1 = re.compile(r"(GET|HEAD|POST|PUT) [^ ]+ HTTP/1.1$")
+RE_HTTP1 = re.compile(r"(GET|HEAD|POST|PUT) /[^ ]* HTTP/1.1$")
 RE_HR = re.compile(r"[<>\"'&]")
 RE_MDV = re.compile(r"(.*)\.([0-9]+\.[0-9]{3})(\.[Mm][Dd])$")
 RE_RSS_KW = re.compile(r"(\{[^} ]+\})")
@@ -385,14 +387,17 @@ class HttpCli(object):
                 return False
 
             try:
+                if not RE_CCM.match("".join(headerlines)):
+                    raise Exception()
+
                 self.mode, self.req, self.http_ver = headerlines[0].split(" ")
 
                 # normalize incoming headers to lowercase;
                 # outgoing headers however are Correct-Case
-                for header_line in headerlines[1:]:
-                    k, zs = header_line.split(":", 1)
+                for ln in headerlines[1:]:
+                    k, zs = ln.split(":", 1)
                     self.headers[k.lower()] = zs.strip()
-                    if zs.endswith(" HTTP/1.1") and RE_HTTP1.search(zs):
+                    if ln.endswith(" HTTP/1.1") and RE_HTTP1.search(ln):
                         raise Exception()
             except:
                 headerlines = [repr(x) for x in headerlines]
@@ -1161,14 +1166,17 @@ class HttpCli(object):
         for k, zs in list(self.out_headers.items()) + self.out_headerlist:
             response.append("%s: %s" % (k, zs))
 
-        ptn_cc = RE_CC
-        for zs in response:
-            m = ptn_cc.search(zs)
-            if m:
-                t = "malicious user; Cc in out-hdr; req(%r) hdr(%r) => %r"
-                self.log(t % (self.req, zs, zs[m.span()[0] :]), 1)
-                self.cbonk(self.conn.hsrv.gmal, zs, "cc_hdr", "Cc in out-hdr")
-                raise Pebkac(999)
+        if not RE_CCM.match("".join(response)):
+            ta = (self.req, response, "?")
+            for zs in response:
+                m = RE_CC.search(zs)
+                if m:
+                    ta = (self.req, zs, zs[m.span()[0] :])
+                    break
+            t = "malicious user; Cc in out-hdr; req(%r) hdr(%r) => %r"
+            self.log(t % ta, 1)
+            self.cbonk(self.conn.hsrv.gmal, zs, "cc_hdr", "Cc in out-hdr")
+            raise Pebkac(999)
 
         response.append(self.vn.flags[oh_k].replace("{{ js_nonce }}", self.js_nonce))
 
@@ -1918,9 +1926,7 @@ class HttpCli(object):
 
         try:
             with zipfile.ZipFile(abspath, "r") as zf:
-                zi = zf.getinfo(inner_path)
-                if zi.file_size >= maxsz:
-                    raise Pebkac(404, "zip bomb defused")
+                zi = zip_fi(zf, inner_path, maxsz)
                 with zf.open(zi, "r") as fi:
                     mime = guess_mime(inner_path)
                     if mime not in SAFE_MIMES and "nohtml" in self.vn.flags:
@@ -3149,7 +3155,8 @@ class HttpCli(object):
 
         v = self.uparam[k]
 
-        if self._use_dirkey(self.vn, ""):
+        is_dk = self._use_dirkey(self.vn, "")
+        if is_dk:
             vn = self.vn
             rem = self.rem
         else:
@@ -3161,6 +3168,9 @@ class HttpCli(object):
 
         items = zs.replace("\r", "").split("\n")
         items = [unquotep(x) for x in items if items]
+        if is_dk:
+            zss = set(vn_ls_regfile(self.args, vn, rem))
+            items = [x for x in items if x in zss]
 
         self.parser.drop()
         return self.tx_zip(k, v, "", vn, rem, items)
@@ -5038,7 +5048,7 @@ class HttpCli(object):
 
         if "txt" in self.uparam:
             mime = "text/plain; charset={}".format(self.uparam["txt"] or "utf-8")
-        elif "mime" in self.uparam:
+        elif "mime" in self.uparam and "nomime" not in self.vn.flags:
             mime = str(self.uparam.get("mime"))
         elif "rmagic" in self.vn.flags:
             mime = guess_mime(req_path, fs_path)
@@ -6911,11 +6921,17 @@ class HttpCli(object):
         return True
 
     def handle_fs_abrt(self):
+        rk = self.uparam["fs_abrt"]
+        if rk == "ping":
+            self.conn.hsrv.broker.ask("up2k.handle_fs_abrt", rk)
+            self.reply(b"pong")
+            return True
+
         if self.args.no_fs_abrt:
             t = "aborting an ongoing copy/move is disabled in server config"
             raise Pebkac(403, t)
 
-        self.conn.hsrv.broker.say("up2k.handle_fs_abrt", self.uparam["fs_abrt"])
+        self.conn.hsrv.broker.say("up2k.handle_fs_abrt", rk)
         self.loud_reply("aborting", status=200)
         return True
 
@@ -7428,10 +7444,10 @@ class HttpCli(object):
         for k in ["zip", "tar"]:
             v = self.uparam.get(k)
             if v is not None and (not add_og or not og_fn):
+                filt = []
                 if is_dk and "dks" not in vn.flags:
-                    t = "server config does not allow download-as-zip/tar; only dk is specified, need dks too"
-                    raise Pebkac(403, t)
-                return self.tx_zip(k, v, self.vpath, vn, rem, [])
+                    filt = set(vn_ls_regfile(self.args, vn, rem))
+                return self.tx_zip(k, v, self.vpath, vn, rem, filt)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(
             rem,
@@ -8081,3 +8097,13 @@ class HttpCli(object):
         html = self.j2s(tpl, **j2a)
         self.reply(html.encode("utf-8", "replace"))
         return True
+
+
+def vn_ls_regfile(args: argparse.Namespace, vn: VFS, rem: str) -> list[str]:
+    _, ls, _ = vn.ls(
+        rem,
+        "",
+        not args.no_scandir,
+        [[False, False]],
+    )
+    return [x[0] for x in ls if stat.S_ISREG(x[1].st_mode)]

@@ -52,6 +52,7 @@ from .util import (
     ren_open,
     rmdirs,
     rmdirs_up,
+    runcmd,
     runhook,
     runihook,
     s2hms,
@@ -174,6 +175,7 @@ class Up2k(object):
         self.pp: Optional[ProgressPrinter] = None
         self.rescan_cond = threading.Condition()
         self.need_rescan: set[str] = set()
+        self.have_e2d = False
         self.db_act = 0.0
 
         self.reg_mutex = threading.Lock()
@@ -253,6 +255,10 @@ class Up2k(object):
         with self.reload_mutex:
             if self.reload_flag < n:
                 self.reload_flag = n
+            if not self.have_e2d and not self.reloading:
+                self.reloading = True
+                Daemon(self._reload_thr)
+                return
         with self.rescan_cond:
             self.rescan_cond.notify_all()
 
@@ -290,7 +296,7 @@ class Up2k(object):
 
     def deferred_init(self) -> None:
         all_vols = self.asrv.vfs.all_vols
-        have_e2d = self.init_indexes(all_vols, [], False)
+        self.init_indexes(all_vols, [], False)
 
         if self.stop:
             # up-mt consistency not guaranteed if init is interrupted;
@@ -308,7 +314,7 @@ class Up2k(object):
             return
 
         Daemon(self._snapshot, "up2k-snapshot")
-        if have_e2d:
+        if self.have_e2d:
             Daemon(self._hasher, "up2k-hasher")
             Daemon(self._sched_rescan, "up2k-rescan")
             if self.mtag:
@@ -891,7 +897,7 @@ class Up2k(object):
 
     def init_indexes(
         self, all_vols: dict[str, VFS], scan_vols: list[str], fscan: bool, gid: int = 0
-    ) -> bool:
+    ) -> None:
         if not gid:
             with self.mutex:
                 gid = self.gid
@@ -1128,7 +1134,7 @@ class Up2k(object):
         else:
             self.unpp()
 
-        return have_e2d
+        self.have_e2d = self.have_e2d or have_e2d
 
     def register_vpath(
         self, ptop: str, flags: dict[str, Any]
@@ -1290,6 +1296,14 @@ class Up2k(object):
             t = "failed to initialize volume '/%s': %s"
             self.log(t % (vpath, ex), 1)
             return None
+
+        if dir_is_empty(self.log_func, not self.args.no_scandir, histpath) and not (
+            ANYWIN or UNIX or "hist_cow" in flags
+        ):
+            try:
+                runcmd([b"chattr", b"+C", fsenc(histpath)], 1)
+            except:
+                pass
 
         try:
             cur = self._open_db_wd(db_path)
@@ -4133,6 +4147,9 @@ class Up2k(object):
                 pass
 
     def handle_fs_abrt(self, akey: str) -> None:
+        if akey == "ping":
+            with self.mutex, self.reg_mutex:
+                return
         self.abrt_key = akey
 
     def handle_rm(

@@ -59,6 +59,9 @@ window.onpointerdown = function (e) {
 if (!window.WebAssembly || !WebAssembly.Memory)
     window.WebAssembly = false;
 
+if (!window.AbortController)
+    window.AbortController = false;
+
 if (!window.Notification || !Notification.permission)
     window.Notification = false;
 
@@ -463,8 +466,11 @@ function import_js(url, cb, ecb) {
     var head = document.head || document.getElementsByTagName('head')[0];
     var script = mknod('script');
     script.type = 'text/javascript';
-    if (window.JS_NONCE)
+    if (window.JS_NONCE) {
         script.nonce = JS_NONCE;
+        if (!AbortController)
+            script.setAttribute('nonce', JS_NONCE);
+    }
     script.src = url + '?_=' + (window.TS || 'a');
     script.onload = cb;
     script.onerror = ecb || function () {

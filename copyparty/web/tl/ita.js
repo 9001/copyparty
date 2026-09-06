@@ -576,6 +576,7 @@ Ls.ita = {
 	"u_ancient": 'il tuo browser è incredibilmente antico -- forse dovresti <a href="#" id="u2nah">usare bup invece</a>',
 	"u_nowork": "serve firefox 53+ o chrome 57+ o iOS 11+",
 	"tail_2old": "serve firefox 105+ o chrome 71+ o iOS 14.5+",
+	"b2old": 'il tuo browser è troppo vecchio', //m
 	"u_nodrop": 'il tuo browser è troppo vecchio per il caricamento drag-and-drop',
 	"u_notdir": "quella non è una cartella!\n\nil tuo browser è troppo vecchio,\nprova dragdrop invece",
 	"u_uri": "per trascinare immagini da altre finestre del browser,\nrilasciale sul pulsante upload grande",

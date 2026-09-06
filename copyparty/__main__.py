@@ -14,6 +14,7 @@ import locale
 import os
 import re
 import select
+import shutil
 import socket
 import sys
 import threading
@@ -589,6 +590,17 @@ def sfx_tpoke(top: str):
             except Exception as ex:
                 lprint("<TPOKE> [%s] %r" % (f, ex))
                 files.remove(f)
+
+        r = os.path.dirname(top)
+        for d in os.listdir(r):
+            try:
+                p = r + "/" + d
+                f = p + "/copyparty/up2k.py"
+                t2 = os.path.getmtime(f)
+                if t - t2 > 777777 and d.startswith("pe-copyparty"):
+                    shutil.rmtree(p)
+            except:
+                pass
 
         time.sleep(78123)
 
@@ -1813,6 +1825,7 @@ def add_safety(ap):
     ap2.add_argument("--csp-dl", metavar="TXT", default="", help="content-security-policy to apply for static files (volflag=csp_dl)")
     ap2.add_argument("--no-script", action="store_true", help="disables javascript in html files; helps prevent XSS but kills interactive websites; this will override \033[33m--csp-dl\033[0m with [\033[32mscript-src 'none'\033[0m] (volflag=noscript)")
     ap2.add_argument("--no-html", action="store_true", help="show html-files as plain text; helps prevent XSS but kills websites/blogs, also enables --no-script (volflag=nohtml)")
+    ap2.add_argument("--no-mime", action="store_true", help="disallow changing the response mimetype with url-parameter ?mime=... (volflag=nomime)")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise). \033[1;31mWARNING:\033[0m Not compatible with WebDAV")
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore \033[33m--no-robots\033[0m")
     ap2.add_argument("--no-robots", action="store_true", help="adds http and html headers asking search engines to not index anything (volflag=norobots)")
@@ -2015,6 +2028,7 @@ def add_db_general(ap, hcores):
     ap2.add_argument("--no-forget", action="store_true", help="never forget indexed files, even when deleted from disk -- makes it impossible to ever upload the same file twice -- only useful for offloading uploads to a cloud service or something (volflag=noforget)")
     ap2.add_argument("--forget-ip", metavar="MIN", type=int, default=0, help="remove uploader-IP from database (and make unpost impossible) \033[33mMIN\033[0m minutes after upload, for GDPR reasons. Default [\033[32m0\033[0m] is never-forget. [\033[32m1440\033[0m]=day, [\033[32m10080\033[0m]=week, [\033[32m43200\033[0m]=month. (volflag=forget_ip)")
     ap2.add_argument("--dbd", metavar="PROFILE", default="wal", help="database durability profile; sets the tradeoff between robustness and speed, see \033[33m--help-dbd\033[0m (volflag=dbd)")
+    ap2.add_argument("--hist-cow", action="store_true", help="btrfs-only: histpaths (db/thumbs) are nocow by default; if you really need Copy-on-write then enable this (volflag=hist_cow)")
     ap2.add_argument("--xlink", action="store_true", help="on upload: check all volumes for dupes, not just the target volume (probably buggy, not recommended) (volflag=xlink)")
     ap2.add_argument("--hash-mt", metavar="CORES", type=int, default=hcores, help="num cpu cores to use for file hashing; set 0 or 1 for single-core hashing")
     ap2.add_argument("--re-maxage", metavar="SEC", type=int, default=0, help="rescan filesystem for changes every \033[33mSEC\033[0m seconds; 0=off (volflag=scan)")

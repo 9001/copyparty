@@ -495,8 +495,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             smode = "rb"
 
         try:
-            vn, rem = self.asrv.vfs.get(vp, self.uname, rd, wr)
-            ap = vn.canonical(rem, False)
+            ap, vn, rem = self.v2a(vp, rd, wr)
             vf = vn.flags
         except Pebkac as ex:
             t = "denied open file [%s], iflag=%s, read=%s, write=%s: %s"

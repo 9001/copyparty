@@ -573,6 +573,7 @@ Ls.nno = {
 	"u_ancient": 'nettlesaren din er prehistorisk -- mulig du burde <a href="#" id="u2nah">bruke bup i staden for</a>',
 	"u_nowork": "krev firefox 53+, chrome 57+, eller iOS 11+",
 	"tail_2old": "krev firefox 105+, chrome 71+, eller iOS 14.5+",
+	"b2old": 'nettlesaren din er for gamal',
 	"u_nodrop": 'nettlesaren din er for gamal åt å laste opp filer ved å drage dei inn i vindauget',
 	"u_notdir": "mottok ikkje mappa!\n\nnettlesaren din er for gamal,\nprøv å drage mappa inn i vindauget i staden for",
 	"u_uri": "for å laste opp bilder frå andre nettlesarvindauge,\nslipp bildet rett på den store last-opp-knappen",

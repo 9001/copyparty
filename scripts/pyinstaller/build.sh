@@ -42,6 +42,7 @@ dl https://192.168.123.1:3923/cpp/scripts/pyinstaller/loader.rc
     [ $st_en ] && [ $st_en -ge $st_sfx ] || sfx=sfx
 }
 
+export PRTY_XD=$TEMP
 rm -rf $TEMP/pe-copyparty*
 python copyparty-$sfx.py --version
 
@@ -67,6 +68,7 @@ rm -rf mods/magic/
         sed -ri 's/\binspect\b/os/' $spkgs/jinja2/$f.py
     done
 }
+af '/print\(lic/{s=0}!s;/lic = buf.deco/{s=1}' mods/copyparty/__main__.py
 
 sed -ri /fork_process/d mods/pyftpdlib/servers.py
 af '/^class _Base/{s=1}!s' mods/pyftpdlib/authorizers.py

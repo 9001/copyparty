@@ -1,6 +1,6 @@
 # this will start `/usr/bin/copyparty`
 # in a chroot, preventing accidental access elsewhere,
-# and read copyparty config from `/etc/copyparty/copyparty.conf`
+# and read copyparty config from `/etc/copyparty.conf`
 #
 # expose additional filesystem locations to copyparty
 #   by listing them between the last `%i` and `--`
@@ -19,9 +19,9 @@ Description=copyparty file server
 [Service]
 Type=notify
 SyslogIdentifier=prisonparty
-WorkingDirectory=/var/lib/copyparty-jail
+WorkingDirectory=/var/lib/copyparty-jail/srv
 Environment=PYTHONUNBUFFERED=x
-Environment=PRTY_CONFIG=/etc/copyparty/copyparty.conf
+Environment=PRTY_CONFIG=/etc/copyparty.conf
 ExecReload=/bin/kill -s USR1 $MAINPID
 
 # user to run as + where the TLS certificate is (if any)

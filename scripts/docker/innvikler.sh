@@ -72,7 +72,7 @@ exec /usr/bin/python3 -m copyparty "$@"
 EOF
 
 # unpack sfx and dive in
-python3 copyparty-sfx.py --version
+PRTY_XD=/tmp python3 copyparty-sfx.py --version
 cd /tmp/pe-copyparty.0
 
 # steal the stuff we need

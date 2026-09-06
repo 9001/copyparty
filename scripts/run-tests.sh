@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+export PRTY_NO_VIPS=1
+
 if uname | grep -iE '^(msys|mingw)'; then
     pids=()
 

@@ -573,6 +573,7 @@ Ls.nor = {
 	"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" id="u2nah">bruke bup istedenfor</a>',
 	"u_nowork": "krever firefox 53+, chrome 57+, eller iOS 11+",
 	"tail_2old": "krever firefox 105+, chrome 71+, eller iOS 14.5+",
+	"b2old": 'nettleseren din er for gammel',
 	"u_nodrop": 'nettleseren din er for gammel til å laste opp filer ved å dra dem inn i vinduet',
 	"u_notdir": "mottok ikke mappen!\n\nnettleseren din er for gammel,\nprøv å dra mappen inn i vinduet istedenfor",
 	"u_uri": "for å laste opp bilder ifra andre nettleservinduer,\nslipp bildet rett på den store last-opp-knappen",
