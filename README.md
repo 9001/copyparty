@@ -703,7 +703,7 @@ config file example, where the same permission to see dotfiles is given in two d
 
 accessing a copyparty server using a web-browser
 
-![copyparty-browser-fs8](./docs/images/browser.webp)
+![copyparty-browser-fs8](./docs/images/browser.png)
 
 ## tabs
 
@@ -807,7 +807,7 @@ press `g` or use the view mode buttons in the top left to toggle grid-view inste
 * can be made default globally with `--grid` or per-volume with volflag `grid`
 * enable by adding `?imgs` to a link, or disable with `?imgs=0`
 
-![copyparty-thumbs-fs8](./docs/images/grid.webp)
+![copyparty-thumbs-fs8](./docs/images/grid.png)
 
 it does static images with Pillow / pyvips / FFmpeg, and uses FFmpeg for video files, so you may want to `--no-thumb` or maybe just `--no-vthumb` depending on how dangerous your users are
 * Pillow is 3x faster (and safer) than FFmpeg
@@ -1359,7 +1359,7 @@ search by size, date, path/name, mp3-tags, ...
 
 by default, the `[🔍]` search button shows the folder search bar.
 
-![copyparty-search-compact-fs8](./docs/images/search-compact.webp)
+![copyparty-search-compact-fs8](./docs/images/search-compact.png)
 
 search for files within a folder and optionally its subfolders.
 
