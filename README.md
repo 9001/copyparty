@@ -884,7 +884,7 @@ select which type of archive you want in the `[⚙️] config` tab:
 
 you can also zip a selection of files or folders by clicking them in the browser, that brings up a selection editor and zip button in the bottom right
 
-![copyparty-zipsel-fs8](./docs/images/zip-dl.webp)
+![copyparty-zipsel-fs8](./docs/images/zip-dl.png)
 
 cool trick: download a folder by appending url-params `?tar&opus` or `?tar&mp3` to transcode all audio files (except aac|m4a|mp3|ogg|opus|wma) to opus/mp3 before they're added to the archive
 * super useful if you're 5 minutes away from takeoff and realize you don't have any music on your phone but your server only has flac files and downloading those will burn through all your data + there wouldn't be enough time anyways
@@ -927,7 +927,7 @@ up2k has several advantages:
 
 see [up2k](./docs/devnotes.md#up2k) for details on how it works, or watch a [demo video](https://a.ocv.me/pub/demo/pics-vids/#gf-0f6f5c0d)
 
-![copyparty-upload-fs8](./docs/images/upload.webp)
+![copyparty-upload-fs8](./docs/images/upload.png)
 
 **protip:** you can avoid scaring away users with [contrib/plugins/minimal-up2k.js](contrib/plugins/minimal-up2k.js) which makes it look [much simpler](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png)
 
@@ -966,7 +966,7 @@ if you want to replace existing files on the server with new uploads by default,
 
 dropping files into the browser also lets you see if they exist on the server
 
-![copyparty-fsearch-fs8](./docs/images/file-search.webp)
+![copyparty-fsearch-fs8](./docs/images/file-search.png)
 
 toggle the `[🔎]` switch in the upload options to search for files instead of uploading
 
@@ -982,7 +982,7 @@ if you have a "wark" (file-identifier/checksum) then you can also search for tha
 
 undo/delete accidental uploads  using the `[🧯]` tab in the UI
 
-![copyparty-unpost-fs8](./docs/images/unpost.webp)
+![copyparty-unpost-fs8](./docs/images/unpost.png)
 
 you can unpost even if you don't have regular move/delete access, however only for files uploaded within the past `--unpost` seconds (default 12 hours) and the server must be running with `-e2d`
 
@@ -1365,7 +1365,7 @@ search for files within a folder and optionally its subfolders.
 
 for extended search options, use the dropdown arrow to open the full search UI
 
-![copyparty-search-fs8](./docs/images/search.webp)
+![copyparty-search-fs8](./docs/images/search.png)
 
 when started with `-e2dsa` copyparty will scan/index all your files. This avoids duplicates on upload, and also makes the volumes searchable through the web-ui:
 * make search queries by `size`/`date`/`directory-path`/`filename`, or...
@@ -2363,25 +2363,25 @@ other customization options include a custom accent color `--tcolor`, corner rad
 the [config GUI](#config-gui) provides an easy way to configure the background image (and more), including opacity and blur
 
 <table><tr>
-<td width="33%" align="center"><a href="./docs/images/theme-0.webp"><img src="./docs/images/theme-0.webp"></a>0. flat dark</td>
-<td width="33%" align="center"><a href="./docs/images/theme-1.webp"><img src="./docs/images/theme-1.webp"></a>1. flat light</td>
-<td width="33%" align="center"><a href="./docs/images/theme-2.webp"><img src="./docs/images/theme-2.webp"></a>2. pm monokai</td>
+<td width="33%" align="center"><a href="./docs/images/theme-0.png"><img src="./docs/images/theme-0.png"></a>0. flat dark</td>
+<td width="33%" align="center"><a href="./docs/images/theme-1.png"><img src="./docs/images/theme-1.png"></a>1. flat light</td>
+<td width="33%" align="center"><a href="./docs/images/theme-2.png"><img src="./docs/images/theme-2.png"></a>2. pm monokai</td>
 </tr><tr>
-<td align="center"><a href="./docs/images/theme-3.webp"><img src="./docs/images/theme-3.webp"></a>3. athlete</td>
-<td align="center"><a href="./docs/images/theme-4.webp"><img src="./docs/images/theme-4.webp"></a>4. vice</td>
-<td align="center"><a href="./docs/images/theme-5.webp"><img src="./docs/images/theme-5.webp"></a>5. <a href="https://blog.codinghorror.com/a-tribute-to-the-windows-31-hot-dog-stand-color-scheme/">hotdog stand</a></td>
+<td align="center"><a href="./docs/images/theme-3.png"><img src="./docs/images/theme-3.png"></a>3. athlete</td>
+<td align="center"><a href="./docs/images/theme-4.png"><img src="./docs/images/theme-4.png"></a>4. vice</td>
+<td align="center"><a href="./docs/images/theme-5.png"><img src="./docs/images/theme-5.png"></a>5. <a href="https://blog.codinghorror.com/a-tribute-to-the-windows-31-hot-dog-stand-color-scheme/">hotdog stand</a></td>
 </tr><tr>
-<td align="center"><a href="./docs/images/theme-6.webp"><img src="./docs/images/theme-6.webp"></a>6. hacker</td>
-<td align="center"><a href="./docs/images/theme-7.webp"><img src="./docs/images/theme-7.webp"></a>7. high contrast</td>
-<td align="center"><a href="./docs/images/theme-8.webp"><img src="./docs/images/theme-8.webp"></a>8. phi 95 dark</td>
+<td align="center"><a href="./docs/images/theme-6.png"><img src="./docs/images/theme-6.png"></a>6. hacker</td>
+<td align="center"><a href="./docs/images/theme-7.png"><img src="./docs/images/theme-7.png"></a>7. high contrast</td>
+<td align="center"><a href="./docs/images/theme-8.png"><img src="./docs/images/theme-8.png"></a>8. phi 95 dark</td>
 </tr><tr>
-<td align="center"><a href="./docs/images/theme-9.webp"><img src="./docs/images/theme-9.webp"></a>9. phi 95</td>
-<td align="center"><a href="./docs/images/theme-10.webp"><img src="./docs/images/theme-10.webp"></a>10. poison</td>
-<td align="center"><a href="./docs/images/theme-11.webp"><img src="./docs/images/theme-11.webp"></a>11. wing</td>
+<td align="center"><a href="./docs/images/theme-9.png"><img src="./docs/images/theme-9.png"></a>9. phi 95</td>
+<td align="center"><a href="./docs/images/theme-10.png"><img src="./docs/images/theme-10.png"></a>10. poison</td>
+<td align="center"><a href="./docs/images/theme-11.png"><img src="./docs/images/theme-11.png"></a>11. wing</td>
 </tr><tr>
-<td align="center"><a href="./docs/images/theme-12.webp"><img src="./docs/images/theme-12.webp"></a>12. frutiger dark</td>
-<td align="center"><a href="./docs/images/theme-13.webp"><img src="./docs/images/theme-13.webp"></a>13. frutiger light</td>
-<td align="center"><a href="./docs/images/theme-nofun.webp"><img src="./docs/images/theme-nofun.webp"></a>white accent, no emojis, bg img</td>
+<td align="center"><a href="./docs/images/theme-12.png"><img src="./docs/images/theme-12.png"></a>12. frutiger dark</td>
+<td align="center"><a href="./docs/images/theme-13.png"><img src="./docs/images/theme-13.png"></a>13. frutiger light</td>
+<td align="center"><a href="./docs/images/theme-nofun.png"><img src="./docs/images/theme-nofun.png"></a>white accent, no emojis, bg img</td>
 </tr></table>
 
 the classname of the HTML tag is set according to the selected theme, which is used to set colors as css variables ++
