@@ -788,9 +788,15 @@ html.y #path {
 #files tbody div a {
 	color: var(--tab-alt);
 }
-a, #blogout, #files tbody div a:last-child {
+a, #blogout{
 	color: #d7dbe0;
 	color: var(--fg);
+	padding: .2em;
+	text-decoration: none;
+}
+.splitsub a, #op_unpost a, #files tbody div a:last-child {
+	color: #07c;
+	color: var(--a);
 	padding: .2em;
 	text-decoration: none;
 }
