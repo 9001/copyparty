@@ -659,6 +659,7 @@ Ls.fin = {
 	"rc_pla": "toista äänitiedostona",
 	"rc_txt": "avaa tekstinäkymässä",
 	"rc_md": "avaa markdown-näkymässä",
+	"rc_wopi": "avaa office-editorissa", //m
 	"rc_dl": "lataa",
 	"rc_zip": "lataa arkistona",
 	"rc_cpl": "kopioi linkki",

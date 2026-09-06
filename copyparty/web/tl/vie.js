@@ -690,6 +690,7 @@ Ls.vie = {
 	"rc_pla": "phát dưới dạng âm thanh", //m
 	"rc_txt": "mở trong trình xem tệp", //m
 	"rc_md": "mở trong trình soạn thảo văn bản", //m
+	"rc_wopi": "mở trong trình soạn thảo office", //m
 	"rc_dl": "tải xuống", //m
 	"rc_zip": "tải xuống dưới dạng gói nén", //m
 	"rc_cpl": "sao chép liên kết", //m

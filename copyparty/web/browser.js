@@ -697,6 +697,7 @@ if (1)
 		"rc_pla": "play as audio",
 		"rc_txt": "open in textfile viewer",
 		"rc_md": "open in markdown viewer",
+		"rc_wopi": "open in office editor",
 		"rc_dl": "download",
 		"rc_zip": "download as archive",
 		"rc_cpl": "copy link",
@@ -1537,6 +1538,7 @@ ebi('rcm').innerHTML = (
 	'<a href="#" id="rpla">' + (fun_tgl ? '🎧 ' : '') + L.rc_pla + '</a>' +
 	'<a href="#" id="rtxt">' + (fun_tgl ? '📄 ' : '') + L.rc_txt + '</a>' +
 	'<a href="#" id="rmd">' + (fun_tgl ? '📜 ' : '') + L.rc_md + '</a>' +
+	'<a href="#" id="rwopi">' + (fun_tgl ? '📘 ' : '') + L.rc_wopi + '</a>' +
 	'<div id="rs1" class="sep"></div>' +
 	'<a href="#" id="rcpl">' + (fun_tgl ? '🔗 ' : '') + L.rc_cpl + '</a>' +
 	'<a href="#" id="rdl">' + (fun_tgl ? '⬇️ ' : '') + L.rc_dl + '</a>' +
@@ -1783,8 +1785,8 @@ check_image_support('jxl', "data:image/jxl;base64,/woIAAAMABKIAgC4AF3lEgA=");
 
 
 var img_re = APPLE ?
-	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jxl|jfif|svg|ico|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
-	/\.(a?png|avif|bmp|gif|jpe?g|jxl|jfif|svg|ico|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
+	/\.(a?png|avif|bmp|gif|hei[cf]s?|jpe?g|jfif|jxl|svg|ico|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i :
+	/\.(a?png|avif|bmp|gif|jpe?g|jfif|jxl|svg|ico|webp|webm|mkv|mp4|m4v|mov)(\?|$)/i;
 
 var wopi_set = !window.have_wopi ? null :
 	new Set('odt fodt ott doc docx dotx rtf odm ods fods ots xls xlsx odp fodp otp ppt pptx ppsx odg fodg otg odf'.split(' '));
@@ -11073,6 +11075,7 @@ var rcm = (function () {
 				case 'txt': showfile.show(selFile.name); break;
 				case 'md': location = selFile.path + (has(selFile.path, '?') ? '&v' : '?v'); break;
 				case 'cpl': fileman.link(); break;
+				case 'wopi': window.open('?wopi=' + selFile.name, '_blank').focus(); break;
 				case 'dl': ebi('seldl').click(); break;
 				case 'zip': ebi('selzip').click(); break;
 				case 'del': fileman.delete(); break;
@@ -11132,13 +11135,20 @@ var rcm = (function () {
 
 		var has_sel = msel.getsel().length;
 		var has_clip = fileman.clip.length;
+		var ext = (function() {
+			if (!selFile.name) return null;
+			var di = selFile.name.lastIndexOf('.');
+			if (di < 1) return null;
+			return selFile.name.slice(di + 1).toLowerCase();
+		})();
 
 		clmod(ebi('ropn'), 'hide', !selFile.path);
 		clmod(ebi('rply'), 'hide', selFile.type != 'gf' && selFile.type != 'af');
 		clmod(ebi('rpla'), 'hide', selFile.type != 'gf');
 		clmod(ebi('rtxt'), 'hide', !selFile.id);
 		clmod(ebi('rs1'), 'hide', !selFile.path);
-		clmod(ebi('rmd'), 'hide', !selFile.name || selFile.name.slice(-3) != ".md");
+		clmod(ebi('rmd'), 'hide', !selFile.name || ext != "md");
+		clmod(ebi('rwopi'), 'hide', !selFile.name || !wopi_set.has(ext));
 		clmod(ebi('rcpl'), 'hide', !selFile.path);
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);

@@ -81,7 +81,6 @@ from .util import (
     alltrace,
     build_netmap,
     expat_ver,
-    fsenc,
     gzip,
     html_escape,
     load_ipr,

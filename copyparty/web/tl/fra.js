@@ -659,6 +659,7 @@ Ls.fra = {
 	"rc_pla": "Lire comme audio", //m
 	"rc_txt": "ouvrir dans le visionneur de fichiers", //m
 	"rc_md": "ouvrir dans l’éditeur de texte", //m
+	"rc_wopi": "ouvrir dans l’éditeur office", //m
 	"rc_dl": "télécharger", //m
 	"rc_zip": "télécharger comme archive", //m
 	"rc_cpl": "copier le lien", //m

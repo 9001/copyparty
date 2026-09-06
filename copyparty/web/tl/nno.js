@@ -656,6 +656,7 @@ Ls.nno = {
 	"rc_pla": "spel av som lyd",
 	"rc_txt": "opne i filvisar",
 	"rc_md": "opne i tekstredigerar",
+	"rc_wopi": "opne i office-redigerar",
 	"rc_dl": "Last ned",
 	"rc_zip": "Last ned som arkiv",
 	"rc_cpl": "kopier lenke",

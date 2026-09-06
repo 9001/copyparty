@@ -24,9 +24,6 @@ backup=("/etc/${pkgname}.d/init" )
 sha256sums=("654ef47555bb402e27d8905c900c99f54b7f1d6db874a749effdf9ab23cf4223")
 
 build() {
-    cd "${srcdir}/${pkgname}-${pkgver}/copyparty/web"
-    make
-
     cd "${srcdir}/${pkgname}-${pkgver}"
     python -m build --wheel --no-isolation
 }

@@ -36,6 +36,7 @@ these are `--xiu` hooks; unlike `xbu` and `xau` (which get executed on every sin
 * [reject-and-explain.py](reject-and-explain.py) shows a custom error-message when it rejects an upload
 * [reject-ramdisk.py](reject-ramdisk.py) rejects the upload if the destination is a ramdisk
   * this hook uses the `I` flag which makes it 140x faster, but if the plugin has a bug it may crash copyparty
+* [phonecam-sorter.py](phonecam-sorter.py) is for syncing backups of phone gallery into year/month folders
 
 
 # more upload stuff

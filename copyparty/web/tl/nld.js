@@ -659,6 +659,7 @@ Ls.nld = {
 	"rc_pla": "Afspelen als audio", //m
 	"rc_txt": "Openen in bestandsviewer", //m
 	"rc_md": "Openen in teksteditor", //m
+	"rc_wopi": "Openen in office-editor", //m
 	"rc_dl": "Downloaden", //m
 	"rc_zip": "Downloaden als archief", //m
 	"rc_cpl": "Link kopiëren", //m

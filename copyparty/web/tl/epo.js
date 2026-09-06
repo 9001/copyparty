@@ -659,6 +659,7 @@ Ls.epo = {
 	"rc_pla": "ludi kiel aŭdiaĵo",
 	"rc_txt": "malfermi per tekstovidilo",
 	"rc_md": "malfermi per tekstoredaktilo",
+	"rc_wopi": "malfermi per office-redaktilo", //m
 	"rc_dl": "elŝuti",
 	"rc_zip": "elŝuti kiel arkivo",
 	"rc_cpl": "kopii ligilon",

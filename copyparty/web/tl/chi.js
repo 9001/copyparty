@@ -660,6 +660,7 @@ Ls.chi = {
 	"rc_pla": "作为音频播放",
 	"rc_txt": "在文本文件查看器中打开",
 	"rc_md": "在 markdown 查看器中打开",
+	"rc_wopi": "在 office 编辑器中打开", //m
 	"rc_dl": "下载",
 	"rc_zip": "下载为压缩包",
 	"rc_cpl": "复制链接",

@@ -26,9 +26,6 @@ See release at https://github.com/9001/copyparty/releases
 %setup -q
 
 %build
-cd "copyparty/web"
-make
-cd -
 %pyproject_wheel
 
 %install

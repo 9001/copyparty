@@ -7,7 +7,8 @@ pk: $(addsuffix .gz, $(wildcard tl/*.js *.js *.css) \
 un: $(addsuffix .un, $(wildcard tl/*.gz *.gz a/*.gz))
 
 tl/%.js.gz: tl/%.js
-	./Makefile.s1 <$< | pigz -c11 -J 34 -I 573 >$@
+	sh Makefile.s1 <$< | pigz -c11 -J 34 -I 573 >$@
+	pigz -dc <$@ | grep -q ^Ls
 	touch -r $< $@
 	rm $<
 

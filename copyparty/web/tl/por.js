@@ -659,6 +659,7 @@ Ls.por = {
 	"rc_pla": "reproduzir como áudio",
 	"rc_txt": "abrir no leitor de texto",
 	"rc_md": "abrir no leitor markdown",
+	"rc_wopi": "abrir no editor office", //m
 	"rc_dl": "baixar",
 	"rc_zip": "baixar compactado",
 	"rc_cpl": "copiar link",

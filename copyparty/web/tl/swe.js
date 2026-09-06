@@ -659,6 +659,7 @@ Ls.swe = {
 	"rc_pla": "spela upp som ljud", //m
 	"rc_txt": "öppna i filvisare", //m
 	"rc_md": "öppna i textredigerare", //m
+	"rc_wopi": "öppna i office-redigerare", //m
 	"rc_dl": "Ladda ner", //m
 	"rc_zip": "Ladda ner som arkiv", //m
 	"rc_cpl": "kopiera länk", //m

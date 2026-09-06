@@ -659,6 +659,7 @@ Ls.ita = {
 	"rc_pla": "riproduci come audio", //m
 	"rc_txt": "apri nel visualizzatore di file", //m
 	"rc_md": "apri nell’editor di testo", //m
+	"rc_wopi": "apri nell’editor office", //m
 	"rc_dl": "scarica", //m
 	"rc_zip": "scarica come archivio", //m
 	"rc_cpl": "copia link", //m

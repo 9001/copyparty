@@ -34,7 +34,7 @@ from .__init__ import ANYWIN, PY2, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
-from .qrkode import QrCode, qr2svg, qrgen
+from .qrkode import qr2svg, qrgen
 from .star import StreamTar
 from .sutil import StreamArc, gfilter
 from .szip import StreamZip
@@ -3350,7 +3350,7 @@ class HttpCli(object):
         try:
             postsize = remains = int(self.headers["content-length"])
         except:
-            raise Pebkac(400, "you must supply a content-length for binary POST")
+            raise Pebkac(411)
 
         if self.args.wopi and self.vpath.startswith("wopi"):
             return self.rx_wopi(postsize)
@@ -4978,14 +4978,15 @@ class HttpCli(object):
 
                 a, b = hrange.split("=", 1)[1].split("-")
 
+                if b.strip():
+                    upper = 1 + int(b.strip())
+                else:
+                    upper = file_sz
+
                 if a.strip():
                     lower = int(a.strip())
                 else:
-                    lower = 0
-
-                if b.strip():
-                    upper = int(b.strip()) + 1
-                else:
+                    lower = 1 + file_sz - upper
                     upper = file_sz
 
                 if upper > file_sz:

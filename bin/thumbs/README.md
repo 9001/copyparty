@@ -47,8 +47,9 @@ copyparty performs buffered reading, so expect multiple `read()` calls, respect 
 ## examples
 
 * [randomcolor](https://github.com/9001/copyparty/blob/hovudstraum/bin/thumbs/randomcolor.py) generates a random .gif image
+* [collabora](https://github.com/9001/copyparty/blob/hovudstraum/bin/thumbs/collabora.py) uses external self-hosted service (collabora online) to generate previews for various office documents, pdf and fb2 books, html, markdown, text files and some image formats; collabora is also supported as office editor in copyparty, see [wopi](https://github.com/9001/copyparty#wopi-server)
 
 
 ## some other known plugins seen on the internets
 
-* [fpkg_thumb](https://github.com/kamaeff/copyparty-dumb-fpkgi-handler/blob/master/fpkg_thumb.py) extracts cover images from playstation4 software installation packages ("pkg" and "fpkg" files)
+* [fpkg_thumb](https://github.com/kamaeff/fpkg-vault/blob/1c248de62a9ff9c4088d4b3e7962023cde9d6426/old/fpkg_thumb.py) extracts cover images from playstation4 software installation packages ("pkg" and "fpkg" files)
