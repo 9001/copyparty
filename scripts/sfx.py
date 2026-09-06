@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# coding: latin-1
+# coding: L1
 from __future__ import division, print_function, unicode_literals
 import re, os, sys, time, shutil, signal, tarfile, hashlib, platform, tempfile, traceback
 import subprocess as sp
@@ -25,19 +25,10 @@ import subprocess as sp
 
 
 """
-to edit this file, use HxD or "vim -b"
-  (there is compressed stuff at the end)
-
 run me with python 2.7 or 3.3+ to unpack and run copyparty
 
-there's zero binaries! just plaintext python scripts all the way down
-  so you can easily unpack the archive and inspect it for shady stuff
-
-the archive data is attached after the b"\n# eof\n" archive marker,
-  b"?0" decodes to b"\x00"
-  b"?n" decodes to b"\n"
-  b"?r" decodes to b"\r"
-  b"??" decodes to b"?"
+this is an SFX (self-extracting) tar.gz archive;
+see https://copyparty.eu/sfx-wtf/
 """
 
 
