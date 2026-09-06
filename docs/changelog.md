@@ -1,4 +1,48 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0906-2112  `v1.20.22`  hello fedora
+
+## 🧪 new features
+
+* iPhone: new bug in iOS breaks uploading; add workaround 3ea671ff
+  * apple broke XHR/fetch in a recent iOS version by introducing some wtf race-conditions in response handling; under high network load, the browser simply forgets to tell js that there's a response, so we're basically flying blind
+  * this workaround makes iOS uploads 50x faster than before but still not perfect (impossible given the situation); will be stuttery until apple fixes iOS
+    * apple will probably fix it very soon given the severity of the bug, but at least one copyparty user is forever-stuck on iOS-18.x which will never be fixed by apple, so a workaround is justified
+* #1617 new plugin to thumbnail office documents with collabora (thx @kamaeff!) d4a1ce48
+* new hook: [phonecam-sorter.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/phonecam-sorter.py) to automate organizing of pics/vids synced from phone to nas 9de09026
+* dirkeys: allow non-recursive download-as-zip with just `dk` 3e3401f4
+* `--no-mime` / volflag `nomime` disables `?mime=` for specifying custom response mimetype 370a05ab
+* btrfs-specific: nocow .hist to improve sqlite performance dd9cf645
+
+## 🩹 bugfixes
+
+* two low-severity vulns in different components, but surprisingly similar synopses:
+  * GHSA-mc69-pxc8-4xf4 dirkeys (volflag `dk`) did not prevent descending into subdirs if an attacker could guess the name of the subdir 55969b8e
+  * GHSA-3fhv-rhjw-7hrg sftp did not fully enforce volflags xvol/xdev; an attacker could read a file inside the symlink destination if they could guess the name inside b80a210e
+  * not important enough to be listed in "recent important news", but will be detected by the (default-disabled) [version-checker](https://github.com/9001/copyparty/#version-checker)
+* #1628 fix http206 range-request for last-n-bytes bdf8b793
+* #1610 autogrid didn't count jxl images (thx @sylfn!) 7796c2d0
+* when running without `e2d`, a config-reload would block uploads 0767d956
+* really old chrome versions (before ver.62) was only able to upload over https ab791921
+
+## 🔧 other changes
+
+* #1632 connect-page: adjust rclone commands to support long passwords d7d30f26
+* packaging: fix jank in source tarballs b854b8f5
+* packaging: don't list licenses of unvendored modules 704af697
+* #1631 systemd-examples: move config to `/etc/copyparty.conf` 185087ee
+* reduce binary-garbage in logs from scrapers/scanners f00d19c5
+* sfx: prefer `~/.cache/` (set `PRTY_XD=/tmp` to override) f870cf3c
+* sfx: mention https://copyparty.eu/sfx-wtf/ in the header 80165120
+* reduce complaining in log about default/unsafe tls-certs when not relevant 80cf7bfd
+
+## 🌠 fun facts
+
+* #887 copyparty has been packaged for Fedora 44! And EPEL-10 is on the way too... Thx @supakeen o/
+  * [verified at RevSpace NL](https://a.ocv.me/pub/g/2026/09/20260901_151949.jpg?cache)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0817-2157  `v1.20.21`  thumbex
 
 ## 🧪 new features
