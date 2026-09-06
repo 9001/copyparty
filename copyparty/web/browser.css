@@ -195,7 +195,7 @@ html.g {
 		color-mix(in oklab, var(--btn-bg-a) 30%, var(--b)));
 }
 html.gz {
-	--a: #5fb9b8;
+	--a: #1f61e0;
 	--btn-1-bs: .05em .1em .2em var(--a-dark) inset;
 	--fg-weak: var(--fg-max);
 
