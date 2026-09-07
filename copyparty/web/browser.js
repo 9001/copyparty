@@ -11151,7 +11151,7 @@ var rcm = (function () {
 		clmod(ebi('rtxt'), 'hide', !selFile.id);
 		clmod(ebi('rs1'), 'hide', !selFile.path);
 		clmod(ebi('rmd'), 'hide', !selFile.name || ext != "md");
-		clmod(ebi('rwopi'), 'hide', !selFile.name || !wopi_set.has(ext));
+		clmod(ebi('rwopi'), 'hide', !selFile.name || !wopi_set || !wopi_set.has(ext));
 		clmod(ebi('rcpl'), 'hide', !selFile.path);
 		clmod(ebi('rdl'), 'hide', !has_sel);
 		clmod(ebi('rzip'), 'hide', !has_sel);

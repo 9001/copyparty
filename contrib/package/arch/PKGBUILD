@@ -3,7 +3,7 @@
 # NOTE: You generally shouldn't use this PKGBUILD on Arch, as it is mainly for testing purposes. Install copyparty using pacman instead.
 
 pkgname=copyparty
-pkgver="1.20.22"
+pkgver="1.20.23"
 pkgrel=1
 pkgdesc="File server with accelerated resumable uploads, dedup, WebDAV, SFTP, FTP, TFTP, zeroconf, media indexer, thumbnails++"
 arch=("any")
@@ -24,8 +24,9 @@ optdepends=("ffmpeg: thumbnails for videos, images (slower) and audio, music tag
             "python-argon2-cffi: hashed passwords in config"
 )
 source=("https://github.com/9001/${pkgname}/releases/download/v${pkgver}/${pkgname}-${pkgver}.tar.gz")
-backup=("etc/${pkgname}/copyparty.conf" )
-sha256sums=("14d590644943c3ed14e21093cce79e06f1ae206adeeda16032d15a7241ff4344")
+backup=("etc/copyparty.conf")
+install=copyparty.install
+sha256sums=("c0957ce077b0494292541116b9473fdbda1e6597b5d9158b2fc470db0a1834dd")
 
 build() {
     cd "${srcdir}/${pkgname}-${pkgver}"
@@ -36,12 +37,11 @@ package() {
     cd "${srcdir}/${pkgname}-${pkgver}"
     python -m installer --destdir="$pkgdir" dist/*.whl
 
-    install -dm755 "${pkgdir}/etc/${pkgname}"
     install -Dm755 "bin/prisonparty.sh" "${pkgdir}/usr/bin/prisonparty"
-    install -Dm644 "contrib/systemd/${pkgname}.conf" "${pkgdir}/etc/${pkgname}/copyparty.conf"
+    install -Dm644 "contrib/systemd/${pkgname}.conf" "${pkgdir}/etc/copyparty.conf"
     install -Dm644 "contrib/systemd/${pkgname}@.service" "${pkgdir}/usr/lib/systemd/system/${pkgname}@.service"
     install -Dm644 "contrib/systemd/${pkgname}-user.service" "${pkgdir}/usr/lib/systemd/user/${pkgname}.service"
     install -Dm644 "contrib/systemd/prisonparty@.service" "${pkgdir}/usr/lib/systemd/system/prisonparty@.service"
-    install -Dm644 "contrib/systemd/index.md" "${pkgdir}/var/lib/${pkgname}-jail/README.md"
+    install -Dm644 "contrib/systemd/index.md" "${pkgdir}/var/lib/${pkgname}-jail/srv/README.md"
     install -Dm644 "LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 }

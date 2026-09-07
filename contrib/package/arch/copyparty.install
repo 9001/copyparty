@@ -1,0 +1,27 @@
+post_upgrade() {
+
+    # v1.20.22 moved the config-file, affecting the system-service only
+    if [[ $(vercmp "$2" 1.20.22) -lt 0 ]]; then
+
+        oldpath="/etc/copyparty/copyparty.conf"
+        newpath="/etc/copyparty.conf"
+
+        echo "==> Migrating config-file from $oldpath to $newpath"
+
+        if [[ ! -f "$oldpath" ]]; then
+            oldpath="$oldpath.pacsave"
+        fi
+
+        if [[ -f "$newpath.pacnew" ]]; then
+            echo "==> WARNING: A config-file already existed in the new location [$newpath]. The existing file will be used as-is."
+
+        elif [[ -f "$oldpath" ]]; then
+            mv -v "$oldpath" "$newpath"
+            rmdir /etc/copyparty 2>/dev/null || true
+        fi
+
+        systemctl cat copyparty@.service | awk '/=PRTY_CONFIG=/ && !/=\/etc\/copyparty.conf/ {exit 1}' || {
+            echo "==> WARNING: The copyparty system-service has been edited by hand since installation, so it will not read config from the new default config path [$newpath]. Please use PRTY_CONFIG=$newpath if that is correct for your setup."
+        }
+    fi
+}
