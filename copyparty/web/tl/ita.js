@@ -5,7 +5,7 @@ Ls.ita = {
 	"tt": "Italiano",
 
 	"cols": {
-		"c": "pulsanti azione",
+		"!": "pulsanti azione",
 		"dur": "durata",
 		"q": "qualità / bitrate",
 		"Ac": "codec audio",
@@ -14,7 +14,7 @@ Ls.ita = {
 		"Ahash": "checksum audio",
 		"Vhash": "checksum video",
 		"Res": "risoluzione",
-		"T": "tipo file",
+		"Ext": "tipo file",
 		"aq": "qualità audio / bitrate",
 		"vq": "qualità video / bitrate",
 		"pixfmt": "subsampling / struttura pixel",
@@ -33,7 +33,7 @@ Ls.ita = {
 			["G", "alterna vista lista / griglia"],
 			["T", "alterna miniature / icone"],
 			["⇧ A/D", "dimensione miniature"],
-			["ctrl-K", "elimina selezionati"],
+			["ctrl-K/Del", "elimina selezionati"],
 			["ctrl-X", "taglia selezione negli appunti"],
 			["ctrl-C", "copia selezione negli appunti"],
 			["ctrl-V", "incolla (sposta/copia) qui"],
@@ -108,9 +108,9 @@ Ls.ita = {
 	"ht_and": " e ",
 
 	"goh": "control-panel",
-	"gop": 'cartella sorella precedente">prec',
-	"gou": 'cartella genitore">su',
-	"gon": 'prossima cartella">succ',
+	"gop": 'cartella sorella precedente',
+	"gou": 'cartella genitore',
+	"gon": 'prossima cartella',
 	"logout": "Logout ",
 	"login": "Accedi", //m
 	"access": " accesso",
@@ -158,7 +158,7 @@ Ls.ita = {
 	"ut_u2ts": "copia il timestamp di ultima modifica$Ndal tuo filesystem al server\">📅",
 	"ut_ow": "sovrascrivere file esistenti sul server?$N🛡️: mai (genererà un nuovo nome file)$N🕒: sovrascrivi se il file del server è più vecchio del tuo$N♻️: sovrascrivi sempre se i file sono diversi$N⏭️: ignora sempre tutti i file esistenti", //m
 	"ut_mt": "continua l'hashing di altri file durante il caricamento$N$NProva a disabilitare se la tua CPU o HDD è un collo di bottiglia",
-	"ut_ask": 'chiedi conferma prima che inizi il caricamento">💭',
+	"ut_ask": 'chiedi conferma prima che inizi il caricamento',
 	"ut_pot": "migliora la velocità di caricamento su dispositivi lenti$Nrendendo l'interfaccia meno complessa",
 	"ut_srch": "non caricare realmente, invece controlla se i file esistono già $N sul server (scansionerà tutte le cartelle che puoi leggere)",
 	"ut_par": "metti in pausa i caricamenti impostandolo a 0$N$NAumenta se la tua connessione è lenta / alta latenza$N$NMantienilo a 1 su LAN o se l'HDD del server è un collo di bottiglia",
@@ -226,7 +226,7 @@ Ls.ita = {
 
 	"ct_grid": '田 griglia',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltip',
-	"ct_thumb": 'nella vista griglia, alterna icone o miniature$NTasto rapido: T">🖼️ miniature',
+	"ct_thumb": 'alterna icone o miniature$NTasto rapido: T">🖼️ miniature',
 	"ct_csel": 'usa CTRL e SHIFT per la selezione file nella vista griglia">sel',
 	"ct_dsel": 'usa la selezione tramite trascinamento nella vista griglia">trascina', //m
 	"ct_dl": 'forza il download (non visualizzare inline) quando si clicca su un file">dl', //m
@@ -289,9 +289,9 @@ Ls.ita = {
 	"ml_drc": "compressore gamma dinamica",
 	"ml_ss": "salta i silenzi", //m
 
-	"mt_loop": "loop/ripeti una canzone\">🔁",
+	"mt_loop": "loop/ripeti una canzone",
 	"mt_one": "fermati dopo una canzone\">1️⃣",
-	"mt_shuf": "mescola le canzoni in ogni cartella\">🔀",
+	"mt_shuf": "mescola le canzoni in ogni cartella",
 	"mt_aplay": "autoplay se c'è un song-ID nel link che hai cliccato per accedere al server$N$NDisabilitando questo fermerà anche l'aggiornamento dell'URL della pagina con song-ID quando riproduci musica, per prevenire autoplay se queste impostazioni vengono perse ma l'URL rimane\">a▶",
 	"mt_preload": "inizia a caricare la prossima canzone verso la fine per riproduzione senza interruzioni\">preload",
 	"mt_prescan": "vai alla prossima cartella prima che finisca l'ultima canzone$Nmantenendo felice il browser web$Ncosì non si ferma la riproduzione\">nav",
@@ -306,8 +306,8 @@ Ls.ita = {
 	"mt_follow": "mantieni la traccia in riproduzione scorrevole nella vista\">🎯",
 	"mt_compact": "controlli compatti\">⟎",
 	"mt_uncache": "pulisci cache &nbsp;(prova ad attivare se il tuo browser ha messo in cache$Nuna copia rotta di una canzone e si rifiuta di riprodurla)\">uncache",
-	"mt_mloop": "loop della cartella aperta\">🔁 loop",
-	"mt_mnext": "carica la prossima cartella e continua\">📂 succ",
+	"mt_mloop": "loop della cartella aperta",
+	"mt_mnext": "carica la prossima cartella e continua",
 	"mt_mstop": "ferma riproduzione\">⏸ stop",
 	"mt_cflac": "converti flac / wav in {0}\">flac",
 	"mt_caac": "converti aac / m4a in {0}\">aac",

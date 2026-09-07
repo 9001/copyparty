@@ -29,6 +29,12 @@ a {
 }
 #wrap td a {
 	margin: 0;
+	max-width: 40vw;
+	display: inline-block;
+	white-space: wrap;
+	word-wrap: break-word;
+	vertical-align: top;
+	line-height: 1.5em;
 }
 #w {
 	color: #fff;
@@ -61,7 +67,7 @@ th {
 	vertical-align: top;
 	white-space: nowrap;
 }
-#wrap td+td+td+td+td+td+td+td {
+#wrap td+td+td+td+td+td+td+td+td {
 	font-family: var(--font-mono), monospace, monospace;
 }
 #wrap th:first-child,
@@ -93,7 +99,4 @@ html.z th {
 html.bz {
 	color: #bbd;
 	background: #11121d;
-}
-html.bz th {
-	background: #223;
 }

@@ -3282,6 +3282,12 @@ class AuthSrv(object):
             if enshare and vp.startswith(shrs):
                 continue  # propagates later in this func
             vf = vn.flags
+            if "theme" in vf:
+                if re.match(r'[0-9]', vf["theme"]):
+                    zs = int(vf["theme"])
+                    bri = "zy"[zs % 2 :][:1]
+                    ch = "abcdefghijklmnopqrstuvwx"[int(zs / 2)]
+                    vf["theme"] = "{0}{1} {0} {1}".format(ch, bri)
             vn.js_ls = {
                 "idx": "e2d" in vf,
                 "itag": "e2t" in vf,
@@ -3300,6 +3306,9 @@ class AuthSrv(object):
                 "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
                 "sb_md": "" if "no_sb_md" in vf else (vf.get("md_sbf") or "y"),
                 "rw_edit": vf["rw_edit"],
+                "dtheme": vf["theme"],
+                "bg_img": vf["bg_img"],
+                "tcolor": vf["tcolor"],
             }
             if "ufavico_h" in vf:
                 vn.js_ls["ufavico"] = vf["ufavico_h"]
@@ -3326,6 +3335,9 @@ class AuthSrv(object):
                 "sba_md": vf.get("md_sba") or "",
                 "sba_lg": vf.get("lg_sba") or "",
                 "rw_edit": vf["rw_edit"],
+                "dtheme": vf["theme"],
+                "bg_img": vf["bg_img"],
+                "tcolor": vf["tcolor"],
                 "txt_ext": self.args.textfiles.replace(",", " "),
                 "def_hcols": list(vf.get("mth") or []),
                 "unlist0": vf.get("unlist") or "",
