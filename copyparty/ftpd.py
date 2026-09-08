@@ -624,6 +624,16 @@ try:
     class SftpHandler(FtpHandler, TLS_FTPHandler):
         pass
 
+    class FtpsImplicitHandler(FtpHandler, TLS_FTPHandler):
+        def handle(self):
+            self.secure_connection(self.ssl_context)
+
+        def handle_ssl_established(self):
+            FtpHandler.handle(self)
+
+        def ftp_AUTH(self, arg):
+            self.respond("550 not supposed to be used with implicit SSL.")
+
 except:
     pass
 
@@ -638,7 +648,7 @@ class Ftpd(object):
             hs.append([FtpHandler, self.args.ftp])
         if self.args.ftps:
             try:
-                h1 = SftpHandler
+                h1 = FtpsImplicitHandler
             except:
                 t = "\nftps requires pyopenssl;\nplease run the following:\n\n  {} -m pip install --user pyopenssl\n"
                 print(t.format(pybin))
