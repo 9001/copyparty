@@ -1,0 +1,29 @@
+fs.example.com {
+    tls internal # needed if you don't have an actual domain and use local dns in your network
+    forward_auth authelia:9091 {
+        uri /api/authz/forward-auth
+        copy_headers Remote-User Remote-Groups Remote-Email Remote-Name
+    }
+    
+    route {
+        @login query rd=*
+        redir @login https://authelia.example.com{uri}
+        
+        @logout path /logout
+        redir @logout https://authelia.example.com{uri}
+        
+        reverse_proxy copyparty:3923 {
+            header_up Cookie "authelia_session=[^;]+" "authelia_session=_"
+        }
+    }
+}
+
+# fs.example.com {
+#     tls internal # needed if you don't have an actual domain and use local dns in your network
+#     reverse_proxy copyparty:3923
+# }
+
+authelia.example.com {
+    tls internal # needed if you don't have an actual domain and use local dns in your network
+    reverse_proxy authelia:9091
+}
