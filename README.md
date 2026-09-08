@@ -219,6 +219,8 @@ other places to download copyparty from  (non-github links):
   * https://copyparty.eu/enz = https://copyparty.eu/copyparty-en.pyz = the enterprise pyz
   * https://copyparty.eu/cli = online cli helptext
 
+DO NOT download from [sourceforge](https://copyparty.eu/unsanctioned/sourceforge.txt)
+
 
 ### at home
 
