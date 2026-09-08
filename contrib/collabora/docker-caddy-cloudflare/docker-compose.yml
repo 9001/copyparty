@@ -1,0 +1,84 @@
+name: contrib-collabora
+
+services:
+  caddy:
+    image: ghcr.io/caddybuilds/caddy-cloudflare:2
+    container_name: caddy
+    user: "1000:1000"
+    restart: always
+    networks:
+      copyparty:
+        # resolve your domain names to internal caddy container IP address
+        # so backend-to-backend communication never leaves docker network
+        aliases:
+          # force collabora backend to connect to copyparty internally through caddy
+          - party.example.org
+          # force copyparty backend to connect to collabora internally through caddy
+          - office.example.org
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+    env_file: ./caddy/.env
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/config:/config
+      - ./caddy/data:/data
+
+  copyparty:
+    image: copyparty/dj:latest
+    container_name: copyparty
+    user: "1000:1000"
+    restart: always
+    networks:
+      - copyparty
+    expose:
+      - "3923"
+    volumes:
+      - ./copyparty/cfg:/cfg
+      - ./copyparty/fileshare:/w
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
+      PYTHONUNBUFFERED: 1 # ensures log-messages are not delayed (but can reduce speed a tiny bit)
+    stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
+    healthcheck:
+      # hide it from logs with "/._" so it matches the default --lf-url filter
+      test: ["CMD-SHELL", "wget --spider -q 127.0.0.1:3923/?reset=/._"]
+      interval: 1m
+      timeout: 2s
+      retries: 5
+      start_period: 15s
+
+  collabora:
+    image: collabora/code:26.04.2.4.1
+    container_name: collabora
+    user: "1001:1001" # collabora's `cool:cool` user inside of container
+    restart: always
+    networks:
+      - copyparty
+    expose:
+      - "9980"
+    environment:
+      # let caddy handle TLS termination
+      DONT_GEN_SSL_CERT: "1"
+      extra_params:
+        --o:ssl.enable=false
+        --o:ssl.termination=true
+      dictionaries: "en_US en_GB ru"
+      aliasgroup1: "https://party.example.org" # copyparty instance address
+    security_opt:
+      # disabled apparmor may be insecure but allows faster jail creation via bind mount, https://github.com/CollaboraOnline/online/issues/13972
+      - apparmor=unconfined
+      # seccomp: full set of syscalls and capabilites required by collabora to function properly;
+      # alternatively, use cap_drop and cap_add according to https://sdk.collaboraonline.com/docs/installation/CODE_Docker_image.html?highlight=fowner#container-security-and-capability-management
+      - seccomp=./collabora/seccomp-profile.json 
+
+
+networks:
+  copyparty:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.10.0/24
