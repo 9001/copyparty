@@ -210,9 +210,9 @@ clients can authenticate in the following ways; the first of these which is not 
 | GET | `?zls` | get listing of filepaths in zip file at URL |
 | GET | `?zget=path` | get specific file from inside a zip file at URL |
 
-| method | body | result |
-|--|--|--|
-| jPOST | `{"q":"foo"}` | do a server-wide search; see the `[🔎]` search tab `raw` field for syntax |
+| method | params | body | result |
+|--|--|--|--|
+| jPOST | `?srch` | `{"n":42,"q":"foo"}` | do a server-wide search; see the `[🔎]` search tab `raw` field for syntax |
 
 | method | params | body | result |
 |--|--|--|--|
