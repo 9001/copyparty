@@ -19,6 +19,12 @@ if (window.CGV1)
 if (window.CGV)
     Object.assign(window, window.CGV);
 
+function supportsEmoji() {
+    var ctx = document.createElement('canvas').getContext('2d');
+    ctx.canvas.width = ctx.canvas.height = 1;
+    ctx.fillText('🎉', -4, 4);
+    return ctx.getImageData(0, 0, 1, 1).data[3] > 0; // Checks if pixels were drawn
+}
 
 var wah = '',
     STG = null,
@@ -35,13 +41,20 @@ var wah = '',
     VCHROME = CHROME ? 1 : 0,
     UA = '' + navigator.userAgent,
     IE = !!document.documentMode,
+    EMOJI = supportsEmoji(),
+    N3DS = /Nintendo 3DS/i.test(UA),
     FIREFOX = ('netscape' in window) && / rv:/.test(UA),
     IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(UA),
     LINUX = /Linux/.test(UA),
     MACOS = /Macintosh/.test(UA),
     WINDOWS = /Windows/.test(UA),
     APPLE = IPHONE || MACOS,
-    APPLEM = TOUCH && APPLE;
+    APPLEM = TOUCH && APPLE,
+    PWA = window.matchMedia && window.matchMedia('(display-mode: minimal-ui)').matches;
+
+window.onpointerdown = function (e) {
+    TOUCH = e.pointerType === "touch";
+}
 
 if (!window.WebAssembly || !WebAssembly.Memory)
     window.WebAssembly = false;
@@ -467,6 +480,11 @@ function import_js(url, cb, ecb) {
     };
     head.appendChild(script);
 }
+function import_mjs(name, id) {
+    import_js(SR + "/.cpr/w/" + name + ".js", function () {
+        if (id) jsldp(id, name);
+    });
+}
 
 
 function unsmart(txt) {
@@ -790,7 +808,7 @@ function assert_vp(path) {
 }
 
 
-function linksplit(rp, base, id) {
+function linksplit(rp, base, id, flink) {
     var ret = [],
         apath = base || '/',
         q = null;
@@ -827,7 +845,7 @@ function linksplit(rp, base, id) {
                 link += '" id="' + id;
         }
 
-        ret.push('<a href="' + apath + link + '">' + vlink + '</a>');
+        ret.push('<a href="' + apath + link + '" class="' + (!rp ? 'flink' : '') + '">' + vlink + '</a>');
         apath += link;
     }
     return ret;
@@ -1350,8 +1368,12 @@ function bcfg_upd_ui(name, val) {
     if (!o)
         return val;
 
-    if (o.getAttribute('type') == 'checkbox')
+    if (o.getAttribute('type') == 'checkbox'){
         o.checked = val;
+        var lbls = QSA('label[for="' + o.id +'"]');
+        for(var i=0; i<lbls.length; i++)
+            clmod(lbls[i], 'on', val);
+    }
     else if (o) {
         clmod(o, 'on', val);
     }
@@ -1423,7 +1445,7 @@ function hist_replace(url) {
 
 function sethash(hv) {
     if (window.history && history.replaceState) {
-        hist_replace(location.pathname + location.search + '#' + hv);
+        hist_replace(location.pathname + location.search + (hv ? '#' : '') + hv);
     }
     else {
         location.hash = hv;
@@ -1616,6 +1638,18 @@ var tt = (function () {
         return el.getAttribute('tt');
     };
 
+    r.parse = function(msg){
+        if(msg == null || msg.length == 0)
+            return msg;
+        if (msg.startsWith('`')) {
+            var x = false;
+            msg = msg.slice(1);
+            while (msg.indexOf('`') + 1)
+                msg = msg.replace('`', (x = !x) ? '<code>' : '</code>');
+        }
+        return msg.replace(/\$N/g, "<br />");
+    }
+
     r.show = function () {
         clearTimeout(tev);
         if (r.skip) {
@@ -1625,13 +1659,6 @@ var tt = (function () {
         var msg = r.getmsg(this);
         if (!msg)
             return;
-
-        if (msg.startsWith('`')) {
-            var x = false;
-            msg = msg.slice(1);
-            while (msg.indexOf('`') + 1)
-                msg = msg.replace('`', (x = !x) ? '<code>' : '</code>')
-        }
 
         r.el = this;
         var pos = this.getBoundingClientRect(),
@@ -1648,7 +1675,7 @@ var tt = (function () {
         r.tt.style.left = '0';
         r.tt.style.top = '0';
 
-        r.tt.innerHTML = msg.replace(/\$N/g, "<br />");
+        r.tt.innerHTML = r.parse(msg);
         r.el.addEventListener('mouseleave', r.hide);
         window.addEventListener('scroll', r.hide);
         clmod(r.tt, 'show', 1);
@@ -1669,6 +1696,10 @@ var tt = (function () {
 
     r.hide = function (e) {
         //ev(e);  // eats checkbox-label clicks
+
+        r.show.bind(null);
+        r.el = null;
+
         clearTimeout(tev);
         window.removeEventListener('scroll', r.hide);
 
@@ -1762,6 +1793,8 @@ var toast = (function () {
         scrolling = false,
         obj = mknod('div', 'toast');
 
+    clmod(obj, 'hide', true);
+
     document.body.appendChild(obj);
     r.visible = false;
     r.txt = null;
@@ -1842,7 +1875,7 @@ var toast = (function () {
             setcvar('--tmstep', Math.floor(sec * 20));
             html += '<div id="toastt"></div>';
         }
-        obj.innerHTML = html + '<a href="#" id="toastc">x</a><div id="toastb">' + lf2br(txt) + '</div>';
+        obj.innerHTML = html + '<a href="#" id="toastc"><span class="x">×</span></a><div id="toastb">' + lf2br(txt) + '</div>';
         obj.className = cl;
         sec += obj.offsetWidth;
         obj.className += ' vis';
@@ -2296,7 +2329,7 @@ var favico = (function () {
 
     var gx = function (txt) {
         return (svg_decl +
-            '<svg version="1.1" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">\n' +
+            '<svg version="1.1" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg">\n' +
             (r.bg ? '<rect width="100%" height="100%" rx="16" fill="#' + r.bg + '" />\n' : '') +
             '<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"' +
             ' font-family="sans-serif" font-weight="bold" font-size="64px"' +
@@ -2333,6 +2366,11 @@ var favico = (function () {
             document.head.appendChild(r.tag);
         }
         r.tag.href = 'data:image/svg+xml;base64,' + b64;
+
+        var fiop = ebi('favico_onpage');
+        if(fiop != null){
+            fiop.innerHTML = svg ? atob(b64) : gx(r.txt);
+        }
     };
 
     r.init = function () {
@@ -2356,6 +2394,70 @@ function cprop(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name);
 }
 
+// read accent / theme color
+function parseColor (strColor) {
+    if(strColor && strColor.length > 0 && strColor.length <= 8 && !strColor.startsWith('#') && !strColor.match(",")) 
+        strColor = '#' + strColor;
+	var s = new Option().style;
+	s.color = strColor;
+	return s.color !== '' ? s.color : '';
+}
+function setColor (color, temp) {
+    if(color == '#333333' || color == 'rgb(51, 51, 51)') color = '';
+	accent = color;
+    if(!temp)
+	    swrite('paccent', accent);
+	var a = accent || '';
+	console.log('accent color set to: ' + a);
+	setcvar('--a', a);
+	pbar.drawbuf();
+	pbar.drawpos();
+	vbar.draw();
+}
+
+var accent = sread('paccent');
+var tcolor = QS('meta[name=theme-color]');
+if(tcolor)
+    tcolor = tcolor.content;
+if((!accent || accent.length <= 3) && tcolor != "#333333")
+    accent = tcolor;
+if(accent && accent.length > 3){
+    console.log('read accent color from settings: ' + accent);
+    setcvar('--a', parseColor(accent));
+}
+
+var HAS_BG = false
+var setBg = function(bg){
+    var bgv = ebi('bg_vid'),
+        re_v = /^[^?]+\.(webm|mkv|mp4|m4v|mov)(\?|$)/i,
+        isVid = false,
+        src;
+    HAS_BG = bg != '' && bg !== true;
+    if(sread('enbg') == 0) bg = '';
+    console.log('setting bg to: ' + (bg || 'none'))
+    if(bg && bg !== true){
+        var parts = bg.split(',');
+        if(parts){
+            isVid = re_v.test(parts[0])
+            src = parts[0]
+        }
+        for(var i = 0; i < parts.length; i++){
+            if(parts[i].match('=')){
+                var o = parts[i].split('=')
+                if(o[0].trim() == 'blur')
+                    o[1] = 'blur(' + o[1] + 'px)'
+                setcvar('--bg-' + o[0].trim(), o[1])
+            }
+        }
+    }
+    setcvar('--bg-img', !isVid && src ? ('url("' + src + '")') : '');
+    if(bgv){
+        clmod(bgv, 'vis', isVid);
+        if(isVid)
+            bgv.innerHTML = '<source src="' + src + '" type="video/mp4"/>';
+    }
+}
+setBg(window.bg_img);
 
 function bchrome() {
     var v, o = QS('meta[name=theme-color]');
@@ -2363,7 +2465,7 @@ function bchrome() {
         return;
 
     try {
-        v = cprop('--bg-u3');
+        v = cprop('--a');
     }
     catch (ex) { }
     o.setAttribute('content', v ? v : document.documentElement.className.indexOf('y') + 1 ? '#eee' : '#333');
@@ -2430,5 +2532,17 @@ function xhrchk(xhr, prefix, e404, lvl, tag) {
 
     return fun(0, prefix + xhr.status + ": " + errtxt, tag);
 }
+
+function jsldp(a, b) {
+	2 != window[a] && alert("FATAL ERROR: cannot load " + b + ".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R");
+}
+
+// polyfill for 3DS (IE11 can do this natively)
+var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
+	e = e || { bubbles: false, cancelable: false };
+	var mouseEvent = document.createEvent('MouseEvent');
+	mouseEvent.initMouseEvent(eventType, e.bubbles, e.cancelable, window, 0, 0, 0, 0, false, false, false, false, 0, null);
+	return mouseEvent;
+};
 
 J_UTL = 2;

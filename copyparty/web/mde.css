@@ -9,6 +9,9 @@ html .editor-toolbar.disabled-for-preview>button:not(.no-disable) { opacity: .35
 
 
 
+:root {
+	background: none;
+}
 html {
 	line-height: 1.5em;
 }
@@ -39,12 +42,13 @@ html, body {
 
 #mn {
 	font-weight: normal;
-	margin: 1.3em 0 .7em 1em;
+	margin: .8em 0 .2em 1em;
 }
 #mn a {
+	display: inline-block;
 	color: #444;
 	margin: 0 0 0 -.2em;
-	padding: 0 0 0 .4em;
+	padding: .5em .4em .5em 0;
 	text-decoration: none;
 	/* ie: */
 	border-bottom: .1em solid #777\9;

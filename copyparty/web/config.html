@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" id="ht_shr">
+
+<head>
+	<meta charset="utf-8">
+	<title>{{ s_doctitle }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="theme-color" content="#{{ tcolor }}">
+	<link rel="manifest" href="{{ r }}/.cpr/w/manifest.json?_={{ ts }}" />
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/config.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/ui.css?_={{ ts }}">
+{{ html_head }}
+</head>
+
+<video id="bg_vid" autoplay muted loop playsinline></video>
+
+<body>
+    <div id="header">
+        <a href="/?h">⬅️</a>
+        <h1>guest list</h1>
+        <a href="https://github.com/9001/copyparty#quickstart">ℹ️</a>
+    </div>
+    <button id="copyBtn" class="abtn" tt="export config / copy to clipboard">📋</button>
+    <div id="disclaimer">
+        ⚠️ this page is a preview feature! this is only a config builder and doesn't use your actual config atm. feedback is welcome in the copyparty discord. ⚠️
+    </div>
+	<div id="wrap" class="main">
+
+        <div tt="feel free to add anything here. this will be the at the start of your run command one-to-one">
+            <p class="inlinePrompt">run prefix</p>
+            <input id="rpre" type="text" placeholder="python -m copyparty"/>
+        </div>
+
+        <div>
+            <p class="inlinePrompt">server name</p>
+            <input data-flag="--name" type="text" placeholder="copyparty"/>
+        </div>
+
+        <div>
+            <p class="inlinePrompt">port</p>
+            <input data-flag="-p" type="text" placeholder="3923"/>
+        </div>
+
+        <div>
+            <h2>global settings</h2>
+            <div id="flags"></div>
+            <p class="inlinePrompt">+ add launch argument</p>
+            <input id="flagSearch" class="autocomplete" type="text" placeholder="🔎 arguments"/>
+        </div>
+
+        <h2>shared volumes</h2>
+        <div id="volumes"></div>
+        <button id="addVol">+ add volume</button>
+
+        <h2>users</h2>
+        <div id="uopt">
+            <input type="checkbox" id="unames" data-flag="--usernames"/>
+            <label for="unames">require usernames</label>
+
+            <input type="checkbox" id="uchpw" data-flag="--chpw"/>
+            <label for="uchpw">allow password change</label>
+
+            <div>
+                <label for="uminpw" class="inplbl">min pw length</label>
+                <input type="number" class="uinp" id="uminpw" data-flag="--chpw-len" placeholder="8"/>
+            </div>
+        </div>
+        <div id="users"></div>
+        <button id="addUser">+ add user</button>
+
+        <h2>groups</h2>
+        <div id="groups"></div>
+        <button id="addGrp">+ add group</button>
+
+        <h2>display defaults</h2>
+        <div id="dopt">
+            <input type="checkbox" id="gview" data-flag="--grid"/>
+            <label for="gview" tt="--grid: enable or disable the grid by default. can be set per folder via volflag: grid">grid view</label>
+
+            <div tt="--theme: 0=flat dark, 1=flat light... look at the file browser's settings dialog for reference (can be set per volume with volflag: theme)">
+                <label for="dtheme" class="inplbl">default theme no.</label>
+                <input type="number" class="uinp" id="dtheme" data-flag="--theme" placeholder="0-11"/>
+            </div>
+
+            <div tt="--tcolor: default theme color. users can change this in the settings. this can be set per volume with volflag: tcolor">
+                <label for="tcolor" class="inplbl">accent color</label>
+                <input type="text" class="uinp" id="tcolor" data-flag="--tcolor" placeholder="fc5 / ffcc55"/>
+                <input type="color" class="uinp" id="tcolor+" data-flag="--tcolor"/>
+            </div>
+
+            <div style="display: inline-block;" tt="--bg-img: the url may not contain any commas or spaces. supports relative paths. also supports video. (can be set per volume with volflag: bg_img)">
+                <label for="bg-url" class="inplbl">background image url</label>
+                <input type="text" class="uinp" id="bg-url" data-flag="--bg-img" placeholder="/folder/image.jpg"/>
+            </div>
+            <div style="display: inline-block;">
+                <label for="bg-opa" class="inplbl">opacity</label>
+                <input type="number" class="uinp" id="bg-opa" data-prefix="opacity=" data-flag="--bg-img+" placeholder="0-1"/>
+            </div>
+            <div style="display: inline-block;" tt="it's recommended to blur the image itself instead of using this setting for performance reasons">
+                <label for="bg-blur" class="inplbl">blur in px</label>
+                <input type="number" class="uinp" id="bg-blur" data-prefix="blur=" data-flag="--bg-img++" placeholder="0-50"/>
+            </div>
+        </div>
+
+        <div>
+            <h2>database options</h2>
+            <input type="checkbox" name="e2d" id="e2dsa" data-flag="-e2dsa"/>
+            <label for="e2dsa">enable file search</label>
+            <br/>
+            <input type="checkbox" id="e2ts" data-flag="-e2ts"/>
+            <label for="e2ts">metadata indexing (file properties become searchable)</label>
+            <p>you can find more related options and explanations by searching for "e2" in the global settings</p>
+        </div>
+
+        <h2>save / load</h2>
+        <p>your changes are saved automatically</p>
+        <p>saving / loading the real server config is currently not implemented, but you can import an existing config command below</p>
+        <input id="importTxt" placeholder="paste command here" tt="format is more strict than normal. supports importing configs generated on this page."/>
+        <button id="importBtn">import</button>
+        <br/>
+        <button id="resetBtn">reset</button>
+
+    </div>
+    <div id="perms-modal">
+        <div id="m_closeArea"></div>
+        <div id="perms-content">
+            <h2 id="h_perms">permissions for volume</h2>
+            <div id="perm-list"></div>
+            <button id="m_close" class="delBtn">×</button>
+            <button id="m_accept">OK</button>
+        </div>
+    </div>
+    
+	<script nonce="{{ js_nonce }}">
+        var SR="{{ r }}",
+            lang="{{ lang }}",
+			bg_img = "{{ bg_img }}",
+			JS_NONCE = "{{ js_nonce }}",
+            dfavico="{{ favico }}";
+
+        var STG = window.localStorage;
+        document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme }}";
+    </script>
+    <script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
+    <script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/config.js?_={{ ts }}"></script>
+    {%- if js %}
+    <script nonce="{{ js_nonce }}" src="{{ js }}_={{ ts }}"></script>
+    {%- endif %}
+    <script nonce="{{ js_nonce }}">
+        Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+        jsldp("J_UTL","util");
+        jsldp("J_CFG","config");
+    </script>
+</body>
+</html>
+
