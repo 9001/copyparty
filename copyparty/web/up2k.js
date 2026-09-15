@@ -1012,6 +1012,11 @@ function up2k_init(subtle) {
                 return true;
     }
 
+    function unxhr(xhr) {
+        xhr.onload = xhr.onerror = xhr.ontimeout = null;
+        apop(st.xhr, xhr);
+    }
+
     var pvis = new U2pvis("bz", '#u2cards', uc, st),
         donut = new Donut(uc, st);
 
@@ -1934,10 +1939,8 @@ function up2k_init(subtle) {
                     if (!st.deaf)
                         console.log('xhr: bad apple');
 
-                    xhr.onerror = xhr.ontimeout = null;
-                    xhr.onload();
-                    xhr.abort();
                     st.deaf = true;
+                    xhr.onload();
                 }
 
                 if (st.bytes.inflight && (st.bytes.inflight < 0 || !st.busy.upload.length)) {
@@ -2498,12 +2501,12 @@ function up2k_init(subtle) {
             if (!toast.visible)
                 toast.warn(9.98, L.u_enethd + "\n\nfile: " + esc(t.name), t);
 
-            apop(st.xhr, xhr);
+            unxhr(xhr);
             apop(st.busy.head, t);
             st.todo.head.unshift(t);
         };
         function orz(e) {
-            apop(st.xhr, xhr);
+            unxhr(xhr);
             if (t.done)
                 return console.log('done; skip head2', t.name, t);
 
@@ -2571,7 +2574,7 @@ function up2k_init(subtle) {
 
         var xhr = new XHR();
         xhr.onerror = xhr.ontimeout = function () {
-            apop(st.xhr, xhr);
+            unxhr(xhr);
             if (t.t_busied != me)  // t.done ok
                 return console.log('zombie handshake onerror', t.name, t);
 
@@ -2584,7 +2587,7 @@ function up2k_init(subtle) {
             t.keepalive = keepalive;
         };
         var orz = function (e) {
-            apop(st.xhr, xhr);
+            unxhr(xhr);
             if (t.t_busied != me || t.done)
                 return console.log('zombie handshake onload', t.name, t);
 
@@ -2963,7 +2966,7 @@ function up2k_init(subtle) {
                 pcar == pcdr ? pcar : ('' + pcar + '~' + pcdr);
 
         var orz = function (xhr) {
-            apop(st.xhr, xhr);
+            unxhr(xhr);
             st.bytes.inflight -= xhr.bsent;
             var txt = unpre((xhr.response && xhr.response.err) || xhr.responseText);
             if (txt.indexOf('upload blocked by x') + 1) {
@@ -3014,7 +3017,9 @@ function up2k_init(subtle) {
             orz2(xhr);
         }
         var orz2 = function (xhr) {
-            apop(st.xhr, xhr);
+            unxhr(xhr);
+            if (st.deaf)
+                xhr.abort();
             apop(st.busy.upload, upt);
             for (var a = pcar; a <= pcdr; a++)
                 apop(t.postlist, a);
