@@ -188,6 +188,7 @@ try:
     HAVE_IFADDR = True
 except:
     HAVE_IFADDR = False
+    IFADDR_VND = False
 
     def get_adapters(include_unconfigured=False):
         return []
@@ -288,7 +289,6 @@ try:
         raise Exception()
 
     socket.inet_pton(socket.AF_INET6, "::1")
-    HAVE_IPV6 = True
 
     if GRAAL:
         try:
@@ -303,13 +303,15 @@ try:
                 return _inet_pton(fam, ip)
 
             socket.inet_pton = inet_pton
+
+    HAVE_IPV6 = True
 except:
+    HAVE_IPV6 = False
 
     def inet_pton(fam, ip):
         return socket.inet_aton(ip)
 
     socket.inet_pton = inet_pton
-    HAVE_IPV6 = False
 
 
 try:
