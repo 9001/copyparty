@@ -4667,6 +4667,12 @@ class Up2k(object):
             self.log("not found in src db: %r" % (svp,))
 
         try:
+            if svn_dbv != dvn and not (
+                "xlink" in dvn.flags
+                or "reflink" in dvn.flags
+                or "hardlinkonly" in dvn.flags
+            ):
+                raise OSError(errno.EXDEV, "different volumes")
             if is_link and st != stl:
                 # relink non-broken symlinks to still work after the move,
                 # but only resolve 1st level to maintain relativity
