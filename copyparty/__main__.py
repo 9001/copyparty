@@ -1437,6 +1437,8 @@ def add_upload(ap):
     ap2.add_argument("--hardlink", action="store_true", help="enable hardlink-based dedup; will fallback on symlinks when that is impossible (across filesystems) (volflag=hardlink)")
     ap2.add_argument("--hardlink-only", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made (volflag=hardlinkonly)")
     ap2.add_argument("--reflink", action="store_true", help="enable reflink-based dedup; will fallback on full copies when that is impossible (non-CoW filesystem) (volflag=reflink)")
+    ap2.add_argument("--redup", metavar="A[,B]=T", help="convert dedup-type for existing files; \033[33mA,B\033[0m is dedup-types to convert from (no/ref/sym/hard), \033[33mT\033[0m is target type; converting from sym/hard is fast-ish, from no/ref is slooow; example: [\033[32msym,hard=ref\033[0m] (volflag=redup)")
+    ap2.add_argument("--redup-dry", action="store_true", help="dry-run; makes \033[33m--redup\033[0m not apply changes (volflag=redup_dry)")
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
     ap2.add_argument("--no-dupe-m", action="store_true", help="also reject dupes when moving a file into another volume (volflag=nodupem)")
     ap2.add_argument("--no-clone", action="store_true", help="do not use existing data on disk to satisfy dupe uploads; reduces server HDD reads in exchange for much more network load (volflag=noclone)")

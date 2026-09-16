@@ -17,7 +17,7 @@ from copy import deepcopy
 from queue import Queue
 
 from .__init__ import ANYWIN, PY2, TYPE_CHECKING, UNIX, WINDOWS, E
-from .authsrv import LEELOO_DALLAS, SEESLOG, VFS, AuthSrv
+from .authsrv import LEELOO_DALLAS, REDUP_E2, SEESLOG, VFS, AuthSrv
 from .bos import bos
 from .cfg import vf_bmap, vf_cmap, vf_vmap
 from .fsutil import Fstab
@@ -1000,6 +1000,21 @@ class Up2k(object):
             with self.mutex, self.reg_mutex:
                 self._drop_caches()
 
+        def setstate(vol, n):
+            t = ""
+            if n < 1 and "e2v" in vol.flags:
+                t += "+e2v"
+            if n < 2 and "redup" in vol.flags:
+                t += "+redup"
+            if n < 3 and "e2ts" in vol.flags:
+                t += "+tags"
+
+            if t:
+                t = "online (%s pending)" % (t[1:],)
+            else:
+                t = "online, idle"
+            self.volstate[vol.vpath] = t
+
         for vol in vols:
             if self.stop or gid != self.gid:
                 break
@@ -1016,26 +1031,16 @@ class Up2k(object):
                 if vac:
                     need_vac[vol] = True
 
-            if "e2v" in vol.flags:
-                t = "online (integrity-check pending)"
-            elif "e2ts" in vol.flags:
-                t = "online (tags pending)"
-            else:
-                t = "online, idle"
-
-            self.volstate[vol.vpath] = t
+            setstate(vol, 0)
 
         self._unblock()
 
         # file contents verification
         for vol in vols:
-            if self.stop:
-                break
-
-            if "e2v" not in vol.flags:
+            if self.stop or "e2v" not in vol.flags:
                 continue
 
-            t = "online (verifying integrity)"
+            t = "online (doing e2v)"
             self.volstate[vol.vpath] = t
             self.log("{} [{}]".format(t, vol.realpath))
 
@@ -1044,12 +1049,23 @@ class Up2k(object):
                 self.log("modified {} entries in the db".format(nmod), 3)
                 need_vac[vol] = True
 
-            if "e2ts" in vol.flags:
-                t = "online (tags pending)"
-            else:
-                t = "online, idle"
+            setstate(vol, 1)
 
+        # convert dedup type
+        for vol in vols:
+            if self.stop or not vol.flags.get("redup"):
+                continue
+
+            t = "online (doing redup)"
             self.volstate[vol.vpath] = t
+            self.log("{} [{}]".format(t, vol.realpath))
+
+            try:
+                with self.mutex, self.reg_mutex:
+                    self._redup(vol, vols)
+            except:
+                self.log("redup failed: " + min_ex(), 1)
+            setstate(vol, 2)
 
         # open the rest + do any e2ts(a)
         needed_mutagen = False
@@ -2087,6 +2103,122 @@ class Up2k(object):
             cur.connection.commit()
 
         return len(rewark) + len(f404)
+
+    def _redup(self, vol: VFS, vols: list[VFS]) -> None:
+        logmsg = "redup: replacing %r with %r"
+        dry = "redup_dry" in vol.flags
+        if dry:
+            logmsg += " #dry"
+
+        zs, to = vol.flags["redup"].split("=")
+        zsl = zs.split(",")
+        cref = "no" in zsl or "ref" in zsl
+        csym = "sym" in zsl
+        chard = "hard" in zsl
+        chard0 = chard
+
+        vf = vol.flags.copy()
+        vf["dedup"] = 1
+        for zs in "hardlink hardlinkonly reflink".split():
+            vf.pop(zs, None)
+
+        if to == "ref":
+            vf["reflink"] = 1
+        elif to == "hard":
+            vf["hardlinkonly"] = vf["hardlink"] = 1
+        elif to == "sym":
+            pass
+        else:
+            raise Exception("target type not implemented: " + to)
+
+        if (csym or chard) and to != "sym":
+            self.log("redup: stage 1 begin")
+            if to == "hard":
+                chard = False
+            for x in vol.walk("", "", [], LEELOO_DALLAS, [[]], 2, True, True, True):
+                vn, _, _, atop, lsf, lsd, lsv = x
+                if vn is not vol:
+                    lsd[:] = []
+                    lsv.clear()
+                    continue
+                for fn, st in lsf:
+                    if (csym and stat.S_ISLNK(st.st_mode)) or (
+                        chard and st.st_nlink > 1
+                    ):
+                        ap = os.path.join(atop, fn)
+                        self.log(logmsg % (ap, absreal(ap)))
+                        if dry:
+                            continue
+                        ap2 = tempfile.NamedTemporaryFile(
+                            prefix="r,", dir=atop, delete=False
+                        ).name
+                        self._symlink(ap, ap2, vf, True, True, st.st_mtime)
+                        wunlink(self.log, ap, vf)
+                        bos.rename(ap2, ap)
+
+        if cref or to == "sym":
+            self.log("redup: stage 2 begin")
+            if "e2ds" not in vol.flags:
+                self.log(REDUP_E2 % (vol.vpath,), 3)
+            cur = self.cur[vol.realpath]
+            curs = [(vol, cur.connection.cursor())]
+            if to != "sym":
+                for v2 in vols:
+                    if vol is not v2 and v2.realpath in self.cur:
+                        curs += [(v2, self.cur[v2.realpath])]
+            nrem = cur.execute("select count(w) from up").fetchone()[0]
+            self.log("redup [/%s]: %d files left" % (vol.vpath, nrem))
+            q2 = "select rd, fn from up where substr(w,1,16) = ? and w=?"
+            for w, rd, fn in cur.execute("select w, rd, fn from up"):
+                w16 = w[:16]
+                for v2, c2 in curs:
+                    hit = c2.execute(q2, (w16, w)).fetchone()
+                    if not hit:
+                        continue
+                    rd2, fn2 = hit
+                    if fn == fn2 and rd == rd2 and vol is v2:
+                        continue
+                    try:
+                        apt = ""
+                        rd, fn = s3dec(rd, fn)
+                        rd2, fn2 = s3dec(rd2, fn2)
+                        fp1 = os.path.join(vol.realpath, rd, fn)
+                        fp2 = os.path.join(v2.realpath, rd2, fn2)
+                        st1 = bos.lstat(fp1)
+                        if fp1 == fp2 or stat.S_ISLNK(st1.st_mode):
+                            continue  # self(?), or redup failed during walk
+                        ap1 = absreal(fp1)
+                        ap2 = absreal(fp2)
+                        st2 = bos.lstat(ap2)
+                        if stat.S_ISLNK(st2.st_mode):
+                            continue  # dead hit
+                        for ap in (ap1,) if ap1 == ap2 else (ap1, ap2):
+                            self.log("redup: integrity-checking %r" % (ap,))
+                            zsl, st = self._hashlist_from_file(ap)
+                            w2 = up2k_wark_from_hashlist(self.salt, st.st_size, zsl)
+                            if w2 != w:
+                                t = "db desync:\n%s %r\n%s db"
+                                raise Exception(t % (w2, ap, w))
+
+                        self.log(logmsg % (ap1, ap2))
+                        if dry:
+                            continue
+                        apt = tempfile.NamedTemporaryFile(
+                            prefix="r,", dir=os.path.dirname(fp1), delete=False
+                        ).name
+                        self._symlink(ap2, apt, vf, True, True, st1.st_mtime)
+                        zsl, st = self._hashlist_from_file(apt)
+                        w2 = up2k_wark_from_hashlist(self.salt, st.st_size, zsl)
+                        if w != w2:
+                            raise Exception("bad checksum after copy?!")
+                        wunlink(self.log, ap1, vf)
+                        bos.rename(apt, ap1)
+                        break
+                    except Exception as ex:
+                        self.log("redup: skipping match due to " + str(ex))
+                        if apt and os.path.exists(apt):
+                            os.unlink(apt)
+                        continue
 
     def _build_tags_index(self, vol: VFS) -> tuple[int, int, bool]:
         ptop = vol.realpath

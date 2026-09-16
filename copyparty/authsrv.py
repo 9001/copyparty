@@ -107,6 +107,7 @@ SEESLOG = " (see fileserver log for details)"
 SSEELOG = " ({})".format(SEE_LOG)
 BAD_CFG = "invalid config; {}".format(SEE_LOG)
 SBADCFG = " ({})".format(BAD_CFG)
+REDUP_E2 = "WARNING: [/%s] needs 'e2ds' for redup from 'ref' and/or to 'sym'"
 
 PTN_U_GRP = re.compile(r"\$\{u(%[+-][^}]+)\}")
 PTN_G_GRP = re.compile(r"\$\{g(%[+-][^}]+)\}")
@@ -2914,6 +2915,17 @@ class AuthSrv(object):
             vol.flags["casechk"] = ccs
             if ccs == "y":
                 vol.flags["bcasechk"] = True
+
+        ptn = re.compile(r"^(,no|,sym|,hard|,ref)+=(sym|hard|ref)$")
+        ptn2 = re.compile(r"(no|ref).*=|=sym")
+        for vol in vfs.all_nodes.values():
+            zs = vol.flags.get("redup")
+            if zs and not ptn.match("," + zs):
+                t = "invalid redup for volume /%s: %r"
+                self.log(t % (vol.vpath, zs), 1)
+                errors = True
+            if zs and "e2ds" not in vol.flags and ptn2.search(zs):
+                self.log(REDUP_E2 % (vol.vpath,), 3)
 
         tags = self.args.mtp or []
         tags = [x.split("=")[0] for x in tags]

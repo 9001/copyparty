@@ -450,6 +450,7 @@ IMPLICATIONS = [
     ["no_logue", "no_logues"],  # user-typo
     ["nologues", "no_logues"],  # user-typo
     ["nologue", "no_logues"],  # user-typo
+    ["nw", "redup_dry"],
     ["plainlogue", "plainlogues"],  # user-typo
     ["plainreadmes", "plainreadme"],  # user-typo
     ["noscript", "plainlogues"],

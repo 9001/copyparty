@@ -70,6 +70,9 @@ done
 [ "$1" ] || {
     python3 ../scripts/test/smoketest.py &
     pids+=($!)
+
+    bash ../scripts/test/redup.sh &
+    pids+=($!)
 }
 
 for pid in ${pids[@]}; do
