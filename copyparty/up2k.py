@@ -3216,7 +3216,7 @@ class Up2k(object):
             data_ok = safe_dedup < 10 or n4g
 
             vols = [(ptop, jcur)] if jcur else []
-            if vfs.flags.get("xlink"):
+            if vfs.flags.get("xlink") or "reflink" in vfs.flags:
                 vols += [(k, v) for k, v in self.cur.items() if k != ptop]
 
             if noclone:
