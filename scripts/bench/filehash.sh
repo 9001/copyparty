@@ -49,7 +49,7 @@ echo warming up cache
 cat 1 >/dev/null
 
 echo ok lets go
-$pybin "$sfx" -p39204 -e2dsa --dbd=yolo --exit=idx -lo=t -q "$@" && err= || err=$?
+$pybin "$sfx" -i no -e2dsa --dbd=yolo --exit=idx -lo=t -q "$@" && err= || err=$?
 [ $win ] && [ $err = 15 ] && err=  # sigterm doesn't hook on windows, ah whatever
 [ $err ] && echo ERROR $err && exit $err
 

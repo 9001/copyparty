@@ -687,6 +687,7 @@ def get_sects():
             \033[32m-i 127.0.0.1\033[0m  listens on IPv4 localhost only
             \033[32m-i 127.1\033[0m      listens on IPv4 localhost only
             \033[32m-i 127.1,192.168.123.1\033[0m = IPv4 localhost and 192.168.123.1
+            \033[32m-i no\033[0m         disable webserver
 
             \033[33m-p\033[0m takes a comma-separated list of tcp ports to listen on;
             the default is \033[32m-p 3923\033[0m but as root you can \033[32m-p 80,443,3923\033[0m
