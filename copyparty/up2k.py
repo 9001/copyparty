@@ -887,13 +887,10 @@ class Up2k(object):
 
     def _expr_idx_filter(self, flags: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
         if not self.no_expr_idx:
-            return False, flags
+            return False, dict(flags)
 
         ret = {k: v for k, v in flags.items() if not k.startswith("e2t")}
-        if len(ret) == len(flags):
-            return False, flags
-
-        return True, ret
+        return len(ret) != len(flags), flags
 
     def init_indexes(
         self, all_vols: dict[str, VFS], scan_vols: list[str], fscan: bool, gid: int = 0
@@ -951,6 +948,9 @@ class Up2k(object):
         with self.mutex, self.reg_mutex:
             # only need to protect register_vpath but all in one go feels right
             for vol in vols:
+                if vol.realpath:
+                    self.flags[vol.realpath] = dict(vol.flags)
+
                 if bos.path.isfile(vol.realpath):
                     self.volstate[vol.vpath] = "online (just-a-file)"
                     t = "NOTE: volume [/%s] is a file, not a folder"
@@ -1412,6 +1412,7 @@ class Up2k(object):
         with self.mutex:
             with self.reg_mutex:
                 reg = self.register_vpath(top, vol.flags)
+                self.flags[vol.realpath] = dict(vol.flags)
 
             assert reg and self.pp  # !rm
             cur, db_path = reg
