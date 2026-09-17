@@ -1313,11 +1313,14 @@ class Up2k(object):
             self.log(t % (vpath, ex), 1)
             return None
 
-        if dir_is_empty(self.log_func, not self.args.no_scandir, histpath) and not (
-            ANYWIN or UNIX or "hist_cow" in flags
+        if not (
+            ANYWIN or UNIX or "hist_cow" in flags or "up2k.db" in os.listdir(histpath)
         ):
             try:
-                runcmd([b"chattr", b"+C", fsenc(histpath)], 1)
+                if self.fstab.get(ptop)[0] != "btrfs":
+                    raise Exception()
+                runcmd([b"chattr", b"-c", fsenc(histpath)], 1)  # compression and...
+                runcmd([b"chattr", b"+C", fsenc(histpath)], 1)  # no-cow are incompat
             except:
                 pass
 
