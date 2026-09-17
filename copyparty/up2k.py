@@ -3219,6 +3219,9 @@ class Up2k(object):
             vols = [(ptop, jcur)] if jcur else []
             if vols and ("xlink" in vfs.flags or "reflink" in vfs.flags):
                 vols += [(k, v) for k, v in self.cur.items() if k != ptop]
+                if "xlink" not in vfs.flags:
+                    zs = self.fstab.get(ptop)[1]
+                    vols = [x for x in vols if self.fstab.get(x[0])[1] == zs]
 
             if noclone:
                 wark = up2k_wark_from_metadata(
