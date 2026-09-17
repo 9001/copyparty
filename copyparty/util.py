@@ -4052,9 +4052,9 @@ def runihook(
             }
             for x, vp, ap in zip(ups, vps, aps)
         ]
-        sp_ka["sin"] = json.dumps(ja).encode("utf-8", "replace")
+        sp_ka["sin"] = json.dumps(ja).encode("utf-8", "replace") + b"\n"
     else:
-        sp_ka["sin"] = b"\n".join(fsenc(x) for x in aps)
+        sp_ka["sin"] = b"\n".join(fsenc(x) for x in aps) + b"\n"
 
     if acmd[0].startswith("zmq:"):
         try:
