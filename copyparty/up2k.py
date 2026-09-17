@@ -1174,7 +1174,7 @@ class Up2k(object):
                 vpath = k
 
         _, flags = self._expr_idx_filter(flags)
-        n4g = bool(flags.get("noforget"))
+        n4g = "noforget" in flags
 
         ft = "\033[0;32m{}{:.0}"
         ff = "\033[0;35m{}{:.0}"
@@ -1404,10 +1404,10 @@ class Up2k(object):
         top = vol.realpath
         rei = vol.flags.get("noidx")
         reh = vol.flags.get("nohash")
-        n4g = bool(vol.flags.get("noforget"))
+        n4g = "noforget" in vol.flags
         ffat = "fat32" in vol.flags
         cst = bos.stat(top)
-        dev = cst.st_dev if vol.flags.get("xdev") else 0
+        dev = cst.st_dev if "xdev" in vol.flags else 0
 
         with self.mutex:
             with self.reg_mutex:
@@ -1467,7 +1467,7 @@ class Up2k(object):
                     [],
                     cst,
                     dev,
-                    bool(vol.flags.get("xvol")),
+                    "xvol" in vol.flags,
                 )
                 if not n4g:
                     n_rm = self._drop_lost(db.c, top, excl)
@@ -3208,16 +3208,16 @@ class Up2k(object):
             jcur = self.cur.get(ptop)
             reg = self.registry[ptop]
             vfs = self.vfs.all_vols[cj["vtop"]]
-            n4g = bool(vfs.flags.get("noforget"))
-            noclone = bool(vfs.flags.get("noclone"))
-            rand = vfs.flags.get("rand") or cj.get("rand")
+            n4g = "noforget" in vfs.flags
+            noclone = "noclone" in vfs.flags
+            rand = "rand" in vfs.flags or cj.get("rand")
             lost: list[tuple["sqlite3.Cursor", str, str]] = []
 
             safe_dedup = vfs.flags.get("safededup") or 50
             data_ok = safe_dedup < 10 or n4g
 
             vols = [(ptop, jcur)] if jcur else []
-            if vfs.flags.get("xlink") or "reflink" in vfs.flags:
+            if vols and ("xlink" in vfs.flags or "reflink" in vfs.flags):
                 vols += [(k, v) for k, v in self.cur.items() if k != ptop]
 
             if noclone:
@@ -3708,7 +3708,7 @@ class Up2k(object):
             st = bos.stat(fp)
             try:
                 vrel = vjoin(job["prel"], fname)
-                xlink = bool(vf.get("xlink"))
+                xlink = "xlink" in vf
                 cur, wark, _, _, _, _, _ = self._find_from_vpath(ptop, vrel)
                 self._forget_file(ptop, vrel, vf, cur, wark, True, st.st_size, xlink)
             except Exception as ex:
@@ -3763,7 +3763,7 @@ class Up2k(object):
             if rm and bos.path.exists(dst):
                 wunlink(self.log, dst, flags)
 
-            if not is_mv and not flags.get("dedup"):
+            if not is_mv and "dedup" not in flags:
                 raise Exception("dedup is disabled in config")
 
             if "reflink" in flags:
@@ -4464,7 +4464,7 @@ class Up2k(object):
                     cur = None
                     try:
                         ptop = dbv.realpath
-                        xlink = bool(dbv.flags.get("xlink"))
+                        xlink = "xlink" in dbv.flags
                         cur, wark, _, _, _, _, _ = self._find_from_vpath(ptop, volpath)
                         self._forget_file(
                             ptop, volpath, dbv.flags, cur, wark, True, st.st_size, xlink
@@ -4951,7 +4951,7 @@ class Up2k(object):
                             raise Pebkac(400, t)
                 self._copy_tags(c1, c2, w)
 
-            xlink = bool(svn.flags.get("xlink"))
+            xlink = "xlink" in svn.flags
 
             with self.reg_mutex:
                 has_dupes = self._forget_file(

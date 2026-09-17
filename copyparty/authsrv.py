@@ -2969,6 +2969,9 @@ class AuthSrv(object):
             errors = True
 
         for vol in vfs.all_nodes.values():
+            for zs in vf_bmap().values():
+                if vol.flags.get(zs) in (None, False, ""):
+                    vol.flags.pop(zs, None)
             for k in list(vol.flags.keys()):
                 if re.match("^-[^-]+$", k):
                     vol.flags.pop(k)
@@ -3306,7 +3309,7 @@ class AuthSrv(object):
                 "dth3x": vf["th3x"],
                 "u2ts": vf["u2ts"],
                 "shr_who": vf["shr_who"],
-                "frand": bool(vf.get("rand")),
+                "frand": "rand" in vf,
                 "lifetime": vf.get("lifetime") or 0,
                 "unlist": vf.get("unlist") or "",
                 "sb_lg": "" if "no_sb_lg" in vf else (vf.get("lg_sbf") or "y"),
@@ -3364,7 +3367,7 @@ class AuthSrv(object):
                 "u2sz": self.args.u2sz,
                 "u2ts": vf["u2ts"],
                 "u2ow": vf["u2ow"],
-                "frand": bool(vf.get("rand")),
+                "frand": "rand" in vf,
                 "lifetime": vn.js_ls["lifetime"],
                 "u2sort": self.args.u2sort,
             }

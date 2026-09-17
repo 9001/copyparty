@@ -3888,7 +3888,7 @@ class HttpCli(object):
             rnd = 0
         else:
             rnd = int(self.uparam.get("rand") or self.headers.get("rand") or 0)
-            if vfs.flags.get("rand"):  # force-enable
+            if "rand" in vfs.flags:  # force-enable
                 rnd = max(rnd, vfs.flags["nrand"])
 
         zs = self.uparam.get("life", self.headers.get("life", ""))
@@ -7978,7 +7978,7 @@ class HttpCli(object):
             else:
                 j2a["og_url"] = j2a["og_raw"] = url_base
 
-            if not vn.flags.get("og_no_head"):
+            if "og_no_head" not in vn.flags:
                 ogh = {"twitter:card": "summary"}
 
                 title = str(vn.flags.get("og_title") or "")
@@ -8047,7 +8047,7 @@ class HttpCli(object):
                 while title.endswith(" - "):
                     title = title[:3]
 
-                if vn.flags.get("og_s_title") or not title:
+                if "og_s_title" in vn.flags or not title:
                     title = str(vn.flags.get("og_title") or "")
 
                 for tag, hname in tagmap.items():
