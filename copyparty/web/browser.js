@@ -5077,6 +5077,14 @@ var showfile = (function () {
 	r.nmap = {
 		'dockerfile': 'docker'
 	};
+	r.smap = {
+		'sh': 'bash',
+		'bash': 'bash',
+		'python': 'python',
+		'python3': 'python',
+		'perl': 'perl',
+		'ruby': 'ruby',
+	};
 	var x = txt_ext + ' ans c cfg conf cpp cs css diff glsl go html ini java js json jsx kt kts latex less lisp lua makefile md nasm nim nix py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml zig';
 	x = x.split(/ +/g);
 	for (var a = 0; a < x.length; a++)
@@ -5121,10 +5129,19 @@ var showfile = (function () {
 		return !!/[?&]doc=/.exec(location.search);
 	};
 
-	r.getlang = function (fn) {
+	r.getlang = function (fn, txt) {
 		fn = fn.toLowerCase();
 		var ext = fn.slice(fn.lastIndexOf('.'));
-		return r.map[ext] || r.nmap[fn];
+		var shebang = txt && txt.startsWith("#!")
+			? txt
+					.split('\n')[0]
+					.replace('#!/usr/bin/env', '')
+					.replace('#!/usr/bin/', '')
+					.replace('#!/bin/', '')
+					.trim()
+					.split(' ')[0]
+			: null;
+		return r.map[ext] || r.nmap[fn] || r.smap[shebang];
 	}
 
 	r.addlinks = function () {
@@ -5274,7 +5291,7 @@ var showfile = (function () {
 			txt = doc[2],
 			name = url.split('?')[0].split('/').pop(),
 			tname = uricom_dec(name),
-			lang = r.getlang(name),
+			lang = r.getlang(name, txt),
 			is_md = lang == 'md';
 
 		ebi('files').style.display = ebi('gfiles').style.display = ebi('lazy').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
