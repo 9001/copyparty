@@ -648,10 +648,26 @@ def walkdir(err, top, excl, seen):
             yield ap, inf
         else:
             err.append((ap, "irregular filetype 0%o" % (inf.st_mode,)))
+            
+def walkdir_no_recurse(err, top, excl, seen):
+    """non-recursive statdir"""
+    atop = os.path.abspath(os.path.realpath(top))
+    if atop in seen:
+        err.append((top, "recursive-symlink"))
+        return
+
+    seen = seen[:] + [atop]
+    for ap, inf in sorted(statdir(err, top)):
+        if excl.match(ap):
+            continue
+        if stat.S_ISREG(inf.st_mode):
+            yield ap, inf
+        elif not stat.S_ISDIR(inf.st_mode):
+            err.append((ap, "irregular filetype 0%o" % (inf.st_mode,)))
 
 
-def walkdirs(err, tops, excl):
-    """recursive statdir for a list of tops, yields [top, relpath, stat]"""
+def walkdirs(err, tops, excl, nr):
+    """statdir for a list of tops, yields [top, relpath, stat]. nr determines if its (n)ot (r)ecursive"""
     sep = "{0}".format(os.sep).encode("ascii")
     if not VT100:
         excl = excl.replace("/", r"\\")
@@ -683,8 +699,13 @@ def walkdirs(err, tops, excl):
             if isdir:
                 yield stop, dn, os.stat(stop)
 
+        if nr:
+            dir_traverse = walkdir_no_recurse
+        else:
+            dir_traverse = walkdir
+
         if isdir:
-            for ap, inf in walkdir(err, top, ptn, []):
+            for ap, inf in dir_traverse(err, top, ptn, []):
                 yield stop, ap[len(stop) :].lstrip(sep), inf
         else:
             d, n = top.rsplit(sep, 1)
@@ -972,7 +993,7 @@ class Ctl(object):
         nfiles = 0
         nbytes = 0
         err = []
-        for _, _, inf in walkdirs(err, ar.files, ar.x):
+        for _, _, inf in walkdirs(err, ar.files, ar.x, ar.nr):
             if stat.S_ISDIR(inf.st_mode):
                 continue
 
@@ -1009,7 +1030,7 @@ class Ctl(object):
             return
 
         self.nfiles, self.nbytes = self.stats
-        self.filegen = walkdirs([], ar.files, ar.x)
+        self.filegen = walkdirs([], ar.files, ar.x, ar.nr)
         self.recheck = []  # type: list[File]
         self.last_file = None
 
@@ -1585,6 +1606,7 @@ NOTE: if server has --usernames enabled, then password is "username:password"
     ap.add_argument("--ow", action="store_true", help="overwrite existing files instead of autorenaming")
     ap.add_argument("--owo", action="store_true", help="overwrite existing files if server-file is older")
     ap.add_argument("--spd", action="store_true", help="print speeds for each file")
+    ap.add_argument("--nr", action="store_true", help="don't scan folders within a folder")
     ap.add_argument("--version", action="store_true", help="show version and exit")
 
     ap = app.add_argument_group("print links")
