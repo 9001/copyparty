@@ -1,0 +1,51 @@
+(tls) {
+    tls {
+        # cloudflare-managed DNS to pass ACME DNS challenge to issue letsencrypt TLS certs for your domains
+        dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+        resolvers 1.1.1.1
+    }
+}
+
+party.example.org {
+    import tls
+
+    @external_wopi {
+        path /wopi*
+        not client_ip 10.0.10.0/24
+    }
+    handle @external_wopi {
+        # forbid wopi endpoints access for requests coming from anywhere except docker's `copyparty` network configured in docker-compose.yml
+        respond nope 403
+    }
+    handle {
+        reverse_proxy copyparty:3923 {
+            header_up x-forwarded-for "{client_ip}"
+        }
+    }
+    
+    
+}
+
+office.example.org {
+    import tls
+
+    @external_wopi {
+        path /hosting /hosting/*
+        not client_ip 10.0.10.0/24
+    }
+    handle @external_wopi {
+        # forbid wopi endpoints access for requests coming from anywhere except docker's `copyparty` network configured in docker-compose.yml
+        respond nope 403
+    }
+
+    @collabora path_regexp ^/(browser|cool|hosting/(discovery|capabilities))(/.*)?$    
+    handle @collabora {
+        reverse_proxy collabora:9980 {
+            header_up x-forwarded-for "{client_ip}"
+        }
+    }
+
+    handle {
+        respond oops 404
+    }
+}
