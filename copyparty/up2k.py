@@ -909,7 +909,7 @@ class Up2k(object):
 
             with self.mutex:
                 if gid != self.gid:
-                    return False
+                    return
 
                 if self.pp:
                     continue
@@ -1100,7 +1100,7 @@ class Up2k(object):
                 cur.execute("vacuum")
 
         if self.stop:
-            return False
+            return
 
         for vol in all_vols.values():
             if vol.flags["dbd"] == "acid":
@@ -1130,7 +1130,7 @@ class Up2k(object):
                 self.log("checkpoint failed: {}".format(ex), 3)
 
         if self.stop:
-            return False
+            return
 
         self.pp.end = True
 
@@ -2182,8 +2182,8 @@ class Up2k(object):
                     rd2, fn2 = hit
                     if fn == fn2 and rd == rd2 and vol is v2:
                         continue
+                    apt = ""
                     try:
-                        apt = ""
                         rd, fn = s3dec(rd, fn)
                         rd2, fn2 = s3dec(rd2, fn2)
                         fp1 = os.path.join(vol.realpath, rd, fn)
