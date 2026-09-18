@@ -5077,11 +5077,22 @@ var showfile = (function () {
 	r.nmap = {
 		'dockerfile': 'docker'
 	};
+	r.pmap = {
+		'sh': 'bash',
+		'ash': 'bash',
+		'dash': 'bash',
+		'luajit': 'lua',
+		'node': 'js',
+	};
 	var x = txt_ext + ' ans c cfg conf cpp cs css diff glsl go html ini java js json jsx kt kts latex less lisp lua makefile md nasm nim nix py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml zig';
 	x = x.split(/ +/g);
 	for (var a = 0; a < x.length; a++)
 		if (!r.map["." + x[a]])
 			r.map["." + x[a]] = x[a];
+	x = 'awk bash lua make perl python ruby swift';
+	x = x.split(/ +/g);
+	for (var a = 0; a < x.length; a++)
+		r.pmap[x[a]] = x[a];
 
 	r.sname = function (srch) {
 		return srch.split(/[?&]doc=/)[1].split('&')[0];
@@ -5121,11 +5132,17 @@ var showfile = (function () {
 		return !!/[?&]doc=/.exec(location.search);
 	};
 
-	r.getlang = function (fn) {
+	r.getlang = function (fn, txt) {
 		fn = fn.toLowerCase();
 		var ext = fn.slice(fn.lastIndexOf('.'));
-		return r.map[ext] || r.nmap[fn];
-	}
+		var prog = txt && txt.startsWith('#!') && txt.split('\n')[0].replace(
+			'#!/usr/bin/env', '').replace(
+			'#!/usr/bin/', '').replace(
+			'#!/bin/', '').trim().split(' ')[0];
+		if (prog)
+			prog = r.pmap[prog] || r.pmap[prog.replace(/[0-9].*/, '')];
+		return r.map[ext] || r.nmap[fn] || prog;
+	};
 
 	r.addlinks = function () {
 		r.files = [];
@@ -5274,7 +5291,7 @@ var showfile = (function () {
 			txt = doc[2],
 			name = url.split('?')[0].split('/').pop(),
 			tname = uricom_dec(name),
-			lang = r.getlang(name),
+			lang = r.getlang(name, txt),
 			is_md = lang == 'md';
 
 		ebi('files').style.display = ebi('gfiles').style.display = ebi('lazy').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
