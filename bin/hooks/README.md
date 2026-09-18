@@ -49,6 +49,8 @@ these are `--xiu` hooks; unlike `xbu` and `xau` (which get executed on every sin
 * [qbittorrent-magnet.py](qbittorrent-magnet.py) starts downloading a torrent if you post a magnet url
 * [usb-eject.py](usb-eject.py) adds web-UI buttons to safe-remove usb flashdrives shared through copyparty
 * [msg-log.py](msg-log.py) is a guestbook; logs messages to a doc in the same folder
+* [ytdlp-i.py](ytdlp-i.py) is an import-safe hook, based on wget.py, adds yt-dlp and aria2 support
+  * allows downloading file via URLs, yt-dlp supported links, any link downloadable with aria2 (including magnets)
 
 
 # general concept demos
