@@ -3559,7 +3559,7 @@ function eval_hash() {
 	if (hash0 && window.og_fn) {
 		var all = msel.getall(), mi;
 		for (var a = 0; a < all.length; a++)
-			if (og_fn == uricom_dec(vsplit(all[a].vp)[1].split('?')[0])) {
+			if (og_fn == all[a].fn) {
 				mi = all[a];
 				break;
 			}
@@ -4254,9 +4254,6 @@ var fileman = (function () {
 			s2d[a] = all.indexOf(sel[a]);
 
 			var vp = sel[a].vp;
-			if (vp.endsWith('/'))
-				vp = vp.slice(0, -1);
-
 			var vsp = vsplit(vp);
 			if (base != vsp[0])
 				return toast.err(0, esc('bug:\n' + base + '\n' + vsp[0]));
@@ -5104,7 +5101,7 @@ var showfile = (function () {
 	if (window.og_fn) {
 		var ext = og_fn.split(/\./g).pop();
 		if (r.map['.' + ext])
-			hist_replace(get_evpath() + '?doc=' + og_fn);
+			hist_replace(get_evpath() + '?doc=' + uricom_enc(og_fn));
 	}
 
 	window.Prism = { 'manual': true };
@@ -5115,7 +5112,7 @@ var showfile = (function () {
 		var m = /[?&]doc=([^&]+)/.exec(location.search);
 		if (m) {
 			setTimeout(function () {
-				r.show(uricom_dec(m[1]), true);
+				r.show(m[1], true);
 			}, 1);
 		}
 	}
@@ -5158,7 +5155,7 @@ var showfile = (function () {
 			if (!lang)
 				continue;
 
-			r.files.push({ 'id': link.id, 'name': uricom_dec(fn) });
+			r.files.push({ 'id': link.id, 'name': link.fn });
 
 			var ah = ebi(link.id),
 				td = ah.closest('tr').getElementsByTagName('td')[0];
@@ -5483,7 +5480,7 @@ var showfile = (function () {
 				sel = false;
 
 			for (var b = 0; b < sels.length; b++)
-				if (vsplit(sels[b].vp)[1] == lin)
+				if (sels[b].fn == lin)
 					sel = true;
 
 			clmod(lis[a], 'hl', lin == fn);
@@ -8788,6 +8785,7 @@ var msel = (function () {
 			item.id = links[a].getAttribute('id');
 			item.sel = clgot(links[a].closest('tr'), 'sel');
 			item.vp = href.indexOf('/') !== -1 ? href : vbase + href;
+			item.fn = uricom_dec(href.split('/').pop());
 
 			if (dk) {
 				var m = /[?&](k=[^&#]+)/.exec(qhref);
