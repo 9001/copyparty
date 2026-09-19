@@ -849,6 +849,43 @@ def get_sects():
             + build_flags_desc(),
         ],
         [
+            "dedup",
+            "file deduplication",
+            dedent(
+                """
+            when just \033[36m--dedup\033[0m or volflag "\033[36mdedup\033[0m" is enabled, files will be
+            deduplicated by means of \033[1msymlinks,\033[0m which demand some caution:
+
+            the available dedup approaches:
+
+              * symlinks work on most filesystems, but if another software
+                 moves either the symlink itself or the file that it points to,
+                 the link will break and the file "disappears"
+
+              * hardlinks work on Linux filesystems and \033[1mlook\033[0m like regular files,
+                 except if the contents of one copy of that file is edited, then
+                 this will affect \033[1mall the dupes too!\033[0m
+
+              * reflinks only work on btrfs/zfs/xfs but is the safest/best choice;
+                 deduplicated files behave just like regular files,
+                 and can be modified without affecting other copies/dupes
+
+            to change approach, add one of the following in addition to "\033[36mdedup\033[0m":
+
+            \033[36m--reflink\033[0m or volflag "\033[36mreflink\033[0m"
+            if reflink is not possible (unsupp/cross-fs), a full copy is made
+
+            \033[36m--hardlink-only\033[0m or volflag "\033[36mhardlinkonly\033[0m"
+            if hardlink is not possible (unsupp/cross-fs), a full copy is made
+
+            \033[36m--hardlink\033[0m or volflag "\033[36mhardlink\033[0m"
+            if hardlink is not possible (unsupp/cross-fs), a symlink is made
+
+            note: dedup works best when combined with e2ds or e2dsa
+            """
+            ),
+        ],
+        [
             "thumb-ex",
             "extract thumbnails from custom file formats with python scripts",
             dedent(
@@ -1213,9 +1250,9 @@ def get_sects():
             "file/folder permissions",
             dedent(
                 """
-            global-option \033[33m--chmod-f\033[0m and volflag \033[33mchmod_f\033[0m specifies the unix-permission to use when creating a new file
+            global-option \033[33m--chmod-f\033[0m and volflag "\033[33mchmod_f\033[0m" specifies the unix-permission to use when creating a new file
 
-            similarly, \033[33m--chmod-d\033[0m and \033[33mchmod_d\033[0m sets the directory/folder perm
+            similarly, \033[33m--chmod-d\033[0m and "\033[33mchmod_d\033[0m" sets the directory/folder perm
 
             the value is a three- or four-digit octal number such as \033[32m755\033[0m, \033[32m0644\033[0m, \033[32m2750\033[0m, etc.
 
@@ -1382,8 +1419,8 @@ def add_qr(ap, tty):
     ap2.add_argument("--qrz", metavar="N", type=int, default=0, help="[\033[32m1\033[0m]=1x, [\033[32m2\033[0m]=2x, [\033[32m0\033[0m]=auto (try [\033[32m2\033[0m] on broken fonts)")
     ap2.add_argument("--qr-pin", metavar="N", type=int, default=0, help="sticky/pin the qr-code to always stay on-screen; [\033[32m0\033[0m]=disabled, [\033[32m1\033[0m]=with-url, [\033[32m2\033[0m]=just-qr")
     ap2.add_argument("--qr-wait", metavar="SEC", type=float, default=0, help="wait \033[33mSEC\033[0m before printing the qr-code to the log")
-    ap2.add_argument("--qr-every", metavar="SEC", type=float, default=0, help="print the qr-code every \033[33mSEC\033[0m (try this with/without --qr-pin in case of issues)")
-    ap2.add_argument("--qr-winch", metavar="SEC", type=float, default=0, help="when --qr-pin is enabled, check for terminal size change every \033[33mSEC\033[0m")
+    ap2.add_argument("--qr-every", metavar="SEC", type=float, default=0, help="print the qr-code every \033[33mSEC\033[0m (try this with/without \033[33m--qr-pin\033[0m in case of issues)")
+    ap2.add_argument("--qr-winch", metavar="SEC", type=float, default=0, help="when \033[33m--qr-pin\033[0m is enabled, check for terminal size change every \033[33mSEC\033[0m")
     ap2.add_argument("--qr-file", metavar="TXT", type=u, action="append", help="\033[34mREPEATABLE:\033[0m write qr-code to file.\n └─To create txt or svg, \033[33mTXT\033[0m is Filepath:Zoom:Pad, for example [\033[32mqr.txt:1:2\033[0m]\n └─To create png or gif, \033[33mTXT\033[0m is Filepath:Zoom:Pad:Foreground:Background, for example [\033[32mqr.png:8:2:333333:ffcc55\033[0m], or [\033[32mqr.png:8:2::ffcc55\033[0m] for transparent")
     ap2.add_argument("--qr-stdout", action="store_true", help="always display the QR-code on STDOUT in the terminal, even if \033[33m-q\033[0m")
     ap2.add_argument("--qr-stderr", action="store_true", help="always display the QR-code on STDERR in the terminal, even if \033[33m-q\033[0m")
@@ -1428,17 +1465,17 @@ def add_upload(ap):
     ap2.add_argument("--reg-cap", metavar="N", type=int, default=38400, help="max number of uploads to keep in memory when running without \033[33m-e2d\033[0m; roughly 1 MiB RAM per 600")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload (bad idea to enable this on windows and/or cow filesystems)")
     ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even when it might be dangerous (multiprocessing, filesystems lacking sparse-files support, ...)")
-    ap2.add_argument("--chmod-f", metavar="UGO", type=u, default="", help="unix file permissions to use when creating files; default is probably 644 (OS-decided), see --help-chmod. Examples: [\033[32m644\033[0m] = owner-RW + all-R, [\033[32m755\033[0m] = owner-RWX + all-RX, [\033[32m777\033[0m] = full-yolo (volflag=chmod_f)")
-    ap2.add_argument("--chmod-d", metavar="UGO", type=u, default="755", help="unix file permissions to use when creating directories; see --help-chmod. Examples: [\033[32m755\033[0m] = owner-RW + all-R, [\033[32m2750\033[0m] = setgid + owner-RW + group-R, [\033[32m777\033[0m] = full-yolo (volflag=chmod_d)")
+    ap2.add_argument("--chmod-f", metavar="UGO", type=u, default="", help="unix file permissions to use when creating files; default is probably 644 (OS-decided), see \033[33m--help-chmod\033[0m. Examples: [\033[32m644\033[0m] = owner-RW + all-R, [\033[32m755\033[0m] = owner-RWX + all-RX, [\033[32m777\033[0m] = full-yolo (volflag=chmod_f)")
+    ap2.add_argument("--chmod-d", metavar="UGO", type=u, default="755", help="unix file permissions to use when creating directories; see \033[33m--help-chmod\033[0m. Examples: [\033[32m755\033[0m] = owner-RW + all-R, [\033[32m2750\033[0m] = setgid + owner-RW + group-R, [\033[32m777\033[0m] = full-yolo (volflag=chmod_d)")
     ap2.add_argument("--uid", metavar="N", type=int, default=-1, help="unix user-id to chown new files/folders to; default = -1 = do-not-change (volflag=uid)")
     ap2.add_argument("--gid", metavar="N", type=int, default=-1, help="unix group-id to chown new files/folders to; default = -1 = do-not-change (volflag=gid)")
     ap2.add_argument("--wram", action="store_true", help="allow uploading even if a volume is inside a ramdisk, meaning that all data will be lost on the next server reboot (volflag=wram)")
-    ap2.add_argument("--dedup", action="store_true", help="enable symlink-based upload deduplication (volflag=dedup)")
+    ap2.add_argument("--dedup", action="store_true", help="enable symlink-based upload deduplication; see \033[33m--help-dedup\033[0m (volflag=dedup)")
     ap2.add_argument("--safe-dedup", metavar="N", type=int, default=50, help="how careful to be when deduplicating files; [\033[32m1\033[0m] = just verify the filesize, [\033[32m50\033[0m] = verify file contents have not been altered (volflag=safededup)")
     ap2.add_argument("--hardlink", action="store_true", help="enable hardlink-based dedup; will fallback on symlinks when that is impossible (across filesystems) (volflag=hardlink)")
     ap2.add_argument("--hardlink-only", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made (volflag=hardlinkonly)")
     ap2.add_argument("--reflink", action="store_true", help="enable reflink-based dedup; will fallback on full copies when that is impossible (non-CoW filesystem) (volflag=reflink)")
-    ap2.add_argument("--redup", metavar="A[,B]=T", help="convert dedup-type for existing files; \033[33mA,B\033[0m is dedup-types to convert from (no/ref/sym/hard), \033[33mT\033[0m is target type; converting from sym/hard is fast-ish, from no/ref is slooow; example: [\033[32msym,hard=ref\033[0m] (volflag=redup)")
+    ap2.add_argument("--redup", metavar="A[,B]=T", help="convert dedup-type for existing files; \033[33mA,B\033[0m is dedup-types to convert from (no/ref/sym/hard), \033[33mT\033[0m is target type; converting from sym/hard is fast-ish, from no/ref is slooow; see \033[33m--help-dedup\033[0m. Example: [\033[32msym,hard=ref\033[0m] (volflag=redup)")
     ap2.add_argument("--redup-dry", action="store_true", help="dry-run; makes \033[33m--redup\033[0m not apply changes (volflag=redup_dry)")
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
     ap2.add_argument("--no-dupe-m", action="store_true", help="also reject dupes when moving a file into another volume (volflag=nodupem)")
@@ -1533,7 +1570,7 @@ def add_auth(ap):
     ses_db = os.path.join(E.cfg, "sessions.db")
     ap2 = ap.add_argument_group("IdP / identity provider / user authentication options")
     ap2.add_argument("--idp-h-usr", metavar="HN", type=u, action="append", help="\033[34mREPEATABLE:\033[0m bypass the copyparty authentication checks if the request-header \033[33mHN\033[0m contains a username to associate the request with (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy")
-    ap2.add_argument("--idp-hm-usr", metavar="T", type=u, action="append", help="\033[34mREPEATABLE:\033[0m bypass the copyparty authentication checks if the request-header \033[33mT\033[0m is provided, and its value exists in a mapping defined by this option; see --help-idp")
+    ap2.add_argument("--idp-hm-usr", metavar="T", type=u, action="append", help="\033[34mREPEATABLE:\033[0m bypass the copyparty authentication checks if the request-header \033[33mT\033[0m is provided, and its value exists in a mapping defined by this option; see \033[33m--help-idp\033[0m")
     ap2.add_argument("--idp-h-grp", metavar="HN", type=u, default="", help="assume the request-header \033[33mHN\033[0m contains the groupname of the requesting user; can be referenced in config files for group-based access control")
     ap2.add_argument("--idp-h-key", metavar="HN", type=u, default="", help="optional but recommended safeguard; your reverse-proxy will insert a secret header named \033[33mHN\033[0m into all requests, and the other IdP headers will be ignored if this header is not present")
     ap2.add_argument("--idp-gsep", metavar="RE", type=u, default="|:;+,", help="if there are multiple groups in \033[33m--idp-h-grp\033[0m, they are separated by one of the characters in \033[33mRE\033[0m")
@@ -1545,7 +1582,7 @@ def add_auth(ap):
     ap2.add_argument("--idp-login", metavar="L", type=u, default="", help="replace all login-buttons with a link to URL \033[33mL\033[0m (unless \033[32mpw\033[0m is in \033[33m--auth-ord\033[0m then both will be shown); [\033[32m{dst}\033[0m] expands to url of current page")
     ap2.add_argument("--idp-login-t", metavar="T", type=u, default="Login with SSO", help="the label/text for the idp-login button")
     ap2.add_argument("--idp-logout", metavar="L", type=u, default="", help="replace all logout-buttons with a link to URL \033[33mL\033[0m")
-    ap2.add_argument("--auth-ord", metavar="TXT", type=u, default="idp,ipu", help="controls auth precedence; examples: [\033[32mpw,idp,ipu\033[0m], [\033[32mipu,pw,idp\033[0m], see --help-auth-ord")
+    ap2.add_argument("--auth-ord", metavar="TXT", type=u, default="idp,ipu", help="controls auth precedence; examples: [\033[32mpw,idp,ipu\033[0m], [\033[32mipu,pw,idp\033[0m], see \033[33m--help-auth-ord\033[0m")
     ap2.add_argument("--pw-hdr", metavar="NAME", type=u, default="pw", help="lowercase name of password-header (NAME: foo); \033[1;31mWARNING:\033[0m Changing this will break support for many clients")
     ap2.add_argument("--pw-urlp", metavar="NAME", type=u, default="pw", help="lowercase name of password url-param (?NAME=foo); \033[1;31mWARNING:\033[0m Changing this will break support for many clients")
     ap2.add_argument("--no-bauth", action="store_true", help="disable basic-authentication support; do not accept passwords from the 'Authenticate' header at all. NOTE: This breaks support for the android app")
@@ -1827,7 +1864,7 @@ def add_safety(ap):
     ap2.add_argument("--csp-ui", metavar="TXT", default="script-src 'unsafe-eval' 'nonce-{{ js_nonce }}'; worker-src 'self'", help="content-security-policy to apply for the web-UI; default helps prevent XSS by blocking <script> / onclick / ... (volflag=csp_ui)")
     ap2.add_argument("--csp-dl", metavar="TXT", default="", help="content-security-policy to apply for static files (volflag=csp_dl)")
     ap2.add_argument("--no-script", action="store_true", help="disables javascript in html files; helps prevent XSS but kills interactive websites; this will override \033[33m--csp-dl\033[0m with [\033[32mscript-src 'none'\033[0m] (volflag=noscript)")
-    ap2.add_argument("--no-html", action="store_true", help="show html-files as plain text; helps prevent XSS but kills websites/blogs, also enables --no-script (volflag=nohtml)")
+    ap2.add_argument("--no-html", action="store_true", help="show html-files as plain text; helps prevent XSS but kills websites/blogs, also enables \033[33m--no-script\033[0m (volflag=nohtml)")
     ap2.add_argument("--no-mime", action="store_true", help="disallow changing the response mimetype with url-parameter ?mime=... (volflag=nomime)")
     ap2.add_argument("--vague-403", action="store_true", help="send 404 instead of 403 (security through ambiguity, very enterprise). \033[1;31mWARNING:\033[0m Not compatible with WebDAV")
     ap2.add_argument("--force-js", action="store_true", help="don't send folder listings as HTML, force clients to use the embedded json instead -- slight protection against misbehaving search engines which ignore \033[33m--no-robots\033[0m")
@@ -1972,7 +2009,7 @@ def add_thumbnail(ap):
 
     ap2.add_argument("--th-spec-cnv", metavar="T", type=u, default="it,itgz,itxz,itz,mdgz,mdxz,mdz,mo3,mod,s3m,s3gz,s3xz,s3z,xm,xmgz,xmxz,xmz,xpk", help="audio formats which provoke https://trac.ffmpeg.org/ticket/10797 (huge ram usage for s3xmodit spectrograms)")
     ap2.add_argument("--au-unpk", metavar="E=F.C", type=u, default="mdz=mod.zip, mdgz=mod.gz, mdxz=mod.xz, s3z=s3m.zip, s3gz=s3m.gz, s3xz=s3m.xz, xmz=xm.zip, xmgz=xm.gz, xmxz=xm.xz, itz=it.zip, itgz=it.gz, itxz=it.xz, cbz=jpg.cbz, epub=jpg.epub, kra=png.kra, ora=png.ora", help="audio/image formats to decompress before passing to ffmpeg")
-    ap2.add_argument("--th-extract", metavar="T", type=u, action="append", help="\033[34mREPEATABLE:\033[0m list of file extensions to thumbnail using a custom plugin (a python script); example: [\033[32mmdf,iso,dmg=/thumbs/diskimg.py\033[0m], see --help-thumb-ex")
+    ap2.add_argument("--th-extract", metavar="T", type=u, action="append", help="\033[34mREPEATABLE:\033[0m list of file extensions to thumbnail using a custom plugin (a python script); example: [\033[32mmdf,iso,dmg=/thumbs/diskimg.py\033[0m], see \033[33m--help-thumb-ex\033[0m")
     ap2.add_argument("--th-extr-sz", metavar="M", type=int, default=16, help="max num megabytes to allow \033[33m--th-extract\033[0m plugins to extract from each file")
     ap2.add_argument("--hot-th-extr", action="store_true", help="recompile extractors on each thumbnail extraction -- expensive but convenient when hacking on stuff")
 
@@ -2129,7 +2166,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--js-browser", metavar="L", type=u, default="", help="URL to additional JS to include in the filebrowser html")
     ap2.add_argument("--js-other", metavar="L", type=u, default="", help="URL to additional JS to include in all other pages")
     ap2.add_argument("--html-head", metavar="TXT", type=u, default="", help="text to append to the <head> of all HTML pages (except for basic-browser); can be @PATH to send the contents of a file at PATH, and/or begin with %% to render as jinja2 template; \033[32m<script>\033[0m will not work, use \033[32m<script nonce=\"{{ js_nonce }}\">\033[0m (volflag=html_head)")
-    ap2.add_argument("--html-head-s", metavar="T", type=u, default="", help="text to append to the <head> of all HTML pages (except for basic-browser); similar to (and can be combined with) --html-head but only accepts static text (volflag=html_head_s)")
+    ap2.add_argument("--html-head-s", metavar="T", type=u, default="", help="text to append to the <head> of all HTML pages (except for basic-browser); similar to (and can be combined with) \033[33m--html-head\033[0m but only accepts static text (volflag=html_head_s)")
     ap2.add_argument("--ih", action="store_true", help="if a folder contains index.html, show that instead of the directory listing by default (can be changed in the client settings UI, or add ?v to URL for override)")
     ap2.add_argument("--textfiles", metavar="CSV", type=u, default="txt,nfo,diz,cue,readme", help="file extensions to present as plaintext")
     ap2.add_argument("--txt-max", metavar="KiB", type=int, default=64, help="max size of embedded textfiles on ?doc= (anything bigger will be lazy-loaded by JS)")
@@ -2140,7 +2177,7 @@ def add_ui(ap, retry: int):
     ap2.add_argument("--doctitle", metavar="TXT", type=u, default="copyparty @ --name", help="title / service-name to show in html documents")
     ap2.add_argument("--bname", metavar="TXT", type=u, default="--name", help="server name (displayed in filebrowser document title)")
     ap2.add_argument("--pb-url", metavar="URL", type=u, default=URL_PRJ, help="powered-by link; disable with \033[33m-nb\033[0m")
-    ap2.add_argument("--ver", action="store_true", help="show version on the control panel (incompatible with \033[33m-nb\033[0m). This is the same as --ver-who all")
+    ap2.add_argument("--ver", action="store_true", help="show version on the control panel (incompatible with \033[33m-nb\033[0m). This is the same as \033[33m--ver-who all\033[0m")
     ap2.add_argument("--ver-who", metavar="TXT", type=u, default="no", help="only show version for: [\033[32ma\033[0m]=admin-permission-anywhere, [\033[32mauth\033[0m]=authenticated, [\033[32mall\033[0m]=anyone")
     ap2.add_argument("--du-who", metavar="TXT", type=u, default="all", help="only show disk usage for: [\033[32mno\033[0m]=nobody, [\033[32ma\033[0m]=admin-permission, [\033[32mrw\033[0m]=read-write, [\033[32mw\033[0m]=write, [\033[32mauth\033[0m]=authenticated, [\033[32mall\033[0m]=anyone (volflag=du_who)")
     ap2.add_argument("--ver-iwho", type=int, default=0, help=argparse.SUPPRESS)
