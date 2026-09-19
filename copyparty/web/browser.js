@@ -4601,6 +4601,9 @@ var fileman = (function () {
 				if (err !== 'xbd')
 					toast.ok(2, L.fd_ok);
 
+				if (QS('#seldoc.sel'))
+					thegrid.setvis(true);
+
 				treectl.goto();
 				return;
 			}
