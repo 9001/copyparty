@@ -3251,6 +3251,8 @@ class HttpCli(object):
             dst = vfs.canonical(rem)
             try:
                 if not bos.path.isdir(dst):
+                    if "nosub" in vfs.flags:
+                        raise Pebkac(500, "no subdirectories allowed")
                     bos.makedirs(dst, vf=vfs.flags)
             except OSError as ex:
                 self.log("makedirs failed %r" % (dst,))
@@ -3262,6 +3264,8 @@ class HttpCli(object):
                         raise Pebkac(400, "some file got your folder name")
 
                     raise Pebkac(500, min_ex())
+            except Pebkac:
+                raise
             except:
                 raise Pebkac(500, min_ex())
 
