@@ -850,7 +850,7 @@ def get_sects():
         ],
         [
             "dedup",
-            "file deduplication",
+            "file deduplication on upload",
             dedent(
                 """
             when just \033[36m--dedup\033[0m or volflag "\033[36mdedup\033[0m" is enabled, files will be
@@ -860,11 +860,13 @@ def get_sects():
 
               * symlinks work on most filesystems, but if another software
                  moves either the symlink itself or the file that it points to,
-                 the link will break and the file "disappears"
+                 the link will break and the file "disappears";
+                 only safe if only copyparty is used to rename/move/delete
 
               * hardlinks work on Linux filesystems and \033[1mlook\033[0m like regular files,
                  except if the contents of one copy of that file is edited, then
                  this will affect \033[1mall the dupes too!\033[0m
+                 and they share the same last-modified-time
 
               * reflinks only work on btrfs/zfs/xfs but is the safest/best choice;
                  deduplicated files behave just like regular files,
@@ -882,6 +884,33 @@ def get_sects():
             if hardlink is not possible (unsupp/cross-fs), a symlink is made
 
             note: dedup works best when combined with e2ds or e2dsa
+
+            to deduplicate existing files on-disk, see \033[36m--help-redup\033[0m
+            """
+            ),
+        ],
+        [
+            "redup",
+            "deduplicating existing files on disk",
+            dedent(
+                """
+            \033[36m--redup\033[0m can convert on-disk files between deduplication-approaches,
+            for example turning redundant full copies into reflinks to save space
+
+            example: --redup \033[32mno,sym,hard\033[0m=\033[35mref\033[0m will find all files of type
+            \033[32mfullcopy/symlink/hardlink\033[0m, and convert them into \033[35mreflinks\033[0m
+            (see \033[36m--help-dedup\033[0m for a summary on the types)
+
+            converting \033[1mfrom\033[0m symlinks/hardlinks is fairly fast and simple;
+            in this case, the obvious target type/approach is reflinks
+            which only works on btrfs/zfs/xfs
+
+            converting \033[1mto\033[0m symlinks or hardlinks is \033[3mpossible\033[0m, but
+            not-recommended due to risks explained in \033[36m--help-dedup\033[0m
+            (interaction with other softwares can result in data loss)
+
+            converting \033[1mfrom\033[0m 'no' (full redundant copies) is hella slow;
+            checksums each file to avoid corruption from bad RAM
             """
             ),
         ],
@@ -1475,7 +1504,7 @@ def add_upload(ap):
     ap2.add_argument("--hardlink", action="store_true", help="enable hardlink-based dedup; will fallback on symlinks when that is impossible (across filesystems) (volflag=hardlink)")
     ap2.add_argument("--hardlink-only", action="store_true", help="do not fallback to symlinks when a hardlink cannot be made (volflag=hardlinkonly)")
     ap2.add_argument("--reflink", action="store_true", help="enable reflink-based dedup; will fallback on full copies when that is impossible (non-CoW filesystem) (volflag=reflink)")
-    ap2.add_argument("--redup", metavar="A[,B]=T", help="convert dedup-type for existing files; \033[33mA,B\033[0m is dedup-types to convert from (no/ref/sym/hard), \033[33mT\033[0m is target type; converting from sym/hard is fast-ish, from no/ref is slooow; see \033[33m--help-dedup\033[0m. Example: [\033[32msym,hard=ref\033[0m] (volflag=redup)")
+    ap2.add_argument("--redup", metavar="A[,B]=T", help="convert dedup-type for existing files; \033[33mA,B\033[0m is dedup-types to convert from (no/ref/sym/hard), \033[33mT\033[0m is target type; converting from sym/hard is fast-ish, from no/ref is slooow, to sym/hard is jank; see \033[33m--help-redup\033[0m. Example: [\033[32msym,hard=ref\033[0m] (volflag=redup)")
     ap2.add_argument("--redup-dry", action="store_true", help="dry-run; makes \033[33m--redup\033[0m not apply changes (volflag=redup_dry)")
     ap2.add_argument("--no-dupe", action="store_true", help="reject duplicate files during upload; only matches within the same volume (volflag=nodupe)")
     ap2.add_argument("--no-dupe-m", action="store_true", help="also reject dupes when moving a file into another volume (volflag=nodupem)")

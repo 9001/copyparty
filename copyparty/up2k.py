@@ -2157,6 +2157,11 @@ class Up2k(object):
                             prefix="r,", dir=atop, delete=False
                         ).name
                         self._symlink(ap, ap2, vf, True, True, st.st_mtime)
+                        st1 = bos.stat(ap)
+                        st2 = bos.lstat(ap2)
+                        if st1.st_size != st2.st_size or stat.S_ISLNK(st2.st_mode):
+                            wunlink(self.log, ap2, vf)
+                            raise Exception("redup: clone failed; giving up")
                         wunlink(self.log, ap, vf)
                         bos.rename(ap2, ap)
 
