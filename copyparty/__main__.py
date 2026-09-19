@@ -897,13 +897,15 @@ def get_sects():
             \033[36m--redup\033[0m can convert on-disk files between deduplication-approaches,
             for example turning redundant full copies into reflinks to save space
 
+            converts \033[1mall files\033[0m in each volume! not just copyparty-created ones
+
             example: --redup \033[32mno,sym,hard\033[0m=\033[35mref\033[0m will find all files of type
             \033[32mfullcopy/symlink/hardlink\033[0m, and convert them into \033[35mreflinks\033[0m
             (see \033[36m--help-dedup\033[0m for a summary on the types)
 
             converting \033[1mfrom\033[0m symlinks/hardlinks is fairly fast and simple;
             in this case, the obvious target type/approach is reflinks
-            which only works on btrfs/zfs/xfs
+            (which only works on btrfs/zfs/xfs)
 
             converting \033[1mto\033[0m symlinks or hardlinks is \033[3mpossible\033[0m, but
             not-recommended due to risks explained in \033[36m--help-dedup\033[0m

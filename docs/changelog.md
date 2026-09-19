@@ -1,4 +1,14 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0906-2249  `v1.20.23`  rcm once again
+
+## 🩹 bugfixes
+
+* the custom right-click-menu didn't like being enabled ad9994be
+  * this release is a hotfix for that; see v1.20.22 for all the other new stuff
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0906-2112  `v1.20.22`  hello fedora
 
 ## 🧪 new features
