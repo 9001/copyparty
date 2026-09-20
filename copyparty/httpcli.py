@@ -6664,6 +6664,7 @@ class HttpCli(object):
         act = self.uparam["eshare"]
         if act == "rm":
             cur.execute("delete from sh where k = ?", (skey,))
+            cur.execute("delete from sf where k = ?", (skey,))
             if skey in self.asrv.vfs.nodes[self.args.shr.strip("/")].nodes:
                 reload = True
         else:
