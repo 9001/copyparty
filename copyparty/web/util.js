@@ -883,7 +883,7 @@ function vjoin(p1, p2) {
     if (!p2)
         return p1;
 
-    return p1 + '/' + p2;
+    return p1 + (p1.endsWith('/') ? '' : '/') + p2;
 }
 
 
