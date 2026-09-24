@@ -1,0 +1,39 @@
+# rust-rpxy configuration for copyparty
+# This configuration sets up rust-rpxy as a reverse proxy for copyparty with HTTP/3 support
+
+# Basic server configuration with HTTP/3 enabled
+listen_port = 8080
+listen_port_tls = 8443
+listen_port_quic = 8443  # HTTP/3 uses QUIC protocol on the same port as TLS
+
+# Application configuration for copyparty
+[apps.copyparty]
+server_name = "localhost"  # Change this to your domain name
+# NOTE: Private key must be in PKCS8 format for rust-rpxy
+reverse_proxy = [
+  { upstream = [
+      { location = "127.0.0.1:3923" }  # copyparty backend server
+    ]
+  }
+]
+# [apps.copyparty.tls]
+# tls_cert_path = "/path/to/certificate.pem"
+# tls_cert_key_path = "/path/to/private.key"
+
+# Path-based routing example (if you want to serve copyparty under a specific path)
+# [[apps.copyparty.reverse_proxy]]
+# path = "/copyparty/"
+# upstream = [{ location = "127.0.0.1:3923" }]
+# replace_path = "/"  # Rewrite path for backend
+
+# If this specified, h3 is enabled
+[experimental.h3]
+alt_svc_max_age = 3600             # sec
+# request_max_body_size = 65536      # bytes
+# request_max_body_size = 10485760      # same as seafile nginx
+request_max_body_size = 1073741824      # https://github.com/junkurihara/rust-rpxy/discussions/221
+max_concurrent_connections = 10000
+max_concurrent_bidistream = 100
+max_concurrent_unistream = 100
+max_idle_timeout = 10              # secs. 0 represents an infinite timeout.
+# WARNING: If a peer or its network path malfunctions or acts maliciously, an infinite idle timeout can result in permanently hung futures!
