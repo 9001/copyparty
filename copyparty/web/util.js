@@ -871,6 +871,9 @@ function vjoin(p1, p2) {
     if (!p2)
         p2 = '';
 
+    if(p1 == '/')
+        return p1 + p2;
+    
     if (p1.endsWith('/'))
         p1 = p1.slice(0, -1);
 
