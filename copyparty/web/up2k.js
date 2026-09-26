@@ -3008,7 +3008,7 @@ function up2k_init(subtle) {
             }
             else {
                 xhrchk(xhr, L.u_cuerr2.format(snpart, Math.ceil(t.size / chunksize), esc(t.name)), "404, target folder not found (???)", "warn", t);
-                if (txt.indexOf('unknown wark') == 0) {
+                if (!t.sprs || txt.indexOf('unknown wark') == 0) {
                     t.cooldown = t.coolmul = 0;
                     unqueue_up(t);
                 }
