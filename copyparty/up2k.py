@@ -1004,7 +1004,7 @@ class Up2k(object):
             t = ""
             if n < 1 and "e2v" in vol.flags:
                 t += "+e2v"
-            if n < 2 and "redup" in vol.flags:
+            if n < 2 and vol.flags.get("redup"):
                 t += "+redup"
             if n < 3 and "e2ts" in vol.flags:
                 t += "+tags"
