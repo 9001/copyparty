@@ -1290,7 +1290,7 @@ class SvcHub(object):
 
         TH_BWRAP[:] = al.th_bwrap_b
 
-        zs = "dav_ua1 lf_url sus_urls nonsus_urls ua_nodav ua_nodoc ua_nozip"
+        zs = "acao_re dav_ua1 lf_url sus_urls nonsus_urls ua_nodav ua_nodoc ua_nozip"
         for k in zs.split(" "):
             vs = getattr(al, k)
             if not vs or vs == "no":
