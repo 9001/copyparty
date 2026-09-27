@@ -5267,6 +5267,8 @@ class HttpCli(object):
         self.send_headers("oh_f", length=upper - lower, status=status, mime=mime)
         wr_slp = self.args.s_wr_slp
         wr_sz = self.args.s_wr_sz
+        dls = self.conn.hsrv.dls
+        dl_id = self.dl_id
         file_size = job["size"]
         chunk_size = up2k_chunksize(file_size)
         num_need = -1
@@ -5286,7 +5288,7 @@ class HttpCli(object):
                     if job:
                         self.pipes.set(req_path, job)
 
-            if not job:
+            if not job or not job["hash"]:
                 t = "pipe: OK, upload has finished; yeeting remainder"
                 self.log(t, 2)
                 data_end = file_size
@@ -5383,6 +5385,9 @@ class HttpCli(object):
                     broken = True
                     break
 
+                if dl_id:
+                    dls[dl_id] = (time.time(), lower)
+
         if lower < upper and not broken:
             with open_nolock(req_path, "rb") as f:
                 remains = sendfile_py(
@@ -5394,8 +5399,8 @@ class HttpCli(object):
                     wr_sz,
                     wr_slp,
                     not self.args.no_poll,
-                    self.conn.hsrv.dls,
-                    self.dl_id,
+                    dls,
+                    dl_id,
                 )
 
         spd = self._spd((upper - lower) - remains)
