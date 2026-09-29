@@ -2,6 +2,15 @@
 set -e
 
 td=redump-test
+export TZ=Etc/UTC
+
+rl_always=--reflink=always
+rl_never=--reflink=never
+[ "$(uname)" = Darwin ] && {
+    rl_always=
+    rl_never=
+    stat() { gstat "$@"; }
+}
 
 st_orig() { cat <<'EOF'
 f1,1,'f1',3660
@@ -61,14 +70,13 @@ setup() {
     rm -rf $td
     mkdir $td
     th=19700101010 #..M
-    tu=978310800 #unix
     ( cd "$td"
         for n in {1..4}; do echo -n f$n > f$n; done
         ln -s f2 f5
         ln f3 f6
-        cp --reflink=always f4 f7
-        cp --reflink=never f1 f8
-        cp --reflink=never f1 f9
+        cp $rl_always f4 f7
+        cp $rl_never f1 f8
+        cp $rl_never f1 f9
         for n in {1..9}; do touch -ht $th$n f$n; done
     );statchk st_orig
 }
