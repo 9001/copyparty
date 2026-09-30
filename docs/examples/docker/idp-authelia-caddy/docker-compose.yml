@@ -1,0 +1,63 @@
+---
+
+networks:
+  net:
+    driver: bridge
+
+services:
+  copyparty:
+    image: copyparty/ac:latest
+    container_name: idp_copyparty
+    user: "1000:1000"  # should match the user/group of your fileshare volumes
+    volumes:
+      - ./cpp/:/cfg:z  # the copyparty config folder
+      - /srv/pub:/w:z  # this is where we declare that "/srv/pub" is the filesystem-path on the server that shall be shared online
+    networks:
+      - net
+    expose:
+      - 3923
+    stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
+    environment:
+      LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE
+      # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
+      PYTHONUNBUFFERED: 1
+      # ensures log-messages are not delayed (but can reduce speed a tiny bit)
+
+  authelia:
+    image: authelia/authelia:4.39.5@sha256:023e02e5203dfa0ebaee7a48b5bae34f393d1f9cada4a9df7fbf87eb1759c671
+    container_name: idp_authelia
+    volumes:
+      - ./authelia:/config:z
+    networks:
+      - net
+    expose:
+      - 9091
+    restart: unless-stopped
+    environment:
+      - TZ=Etc/UTC
+
+  valkey:
+    image: valkey/valkey:8.1.3-alpine3.22@sha256:0d27f0bca0249f61d060029a6aaf2e16b2c417d68d02a508e1dfb763fa2948b4
+    container_name: idp_valkey
+    volumes:
+      - ./valkey:/data:z
+    networks:
+      - net
+    expose:
+      - 6379
+    restart: unless-stopped
+    environment:
+      - TZ=Etc/UTC
+      - VALKEY_EXTRA_FLAGS=--requirepass your_secure_password_here
+
+  caddy:
+    image: caddy:2.10-alpine
+    container_name: idp_caddy
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - net
+    ports:
+      - 443:443/tcp
+      - 443:443/udp
+    restart: unless-stopped
