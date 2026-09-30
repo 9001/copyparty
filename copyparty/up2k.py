@@ -20,7 +20,7 @@ from .__init__ import ANYWIN, PY2, TYPE_CHECKING, UNIX, WINDOWS, E
 from .authsrv import LEELOO_DALLAS, REDUP_E2, SEESLOG, VFS, AuthSrv
 from .bos import bos
 from .cfg import vf_bmap, vf_cmap, vf_vmap
-from .fsutil import Fstab
+from .fsutil import Fstab, filefrag
 from .mtag import MParser, MTag
 from .util import (
     E_FS_CRIT,
@@ -2181,10 +2181,10 @@ class Up2k(object):
             for w, rd, fn in cur.execute("select w, rd, fn from up"):
                 w16 = w[:16]
                 for v2, c2 in curs:
-                    hit = c2.execute(q2, (w16, w)).fetchone()
-                    if not hit:
+                    hits = c2.execute(q2, (w16, w)).fetchall()
+                    if not hits:
                         continue
-                    rd2, fn2 = hit
+                    rd2, fn2 = hits[0]
                     if fn == fn2 and rd == rd2 and vol is v2:
                         continue
                     apt = ""
@@ -2196,11 +2196,22 @@ class Up2k(object):
                         st1 = bos.lstat(fp1)
                         if fp1 == fp2 or stat.S_ISLNK(st1.st_mode):
                             continue  # self(?), or redup failed during walk
+                        if to == "hard" and st1.st_nlink >= len(hits):
+                            continue
                         ap1 = absreal(fp1)
                         ap2 = absreal(fp2)
                         st2 = bos.lstat(ap2)
                         if stat.S_ISLNK(st2.st_mode):
                             continue  # dead hit
+                        if to == "ref" and ap1 != ap2:
+                            try:
+                                frag1 = filefrag(ap1)
+                                if frag1:
+                                    frag2 = filefrag(ap2)
+                                    if frag1 == frag2:
+                                        continue
+                            except Exception as ex:
+                                self.log("redup: filefrag failed (OK); %r" % (ex,))
                         for ap in (ap1,) if ap1 == ap2 else (ap1, ap2):
                             self.log("redup: integrity-checking %r" % (ap,))
                             zsl, st = self._hashlist_from_file(ap)
