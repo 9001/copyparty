@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+$for(author-meta)$
+    <meta name="author" content="$author-meta$" />
+$endfor$
+$if(date-meta)$
+    <meta name="dcterms.date" content="$date-meta$" />
+$endif$
+$if(keywords)$
+    <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
+$endif$
+$if(description-meta)$
+    <meta name="description" content="$description-meta$" />
+$endif$
+$for(css)$
+    <link rel="stylesheet" href="$css$">
+$endfor$
+$for(header-includes)$
+    $header-includes$
+$endfor$
+</head>
+<body>
+$for(include-before)$
+    $include-before$
+$endfor$
+    <nav class="sidebar" id="$idprefix$sidebar" role="doc-toc" >
+        <div class="toc-header">
+            <img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" alt="copyparty logo">
+        </div>
+        <div class="toc">
+            $table-of-contents$
+        </div>
+    </nav>
+    <div class="content">
+        <main>
+            <article>
+            $if(top)$ $-- only true on the root page
+            $else$
+            $if(title)$
+                <h1>$title$</h1>
+            $endif$
+            $endif$
+            $body$
+            </article>
+        </main>
+        <footer>
+            <nav class="sitenav">
+            $if(previous.url)$
+                <span class="left">
+                    <a href="$previous.url$" class="href" rel="prev"><code><-</code> $previous.title$</a>
+                </span>
+            $endif$
+            $if(next.url)$
+                <span class="next">
+                    <a href="$next.url$" class="href" rel="next">$next.title$ <code>-></code></a>
+                </span>
+            $endif$
+            </nav>
+        </footer>
+    </div>
+$for(include-after)$
+    $include-after$
+$endfor$
+</body>
+</html>
