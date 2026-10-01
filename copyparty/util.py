@@ -188,6 +188,7 @@ try:
     HAVE_IFADDR = True
 except:
     HAVE_IFADDR = False
+    IFADDR_VND = False
 
     def get_adapters(include_unconfigured=False):
         return []
@@ -288,7 +289,6 @@ try:
         raise Exception()
 
     socket.inet_pton(socket.AF_INET6, "::1")
-    HAVE_IPV6 = True
 
     if GRAAL:
         try:
@@ -303,13 +303,15 @@ try:
                 return _inet_pton(fam, ip)
 
             socket.inet_pton = inet_pton
+
+    HAVE_IPV6 = True
 except:
+    HAVE_IPV6 = False
 
     def inet_pton(fam, ip):
         return socket.inet_aton(ip)
 
     socket.inet_pton = inet_pton
-    HAVE_IPV6 = False
 
 
 try:
@@ -450,6 +452,7 @@ IMPLICATIONS = [
     ["no_logue", "no_logues"],  # user-typo
     ["nologues", "no_logues"],  # user-typo
     ["nologue", "no_logues"],  # user-typo
+    ["nw", "redup_dry"],
     ["plainlogue", "plainlogues"],  # user-typo
     ["plainreadmes", "plainreadme"],  # user-typo
     ["noscript", "plainlogues"],
@@ -4052,9 +4055,9 @@ def runihook(
             }
             for x, vp, ap in zip(ups, vps, aps)
         ]
-        sp_ka["sin"] = json.dumps(ja).encode("utf-8", "replace")
+        sp_ka["sin"] = json.dumps(ja).encode("utf-8", "replace") + b"\n"
     else:
-        sp_ka["sin"] = b"\n".join(fsenc(x) for x in aps)
+        sp_ka["sin"] = b"\n".join(fsenc(x) for x in aps) + b"\n"
 
     if acmd[0].startswith("zmq:"):
         try:

@@ -1,3 +1,4 @@
+
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0428-0907 `v1.21.0` UI V1.5
 
@@ -79,6 +80,15 @@
 ## 😔 unfun facts
 
 * #1209 (partially), #711 added a setting that gets rid of (most) emojis
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0906-2249  `v1.20.23`  rcm once again
+
+## 🩹 bugfixes
+
+* the custom right-click-menu didn't like being enabled ad9994be
+  * this release is a hotfix for that; see v1.20.22 for all the other new stuff
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  

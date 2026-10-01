@@ -10,12 +10,17 @@ import time
 from .__init__ import ANYWIN, FREEBSD, MACOS, UNIX
 from .authsrv import AXS, VFS, AuthSrv
 from .bos import bos
-from .util import chkcmd, json_hesc, min_ex, undot
+from .util import chkcmd, fsenc, json_hesc, min_ex, runcmd, undot
 
 if True:  # pylint: disable=using-constant-test
     from typing import Optional, Union
 
     from .util import RootLogger, undot
+
+
+PTN_FILEFRAG = re.compile(
+    r"^\s*[0-9]+:\s*[0-9]+\.\.\s*[0-9]+:\s*([0-9]+)\.\.\s*([0-9]+):\s*[0-9]+:\s*(.*)$"
+)
 
 
 class Fstab(object):
@@ -264,3 +269,17 @@ def ramdisk_chk(asrv: AuthSrv) -> None:
         vol.flags["fsnt"] = vol.js_ls["fsnt"] = htm["fsnt"] = fs
         vol.js_htm = json_hesc(json.dumps(htm))
         # md_htm is dontcare; only relevant for up2k request body
+
+
+def filefrag(ap: str) -> list[str]:
+    rc, so, se = runcmd([b"filefrag", b"-v", fsenc(ap)], timeout=10)
+    ptn = PTN_FILEFRAG
+    ret = []
+    for ln in so.split("\n"):
+        m = ptn.match(ln)
+        if not m:
+            continue
+        a, b, s = m.groups()
+        if "shared" in s.strip().split(","):
+            ret.append((a, b))
+    return ret

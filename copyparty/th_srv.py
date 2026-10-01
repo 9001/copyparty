@@ -201,11 +201,11 @@ try:
         # reduces glibc RAM usage from 4.7 to 3.5 GiB ...yep, still bonkers
         os.environ["VIPS_CONCURRENCY"] = "1"
 
-    HAVE_VIPS = True
     import pyvips
 
     pyvips.cache_set_max(0)
     logging.getLogger("pyvips").setLevel(logging.WARNING)
+    HAVE_VIPS = True
 except Exception as e:
     HAVE_VIPS = False
     if not isinstance(e, ImportError):
@@ -219,10 +219,10 @@ try:
     if PRTY_NO_RAWPY:
         raise Exception()
 
-    HAVE_RAWPY = True
     import rawpy
 
     logging.getLogger("rawpy").setLevel(logging.WARNING)
+    HAVE_RAWPY = True
 except:
     HAVE_RAWPY = False
 

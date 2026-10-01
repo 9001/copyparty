@@ -4213,7 +4213,7 @@ function eval_hash() {
 	if (hash0 && window.og_fn) {
 		var all = msel.getall(), mi;
 		for (var a = 0; a < all.length; a++)
-			if (og_fn == uricom_dec(vsplit(all[a].vp)[1].split('?')[0])) {
+			if (og_fn == all[a].fn) {
 				mi = all[a];
 				break;
 			}
@@ -4978,9 +4978,6 @@ var fileman = (function () {
 			s2d[a] = all.indexOf(sel[a]);
 
 			var vp = sel[a].vp;
-			if (vp.endsWith('/'))
-				vp = vp.slice(0, -1);
-
 			var vsp = vsplit(vp);
 			if (base != vsp[0])
 				return toast.err(0, esc('batch rename not allowed for differing file paths:\n' + base + '\n' + vsp[0]));
@@ -5324,6 +5321,9 @@ var fileman = (function () {
 			if (!vp) {
 				if (err !== 'xbd')
 					toast.ok(2, L.fd_ok);
+
+				if (QS('#seldoc.sel'))
+					thegrid.setvis(true);
 
 				treectl.goto();
 				return;
@@ -5827,11 +5827,22 @@ var showfile = (function () {
 	r.nmap = {
 		'dockerfile': 'docker'
 	};
+	r.pmap = {
+		'sh': 'bash',
+		'ash': 'bash',
+		'dash': 'bash',
+		'luajit': 'lua',
+		'node': 'js',
+	};
 	var x = txt_ext + ' ans c cfg conf cpp cs css diff glsl go html ini java js json jsx kt kts latex less lisp lua makefile md nasm nim nix py r rss rb ruby sass scss sql svg swift tex toml ts vhdl xml yaml zig';
 	x = x.split(/ +/g);
 	for (var a = 0; a < x.length; a++)
 		if (!r.map["." + x[a]])
 			r.map["." + x[a]] = x[a];
+	x = 'awk bash lua make perl python ruby swift';
+	x = x.split(/ +/g);
+	for (var a = 0; a < x.length; a++)
+		r.pmap[x[a]] = x[a];
 
 	r.sname = function (srch) {
 		return srch.split(/[?&]doc=/)[1].split('&')[0];
@@ -5840,7 +5851,7 @@ var showfile = (function () {
 	if (window.og_fn) {
 		var ext = og_fn.split(/\./g).pop();
 		if (r.map['.' + ext])
-			hist_replace(get_evpath() + '?doc=' + og_fn);
+			hist_replace(get_evpath() + '?doc=' + uricom_enc(og_fn));
 	}
 
 	window.Prism = { 'manual': true };
@@ -5851,7 +5862,7 @@ var showfile = (function () {
 		var m = /[?&]doc=([^&]+)/.exec(location.search);
 		if (m) {
 			setTimeout(function () {
-				r.show(uricom_dec(m[1]), true);
+				r.show(m[1], true);
 			}, 1);
 		}
 	}
@@ -5871,11 +5882,17 @@ var showfile = (function () {
 		return !!/[?&]doc=/.exec(location.search);
 	};
 
-	r.getlang = function (fn) {
+	r.getlang = function (fn, txt) {
 		fn = fn.toLowerCase();
 		var ext = fn.slice(fn.lastIndexOf('.'));
-		return r.map[ext] || r.nmap[fn];
-	}
+		var prog = txt && txt.startsWith('#!') && txt.split('\n')[0].replace(
+			'#!/usr/bin/env', '').replace(
+			'#!/usr/bin/', '').replace(
+			'#!/bin/', '').trim().split(' ')[0];
+		if (prog)
+			prog = r.pmap[prog] || r.pmap[prog.replace(/[0-9].*/, '')];
+		return r.map[ext] || r.nmap[fn] || prog;
+	};
 
 	r.addlinks = function () {
 		r.files = [];
@@ -5888,7 +5905,7 @@ var showfile = (function () {
 			if (!lang)
 				continue;
 
-			r.files.push({ 'id': link.id, 'name': uricom_dec(fn) });
+			r.files.push({ 'id': link.id, 'name': link.fn });
 
 			var ah = ebi(link.id),
 				td = ah.closest('tr').getElementsByTagName('td')[0];
@@ -6024,7 +6041,7 @@ var showfile = (function () {
 			txt = doc[2],
 			name = url.split('?')[0].split('/').pop(),
 			tname = uricom_dec(name),
-			lang = r.getlang(name),
+			lang = r.getlang(name, txt),
 			is_md = lang == 'md';
 
 		ebi('files').style.display = ebi('gfiles').style.display = ebi('lazy').style.display = ebi('pro').style.display = ebi('epi').style.display = 'none';
@@ -6213,7 +6230,7 @@ var showfile = (function () {
 				sel = false;
 
 			for (var b = 0; b < sels.length; b++)
-				if (vsplit(sels[b].vp)[1] == lin)
+				if (sels[b].fn == lin)
 					sel = true;
 
 			clmod(lis[a], 'hl', lin == fn);
@@ -9899,6 +9916,7 @@ var msel = (function () {
 			item.id = links[a].getAttribute('id');
 			item.sel = clgot(links[a].closest('tr'), 'sel');
 			item.vp = href.indexOf('/') !== -1 ? href : vbase + href;
+			item.fn = uricom_dec(href.split('/').pop());
 
 			if (dk) {
 				var m = /[?&](k=[^&#]+)/.exec(qhref);

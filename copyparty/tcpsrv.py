@@ -87,6 +87,9 @@ class TcpSrv(object):
                 successful_binds = 0
                 try:
                     for ipa in ips:
+                        if ipa == "no":
+                            self.args.ign_ebind_all = True
+                            continue
                         try:
                             self._listen(ipa, port)
                             ok[ipa].append(port)

@@ -2,12 +2,16 @@
 from __future__ import print_function, unicode_literals
 
 import ctypes
+import sys
 from ctypes import wintypes
 
 if True:  # pylint: disable=using-constant-test
     from typing import Iterable, List
 
 from . import _shared as shared
+
+WINVER = sys.getwindowsversion()
+LE_XP = WINVER.major < 6
 
 NO_ERROR = 0
 ERROR_BUFFER_OVERFLOW = 111
@@ -83,7 +87,10 @@ def enumerate_interfaces_of_adapter(
             t = "sockaddr_to_ip({}) returned None"
             raise Exception(t.format(address.Address.lpSockaddr))
 
-        network_prefix = address.OnLinkPrefixLength
+        if LE_XP:
+            network_prefix = 16 if str(ip).startswith("169.254") else 24
+        else:
+            network_prefix = address.OnLinkPrefixLength
         yield shared.IP(ip, network_prefix, nice_name)
 
 
