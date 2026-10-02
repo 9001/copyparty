@@ -2890,9 +2890,6 @@ input[type="text"].invalid {
 	position: absolute;
 	z-index: 750;
 }
-#files #rn_overlay {
-	margin-left: .8em;
-}
 #rn_more {
 	position: absolute;
 	top: .1em;
