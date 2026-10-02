@@ -5070,7 +5070,7 @@ var fileman = (function () {
 			rn_overlay.appendChild(rn0);
 			rn0.onblur = function(){
 				setTimeout(function(){
-					if(!rn_overlay || rn_overlay.contains(document.activeElement))
+					if(!rn_overlay || rn_overlay.contains(document.activeElement) || !f[0].iold)
 						return;
 					if(rn0.value != f[0].iold.value)
 						rn_apply();

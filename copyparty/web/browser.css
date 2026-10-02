@@ -2901,6 +2901,8 @@ input[type="text"].invalid {
 	font-size: 1em;
   	padding: .2em .4em 0 .4em;
 	margin: .1em 0;
+	border-bottom-left-radius: 0 !important;
+	border-top-left-radius: 0 !important;
 }
 #ggrid #rn_overlay input,
 #ggrid #rn_more {
@@ -2912,9 +2914,11 @@ input[type="text"].invalid {
 	top: .1em;
 	bottom: .1em;
 	left: .1em;
-	right: 1.85em;
+	right: 1.75em;
 	margin: .1em 0;
 	padding-right: 0;
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
 }
 #fs_abrt {
 	margin-top: 1em;
