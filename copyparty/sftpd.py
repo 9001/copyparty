@@ -55,6 +55,23 @@ if True:  # pylint: disable=using-constant-test
 SATTR = paramiko.sftp_attr.SFTPAttributes
 
 
+try:
+    from paramiko.rsakey import serialization
+
+    _load_der_pk = serialization.load_der_private_key
+
+    def fastloader(*a, **ka):
+        ka0 = ka.copy()
+        try:
+            ka["unsafe_skip_rsa_key_validation"] = True
+            return _load_der_pk(*a, **ka)
+        except:
+            return _load_der_pk(*a, **ka0)
+
+except:
+    pass
+
+
 class SSH_Srv(paramiko.ServerInterface):
     def __init__(self, hub: "SvcHub", addr: Any):
         self.hub = hub
@@ -774,6 +791,10 @@ class Sftpd(object):
             self.log("cannot start sftp-server; no compatible IPs in -i", 1)
             return
 
+        if args.sftp_fastldr:
+            serialization.load_der_private_key = fastloader  # type: ignore
+        else:
+            self.log("loading hostkeys...")
         self.hostkeys = []
         hostkeytypes = (
             ("ed25519", "Ed25519Key", {}),  # best
@@ -801,6 +822,8 @@ class Sftpd(object):
             self.hostkeys.append(pkey)
             if args.sftpv:
                 self.log("loaded hostkey %r" % (pkey,))
+        if args.sftp_fastldr:
+            serialization.load_der_private_key = _load_der_pk  # type: ignore
 
         ips = list(ODict.fromkeys(ips))  # dedup
 
