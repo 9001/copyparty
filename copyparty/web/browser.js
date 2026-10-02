@@ -5016,14 +5016,14 @@ var fileman = (function () {
 
 		var html = sel.length > 1 ? ['<div>'] : [
 			'<div>',
-			'<button class="rn_dec" id="rn_dec_0" tt="' + L.frt_dec + '</button>',
-			'//',
-			'<button class="rn_reset" id="rn_reset_0" tt="' + L.frt_rst + '</button>'
+			'<a class="rn_reset btn" id="rn_reset_0" tt="' + L.frt_rst + '</a>',
+			'<a class="rn_dec btn" id="rn_dec_0" tt="' + L.frt_dec + '</a>',
+			'<a></a><a></a>'
 		];
 
 		html = html.concat([
-			'<button id="rn_cancel" tt="' + L.frt_abrt + '</button>',
-			'<button id="rn_apply">✅ ' + L.frb_apply + '</button>',
+			'<a id="rn_cancel" class="btn" tt="' + L.frt_abrt + '</a>',
+			'<a id="rn_apply" class="btn">✅ ' + L.frb_apply + '</a>',
 			'<a id="rn_adv" class="tgl btn" href="#" tt="' + L.fr_adv + '</a>',
 			'<a id="rn_case" class="tgl btn" href="#" tt="' + L.fr_case + '</a>',
 			'<a id="rn_win" class="tgl btn" href="#" tt="' + L.fr_win + '</a>',
@@ -5037,20 +5037,64 @@ var fileman = (function () {
 			'<code>n.d=</code><input type="text" id="rn_n_d" placeholder="1" ' + NOAC + ' /> &nbsp;',
 			'<code>n.s=</code><input type="text" id="rn_n_s" placeholder="1" ' + NOAC + ' />',
 			'</td></tr>',
-			'<button id="rn_pdel">❌ ' + L.fr_pdel + '</button>',
-			'<button id="rn_pnew">💾 ' + L.fr_pnew + '</button>',
+			'<a id="rn_pdel" class="btn">❌ ' + L.fr_pdel + '</a>',
+			'<a id="rn_pnew" class="btn">💾 ' + L.fr_pnew + '</a>',
 			'</td></tr>',
 			'</table></div>'
 		]);
 
 		var cheap = f.length > 500,
-			t_rst = L.frt_rst.split('>').pop();
+			t_rst = L.frt_rst.split('>').pop(),
+			rn0 = null, 
+			rn_overlay = ebi('rn_overlay');
 
-		if (sel.length == 1)
+		if(rn_overlay)
+			rn_overlay.remove();
+
+		if (sel.length == 1){
 			html.push(
 				'<div><table id="rn_f">\n' +
 				'<tr><td>old:</td><td><input type="text" id="rn_old_0" readonly /></td></tr>\n' +
-				'<tr><td>new:</td><td><input type="text" id="rn_new_0" /></td></tr>');
+				'<tr><td>new:</td><td id="rn0ins"></td></tr>');
+
+			rn_overlay = mknod('div', 'rn_overlay');
+			var container = thegrid.en ? ebi('ggrid') : ebi('files')
+			container.appendChild(rn_overlay);
+
+			rn_overlay.setAttribute("rnref", sel[0].id);
+			placerenameoverlay();
+
+			rn0 = mknod("input", "rn_new_0");
+			rn0.type = "text";
+
+			rn_overlay.appendChild(rn0);
+			rn0.onblur = function(){
+				setTimeout(function(){
+					if(!rn_overlay || rn_overlay.contains(document.activeElement))
+						return;
+					if(rn0.value != f[0].iold.value)
+						rn_apply();
+					else
+						rn_cancel();
+				},1);
+			};
+
+			var rnmore = mknod('a', 'rn_more', '...');
+			rnmore.classList = 'btn tgl on';
+			rnmore.setAttribute('tabindex', 0);
+			rnmore.setAttribute('tt', L.more_options);
+			rnmore.onclick = function(){
+				rn0.onblur = null;
+				ebi('rn0ins').appendChild(rn0);
+				rn_overlay.remove();
+				rn_overlay = null;
+				rui.style.display = "";
+				rn0.focus();
+			}
+			rn_overlay.appendChild(rnmore);
+			tt.att(rn_overlay);
+			rui.style.display = "none";
+		}
 		else {
 			html.push(
 				'<div><table id="rn_f" class="m">' +
@@ -5122,7 +5166,11 @@ var fileman = (function () {
 		}
 		function rn_cancel(e) {
 			ev(e);
-			rui.parentNode.removeChild(rui);
+			if(rui && rui.parentNode)
+				rui.parentNode.removeChild(rui);
+			if(rn_overlay){
+				rn_overlay.remove();
+			}
 		}
 
 		ebi('rn_cancel').onclick = rn_cancel;
@@ -5692,6 +5740,9 @@ var fileman = (function () {
 		function rn_cancel(e) {
 			ev(e);
 			rui.parentNode.removeChild(rui);
+			if(rn_overlay){
+				rn_overlay.remove();
+			}
 		}
 		ebi('rn_cancel').onclick = rn_cancel;
 		ebi('rn_skip').onclick = rn_skip;
@@ -7885,6 +7936,29 @@ var filecolwidth = (function () {
 })();
 onresize100.add(filecolwidth, true);
 
+function placerenameoverlay(){
+	var rno = ebi('rn_overlay');
+	if(rno){
+		var t = thegrid.en ? QS('a[ref=' + rno.getAttribute('rnref') + ']>span') : ebi(rno.getAttribute('rnref')).parentNode;
+		if(t && t.nodeName.toLowerCase() == 'span' && (!thegrid.gallery || getComputedStyle(t).display != "none") || 
+				t.nodeName.toLowerCase() == 'td'){
+			rno.style.top = t.offsetTop + 'px';
+			rno.style.left = t.offsetLeft + 'px';
+			rno.style.height = t.offsetHeight + 'px';
+			rno.style.width = t.offsetWidth + 'px';
+		}
+		else if(thegrid.en){
+			t = QS('a[ref=' + rno.getAttribute('rnref') + ']')
+			if(!t)
+				return;
+			rno.style.top = t.offsetTop + t.offsetHeight - 26 + 'px';
+			rno.style.left = t.offsetLeft + 'px';
+			rno.style.height = '25px';
+			rno.style.width = t.offsetWidth + 'px';
+		}
+	}
+}
+
 function onwidgetresize(){
 	var mumodal = QS('#music.vis');
 	var widget = ebi('widget');
@@ -7955,6 +8029,8 @@ function onwidgetresize(){
 
 	// keep path scrolled right
 	ebi('path').onresize = keep_right(ebi('path'));
+
+	placerenameoverlay();
 }
 window.addEventListener('resize', onwidgetresize);
 onwidgetresize();
@@ -10157,6 +10233,10 @@ var msel = (function () {
 })();
 
 function fclick1(e) {
+	if(clgot(this, 'renaming')){
+		ev(e);
+		return;
+	}
 	e.preventDefault ? e.preventDefault() : e.returnValue = false;
 
 	var td = ebi(this.getAttribute('ref'));
@@ -11004,7 +11084,7 @@ function restore_scroll() {
 
 
 ebi('files').onclick = ebi('docul').onclick = function (e) {
-	if (!treectl.csel && e && (ctrl(e) || e.shiftKey))
+	if (!treectl.csel && e && (ctrl(e) || e.shiftKey) || e.target.nodeName.toLowerCase() == "INPUT")
 		return true;
 
 	if (!showfile.active())
@@ -11542,7 +11622,7 @@ function reload_browser() {
 			}
 			if (e.button !== 0 && e.type !== 'touchstart') return;
 			if (!thegrid.en || !treectl.dsel) return;
-			if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open,#ggrid>a,.modal,.normalrcm,#tree')) return;
+			if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open,#ggrid>a,.modal,.normalrcm,#tree,#rn_overlay')) return;
 		}
 		catch(ex){
 			console.log(ex);

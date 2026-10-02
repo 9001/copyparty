@@ -813,7 +813,7 @@ a:hover {
 	background: var(--a-h-bg);
 }
 #files .imgcontainer:hover,
-#files a:hover {
+#files a:not(.btn):hover {
 	color: var(--fg-max);
 	background-color: color-mix(in oklab, var(--a) 20%, transparent);
 	text-decoration: underline;
@@ -2127,6 +2127,7 @@ html.y #ops svg circle {
 #op_cfg {
 	display: none;
 }
+#rn_overlay input,
 #pathBar input[type=text],
 .opview select,
 .opview input[type=number],
@@ -2817,7 +2818,7 @@ html.g .btn {
 	height: auto;
 	overflow: auto;
 	max-height: calc(100% - 2em);
-	border-bottom: .5em solid var(--f-gray);
+	border-bottom: .1em solid var(--f-gray);
 	box-shadow: 0 0 5em rgba(0,0,0,0.8);
 	padding: 1em;
 	z-index: 765;
@@ -2884,6 +2885,36 @@ input[type="text"].invalid {
 	margin: 0 0 .3em 0;
 	padding: 0;
 	font-size: 1.5em;
+}
+#rn_overlay {
+	position: absolute;
+	z-index: 750;
+}
+#files #rn_overlay {
+	margin-left: .8em;
+}
+#rn_more {
+	position: absolute;
+	top: .1em;
+	bottom: .1em;
+	right: .1em;
+	font-size: 1em;
+  	padding: .2em .4em 0 .4em;
+	margin: .1em 0;
+}
+#ggrid #rn_overlay input,
+#ggrid #rn_more {
+	margin: -.1em 0;
+}
+#rn_overlay input {
+	font-size: 1em;
+	position: absolute;
+	top: .1em;
+	bottom: .1em;
+	left: .1em;
+	right: 1.85em;
+	margin: .1em 0;
+	padding-right: 0;
 }
 #fs_abrt {
 	margin-top: 1em;
