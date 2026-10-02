@@ -5058,6 +5058,7 @@ var fileman = (function () {
 				'<tr><td>new:</td><td id="rn0ins"></td></tr>');
 
 			rn_overlay = mknod('div', 'rn_overlay');
+			rn_overlay.classList = 'normalrcm'
 			var container = thegrid.en ? ebi('ggrid') : ebi('files')
 			container.appendChild(rn_overlay);
 
