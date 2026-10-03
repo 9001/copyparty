@@ -374,6 +374,16 @@ VPTL_OS = VPTL_WIN if ANYWIN else VPTL_MAC if MACOS else None
 APTL_OS = APTL_WIN if ANYWIN else APTL_MAC if MACOS else None
 
 
+BADNAMES = []
+if ANYWIN:
+    BADNAMES += ["con", "prn", "aux", "nul"]
+    BADNAMES += ["com%s" % (n,) for n in range(1, 10)]
+    BADNAMES += ["lpt%s" % (n,) for n in range(1, 10)]
+    BADNAMES += ["com%s" % (n,) for n in ("¹", "²", "³")]
+    BADNAMES += ["lpt%s" % (n,) for n in ("¹", "²", "³")]
+BADNAMESET = set(BADNAMES)
+
+
 BOS_SEP = ("%s" % (os.sep,)).encode("ascii")
 
 
@@ -2429,7 +2439,7 @@ def uncyg(path: str) -> str:
     return "%s:\\%s" % (path[1], path[3:])
 
 
-def undot(path: str) -> str:
+def _undot(path: str) -> str:
     ret: list[str] = []
     for node in path.split("/"):
         if node == "." or not node:
@@ -2445,8 +2455,33 @@ def undot(path: str) -> str:
     return "/".join(ret)
 
 
+def _undot_win(path: str) -> str:
+    ret: list[str] = []
+    for node in path.replace("\\", "/").split("/"):
+        if node == "..":
+            if ret:
+                ret.pop()
+            continue
+
+        node = node.rstrip(". ")
+        if node:
+            ret.append(node)
+
+    return "/".join(ret)
+
+
+if ANYWIN:
+    undot = _undot_win
+else:
+    undot = _undot
+
+
 def sanitize_fn(fn: str) -> str:
-    fn = fn.replace("\\", "/").split("/")[-1]
+    fn = fn.replace("\x00", "_")
+    fn2 = fn.replace("\\", "/")
+    if ANYWIN or "/../" in fn2:
+        fn = fn2.rstrip(". ")
+    fn = fn.split("/")[-1]
     if APTL_OS:
         fn = sanitize_to(fn, APTL_OS)
     return fn.strip()
@@ -2454,13 +2489,8 @@ def sanitize_fn(fn: str) -> str:
 
 def sanitize_to(fn: str, tl: dict[int, int]) -> str:
     fn = fn.translate(tl)
-    if ANYWIN:
-        bad = ["con", "prn", "aux", "nul"]
-        for n in range(1, 10):
-            bad += ("com%s lpt%s" % (n, n)).split(" ")
-
-        if fn.lower().split(".")[0] in bad:
-            fn = "_" + fn
+    if ANYWIN and fn.lower().split(".")[0].strip() in BADNAMESET:
+        fn = "_" + fn
     return fn
 
 
