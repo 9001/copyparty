@@ -2127,7 +2127,11 @@ html.y #ops svg circle {
 #op_cfg {
 	display: none;
 }
+span[role=textbox]{
+	display: block;
+}
 #rn_overlay #rn_new_0,
+span[role=textbox],
 #pathBar input[type=text],
 .opview select,
 .opview input[type=number],
@@ -2853,7 +2857,8 @@ html.g .btn {
 #rui td+td,
 #shui td input[type="text"],
 #rui td input[type="text"],
-td textarea {
+#rui span[role=textbox] {
+	margin: 0;
 	width: 100%;
 }
 input[type="text"].invalid {
@@ -2890,42 +2895,39 @@ input[type="text"].invalid {
 #rn_overlay {
 	position: absolute;
 	z-index: 7;
+	background: var(--txt-bg);
+	border-radius: var(--radius) 0 0 var(--radius);
+	outline: var(--a) solid .1em;
+	outline-offset: -.1em;
 }
 #rn_more {
 	position: absolute;
-	top: .1em;
-	bottom: .1em;
-	right: -1.7em;
+	top: -.1em;
+	bottom: -.1em;
+	right: -1.6em;
 	font-size: 1em;
   	padding: .2em .4em 0 .4em;
 	margin: .1em 0;
 	border-top-left-radius: 0;
   	border-bottom-left-radius: 0;
+	outline: var(--a) solid .1em;
+	outline-offset: -.1em;
 }
-#ggrid #rn_overlay #rn_new_0,
-#ggrid #rn_more {
-	margin: -.1em 0;
-}
-#ggrid #rn_overlay #rn_new_0 {
+#ggrid #rn_overlay {
 	text-align: center;
 	padding-left: .1em;
 	padding-right: .1em;
 }
-#rn_overlay>* {
-	outline: var(--a) solid .1em;
-}
 #rn_overlay #rn_new_0 {
 	resize: none;
 	font-size: 1em;
-	position: absolute;
-	top: .1em;
-	bottom: .1em;
-	left: .1em;
-	right: .1em;
-	margin: .1em 0;
+	margin: .05em;
 	border-top-right-radius: 0;
   	border-bottom-right-radius: 0;
 	border-bottom: none;
+	outline: none;
+	display: block;
+	overflow-wrap: break-word;
 }
 #fs_abrt {
 	margin-top: 1em;

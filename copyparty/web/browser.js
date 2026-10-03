@@ -5067,7 +5067,29 @@ var fileman = (function () {
 			rn_overlay.setAttribute("rnref", sel[0].id);
 			placerenameoverlay();
 
-			rn0 = mknod("textarea", "rn_new_0");
+			rn0 = mknod("span", "rn_new_0");
+			rn0.setAttribute('role', 'textbox');
+			rn0.setAttribute('contenteditable', true);
+			rn0.setSelectionRange = function(a, b){
+				this.focus();
+				var n = this.firstChild;
+				if(!n) return;
+				var s = window.getSelection();
+				s.removeAllRanges();
+				var r = document.createRange();
+				r.setStart(n, Math.max(a, 0));
+				if(b < 0) b = n.length;
+				r.setEnd(n, Math.min(b, n.length));
+				s.addRange(r);
+			}
+			Object.defineProperty(rn0, 'value', {
+				get: function() {
+					return this.textContent;
+				},
+				set: function(v){
+					this.textContent = v;
+				}
+			});
 			//rn0.type = "text";
 
 			rn_overlay.appendChild(rn0);
@@ -7951,7 +7973,7 @@ function placerenameoverlay(){
 				t.nodeName.toLowerCase() == 'td'){
 			rno.style.top = t.offsetTop + 'px';
 			rno.style.left = t.offsetLeft + 'px';
-			rno.style.height = t.offsetHeight + 'px';
+			rno.style.minHeight = t.offsetHeight + 'px';
 			rno.style.width = t.offsetWidth + 'px';
 		}
 		else if(thegrid.en){
@@ -7960,7 +7982,7 @@ function placerenameoverlay(){
 				return;
 			rno.style.top = t.offsetTop + t.offsetHeight - 26 + 'px';
 			rno.style.left = t.offsetLeft + 'px';
-			rno.style.height = '25px';
+			rno.style.minHeight = '25px';
 			rno.style.width = t.offsetWidth + 'px';
 		}
 	}
