@@ -368,6 +368,7 @@ class HttpCli(object):
         """returns true if connection can be reused"""
         self.out_headers = {
             "Cache-Control": "no-store, max-age=0",
+            "Service-Worker-Allowed": "/",
         }
 
         if self.args.early_ban and self.is_banned():
@@ -1565,6 +1566,9 @@ class HttpCli(object):
 
             if "hc" in self.uparam:
                 return self.tx_svcs()
+
+            if "config" in self.uparam:
+                return self.tx_config()
 
             if "shares" in self.uparam:
                 return self.tx_shares()
@@ -5583,7 +5587,7 @@ class HttpCli(object):
         # chrome cannot handle more than ~2000 unique SVGs
         # so url-param "raster" returns a png/webp instead
         # (useragent-sniffing kinshi due to caching proxies)
-        mime, ico = self.conn.hsrv.ico.get(txt, not small, "raster" in self.uparam)
+        mime, ico = self.conn.hsrv.ico.get(txt, not small, "raster" in self.uparam, self.uparam.get('a'))
 
         lm = formatdate(self.E.t0)
         self.reply(ico, mime=mime, headers={"Last-Modified": lm})
@@ -5728,6 +5732,17 @@ class HttpCli(object):
         if self.do_log:
             self.log(logmsg + " " + unicode(len(html)))
 
+        return True
+
+    def tx_config(self) -> bool:
+        html = self.j2s(
+            "config",
+            this=self,
+            accs=bool(self.asrv.acct),
+            s="s" if self.is_https else "",
+            bg_img=self.args.bg_img,
+        )
+        self.reply(html.encode("utf-8"))
         return True
 
     def tx_svcs(self) -> bool:
@@ -6952,7 +6967,7 @@ class HttpCli(object):
             {
                 "lead": "",
                 "href": "%s/" % (x,),
-                "ext": "---",
+                "ext": "",
                 "sz": 0,
                 "ts": 0,
                 "tags": e_d,
@@ -7161,7 +7176,7 @@ class HttpCli(object):
                                 pass
 
                     if is_dir:
-                        return self.tx_svg("folder")
+                        return self.reply(b"(no thumbnail)")
 
                 thp = None
                 if self.thumbcli and not nothumb:
@@ -7181,7 +7196,7 @@ class HttpCli(object):
                 elif th_fmt in ACODE2_FMT:
                     raise Pebkac(415)
 
-                return self.tx_ico(rem)
+                return self.reply(b"(no thumbnail)")
 
         elif self.can_write and th_fmt is not None:
             return self.tx_svg("upload\nonly")
@@ -7285,6 +7300,7 @@ class HttpCli(object):
             self.log("#wow #whoa")
 
         zi = vn.flags["du_iwho"]
+        volspace = []
         if zi and (
             zi == 9
             or (zi == 7 and self.uname != "*")
@@ -7309,9 +7325,12 @@ class HttpCli(object):
                             free = min(free, max(0, vn.lim.vbmax - zi))
                         except:
                             pass
-                h1 = humansize(free or 0)
+                if not free:
+                    free = 0
+                h1 = humansize(free)
                 h2 = humansize(total)
                 srv_info.append("{} free of {}".format(h1, h2))
+                volspace = [h1, h2, int((total - free) / total * 10000)]
             elif zs:
                 self.log("diskfree(%r): %s" % (abspath, zs), 3)
 
@@ -7362,6 +7381,7 @@ class HttpCli(object):
             "files": [],
             "taglist": [],
             "srvinf": srv_infot,
+            "volspace": volspace,
             "acct": self.uname,
             "perms": perms,
             "cfg": vn.js_ls,
@@ -7370,6 +7390,7 @@ class HttpCli(object):
             "ls0": None,
             "acct": self.uname,
             "perms": perms,
+            "volspace": volspace,
         }
         # also see `js_htm` in authsrv.py
         j2a = {
@@ -7385,7 +7406,10 @@ class HttpCli(object):
             "url_suf": url_suf,
             "title": html_escape("%s %s" % (self.args.bname, self.vpath), crlf=True),
             "srv_info": srv_infot,
+            "srv_name": "" if self.args.nih else self.args.name,
+            "srv_url": self.args.name_url if self.args.name_url else "/",
             "dtheme": self.args.theme,
+            "unfun": self.args.unfun,
         }
 
         if self.args.js_browser:
@@ -7528,12 +7552,12 @@ class HttpCli(object):
                     margin = "DIR"
                 elif add_dk:
                     zs = absreal(fspath)
-                    margin = '<a href="%s?k=%s&zip=crc" rel="nofollow">zip</a>' % (
+                    margin = '<a href="%s?k=%s&zip=crc" rel="nofollow" class="dir">zip</a>' % (
                         quotep(href),
                         self.gen_fk(2, self.args.dk_salt, zs, 0, 0)[:add_dk],
                     )
                 else:
-                    margin = '<a href="%s?zip=crc" rel="nofollow">zip</a>' % (
+                    margin = '<a href="%s?zip=crc" rel="nofollow" class="dir">zip</a>' % (
                         quotep(href),
                     )
             elif fn in hist:
@@ -7557,7 +7581,7 @@ class HttpCli(object):
             )
 
             if is_dir:
-                ext = "---"
+                ext = ""
             elif "." in fn:
                 ext = ptn_hr.sub("@", fn.rsplit(".", 1)[1])
                 if len(ext) > 16:
