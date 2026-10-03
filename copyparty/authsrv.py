@@ -2984,6 +2984,22 @@ class AuthSrv(object):
                 for name in vol.axs.uread:
                     vol.axs.udot.add(name)
 
+        zi = 1
+        zs = "; you must also enable --hack-me-bro to accept the total loss of security"
+        if self.args.hack_me_bro:
+            zi = 3
+            zs = ""
+
+        if self.args.smb:
+            t = "smb is enabled; this has serious security issues which will not be fixed"
+            self.log(t + zs, zi)
+            if zs:
+                errors = True
+
+        if self.args.tftp:
+            t = "tftp is enabled; primitive protocol with primitive access-restrictions"
+            self.log(t, 3)
+
         if errors:
             sys.exit(1)
 

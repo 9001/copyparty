@@ -1819,6 +1819,7 @@ def add_stats(ap):
 
 def add_yolo(ap):
     ap2 = ap.add_argument_group("yolo options")
+    ap2.add_argument("--hack-me-bro", action="store_true", help="allow enabling dangerously buggy protocols such as \033[33m--smb\033[0m / \033[33m--tftp\033[0m")
     ap2.add_argument("--allow-csrf", action="store_true", help="disable csrf protections; let other domains/sites impersonate you through cross-site requests; \033[1;31mDANGEROUS\033[0m / LAN-only")
     ap2.add_argument("--cookie-lax", action="store_true", help="allow cookies from other domains (if you follow a link from another website into your server, you will arrive logged-in); this reduces protection against CSRF")
     ap2.add_argument("--allow-svg-js", action="store_true", help="allow svg images to execute javascript; default-disabled because ~nobody wants it (volflag=allow_svg_js)")
