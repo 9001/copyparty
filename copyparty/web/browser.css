@@ -2904,12 +2904,13 @@ input[type="text"].invalid {
 #ggrid #rn_more {
 	margin: -.1em 0;
 }
-#files #rn_overlay #rn_new_0 {
-	text-align: left;
+#ggrid #rn_overlay #rn_new_0 {
+	text-align: center;
+	padding-left: .1em;
+	padding-right: .1em;
 }
 #rn_overlay #rn_new_0 {
 	resize: none;
-	text-align: center;
 	font-size: 1em;
 	position: absolute;
 	top: .1em;

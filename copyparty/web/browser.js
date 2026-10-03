@@ -5048,8 +5048,10 @@ var fileman = (function () {
 			rn0 = null, 
 			rn_overlay = ebi('rn_overlay');
 
-		if(rn_overlay)
+		if(rn_overlay){
 			rn_overlay.remove();
+			rn_overlay = null;
+		}
 
 		if (sel.length == 1){
 			html.push(
@@ -5170,8 +5172,8 @@ var fileman = (function () {
 			if(rui && rui.parentNode)
 				rui.parentNode.removeChild(rui);
 			if(rn_overlay){
-				rn0.value = f[0].iold.value;
 				rn_overlay.remove();
+				rn_overlay = null;
 			}
 		}
 
@@ -5243,8 +5245,10 @@ var fileman = (function () {
 		ire.onkeydown = ifmt.onkeydown = function (e) {
 			var k = (e.key || e.code) + '';
 
-			if (k == 'Escape' || k == 'Esc')
+			if (k == 'Escape' || k == 'Esc'){
+				rn0.value = f[0].iold.value;
 				return rn_cancel();
+			}
 
 			if (k.endsWith('Enter'))
 				return rn_apply();
@@ -5744,6 +5748,7 @@ var fileman = (function () {
 			rui.parentNode.removeChild(rui);
 			if(rn_overlay){
 				rn_overlay.remove();
+				rn_overlay = null;
 			}
 		}
 		ebi('rn_cancel').onclick = rn_cancel;
