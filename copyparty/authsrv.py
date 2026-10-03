@@ -673,8 +673,6 @@ class VFS(object):
             if lfn == zs.lower():
                 hit = zs
                 break
-        if not hit:
-            return True  # NFC/NFD or something, can't be helped either way
         if self.log:
             t = "returning 404 due to underlying case-insensitive filesystem:\n  http-req: %r\n  local-fs: %r"
             self.log("vfs", t % (fn, hit))
