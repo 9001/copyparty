@@ -2889,16 +2889,18 @@ input[type="text"].invalid {
 }
 #rn_overlay {
 	position: absolute;
-	z-index: 750;
+	z-index: 7;
 }
 #rn_more {
 	position: absolute;
 	top: .1em;
 	bottom: .1em;
-	right: -1.8em;
+	right: -1.7em;
 	font-size: 1em;
   	padding: .2em .4em 0 .4em;
 	margin: .1em 0;
+	border-top-left-radius: 0;
+  	border-bottom-left-radius: 0;
 }
 #ggrid #rn_overlay #rn_new_0,
 #ggrid #rn_more {
@@ -2909,6 +2911,9 @@ input[type="text"].invalid {
 	padding-left: .1em;
 	padding-right: .1em;
 }
+#rn_overlay>* {
+	outline: var(--a) solid .1em;
+}
 #rn_overlay #rn_new_0 {
 	resize: none;
 	font-size: 1em;
@@ -2918,6 +2923,9 @@ input[type="text"].invalid {
 	left: .1em;
 	right: .1em;
 	margin: .1em 0;
+	border-top-right-radius: 0;
+  	border-bottom-right-radius: 0;
+	border-bottom: none;
 }
 #fs_abrt {
 	margin-top: 1em;
