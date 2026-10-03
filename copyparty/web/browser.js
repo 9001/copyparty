@@ -5065,7 +5065,6 @@ var fileman = (function () {
 			container.appendChild(rn_overlay);
 
 			rn_overlay.setAttribute("rnref", sel[0].id);
-			placerenameoverlay();
 
 			rn0 = mknod("span", "rn_new_0");
 			rn0.setAttribute('role', 'textbox');
@@ -5119,6 +5118,8 @@ var fileman = (function () {
 			rn_overlay.appendChild(rnmore);
 			tt.att(rn_overlay);
 			rui.style.display = "none";
+
+			placerenameoverlay();
 		}
 		else {
 			html.push(
@@ -7968,20 +7969,33 @@ onresize100.add(filecolwidth, true);
 function placerenameoverlay(){
 	var rno = ebi('rn_overlay');
 	if(rno){
+		var ff = 0;
+		if(FIREFOX && !thegrid.en){
+			// workaround: firefox doesn't include the padding of the parent when getting offsetLeft below
+			ff = getComputedStyle(ebi('files')).paddingLeft;
+			if(ff.match('px'))
+				ff = parseFloat(ff) || 0;
+		}
 		var t = thegrid.en ? QS('a[ref=' + rno.getAttribute('rnref') + ']>span') : ebi(rno.getAttribute('rnref')).parentNode;
 		if(t && t.nodeName.toLowerCase() == 'span' && (!thegrid.gallery || getComputedStyle(t).display != "none") || 
 				t.nodeName.toLowerCase() == 'td'){
 			rno.style.top = t.offsetTop + 'px';
-			rno.style.left = t.offsetLeft + 'px';
+			rno.style.left = t.offsetLeft + ff + 'px';
 			rno.style.minHeight = t.offsetHeight + 'px';
 			rno.style.width = t.offsetWidth + 'px';
+			if(!thegrid.en){
+				var tb = ebi('rn_new_0');
+				var fn = getComputedStyle(ebi(rno.getAttribute('rnref')));
+				tb.style.padding = fn.padding;
+			}
+				ebi('rn_new_0').style.padding = ebi(rno.getAttribute('rnref')).padding;
 		}
 		else if(thegrid.en){
 			t = QS('a[ref=' + rno.getAttribute('rnref') + ']')
 			if(!t)
 				return;
 			rno.style.top = t.offsetTop + t.offsetHeight - 26 + 'px';
-			rno.style.left = t.offsetLeft + 'px';
+			rno.style.left = t.offsetLeft + ff + 'px';
 			rno.style.minHeight = '25px';
 			rno.style.width = t.offsetWidth + 'px';
 		}

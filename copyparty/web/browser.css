@@ -2130,7 +2130,6 @@ html.y #ops svg circle {
 span[role=textbox]{
 	display: block;
 }
-#rn_overlay #rn_new_0,
 span[role=textbox],
 #pathBar input[type=text],
 .opview select,
@@ -2904,7 +2903,7 @@ input[type="text"].invalid {
 	position: absolute;
 	top: -.1em;
 	bottom: -.1em;
-	right: -1.6em;
+	left: 100%;
 	font-size: 1em;
   	padding: .2em .4em 0 .4em;
 	margin: .1em 0;
@@ -2921,13 +2920,16 @@ input[type="text"].invalid {
 #rn_overlay #rn_new_0 {
 	resize: none;
 	font-size: 1em;
-	margin: .05em;
 	border-top-right-radius: 0;
   	border-bottom-right-radius: 0;
 	border-bottom: none;
 	outline: none;
 	display: block;
 	overflow-wrap: break-word;
+	padding: 0;
+}
+#files #rn_overlay #rn_new_0 {
+	margin: 0;
 }
 #fs_abrt {
 	margin-top: 1em;
