@@ -61,7 +61,7 @@ f9,3,'f9',3600
 EOF
 }
 statchk() {
-    (cd $td;stat -c%n,%h,%N,%Y * | sort -n | diff -U9 <($1) -) && return
+    (cd $td;stat -c%n,%h,%N,%Y * | sort -n | tr -d \' | diff -U9 <($1|tr -d \') -) && return
     cat $td/* | grep -vE '^f1f2f3f4f2f3f4f1f1$' || return
     cat $td.l
     exit 1
