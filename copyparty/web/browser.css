@@ -2127,7 +2127,7 @@ html.y #ops svg circle {
 #op_cfg {
 	display: none;
 }
-#rn_overlay input,
+#rn_overlay #rn_new_0,
 #pathBar input[type=text],
 .opview select,
 .opview input[type=number],
@@ -2852,7 +2852,8 @@ html.g .btn {
 #shui td+td,
 #rui td+td,
 #shui td input[type="text"],
-#rui td input[type="text"] {
+#rui td input[type="text"],
+td textarea {
 	width: 100%;
 }
 input[type="text"].invalid {
@@ -2894,28 +2895,28 @@ input[type="text"].invalid {
 	position: absolute;
 	top: .1em;
 	bottom: .1em;
-	right: .1em;
+	right: -1.8em;
 	font-size: 1em;
   	padding: .2em .4em 0 .4em;
 	margin: .1em 0;
-	border-bottom-left-radius: 0 !important;
-	border-top-left-radius: 0 !important;
 }
-#ggrid #rn_overlay input,
+#ggrid #rn_overlay #rn_new_0,
 #ggrid #rn_more {
 	margin: -.1em 0;
 }
-#rn_overlay input {
+#files #rn_overlay #rn_new_0 {
+	text-align: left;
+}
+#rn_overlay #rn_new_0 {
+	resize: none;
+	text-align: center;
 	font-size: 1em;
 	position: absolute;
 	top: .1em;
 	bottom: .1em;
 	left: .1em;
-	right: 1.75em;
+	right: .1em;
 	margin: .1em 0;
-	padding-right: 0;
-	border-top-right-radius: 0 !important;
-	border-bottom-right-radius: 0 !important;
 }
 #fs_abrt {
 	margin-top: 1em;

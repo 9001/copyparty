@@ -5065,8 +5065,8 @@ var fileman = (function () {
 			rn_overlay.setAttribute("rnref", sel[0].id);
 			placerenameoverlay();
 
-			rn0 = mknod("input", "rn_new_0");
-			rn0.type = "text";
+			rn0 = mknod("textarea", "rn_new_0");
+			//rn0.type = "text";
 
 			rn_overlay.appendChild(rn0);
 			rn0.onblur = function(){
@@ -5170,6 +5170,7 @@ var fileman = (function () {
 			if(rui && rui.parentNode)
 				rui.parentNode.removeChild(rui);
 			if(rn_overlay){
+				rn0.value = f[0].iold.value;
 				rn_overlay.remove();
 			}
 		}
