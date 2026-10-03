@@ -4409,7 +4409,7 @@ class Up2k(object):
             is_dir = stat.S_ISDIR(st.st_mode)
         except:
             # NOTE: "file not found" *sftpd
-            raise Pebkac(400, "file not found on disk (already deleted?)")
+            raise Pebkac(404, "file not found on disk (already deleted?)")
 
         if "bcasechk" in vn.flags and not vn.casechk(rem, False):
             raise Pebkac(400, "file does not exist case-sensitively")
