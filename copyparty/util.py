@@ -2275,6 +2275,8 @@ def _gen_filekey(alg: int, salt: str, fspath: str, fsize: int, inode: int) -> st
 def _gen_filekey_w(alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str:
     return _gen_filekey(alg, salt, fspath.replace("/", "\\"), fsize, inode)
 
+def ct_eq(a: str, b: str):
+    return hmac.compare_digest(a, b)
 
 gen_filekey = _gen_filekey_w if ANYWIN else _gen_filekey
 
