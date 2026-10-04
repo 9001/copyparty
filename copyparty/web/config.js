@@ -1121,28 +1121,38 @@ function autocompleteFlags(inp, arr) {
         var leftovers = [];
         for (i = 0; i < arr.length; i++) {
             // check if cmd contains query
-            if (arr[i].cmd.toUpperCase().match(val.toUpperCase())) {
-                b = mknod("DIV");
-                b.innerHTML = "<strong>" + arr[i].cmd + "</strong>\n";
-                b.innerHTML += arr[i].help;
-                b.innerHTML += "<input type='hidden' value='" + arr[i].cmd + "'>";
-                b.onclick = iClick;
-                a.appendChild(b);
+            try{
+                if (arr[i].cmd.toUpperCase().match(val.toUpperCase())) {
+                    b = mknod("DIV");
+                    b.innerHTML = "<strong>" + arr[i].cmd + "</strong>\n";
+                    b.innerHTML += arr[i].help;
+                    b.innerHTML += "<input type='hidden' value='" + arr[i].cmd + "'>";
+                    b.onclick = iClick;
+                    a.appendChild(b);
+                }
+                else{
+                    leftovers.push(arr[i])
+                }
             }
-            else{
-                leftovers.push(arr[i])
+            catch(err){
+                console.log(err); // usually invalid regex
             }
         }
         // achieves basic sorting prio by appending help text matches to the dropdown later
         for (i = 0; i < leftovers.length; i++) {
             // check if help text contains query
-            if (leftovers[i].help.toUpperCase().match(val.toUpperCase())) {
-                b = mknod("DIV");
-                b.innerHTML = "<strong>" + leftovers[i].cmd + "</strong>\n";
-                b.innerHTML += leftovers[i].help;
-                b.innerHTML += "<input type='hidden' value='" + leftovers[i].cmd + "'>";
-                b.onclick = iClick;
-                a.appendChild(b);
+            try{
+                if (leftovers[i].help.toUpperCase().match(val.toUpperCase())) {
+                    b = mknod("DIV");
+                    b.innerHTML = "<strong>" + leftovers[i].cmd + "</strong>\n";
+                    b.innerHTML += leftovers[i].help;
+                    b.innerHTML += "<input type='hidden' value='" + leftovers[i].cmd + "'>";
+                    b.onclick = iClick;
+                    a.appendChild(b);
+                }
+            }
+            catch(err){
+                console.log(err); // usually invalid regex
             }
         }
         
