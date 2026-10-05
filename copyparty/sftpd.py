@@ -37,7 +37,6 @@ from .util import (
     ipnorm,
     min_ex,
     read_utf8,
-    relchk,
     runhook,
     sanitize_fn,
     ub64enc,
@@ -337,15 +336,23 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
         m: bool = False,
         d: bool = False,
     ) -> tuple[str, VFS, str]:
-        vpath = vpath.replace(os.sep, "/").strip("/")
-        rd, fn = os.path.split(vpath)
-        if relchk(rd):
-            self.log("malicious vpath: %s", vpath)
-            raise Exception("Unsupported characters in [%s]" % (vpath,))
+        # because:
+        #  * maybe some clients use \
+        #  * windows filename limitations
+        # need to allow/translate illegal fn,
+        # but require filesystem-correct rd
+        if ANYWIN or ("\\" in vpath and "/" not in vpath):
+            vpath = vpath.replace("\\", "/")
+        vpath = vpath.strip("/\\")
+        if ANYWIN:
+            rd, fn = os.path.split(vpath)
+            fn = sanitize_fn(fn, "win")
+            vpath = vjoin(rd, fn)
+        # end of windows jank
 
-        fn = sanitize_fn(fn or "")
-        vpath = vjoin(rd, fn)
         vn, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
+        vpath = vjoin(vn.vpath, rem)
+        rd, fn = os.path.split(vpath)
         if (
             w
             and fn.lower() in vn.flags["emb_all"]
@@ -684,8 +691,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
     def _mkdir(self, vp: str, attr: SATTR) -> int:
         self.log("mkdir(%s)" % (vp,))
         try:
-            vn, rem = self.asrv.vfs.get(vp, self.uname, False, True)
-            ap = vn.canonical(rem, False)
+            ap, vn, _ = self.v2a(vp, w=True)
             bos.makedirs(ap, vf=vn.flags)  # filezilla expects this
             if attr is not None:
                 paramiko.SFTPServer.set_file_attr(ap, attr)
@@ -708,8 +714,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
     def _rmdir(self, vp: str) -> int:
         self.log("rmdir(%s)" % (vp,))
         try:
-            vn, rem = self.asrv.vfs.get(vp, self.uname, False, False, will_del=True)
-            ap = os.path.join(vn.realpath, rem)
+            ap, _, _ = self.v2a(vp, d=True)
             bos.rmdir(ap)
             return SFTP_OK
         except Pebkac as ex:
@@ -730,8 +735,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
     def _chattr(self, vp: str, attr: SATTR) -> int:
         self.log("chattr(%s, %s)" % (vp, attr))
         try:
-            vn, rem = self.asrv.vfs.get(vp, self.uname, False, True, will_del=True)
-            ap = os.path.join(vn.realpath, rem)
+            ap, _, _ = self.v2a(vp, w=True, d=True)
             paramiko.SFTPServer.set_file_attr(ap, attr)
             return SFTP_OK
         except Pebkac as ex:

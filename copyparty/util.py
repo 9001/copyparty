@@ -365,13 +365,9 @@ if PY2:
 else:
     umktrans = str.maketrans
 
-FNTL_WIN = umktrans('<>:|?*"\\/', "＜＞：｜？＊＂＼／")
 VPTL_WIN = umktrans('<>:|?*"\\', "＜＞：｜？＊＂＼")
-APTL_WIN = umktrans('<>:|?*"/', "＜＞：｜？＊＂／")
-FNTL_MAC = VPTL_MAC = APTL_MAC = umktrans(":", "：")
-FNTL_OS = FNTL_WIN if ANYWIN else FNTL_MAC if MACOS else None
+VPTL_MAC = umktrans(":", "：")
 VPTL_OS = VPTL_WIN if ANYWIN else VPTL_MAC if MACOS else None
-APTL_OS = APTL_WIN if ANYWIN else APTL_MAC if MACOS else None
 
 
 BADNAMES = []
@@ -2476,29 +2472,35 @@ else:
     undot = _undot
 
 
-def sanitize_fn(fn: str) -> str:
-    fn = fn.replace("\x00", "_")
+def sanitize_fn(fn: str, fsnt: Optional[str] = None) -> str:
+    fn = fn.replace("\x00", "_").split("/")[-1]
+    if fsnt and fsnt != "lin":
+        fn = fn.translate(VPTL_WIN if fsnt == "win" or ANYWIN else VPTL_MAC)
     fn2 = fn.replace("\\", "/")
-    if ANYWIN or "/../" in fn2:
-        fn = fn2.rstrip(". ")
-    fn = fn.split("/")[-1]
-    if APTL_OS:
-        fn = sanitize_to(fn, APTL_OS)
+    if ANYWIN or fsnt == "win" or "/../" in fn2:
+        fn = fn2.split("/")[-1].rstrip(". ")
+    if VPTL_OS:
+        fn = sanitize_to(fn, VPTL_OS)
     return fn.strip()
 
 
-def sanitize_to(fn: str, tl: dict[int, int]) -> str:
+def sanitize_to(fn: str, tl: dict[int, int], fsnt: Optional[str] = None) -> str:
     fn = fn.translate(tl)
-    if ANYWIN and fn.lower().split(".")[0].strip() in BADNAMESET:
-        fn = "_" + fn
+    if ANYWIN or fsnt == "win":
+        fn = fn.rstrip(". ")
+        if fn.lower().split(".")[0].strip() in BADNAMESET:
+            fn = "_" + fn
     return fn
 
 
-def sanitize_vpath(vp: str) -> str:
-    if not APTL_OS:
+def sanitize_vpath(vp: str, fsnt: Optional[str] = None) -> str:
+    vptl = VPTL_OS
+    if fsnt and fsnt != "lin":
+        vptl = VPTL_WIN if fsnt == "win" or ANYWIN else VPTL_MAC
+    if not vptl:
         return vp
     parts = vp.replace(os.sep, "/").split("/")
-    ret = [sanitize_to(x, APTL_OS) for x in parts]
+    ret = [sanitize_to(x, vptl, fsnt) for x in parts]
     return "/".join(ret)
 
 

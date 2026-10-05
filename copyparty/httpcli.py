@@ -110,7 +110,6 @@ from .util import (
     s2hms,
     s3enc,
     safe_mime,
-    sanitize_fn,
     sanitize_vpath,
     sendfile_kern,
     sendfile_py,
@@ -2736,7 +2735,7 @@ class HttpCli(object):
             if rnd:
                 fn = rand_name(fdir, fn, rnd)
 
-            fn = sanitize_fn(fn or "")
+            fn = vfs.sanitize_fn(fn or "", rem)
 
         path = os.path.join(fdir, fn)
 
@@ -3216,19 +3215,20 @@ class HttpCli(object):
         if "delete" in self.uparam:
             return self.handle_rm(body)
 
-        name = undot(body["name"])
-        if "/" in name:
-            raise Pebkac(400, "your client is old; press CTRL-SHIFT-R and try again")
+        name = body["name"]
+        if "/" in name or name in (".", ".."):
+            raise Pebkac(400, "filename contains '/' or is invalid")
 
-        vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
-        fsnt = vfs.flags["fsnt"]
-        if fsnt != "lin":
+        vpath = self.vpath
+        fsnt = self.vn.flags["fsnt"]
+        if not VPTL_OS and fsnt != "lin":
             tl = VPTL_WIN if fsnt == "win" else VPTL_MAC
-            rem = rem.translate(tl)
-            name = name.translate(tl)
+            vpath = vpath.translate(tl)
+
+        vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
+        name = vfs.sanitize_fn(name, rem)
         dbv, vrem = vfs.get_dbv(rem)
 
-        name = sanitize_fn(name)
         if (
             not self.can_read
             and self.can_write
@@ -3593,7 +3593,6 @@ class HttpCli(object):
             return self.tx_404()
 
         vfs, rem = self.asrv.vfs.get(session["vp"], self.uname, False, True)
-        vpath = vjoin(vfs.vpath, rem)
         ap = vfs.canonical(rem)
         st = bos.stat(ap)
 
@@ -3776,12 +3775,11 @@ class HttpCli(object):
     def _mkdir(self, vpath: str, dav: bool = False) -> bool:
         nullwrite = self.args.nw
         self.gctx = vpath
-        vpath = sanitize_vpath(undot(vpath))
+        vpath = sanitize_vpath(undot(vpath), self.vn.flags["fsnt"])
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
         if "nosub" in vfs.flags:
             raise Pebkac(403, "mkdir is forbidden below this folder")
 
-        rem = sanitize_vpath(rem)
         fn = vfs.canonical(rem)
 
         if not nullwrite:
@@ -3828,7 +3826,7 @@ class HttpCli(object):
             t = "you can only create %s files because you don't have the delete-permission"
             raise Pebkac(400, t % (vfs.flags["rw_edit"].replace(",", "/")))
 
-        sanitized = sanitize_fn(new_file)
+        sanitized = vfs.sanitize_fn(new_file, rem)
         fdir = vfs.canonical(rem)
         fn = os.path.join(fdir, sanitized)
 
@@ -3983,7 +3981,7 @@ class HttpCli(object):
                     # fallthrough
 
                 fdir = fdir_base
-                fname = sanitize_fn(p_file or "")
+                fname = vfs.sanitize_fn(p_file or "", rem)
                 suffix = "-%.6f-%s" % (time.time(), dip)
                 if p_file and not nullwrite:
                     if rnd:
@@ -7272,7 +7270,7 @@ class HttpCli(object):
             if use_dirkey:
                 is_dk = True
             elif self.can_get and "doc" in self.uparam:
-                zs = vjoin(self.vpath, self.uparam["doc"]) + "?v"
+                zs = vjoin(self.vpath, self.uparam["doc"].split("//")[-1]) + "?v"
                 return self.redirect(zs, flavor="redirecting to", use302=True)
             elif not self.can_write:
                 return self.tx_404(True)

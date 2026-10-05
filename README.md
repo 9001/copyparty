@@ -622,6 +622,8 @@ config file example:
 
 hiding specific subfolders  by mounting another volume on top of them
 
+> **WARNING:** shadowing is NOT bulletproof when the underlying filesystem is casefolding (case-insensitive), in other words DON'T rely on this when copyparty is running on Windows and/or MacOS. This is also unsafe when combined with certain filesystems on Linux, especially FAT32/exFAT. Pay attention to the volume-listing in the startup log; `casechk:n` indicates probably-OK, but if it says `casechk:y` then DO NOT trust shadowing to fully prevent access to a file/subfolder.
+
 for example `-v /mnt::r -v /var/empty:web/certs:` (note: no permissions) mounts the server folder `/mnt` as the webroot, but another volume is mounted at `/web/certs` -- so visitors can only see the contents of `/mnt` and `/mnt/web` (at URLs `/` and `/web`), but not `/mnt/web/certs` because URL `/web/certs` is mapped to `/var/empty`
 
 to fully unmap it from the filesystem, specify `//NULL` instead of a real path such as `/var/empty`, so for example `-v /mnt::r -v //NULL:web/certs:` ensures `/web/certs` will never be accessible by anyone
@@ -3047,7 +3049,7 @@ below are some tweaks roughly ordered by usefulness:
   * and pypy can sometimes crash on startup with `-j0` (TODO make issue)
 
 * if you are running the copyparty server **on Windows or Macos:**
-  * `--casechk=n` makes it much faster, but also awakens [the usual surprises](https://github.com/9001/copyparty/issues/781) you expect from a case-insensitive filesystem
+  * `--casechk=n` makes it much faster, but [reduces security](https://github.com/9001/copyparty/security/advisories/GHSA-3c88-p299-7hvr) and awakens [the usual surprises](https://github.com/9001/copyparty/issues/781) you expect from a case-insensitive filesystem
     * this is the same as `casechk: n` in a config-file
 
 

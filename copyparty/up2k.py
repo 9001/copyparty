@@ -3550,7 +3550,7 @@ class Up2k(object):
                                     job["ptop"] = vfs.realpath
                                     job["vtop"] = vfs.vpath
                                     job["prel"] = rem
-                                    job["name"] = sanitize_fn(job["name"])
+                                    job["name"] = vfs.sanitize_fn(job["name"], rem)
                                     ud2 = (vfs.vpath, job["prel"], job["name"])
                                     if ud1 != ud2:
                                         # print(json.dumps(job, sort_keys=True, indent=4))
@@ -5439,7 +5439,7 @@ class Up2k(object):
                     job["ptop"] = vfs.realpath
                     job["vtop"] = vfs.vpath
                     job["prel"] = rem
-                    job["name"] = sanitize_fn(job["name"])
+                    job["name"] = vfs.sanitize_fn(job["name"], rem)
                     ud2 = (vfs.vpath, job["prel"], job["name"])
                     if ud1 != ud2:
                         job["vcfg"] = vf

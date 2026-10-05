@@ -15,7 +15,7 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.ioloop import IOLoop
 from pyftpdlib.servers import FTPServer
 
-from .__init__ import PY2, TYPE_CHECKING
+from .__init__ import ANYWIN, PY2, TYPE_CHECKING
 from .authsrv import VFS
 from .bos import bos
 from .util import (
@@ -29,7 +29,6 @@ from .util import (
     ipnorm,
     pybin,
     read_utf8,
-    relchk,
     runhook,
     sanitize_fn,
     set_fperms,
@@ -169,16 +168,23 @@ class FtpFs(AbstractedFS):
         d: bool = False,
     ) -> tuple[str, VFS, str]:
         try:
-            vpath = vpath.replace("\\", "/").strip("/")
-            rd, fn = os.path.split(vpath)
-            if relchk(rd):
-                logging.warning("malicious vpath: %s", vpath)
-                t = "Unsupported characters in [{}]"
-                raise FSE(t.format(vpath), 1)
+            # because:
+            #  * ftp-spec doesn't define sep
+            #  * windows filename limitations
+            # need to allow/translate illegal fn,
+            # but require filesystem-correct rd
+            if ANYWIN or ("\\" in vpath and "/" not in vpath):
+                vpath = vpath.replace("\\", "/")
+            vpath = vpath.strip("/\\")
+            if ANYWIN:
+                rd, fn = os.path.split(vpath)
+                fn = sanitize_fn(fn, "win")
+                vpath = vjoin(rd, fn)
+            # end of windows jank
 
-            fn = sanitize_fn(fn or "")
-            vpath = vjoin(rd, fn)
             vfs, rem = self.hub.asrv.vfs.get(vpath, self.uname, r, w, m, d)
+            vpath = vjoin(vfs.vpath, rem)
+            rd, fn = os.path.split(vpath)
             if (
                 w
                 and fn.lower() in vfs.flags["emb_all"]
