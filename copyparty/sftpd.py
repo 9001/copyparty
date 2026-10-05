@@ -311,6 +311,17 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
         if self.uname == LEELOO_DALLAS:
             raise Exception("send her back")
 
+        cm = 0
+        for zs, zi in (
+            ("s", SATTR.FLAG_SIZE),
+            ("t", SATTR.FLAG_AMTIME),
+            ("p", SATTR.FLAG_PERMISSIONS),
+            ("u", SATTR.FLAG_UIDGID),
+        ):
+            if zs in self.args.sftp_chattr:
+                cm |= zi
+        self.chattr_mask = cm
+
         self.vols = [
             vp
             for vp, vn in self.asrv.vfs.all_vols.items()
@@ -735,6 +746,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
     def _chattr(self, vp: str, attr: SATTR) -> int:
         self.log("chattr(%s, %s)" % (vp, attr))
         try:
+            attr._flags &= self.chattr_mask
             ap, _, _ = self.v2a(vp, w=True, d=True)
             paramiko.SFTPServer.set_file_attr(ap, attr)
             return SFTP_OK
