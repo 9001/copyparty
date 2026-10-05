@@ -4572,6 +4572,8 @@ var fileman = (function () {
 			xhr.onload = xhr.onerror = rename_cb;
 			xhr.send();
 		}
+
+		ire.oninput();
 	};
 
 	r.delete = function (e) {
