@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import division, print_function, unicode_literals
 
-S_VERSION = "2.24"
-S_BUILD_DT = "2026-09-26"
+S_VERSION = "2.25"
+S_BUILD_DT = "2026-10-05"
 
 """
 u2c.py: upload to copyparty
@@ -66,6 +66,8 @@ else:
 
 
 WTF8 = "replace" if PY2 else "surrogateescape"
+
+SEP = "{0}".format(os.sep).encode("ascii")
 
 VT100 = platform.system() != "Windows"
 
@@ -249,7 +251,7 @@ class File(object):
 
     def __init__(self, top, rel, size, lmod):
         self.top = top  # type: bytes
-        self.rel = rel.replace(b"\\", b"/")  # type: bytes
+        self.rel = rel.replace(SEP, b"/")  # type: bytes
         self.size = size  # type: int
         self.lmod = lmod  # type: float
 
@@ -653,7 +655,7 @@ def walkdir(err, top, excl, seen):
 
 def walkdirs(err, tops, excl):
     """recursive statdir for a list of tops, yields [top, relpath, stat]"""
-    sep = "{0}".format(os.sep).encode("ascii")
+    sep = SEP
     if not VT100:
         excl = excl.replace("/", r"\\")
         za = []
@@ -1215,14 +1217,15 @@ class Ctl(object):
 
     def hasher(self):
         ptn = re.compile(self.ar.x.encode("utf-8"), re.I) if self.ar.x else None
-        sep = "{0}".format(os.sep).encode("ascii")
+        usep = os.sep
+        sep = SEP
         prd = None
         ls = {}
         for top, rel, inf in self.filegen:
             isdir = stat.S_ISDIR(inf.st_mode)
             if self.ar.z or self.ar.drd:
                 rd = rel if isdir else os.path.dirname(rel)
-                srd = rd.decode("utf-8", "replace").replace("\\", "/").rstrip("/")
+                srd = rd.decode("utf-8", "replace").replace(usep, "/").rstrip("/")
                 if srd:
                     srd += "/"
                 if prd != rd:
@@ -1232,7 +1235,7 @@ class Ctl(object):
                         print("      ls ~{0}".format(srd))
                         zt = (
                             self.ar.vtop,
-                            quotep(rd.replace(b"\\", b"/")).decode("utf-8"),
+                            quotep(rd.replace(sep, b"/")).decode("utf-8"),
                         )
                         sc, txt = web.req("GET", "%s%s?ls&lt&dots" % zt, {})
                         if sc >= 400:
