@@ -17,6 +17,7 @@ import threading  # typechk
 import time
 import uuid
 from datetime import datetime
+from hmac import compare_digest as ct_eq
 from operator import itemgetter
 
 import jinja2  # typechk
@@ -4586,7 +4587,7 @@ class HttpCli(object):
             ap = vn.canonical(self.rem)
 
         zs = self.gen_fk(2, self.args.dk_salt, ap, 0, 0)[:dk_len]
-        if req == zs:
+        if ct_eq(req, zs):
             return True
 
         t = "wrong dirkey, want %s, got %s\n  vp: %r\n  ap: %r"
@@ -4614,7 +4615,7 @@ class HttpCli(object):
             alg, self.args.fk_salt, ap, st.st_size, 0 if ANYWIN else st.st_ino
         )[:fk_len]
 
-        if req == zs:
+        if ct_eq(req, zs):
             return True
 
         t = "wrong filekey, want %s, got %s\n  vp: %r\n  ap: %r"
