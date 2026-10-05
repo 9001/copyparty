@@ -17,6 +17,7 @@ import threading  # typechk
 import time
 import uuid
 from datetime import datetime
+from hmac import compare_digest as ct_eq
 from operator import itemgetter
 
 import jinja2  # typechk
@@ -64,7 +65,6 @@ from .util import (
     atomic_move,
     b64dec,
     b64enc,
-    ct_eq,
     eol_conv,
     exclude_dotfiles,
     exclude_dotfiles_ls,
