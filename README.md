@@ -572,7 +572,7 @@ if you want to grant access to all users who are logged in, the group `acct` wil
 * to do the opposite, granting access to everyone who is NOT logged in. `*,-@acct` does the trick, for example `-v /srv/welcome:welcome:r,*,-@acct`
 * single users can also be subtracted from a group: `@admins,-james`
 
-anyone trying to bruteforce a password gets banned according to `--ban-pw`; default is 24h ban for 9 failed attempts in 1 hour
+anyone trying to bruteforce a password gets banned according to `--ban-pw` (assuming [real-ip](#real-ip) is configured correctly); default is 24h ban for 9 failed attempts in 1 hour
 
 and if you want to use config files instead of commandline args (good!) then here's the same examples as a configfile; save it as `foobar.conf` and use it like this: `python copyparty-sfx.py -c foobar.conf`
 

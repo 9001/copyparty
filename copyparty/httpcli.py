@@ -738,6 +738,7 @@ class HttpCli(object):
                     hpw = self.asrv.ah.hash(bauth)
                     if self.asrv.iacct.get(hpw):
                         break
+                    bauth = zs
             except:
                 pass
 
