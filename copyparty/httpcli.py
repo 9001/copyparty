@@ -4308,6 +4308,7 @@ class HttpCli(object):
         else:
             self.redirect(
                 self.vpath,
+                suf="?b=u" if self.ouparam.get("b") == "u" else "",
                 msg=msg + suf,
                 flavor="return to",
                 click=False,
