@@ -3341,7 +3341,7 @@ class AuthSrv(object):
             if not vn.realpath:
                 continue
             if "bcasechk" in vn.flags:
-                if ".hist" in vn.nodes:
+                if ".hist" in vn.nodes and "e2d" in vn.flags:
                     zb1 = True
                 if vn.nodes and (len(vn.nodes) > 1 or ".hist" not in vn.nodes):
                     zb2 = True
