@@ -3493,7 +3493,7 @@ if you are suddenly unable to access storage (permission issues), try forcequitt
 
 ## external storage on android
 
-**exFAT recommended!**
+>you most likely want exFAT, but look at your server log warnings carefully when using this, as case insensitive formats like exFAT or NTFS come with issues in certain cases
 
 if you want to use external storage like an SD card or USB stick, you need to get the mount path from the folder info in a file explorer (for example [CX explorer](https://play.google.com/store/apps/details?id=com.cxinventor.file.explorer) (closed source though))
 
