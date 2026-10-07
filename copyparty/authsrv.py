@@ -42,6 +42,7 @@ from .util import (
     odfusion,
     read_utf8,
     relchk,
+    sanitize_fn,
     statdir,
     ub64enc,
     uncyg,
@@ -426,6 +427,7 @@ class VFS(object):
         self.root = self
         self.dev = 0  # st_dev
         self.nodes: dict[str, VFS] = {}  # child nodes
+        self.lnodes: Optional[dict[bytes, VFS]] = None  # lowercase
         self.histtab: dict[str, str] = {}  # all realpath->histpath
         self.dbpaths: dict[str, str] = {}  # all realpath->dbpath
         self.dbv: Optional[VFS] = None  # closest full/non-jump parent
@@ -575,6 +577,11 @@ class VFS(object):
         if name in self.nodes:
             return self.nodes[name]._find(rem)
 
+        if self.lnodes:
+            zs = name.casefold().encode("ascii", "ignore")
+            if zs in self.lnodes:
+                return self.lnodes[zs]._find(rem)
+
         return self, vpath
 
     def can_access(
@@ -673,8 +680,6 @@ class VFS(object):
             if lfn == zs.lower():
                 hit = zs
                 break
-        if not hit:
-            return True  # NFC/NFD or something, can't be helped either way
         if self.log:
             t = "returning 404 due to underlying case-insensitive filesystem:\n  http-req: %r\n  local-fs: %r"
             self.log("vfs", t % (fn, hit))
@@ -786,6 +791,12 @@ class VFS(object):
         if not rem:
             # no vfs nodes in the list of real inodes
             real = [x for x in real if x[0] not in self.nodes]
+            if self.lnodes:
+                real = [
+                    x
+                    for x in real
+                    if x[0].casefold().encode("ascii", "ignore") not in self.lnodes
+                ]
 
             dbv = self.dbv or self
             for name, vn2 in sorted(self.nodes.items()):
@@ -950,6 +961,22 @@ class VFS(object):
             ret2 = list(zip(vpaths, apaths, dstats))
             for d in [{"vp": v, "ap": a, "st": n} for v, a, n in ret2]:
                 yield d
+
+    def sanitize_fn(self, fn: str, rem: Any = None) -> str:
+        fn = sanitize_fn(fn, self.flags["fsnt"])
+        if rem:
+            return fn
+        if fn in self.nodes or (
+            self.lnodes and fn.casefold().encode("ascii", "ignore") in self.lnodes
+        ):
+            raise Pebkac(400, "bad filename")
+        return fn
+
+    def chk_fn(self, fn: str) -> None:
+        if fn in self.nodes or (
+            self.lnodes and fn.casefold().encode("ascii", "ignore") in self.lnodes
+        ):
+            raise Pebkac(400, "bad filename")
 
     def chk_ap(self, ap: str, st: Optional[os.stat_result] = None) -> Optional["VFS"]:
         aps = ap + os.sep
@@ -2986,6 +3013,22 @@ class AuthSrv(object):
                 for name in vol.axs.uread:
                     vol.axs.udot.add(name)
 
+        zi = 1
+        zs = "; you must also enable --hack-me-bro to accept the total loss of security"
+        if self.args.hack_me_bro:
+            zi = 3
+            zs = ""
+
+        if self.args.smb:
+            t = "smb is enabled; this has serious security issues which will not be fixed"
+            self.log(t + zs, zi)
+            if zs:
+                errors = True
+
+        if self.args.tftp:
+            t = "tftp is enabled; primitive protocol with primitive access-restrictions"
+            self.log(t, 3)
+
         if errors:
             sys.exit(1)
 
@@ -3289,6 +3332,34 @@ class AuthSrv(object):
             cur2.close()
             cur.close()
             db.close()
+
+        zb1 = zb2 = False
+        nodes = [self.vfs]
+        while nodes:
+            vn = nodes.pop()
+            nodes += list(vn.nodes.values())
+            if not vn.realpath:
+                continue
+            if "bcasechk" in vn.flags:
+                if ".hist" in vn.nodes and "e2d" in vn.flags:
+                    zb1 = True
+                if vn.nodes and (len(vn.nodes) > 1 or ".hist" not in vn.nodes):
+                    zb2 = True
+                if PY2:
+                    continue
+                vn.lnodes = {
+                    k.casefold().encode("ascii", "ignore"): v
+                    for k, v in vn.nodes.items()
+                }
+        if zb2 and PY2:
+            t = "SECURITY WARNING: due to python2, shadowing will NOT provide much security:"
+            self.log(t, 1)
+        if zb2:
+            t = "SECURITY WARNING: you have a case-insensitive / casefolding filesystem, and you also have nested volumes (subvolumes). This combination is NOT 100% bulletproof; it *might* be possible for someone to sneakily access a subvolume they're not supposed to have access to, if they have access to the parent volume."
+            self.log(t, 3)
+        if zb1:
+            t = "you have a case-insensitive / casefolding filesystem, so it is recommended to set --hist C:\\copyparty-data\\ or another safe place"
+            self.log(t, 3)
 
         self.js_ls = {}
         self.js_htm = ""

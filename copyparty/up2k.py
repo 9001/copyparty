@@ -3550,7 +3550,7 @@ class Up2k(object):
                                     job["ptop"] = vfs.realpath
                                     job["vtop"] = vfs.vpath
                                     job["prel"] = rem
-                                    job["name"] = sanitize_fn(job["name"])
+                                    job["name"] = vfs.sanitize_fn(job["name"], rem)
                                     ud2 = (vfs.vpath, job["prel"], job["name"])
                                     if ud1 != ud2:
                                         # print(json.dumps(job, sort_keys=True, indent=4))
@@ -4409,7 +4409,7 @@ class Up2k(object):
             is_dir = stat.S_ISDIR(st.st_mode)
         except:
             # NOTE: "file not found" *sftpd
-            raise Pebkac(400, "file not found on disk (already deleted?)")
+            raise Pebkac(404, "file not found on disk (already deleted?)")
 
         if "bcasechk" in vn.flags and not vn.casechk(rem, False):
             raise Pebkac(400, "file does not exist case-sensitively")
@@ -5439,7 +5439,7 @@ class Up2k(object):
                     job["ptop"] = vfs.realpath
                     job["vtop"] = vfs.vpath
                     job["prel"] = rem
-                    job["name"] = sanitize_fn(job["name"])
+                    job["name"] = vfs.sanitize_fn(job["name"], rem)
                     ud2 = (vfs.vpath, job["prel"], job["name"])
                     if ud1 != ud2:
                         job["vcfg"] = vf

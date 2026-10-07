@@ -104,7 +104,7 @@ def gen_hdr(
     ret += spack(b"<LL", vsz, vsz)
 
     # windows support (the "?" replace below too)
-    fn = sanitize_to(fn, VPTL_WIN)
+    fn = sanitize_to(fn, VPTL_WIN, "win")
     bfn = fn.encode("utf-8" if utf8 else "cp437", "replace").replace(b"?", b"_")
 
     # add ntfs (0x24) and/or unix (0x10) extrafields for utc, add z64 if requested

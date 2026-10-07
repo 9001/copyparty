@@ -174,6 +174,7 @@ class SvcHub(object):
         self.is_dut = False  # running in unittest; always False
         self.stopping = False
         self.stopped = False
+        self.init_mutex = threading.Lock()
         self.reload_mutex = threading.Lock()
         self.retcode = 0
         self.httpsrv_up = 0
@@ -535,9 +536,6 @@ class SvcHub(object):
 
             self.tftpd: Optional[Tftpd] = None
 
-        if args.sftp or args.ftp or args.ftps or args.tftp:
-            Daemon(self.start_ftpd, "start_tftpd")
-
         if args.smb:
             # impacket.dcerpc is noisy about listen timeouts
             sto = socket.getdefaulttimeout()
@@ -861,29 +859,19 @@ class SvcHub(object):
         cur.close()
         db.close()
 
-    def start_ftpd(self) -> None:
-        time.sleep(30)
-
-        if hasattr(self, "sftpd") and not self.sftpd:
-            self.restart_sftpd()
-
-        if hasattr(self, "ftpd") and not self.ftpd:
-            self.restart_ftpd()
-
-        if hasattr(self, "tftpd") and not self.tftpd:
-            self.restart_tftpd()
-
     def restart_sftpd(self) -> None:
         if not hasattr(self, "sftpd"):
             return
 
         from .sftpd import Sftpd
 
-        if self.sftpd:
-            return  # todo
+        with self.init_mutex:
+            if self.sftpd:
+                return  # todo
 
-        self.sftpd = Sftpd(self)
-        self.sftpd.run()
+            self.sftpd = Sftpd(self)
+            self.sftpd.run()
+
         self.log("root", "started SFTPd")
 
     def restart_ftpd(self) -> None:
@@ -892,13 +880,15 @@ class SvcHub(object):
 
         from .ftpd import Ftpd
 
-        if self.ftpd:
-            return  # todo
+        with self.init_mutex:
+            if self.ftpd:
+                return  # todo
 
-        if not os.path.exists(self.args.cert):
-            ensure_cert(self.log, self.args)
+            if not os.path.exists(self.args.cert):
+                ensure_cert(self.log, self.args)
 
-        self.ftpd = Ftpd(self)
+            self.ftpd = Ftpd(self)
+
         self.log("root", "started FTPd")
 
     def restart_tftpd(self) -> None:
@@ -907,10 +897,11 @@ class SvcHub(object):
 
         from .tftpd import Tftpd
 
-        if self.tftpd:
-            return  # todo
+        with self.init_mutex:
+            if self.tftpd:
+                return  # todo
 
-        self.tftpd = Tftpd(self)
+            self.tftpd = Tftpd(self)
 
     def thr_httpsrv_up(self) -> None:
         time.sleep(1 if self.args.ign_ebind_all else 5)

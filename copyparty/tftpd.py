@@ -275,7 +275,16 @@ class Tftpd(object):
         if not vfs.realpath:
             raise Exception("unmapped vfs")
 
-        return vfs, vpath, vfs.canonical(rem)
+        ap = vfs.canonical(rem)
+        if "xdev" in vfs.flags or "xvol" in vfs.flags:
+            avn = vfs.chk_ap(ap)
+            for n, zb in enumerate(perms):
+                if not avn or zb and not avn.uaxs["*"][n]:
+                    raise Exception("no access")
+        if "bcasechk" in vfs.flags and not vfs.casechk(rem, True):
+            raise Exception("file not found")
+
+        return vfs, vpath, ap
 
     def _ls(self, vpath: str, raddress: str, rport: int, force=False) -> Any:
         # generate file listing if vpath is dir.txt and return as file object

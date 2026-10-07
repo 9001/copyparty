@@ -1699,6 +1699,8 @@ def add_sftp(ap):
     ap2.add_argument("--sftp-pw", action="store_true", help="allow password-authentication with sftp (not just ssh-keys)")
     ap2.add_argument("--sftp-anon", metavar="TXT", type=u, default="", help="allow anonymous/unauthenticated connections with \033[33mTXT\033[0m as username")
     ap2.add_argument("--sftp-hostk", metavar="FP", type=u, default=E.cfg, help="path to folder with hostkeys, for example 'ssh_host_rsa_key'; missing keys will be generated")
+    ap2.add_argument("--sftp-fastldr", action="store_true", help="speedhack for 'loading hostkeys' on old CPUs; only use with known-good hostkeys")
+    ap2.add_argument("--sftp-chattr", metavar="T", default="s", help="which attributes can be modified with chattr? [\033[32ms\033[0m]=size, [\033[32mt\033[0m]=mtime, [\033[32mp\033[0m]=permissions, [\033[32mu\033[0m]=uid/gid. Example: [\033[32mstpu\033[0m]")
     ap2.add_argument("--sftp-banner", metavar="T", type=u, default="", help="bannertext to send when someone connects; can be @filepath")
     ap2.add_argument("--sftp-ipa", metavar="CIDR", type=u, default="", help="only accept connections from IP-addresses inside \033[33mCIDR\033[0m (comma-separated); specify [\033[32many\033[0m] to disable inheriting \033[33m--ipa\033[0m / \033[33m--ipar\033[0m. Examples: [\033[32mlan\033[0m] or [\033[32m10.89.0.0/16, 192.168.33.0/24\033[0m]")
     ap2.add_argument("--sftp-hs-t", metavar="SEC", type=int, default=15, help="connection handshake timeout in seconds")
@@ -1818,6 +1820,7 @@ def add_stats(ap):
 
 def add_yolo(ap):
     ap2 = ap.add_argument_group("yolo options")
+    ap2.add_argument("--hack-me-bro", action="store_true", help="allow enabling dangerously buggy protocols such as \033[33m--smb\033[0m / \033[33m--tftp\033[0m")
     ap2.add_argument("--allow-csrf", action="store_true", help="disable csrf protections; let other domains/sites impersonate you through cross-site requests; \033[1;31mDANGEROUS\033[0m / LAN-only")
     ap2.add_argument("--cookie-lax", action="store_true", help="allow cookies from other domains (if you follow a link from another website into your server, you will arrive logged-in); this reduces protection against CSRF")
     ap2.add_argument("--allow-svg-js", action="store_true", help="allow svg images to execute javascript; default-disabled because ~nobody wants it (volflag=allow_svg_js)")

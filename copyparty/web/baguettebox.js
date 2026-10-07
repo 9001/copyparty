@@ -723,6 +723,7 @@ window.baguetteBox = (function () {
         unbind(overlay, 'touchend', touchendHandler);
         unbind(document, 'focus', trapFocusInsideOverlay, true);
         timer.rm(rotn);
+        clearTimeout(unrot_timer);
     }
 
     function prepareOverlay(gallery, userOptions, cbz) {
