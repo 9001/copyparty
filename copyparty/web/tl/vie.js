@@ -2,7 +2,7 @@ Ls.vie = {
 	"tt": "Tiếng Việt",
 
 	"cols": {
-		"c": "nút hành động",
+		"!": "nút hành động",
 		"dur": "thời lượng",
 		"q": "chất lượng / bitrate",
 		"Ac": "codec âm thanh",
@@ -11,7 +11,7 @@ Ls.vie = {
 		"Ahash": "checksum âm thanh",
 		"Vhash": "checksum video",
 		"Res": "độ phân giải",
-		"T": "loại tệp",
+		"Ext": "loại tệp",
 		"aq": "chất lượng âm thanh / bitrate",
 		"vq": "chất lượng video / bitrate",
 		"pixfmt": "subsampling / pixel structure",
@@ -30,7 +30,7 @@ Ls.vie = {
 			["G", "chuyển đổi chế độ xem danh sách / lưới"],
 			["T", "chuyển đổi ảnh thu nhỏ / biểu tượng"],
 			["⇧ A/D", "kích thước ảnh thu nhỏ"],
-			["ctrl-K", "xoá mục đã chọn"],
+			["ctrl-K/Del", "xoá mục đã chọn"],
 			["ctrl-X", "cắt mục đã chọn vào bảng nhớ tạm"],
 			["ctrl-C", "sao chép mục đã chọn vào bảng nhớ tạm"],
 			["ctrl-V", "dán (di chuyển/sao chép) tại đây"],
@@ -103,9 +103,9 @@ Ls.vie = {
 	"ht_and": " và ",
 
 	"goh": "bảng điều khiển",
-	"gop": 'thư mục trước">trước',
-	"gou": 'thư mục cha">lên',
-	"gon": 'thư mục sau">tiếp',
+	"gop": 'thư mục trước',
+	"gou": 'thư mục cha',
+	"gon": 'thư mục sau',
 	"logout": "Đăng xuất ",
 	"login": "Đăng nhập",
 	"access": "quyền truy cập",
@@ -155,7 +155,7 @@ Ls.vie = {
 	"ut_u2ts": "sao chép dấu thời gian chỉnh sửa cuối$Ntừ hệ thống tệp của bạn lên máy chủ\">📅",
 	"ut_ow": "ghi đè các tệp đã có trên máy chủ?$N🛡️: không bao giờ (sẽ tạo tên tệp mới)$N🕒: ghi đè nếu tệp trên máy chủ cũ hơn$N♻️: luôn ghi đè nếu hai tệp khác nhau$N⏭️: bỏ qua vô điều kiện tất cả các tệp hiện có", //m
 	"ut_mt": "tiếp tục hash các tệp khác trong khi tải lên$N$NCó thể tắt nếu CPU hoặc HDD của bạn bị nghẽn",
-	"ut_ask": 'yêu cầu xác nhận trước khi bắt đầu tải lên">💭',
+	"ut_ask": 'yêu cầu xác nhận trước khi bắt đầu tải lên',
 	"ut_pot": "cải thiện tốc độ tải lên trên các thiết bị chậm$Nbằng cách đơn giản hoá giao diện người dùng",
 	"ut_srch": "không tải lên, chỉ kiểm tra xem tệp$Nđã tồn tại trên máy chủ hay chưa (sẽ quét toàn bộ thư mục bạn có quyền đọc)",
 	"ut_par": "tạm dừng tải lên bằng cách đặt thành 0$N$NTăng lên nếu kết nối chậm hoặc độ trễ cao$N$NGiữ ở mức 1 khi dùng LAN hoặc nếu ổ cứng máy chủ bị nghẽn",
@@ -227,7 +227,7 @@ Ls.vie = {
 	// settings / tuỳ chọn
 	"ct_grid": '田 chế độ lưới',
 	"ct_ttips": '༼ ◕_◕ ༽">ℹ️ tooltips',
-	"ct_thumb": 'ở chế độ lưới, chuyển biểu tượng hoặc hình thu nhỏ$NPhím tắt: T">🖼️ ảnh thu nhỏ',
+	"ct_thumb": 'chuyển biểu tượng hoặc hình thu nhỏ$NPhím tắt: T">🖼️ ảnh thu nhỏ',
 	"ct_csel": 'dùng CTRL và SHIFT để chọn tệp trong chế độ lưới">sel',
 	"ct_dsel": 'dùng chọn bằng cách kéo trong chế độ lưới">kéo', //m
 	"ct_dl": 'cưỡng chế tải xuống (không hiện thị trong dòng) khi nhấp vào tệp">dl',
@@ -293,9 +293,9 @@ Ls.vie = {
 	"ml_drc": "bộ nén dải động",
 	"ml_ss": "bỏ qua khoảng lặng", //m
 
-	"mt_loop": "lặp lại một bài\">🔁",
+	"mt_loop": "lặp lại một bài",
 	"mt_one": "dừng sau một bài\">1️⃣",
-	"mt_shuf": "trộn các bài trong thư mụcr\">🔀",
+	"mt_shuf": "trộn các bài trong thư mụcr",
 	"mt_aplay": "tự động phát nếu có ID bài trong link bạn nhấp để truy cập máy chủ$N$Ntắt tuỳ chọn sẽ ngăn URL của trang cập nhật theo ID bài khi phát nhạc, tránh tự động phát nếu cài đặt mất nhưng URL còn\">a▶",
 	"mt_preload": "bắt đầu tải bài hát tiếp theo khi gần hết bài để phát liền mạch\">preload",
 	"mt_prescan": "chuyển đến thư mục tiếp theo trước khi bài cuối cùng $Nkết thúc, giúp giữ trình duyệt hoạt động $N và không dừng phát nhạc\">nav",
@@ -310,8 +310,8 @@ Ls.vie = {
 	"mt_follow": "giữ bài đang phát trong tầm nhìn\">🎯",
 	"mt_compact": "giao diện điều khiển thu gọn\">⟎",
 	"mt_uncache": "xoá bộ nhớ đệm &nbsp;(thử nếu trình duyệt lưu trữ đệm $Nmột bản nhạc bị lỗi và không thể phát)\">uncache",
-	"mt_mloop": "lặp trong thư mục đang mở\">🔁 loop",
-	"mt_mnext": "tải thư mục tiếp theo và tiếp tục\">📂 next",
+	"mt_mloop": "lặp trong thư mục đang mở",
+	"mt_mnext": "tải thư mục tiếp theo và tiếp tục",
 	"mt_mstop": "dừng phát\">⏸ stop",
 	"mt_cflac": "chuyển flac / wav sang {0}\">flac",
 	"mt_caac": "chuyển aac / m4a sang {0}\">aac",

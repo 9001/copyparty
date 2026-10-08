@@ -82,15 +82,15 @@
 	};
 
 	// ...and then the trick! near the end of loadgrid,
-	// thegrid.bagit is called to initialize the baguettebox
+	// msel.bagit is called to initialize the baguettebox
 	// (image/video gallery); this is the perfect function to
 	// "hook" (hijack) so we can run our code :^)
 
 	// need to grab a backup of the original function first,
-	var orig_func = thegrid.bagit;
+	var orig_func = msel.bagit;
 
 	// and then replace it with our own:
-	thegrid.bagit = function (isrc) {
+	msel.bagit = function (isrc) {
 
 		if (isrc !== '#ggrid')
 			// we only want to modify the grid, so
@@ -104,7 +104,7 @@
 		// filenames, so schedule another run:
 		setTimeout(graft_thumbs, 1);
 
-		// and finally, call the original thegrid.bagit function
+		// and finally, call the original msel.bagit function
 		return orig_func(isrc);
 	};
 

@@ -11,31 +11,32 @@ from .th_srv import HAVE_PIL, HAVE_PILF
 from .util import BytesIO, html_escape  # type: ignore
 
 
+RE_CSS_COLOR = re.compile(r"[^a-zA-Z0-9#()%.,/-]")
+
+
 class Ico(object):
     def __init__(self, args: argparse.Namespace) -> None:
         self.args = args
 
-    def get(self, ext: str, as_thumb: bool, chrome: bool) -> tuple[str, bytes]:
+    def get(self, ext: str, as_thumb: bool, png: bool, accent: str) -> tuple[str, bytes]:
         """placeholder to make thumbnails not break"""
 
         bext = ext.encode("ascii", "replace")
         ext = bext.decode("utf-8")
-        zb = hashlib.sha1(bext).digest()[2:4]
-        if PY2:
-            zb = [ord(x) for x in zb]  # type: ignore
-
-        c1 = colorsys.hsv_to_rgb(zb[0] / 256.0, 1, 0.3)
-        c2 = colorsys.hsv_to_rgb(zb[0] / 256.0, 0.8 if HAVE_PILF else 1, 1)
-        ci = [int(x * 255) for x in list(c1) + list(c2)]
-        c = "".join(["%02x" % (x,) for x in ci])
-
+        
         w = 100
         h = 30
         if as_thumb:
             sw, sh = self.args.th_size.split("x")
             h = int(100.0 / (float(sw) / float(sh)))
 
-        if chrome:
+        if accent:
+            accent = RE_CSS_COLOR.sub("", accent)
+
+        # obsolete. 2000+ svgs slows chrome down massively, but no crash.
+        # further, unique svgs are only used for non-standard thumbnails,
+        # so it's unrealistic to see that many in use
+        if png & 0:
             # cannot handle more than ~2000 unique SVGs
             if HAVE_PILF:
                 # pillow 10.1 made this the default font;
@@ -48,11 +49,11 @@ class Ico(object):
 
                     h = int(128.0 * h / w)
                     w = 128
-                    img = Image.new("RGB", (w, h), "#" + c[:6])
+                    img = Image.new("RGBA", (w, h), "#00000000")
                     pb = ImageDraw.Draw(img)
                     _, _, tw, th = pb.textbbox((0, 0), ext2, font_size=16)
                     xy = (int((w - tw) / 2), int((h - th) / 2))
-                    pb.text(xy, ext2, fill="#" + c[6:], font_size=16)
+                    pb.text(xy, ext2, fill=accent, font_size=16)
 
                     img = img.resize((w * 2, h * 2), Image.NEAREST)
 
@@ -69,7 +70,7 @@ class Ico(object):
 
                 h = int(64.0 * h / w)
                 w = 64
-                img = Image.new("RGB", (w, h), "#" + c[:6])
+                img = Image.new("RGBA", (w, h), "#00000000")
                 pb = ImageDraw.Draw(img)
                 try:
                     _, _, tw, th = pb.textbbox((0, 0), ext)
@@ -79,7 +80,7 @@ class Ico(object):
                 tw += len(ext)
                 cw = tw // len(ext)
                 x = ((w - tw) // 2) - (cw * 2) // 3
-                fill = "#" + c[6:]
+                fill = accent
                 for ch in ext:
                     pb.text((x, (h - th) // 2), " %s " % (ch,), fill=fill)
                     x += cw
@@ -93,9 +94,9 @@ class Ico(object):
         svg = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <svg version="1.1" viewBox="0 0 100 {}" xmlns="http://www.w3.org/2000/svg"><g>
-<rect width="100%" height="100%" fill="#{}" />
+<rect width="100%" height="100%" fill="#0000" />
 <text x="50%" y="{}" dominant-baseline="middle" text-anchor="middle" xml:space="preserve"
-  fill="#{}" font-family="monospace" font-size="14px" style="letter-spacing:.5px">{}</text>
+  fill="{}" font-family="monospace" font-size="14px" style="letter-spacing:.5px">{}</text>
 </g></svg>
 """
 
@@ -109,6 +110,6 @@ class Ico(object):
         else:
             y = "50%"
 
-        svg = svg.format(h, c[:6], y, c[6:], txt)
+        svg = svg.format(h, y, accent or '#000', txt)
 
         return "image/svg+xml", svg.encode("utf-8")

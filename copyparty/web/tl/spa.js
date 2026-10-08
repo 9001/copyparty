@@ -5,7 +5,7 @@ Ls.spa = {
 	"tt": "Español",
 
 	"cols": {
-		"c": "acciones",
+		"!": "acciones",
 		"dur": "duración",
 		"q": "calidad / bitrate",
 		"Ac": "códec de audio",
@@ -14,7 +14,7 @@ Ls.spa = {
 		"Ahash": "checksum de audio",
 		"Vhash": "checksum de vídeo",
 		"Res": "resolución",
-		"T": "tipo de archivo",
+		"Ext": "tipo de archivo",
 		"aq": "calidad de audio / bitrate",
 		"vq": "calidad de vídeo / bitrate",
 		"pixfmt": "submuestreo / estructura de píxel",
@@ -33,7 +33,7 @@ Ls.spa = {
 			["G", "alternar vista de lista / cuadrícula"],
 			["T", "alternar miniaturas / iconos"],
 			["⇧ A/D", "tamaño de miniatura"],
-			["ctrl-K", "eliminar seleccionados"],
+			["ctrl-K/Del", "eliminar seleccionados"],
 			["ctrl-X", "cortar selección al portapapeles"],
 			["ctrl-C", "copiar selección al portapapeles"],
 			["ctrl-V", "pegar (mover/copiar) aquí"],
@@ -108,9 +108,9 @@ Ls.spa = {
 	"ht_and": " y ",
 
 	"goh": "panel de control",
-	"gop": 'hermano anterior">anterior',
-	"gou": 'carpeta de nivel superior">subir',
-	"gon": 'siguiente carpeta">siguiente',
+	"gop": 'hermano anterior',
+	"gou": 'carpeta de nivel superior',
+	"gon": 'siguiente carpeta',
 	"logout": "Cerrar sesión ",
 	"login": "Iniciar sesión", //m
 	"access": " acceso",
@@ -158,7 +158,7 @@ Ls.spa = {
 	"ut_u2ts": 'copiar la fecha de última modificación$Nde tu sistema de archivos al servidor">📅',
 	"ut_ow": "sobrescribir archivos existentes en el servidor?$N🛡️: nunca (generará un nuevo nombre de archivo en su lugar)$N🕒: sobrescribir si el archivo del servidor es más antiguo que el tuyo$N♻️: siempre sobrescribir si los archivos son diferentes$N⏭️: omitir incondicionalmente todos los archivos existentes", //m
 	"ut_mt": "continuar generando hashes de otros archivos mientras se sube$N$Nquizás desactivar si tu CPU o HDD es un cuello de botella",
-	"ut_ask": 'pedir confirmación antes de iniciar la subida">💭',
+	"ut_ask": 'pedir confirmación antes de iniciar la subida',
 	"ut_pot": "mejorar la velocidad de subida en dispositivos lentos$Nsimplificando la interfaz de usuario",
 	"ut_srch": "no subir, en su lugar comprobar si los archivos ya $N existen en el servidor (escaneará todas las carpetas que puedas leer)",
 	"ut_par": "pausar subidas poniéndolo a 0$N$Naumentar si tu conexión es lenta / de alta latencia$N$Nmantener en 1 en LAN o si el HDD del servidor es un cuello de botella",
@@ -225,7 +225,7 @@ Ls.spa = {
 
 	"ct_grid": '田 cuadrícula',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tooltips',
-	"ct_thumb": 'en vista de cuadrícula, alternar iconos o miniaturas$NAtajo: T">🖼️ miniaturas',
+	"ct_thumb": 'alternar iconos o miniaturas$NAtajo: T">🖼️ miniaturas',
 	"ct_csel": 'usa CTRL y SHIFT para seleccionar archivos en la vista de cuadrícula">sel',
 	"ct_dsel": 'usa la selección por arrastre en la vista de cuadrícula">arrastrar', //m
 	"ct_dl": 'forzar descarga (no mostrar en línea) al hacer clic en un archivo">dl', //m
@@ -288,9 +288,9 @@ Ls.spa = {
 	"ml_drc": "compresor de rango dinámico",
 	"ml_ss": "saltar silencios", //m
 
-	"mt_loop": 'poner en bucle/repetir una canción">🔁',
+	"mt_loop": 'poner en bucle/repetir una canción',
 	"mt_one": 'parar después de una canción">1️⃣',
-	"mt_shuf": 'reproducir aleatoriamente las canciones en cada carpeta">🔀',
+	"mt_shuf": 'reproducir aleatoriamente las canciones en cada carpeta',
 	"mt_aplay": 'reproducir automaticamente si hay un ID de canción en el enlace en el que hiciste clic para acceder al servidor$N$Ndesactivar esto también evitará que la URL de la página se actualice con IDs de canción al reproducir música, para prevenir la reproducción automática si se pierden estos ajustes pero la URL permanece">a▶',
 	"mt_preload": 'empezar a cargar la siguiente canción cerca del final para una reproducción sin pausas">precarga',
 	"mt_prescan": 'ir a la siguiente carpeta antes de que la última canción$Ntermine, manteniendo contento al navegador$Npara que no detenga la reproducción">nav',
@@ -305,8 +305,8 @@ Ls.spa = {
 	"mt_follow": 'mantener la pista en reproducción visible en pantalla">🎯',
 	"mt_compact": 'controles compactos">⟎',
 	"mt_uncache": 'limpiar caché &nbsp;(prueba esto si tu navegador guardó en caché$Nuna copia rota de una canción que se niega a reproducir)">limpiar caché',
-	"mt_mloop": 'repetir la carpeta actual">🔁 bucle',
-	"mt_mnext": 'cargar la siguiente carpeta y continuar">📂 sig',
+	"mt_mloop": 'repetir la carpeta actual',
+	"mt_mnext": 'cargar la siguiente carpeta y continuar',
 	"mt_mstop": 'detener reproducción">⏸ parar',
 	"mt_cflac": 'convertir flac / wav a {0}">flac',
 	"mt_caac": 'convertir aac / m4a a {0}">aac',
