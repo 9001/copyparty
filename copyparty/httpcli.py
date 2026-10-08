@@ -1715,6 +1715,7 @@ class HttpCli(object):
             else:
                 zs = ("https://" if self.is_https else "http://") + self.host
             url += quotep(zs + "/wopi/files/" + session["file_id"])
+            url += "&closebutton=1" # enables the close button in collabora online
         except:
             del wopi_files[atoken]  # dont reuse an atoken wopi-client doesnt like
             t = "reading WOPI-client response from %s failed; %s\n%s"
