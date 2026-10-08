@@ -4603,6 +4603,8 @@ if(navigator.serviceWorker && caches){
 	});
 }
 
+var rn_overlay;
+
 var fileman = (function () {
 	var bren = ebi('fren'),
 		bdel = ebi('fdel'),
