@@ -1790,8 +1790,8 @@ function getVolFromStr(s){
             for(var j = 0; j < n.length; j++){
                 if(n[j].startsWith('@'))
                     continue
-                console.log('user: ' + n[j] + ' gets perms: ' + p)
-                perms.push({user: n[j], perms: p})
+                console.log('user: ' + (n[j] || 'everyone') + ' gets perms: ' + p)
+                perms.push({user: (n[j] || 'everyone'), perms: p})
 
                 if(n[j] && !usrsConf.filter((u) => u.name === n[j])[0])
                     usrsConf.push({name: n[j], pw: ''})
