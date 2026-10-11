@@ -31,6 +31,7 @@ self.addEventListener("fetch", (event) => {
                 // store in cache for retrieval in up2k.js.
                 const cache = await caches.open('/media');
                 for(var i = 0; i < files.length; i++){
+                    console.log("storing file" + i)
                     await cache.put('/shared-file-' + i, new Response(files[i]))
                     await cache.put('/shared-filename-' + i, new Response(files[i].name))
                 }
