@@ -34,8 +34,6 @@ self.addEventListener("fetch", (event) => {
                 }
 
                 await cache.put('/shared-file-count', new Response(files.length))
-
-                return Response.redirect('/?share-target', 303);
             }
             catch(e){
                 console.log(e)
