@@ -5,6 +5,7 @@
 console.log('sw load')
 self.addEventListener("fetch", (event) => {
     // Regular requests not related to Web Share Target.
+    console.log(event.request.url)
     var [baseurl, query] = event.request.url.split('?');
     if (event.request.method !== "POST" || !query.match("share-target")) {
         var toplevel = baseurl == self.location.origin;
