@@ -308,6 +308,8 @@ class VHttpSrv(object):
         self.tdli = self.dli = {}
         self.nreq = 0
         self.nsus = 0
+        self.mutex = threading.Lock()
+        self.wopi_files = {}
 
         aliases = ["splash", "shares", "browser", "browser2", "msg", "md", "mde"]
         self.j2 = {x: J2_FILES for x in aliases}

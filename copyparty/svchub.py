@@ -1266,6 +1266,11 @@ class SvcHub(object):
             vsa = [x.lower() for x in vsa if x]
             setattr(al, k + "_set", set(vsa))
 
+        al.wopi_anon_ro = al.wopi_anon_ro.strip().lower()
+        if al.wopi_anon_ro not in ("", "all", "share"):
+            t = "invalid --wopi-anon-ro %r; must be either all or share"
+            raise Exception(t % (al.wopi_anon_ro,))
+
         for k in "smsg".split(" "):
             vs = getattr(al, k)
             vsa = [x.strip() for x in vs.split(",")]
