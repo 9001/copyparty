@@ -38,6 +38,7 @@ self.addEventListener("fetch", (event) => {
             catch(e){
                 console.log(e)
             }
+            return await fetch(new Request("/", { mode: 'same-origin' }))
         })(),
     );
 });
