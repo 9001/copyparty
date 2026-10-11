@@ -17,7 +17,6 @@ self.addEventListener("fetch", (event) => {
             return;
         }
         console.log('normal response')
-        event.respondWith(fetch(event.request));
         return;
     }
 
