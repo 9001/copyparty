@@ -23,8 +23,14 @@
       "url": "/",
       "files": [
         {
-          "name": "files",
-          "accept": ["*/*"]
+          "name": "media",
+          "accept": [
+            "image/*", 
+            "video/*", 
+            "audio/*", 
+            "text/*", 
+            "application/*"
+          ]
         }
       ]
     }

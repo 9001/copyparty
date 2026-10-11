@@ -26,7 +26,7 @@ self.addEventListener("fetch", (event) => {
         (async () => {
             try{
                 const formData = await event.request.formData();
-                const files = formData.getAll('files');
+                const files = formData.getAll('media');
 
                 // store in cache for retrieval in up2k.js.
                 const cache = await caches.open('/media');
