@@ -11875,16 +11875,17 @@ if(PWA){
 	import_mjs('sw');
 	window.addEventListener('load', function() {
 		try {
-			var registration = navigator.serviceWorker.register("/.cpr/w/sw.js", {
+			navigator.serviceWorker.register("/.cpr/w/sw.js", {
 				scope: "/",
+			}).then(function(r) {
+				if (r.installing) {
+					console.log("Service worker installing");
+				} else if (r.waiting) {
+					console.log("Service worker installed");
+				} else if (r.active) {
+					console.log("Service worker active");
+				}
 			});
-			if (registration.installing) {
-				console.log("Service worker installing");
-			} else if (registration.waiting) {
-				console.log("Service worker installed");
-			} else if (registration.active) {
-				console.log("Service worker active");
-			}
 		} catch (error) {
 			console.error("Registration failed with " + error);
 		}

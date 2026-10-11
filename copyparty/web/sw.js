@@ -28,8 +28,6 @@ self.addEventListener("fetch", (event) => {
                 const files = formData.getAll('files');
 
                 // store in cache for retrieval in up2k.js.
-                // leading "/" is necessary, because cache 
-                // operates relative to path of current file
                 const cache = await caches.open('/media');
                 for(var i = 0; i < files.length; i++){
                     await cache.put('/shared-file-' + i, new Response(files[i]))
