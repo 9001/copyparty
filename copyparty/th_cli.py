@@ -102,7 +102,9 @@ class ThumbCli(object):
                 ):
                     sfmt = "j"
 
-            if sfmt == "x" and not self.can_jxl:
+            if sfmt == "x" and (
+                not self.can_jxl or (not H_PIL_JXL and ext in self.fmt_raw)
+            ):
                 sfmt = "w"
 
             vf_crop = dbv.flags["crop"]
