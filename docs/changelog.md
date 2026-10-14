@@ -1,4 +1,78 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-1006-0035  `v1.20.25`  SECURITY: shadowing on windows/mac
+
+## ⚠️ ATTN: this release mitigates a Windows/MacOS-specific issue with shadowing
+
+[GHSA-3c88-p299-7hvr](https://github.com/9001/copyparty/security/advisories/GHSA-3c88-p299-7hvr): due to windows/macos having case-insensitive (casefolding) filesystems, [shadowing](https://github.com/9001/copyparty/#shadowing) is not bulletproof, even with this fix
+
+## 🧪 new features
+
+* #1498 [--acao-re](https://copyparty.eu/cli/#g-acao-re) for allowing cross-domain access with more complex rules ab2299e3
+* #1652 [redup](https://copyparty.eu/cli/#redup-help-page): detect and skip hardlinks / reflinks which are already optimally deduplicated 08093578
+* [--sftp-fastldr](https://copyparty.eu/cli/#g-sftp-fastldr) to improve startup time on extremely old hardware 186cbf93
+* [--sftp-chattr](https://copyparty.eu/cli/#g-sftp-chattr) to restrict chattr to certain properties e59fc05e
+
+## 🩹 bugfixes
+
+* GHSA-3c88-p299-7hvr e8de4211
+  * for further context, torvalds has some [technically accurate and colourful opinions](https://lore.kernel.org/lkml/CAHk-=wjajMJyoTv2KZdpVRoPn0LFZ94Loci37WLVXmMxDbLOjg@mail.gmail.com/) (nsfw) on how casefolding filesystems are an ongoing mistake
+  * on a more serious note, [the readme was updated](https://github.com/9001/copyparty/#shadowing)
+* fix uploads struggling to resume from a network glitch if the server filesystem is FAT32 or exFAT 23e00c0a 731dbbff
+* #1647 shares: fix cleanup of single-file shares when manually deleted before expiration (thx @willie6666!) f445bfa8
+* #1660 ban-pw now more aggressive on failed basic-auth (thx @PAStheLoD!) 5e0a88e3
+* #1656 webdav: return 404 instead of 400 when file didn't exist 74b17374
+* fix navigating to an index.html webroot (thx @tilse!) 334dccc5
+* fix IP-address detection on Windows XP 107dec9e
+
+## 🔧 other changes
+
+* #1658 constant-time verification of filekeys/dirkeys (thx @rozbb!) a31870cb
+* prevent enabling the smb server unless `--hack-me-bro` is also enabled because the smb-server was intentionally made super-insecure so it would work with ancient outdated equipment in emergencies and should never be used otherwise 1341b342
+* now possible to upload [09. t+pazolite - I still think about y%#'()_*{\\"'&36)%("'$&''&(15y!!!_??*`~.flac](https://www.youtube.com/watch?v=btPU_rluFSE) (dont click that link on acid) 28f9f6f0 64f574fe
+
+## 🌠 fun facts
+
+* [thx t+paz](https://a.ocv.me/pub/g/2026/10/Screenshot_20261002-221751_1.png?cache)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-0919-2133  `v1.20.24`  redup
+
+## 🧪 new features
+
+* new option [--redup](https://copyparty.eu/cli/#g-redup) (global or volflag) to convert local files between various dedup approaches fd4f4341 22915902 16a3f5d5
+  * turn full copies into reflinks/symlinks/hardlinks or convert between those
+  * run it with `--redup-dry` (dryrun) to check for unexpected consequences
+  * WARNING: maybe take a snapshot of your filesystem before enabling this; brand new code with little testing, read [--help-redup](https://copyparty.eu/cli/#redup-help-page) and use with care
+    * seems fine for converting between symlinks and reflinks, probably hardlinks too
+* #1643 textfile-viewer can detect filetype from shebang (thx @botahamec!) 097b8305
+* when dedup with [reflink](https://copyparty.eu/cli/#g-reflink) is enabled, then also dedup between volumes when possible (since reflink makes that safe) 735d6e00 5ddbce31
+* option [-i no](https://copyparty.eu/cli/#bind-help-page) to launch copyparty without the webserver, for indexing / testing / whatever c92435c2
+
+## 🩹 bugfixes
+
+* if `--dedup` was enabled, then copying a file from one volume to another could dedup (create a symlink/hardlink/reflink) instead of a full copy 947d73ee
+  * mainly an issue for portable storage such as flashdrives, and the main reason why `--redup` was added
+* the list of filenames given as input to xiu hooks did not have a trailing newline c688bb2e
+* #1611 volflag `nosub` would still result in empty folders from up2k ec4a95e1
+* fix `PRTY_NO_IFADDR` 6867ccc5
+
+## 🔧 other changes
+
+* iOS: further improved upload-speeds on buggy iOS versions 971a62cc
+  * looks like apple is working on fixing this bug; iOS v27 made https way more stable but http is still just as broken, so improved the workaround a bit more
+* added [--help-dedup](https://copyparty.eu/cli/#dedup-help-page) and [--help-redup](https://copyparty.eu/cli/#redup-help-page) 22915902 16a3f5d5
+* add a warning that the sourceforge project is not official and probably malware bfc3cff8
+
+## 🌠 fun facts
+
+* the [railgun roulette vip-mix](https://www.youtube.com/watch?v=mv9BmrzkiJc) has the same bpm as the [turn-signal on a honda jazz](https://a.ocv.me/pub/stuff/music/railgun-roulette-honda-remix.opus)
+  * on that note, [this fantasy-OPNA remake](https://www.youtube.com/watch?v=hv2hr8aPBMU) is too awesome to leave out
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-0906-2249  `v1.20.23`  rcm once again
 
 ## 🩹 bugfixes
