@@ -3413,19 +3413,24 @@ class AuthSrv(object):
         while nodes:
             vn = nodes.pop()
             nodes += list(vn.nodes.values())
-            if not vn.realpath:
+            if (
+                not vn.realpath
+                or "bcasechk" not in vn.flags
+                or (not vn.axs.uread and not vn.axs.uwrite and not vn.axs.uget)
+            ):
                 continue
-            if "bcasechk" in vn.flags:
-                if ".hist" in vn.nodes and "e2d" in vn.flags:
-                    zb1 = True
-                if vn.nodes and (len(vn.nodes) > 1 or ".hist" not in vn.nodes):
+            if ".hist" in vn.nodes and "e2d" in vn.flags:
+                zb1 = True
+            for zs, vnn in vn.nodes.items():
+                if zs != ".hist" and (vnn.realpath or "").startswith(vn.realpath):
+                    t = "nested volume on casefolding filesystem: [/%s] inside [/%s]"
+                    self.log(t % (vnn.vpath, vn.vpath), 3)
                     zb2 = True
-                if PY2:
-                    continue
-                vn.lnodes = {
-                    k.casefold().encode("ascii", "ignore"): v
-                    for k, v in vn.nodes.items()
-                }
+            if PY2:
+                continue
+            vn.lnodes = {
+                k.casefold().encode("ascii", "ignore"): v for k, v in vn.nodes.items()
+            }
         if zb2 and PY2:
             t = "SECURITY WARNING: due to python2, shadowing will NOT provide much security:"
             self.log(t, 1)
