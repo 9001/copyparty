@@ -470,6 +470,7 @@ class VFS(object):
             self.canonical = self._canonical_null
             self.dcanonical = self._dcanonical_null
 
+        self.get = self._get
         self.get_dbv = self._get_dbv
         self.ls = self._ls
 
@@ -603,7 +604,7 @@ class VFS(object):
             ret += "A"
         return ret
 
-    def get(
+    def _get(
         self,
         vpath: str,
         uname: str,
@@ -643,6 +644,42 @@ class VFS(object):
                 t = "you don't have %s-access in %r or below %r"
                 raise Pebkac(err, t % (msg, "/" + cvpath, "/" + vn.vpath))
 
+        return vn, rem
+
+    def _get_xvd(
+        self,
+        vpath: str,
+        uname: str,
+        will_read: bool,
+        will_write: bool,
+        will_move: bool = False,
+        will_del: bool = False,
+        will_get: bool = False,
+        err: int = 403,
+    ) -> tuple["VFS", str]:
+        zvr = self._get(
+            vpath, uname, will_read, will_write, will_move, will_del, will_get, err
+        )
+        if not zvr:
+            return None
+        vn, rem = zvr
+        if "xvd" in vn.flags and vn.realpath:
+            avn = vn.chk_ap(vn.canonical(rem))
+            if avn and avn.vpath == vn.vpath:
+                return vn, rem
+            if (
+                not avn
+                or (will_read and uname not in avn.axs.uread)
+                or (will_write and uname not in avn.axs.uwrite)
+                or (will_move and uname not in avn.axs.umove)
+                or (will_del and uname not in avn.axs.udel)
+                or (will_get and uname not in avn.axs.uget)
+            ):
+                if not err:
+                    return None
+                raise Pebkac(
+                    err, "permission denied for [/%s]" % (vjoin(vn.vpath, rem))
+                )
         return vn, rem
 
     def _get_share_src(self, vrem: str) -> tuple["VFS", str]:
@@ -870,12 +907,16 @@ class VFS(object):
                 self.log("vfs.walk", t % (seen[-1], fsroot, self.vpath, rem), 3)
             return
 
-        if "xdev" in self.flags or "xvol" in self.flags:
+        if "xvd" in self.flags:
+            ps = (permsets[0] + [False] * 5)[:5]  # rwmdg
             rm1 = []
             for le in vfs_ls:
                 ap = absreal(os.path.join(fsroot, le[0]))
                 vn2 = self.chk_ap(ap)
-                if not vn2 or not vn2.get("", uname, True, False, err=0):
+                try:
+                    if not vn2.get("", uname, *ps):
+                        raise Exception()
+                except:
                     rm1.append(le)
             _ = [vfs_ls.remove(x) for x in rm1]  # type: ignore
 
@@ -2978,6 +3019,12 @@ class AuthSrv(object):
             vol.flags["srch_re_dots"] = re.compile("|".join(excl or ["^$"]))
             excl.extend([r"^\.", r"/\."])
             vol.flags["srch_re_nodot"] = re.compile("|".join(excl))
+
+        for vol in list(vfs.all_nodes.values()):
+            if "xvd" in vol.flags:
+                for vol in vfs.all_nodes.values():
+                    vol.get = vol._get_xvd
+                break
 
         have_daw = False
         for vol in vfs.all_nodes.values():

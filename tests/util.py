@@ -163,7 +163,7 @@ class Cfg(Namespace):
         ex = "ac_convt au_vol dl_list du_iwho mcr mtab_age reg_cap s_thead s_tbody tail_tmax tail_who th_convt th_qv th_qvx ups_who ver_iwho zip_who"
         ka.update(**{k: 9 for k in ex.split()})
 
-        ex = "ctl_re db_act forget_ip gauto idp_cookie idp_store k304 loris md_nhist no304 nosubtle qr_pin qr_wait re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri tftp theme themes turbo u2ow zipmaxn zipmaxs"
+        ex = "ctl_re dav_port db_act forget_ip gauto idp_cookie idp_store k304 loris md_nhist no304 nosubtle qr_pin qr_wait re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri tftp theme themes turbo u2ow zipmaxn zipmaxs"
         ka.update(**{k: 0 for k in ex.split()})
 
         ex = "ah_alg bname chdir chmod_f chpw_db csp_dl csp_ui db_xattr doctitle df epilogues exit favico fika ipa ipar html_head html_head_d html_head_s idp_login idp_logout lg_sba lg_sbf log_date log_fk md_sba md_sbf name og_desc og_site og_th og_title og_title_a og_title_v og_title_i opds_exts preadmes prologues readmes redup shr shr1 shr_site site smsg tcolor textfiles th_pregen txt_eol ufavico ufavico_h unlist up_site vc_url vname xff_src zipmaxt R RS SR"
@@ -172,7 +172,7 @@ class Cfg(Namespace):
         ex = "apnd_who ban_403 ban_404 ban_422 ban_pw ban_pwc ban_url dont_ban cachectl http_vary rcm rss_fmt_d rss_fmt_t spinner"
         ka.update(**{k: "no" for k in ex.split()})
 
-        ex = "ext_th grp idp_h_usr idp_hm_usr ipr on403 on404 qr_file xac xad xar xau xban xbc xbd xbr xbu xiu xm"
+        ex = "ext_th grp idp_h_usr idp_hm_usr ipr on403 on404 p_nodav qr_file xac xad xar xau xban xbc xbd xbr xbu xiu xm"
         ka.update(**{k: [] for k in ex.split()})
 
         ex = "exp_lg exp_md"
@@ -227,6 +227,7 @@ class Cfg(Namespace):
             th_crop="y",
             th_size="320x256",
             th_x3="n",
+            ua_nodav=re.compile("\n"),
             u2sort="s",
             u2ts="c",
             ui_filesz="1",

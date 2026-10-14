@@ -1805,11 +1805,16 @@ avoid traversing into other filesystems  using `--xdev` / volflag `:c,xdev`, ski
 
 and/or you can `--xvol` / `:c,xvol` to ignore all symlinks leaving the volume's top directory, but still allow bind-mounts pointing elsewhere
 
-* symlinks are permitted with `xvol` if they point into another volume where the user also has some sort of access, keeping permissions from outer/initial volume
+* symlinks are permitted with `xvol` if they point into another volume where the user also has some sort of access
+  * usually keeps permissions from outer/initial volume, but don't take that for granted
 
-these options will reduce performance; unlikely worst-case estimates are 14% reduction for directory listings, 35% for download-as-tar
+these options will reduce performance; unlikely worst-case estimates are 27% reduction for directory listings, 35% for download-as-tar
+
+* if the underlying storage is [a network disk](#using-the-cloud-as-storage) then xvol/xdev will be **very** slow (not to mention pointless/useless)
 
 as of copyparty v1.7.0 these options also prevent file access at runtime -- in previous versions it was just hints for the indexer
+
+> **WARNING:** the `xvol` and `xdev` options should NOT be relied on for security; these are originally and primarily intended for the [e2ds indexer](#file-indexing). Certain underlying filesystems (especially FUSE-based and casefolding ones) will be problematic, and symlinks inherently have various TOCTOUs, and there's probably also bugs in copyparty where xvol/xdev is not fully enforced for certain APIs. The developer does not care about these options and they do not receive much testing.
 
 ### periodic rescan
 

@@ -469,6 +469,8 @@ IMPLICATIONS = [
     ["smbvvv", "smbvv"],
     ["smbvv", "smbv"],
     ["smbv", "smb"],
+    ["xdev", "xvd"],
+    ["xvol", "xvd"],
     ["zv", "zmv"],
     ["zv", "zsv"],
     ["z", "zm"],
