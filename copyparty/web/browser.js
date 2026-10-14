@@ -4096,7 +4096,7 @@ var fileman = (function () {
 		if (wr)
 			html.push('<a href="#" class="btn">write-only</a>');
 
-		html.push('</td></tr></div');
+		html.push('</td></tr><table></div>');
 		shui.innerHTML = html.join('\n');
 
 		var sh_rand = ebi('sh_rand'),
