@@ -2545,4 +2545,19 @@ var MouseEvent = MouseEvent ? MouseEvent : function (eventType, e) {
 	return mouseEvent;
 };
 
+function cumulativeOffset(e) {
+    var top = 0, left = 0;
+    do {
+        top += e.offsetTop  || 0;
+        left += e.offsetLeft || 0;
+        e = e.offsetParent;
+    } while(e);
+
+    return {
+        top: top,
+        left: left
+    };
+};
+
+
 J_UTL = 2;

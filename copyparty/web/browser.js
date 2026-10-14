@@ -5131,8 +5131,8 @@ var fileman = (function () {
 				html.push(
 					'<tr><td>' +
 					(cheap ? '</td>' :
-						'<button class="rn_dec" id="rn_dec_' + a + '">decode</button>' +
-						'<button class="rn_reset" id="rn_reset_' + a + '">' + t_rst + '</button></td>') +
+						'<a class="rn_dec btn" id="rn_dec_' + a + '">decode</a>' +
+						'<a class="rn_reset btn" id="rn_reset_' + a + '">' + t_rst + '</a></td>') +
 					'<td><input type="text" id="rn_new_' + a + '" /></td>' +
 					'<td><input type="text" id="rn_old_' + a + '" readonly /></td></tr>');
 		}
@@ -7987,6 +7987,7 @@ function placerenameoverlay(){
 			rno.style.left = t.offsetLeft + ff + 'px';
 			rno.style.minHeight = t.offsetHeight + 'px';
 			rno.style.width = t.offsetWidth + 'px';
+			clmod(rno, 'left', cumulativeOffset(t).left + t.offsetWidth + ebi('rn_more').offsetWidth * 1.25 > window.innerWidth);
 			if(!thegrid.en){
 				var tb = ebi('rn_new_0');
 				var fn = getComputedStyle(ebi(rno.getAttribute('rnref')));

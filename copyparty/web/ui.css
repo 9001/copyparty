@@ -496,6 +496,7 @@ html:not(.fy) #modalb a:hover {
 }
 input, button {
 	font-family: var(--font-main), sans-serif;
+	font-size: medium;
 }
 input[type="submit"] {
 	cursor: pointer;

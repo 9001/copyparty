@@ -810,7 +810,7 @@ input[type=submit]:hover,
 #goh:hover,
 a:hover {
 	color: var(--a-hil);
-	background: var(--a-h-bg);
+	/* background: var(--a-h-bg); */
 }
 #files .imgcontainer:hover,
 #files a:not(.btn):hover {
@@ -2132,9 +2132,9 @@ span[role=textbox]{
 }
 span[role=textbox],
 #pathBar input[type=text],
-.opview select,
+select,
 .opview input[type=number],
-.opview input[type=text],
+input[type=text],
 .opview input[type=color],
 .opview input[type=date] {
 	color: #fff;
@@ -2186,7 +2186,7 @@ html.dz input {
 	cursor: pointer;
 }
 .opview input.i {
-	width: calc(100% - 12em);
+	width: calc(100% - 14em);
 }
 input.eq_gain[type=range]{
 	writing-mode: vertical-lr;
@@ -2870,9 +2870,11 @@ input[type="text"].invalid {
 }
 #rn_f.m td:first-child {
 	white-space: nowrap;
+	padding-right: 1em;
 }
 #rn_f.m td+td {
 	width: 50%;
+	padding-right: .5em;
 }
 #rn_f .err td,
 #rn_f .err input[readonly],
@@ -2885,6 +2887,8 @@ input[type="text"].invalid {
 	background: var(--bg-u5);
 	border: 1px solid rgba(255,255,255,0.2);
 	padding: .2em .25em;
+	border-radius: var(--radius);
+	font-size: medium;
 }
 #rui h1 {
 	margin: 0 0 .3em 0;
@@ -2911,6 +2915,14 @@ input[type="text"].invalid {
   	border-bottom-left-radius: 0;
 	outline: var(--a) solid .1em;
 	outline-offset: -.1em;
+}
+#rn_overlay.left{
+	border-radius: 0 var(--radius) var(--radius) 0;
+}
+#rn_overlay.left #rn_more{
+	border-radius: var(--radius) 0 0 var(--radius);
+	left: auto;
+	right: 100%;
 }
 #ggrid #rn_overlay {
 	text-align: center;
