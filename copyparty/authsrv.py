@@ -807,6 +807,32 @@ class VFS(object):
         real = [x for x in real if os.path.basename(x[0]) in self.shr_files]
         return abspath, real, {}
 
+    def _ls_xvd(
+        self,
+        rem: str,
+        uname: str,
+        scandir: bool,
+        permsets: list[list[bool]],
+        lstat: bool = False,
+        throw: bool = False,
+    ) -> tuple[str, list[tuple[str, os.stat_result]], dict[str, "VFS"]]:
+        dirpath, real0, virt_vis = self._ls(rem, uname, scandir, permsets, True, throw)
+        lns = [x for x in real0 if stat.S_ISLNK(x[1].st_mode)]
+        if not lns:
+            return dirpath, real0, virt_vis
+        real = [x for x in real0 if not stat.S_ISLNK(x[1].st_mode)]
+        ps = (permsets[0] + [False] * 5)[:5]  # rwmdg
+        for fn, _ in lns:
+            ap = absreal(os.path.join(dirpath, fn))
+            vn = self.chk_ap(ap)
+            try:
+                if vn.get("", uname, *ps):
+                    real.append((fn, bos.stat(ap)))
+            except:
+                pass
+        real.sort()
+        return dirpath, real, virt_vis
+
     def _ls(
         self,
         rem: str,
@@ -3024,6 +3050,8 @@ class AuthSrv(object):
             if "xvd" in vol.flags:
                 for vol in vfs.all_nodes.values():
                     vol.get = vol._get_xvd
+                    if vol.ls.__name__ == "_ls":
+                        vol.ls = vol._ls_xvd
                 break
 
         have_daw = False
