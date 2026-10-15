@@ -176,6 +176,9 @@ RSS_SORT = {"m": "mt", "u": "at", "n": "fn", "s": "sz"}
 ACODE2_FMT = set(["opus", "owa", "caf", "mp3", "flac", "wav"])
 IDX_HTML = set(["index.htm", "index.html"])
 
+UNAME_NOT_AUTHED = "*"
+UNAME_PREFIX_PROTECTED_SHARE = "s_"
+
 # coolwsd-26.04.2.3 discovery editnew; browser.js wopi_set is superset of this
 WOPI_NEW = (
     ".odt",
@@ -851,8 +854,9 @@ class HttpCli(object):
                     if wopi_f["expires"] < time.time():
                         raise Exception("expired")
                     uname = wopi_f["uname"]
+                    rw = wopi_f["rw"]
                     self.asrv.vfs.get(
-                        wopi_f["vp"], uname, True, True, False, self.args.wopi_wdel
+                        wopi_f["vp"], uname, True, rw, False, rw and self.args.wopi_wdel
                     )
                     vn, rem = self.asrv.vfs.get(
                         self.vpath, uname, True, True, False, self.args.wopi_wdel
@@ -1611,7 +1615,7 @@ class HttpCli(object):
             return self.tx_404()
         query = self.vpath[len(zs) :]
 
-        vfs, rem = self.asrv.vfs.get(session["vp"], self.uname, True, True)
+        vfs, rem = self.asrv.vfs.get(session["vp"], self.uname, True, session["rw"])
         vpath = vjoin(vfs.vpath, rem)
         ap = vfs.canonical(rem)
         if query.startswith("/contents"):
@@ -1624,7 +1628,8 @@ class HttpCli(object):
                 "OwnerId": self.uname,
                 "UserId": self.uname,
                 "UserFriendlyName": self.uname,
-                "UserCanWrite": True,
+                "UserCanWrite": session["rw"],
+                "ReadOnly": not session["rw"],
                 "UserCanNotWriteRelative": True,
                 "LastModifiedTime": time.strftime(
                     "%Y-%m-%dT%H:%M:%SZ", time.gmtime(st.st_mtime)
@@ -1638,10 +1643,23 @@ class HttpCli(object):
 
     def tx_wopi(self) -> bool:
         self.asrv.vfs.get("wopi", self.uname, True, True, False, self.args.wopi_wdel)
-        vpath = vjoin(self.vpath, self.uparam["wopi"])
-        vfs, rem = self.asrv.vfs.get(
-            vpath, self.uname, True, True, False, self.args.wopi_wdel
+        vpath = undot(vjoin(self.vpath, self.uparam["wopi"]))
+        zt = self.asrv.vfs.get(
+            vpath, self.uname, True, True, False, self.args.wopi_wdel, err=0
         )
+        rw = zt is not None
+        if not rw:
+            uname = self.uname
+            zt = self.asrv.vfs.get(vpath, uname, True, False)
+            if uname == UNAME_NOT_AUTHED or uname.startswith(
+                UNAME_PREFIX_PROTECTED_SHARE
+            ):
+                in_share = self.args.shr and zt[0].vpath.startswith(self.args.shr1)
+                anon_ro = self.args.wopi_anon_ro
+                if anon_ro != "all" and not (anon_ro == "share" and in_share):
+                    t = "you don't have permission to open this document in the office editor"
+                    raise Pebkac(403, t)
+        vfs, rem = zt
         if not bos.path.isfile(vfs.canonical(rem)):
             return self.tx_404()
 
@@ -1655,6 +1673,9 @@ class HttpCli(object):
                     rm.append(atoken)
                     continue
                 if session["vp"] != vpath or session["uname"] != self.uname:
+                    continue
+                # never hand out a session with different perms than the user has now
+                if session["rw"] != rw:
                     continue
                 if session["expires"] - now < self.args.wopi_ttl * 0.9:
                     rm.append(atoken)
@@ -1673,6 +1694,7 @@ class HttpCli(object):
                     "vp": vpath,
                     "uname": self.uname,
                     "file_id": file_id,
+                    "rw": rw,
                     "expires": time.time() + self.args.wopi_ttl,
                 }
 
@@ -1703,9 +1725,13 @@ class HttpCli(object):
             xml = buf.decode(enc, "replace")
             xroot = parse_xml(xml)
             ext = vpath.split(".")[-1]
-            url = xroot.find(
-                ".//action[@ext='%s'][@name='edit'][@urlsrc]" % (ext,)
-            ).get("urlsrc")
+            for zs in ("edit",) if rw else ("view", "edit"):
+                xact = xroot.find(
+                    ".//action[@ext='%s'][@name='%s'][@urlsrc]" % (ext, zs)
+                )
+                if xact is not None:
+                    break
+            url = xact.get("urlsrc")
             if not url.endswith(("?", "&")):
                 url += "&" if "?" in url else "?"
             url += "WOPISrc="
@@ -3594,7 +3620,13 @@ class HttpCli(object):
         if not self.vpath.startswith(zs):
             return self.tx_404()
 
-        vfs, rem = self.asrv.vfs.get(session["vp"], self.uname, False, True)
+        if not session["rw"]:
+            self.log("wopi: rejecting write with read-only session", 3)
+            return self.tx_404()
+
+        vfs, rem = self.asrv.vfs.get(
+            session["vp"], self.uname, False, True, False, self.args.wopi_wdel
+        )
         ap = vfs.canonical(rem)
         st = bos.stat(ap)
 
