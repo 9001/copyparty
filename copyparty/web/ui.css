@@ -498,7 +498,16 @@ input, button {
 	font-family: var(--font-main), sans-serif;
 	font-size: medium;
 }
+button,
 input[type="submit"] {
+	cursor: pointer;
+	border-radius: var(--radius);
+  	border: 1px solid var(--bg-u3);
+	padding: 4px 7px;
+	color: var(--fg);
+	background: color-mix(in oklab, var(--bg-u5), transparent);
+}
+input[type=file]{
 	cursor: pointer;
 }
 

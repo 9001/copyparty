@@ -3453,6 +3453,9 @@ html.c .modalcontent {
 .winbtn {
 	right: 2.3em;
 }
+.unmodal .winbtn {
+	right: 0;
+}
 .winbtn span {
 	font-family: initial;
 	font-size: small;
