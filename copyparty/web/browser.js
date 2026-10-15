@@ -9338,11 +9338,14 @@ function apply_perms(res) {
 	clmod(ebi('up_quick'), 'disabled', !has(perms, 'write'));
 	ebi('bup_tgl').style.display = has(perms, 'write') ? '' : 'none';
 
-	var o = QSA('#ops>a[data-dep], #u2conf div[data-dep]');
-	for (var a = 0; a < o.length; a++)
+	var o = QSA('*[data-dep]');
+	for (var a = 0; a < o.length; a++){
 		o[a].style.display = (
 			o[a].getAttribute('data-dep') != 'idx' || have_up2k_idx
 		) ? '' : 'none';
+		if(o[a].parentNode && clgot(o[a].parentNode, 'setting'))
+			o[a].parentNode.style.display = o[a].style.display;
+	}
 
 	if (in_shr)
 		ebi('opa_srch').style.display = 'none';
