@@ -5,7 +5,7 @@ Ls.swe = {
 	"tt": "Svenska",
 
 	"cols": {
-		"c": "aktion",
+		"!": "aktion",
 		"dur": "längd",
 		"q": "kvalitet / bitrate",
 		"Ac": "ljudkodek",
@@ -14,7 +14,7 @@ Ls.swe = {
 		"Ahash": "ljudchecksumma",
 		"Vhash": "videochecksumma",
 		"Res": "upplösning",
-		"T": "filtyp",
+		"Ext": "filtyp",
 		"aq": "ljudkvalitet / bitrate",
 		"vq": "videokvalitet / bitrate",
 		"pixfmt": "subsampling / pixelstruktur",
@@ -33,7 +33,7 @@ Ls.swe = {
 			["G", "växla mellan listvy / rutnät"],
 			["T", "växla mellan miniatyrer / ikoner"],
 			["⇧ A/D", "miniatyrstorlek"],
-			["ctrl-K", "radera urval"],
+			["ctrl-K/Del", "radera urval"],
 			["ctrl-X", "klipp urval till urklipp"],
 			["ctrl-C", "kopiera urval till urklipp"],
 			["ctrl-V", "klistra in (kopiera/flytta) hit"],
@@ -108,9 +108,9 @@ Ls.swe = {
 	"ht_and": " och ",
 
 	"goh": "kontrollpanel",
-	"gop": 'föregående mapp">föreg.',
-	"gou": 'överordnad mapp">upp',
-	"gon": 'nästa mapp">nästa',
+	"gop": 'föregående mapp',
+	"gou": 'överordnad mapp',
+	"gon": 'nästa mapp',
 	"logout": "Logga ut ",
 	"login": "Logga in", //m
 	"access": "-rättighet",
@@ -158,7 +158,7 @@ Ls.swe = {
 	"ut_u2ts": "bevara tidsstämpeln för senaste ändring$Nfrån ditt filsystem till servern\">📅",
 	"ut_ow": "skriv över existerande filer på servern?$N🛡️: aldrig (skapar ett nytt filnamn istället)$N🕒: skriv över om serverns fil är äldre än din$N♻️: skriv alltid över om filerna skiljer sig$N⏭️: hoppa ovillkorligen över alla befintliga filer", //m
 	"ut_mt": "fortsätt hasha filer under uppladdningens gång$N$Nstäng av om din CPU eller disk är en flaskhals",
-	"ut_ask": 'bekräfta innan uppladdningar påbörjas">💭',
+	"ut_ask": 'bekräfta innan uppladdningar påbörjas',
 	"ut_pot": "förbättra uppladdningshastigheten på långsamma enheter$Ngenom att förenkla användargränssnittet",
 	"ut_srch": "ladda inte upp; kolla istället om filerna redan existerar på $N servern (detta kommer att skanna alla mappar med läsrättighet)",
 	"ut_par": "du kan pausa all uppladdning genom att sätta detta till 0$N$Nöka denna om din uppkoppling är långsam eller har hög latens$N$Nsätt till 1 över lokala nätverk eller om serverns disk är en flaskhals",
@@ -226,7 +226,7 @@ Ls.swe = {
 
 	"ct_grid": '田 rutnätet',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ tips',
-	"ct_thumb": 'växla mellan miniatyrer och ikoner i rutnätsvyn$NSnabbtangent: T">🖼️ miniatyrer',
+	"ct_thumb": 'växla mellan miniatyrer och ikoner$NSnabbtangent: T">🖼️ miniatyrer',
 	"ct_csel": 'använd CTRL och SKIFT för urval av filer i rutnätsvyn">val',
 	"ct_dsel": 'använd dra-urval i rutnätsvyn">dra', //m
 	"ct_dl": 'tvinga nedladdning (visa inte inline) när en fil klickas">dl', //m
@@ -289,9 +289,9 @@ Ls.swe = {
 	"ml_drc": "dynamikkompressor",
 	"ml_ss": "hoppa över tystnad", //m
 
-	"mt_loop": "upprepa en låt\">🔁",
+	"mt_loop": "upprepa en låt",
 	"mt_one": "stoppa uppspelningen efter en låt\">1️⃣",
-	"mt_shuf": "blanda låtarna i varje mapp\">🔀",
+	"mt_shuf": "blanda låtarna i varje mapp",
 	"mt_aplay": "spela automatiskt om det finns en låt-ID i länkar du har klickat på för att öppna sidan$N$Nom detta är avstängt kommer sidans adress inte att bli uppdaterad med en låt-ID om du spelar musik, för att förhindra automatisk uppspelning om dessa inställningar går förlorade men webbadressen återstår\">a▶",
 	"mt_preload": "påbörja nedladdning av nästa låt i förväg för gapfri uppspelning\">ladda",
 	"mt_prescan": "hoppa till nästa mapp i förväg så att webbläsaren$Nförblir glad och inte avbryter uppspelningen\">nav",
@@ -306,8 +306,8 @@ Ls.swe = {
 	"mt_follow": "skrolla vyn till den spelande låten\">🎯",
 	"mt_compact": "kompakt kontrollpanel\">⟎",
 	"mt_uncache": "rensa cachen &nbsp;(prova detta om din webbläsare har cachat$Nen trasig kopia av en låt och den vägrar spela upp den)\">rensa",
-	"mt_mloop": "upprepa den öppna mappen\">🔁 upprepa",
-	"mt_mnext": "ladda nästa mapp och fortsätt\">📂 nästa",
+	"mt_mloop": "upprepa den öppna mappen",
+	"mt_mnext": "ladda nästa mapp och fortsätt",
 	"mt_mstop": "stoppa uppspelningen\">⏸ stopp",
 	"mt_cflac": "konvertera flac / wav till {0}\">flac",
 	"mt_caac": "konvertera aac / m4a till {0}\">aac",
