@@ -159,6 +159,7 @@ if (1)
 		"wt_prev": "previous track$NHotkey: J",
 		"wt_play": "play / pause$NHotkey: P",
 		"wt_next": "next track$NHotkey: L",
+		"wt_slpn": "shuffle / loop / play next track", // i don't know `hotkey` :D
 
 		"ul_par": "parallel uploads:",
 		"ut_rand": "randomize filenames",
@@ -830,7 +831,7 @@ ebi('widget').innerHTML = (
 	' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
 	' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
 	'</span><span id="wzip1"><a' +
-	' href="#" id="zip1" tt="' + L.wt_zip1 + '">📦<span>zip</span></a>' +
+	' href="#" id="zip1" tt="' + L.wt_zip1 + '">📦</a>' +
 	'</span><span id="wzip"><a' +
 	' href="#" id="selall" tt="' + L.wt_selall + '">sel.<br />all</a><a' +
 	' href="#" id="selinv" tt="' + L.wt_selinv + '">sel.<br />inv.</a><a' +
@@ -843,12 +844,13 @@ ebi('widget').innerHTML = (
 	' href="#" id="m3ua" tt="' + L.wt_m3ua + '">📻<span>add</span></a><a' +
 	' href="#" id="m3uc" tt="' + L.wt_m3uc + '">📻<span>copy</span></a>' +
 	'</span><a' +
-	'	href="#" id="wtgrid" tt="' + L.wt_grid + '">田</a><a' +
+	'	href="#" id="wtgrid" tt="' + L.wt_grid + '">⣿⣿</a><a' +
 	'	href="#" id="wtico">♫</a>' +
 	'</div>' +
 	'<div id="widgeti">' +
 	'	<div id="pctl"><a href="#" id="bprev" tt="' + L.wt_prev + '">⏮</a><a href="#" id="bplay" tt="' + L.wt_play + '">▶</a><a href="#" id="bnext" tt="' + L.wt_next + '">⏭</a></div>' +
 	'	<canvas id="pvol" width="288" height="38"></canvas>' +
+	'	<a href="#" id="slpn" tt="' + L.wt_slpn + '" data-mode="0">➡</a>' +
 	'	<canvas id="barpos"></canvas>' +
 	'	<canvas id="barbuf"></canvas>' +
 	'</div>' +
@@ -2481,25 +2483,20 @@ function song_skip(n, dirskip) {
 }
 function next_song(e) {
 	ev(e);
-	if (QS('.dumb_loader_thing')) {
-		treectl.ls_cb = next_song;
-		return;
-	}
-	if (mp.order.length) {
-		var dirskip = mpl.traversals;
-		mpl.traversals = 0;
-		return song_skip(1, dirskip);
-	}
-	if (mpl.traversals++ < 5) {
-		treectl.ls_cb = next_song;
-		return tree_neigh(1);
-	}
-	toast.inf(10, L.mm_nof);
-	console.log("mm_nof2");
-	mpl.traversals = 0;
+	return nxt_au_md();
 }
 function last_song(e) {
 	ev(e);
+	var mode = slpn_md();
+	if (mode === 'loop') {
+		return replay_curr_trk();
+	}
+	if (mode === 'shuffle') {
+		var tid = rnd_lcl_trk(mp && mp.au ? mp.au.tid : null);
+		if (tid)
+			return play(tid);
+		return;
+	}
 	if (mp.order.length) {
 		mpl.traversals = 0;
 		return song_skip(-1, true);
@@ -2514,7 +2511,18 @@ function last_song(e) {
 }
 function prev_song(e) {
 	ev(e);
-
+	var mode = slpn_md();
+	// loop: restart current file
+	if (mode === 'loop')
+		return replay_curr_trk();
+	// shuffle: stay in current directory only, not traversing tree
+	if (mode === 'shuffle') {
+		var tid = rnd_lcl_trk(mp && mp.au ? mp.au.tid : null);
+		if (tid)
+			return play(tid);
+		return;
+	}
+	// normal mode behavior
 	if (mp.au && !mp.au.paused && mp.au.currentTime > 3)
 		return seek_au_sec(0);
 
@@ -2684,7 +2692,7 @@ var mpui = (function () {
 		}
 
 		// preload next song
-		if (!mpl.one && mpl.preload && preloaded != mp.au.rsrc) {
+		if (slpn_md() == 'next' && !mpl.one && mpl.preload && preloaded != mp.au.rsrc) {
 			var len = mp.au.duration,
 				rem = pos > 1 ? len - pos : 999,
 				full = null;
@@ -3400,13 +3408,17 @@ function scroll2playing() {
 
 
 function evau_end(e) {
-	if (mpl.one)
-		return;
-	if (!mpl.loop)
-		return next_song(e);
-	ev(e);
-	mp.au.currentTime = 0;
-	mp.au.play();
+	var mode = slpn_md();
+	if (mode === 'loop') {
+		if (replay_curr_trk())
+			return;
+	}
+	if (mode === 'shuffle') {
+		var tid = rnd_lcl_trk(mp && mp.au ? mp.au.tid : null);
+		if (tid)
+			return play(tid);
+	}
+	return nxt_au_md();
 }
 
 
@@ -10297,3 +10309,115 @@ var mpss = (function() {
 treectl.hydrate();
 
 J_BRW = 2;
+
+// shuffle, loop, play next
+var slpn_modes = [
+	{ icon: '➡', mode: 'next' },
+	{ icon: '🔀', mode: 'shuffle' },
+	{ icon: '⟳', mode: 'loop' },
+];
+
+function slpn_md() {
+	return sread('slpn_mode', ['next', 'shuffle', 'loop']) || 'next';
+}
+
+function syc_slpn() {
+	var btn = ebi('slpn');
+	if (!btn)
+		return;
+	var mode = slpn_md();
+	var idx = 0;
+	for (var a = 0; a < slpn_modes.length; a++) {
+		if (slpn_modes[a].mode == mode) {
+			idx = a;
+			break;
+		}
+	}
+	btn.dataset.mode = String(idx);
+	btn.textContent = slpn_modes[idx].icon;
+}
+
+function set_slpn_md(mode_idx) {
+	mode_idx = ((mode_idx % slpn_modes.length) + slpn_modes.length) % slpn_modes.length;
+	var btn = ebi('slpn');
+	if (!btn)
+		return;
+	var mode = slpn_modes[mode_idx];
+	btn.dataset.mode = String(mode_idx);
+	btn.textContent = mode.icon;
+	btn.setAttribute('title', mode.mode);
+	swrite('slpn_mode', mode.mode);
+}
+
+function replay_curr_trk() {
+	if (!mp || !mp.au || !mp.au.tid)
+		return false;
+	var tid = mp.au.tid;
+	var idx = mp.order.indexOf(tid);
+	// if the current song is not in this order, fall back to first local track
+	if (idx < 0) {
+		if (!mp.order.length)
+			return false;
+		return play(mp.order[0]);
+	}
+	mp.au.currentTime = 0;
+	mp.au.play();
+	mpl.pp();
+	return true;
+}
+
+function rnd_lcl_trk(exclude_tid) {
+	if (!mp || !mp.order.length)
+		return null;
+	var list = mp.order.slice();
+	if (exclude_tid) {
+		list = list.filter(function (tid) {
+			return tid !== exclude_tid;
+		});
+	}
+	if (!list.length)
+		list = mp.order.slice();
+	return list[Math.floor(Math.random() * list.length)];
+}
+
+function nxt_au_md() {
+	var mode = slpn_md();
+	if (mode === 'loop') {
+		// loop current file, do not traverse the tree
+		if (replay_curr_trk())
+			return;
+		return;
+	}
+	if (mode === 'shuffle') {
+		// shuffle only inside the current directory
+		var tid = rnd_lcl_trk(mp && mp.au ? mp.au.tid : null);
+		if (tid)
+			return play(tid);
+		return;
+	}
+	// default mode: normal next behavior
+	if (mp.order.length) {
+		var dirskip = mpl.traversals;
+		mpl.traversals = 0;
+		return song_skip(1, dirskip);
+	}
+	if (mpl.traversals++ < 5) {
+		treectl.ls_cb = next_song;
+		return tree_neigh(1);
+	}
+	toast.inf(10, L.mm_nof);
+	console.log("mm_nof2");
+	mpl.traversals = 0;
+}
+
+(function () {
+	var btn = ebi('slpn');
+	if (!btn)
+		return;
+	syc_slpn();
+	btn.addEventListener('click', function (ev) {
+		ev.preventDefault();
+		set_slpn_md((+btn.dataset.mode || 0) + 1);
+	});
+})();
+

@@ -1138,9 +1138,10 @@ html.y #widget.open {
 	top: -.04em;
 }
 #wtgrid {
-	font-size: .75em;
+	position: relative;
+	font-size: .6em;
 	padding: .1em;
-	top: -.12em;
+	top: -0.2em;
 }
 #wtico {
 	cursor: pointer;
@@ -1210,7 +1211,6 @@ html.y #widget.open {
 #wfm a,
 #wnp a,
 #wm3u a,
-#zip1,
 #wzip a {
 	font-size: .5em;
 	padding: 0 .3em;
@@ -1219,7 +1219,10 @@ html.y #widget.open {
 	display: inline-block;
 }
 #zip1 {
-	font-size: .38em;
+	position: relative;
+	font-size: .65em;
+	padding: .2em;
+	top: -0.1em;
 }
 #wm3u a {
 	margin: -.2em .1em;
@@ -1234,13 +1237,9 @@ html.y #widget.open {
 }
 #wfm span,
 #wm3u span,
-#zip1 span,
 #wnp span {
 	font-size: .6em;
 	display: block;
-}
-#zip1 span {
-	font-size: .9em;
 }
 #wnp span {
 	font-size: .7em;
@@ -1312,7 +1311,7 @@ html.y #widget.open {
 #pvol {
 	position: absolute;
 	top: .7em;
-	right: 1em;
+	right: 0.5em;
 	height: 1.6em;
 	border-radius: 9em;
 	max-width: 12em;
@@ -3233,7 +3232,28 @@ html.d #treepar {
 }
 
 
+@media (max-width: 500px) {
+  #pvol {
+    background: red !important;
+  }
+}
 
+@media (max-width: 70em) {
+  #slpn {
+    position: absolute;
+    top: .4em;
+    left: 7.5em;
+    display: inline-block;
+    font-size: 1.25em;
+    width: 1.3em;
+    height: 1.2em;
+    text-align: center;
+    border-radius: .3em;
+    background: rgba(0,0,0,0.1);
+    margin-right: .5em;
+    box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
+  }
+}
 
 @media (max-width: 32em) {
 	#u2conf {
@@ -3248,7 +3268,7 @@ html.d #treepar {
 @media (min-width: 70em) {
 	#barpos,
 	#barbuf {
-		width: calc(100% - 21em);
+		width: calc(100% - 23.5em);
 		left: 9.8em;
 		top: .7em;
 		height: 1.6em;
@@ -3265,6 +3285,20 @@ html.d #treepar {
 		bottom: -3.2em;
 		height: 3.2em;
 	}
+  #slpn {
+    position: absolute;
+    top: .5em;
+    right: 8em;
+    display: inline-block;
+    font-size: 1.25em;
+    width: 1.3em;
+    height: 1.2em;
+    text-align: center;
+    border-radius: .3em;
+    background: rgba(0,0,0,0.1);
+    margin-right: .5em;
+    box-shadow: -.02em -.02em .3em rgba(0,0,0,0.2) inset;
+  }
 	#pvol {
 		max-width: 9em;
 	}
@@ -3559,6 +3593,7 @@ html.e body {
 }
 html.e #pctl a,
 html.e #repl,
+html.e #slpn,
 html.e #u2conf a,
 html.e #u2conf input[type="checkbox"] + label,
 html.e #wfp a,
@@ -3579,6 +3614,7 @@ html.e input[type="submit"]:active {
 }
 html.e #ops a:hover,
 html.e #pctl a:hover,
+html.e #slpn:hover,
 html.e #repl:hover,
 html.e #u2conf a:hover,
 html.e #u2conf input[type="checkbox"]:hover + label,
@@ -3601,6 +3637,7 @@ html.e tr:focus {
   box-shadow: none;
 }
 html.e #pctl a:focus,
+html.e #slpn:hover,
 html.e #repl:hover,
 html.e #u2conf input[type="checkbox"]:focus + label,
 html.e #wfp a:focus,
