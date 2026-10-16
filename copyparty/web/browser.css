@@ -3231,13 +3231,6 @@ html.d #treepar {
 	border-bottom: .2em solid var(--f-h-b1);
 }
 
-
-@media (max-width: 500px) {
-  #pvol {
-    background: red !important;
-  }
-}
-
 @media (max-width: 70em) {
   #slpn {
     position: absolute;
