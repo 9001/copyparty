@@ -22,7 +22,10 @@
         <h1>guest list</h1>
         <a href="https://github.com/9001/copyparty#quickstart">ℹ️</a>
     </div>
-    <button id="copyBtn" class="abtn" tt="export config / copy to clipboard">📋</button>
+    <div id="copyDiv">
+        <button id="copyBtn" class="abtn" tt="export config / copy to clipboard"><span class="xinf">cmd</span>📋</button>
+        <button id="copyFileBtn" class="abtn" tt="export config / copy to clipboard"><span class="xinf">config</span>📋</button>
+    </div>
     <div id="disclaimer">
         ⚠️ this page is a preview feature! this is only a config builder and doesn't use your actual config atm. feedback is welcome in the copyparty discord. ⚠️
     </div>
@@ -116,11 +119,11 @@
 
         <h2>save / load</h2>
         <p>your changes are saved automatically</p>
-        <p>saving / loading the real server config is currently not implemented, but you can import an existing config command below</p>
-        <input id="importTxt" placeholder="paste command here" tt="format is more strict than normal. supports importing configs generated on this page."/>
-        <button id="importBtn">import</button>
+        <p>saving / loading the real server config is currently not implemented, but you can import from an existing config or command below</p>
+        <span role="textbox" contenteditable="true" id="importTxt" placeholder="paste config/command here" tt="format is more strict than normal. supports importing configs generated on this page. # only allowed in commandline strings and not when importing from config file"></span>
+        <button id="importBtn">import from above</button>
         <br/>
-        <button id="resetBtn">reset</button>
+        <button id="resetBtn">reset all</button>
 
     </div>
     <div id="perms-modal">

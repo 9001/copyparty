@@ -1415,7 +1415,7 @@ function loadVolumes(){
         var h = mknod("p", "", "Volume #" + i)
         a.appendChild(h);
 
-        var h3_1 = mknod("h3", "", "real path");
+        var h3_1 = mknod("h3", "", "real path (file/folder)");
         var inp = mknod("input", "rp" + i, volsConf[i].src);
         inp.setAttribute("value", volsConf[i].src);
         inp.setAttribute("placeholder", "/storage/emulated/0/files");
@@ -1621,6 +1621,63 @@ function esc(s){
         s = '"' + s + '"';
     return s;
 }
+function getConfigFile(){
+    var conf = '# generated using the config GUI'
+
+    if(flagsConf.length > 0)
+        conf += '\n\n[global]'
+    for(var i = 0; i < flagsConf.length; i++){
+        var val = flagsConf[i].value;
+        // i think none of the options want a leading # for colors
+        if(val.startsWith('#')) val = val.slice(1);
+        // checkboxes set text value to 'on'
+        conf += '\n  ' + flagsConf[i].cmd + ((val !== '' && val !== 'on') ? (': ' + val) : '');
+    }
+
+    if(usrsConf.length > 0)
+        conf += '\n\n[accounts]'
+    for(var i = 0; i < usrsConf.length; i++){
+        if(usrsConf[i].pw != ""){
+            conf += "\n  " + usrsConf[i].name + ': ' + usrsConf[i].pw
+        }
+    }
+
+    if(groups.length > 0)
+        conf += '\n\n[groups]'
+    for(var i = 0; i < groups.length; i++){
+        if(groups[i].name != "" && groups[i].users != "")
+            conf += "\n  " + groups[i].name + ': ' + groups[i].users.replaceAll(' ', ',').replaceAll(',,', ',')
+    }
+
+    for(var i = 0; i < volsConf.length; i++){
+        conf += '\n\n[' + volsConf[i].dst + ']\n  ' + volsConf[i].src
+        var a = volsConf[i].perms.filter((u) => u.user === 'everyone')
+        var b = volsConf[i].perms.filter((u) => u.user !== 'everyone')
+        volsConf[i].perms = [...a, ...b]
+        if(volsConf[i].perms.length > 0)
+            conf += '\n  accs:'
+        for(var j = 0; j < volsConf[i].perms.length; j++){
+            var uname = volsConf[i].perms[j].user
+            if(uname)
+                conf += "\n    " + volsConf[i].perms[j].perms + ': ' + 
+                    (uname == "everyone" ? "*" : uname)
+        }
+        if(volsConf[i].flags.length > 0)
+            conf += '\n  flags:'
+        for(var j = 0; j < volsConf[i].flags.length; j++){
+            conf += "\n    " + volsConf[i].flags[j].cmd + (volsConf[i].flags[j].value ? ': ' + volsConf[i].flags[j].value : '')
+        }
+    }
+
+    return conf;
+}
+ebi('copyFileBtn').onclick = function(){
+    cliptxt(getConfigFile(), function(){
+        var a = ebi('copyFileBtn').innerHTML;
+        ebi('copyFileBtn').innerHTML = "✅";
+        setTimeout(function(){ebi('copyFileBtn').innerHTML = a;}, 1000);
+    });
+}
 function getConfig(){
     var conf = ebi('rpre').value + ' ';
 
@@ -1697,8 +1754,105 @@ ebi('importBtn').onclick = function(){
 }
 function importConfig(txt){
     if(!txt || txt === true)
-        txt = ebi('importTxt').value.trim()
+        txt = ebi('importTxt').innerHTML.replaceAll('<br>', '\n').replaceAll('&nbsp;', ' ').trim()
 
+    // check for [sections]
+    var confFile = txt.match(/(\n|^)\s*\[.*\](\n|$)/)
+    if(confFile)
+        parseConfFile(txt)
+    else
+        parseCmdString(txt)
+}
+function parseConfFile(txt){
+    flagsConf = []
+    volsConf = []
+    usrsConf = []
+    groups = []
+
+    // remove #comments
+    txt = txt.replaceAll(/#.*(\n|$)/g, '\n')
+
+    var lines = txt.split(/(\n|(?<!:.*?),)/)
+    var section = ""
+    var subsection = ""
+    var path = ""
+    var perms = []
+    var flags = []
+    for(var i = 0; i < lines.length; i++){
+        var line = lines[i].trim()
+        if(!line || line == ',')
+            continue;
+        if(line.startsWith('[')){
+            if(section !== "" && section != "global" && section != "accounts" && section != "groups")
+                    volsConf.push({src: path, dst: section, perms: perms, flags: flags});
+            var m = line.match(/(?:\[)([^\[][^\]]*)/)
+            if(m){
+                section = m[1]
+                subsection = ""
+                path = ""
+                perms = []
+                flags = []
+            }
+            continue
+        }
+        var c = line.split(':')[0].trim()
+        var val = line.match(':') ? line.split(':')[1].trim() : ''
+        switch(section){
+            case "":
+            case "global":
+                flagsConf.push({cmd: c, value: val});
+                break;
+            case "accounts":
+                usrsConf.push({name: c, pw: val})
+                break;
+            case "groups":
+                groups.push({name: c, users: val})
+                break;
+            default:
+                // vol
+                if(!subsection && !path){
+                    path = line
+                    continue
+                }
+                if(line.startsWith("accs:")){
+                    subsection = "accs"
+                }
+                else if(line.startsWith("flags:")){
+                    subsection = "flags"
+                }
+                else if(subsection == "accs"){
+                    var us = val.split(',')
+                    for(var j = 0; j < us.length; j++){
+                        var u = us[j].trim()
+                        perms.push({user: (u == '*' ? 'everyone' : u), perms: c})
+                    }
+                }
+                else if(subsection == "flags"){
+                    flags.push({cmd: c, value: val})
+                }
+                break;
+        }
+    }
+    if(section !== "" && section != "global" && section != "accounts" && section != "groups")
+                    volsConf.push({src: path, dst: section, perms: perms, flags: flags});
+
+    console.log(flagsConf)
+    console.log(volsConf)
+    console.log(usrsConf)
+    console.log(groups)
+
+    jwrite('flagsConf', flagsConf)
+    jwrite('volsConf', volsConf)
+    jwrite('usrsConf', usrsConf)
+    jwrite('groups', groups)
+
+    loadUiFlags()
+    loadFlags()
+    loadVolumes()
+    loadUsers()
+    loadGroups()
+}
+function parseCmdString(txt){
     flagsConf = []
     volsConf = []
     usrsConf = []

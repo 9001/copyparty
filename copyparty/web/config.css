@@ -24,6 +24,7 @@ button:not(.delBtn){
     min-width: 2.2em;
     margin: .3em;
 }
+#copyFileBtn,
 #copyBtn{
     position: fixed;
     font-size: 1.5em;
@@ -31,6 +32,27 @@ button:not(.delBtn){
     right: .6em;
     z-index: 10;
     box-shadow: 1px 15px 20px #0009;
+    transition: all .15s;
+}
+#copyBtn {
+    box-shadow: none;
+}
+#copyDiv:hover #copyBtn,
+#copyDiv:focus-visible #copyBtn{
+    bottom: 2.8em;
+    box-shadow: 1px 15px 20px #0009;
+}
+.xinf{
+    opacity: 0;
+    width: 0;
+    transition: all .15s;
+    font-size: medium;
+    display: inline-block;
+}
+#copyDiv:hover .xinf,
+#copyDiv:focus-visible .xinf{
+    opacity: 1;
+    width: 3em;
 }
 button,
 .abtn{
@@ -40,17 +62,31 @@ button,
     color: var(--bg);
     padding: 0 .5em;
 }
+span[role=textbox]:empty::before{
+    content: "paste config/command here";
+    cursor: text;
+    opacity: .5;
+}
+span[role=textbox]{
+    display: block;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+span[role=textbox],
 input{
     font-size: 1em;
     margin: .2em;
     outline: none !important;
+    border: 1px solid white;
     border-color: var(--a-gray);
     border-width: 0 0 1px 0;
     line-height: 2em;
     border-radius: .3em;
     max-width: calc(40vw - 2em);
     padding-left: .5em;
+    background: var(--bg-u1);
 }
+span[role=textbox]:focus-visible,
 input:focus-visible{
     border-color: var(--a);
 }
