@@ -199,18 +199,7 @@ class FtpFs(AbstractedFS):
                 t = "No filesystem mounted at [{}]"
                 raise FSE(t.format(vpath))
 
-            if "xdev" in vfs.flags or "xvol" in vfs.flags:
-                ap = vfs.canonical(rem)
-                avfs = vfs.chk_ap(ap)
-                t = "Permission denied in [{}]"
-                if not avfs:
-                    raise FSE(t.format(vpath), 1)
-
-                cr, cw, cm, cd, _, _, _, _, _ = avfs.uaxs[self.h.uname]
-                if r and not cr or w and not cw or m and not cm or d and not cd:
-                    raise FSE(t.format(vpath), 1)
-            else:
-                ap = vfs.canonical(rem, False)
+            ap = vfs.canonical(rem, False)
 
             if "bcasechk" in vfs.flags and not vfs.casechk(rem, True):
                 raise FSE("No such file or directory", 1)
@@ -320,7 +309,11 @@ class FtpFs(AbstractedFS):
 
     def chdir(self, path: str) -> None:
         nwd = join(self.cwd, path)
-        vfs, rem = self.hub.asrv.vfs.get(nwd, self.uname, False, False)
+        try:
+            vfs, rem = self.hub.asrv.vfs.get(nwd, self.uname, False, False)
+        except Exception as ex:
+            raise FSE(str(ex))
+
         if not vfs.realpath:
             self.cwd = nwd
             return

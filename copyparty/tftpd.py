@@ -276,11 +276,6 @@ class Tftpd(object):
             raise Exception("unmapped vfs")
 
         ap = vfs.canonical(rem)
-        if "xdev" in vfs.flags or "xvol" in vfs.flags:
-            avn = vfs.chk_ap(ap)
-            for n, zb in enumerate(perms):
-                if not avn or zb and not avn.uaxs["*"][n]:
-                    raise Exception("no access")
         if "bcasechk" in vfs.flags and not vfs.casechk(rem, True):
             raise Exception("file not found")
 

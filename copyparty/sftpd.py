@@ -378,18 +378,7 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
             # return "", vn, rem
             raise OSError(errno.ENOENT, "no filesystem mounted at [/%s]" % (vpath,))
 
-        if "xdev" in vn.flags or "xvol" in vn.flags:
-            ap = vn.canonical(rem)
-            avn = vn.chk_ap(ap)
-            t = "Permission denied in [{}]"
-            if not avn:
-                raise OSError(errno.EPERM, "permission denied in [/%s]" % (vpath,))
-
-            cr, cw, cm, cd, _, _, _, _, _ = avn.uaxs[self.uname]
-            if r and not cr or w and not cw or m and not cm or d and not cd:
-                raise OSError(errno.EPERM, "permission denied in [/%s]" % (vpath,))
-        else:
-            ap = vn.canonical(rem, False)
+        ap = vn.canonical(rem, False)
 
         if "bcasechk" in vn.flags and not vn.casechk(rem, True):
             raise OSError(errno.ENOENT, "file does not exist case-sensitively")

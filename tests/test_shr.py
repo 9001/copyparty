@@ -42,7 +42,9 @@ class TestShr(unittest.TestCase):
         if edl is None:
             edl = els[1]
         can_dl = []
-        for fn in b[1]:
+        zs = "f1 f2 f3 f4 l1 l2 l3 l4"
+        known_fns = list(sorted(list(set(b[1] + zs.split()))))
+        for fn in known_fns:
             if fn == "a.db":
                 continue
             furl = url + "/" + fn
@@ -51,7 +53,9 @@ class TestShr(unittest.TestCase):
             h, zb = self.curl(furl, True)
             if h.startswith("HTTP/1.1 200 "):
                 can_dl.append(fn)
-        self.assertEqual(edl, can_dl)
+            elif zb.startswith(b">>fb:"):
+                can_dl.append(fn)
+        self.assertEqual(edl, list(sorted(list(set(can_dl)))))
 
     def setUp(self):
         self.td = tu.get_ramdisk()
@@ -61,12 +65,15 @@ class TestShr(unittest.TestCase):
         os.mkdir("d1")
         os.mkdir("d2")
         os.mkdir("d2/d3")
-        for zs in ("d1/f1", "d2/f2", "d2/d3/f3"):
+        os.mkdir("d2/d3/d4")
+        for zs in ("d1/f1", "d2/f2", "d2/d3/f3", "d2/d3/d4/f4"):
             with open(zs, "wb") as f:
-                f.write(zs.encode("utf-8"))
-            for dst in ("d1", "d2", "d2/d3"):
+                f.write(b">>fb:" + zs.encode("utf-8"))
+            for dst in ("d1", "d2", "d2/d3", "d2/d3/d4"):
                 src, fn = zs.rsplit("/", 1)
                 os.symlink(absreal(zs), dst + "/l" + fn[-1:])
+        os.symlink(absreal("d2/d3"), absreal("d2/ld"))
+        os.symlink(absreal("d2/d3"), absreal("d2/d3/d4/ld"))
 
         db = sqlite3.connect("a.db")
         with db:
@@ -92,12 +99,14 @@ class TestShr(unittest.TestCase):
             shr_v=False,
         )
         self.cinit()
+        L1234 = ["l1", "l2", "l3", "l4"]
 
         self.assertLD("", True, [["d1", "d2", "v1"], ["a.db"]], [])
-        self.assertLD("d1", True, [[], ["f1", "l1", "l2", "l3"]], None)
-        self.assertLD("v1", True, [[], ["f1", "l1", "l2", "l3"]], None)
-        self.assertLD("d2", True, [["d3"], ["f2", "l1", "l2", "l3"]], None)
-        self.assertLD("d2/d3", True, [[], ["f3", "l1", "l2", "l3"]], None)
+        self.assertLD("d1", True, [[], ["f1"] + L1234], None)
+        self.assertLD("v1", True, [[], ["f1"] + L1234], None)
+        self.assertLD("d2", True, [["d3", "ld"], ["f2"] + L1234], None)
+        self.assertLD("d2/d3", True, [["d4"], ["f3"] + L1234], None)
+        self.assertLD("d2/d3/d4", True, [["ld"], ["f4"] + L1234], None)
         self.assertLD("d3", True, [], [])
 
         jt = {
@@ -105,7 +114,7 @@ class TestShr(unittest.TestCase):
             "vp": ["/"],
             "pw": "",
             "exp": "99",
-            "perms": ["read"],
+            "perms": ["read", "write"],
         }
         print(self.post_json("?pw=p1&share", jt)[1])
         jt = {
@@ -113,26 +122,48 @@ class TestShr(unittest.TestCase):
             "vp": ["/d2/"],
             "pw": "",
             "exp": "99",
-            "perms": ["read"],
+            "perms": ["read", "write"],
+        }
+        print(self.post_json("?pw=p1&share", jt)[1])
+        jt = {
+            "k": "d4",
+            "vp": ["/d2/d3/d4/"],
+            "pw": "",
+            "exp": "99",
+            "perms": ["read", "write"],
         }
         print(self.post_json("?pw=p1&share", jt)[1])
         self.conn.shutdown()
         self.cinit()
 
         self.assertLD("", True, [["d1", "d2", "v1"], ["a.db"]], [])
-        self.assertLD("d1", True, [[], ["f1", "l1", "l2", "l3"]], None)
-        self.assertLD("v1", True, [[], ["f1", "l1", "l2", "l3"]], None)
-        self.assertLD("d2", True, [["d3"], ["f2", "l1", "l2", "l3"]], None)
-        self.assertLD("d2/d3", True, [[], ["f3", "l1", "l2", "l3"]], None)
+        self.assertLD("d1", True, [[], ["f1"] + L1234], None)
+        self.assertLD("v1", True, [[], ["f1"] + L1234], None)
+        self.assertLD("d2", True, [["d3", "ld"], ["f2"] + L1234], None)
+        self.assertLD("d2/d3", True, [["d4"], ["f3"] + L1234], None)
+        self.assertLD("d2/d3/d4", True, [["ld"], ["f4"] + L1234], None)
         self.assertLD("d3", True, [], [])
 
-        self.assertLD("shr/d2", False, [[], ["f2", "l1", "l2", "l3"]], None)
+        self.assertLD("shr/d2", False, [["ld"], ["f2"] + L1234], None)
         self.assertLD("shr/d2/d3", False, [], None)
+        self.assertLD("shr/d2/d3/d4", False, [], None)
+
+        self.assertLD("shr/d4", False, [["ld"], ["f4"] + L1234], None)
 
         self.assertLD("shr/r", False, [["d1"], ["a.db"]], [])
-        self.assertLD("shr/r/d1", False, [[], ["f1", "l1", "l2", "l3"]], None)
+        self.assertLD("shr/r/d1", False, [[], ["f1"] + L1234], None)
         self.assertLD("shr/r/d2", False, [], None)  # unfortunate
         self.assertLD("shr/r/d2/d3", False, [], None)
+        self.assertLD("shr/r/d2/d3/d4", False, [], None)
+
+        self.put("shr/d2/a", 201)
+        os.unlink("d2/a")
+
+        self.put("shr/d2/ld/a", 201)
+        os.unlink("d2/d3/a")
+
+        self.put("shr/d4/ld/a", 201)
+        os.unlink("d2/d3/a")
 
         self.conn.shutdown()
 
@@ -147,12 +178,14 @@ class TestShr(unittest.TestCase):
             xvol=True,
         )
         self.cinit()
+        L1234 = ["l1", "l2", "l3", "l4"]
 
         self.assertLD("", True, [["d1", "d2", "v1"], ["a.db"]], [])
-        self.assertLD("d1", True, [[], ["f1", "l1", "l2", "l3"]], None)
-        self.assertLD("v1", True, [[], ["f1", "l1", "l2", "l3"]], None)
-        self.assertLD("d2", True, [["d3"], ["f2", "l1", "l2", "l3"]], None)
-        self.assertLD("d2/d3", True, [[], ["f3", "l1", "l2", "l3"]], None)
+        self.assertLD("d1", True, [[], ["f1"] + L1234], None)
+        self.assertLD("v1", True, [[], ["f1"] + L1234], None)
+        self.assertLD("d2", True, [["d3", "ld"], ["f2"] + L1234], None)
+        self.assertLD("d2/d3", True, [["d4"], ["f3"] + L1234], None)
+        self.assertLD("d2/d3/d4", True, [["ld"], ["f4"] + L1234], None)
         self.assertLD("d3", True, [], [])
 
         jt = {
@@ -160,7 +193,7 @@ class TestShr(unittest.TestCase):
             "vp": ["/"],
             "pw": "",
             "exp": "99",
-            "perms": ["read"],
+            "perms": ["read", "write"],
         }
         print(self.post_json("?pw=p1&share", jt)[1])
         jt = {
@@ -168,28 +201,45 @@ class TestShr(unittest.TestCase):
             "vp": ["/d2/"],
             "pw": "",
             "exp": "99",
-            "perms": ["read"],
+            "perms": ["read", "write"],
+        }
+        print(self.post_json("?pw=p1&share", jt)[1])
+        jt = {
+            "k": "d4",
+            "vp": ["/d2/d3/d4/"],
+            "pw": "",
+            "exp": "99",
+            "perms": ["read", "write"],
         }
         print(self.post_json("?pw=p1&share", jt)[1])
         self.conn.shutdown()
         self.cinit()
 
         self.assertLD("", True, [["d1", "d2", "v1"], ["a.db"]], [])
-        self.assertLD("d1", True, [[], ["f1", "l1", "l2", "l3"]], None)
-        self.assertLD("v1", True, [[], ["f1", "l1", "l2", "l3"]], None)
-        self.assertLD("d2", True, [["d3"], ["f2", "l1", "l2", "l3"]], None)
-        self.assertLD("d2/d3", True, [[], ["f3", "l1", "l2", "l3"]], None)
+        self.assertLD("d1", True, [[], ["f1"] + L1234], None)
+        self.assertLD("v1", True, [[], ["f1"] + L1234], None)
+        self.assertLD("d2", True, [["d3", "ld"], ["f2"] + L1234], None)
+        self.assertLD("d2/d3", True, [["d4"], ["f3"] + L1234], None)
+        self.assertLD("d2/d3/d4", True, [["ld"], ["f4"] + L1234], None)
         self.assertLD("d3", True, [], [])
 
-        self.assertLD("shr/d2", False, [[], ["f2", "l1", "l2", "l3"]], ["f2", "l2"])
+        self.assertLD("shr/d2", False, [["ld"], ["f2"] + L1234], ["f2", "l2"])
         self.assertLD("shr/d2/d3", False, [], [])
+        self.assertLD("shr/d2/d3/d4", False, [], None)
+
+        self.assertLD("shr/d4", False, [["ld"], ["f4"] + L1234], ["f4", "l4"])
 
         self.assertLD("shr/r", False, [["d1"], ["a.db"]], [])
-        self.assertLD(
-            "shr/r/d1", False, [[], ["f1", "l1", "l2", "l3"]], ["f1", "l1", "l2"]
-        )
+        self.assertLD("shr/r/d1", False, [[], ["f1"] + L1234], ["f1", "l1", "l2"])
         self.assertLD("shr/r/d2", False, [], [])  # unfortunate
         self.assertLD("shr/r/d2/d3", False, [], [])
+        self.assertLD("shr/r/d2/d3/d4", False, [], None)
+
+        self.put("shr/d2/a", 201)
+        os.unlink("d2/a")
+
+        self.put("shr/d2/ld/a", 401)
+        self.put("shr/d4/ld/a", 401)
 
         self.conn.shutdown()
 
@@ -227,3 +277,9 @@ class TestShr(unittest.TestCase):
         print("PUT -->", buf)
         HttpCli(self.conn.setbuf(buf)).run()
         return self.conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
+
+    def put(self, url: str, expect: str):
+        h = "PUT /%s HTTP/1.1\r\nContent-Length: 1\r\n\r\n`"
+        HttpCli(self.conn.setbuf((h % (url,)).encode("utf-8"))).run()
+        h, r = self.conn.s._reply.decode("utf-8").split("\r\n\r\n", 1)
+        self.assertEqual(expect, int(h.split(" ")[1]))
