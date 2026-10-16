@@ -1,0 +1,15 @@
+/**/*.env
+
+/copyparty/cfg/*
+!/copyparty/cfg/copyparty.conf
+
+/caddy/config/*
+!/caddy/config/.keep
+
+/caddy/data/*
+!/caddy/data/.keep
+
+/copyparty/fileshare/*
+!/copyparty/fileshare/.keep
+
+/collabora/seccomp-profile.json
