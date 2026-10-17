@@ -1631,7 +1631,8 @@ function getConfigFile(){
         // i think none of the options want a leading # for colors
         if(val.startsWith('#')) val = val.slice(1);
         // checkboxes set text value to 'on'
-        conf += '\n  ' + flagsConf[i].cmd + ((val !== '' && val !== 'on') ? (': ' + val) : '');
+        var c = flagsConf[i].cmd.replaceAll(/-*/g, '')
+        conf += '\n  ' + c + ((val !== '' && val !== 'on') ? (': ' + val) : '');
     }
 
     if(usrsConf.length > 0)
@@ -1776,22 +1777,22 @@ function parseConfFile(txt){
     var section = ""
     var subsection = ""
     var path = ""
-    var perms = []
-    var flags = []
+    var newperms = []
+    var newflags = []
     for(var i = 0; i < lines.length; i++){
         var line = lines[i].trim()
         if(!line || line == ',')
             continue;
         if(line.startsWith('[')){
             if(section !== "" && section != "global" && section != "accounts" && section != "groups")
-                    volsConf.push({src: path, dst: section, perms: perms, flags: flags});
+                    volsConf.push({src: path, dst: section, perms: newperms, flags: newflags});
             var m = line.match(/(?:\[)([^\[][^\]]*)/)
             if(m){
                 section = m[1]
                 subsection = ""
                 path = ""
-                perms = []
-                flags = []
+                newperms = []
+                newflags = []
             }
             continue
         }
@@ -1800,6 +1801,8 @@ function parseConfFile(txt){
         switch(section){
             case "":
             case "global":
+                c = flags.filter((f) => f.cmd == c || f.cmd == '-' + c || f.cmd == '--' + c)[0]?.cmd;
+                console.log("found: " + c)
                 flagsConf.push({cmd: c, value: val});
                 break;
             case "accounts":
@@ -1824,17 +1827,17 @@ function parseConfFile(txt){
                     var us = val.split(',')
                     for(var j = 0; j < us.length; j++){
                         var u = us[j].trim()
-                        perms.push({user: (u == '*' ? 'everyone' : u), perms: c})
+                        newperms.push({user: (u == '*' ? 'everyone' : u), perms: c})
                     }
                 }
                 else if(subsection == "flags"){
-                    flags.push({cmd: c, value: val})
+                    newflags.push({cmd: c, value: val})
                 }
                 break;
         }
     }
     if(section !== "" && section != "global" && section != "accounts" && section != "groups")
-                    volsConf.push({src: path, dst: section, perms: perms, flags: flags});
+                    volsConf.push({src: path, dst: section, perms: newperms, flags: newflags});
 
     console.log(flagsConf)
     console.log(volsConf)
