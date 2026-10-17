@@ -67,11 +67,6 @@ span[role=textbox]:empty::before{
     cursor: text;
     opacity: .5;
 }
-span[role=textbox]{
-    display: block;
-    max-height: 80vh;
-    overflow-y: auto;
-}
 span[role=textbox],
 input{
     font-size: 1em;
@@ -85,6 +80,12 @@ input{
     max-width: calc(40vw - 2em);
     padding-left: .5em;
     background: var(--bg-u1);
+}
+span[role=textbox]{
+    display: block;
+    max-height: 80vh;
+    overflow-y: auto;
+    max-width: 100%;
 }
 span[role=textbox]:focus-visible,
 input:focus-visible{
