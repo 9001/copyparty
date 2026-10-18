@@ -13,7 +13,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 
 📷 **screenshots:** [browser](#the-browser) // [themes](#themes) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
-🎬 **videos:** [upload](https://a.ocv.me/pub/demo/pics-vids/up2k.webm) // [cli-upload](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm) // [race-the-beam](https://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm) // 👉 **[feature-showcase](https://a.ocv.me/pub/demo/showcase-hq.webm)** ([youtube](https://www.youtube.com/watch?v=15_-hgsX2V0))
+🎬 **videos:** [upload](https://a.ocv.me/pub/demo/pics-vids/up2k.webm) // [cli-upload](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm) // [race-the-beam](https://a.ocv.me/pub/g/nerd-stuff/cpp/2024-0418-race-the-beam.webm) // 👉 **[feature-showcase](https://a.ocv.me/pub/demo/showcase-hq.webm)** ([youtube](https://www.youtube.com/watch?v=15_-hgsX2V0)) ((old web UI))
 
 built in Norway 🇳🇴 with contributions from [not-norway](https://github.com/9001/copyparty/graphs/contributors)
 
@@ -539,18 +539,18 @@ upgrade notes
 
 to help you configure copyparty, you can use the config GUI ("guest list"), which is accessible via the `✏️ edit config` button (only visible on the control panel when you're logged in as an admin), or by visiting `http://[your-ip]:3923?config`
 
-the config helper page currently has no option to load your real config, but you can import your config from a start command at the bottom of the page. otherwise, all changes are local and use your browser cache
+the config helper page currently has no option to show your real config, but you can import your config by pasting it at the bottom of the page. otherwise, all changes are local and use your browser cache
 
-you will probably want to replace your run prefix according to the [quickstart section](#quickstart)
+if you want to make a oneliner to start copyparty with, you will probably want to replace your run prefix according to the [quickstart section](#quickstart)
 
 in the config GUI, you can search for [commands](https://copyparty.eu/cli/) and see their descriptions, easily configure [users, groups and volumes](#accounts-and-volumes), as well as getting suggestions for some of the recommended options
 
-once you're done with your configuration, just copy it to your clipboard and run it or save it as a bash file
+once you're done with your configuration, just copy it to your clipboard and run it or save it as a config file
 
 
 # accounts and volumes
 
-per-folder, per-user permissions  - if your setup is getting complex, consider using the [config GUI](#config-gui), or making a [config file](./docs/example.conf) instead of using arguments
+per-folder, per-user permissions  - if your setup is getting complex, consider using the [config GUI](#config-gui), and/or making a [config file](./docs/example.conf) instead of using arguments
 
 advantages of a [config file](./docs/example.conf):
 
