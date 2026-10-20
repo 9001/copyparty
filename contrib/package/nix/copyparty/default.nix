@@ -148,7 +148,13 @@ buildPythonApplication {
     ++ lib.optional withZeroMQ pyzmq
     ++ lib.optional withMagic magic
     ++ (extraPythonPackages python.pkgs);
-  makeWrapperArgs = [ "--prefix PATH : ${lib.makeBinPath runtimeDeps}" ];
+
+  makeWrapperArgs = [
+    "--prefix"
+    "PATH"
+    ":"
+    (lib.makeBinPath runtimeDeps)
+  ];
 
   pyproject = true;
   build-system = [
