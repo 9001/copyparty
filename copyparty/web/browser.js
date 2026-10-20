@@ -11732,8 +11732,8 @@ function reload_browser() {
 					var el = e.target;
 					while(el){
 						if(el.scrollWidth > el.clientWidth){
-							if(pos.x > startx && el.offsetWidth + el.scrollLeft >= el.scrollWidth || 
-								pos.x < startx && el.scrollLeft == 0){
+							if((pos.x > startx) && (el.offsetWidth + parseInt(el.scrollLeft + 1) >= el.scrollWidth) || 
+								(pos.x < startx) && (el.scrollLeft == 0)){
 								var ofx = getComputedStyle(el).overflowX;
 								if(ofx == 'auto' || ofx == 'scroll'){
 									tskip = true; // element detected that can still scroll in the current dragdirection (usually #files)
@@ -11746,7 +11746,7 @@ function reload_browser() {
 					if(!tskip){
 						conf_tsz1 = parseFloat(sread('treesz'));
 						if(treectl.hidden && pos.x > startx)
-							treectl.entree();
+							treectl.entree(e);
 						tsz1 = ebi('tree').offsetWidth;
 						tTS = Date.now();
 						lastx = pos.x;
@@ -11799,9 +11799,9 @@ function reload_browser() {
 	function sel_end(e) {
 		if(dragdir == 'h' && touchdown && !tskip){
 			var open = tspd > .6 || tspd > -.6 && sread('treesz') > conf_tsz1 / 2;
-			treectl.settreesize(conf_tsz1)
+			treectl.settreesize(conf_tsz1);
 			if(!open)
-				treectl.detree()
+				treectl.detree(e);
 		}
 		touchdown = false;
 		dragdir = 'n';
