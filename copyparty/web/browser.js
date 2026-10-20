@@ -11716,6 +11716,24 @@ function reload_browser() {
 		ebi('gfiles').style.pointerEvents = 'none';
 	}
 
+	function canscroll(e){
+		var pos = getpp(e);
+		var el = e.target;
+		while(el){
+			if(el.scrollWidth > el.clientWidth){
+				if(pos.x > startx && el.scrollLeft > 0 ||
+					pos.x < startx && (el.clientWidth + el.scrollLeft < el.scrollWidth - 1)){
+					var ofx = getComputedStyle(el).overflowX;
+					if(ofx == 'auto' || ofx == 'scroll'){
+						return true; // element detected that can still scroll in the current dragdirection (usually #files)
+					}
+				}
+			}
+			el = el.parentNode;
+		}
+		return false;
+	}
+	
 	function sel_move(e) {
 		if(resizing){
 			var em2px = parseFloat(getComputedStyle(document.body).fontSize);
@@ -11728,21 +11746,7 @@ function reload_browser() {
 				var d = 5; // deadzone
 				if(Math.abs(pos.x - startx) * .666 > Math.abs(pos.y - starty) && (pos.x > startx + d || pos.x < startx - d)){
 					dragdir = 'h';
-					tskip = treectl.hidden && pos.x < startx || !treectl.hidden && pos.x > startx;
-					var el = e.target;
-					while(el){
-						if(el.scrollWidth > el.clientWidth){
-							if((pos.x > startx) && (el.offsetWidth + parseInt(el.scrollLeft + 1) >= el.scrollWidth) || 
-								(pos.x < startx) && (el.scrollLeft == 0)){
-								var ofx = getComputedStyle(el).overflowX;
-								if(ofx == 'auto' || ofx == 'scroll'){
-									tskip = true; // element detected that can still scroll in the current dragdirection (usually #files)
-									break;
-								}
-							}
-						}
-						el = el.parentNode;
-					}
+					tskip = treectl.hidden && pos.x < startx || !treectl.hidden && pos.x > startx || canscroll(e);
 					if(!tskip){
 						conf_tsz1 = parseFloat(sread('treesz'));
 						if(treectl.hidden && pos.x > startx)
