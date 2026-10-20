@@ -11610,6 +11610,7 @@ function reload_browser() {
 	var dragging = false;
 
 	var startx, starty;
+	var tsz1, conf_tsz1, tTS, tspd, lastx, tskip, dragdir = 'n', touchdown = false;
 	var fwrap = null;
 	var selbox = null;
 	var ttimer = null;
@@ -11672,6 +11673,13 @@ function reload_browser() {
 				return;
 			}
 			if (e.button !== 0 && e.type !== 'touchstart') return;
+			if(TOUCH){
+				touchdown = true;
+				var t = getpp(e);
+				startx = t.x;
+				starty = t.y;
+				tspd = 0;
+			}
 			if (!thegrid.en || !treectl.dsel) return;
 			if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open,#ggrid>a,.modal,.normalrcm,#tree,#rn_overlay')) return;
 		}
@@ -11714,6 +11722,47 @@ function reload_browser() {
 			treectl.settreesize(getpp(e).x / em2px);
 			return;
 		}
+		if(!is_selma && touchdown){
+			var pos = getpp(e);
+			if(dragdir == 'n'){
+				var d = 5; // deadzone
+				if(Math.abs(pos.x - startx) * .666 > Math.abs(pos.y - starty) && (pos.x > startx + d || pos.x < startx - d)){
+					dragdir = 'h';
+					tskip = treectl.hidden && pos.x < startx || !treectl.hidden && pos.x > startx;
+					var el = e.target;
+					while(el){
+						if(el.scrollWidth > el.clientWidth){
+							if(pos.x > startx && el.offsetWidth + el.scrollLeft >= el.scrollWidth || 
+								pos.x < startx && el.scrollLeft == 0){
+								var ofx = getComputedStyle(el).overflowX;
+								if(ofx == 'auto' || ofx == 'scroll'){
+									tskip = true; // element detected that can still scroll in the current dragdirection (usually #files)
+									break;
+								}
+							}
+						}
+						el = el.parentNode;
+					}
+					if(!tskip){
+						conf_tsz1 = parseFloat(sread('treesz'));
+						if(treectl.hidden && pos.x > startx)
+							treectl.entree();
+						tsz1 = ebi('tree').offsetWidth;
+						tTS = Date.now();
+						lastx = pos.x;
+					}
+				}
+				else if (pos.y > starty + d || pos.y < starty - d)
+					dragdir = 'v'
+			}
+			if(dragdir == 'h' && !tskip){
+				ev(e)
+				tspd = (Date.now() - tTS) / 1000 * (pos.x - lastx);
+				lastx = pos.x
+				var em2px = parseFloat(getComputedStyle(document.body).fontSize);
+				treectl.settreesize(Math.min(Math.max((pos.x - startx + tsz1) / em2px, 0), conf_tsz1));
+			}
+		}
 		if (!is_selma) return;
 		var pos = getpp(e);
 		var dist = Math.sqrt(Math.pow(pos.x - startx, 2) + Math.pow(pos.y - starty, 2));
@@ -11748,6 +11797,14 @@ function reload_browser() {
 	}
 
 	function sel_end(e) {
+		if(dragdir == 'h' && touchdown && !tskip){
+			var open = tspd > .6 || tspd > -.6 && sread('treesz') > conf_tsz1 / 2;
+			treectl.settreesize(conf_tsz1)
+			if(!open)
+				treectl.detree()
+		}
+		touchdown = false;
+		dragdir = 'n';
 		if(resizing){
 			resizing = false;
 			clmod(ebi('tree'), 'resz', false);
