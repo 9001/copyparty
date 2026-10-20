@@ -11843,6 +11843,9 @@ function reload_browser() {
 	dsel_init();
 })();
 
+window.addEventListener('scroll', function(e){
+	
+});
 
 var mpss = (function () {
 	var r = {}, config, ssint, npaint = 0;

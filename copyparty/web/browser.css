@@ -4379,10 +4379,6 @@ html:not(.e) #wrap.thin .ghead {
 	top: 7em;
 	/* padding: .3em; */
 }
-html:not(.e):not(.fy) #wrap.thin #wtc {
-	margin-left: 0;
-	margin-right: 0;
-}
 html:not(.e) #wrap.thin #ghead {
 	text-wrap-mode: nowrap;
 	text-wrap: nowrap;
@@ -4516,9 +4512,6 @@ html.e #wrap.thin .ghead {
 	}
 	html:not(.e) #gfiles {
 		margin: 0em -0.4em;
-	}
-	.ghead {
-		margin: 0 .4em 1em .4em;
 	}
 	.modalheader {
 		padding: .8em 3em .8em .7em;
