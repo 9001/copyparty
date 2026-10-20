@@ -11744,7 +11744,7 @@ function reload_browser() {
 			var pos = getpp(e);
 			if(dragdir == 'n'){
 				var d = 5; // deadzone
-				if(Math.abs(pos.x - startx) * .666 > Math.abs(pos.y - starty) && (pos.x > startx + d || pos.x < startx - d)){
+				if(Math.abs(pos.x - startx) * .4 > Math.abs(pos.y - starty) && (pos.x > startx + d || pos.x < startx - d)){
 					dragdir = 'h';
 					tskip = treectl.hidden && pos.x < startx || !treectl.hidden && pos.x > startx || canscroll(e);
 					if(!tskip){
