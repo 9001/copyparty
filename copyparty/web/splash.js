@@ -9,6 +9,7 @@ Ls.eng = {
 		"lo2": "ends the session on all browsers",
 		"u2": "time since the last server write$N( upload / rename / ... )$N$N17d = 17 days$N1h23 = 1 hour 23 minutes$N4m56 = 4 minutes 56 seconds",
 		"v2": "use this server as a local HDD",
+		"tan": "ERROR: New password has to be at least $N characters",
 		"ta1": "fill in your new password first",
 		"ta2": "repeat to confirm new password:",
 		"ta3": "found a typo; please try again",
@@ -114,6 +115,9 @@ if (o) o.onclick = function (e) {
 		ev(e);
 		if (!pwi.value)
 			return ebi('lm').innerHTML = d.ta1;
+
+		if (ebi('lp').value.length < chpw_min)
+			return ebi('lm').innerHTML = d.tan.replace('$N', chpw_min);
 
 		modal.prompt(d.ta2, "y", mok, null, stars);
 	};
