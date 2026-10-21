@@ -1782,6 +1782,7 @@ def add_wopi(ap):
     ap2.add_argument("--wopi-crt-icn", action="store_true", help="if \033[33m--wopi-url\033[0m is selfsigned: ignore the CN (server ip/name) in cert")
     ap2.add_argument("--wopi-ttl", metavar="SEC", type=int, default=1800, help="session lifetime; allow editing for this many seconds (default is 30 min)")
     ap2.add_argument("--wopi-wdel", action="store_true", help="require permissions read+write+delete for writing to file; default is just read+write")
+    ap2.add_argument("--wopi-anon-ro", metavar="TXT", type=u, default="", help="let anonymous viewers with read permission view documents in the WOPI client's read-only mode; [\033[32mall\033[0m]=everywhere, [\033[32mshare\033[0m]=only in shares; default is neither.")
 
 
 def add_handlers(ap):
