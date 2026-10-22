@@ -3216,7 +3216,7 @@ html.gb_fsc figcaption {
 	transition: opacity .15s;
 	pointer-events: none;
 }
-#bbox-overlay figcaption a {
+#bbox-overlay:not(.immersive) figcaption a {
 	background: rgba(0, 0, 0, 0.6);
 	border-radius: var(--radius);
 	padding: .3em .6em;
