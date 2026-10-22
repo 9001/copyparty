@@ -1244,7 +1244,7 @@ var musicSettings = (
 	'');
 
 ebi('op_cfg').innerHTML = (
-	'<div>\n' +
+	'<div class="on">\n' +
 	'	<h3 id="h_general">✅ ' + L.cl_opts + '</h3>\n' +
 	'	<div>\n' +
 	'		<a id="tooltips" class="tgl btn" tt="' + L.ct_ttips + '</a>\n' +
@@ -1437,7 +1437,21 @@ ebi('op_cfg').innerHTML = (
 		}
 		section += '</div>'
 		ebi('s_list').innerHTML += section;
-		ebi('s_nav').innerHTML += '<a href="#' + sId + '" class="btn ' + sections[i].classList +'">' + sName + '</a>\n';
+		ebi('s_nav').innerHTML += '<a href="#' + sId + '" class="btn tgl ' + sections[i].classList +'">' + sName + '</a>\n';
+	}
+
+	ebi('s_hor').onscroll =
+	ebi('s_list').onscroll = function(){
+		var pos = this.scrollTop + ebi('h_cfg').offsetHeight + 20;
+		var sections = QSA('#s_list .s_section');
+		var first = true;
+		for(var i = 0; i < sections.length; i++){
+			var on = first && (!sections[i + 1] || sections[i + 1].offsetTop > pos);
+			first &= !on;
+			if(on && window.location != sections[i].id)
+				hist_replace(get_evpath() + '#' + sections[i].id);
+			clmod(QS('#s_nav .btn[href="#' + sections[i].id + '"]'), 'on', on);
+		}   
 	}
 
 	ebi('h_cfg').onclick = function(){

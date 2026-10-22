@@ -3431,6 +3431,7 @@ html.c .modalcontent {
 	font-size: large;
 	font-weight: bold;
 	color: var(--fg);
+	outline: none;
 }
 .modalheader:hover {
 	color: var(--fg);
@@ -3493,22 +3494,22 @@ html.c .modalcontent {
 	height: 1px;
 	margin: .3em 0;
 }
-#s_nav .btn::after{
+.sub_section.btn::after{
 	position: absolute;
-	content: ">";
-	right: .5em;
+	content: "▼";
+	left: .5em;
+	font-size: .6em;
 }
 #s_nav .btn{
 	display: block;
-	padding-right: 2em;
+	padding-left: 1em;
 	border: 1px solid var(--bg-u3);
+}
+#s_nav .btn:not(:hover):not(.on){
 	color: var(--fg);
 }
-#s_nav .btn:hover{
-	color: var(--a-hil);
-}
 #s_nav .sub {
-	margin-left: 1em;
+	margin-left: 1.25em;
 }
 #s_nav .sub:before {
 	content: "";
@@ -4569,7 +4570,14 @@ html.e #wrap.thin .ghead {
 	}
 	#s_nav .btn {
 		padding: .5em;
-		padding-right: 2em;
+		padding-left: 1.1em;
+		background: var(--btn-bg);
+		color: var(--fg);
+		text-shadow: 1px 1px 0px var(--bg-max);
+	}
+	#s_nav .btn:hover{
+		color: var(--btn-h-fg);
+  		background: var(--btn-h-bg);
 	}
 	html:not(.e) #hspace {
 		min-width: 3em !important;
