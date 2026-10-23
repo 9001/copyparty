@@ -9,7 +9,7 @@ var dom_md = ebi('mt');
 (function () {
     var n = location + '';
     n = (n.slice(n.indexOf('//') + 2).split('?')[0] + '?v').split('/');
-    n[0] = 'top';
+    n[0] = '🏠';
     var loc = [];
     var nav = [];
     for (var a = 0; a < n.length; a++) {
