@@ -11687,7 +11687,7 @@ function reload_browser() {
 				return;
 			}
 			if (e.button !== 0 && e.type !== 'touchstart') return;
-			if(TOUCH){
+			if(TOUCH && !e.target.closest('.bbox-open,.modal,#music')){
 				touchdown = true;
 				var t = getpp(e);
 				startx = t.x;
@@ -11695,7 +11695,7 @@ function reload_browser() {
 				tspd = 0;
 			}
 			if (!thegrid.en || !treectl.dsel) return;
-			if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open,#ggrid>a,.modal,.normalrcm,#tree,#rn_overlay')) return;
+			if (e.target.closest('#widget,#ops,.opview,.doc,.bbox-open,#ggrid>a,.modal,.normalrcm,#tree,#rn_overlay,#music')) return;
 		}
 		catch(ex){
 			console.log(ex);
