@@ -1567,7 +1567,7 @@ class Up2k(object):
         files: list[tuple[int, int, str]] = []
         fat32 = True
         cv = vcv = acv = ""
-        e_d = {}
+        vflags = {"nodirsz": True}
 
         scan_pr_s = self.args.scan_pr_s
 
@@ -1777,7 +1777,7 @@ class Up2k(object):
 
                 t = "reindex %r => %r mtime(%s/%s) size(%s/%s)"
                 self.log(t % (top, rp, dts, lmod, dsz, sz))
-                self.db_rm(db.c, e_d, rd, fn, 0)
+                self.db_rm(db.c, vflags, rd, fn, 0)
                 tfa += 1
                 db.n += 1
                 in_db = []
@@ -1813,8 +1813,8 @@ class Up2k(object):
                 at = 0
                 un = ""
 
-            # skip upload hooks by not providing vflags
-            self.db_add(db.c, e_d, rd, fn, lmod, sz, "", "", wark, wark, "", un, ip, at)
+            # skip upload hooks; directory stats are already rebuilt above
+            self.db_add(db.c, vflags, rd, fn, lmod, sz, "", "", wark, wark, "", un, ip, at)
             db.n += 1
             db.nf += 1
             tfa += 1
@@ -1874,7 +1874,7 @@ class Up2k(object):
         rm_files = [x for x in hits if x not in seen_files]
         n_rm = len(rm_files)
         for fn in rm_files:
-            self.db_rm(db.c, e_d, rd, fn, 0)
+            self.db_rm(db.c, vflags, rd, fn, 0)
 
         if n_rm:
             self.log("forgot {} deleted files".format(n_rm))
