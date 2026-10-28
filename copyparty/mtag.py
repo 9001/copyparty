@@ -204,6 +204,13 @@ def au_unpk(
             zi = zip_fi(zf, "mergedimage.png", maxsz)
             fi = zf.open(zi)
 
+        elif pk == "odt" or pk == "ods" or pk == "odp" or pk == "odg":
+            import zipfile
+
+            zf = zipfile.ZipFile(abspath, "r")
+            zi = zip_fi(zf, "Thumbnails/thumbnail.png", maxsz)
+            fi = zf.open(zi)
+
         elif pk == "epub":
             fi = get_cover_from_epub(log, abspath)
             assert fi  # !rm
