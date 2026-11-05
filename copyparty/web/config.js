@@ -1750,6 +1750,15 @@ function reset(){
     loadUsers()
     loadGroups()
 }
+ebi('importTxt').addEventListener('paste', function(e){
+    var text = e.clipboardData.getData('text/plain');
+    if(text.length > 0)
+    {
+        ev(e);
+        this.innerHTML = text.replace('\n', '<br>');
+        console.log('paste sanitized');
+    }
+})
 ebi('importBtn').onclick = function(){
     modal.confirm("this will overwrite your configuration on this page! (not your actual server config) continue?", importConfig, null);
 }
