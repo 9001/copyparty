@@ -6947,7 +6947,7 @@ function get_thumb(ohref, ref, isdir, grid){
 		(isdir || ext == 'unk' || ext.startsWith('/') ? '' :
 			'<span class="th_ext" style="font-size: ' + 
 			(grid ? 
-				(thegrid.sz / 5) +'em; font-size:calc((var(--grid-sz) - 2.5em) / 3 * ' + (ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')' :
+				(thegrid.sz / 5) +'em; font-size:calc((var(--grid-sz) * .7) / 3 * ' + (ext.length > 3 ? 1 / (3 + ext.length * .4) * 3 : 1) + ')' :
 				'.8em') + 
 			'"><span class="inner">' + ext + '</span></span>') +
 		'<img loading="lazy" fetchPriority="low" src="' +

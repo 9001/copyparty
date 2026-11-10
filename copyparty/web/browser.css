@@ -1204,7 +1204,7 @@ tr.play td:nth-child(1) a {
 	margin: 0 auto;
 	display: block;
 	width: 100%;
-	height: calc(var(--grid-sz) - 2.5em);
+	height: calc(var(--grid-sz) * .77);
 	object-fit: cover;
 }
 .imgcontainer img,
