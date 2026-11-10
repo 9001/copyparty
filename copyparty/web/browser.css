@@ -1218,7 +1218,7 @@ tr.play td:nth-child(1) a {
 	margin: 10px auto 0 auto;
 }
 #ggrid>a.dir.thumbed .imgcontainer img {
-    height: calc(var(--grid-sz) - 2.5em - 10px);
+    height: calc(var(--grid-sz) * .77 - 10px);
 }
 #ggrid.noupscale>a img {
 	width: auto;
