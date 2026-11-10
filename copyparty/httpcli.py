@@ -5597,8 +5597,6 @@ class HttpCli(object):
         return self.tx_svg(ext, exact)
 
     def tx_svg(self, txt: str, small: bool = False) -> bool:
-        # chrome cannot handle more than ~2000 unique SVGs
-        # so url-param "raster" returns a png/webp instead
         # (useragent-sniffing kinshi due to caching proxies)
         mime, ico = self.conn.hsrv.ico.get(txt, not small, "raster" in self.uparam, self.uparam.get('a'))
 

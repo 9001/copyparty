@@ -33,64 +33,6 @@ class Ico(object):
         if accent:
             accent = RE_CSS_COLOR.sub("", accent)
 
-        # obsolete. 2000+ svgs slows chrome down massively, but no crash.
-        # further, unique svgs are only used for non-standard thumbnails,
-        # so it's unrealistic to see that many in use
-        if png & 0:
-            # cannot handle more than ~2000 unique SVGs
-            if HAVE_PILF:
-                # pillow 10.1 made this the default font;
-                # svg: 3.7s, this: 36s
-                try:
-                    from PIL import Image, ImageDraw
-
-                    # [.lt] are hard to see lowercase / unspaced
-                    ext2 = re.sub("(.)", "\\1 ", ext).upper()
-
-                    h = int(128.0 * h / w)
-                    w = 128
-                    img = Image.new("RGBA", (w, h), "#00000000")
-                    pb = ImageDraw.Draw(img)
-                    _, _, tw, th = pb.textbbox((0, 0), ext2, font_size=16)
-                    xy = (int((w - tw) / 2), int((h - th) / 2))
-                    pb.text(xy, ext2, fill=accent, font_size=16)
-
-                    img = img.resize((w * 2, h * 2), Image.NEAREST)
-
-                    buf = BytesIO()
-                    img.save(buf, format="PNG", compress_level=1)
-                    return "image/png", buf.getvalue()
-
-                except:
-                    pass
-
-            if HAVE_PIL:
-                # svg: 3s, cache: 6s, this: 8s
-                from PIL import Image, ImageDraw
-
-                h = int(64.0 * h / w)
-                w = 64
-                img = Image.new("RGBA", (w, h), "#00000000")
-                pb = ImageDraw.Draw(img)
-                try:
-                    _, _, tw, th = pb.textbbox((0, 0), ext)
-                except:
-                    tw, th = pb.textsize(ext)  # type: ignore
-
-                tw += len(ext)
-                cw = tw // len(ext)
-                x = ((w - tw) // 2) - (cw * 2) // 3
-                fill = accent
-                for ch in ext:
-                    pb.text((x, (h - th) // 2), " %s " % (ch,), fill=fill)
-                    x += cw
-
-                img = img.resize((w * 3, h * 3), Image.NEAREST)
-
-                buf = BytesIO()
-                img.save(buf, format="PNG", compress_level=1)
-                return "image/png", buf.getvalue()
-
         svg = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <svg version="1.1" viewBox="0 0 100 {}" xmlns="http://www.w3.org/2000/svg"><g>
