@@ -409,7 +409,7 @@ class U2idx(object):
         self.log("qs: {!r} {!r}".format(uq, uv))
 
         ret = []
-        seen_rps: set[str] = set()
+        seen_vps: set[str] = set()
         clamp = int(self.args.srch_hits)
         if lim >= clamp:
             lim = clamp
@@ -460,7 +460,7 @@ class U2idx(object):
 
                 vp = vjoins(vtop, rd, fn)
 
-                if vp in seen_rps:
+                if vp in seen_vps:
                     continue
 
                 if rex.search(vp):
@@ -509,7 +509,7 @@ class U2idx(object):
                             % (vtop, ptop, zs, chk_vn.vpath, chk_vn.realpath)
                         )
 
-                seen_rps.add(vp)
+                seen_vps.add(vp)
                 sret.append(
                     {"ts": int(ts), "sz": sz, "rp": rp + suf, "w": w[:16], "tags": {}}
                 )
