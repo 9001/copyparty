@@ -409,7 +409,7 @@ class U2idx(object):
         self.log("qs: {!r} {!r}".format(uq, uv))
 
         ret = []
-        seen_rps: set[str] = set()
+        seen_vps: set[str] = set()
         clamp = int(self.args.srch_hits)
         if lim >= clamp:
             lim = clamp
@@ -460,7 +460,7 @@ class U2idx(object):
 
                 vp = vjoins(vtop, rd, fn)
 
-                if vp in seen_rps:
+                if vp in seen_vps:
                     continue
 
                 if rex.search(vp):
@@ -509,21 +509,22 @@ class U2idx(object):
                             % (vtop, ptop, zs, chk_vn.vpath, chk_vn.realpath)
                         )
 
-                seen_rps.add(rp)
-                sret.append({"ts": int(ts), "sz": sz, "rp": rp + suf, "w": w[:16]})
+                seen_vps.add(vp)
+                sret.append(
+                    {"ts": int(ts), "sz": sz, "rp": rp + suf, "w": w[:16], "tags": {}}
+                )
 
-            for hit in sret:
+            ret.extend(sret)
+
+            for hit in ret:
                 w = hit["w"]
-                del hit["w"]
                 tags = {}
                 q2 = "select k, v from mt where w = ? and +k != 'x'"
                 for k, v2 in cur.execute(q2, (w,)):
                     taglist[k] = True
                     tags[k] = v2
 
-                hit["tags"] = tags
-
-            ret.extend(sret)
+                hit["tags"].update(tags)
             # print("[{}] {}".format(ptop, sret))
 
             if dbg:
@@ -535,6 +536,9 @@ class U2idx(object):
 
         if sort:
             ret.sort(key=itemgetter("rp"))
+
+        for hit in ret:
+            del hit["w"]
 
         return ret, list(taglist.keys()), lim < 0 and not clamped
 
