@@ -509,7 +509,7 @@ class U2idx(object):
                             % (vtop, ptop, zs, chk_vn.vpath, chk_vn.realpath)
                         )
 
-                seen_rps.add(rp)
+                seen_rps.add(vp)
                 sret.append({"ts": int(ts), "sz": sz, "rp": rp + suf, "w": w[:16]})
 
             for hit in sret:
