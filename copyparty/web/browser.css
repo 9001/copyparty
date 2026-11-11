@@ -2370,9 +2370,9 @@ html.b html {
 }
 #treeh {
 	line-height: 2.2em;
-	border-bottom: 1px solid var(--bg-d3);
+	border-bottom: var(--btn-bb);
 	display: block;
-	padding: .3em .5em;
+	padding: .3em .5em .5em .5em;
 	text-wrap-mode: nowrap;
 	text-wrap: nowrap;
 	white-space: nowrap;
@@ -2386,10 +2386,11 @@ html.b html {
 	background: var(--tree-bg);
 	left: -.96em;
 	width: calc(.3em + var(--nav-sz) - var(--sbw));
-	border-bottom: 1px solid var(--bg-u5);
+	border-bottom: var(--btn-bb);
 	overflow: hidden;
 	border-right: .5em solid #999\9;
 }
+#treepar:empty,
 #treepar.off {
 	display: none;
 }
@@ -4188,6 +4189,7 @@ html.g #spaceTotal_bar,
 html.g #ops>a {
 	border: var(--bg-u3) solid 1px;
 }
+html.g #treeh,
 html.g #tree li,
 html.g #treepar {
 	border-color: var(--bg-u5) var(--bg-max) transparent var(--bg-max);
@@ -4196,7 +4198,6 @@ html.g #treesuperh,
 html.g #treepar {
 	backdrop-filter: blur(10px);
 	background: color-mix(in srgb, var(--bg) 40%, transparent);
-	border-color: #ddd;
 }
 html.g #tree {
 	background: var(--b);
@@ -4267,7 +4268,7 @@ html.a #ops {
 html.a #treepar {
 	margin-left: .63em;
 	width: calc(.1em + var(--nav-sz) - var(--sbw));
-	border-bottom: .2em solid var(--f-h-b1);
+	background: var(--bg-u2);
 }
 html.d #path i,
 html.b #path i,
@@ -4349,7 +4350,7 @@ html.dz .btn {
 	border-color: var(--bg-u5);
 }
 html.d #treepar {
-	border-bottom: .2em solid var(--f-h-b1);
+	border-color: var(--fg);
 }
 
 
