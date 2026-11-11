@@ -91,19 +91,20 @@ let
     day = builtins.substring 6 2 lastModifiedDate;
   };
   # ex: "1970" "1" "1"
-  dateStringsShort = builtins.mapAttrs (_: val: toString (lib.toIntBase10 val)) dateStringsZeroPrefixed;
+  dateStringsShort = builtins.mapAttrs (
+    _: val: toString (lib.toIntBase10 val)
+  ) dateStringsZeroPrefixed;
   unstableVersion =
     if copypartyFlake == null then
       "${pinData.version}-unstable"
     else
-      with dateStringsZeroPrefixed; "${pinData.version}-unstable-${year}-${month}-${day}"
-  ;
+      with dateStringsZeroPrefixed; "${pinData.version}-unstable-${year}-${month}-${day}";
   version = if stable then pinData.version else unstableVersion;
   stableSrc = fetchurl {
     inherit (pinData) url hash;
   };
   root = ../../../..;
-  unstableSrc = nix-gitignore.gitignoreSource [] root;
+  unstableSrc = nix-gitignore.gitignoreSource [ ] root;
   src = if stable then stableSrc else unstableSrc;
   rev = copypartyFlake.shortRev or copypartyFlake.dirtyShortRev or "unknown";
   unstableCodename = "unstable" + (lib.optionalString (copypartyFlake != null) "-${rev}");
@@ -125,30 +126,38 @@ buildPythonApplication {
     old_src_folder="''${folders[0]}"
     cp -r "$old_src_folder"/copyparty/web/deps copyparty/web/deps
     sed -i 's/^CODENAME =.*$/CODENAME = "${unstableCodename}"/' copyparty/__version__.py
-    ${lib.optionalString (copypartyFlake != null) (with dateStringsShort; ''
-      sed -i 's/^BUILD_DT =.*$/BUILD_DT = (${year}, ${month}, ${day})/' copyparty/__version__.py
-    '')}
+    ${lib.optionalString (copypartyFlake != null) (
+      with dateStringsShort;
+      ''
+        sed -i 's/^BUILD_DT =.*$/BUILD_DT = (${year}, ${month}, ${day})/' copyparty/__version__.py
+      ''
+    )}
   '';
-  dependencies =
-    [
-      jinja2
-      fusepy
-    ]
-    ++ lib.optional withSMB impacket
-    ++ lib.optional withSFTP paramiko
-    ++ lib.optional withFTP pyftpdlib
-    ++ lib.optional withFTPS pyopenssl
-    ++ lib.optional withTFTP partftpy
-    ++ lib.optional withCertgen cfssl
-    ++ lib.optional withThumbnails pillow
-    ++ lib.optional withFastThumbnails pyvips
-    ++ lib.optional withMediaProcessing ffmpeg
-    ++ lib.optional withBasicAudioMetadata mutagen
-    ++ lib.optional withHashedPasswords argon2-cffi
-    ++ lib.optional withZeroMQ pyzmq
-    ++ lib.optional withMagic magic
-    ++ (extraPythonPackages python.pkgs);
-  makeWrapperArgs = [ "--prefix PATH : ${lib.makeBinPath runtimeDeps}" ];
+  dependencies = [
+    jinja2
+    fusepy
+  ]
+  ++ lib.optional withSMB impacket
+  ++ lib.optional withSFTP paramiko
+  ++ lib.optional withFTP pyftpdlib
+  ++ lib.optional withFTPS pyopenssl
+  ++ lib.optional withTFTP partftpy
+  ++ lib.optional withCertgen cfssl
+  ++ lib.optional withThumbnails pillow
+  ++ lib.optional withFastThumbnails pyvips
+  ++ lib.optional withMediaProcessing ffmpeg
+  ++ lib.optional withBasicAudioMetadata mutagen
+  ++ lib.optional withHashedPasswords argon2-cffi
+  ++ lib.optional withZeroMQ pyzmq
+  ++ lib.optional withMagic magic
+  ++ (extraPythonPackages python.pkgs);
+
+  makeWrapperArgs = [
+    "--prefix"
+    "PATH"
+    ":"
+    (lib.makeBinPath runtimeDeps)
+  ];
 
   pyproject = true;
   build-system = [
