@@ -1631,7 +1631,7 @@ function getConfigFile(){
         // i think none of the options want a leading # for colors
         if(val.startsWith('#')) val = val.slice(1);
         // checkboxes set text value to 'on'
-        var c = flagsConf[i].cmd.replaceAll(/-*/g, '')
+        var c = flagsConf[i].cmd.replaceAll(/^-*/g, '').replaceAll(/-*/g, '_')
         conf += '\n  ' + c + ((val !== '' && val !== 'on') ? (': ' + val) : '');
     }
 
