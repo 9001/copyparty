@@ -79,10 +79,6 @@ html.z {
 	background: #222;
 	color: #ccc;
 }
-html.bz {
-	background: #11121d;
-	color: #bbd;
-}
 html.z a {
 	color: #fff;
 	background: #057;
@@ -98,9 +94,6 @@ html.z input[type=text] {
 }
 html.z #wrap th {
 	background: #222;
-}
-html.bz #wrap th {
-	background: #223;
 }
 html.z #wrap tr:hover td {
 	background: #000;
