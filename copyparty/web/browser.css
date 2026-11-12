@@ -4240,7 +4240,6 @@ html.a #tree {
 html.az #tree {
 	box-shadow: 0 -1px 0 var(--bg-d3);
 }
-html.a #treeh,
 html.a #tree li,
 html.b #treeh,
 html.b #tree li {
@@ -4485,6 +4484,7 @@ html.e #wrap.thin .ghead {
 		display: block;
 		max-width: 100%;
 	}
+	#bbox-tsel,
 	#wstack.sel #up_quick,
 	#wstack.sel #wtico {
 		display: none;
