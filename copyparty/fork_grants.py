@@ -7,13 +7,15 @@ from __future__ import division, print_function, unicode_literals
 import hashlib
 import json
 import os
+import stat
 import threading
 import time
 
 from .__init__ import RES, unicode
-from .fork_harden import harden_nodes, has_dot_part, http_refused
+from .fork_harden import harden_nodes, has_dot_part, http_refused, is_grant
 from .fork_util import grants_top
-from .util import Daemon, Pebkac, quotep, ub64enc, undot, vjoin
+from .bos import bos
+from .util import Daemon, Pebkac, absreal, quotep, ub64enc, undot, vjoin
 
 try:
     import sqlite3
@@ -359,6 +361,8 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
 
     # grants always refuse dot names and listing names, whatever --harden says
     harden_nodes(args, virt + grants, grants)
+    for vn in virt + grants:
+        vn.get = _refuse_outside(vn.get)
     _route(vfs, top, trees)
 
 
@@ -547,7 +551,7 @@ def _grant_vol(
     gvn.shr_src = (s_vfs, s_rem)
     gvn.realpath = s_vfs.canonical(s_rem)
     gvn.get_dbv = gvn._get_share_src
-    gvn.ls = gvn._ls
+    gvn.ls = _grant_ls(gvn)
     gvn.canonical = gvn._canonical
     gvn.dcanonical = gvn._dcanonical
 
@@ -597,15 +601,82 @@ def _grant_vol(
     return gvn
 
 
+def _inside(gvn: "VFS", ap: str) -> bool:
+    """True if the resolved path `ap` is the grant's source folder or
+    inside it; symlinks are followed only while they stay in there"""
+    top = gvn.realpath.rstrip(os.sep) + os.sep
+    return ap == gvn.realpath or ap.startswith(top)
+
+
+def _refuse_outside(get: Any) -> Any:
+    """wrap a grants folder's VFS.get (the path lookup behind copy and move
+    destinations, uploads and ftp/sftp/smb) to 404 a path inside a grant
+    that a symlink leads out of its source folder; httpcli.run resolves
+    the request's own path with VFS._get, so http_request checks that"""
+
+    def grant_get(vpath: str, uname: str, *a: Any, **ka: Any) -> Any:
+        ret = get(vpath, uname, *a, **ka)
+        if not ret or not is_grant(ret[0]):
+            return ret
+        vn, rem = ret
+        if _inside(vn, vn.canonical(rem)):
+            return ret
+
+        # mirrors VFS._get(vpath, uname, will_read, will_write, will_move,
+        # will_del, will_get, err=403); err=0 means "return None"
+        err = ka["err"] if "err" in ka else (a[5] if len(a) > 5 else 403)
+        if not err:
+            return None
+        raise Pebkac(404)
+
+    return grant_get
+
+
+def _grant_ls(gvn: "VFS") -> Any:
+    """the grant's VFS.ls, which leaves out links that lead outside the
+    source folder (listings, and zip/tar and webdav through VFS.walk)"""
+    ls = gvn._ls
+
+    def grant_ls(
+        rem: str,
+        uname: str,
+        scandir: bool,
+        permsets: list[list[bool]],
+        lstat: bool = False,
+        throw: bool = False,
+    ) -> tuple[str, list[tuple[str, os.stat_result]], dict[str, "VFS"]]:
+        ap, real, virt = ls(rem, uname, scandir, permsets, True, throw)
+        if not _inside(gvn, ap):
+            return ap, [], {}
+        ret = []
+        for fn, st in real:
+            if stat.S_ISLNK(st.st_mode):
+                fp = absreal(os.path.join(ap, fn))
+                if not _inside(gvn, fp):
+                    continue
+                if not lstat:
+                    try:
+                        st = bos.stat(fp)
+                    except:
+                        continue  # a dangling link
+            ret.append((fn, st))
+        return ap, ret, virt
+
+    return grant_ls
+
+
 def http_request(cli: Any) -> bool:
     """httpcli.run, once the request's volume is known; True = reply 404"""
     if http_refused(cli):
         return True
 
+    vn = cli.vn
+    if is_grant(vn) and not _inside(vn, vn.canonical(cli.rem)):
+        return True
+
     # upstream lists a folder without a path on disk with tx_ls_vols, from
     # the account's readable volumes (rvol). Grants stay out of the global
     # list, which search also reads, so add them for this listing only
-    vn = cli.vn
     if cli.mode not in ("GET", "HEAD") or vn.realpath:
         return False
     is_dir = getattr(vn, "fork_grant_dir", False)

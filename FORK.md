@@ -339,6 +339,15 @@ what works so far:
   * `GET /?grants=rcpts` returns `{"accounts": [...], "groups": ["@family", ...], "top": "shared"}`:
     who a grant can go to (and the grants folder, where the button hides itself), without the caller, the all-accounts group (`--grp-all`) and share link password
     accounts. Every account holder sees every account and group name (accepted in the spec)
+* a recipient reaches only what is really inside the source folder: anything whose real path
+  (symlinks resolved) is outside it is a 404 for every request through the grant (GET, WebDAV,
+  thumbnails, uploads, copy/move destinations, and the path lookup other protocols use), and
+  links that lead out are left out of listings, PROPFIND and `?zip`/`?tar`. Links that stay inside work. This holds whatever `harden` says, and the owner's
+  own volume still follows the links. (`xvol` would not do: it only stops links that leave the
+  *volume*, and the source folder is usually a subfolder of a home folder)
+  * so with grants, `--hardlink` is the safe dedup: `--dedup` stores a duplicate upload as a
+    symlink to the first copy, which may be outside a granted folder and then 404s for the
+    recipient
 * grants are not in an account's list of readable volumes (`aread`), so search, the upload list
   and FTP/SFTP volume lists never see them; listings of `/`, `/shared/` and `/shared/<owner>/`
   add them for that one request
@@ -354,10 +363,6 @@ known gaps:
 * with a **readable root volume** (`[/]`), `/` doesn't list `shared/` (upstream leaves folders
   that have no path on disk out of a real folder's listing); `/shared/` itself works. Our config
   has no root volume
-* a symlink inside the granted folder is followed, as in share links: a link to `../priv.txt`
-  serves that file to the recipient, even though it is outside the granted folder. `xvol` only
-  stops links that leave the *volume*, so it doesn't help within a home folder. Owners must not
-  keep links out of a folder they grant (not enforced yet)
 
 code: `copyparty/fork_grants.py`, tests: `tests/test_fork_grants.py`
 

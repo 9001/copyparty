@@ -694,6 +694,97 @@ class TestForkGrants(unittest.TestCase):
         self.check_upload_names(harden=True)
 
 
+    # symlinks never lead out of a granted folder (ticket 13)
+
+    def make_links(self):
+        """in a/proj: a link to a file and a link to a folder outside it,
+        and a link to a file inside it"""
+        os.makedirs("a/out")
+        with open("a/out/o.txt", "wb") as f:
+            f.write(b"a/out/o.txt")
+        os.symlink(os.path.abspath("a/priv.txt"), "a/proj/lfile.txt")
+        os.symlink(os.path.abspath("a/out"), "a/proj/ldir")
+        os.symlink("f.txt", "a/proj/lin.txt")
+
+    def test_no_upload_through_a_symlink_out_of_a_grant(self):
+        self.make_links()
+        self.cinit()
+        self.assertEqual(self.grant(perms=("read", "write"))[0], 201)
+        self.assertEqual(self.put("shared/alice/proj/ldir/up.txt", "bob")[0], 404)
+        self.assertFalse(os.path.exists("a/out/up.txt"))
+        self.assertEqual(self.put("shared/alice/proj/up.txt", "bob")[0], 201)
+
+        # nor as the destination of a copy or move, nor through the path lookup other protocols use
+        dst = "/shared/alice/proj/ldir/"
+        url = "shared/alice/proj/up.txt"
+        for q in ("copy", "move"):
+            st, _ = self.req("POST", "%s?%s=%s%s.txt" % (url, q, dst, q), "bob", "Content-Length: 0\r\n")
+            self.assertGreaterEqual(st, 400, q)
+        for m in ("COPY", "MOVE"):
+            hdr = "Destination: %sdav-%s.txt\r\nContent-Length: 0\r\n" % (dst, m)
+            self.assertGreaterEqual(self.req(m, url, "bob", hdr)[0], 400, m)
+        self.assertEqual(os.listdir("a/out"), ["o.txt"])
+        self.assertTrue(os.path.exists("a/proj/up.txt"))
+        vfs = self.asrv.vfs
+        for vp in ("lfile.txt", "ldir/o.txt", "ldir"):
+            with self.assertRaises(Exception, msg=vp):
+                vfs.get("shared/alice/proj/" + vp, "bob", True, False)
+        self.assertEqual(vfs.get("shared/alice/proj/lin.txt", "bob", True, False)[1], "lin.txt")
+
+    def check_links(self, **ka):
+        self.make_links()
+        self.cinit(**ka)
+        self.assertEqual(self.grant()[0], 201)
+        url = "shared/alice/proj/"
+
+        # direct, also as webdav and as a thumbnail
+        dav = "User-Agent: Microsoft-WebDAV-MiniRedir/10.0\r\n"
+        for fn in ("lfile.txt", "ldir/o.txt", "ldir/", "ldir/?ls"):
+            self.assertEqual(self.get(url + fn, "bob")[0], 404, fn)
+            self.assertEqual(self.req("GET", url + fn, "bob", dav)[0], 404, fn)
+
+        # a thumbnail gets what a missing file gets (upstream's 404 picture)
+        gone = self.get(url + "nope.txt?th=w", "bob")
+        self.assertIn(b"e404", gone[1])
+        self.assertEqual(self.get(url + "lfile.txt?th=w", "bob"), gone)
+        for depth in ("0", "1"):
+            hdr = "Depth: %s\r\n" % (depth,)
+            for fn in ("lfile.txt", "ldir/"):
+                st, _ = self.req("PROPFIND", url + fn, "bob", hdr)
+                self.assertEqual(st, 404, (depth, fn))
+
+        # a link that stays inside still works
+        self.assertEqual(self.get(url + "lin.txt", "bob"), (200, b"a/proj/f.txt"))
+        self.assertEqual(self.req("GET", url + "lin.txt", "bob", dav), (200, b"a/proj/f.txt"))
+
+        # listings leave the outside links out
+        self.assertEqual(self.ls(url, "bob"), ["f.txt", "lin.txt", "s/"])
+        for hdr in ("Depth: 1\r\n", "Depth: infinity\r\n"):
+            st, b = self.req("PROPFIND", url, "bob", hdr)
+            self.assertEqual(st, 207, hdr)
+            self.assertIn(b"lin.txt", b, hdr)
+            self.assertNotIn(b"lfile", b, hdr)
+            self.assertNotIn(b"ldir", b, hdr)
+            self.assertNotIn(b"o.txt", b, hdr)
+        for fmt in ("zip", "tar"):
+            st, b = self.get(url + "?" + fmt, "bob")
+            self.assertEqual(st, 200, fmt)
+            self.assertIn(b"lin.txt", b, fmt)
+            for name in (b"lfile", b"ldir", b"o.txt", b"a/priv.txt", b"a/out/"):
+                self.assertNotIn(name, b, (fmt, name))
+
+        # alice, in her own folder, still follows them
+        url = "home/alice/proj/"
+        self.assertEqual(self.get(url + "lfile.txt", "alice"), (200, b"a/priv.txt"))
+        self.assertEqual(self.get(url + "ldir/o.txt", "alice"), (200, b"a/out/o.txt"))
+        self.assertEqual(self.ls(url, "alice"), ["f.txt", "ldir/", "lfile.txt", "lin.txt", "s/"])
+
+    def test_symlinks_harden_off(self):
+        self.check_links()
+
+    def test_symlinks_harden_on(self):
+        self.check_links(harden=True)
+
     # grant lifetime across reloads (ticket 09)
 
     def db_exec(self, q, *a):
