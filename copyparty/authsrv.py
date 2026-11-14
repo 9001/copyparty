@@ -2062,6 +2062,7 @@ class AuthSrv(object):
             cur = db.cursor()
             cur2 = db.cursor()
             now = time.time()
+            pw2u = {v.strip(): k for k, v in acct.items()}  # fork-only: share-pw == account-pw
             for row in cur.execute("select * from sh"):
                 s_k, s_pw, s_vp, s_pr, s_nf, s_un, s_t0, s_t1 = row
                 if s_t1 and s_t1 < now:
@@ -2071,7 +2072,10 @@ class AuthSrv(object):
                     t = "loading %s share %r by %r => %r"
                     self.log(t % (s_pr, s_k, s_un, s_vp))
 
-                if s_pw:
+                if s_pw and s_pw.strip() in pw2u:
+                    # that pw logs in as this account; grant the share to it
+                    sun = pw2u[s_pw.strip()]
+                elif s_pw:
                     # gotta reuse the "account" for all shares with this pw,
                     # so do a light scramble as this appears in the web-ui
                     zb = hashlib.sha512(s_pw.encode("utf-8")).digest()
