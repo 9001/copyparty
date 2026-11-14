@@ -13,16 +13,16 @@ See ADR-0001 and spec user stories 1, 5, 24, 25, 29, 30, 36–38, 44.
 
 **Blocked by:** 03
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] The grant store and mounting live in new fork modules; the upstream hooks are one call in the reload path and one in request dispatch
-- [ ] The grants database is created on first use, records a schema version, and refuses to open a newer version (like the share link database)
-- [ ] Mounting resolves the source folder as the owner with exactly the granted rights (the same check share links use) and copies the source volume's settings
-- [ ] Tests (new grants test module, in-memory HTTP seam): after create plus reload, bob lists `/shared/` → `alice/`; lists `/shared/alice/` → `<name>/`; downloads a file
-- [ ] Tests: carol gets nothing listed under `/shared/` and a refusal on the file URL; a guest is refused
-- [ ] Test: WebDAV PROPFIND and GET work for bob
-- [ ] Test: `.env` inside the grant → 404 for bob, with `harden` off and with alice holding `.`
-- [ ] Test: `grants` empty → no `/shared` and the create endpoint refuses
-- [ ] Test: `shr` empty and `grants: /shared` → grants still work
-- [ ] Test (path-lookup seam): bob resolves the grant path; carol is refused
-- [ ] FORK.md: options listed, upstream hook lines listed
+- [x] The grant store and mounting live in new fork modules; the upstream hooks are one call in the reload path and one in request dispatch
+- [x] The grants database is created on first use, records a schema version, and refuses to open a newer version (like the share link database)
+- [x] Mounting resolves the source folder as the owner with exactly the granted rights (the same check share links use) and copies the source volume's settings
+- [x] Tests (new grants test module, in-memory HTTP seam): after create plus reload, bob lists `/shared/` → `alice/`; lists `/shared/alice/` → `<name>/`; downloads a file
+- [x] Tests: carol gets nothing listed under `/shared/` and a refusal on the file URL; a guest is refused
+- [x] Test: WebDAV PROPFIND and GET work for bob
+- [x] Test: `.env` inside the grant → 404 for bob, with `harden` off and with alice holding `.`
+- [x] Test: `grants` empty → no `/shared` and the create endpoint refuses
+- [x] Test: `shr` empty and `grants: /shared` → grants still work
+- [x] Test (path-lookup seam): bob resolves the grant path; carol is refused
+- [x] FORK.md: options listed, upstream hook lines listed
