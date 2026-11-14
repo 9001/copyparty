@@ -100,6 +100,7 @@ def _guard_upload_names(vol: "VFS") -> None:
     listings. Uploads that send the new name in the request body (bput,
     up2k, new_md) name it with VFS.sanitize_fn; the rest (PUT, tput, COPY,
     ?copy) are caught in _refuse_dots, for the volumes harden_nodes guards"""
+    vol.fork_guarded = True  # type: ignore  # for refuse_dot_tree
     sanitize_fn = vol.sanitize_fn
 
     def hardened_sanitize_fn(fn: str, rem: Any = None) -> str:
@@ -150,8 +151,9 @@ def refuse_dot_tree(
     args: Any, vfs: "VFS", uname: str, svp: str, dvp: str, walk: Iterable[Any]
 ) -> None:
     """up2k folder move/copy: 403 before anything happens if any file in
-    `walk` would hit the dot rule at its source or destination, since the
-    per-file VFS.get would otherwise stop the move/copy half-way"""
+    `walk` would hit the dot rule at its source or destination, or the
+    listing-name rule at a guarded destination (share link, grant), since
+    the per-file VFS.get would otherwise stop the move/copy half-way"""
     if not _on(args) and not grants_on(args):
         return
 
@@ -165,6 +167,9 @@ def refuse_dot_tree(
                 if _refused(args, vn, rem, uname, su):
                     t = "this folder holds dotfiles; moving or copying it needs the `.` permission"
                     raise Pebkac(403, t)
+            dvn, _ = vfs._get(dvpf, uname, False, False)
+            if getattr(dvn, "fork_guarded", False):
+                _refuse_listing_name(fn[0])
 
 
 def refuse_dot_name(args: Any, vn: "VFS", uname: str, name: str) -> None:

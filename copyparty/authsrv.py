@@ -2075,7 +2075,7 @@ class AuthSrv(object):
                     t = "loading %s share %r by %r => %r"
                     self.log(t % (s_pr, s_k, s_un, s_vp))
 
-                if s_pw and s_pw.strip() in pw2u:
+                if s_pw and s_pw.strip() in pw2u:  # fork
                     # that pw logs in as this account; grant the share to it
                     sun = pw2u[s_pw.strip()]
                 elif s_pw:

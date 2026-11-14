@@ -10,11 +10,11 @@
 
 **Blocked by:** None (can start immediately).
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Test: bob's share link create on `/shared/alice/` and on `/shared/` is refused, and the share link database gets no row
-- [ ] Test: bob has `.` on alice's source volume and a read grant to `photos/` containing `.env`; the grant's `?zip` and `?tar` don't contain `.env`
-- [ ] Tests: copying and moving a folder containing `sub/README.md` (also `PREADME.md`, `descript.ion`, any case) into a read + upload grant is refused before anything is written; the source is untouched and the grant folder unchanged
-- [ ] Test: the control panel renders for a logged-in user with a test configuration that has no `grants` option
-- [ ] The fork branch in the share link loader carries the `# fork` marker; FORK.md's upstream-edit table still matches
-- [ ] Upstream `tests/test_dots.py` and `tests/test_shr.py` pass unchanged
+- [x] Test: bob's share link create on `/shared/alice/` and on `/shared/` is refused, and the share link database gets no row
+- [x] Test: bob has `.` on alice's source volume and a read grant to `photos/` containing `.env`; the grant's `?zip` and `?tar` don't contain `.env`
+- [x] Tests: copying and moving a folder containing `sub/README.md` (also `PREADME.md`, `descript.ion`, any case) into a read + upload grant is refused before anything is written; the source is untouched and the grant folder unchanged
+- [x] Test: the control panel renders for a logged-in user with a test configuration that has no `grants` option
+- [x] The fork branch in the share link loader carries the `# fork` marker; FORK.md's upstream-edit table still matches
+- [x] Upstream `tests/test_dots.py` and `tests/test_shr.py` pass unchanged

@@ -190,6 +190,17 @@ class TestForkGrants(unittest.TestCase):
         _, b = self.get("shared/alice/proj/?ls&dots", "bob")
         self.assertNotIn(b".env", b)
 
+    def test_no_dotfiles_in_archives(self):
+        # bob holds `.` on the source volume, but not inside the grant
+        self.cinit(v=["a:home/alice:A,alice:r.,bob"])
+        self.assertEqual(self.get("home/alice/proj/.env", "bob")[0], 200)
+        self.assertEqual(self.grant()[0], 201)
+        for fmt in ("zip", "tar"):
+            st, b = self.get("shared/alice/proj/?" + fmt, "bob")
+            self.assertEqual(st, 200, fmt)
+            self.assertIn(b"f.txt", b, fmt)
+            self.assertNotIn(b".env", b, fmt)
+
     def test_dotfiles_404_with_harden(self):
         self.cinit(harden=True)
         self.assertEqual(self.grant()[0], 201)
@@ -229,6 +240,24 @@ class TestForkGrants(unittest.TestCase):
         self.assertFalse(os.path.exists("g.db"))
         self.assertNotIn("shared/", self.ls("", "bob") or [])
         self.assertIn(self.get("shared/alice/proj/f.txt", "bob")[0], (403, 404))
+
+    def test_control_panel_without_the_grants_option(self):
+        # upstream's test Cfg has no `grants`; its control panel must still render
+        import jinja2
+
+        from copyparty.__init__ import E
+        from copyparty.httpsrv import load_jinja2_resource
+
+        self.args = Cfg(a=ACCS, v=["a:home/alice:A,alice"])
+        self.assertFalse(hasattr(self.args, "grants"))
+        self.reload()
+        env = jinja2.Environment()
+        env.loader = jinja2.FunctionLoader(lambda f: load_jinja2_resource(E, f))
+        self.conn.hsrv.j2["splash"] = env.get_template("splash.html")
+        st, b = self.get("?h", "alice")
+        self.assertEqual(st, 200, b)
+        self.assertIn(b'<strong id="un">alice</strong>', b)
+        self.assertNotIn(b'id="yg"', b)
 
     def test_without_share_links(self):
         self.cinit(shr="", shr1="")
@@ -405,6 +434,18 @@ class TestForkGrants(unittest.TestCase):
         st, b = self.share("/shared/alice/proj/", uname="bob")
         self.assertEqual(st, 400, b)
         self.assertIn(self.get("shr/abcdefghijkl/f.txt", "*")[0], (401, 403, 404))
+
+    def test_no_share_link_of_the_grants_folders(self):
+        self.cinit_shr()
+        self.assertEqual(self.grant()[0], 201)
+        for vp in ("/shared/alice/", "/shared/"):
+            st, b = self.share(vp, uname="bob")
+            self.assertEqual(st, 400, (vp, b))
+        db = sqlite3.connect("s.db")
+        try:
+            self.assertEqual(db.execute("select count(*) from sh").fetchall()[0][0], 0)
+        finally:
+            db.close()
 
     def test_grant_who_no(self):
         # grants forbidden, share links allowed, on the same volume
@@ -693,6 +734,45 @@ class TestForkGrants(unittest.TestCase):
     def test_upload_names_harden_on(self):
         self.check_upload_names(harden=True)
 
+    def files_under(self, top):
+        ret = []
+        for dp, _, fns in os.walk(top):
+            ret += [os.path.join(dp, fn) for fn in fns]
+        return sorted(ret)
+
+    def test_folder_copy_or_move_with_listing_names_refused(self):
+        # all-or-nothing, like a folder holding dotfiles
+        v = ["a:home/alice:A,alice", "b:home/bob:A,bob"]
+        self.cinit(v=v, e2d=True, no_dot_mv=False, no_dot_ren=False)
+        self.assertEqual(self.grant(perms=("read", "write"))[0], 201)
+        before = self.files_under("a/proj")
+        for fn in ("README.md", "readme.MD", "PREADME.md", "descript.ion", "DESCRIPT.ION"):
+            for i, q in enumerate(("copy", "move")):
+                d = "b/d%d" % (i,)
+                for fp in ("a.txt", "sub/" + fn):
+                    fp = os.path.join(d, fp)
+                    if not os.path.isdir(os.path.dirname(fp)):
+                        os.makedirs(os.path.dirname(fp))
+                    with open(fp, "wb") as f:
+                        f.write(b"x")
+                src = self.files_under(d)
+                url = "home/bob/d%d?%s=/shared/alice/proj/d" % (i, q)
+                st, b = self.req("POST", url, "bob", "Content-Length: 0\r\n")
+                self.assertEqual(st, 403, (fn, q, b))
+                self.assertEqual(self.files_under(d), src, (fn, q))
+                self.assertEqual(self.files_under("a/proj"), before, (fn, q))
+                shutil.rmtree(d)
+
+        # without such a name, both work
+        os.makedirs("b/d/sub")
+        with open("b/d/sub/ok.md", "wb") as f:
+            f.write(b"x")
+        url = "home/bob/d?copy=/shared/alice/proj/d"
+        self.assertEqual(self.req("POST", url, "bob", "Content-Length: 0\r\n")[0], 201)
+        self.assertTrue(os.path.exists("a/proj/d/sub/ok.md"))
+        url = "home/bob/d?move=/shared/alice/proj/d2"
+        self.assertEqual(self.req("POST", url, "bob", "Content-Length: 0\r\n")[0], 201)
+        self.assertTrue(os.path.exists("a/proj/d2/sub/ok.md"))
 
     # symlinks never lead out of a granted folder (ticket 13)
 

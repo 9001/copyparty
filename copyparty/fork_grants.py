@@ -278,6 +278,7 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
             return parent.nodes[name]
         vp = vjoin(parent.vpath, name) if parent else name
         flags = parent.flags.copy() if parent else vfs._copy_flags(name)
+        flags["shr_who"] = flags["grant_who"] = "no"  # like a grant (_grant_vol)
         vn = VFS(asrv.log_func, "", vp, vp, AXS(), flags)
         vn.fork_grant_dir = True  # type: ignore
         if parent:
@@ -552,6 +553,7 @@ def _grant_vol(
     gvn.realpath = s_vfs.canonical(s_rem)
     gvn.get_dbv = gvn._get_share_src
     gvn.ls = _grant_ls(gvn)
+    gvn.walk = _no_dot_walk(gvn.walk)
     gvn.canonical = gvn._canonical
     gvn.dcanonical = gvn._dcanonical
 
@@ -630,6 +632,26 @@ def _refuse_outside(get: Any) -> Any:
         raise Pebkac(404)
 
     return grant_get
+
+
+def _no_dot_walk(walk: Any) -> Any:
+    """the grant's VFS.walk (zip/tar, webdav, folder copy/move) never
+    yields dotfiles; upstream's walk lets them through for accounts with
+    `.` on the source volume (its dbv), but inside a grant they are 404"""
+
+    def grant_walk(
+        rel: str,
+        rem: str,
+        seen: list[str],
+        uname: str,
+        permsets: list[list[bool]],
+        wantdots: int,
+        *a: Any,
+        **ka: Any
+    ) -> Any:
+        return walk(rel, rem, seen, uname, permsets, 0, *a, **ka)
+
+    return grant_walk
 
 
 def _grant_ls(gvn: "VFS") -> Any:
