@@ -16,7 +16,7 @@ from datetime import datetime
 from .__init__ import ANYWIN, CFG_DEF, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
-from .fork_harden import harden_vfs
+from .fork_harden import harden_vfs, purge_ownerless_shares
 from .pwhash import PWHash
 from .util import (
     DEF_MTE,
@@ -2064,6 +2064,7 @@ class AuthSrv(object):
             cur2 = db.cursor()
             now = time.time()
             pw2u = {v.strip(): k for k, v in acct.items()}  # fork-only: share-pw == account-pw
+            purge_ownerless_shares(self.args, db, acct, self.log)  # fork
             for row in cur.execute("select * from sh"):
                 s_k, s_pw, s_vp, s_pr, s_nf, s_un, s_t0, s_t1 = row
                 if s_t1 and s_t1 < now:
@@ -3059,8 +3060,6 @@ class AuthSrv(object):
                         vol.ls = vol._ls_xvd
                 break
 
-        harden_vfs(self.args, vfs)
-
         have_daw = False
         for vol in vfs.all_nodes.values():
             daw = vol.flags.get("daw") or self.args.daw
@@ -3094,6 +3093,8 @@ class AuthSrv(object):
             if vol.flags.get("dots"):
                 for name in vol.axs.uread:
                     vol.axs.udot.add(name)
+
+        harden_vfs(self.args, vfs)  # fork: after the dots volflag sets udot
 
         zi = 1
         zs = "; you must also enable --hack-me-bro to accept the total loss of security"

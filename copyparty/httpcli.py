@@ -35,7 +35,7 @@ from .__init__ import ANYWIN, PY2, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
-from .fork_harden import http_refused, refuse_dot_name
+from .fork_harden import http_refused, refuse_dot_name, refuse_short_key
 from .qrkode import qr2svg, qrgen
 from .star import StreamTar
 from .sutil import StreamArc, gfilter
@@ -6744,6 +6744,7 @@ class HttpCli(object):
         m = re.search(r"([^0-9a-zA-Z_-])", skey)
         if m:
             raise Pebkac(400, "sharekey has illegal character %r" % (m[1],))
+        refuse_short_key(self.args, skey)  # fork
 
         if vp.startswith(self.args.shr1):
             raise Pebkac(400, "yo dawg...")

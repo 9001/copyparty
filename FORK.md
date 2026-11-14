@@ -165,7 +165,38 @@ exactly upstream's. Our config turns it on. With it on (see `docs/adr/0002`):
   is refused (403) up front, so it never stops half-way
 * not covered: SMB with `--smba` (upstream maps every SMB user to its internal superuser, which
   bypasses all permissions anyway); keep SMB off
-* code: `copyparty/fork_harden.py`, tests: `tests/test_fork_harden.py`
+
+share links (`/share/<key>/...`, used by guests), with `harden` on:
+
+* dotfiles inside a share link are 404, even if the owner gave the link `.` (allowed upstream when
+  the owner has `.`, e.g. `A`), and even with `--ed` or the `dots` volflag; links already in the
+  database lose `.` at the next reload. Upstream's link archives (`?zip`/`?tar`) already leave
+  dotfiles out
+* writes through a share link refuse `README.md`, `PREADME.md` and `descript.ion` in any letter
+  case (403), since copyparty renders them inside the owner's folder listings: PUT (also WebDAV),
+  bput, up2k, new markdown file, the markdown editor's save, and copying a file to that name
+  (`?copy=`, WebDAV `COPY`). Dot names are refused like everywhere else. The owner can still
+  upload them in their own volume
+* creating a share link with a key shorter than 12 characters is refused (400); the web UI's
+  random keys are 12 characters
+* at reload, share links whose owner is no longer an account are deleted from the share link
+  database (`sh` and `sf` rows), so a new account with the same name doesn't get them back. An
+  owner who still exists but lost access keeps the row (upstream only hides the link until access
+  returns). Skipped with IdP headers (`--idp-h-usr`), since IdP accounts aren't in the config
+* code: `copyparty/fork_harden.py`, tests: `tests/test_fork_harden.py`,
+  `tests/test_fork_harden_shr.py`
+
+recommended `[global]` for the deployment, on top of the tested config below (not yet tried in
+docker):
+
+```
+  harden           # the rules above
+  no-html          # uploaded .html/.htm/.xhtml/.svg/.md and the markdown viewer (?v) are served
+                   # as text/plain with script-src 'none'; copyparty's own UI keeps working
+```
+
+`harden` makes `/family` dotfiles 404 for members, since `rwmd` has no `.`. Give `@family`
+`rwmd.` if members should keep access to dotfiles they upload there.
 
 
 ## upstream edits
@@ -176,7 +207,7 @@ every place this fork changes an upstream file. On a merge conflict, resolve eac
 |---|---|---|---|
 | fork modules ship in the sfx build | `scripts/sfx.ls`: one line per new `copyparty/fork_*.py` | -- | keep both sides |
 | `--shr-adm` takes a real comma-separated list of exact names (upstream compared the whole string in `?shares` / `?eshare`, and used a substring test in the active-downloads list, so `adm` matched `admin`) | `svchub.py`: one import + `args.shr_adm = split_names(args.shr_adm)`; `httpcli.py` `tx_shares` / `handle_eshare`: `!=` -> `not in`; `authsrv.py` `cgen`: `shr_adm` added to the `csv` set so `--cgen` still prints it | `copyparty/fork_util.py` (`split_names`), `tests/test_fork_shr_adm.py` | **take theirs if upstream fixes it**, then remove all of the fork side: the `split_names` line + import in `svchub.py`, `shr_adm` in cgen's `csv` set (unless upstream keeps a list too), and `split_names` (and `fork_util.py` + its `sfx.ls` line, if nothing else uses them); keep the test if it still passes |
-| `harden`: dotfiles inside a volume are 404 without `.` | `authsrv.py`: one import + `harden_vfs(self.args, vfs)` in `_reload` right after the `xvd` block (wraps each volume's `get`); `httpcli.py` `run`: one import + `if http_refused(self): return self.tx_404() and False` right after `self.rem = rem` (the per-request lookup uses `VFS._get`, not `get`); `up2k.py`: one import + a `refuse_dot_tree(...)` walk before the folder walk in `handle_mv` and in `handle_cp` (2 lines each, marked `# fork`); `httpcli.py` `handle_post_json`: `refuse_dot_name(...)` right after `vfs.sanitize_fn(name, rem)` (marked `# fork`, import shared with `http_refused`); `__main__.py` `add_safety`: the `--harden` option | `copyparty/fork_harden.py`, `tests/test_fork_harden.py` | keep both sides; if upstream renames `VFS.get` / the `self.vn, self.rem` lookup in `run`, move the hook to the new spot and rerun `tests/test_fork_harden.py`. `_refuse_dots` reads `err` by `VFS._get`'s argument order (6th after `uname`, default 403); recheck it if that signature changes. **If upstream adds a real dotfile block, take theirs** and remove the fork side |
+| `harden`: dotfiles inside a volume are 404 without `.` | `authsrv.py`: one import + `harden_vfs(self.args, vfs)` in `_reload` right after the loop that ends with the `dots` volflag adding to `udot` (marked `# fork`; it wraps each volume's `get`, so it must come after the `xvd` block, and it clears `udot` on share links, so after the `dots` loop); `httpcli.py` `run`: one import + `if http_refused(self): return self.tx_404() and False` right after `self.rem = rem` (the per-request lookup uses `VFS._get`, not `get`); `up2k.py`: one import + a `refuse_dot_tree(...)` walk before the folder walk in `handle_mv` and in `handle_cp` (2 lines each, marked `# fork`); `httpcli.py` `handle_post_json`: `refuse_dot_name(...)` right after `vfs.sanitize_fn(name, rem)` (marked `# fork`, import shared with `http_refused`); `httpcli.py` `handle_share`: `refuse_short_key(self.args, skey)` right after the illegal-character check (marked `# fork`, same import); `authsrv.py` `_reload`, share loader: `purge_ownerless_shares(self.args, db, acct, self.log)` right before the first `for row in cur.execute("select * from sh")` loop (marked `# fork`, import shared with `harden_vfs`); `__main__.py` `add_safety`: the `--harden` option. Share link dotfiles and upload names need no extra edit: `harden_vfs` clears `udot` and wraps `sanitize_fn` on each share link volume, and the wrapped `get` refuses the listing names on write lookups into a share link | `copyparty/fork_harden.py`, `tests/test_fork_harden.py`, `tests/test_fork_harden_shr.py` | keep both sides; if upstream renames `VFS.get` / the `self.vn, self.rem` lookup in `run`, move the hook to the new spot and rerun `tests/test_fork_harden.py` and `tests/test_fork_harden_shr.py` (the share link rules set `VFS.sanitize_fn` / `axs.udot` by name, so a rename upstream would silently stop them; only the tests notice). `_refuse_dots` reads `err` by `VFS._get`'s argument order (6th after `uname`, default 403); recheck it if that signature changes. **If upstream adds a real dotfile block, take theirs** and remove the fork side |
 | a share link password equal to an account's password no longer breaks every reload (upstream loaded it as a made-up `s_...` account with the same password, which tripped the "same password" check; reload/restart then failed for everyone). The share is now granted to the account that owns that password, so the password logs in as that account and opens the share (that account may not be the share's owner: if bob sets alice's password on a share, alice's login also gets the share) | `authsrv.py` `_reload`, share loader: a `pw2u` password->account map before the loop, and an `if s_pw.strip() in pw2u: sun = pw2u[s_pw.strip()]` branch before the `s_` account is made | `tests/test_fork_shr_pw.py` | **take theirs if upstream fixes it**, then drop the `pw2u` line and the extra branch; keep the test if it still passes |
 
 

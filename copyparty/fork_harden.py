@@ -35,23 +35,69 @@ def _refused(vn: "VFS", rem: str, uname: str, su: str) -> bool:
 def harden_vfs(args: Any, vfs: "VFS") -> None:
     """with --harden, make every volume's VFS.get (the path lookup used by
     ftp/sftp/smb/tftp and httpcli's handlers) refuse dot parts below the
-    volume root with 404 for accounts without the `.` permission"""
+    volume root with 404 for accounts without the `.` permission, and
+    harden share links (see _harden_share)"""
     if not _on(args):
         return
 
     su = _su()
+    shares = [x for x in vfs.all_nodes.values() if _is_share(args, x)]
+    for vol in shares:
+        _harden_share(vol)
+
     for vol in vfs.all_nodes.values():  # includes the root ("")
-        vol.get = _refuse_dots(vol.get, su)
+        vol.get = _refuse_dots(vol.get, su, shares)
 
 
-def _refuse_dots(get: Callable[..., Any], su: str) -> Callable[..., Any]:
+def _is_share(args: Any, vol: "VFS") -> bool:
+    """True for the volume of one share link (/<shr>/<key>)"""
+    shr = args.shr.strip("/")
+    return bool(shr) and vol.vpath.startswith(shr + "/")
+
+
+# names copyparty renders inside folder listings (--readme, --preadme, descript.ion)
+_LISTING_NAMES = ("readme.md", "preadme.md", "descript.ion")
+
+
+def _refuse_listing_name(fn: str) -> None:
+    if fn.lower() in _LISTING_NAMES:
+        t = "%r cannot be uploaded through a share link" % (fn,)
+        raise Pebkac(403, t)
+
+
+def _harden_share(vol: "VFS") -> None:
+    """a share link never shows dotfiles, whatever its owner gave it (`.`,
+    --ed, the dots volflag), and refuses uploads of names that would render
+    inside the owner's folder listings. Uploads that send the new name in
+    the request body (bput, up2k, new_md) name it with VFS.sanitize_fn; the
+    rest (PUT, tput, COPY, ?copy) are caught in _refuse_dots"""
+    vol.axs.udot = set()
+    sanitize_fn = vol.sanitize_fn
+
+    def hardened_sanitize_fn(fn: str, rem: Any = None) -> str:
+        ret = sanitize_fn(fn, rem)
+        _refuse_listing_name(ret)
+        return ret
+
+    vol.sanitize_fn = hardened_sanitize_fn
+
+
+def _refuse_dots(
+    get: Callable[..., Any], su: str, shares: list["VFS"]
+) -> Callable[..., Any]:
     def hardened_get(vpath: str, uname: str, *a: Any, **ka: Any) -> Any:
         ret = get(vpath, uname, *a, **ka)
-        if not ret or not _refused(ret[0], ret[1], uname, su):
+        if not ret:
             return ret
 
         # mirrors VFS._get(vpath, uname, will_read, will_write, will_move,
         # will_del, will_get, err=403); err=0 means "return None"
+        if not _refused(ret[0], ret[1], uname, su):
+            will_write = ka["will_write"] if "will_write" in ka else a[1]
+            if will_write and ret[0] in shares:
+                _refuse_listing_name(ret[1].split("/")[-1])
+            return ret
+
         err = ka["err"] if "err" in ka else (a[5] if len(a) > 5 else 403)
         if not err:
             return None
@@ -102,3 +148,36 @@ def refuse_dot_name(args: Any, vn: "VFS", uname: str, name: str) -> None:
     # the folder part was already checked by VFS.get; only the name is new
     if _on(args) and _refused(vn, name, uname, _su()):
         raise Pebkac(404)
+
+
+SHR_KEY_MIN = 12  # the web UI makes 12-character keys
+
+
+def refuse_short_key(args: Any, skey: str) -> None:
+    """share link creation: a short key can be guessed"""
+    if _on(args) and len(skey) < SHR_KEY_MIN:
+        t = "the share key must be at least %d characters long" % (SHR_KEY_MIN,)
+        raise Pebkac(400, t)
+
+
+def purge_ownerless_shares(
+    args: Any, db: Any, acct: dict[str, str], log: Callable[..., None]
+) -> None:
+    """reload: delete the share links of owners who are no longer an
+    account, so a new account with the same name does not get them back.
+    Upstream only hides them (the owner fails the permission check), which
+    is still what happens to an owner who exists but lost access"""
+    if not _on(args) or args.have_idp_hdrs:
+        return  # idp accounts are not in the config; can't tell who's gone
+
+    gone = []
+    for k, un in db.execute("select k, un from sh").fetchall():
+        if un not in acct and un != "*":
+            gone.append((k, un))
+
+    for k, un in gone:
+        log("deleting share [%s]; its owner [%s] is no longer an account" % (k, un), 3)
+        db.execute("delete from sh where k = ?", (k,))
+        db.execute("delete from sf where k = ?", (k,))
+    if gone:
+        db.commit()
