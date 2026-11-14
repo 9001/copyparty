@@ -309,6 +309,39 @@ class TestForkGrants(unittest.TestCase):
             vfs.get("shared/alice/proj/f.txt", "bob", True, True)  # no upload
         self.assertEqual(cm.exception.code, 403)
 
+    def test_ftp_sftp(self):
+        # known limit (ticket 15): grants are left out of aread, so over
+        # ftp/sftp an account whose only access is a grant can't log in, and
+        # /shared/ is no folder; a full path into a grant does work for an
+        # account that can log in. ftpd/sftpd need pyftpdlib and paramiko,
+        # so this repeats the lookups they make
+        os.makedirs("b")
+        self.cinit(v=["a:home/alice:A,alice", "b:home/bob:A,bob"])
+        self.assertEqual(self.grant(rcpt="bob")[0], 201)
+        self.assertEqual(self.grant(rcpt="carol")[0], 201)
+        vfs = self.asrv.vfs
+
+        # the login check in ftpd.FtpAuth.validate_authentication and
+        # sftpd.SSH_Srv._check_auth_password / check_auth_publickey
+        def login(un):
+            return bool(vfs.aread.get(un) or vfs.awrite.get(un))
+
+        self.assertFalse(login("carol"))
+        self.assertTrue(login("bob"))
+
+        # ftpd/sftpd v2a: /shared/ resolves to a folder with no path on disk,
+        # which they refuse (ftp listdir: empty; sftp list_folder: an
+        # OSError, so SFTP_FAILURE)
+        vn, rem = vfs.get("shared", "bob", True, False)
+        self.assertEqual((vn.realpath, rem), ("", ""))
+
+        # ...but the full path resolves into the grant, as for http
+        vn, rem = vfs.get("shared/alice/proj", "bob", True, False)
+        self.assertTrue(vn.realpath.endswith(os.path.join("a", "proj")))
+        _, ls, _ = vn.ls(rem, "bob", True, [[True, False], [False, True]])
+        self.assertIn("f.txt", [x[0] for x in ls])
+        self.assertNotIn("bob", vn.axs.udot)  # so both servers drop .env
+
     def test_under_a_readable_root(self):
         os.mkdir("pub")
         self.cinit(v=["pub::r", "a:home/alice:A,alice"])
@@ -471,6 +504,17 @@ class TestForkGrants(unittest.TestCase):
         self.assertEqual(st, 400, b)
         self.assertEqual(self.grant()[0], 201)
         self.assertEqual(self.get("shared/alice/proj/f.txt", "bob"), (200, b"a/proj/f.txt"))
+
+    def test_grant_who_no_later_keeps_existing_grants(self):
+        # grant_who is checked only when a grant is created (ticket 15)
+        self.cinit()
+        self.assertEqual(self.grant()[0], 201)
+        self.args.v = ["a:home/alice:A,alice:c,grant_who=no"]
+        self.reload()
+        self.assertEqual(
+            self.get("shared/alice/proj/f.txt", "bob"), (200, b"a/proj/f.txt")
+        )
+        self.refused(b"perms to create grants from this volume", rcpt="carol")
 
     def test_grant_who_unknown_value_refuses(self):
         self.cinit(v=["a:home/alice:A,alice:c,grant_who=yes"])

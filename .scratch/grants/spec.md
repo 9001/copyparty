@@ -135,7 +135,7 @@ Together with `no-html` in the config, uploaded pages can't run scripts.
   Create checks, in order:
   - grants are on
   - the source isn't under `/shared` or the share link folder
-  - the volume's `grant_who` allows the caller
+  - the volume's `grant_who` allows the caller (checked only here: changing `grant_who` later leaves existing grants active; owners or share admins revoke them on the grants page, ticket 15)
   - the caller holds every requested right on the source
   - the recipient exists and isn't the caller or the all-accounts group
   - the name is a single safe path segment
@@ -157,7 +157,7 @@ Together with `no-html` in the config, uploaded pages can't run scripts.
 
 - `grants` (global, path of the virtual folder, e.g. `/shared`; empty = off)
 - grants database location (global, like `--shr-db`)
-- `grant_who` (volume setting, `no` / `a` / `auth`, default `auth`)
+- `grant_who` (volume setting, `no` / `a` / `auth`, default `auth`), applied only when a grant is created
 - `harden` (global switch, default off)
 
 Fork code reads every new option with a default, so upstream's test configuration and argument tables don't need entries. Where copyparty requires registering an option or volume setting in its tables, keep the additions to one block.
@@ -222,7 +222,7 @@ Fork code reads every new option with a default, so upstream's test configuratio
 - Granted folders in search results.
 - Move, delete or admin rights through grants.
 - Following a source folder when it's renamed.
-- Making grants available only on some protocols.
+- Grants over FTP, SFTP and SMB. Grants are for HTTP and WebDAV: they stay out of each account's list of readable volumes (which keeps them out of search), and the FTP/SFTP login and volume lists read that list, so an account whose only access is a grant can't log in there and `/shared/` isn't a folder there. An account with a volume of its own still reaches a grant over FTP/SFTP by its full path. This deployment keeps FTP/SFTP/SMB off (ticket 15).
 - The separate admin app for managing accounts, groups and volumes (still planned, unchanged by this spec).
 - Any changes offered to upstream.
 - Measuring the cost of extra reloads on the Pi (a grant change reloads the config, same as a share link change today).

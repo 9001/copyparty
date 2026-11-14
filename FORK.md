@@ -219,7 +219,7 @@ every place this fork changes an upstream file. On a merge conflict, resolve eac
 see `docs/adr/0001` and `.scratch/grants/spec.md`. Work in progress: tickets 06 (the tracer
 bullet), 07 (rights and refusals), 08 (groups), 09 (lifetime across reloads), 10 (the grants
 page), 11 (the button in the file browser), 12 (expiry without a reload), 13 (symlinks) and
-14 (small gaps in the grant rules) are done.
+14 (small gaps in the grant rules) and 15 (FTP/SFTP and `grant_who` limits) are done.
 
 options (`[global]`):
 
@@ -234,7 +234,8 @@ volflag:
 
 * `grant_who` (`no` / `a` / `auth`, default `auth`): who can create grants of folders in this
   volume: nobody, accounts with `a` there, or any account. Independent of `shr_who`, so a volume
-  can allow grants and forbid share links, or the other way round. Any other value = nobody
+  can allow grants and forbid share links, or the other way round. Any other value = nobody.
+  Checked only when a grant is created: existing grants stay until revoked on the grants page
 
 what works so far:
 
@@ -353,12 +354,20 @@ what works so far:
   * so with grants, `--hardlink` is the safe dedup: `--dedup` stores a duplicate upload as a
     symlink to the first copy, which may be outside a granted folder and then 404s for the
     recipient
-* grants are not in an account's list of readable volumes (`aread`), so search, the upload list
-  and FTP/SFTP volume lists never see them; listings of `/`, `/shared/` and `/shared/<owner>/`
-  add them for that one request
+* grants are not in an account's list of readable volumes (`aread`), so search and the upload
+  list never see them; listings of `/`, `/shared/` and `/shared/<owner>/` add them for that one
+  request
 
 known gaps:
 
+* grants are meant for **HTTP and WebDAV**. FTP and SFTP read `aread` (above), so their login
+  refuses an account whose only access is a grant, and `/shared/` is no folder there (FTP lists it
+  empty, SFTP fails). An account that can log in (it has a volume of its own) still reaches a
+  grant by its full path, `/shared/<owner>/<name>`, with the granted rights. Kept that way so
+  grants stay out of search; this deployment keeps FTP/SFTP/SMB off (`test_ftp_sftp`)
+* `grant_who` is checked only when a grant is created. Changing a volume to `grant_who: no` later
+  doesn't suspend the grants already made from it; the owner or a `--shr-adm` account revokes
+  them on the grants page (`test_grant_who_no_later_keeps_existing_grants`)
 * opening `/shared/` or `/shared/<owner>/` directly as a page (typing the url, reload) is a 403;
   the web UI gets there through JSON listings from `/` and the tree, which work. Upstream does
   the same for its own folders with no path on disk (`/home/` with only `[/home/${u}]`)
