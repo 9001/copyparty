@@ -99,16 +99,36 @@ class GrantStore(object):
         finally:
             db.close()
 
-    def live(self, now: float) -> list[tuple[Any, ...]]:
-        """grants that haven't expired, oldest first"""
+    def rows(self) -> list[tuple[Any, ...]]:
+        """every grant, expired ones too, oldest first"""
         db = self._open(False)
         if not db:
             return []
         try:
-            q = "select id, un, rcpt, vp, name, pr from gr where t1 = 0 or t1 > ? order by id"
-            return db.execute(q, (now,)).fetchall()
+            q = "select id, un, rcpt, vp, name, pr, t1 from gr order by id"
+            return db.execute(q).fetchall()
         finally:
             db.close()
+
+    def delete(self, gids: list[int]) -> None:
+        db = self._open(False)
+        if not db:
+            return
+        try:
+            for gid in gids:
+                db.execute("delete from gr where id = ?", (gid,))
+            db.commit()
+        finally:
+            db.close()
+
+
+def grant_desc(
+    gid: int, un: str, rcpt: str, vp: str, name: str, pr: str, t1: int
+) -> str:
+    """how the log names a grant: owner, recipient, path and rights"""
+    zs = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t1)) + " UTC" if t1 else "never"
+    t = "grant %d by [%s] to [%s] of [/%s] as [%s] (%s, expires %s)"
+    return t % (gid, un, rcpt, vp, name, pr, zs)
 
 
 def share_pw_accounts(args: Any) -> set[str]:
@@ -237,22 +257,22 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
         return vn
 
     log = asrv.log
+    now = time.time()
     virt: list["VFS"] = []
     grants: list["VFS"] = []
     trees: dict[str, "VFS"] = {}  # recipient: their /<grants>
     aread: dict[str, list[str]] = {}  # recipient: vpaths of their grants
     pub = folder(None, top)
     pseudo = share_pw_accounts(args)
+    rows = _prune_gone_accounts(asrv, acct, pseudo)
+
     # where one account gets two grants by the same name from one owner
     # (a group gained a member after create checked), the grant naming the
     # account wins, then the oldest; rows come oldest first
-    rows = _store(args).live(time.time())
-    rows.sort(key=lambda row: is_group(row[2]))  # (gid, un, rcpt, ...)
-    for gid, un, rcpt, vp, name, pr in rows:
-        desc = "grant %d by [%s] to [%s] of [/%s] (%s)" % (gid, un, rcpt, vp, pr)
-        uns = reached_accounts(asrv, pseudo, rcpt)
-        if not is_account(acct, pseudo, un) or uns is None:
-            log("skipping %s; not an account" % (desc,), 3)
+    rows.sort(key=lambda x: is_group(x[0][2]))  # ((gid, un, rcpt, ...), ...)
+    for (gid, un, rcpt, vp, name, pr, t1), desc, uns in rows:
+        if t1 and t1 <= now:
+            log("expired %s" % (desc,), 3)
             continue
 
         # the owner, as a member of the group, already has the folder
@@ -322,6 +342,36 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
     # grants always refuse dot names and listing names, whatever --harden says
     harden_nodes(args, virt + grants, grants)
     _route(vfs, top, trees)
+
+
+def _prune_gone_accounts(
+    asrv: "AuthSrv", acct: dict[str, str], pseudo: set[str]
+) -> list[tuple[Any, ...]]:
+    """reload: delete for good every grant whose owner or named recipient
+    is no longer an account, so a new account by the same name never
+    inherits it; returns the other grants as (row, log name, accounts the
+    recipient reaches), oldest first. IdP accounts are not in the config,
+    so with idp there is no telling who is gone; nothing is deleted then"""
+    log = asrv.log
+    store = _store(asrv.args)
+    rows = []
+    gone = []
+    for row in store.rows():
+        gid, un, rcpt = row[:3]
+        desc = grant_desc(*row)
+        uns = reached_accounts(asrv, pseudo, rcpt)
+        owner_ok = is_account(acct, pseudo, un)
+        if owner_ok and uns is not None:
+            rows.append((row, desc, uns))
+        elif asrv.args.have_idp_hdrs:
+            log("skipping %s; not an account" % (desc,), 3)
+        else:
+            who = "recipient" if owner_ok else "owner"
+            log("deleted %s for good; the %s is no longer an account" % (desc, who), 3)
+            gone.append(gid)
+    if gone:
+        store.delete(gone)
+    return rows
 
 
 def _route(vfs: "VFS", top: str, trees: dict[str, "VFS"]) -> None:
@@ -463,6 +513,18 @@ def _rights(perms: Any) -> str:
         raise Pebkac(400, "a grant is either read-only (read) or read + upload (read, write)")
 
 
+def _expiry(exp: Any, now: int) -> int:
+    """the expires-at time for an expiry in minutes (like share links);
+    0 = never, which is the default"""
+    if exp is None or exp == "":
+        return 0
+    if isinstance(exp, (str, unicode)) and exp.isdigit():
+        exp = int(exp)
+    if isinstance(exp, bool) or not isinstance(exp, int) or not 0 <= exp <= 10**9:
+        raise Pebkac(400, "the expiry is a whole number of minutes, or 0 for none")
+    return now + exp * 60 if exp else 0
+
+
 def _may_grant(vn: "VFS", uname: str) -> bool:
     """the grant_who volflag (no / a / auth, default auth); like shr_who,
     but separate, so an admin can allow one and forbid the other"""
@@ -512,6 +574,7 @@ def handle_grant(cli: Any, req: dict[str, Any]) -> bool:
     rcpt = "%s" % (req.get("rcpt") or "",)
     name = "%s" % (req.get("name") or "",)
     pr = _rights(req.get("perms"))
+    t1 = _expiry(req.get("exp"), int(time.time()))
 
     if cli.is_vproxied and (vp == args.R or vp.startswith(args.RS)):
         vp = vp[len(args.RS) :]
@@ -555,11 +618,11 @@ def handle_grant(cli: Any, req: dict[str, Any]) -> bool:
         raise Pebkac(400, t)
 
     _no_overlap(asrv, uname, rcpt, name)
-    gid = _store(args).create(uname, rcpt, vp, name, pr, 0)
+    gid = _store(args).create(uname, rcpt, vp, name, pr, t1)
     if not gid:
         t = "you already gave %r a grant named %r; pick another name"
         raise Pebkac(400, t % (rcpt, name))
-    cli.log("created grant %d by [%s] to [%s] of [/%s] (%s)" % (gid, uname, rcpt, vp, pr))
+    cli.log("created %s" % (grant_desc(gid, uname, rcpt, vp, name, pr, t1),))
 
     cli.conn.hsrv.broker.ask("reload", False, True).get()
     zs = "/%s/%s/%s/" % (top, uname, name)

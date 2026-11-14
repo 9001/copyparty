@@ -21,10 +21,11 @@ ACCS = ["alice:alice", "bob:bob", "carol:carol"]
 
 class TestForkGrants(unittest.TestCase):
     def log(self, src, msg, c=0):
-        pass
+        self.logs.append(msg)
 
     def setUp(self):
         self.conn = None
+        self.logs = []
         self.td = tu.get_ramdisk()
         td = os.path.join(self.td, "vfs")
         os.mkdir(td)
@@ -690,6 +691,160 @@ class TestForkGrants(unittest.TestCase):
 
     def test_upload_names_harden_on(self):
         self.check_upload_names(harden=True)
+
+
+    # grant lifetime across reloads (ticket 09)
+
+    def db_exec(self, q, *a):
+        db = sqlite3.connect("g.db")
+        try:
+            db.execute(q, a)
+            db.commit()
+        finally:
+            db.close()
+
+    def test_expiry_ends_access(self):
+        self.cinit()
+        self.assertEqual(self.grant(exp=60)[0], 201)
+        self.assertTrue(self.can_read("bob"))
+        # half an hour later, as the server sees it
+        self.db_exec("update gr set t1 = t1 - 1800")
+        self.reload()
+        self.assertTrue(self.can_read("bob"))
+        # and past the hour
+        self.db_exec("update gr set t1 = t1 - 1801")
+        self.reload()
+        self.assertFalse(self.can_read("bob"))
+        self.assertNotIn("shared/", self.ls("", "bob"))
+
+    def test_no_expiry_by_default(self):
+        self.cinit()
+        for exp in ({}, {"exp": None}, {"exp": ""}, {"exp": 0}, {"exp": "0"}):
+            self.logs = []
+            self.assertEqual(self.grant(**exp)[0], 201, exp)
+            zsl = [x for x in self.logs if x.startswith("created grant ")]
+            self.assertEqual(len(zsl), 1, exp)
+            self.assertIn("expires never", zsl[0], exp)
+            self.db_exec("delete from gr")
+
+    def test_expiry_refusals(self):
+        self.cinit()
+        for exp in (-1, "x", 1.5, 0.0, False, True, [1], "1e3", 10**10):
+            self.refused(b"expiry", exp=exp)
+
+
+    def test_suspended_while_the_owner_lacks_rights(self):
+        os.makedirs("fam/pics")
+        with open("fam/pics/p.jpg", "wb") as f:
+            f.write(b"fam/pics/p.jpg")
+        v = ["a:home/alice:A,alice", "fam:family:r,@family"]
+        self.ginit("family:alice,carol", v=v)
+        self.assertEqual(self.grant(vp="/family/pics/", name="pics")[0], 201)
+        url = "shared/alice/pics/p.jpg"
+        self.assertEqual(self.get(url, "bob"), (200, b"fam/pics/p.jpg"))
+
+        self.regroup("family:carol")
+        self.assertIn(self.get(url, "bob")[0], (403, 404))
+        self.assertNotIn("shared/", self.ls("", "bob"))
+        self.assertEqual(self.n_grants(), 1)
+
+        self.regroup("family:alice,carol")
+        self.assertEqual(self.get(url, "bob"), (200, b"fam/pics/p.jpg"))
+
+    def test_broken_while_the_source_is_gone(self):
+        self.cinit()
+        self.assertEqual(self.grant()[0], 201)
+        os.rename("a/proj", "a/proj2")
+        self.reload()
+        self.assertFalse(self.can_read("bob"))
+        self.assertNotIn("shared/", self.ls("", "bob"))
+        self.assertEqual(self.n_grants(), 1)
+
+        os.rename("a/proj2", "a/proj")
+        self.reload()
+        self.assertTrue(self.can_read("bob"))
+
+
+    def reaccount(self, *accs):
+        """edit [accounts] in the config, then reload"""
+        self.args.a = list(accs)
+        self.reload()
+
+    def test_deleted_with_the_owner_account(self):
+        self.cinit()
+        self.assertEqual(self.grant()[0], 201)
+        # the admin hands alice's folder to carol and removes alice
+        self.args.v = ["a:home/alice:A,carol"]
+        self.reaccount("bob:bob", "carol:carol")
+        self.assertEqual(self.n_grants(), 0)
+        self.assertFalse(self.can_read("bob"))
+
+        # a new alice doesn't inherit the old one's grant
+        self.args.v = ["a:home/alice:A,alice"]
+        self.reaccount(*ACCS)
+        self.assertFalse(self.can_read("bob"))
+        self.assertNotIn("shared/", self.ls("", "bob"))
+
+    def test_deleted_with_the_recipient_account(self):
+        self.cinit()
+        self.assertEqual(self.grant()[0], 201)
+        self.assertEqual(self.grant(rcpt="carol")[0], 201)
+        self.reaccount("alice:alice", "carol:carol")
+        self.assertEqual(self.n_grants(), 1)
+        self.assertTrue(self.can_read("carol"))
+
+        # a new bob doesn't inherit the old one's grant
+        self.reaccount(*ACCS)
+        self.assertFalse(self.can_read("bob"))
+        self.assertNotIn("shared/", self.ls("", "bob"))
+        self.assertTrue(self.can_read("carol"))
+
+    def test_group_grant_kept_when_a_member_account_is_gone(self):
+        # only a named recipient's account going away deletes the grant
+        self.ginit("family:alice,bob,carol")
+        self.assertEqual(self.grant(rcpt="@family")[0], 201)
+        self.reaccount("alice:alice", "carol:carol")
+        self.assertEqual(self.n_grants(), 1)
+        self.assertTrue(self.can_read("carol"))
+        self.reaccount(*ACCS)
+        self.assertTrue(self.can_read("bob"))
+
+
+    def logged(self, word):
+        """log lines since the last call that start with `word` and name a
+        grant's owner, recipient, path and rights"""
+        ret = [x for x in self.logs if x.startswith(word + " grant ")]
+        self.logs = []
+        for x in ret:
+            for zs in ("[alice]", "[bob]", "[/home/alice/proj]", "(r,"):
+                self.assertIn(zs, x)
+        return ret
+
+    def test_state_changes_are_logged(self):
+        self.cinit()
+        self.logs = []
+        self.assertEqual(self.grant(exp=60)[0], 201)
+        self.assertEqual(len(self.logged("created")), 1)
+
+        self.db_exec("update gr set t1 = 1")
+        self.reload()
+        self.assertEqual(len(self.logged("expired")), 1)
+
+        self.db_exec("update gr set t1 = 0")
+        os.rename("a/proj", "a/proj2")
+        self.reload()
+        self.assertEqual(len(self.logged("broken")), 1)
+        os.rename("a/proj2", "a/proj")
+
+        self.args.v = ["a:home/alice:A,carol"]
+        self.reload()
+        self.assertEqual(len(self.logged("suspended")), 1)
+
+        self.args.a = ["alice:alice", "carol:carol"]
+        self.reload()
+        zsl = self.logged("deleted")
+        self.assertEqual(len(zsl), 1)
+        self.assertIn("for good", zsl[0])
 
 
 if __name__ == "__main__":

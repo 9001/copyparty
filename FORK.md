@@ -215,8 +215,8 @@ every place this fork changes an upstream file. On a merge conflict, resolve eac
 ## grants: fork-only folder sharing between accounts
 
 see `docs/adr/0001` and `.scratch/grants/spec.md`. Work in progress: tickets 06 (the tracer
-bullet), 07 (rights and refusals) and 08 (groups) are done; expiry, the grants page and button
-are not.
+bullet), 07 (rights and refusals), 08 (groups) and 09 (lifetime across reloads) are done; the
+grants page (revoke, extend) and the button are not.
 
 options (`[global]`):
 
@@ -236,13 +236,15 @@ volflag:
 what works so far:
 
 * an owner creates a grant with `POST /?grant`, JSON body
-  `{"vp": "/home/alice/proj/", "rcpt": "bob", "name": "proj", "perms": ["read"]}`; a reload
-  follows. `rcpt` is an account, or `@<group>` for a group from `[groups]` /
+  `{"vp": "/home/alice/proj/", "rcpt": "bob", "name": "proj", "perms": ["read"], "exp": 60}`;
+  a reload follows. `exp` is an optional expiry in minutes, like share links; missing, empty or
+  0 = never. `rcpt` is an account, or `@<group>` for a group from `[groups]` /
   `--grp`. `perms` is `["read"]` (read-only) or `["read", "write"]` (read + upload); the
   recipient also gets `g`. Move, delete, admin and `.` are never possible through a grant.
   Refused, each with a 400:
   * grants off; not logged in
   * any other `perms`
+  * an `exp` that isn't a whole number of minutes from 0 to 10^9
   * a list of paths in `vp`, or a `files` selection (one folder only); a single file
   * a source under `/shared` or under the share link folder (also through `..`, or any path
     that resolves to a share link or grant volume)
@@ -274,7 +276,22 @@ what works so far:
 * at every reload each grant is resolved through the volume tree as its owner with exactly the
   granted rights (like share links), and mounted with the source volume's settings, minus share
   links (`shr_who: no`) and indexing flags. A grant whose owner lost those rights (suspended), or
-  whose source folder is gone (broken), is skipped and logged; its row stays
+  whose source folder is gone (broken), is skipped and logged; its row stays, so it comes back
+  when the owner regains the rights or a folder appears at that path. An expired grant is skipped
+  and logged; its row stays (for the owner to extend, ticket 10)
+* a grant whose owner, or whose named recipient account, is no longer an account in the config is
+  deleted from the database for good at the next reload, so an account created later with the
+  same name doesn't inherit it. A group recipient never causes this (a missing group just mounts
+  for nobody). With IdP headers on (`have_idp_hdrs`) nothing is deleted, since IdP accounts
+  aren't in the config; such grants are only skipped
+  * careful: an account dropped from `[accounts]` by mistake loses every grant it owns or
+    names, at the first reload; putting it back doesn't restore them
+  * with multiprocessing (`-j` above 1) every worker reloads, so the same removal can be logged
+    more than once; the delete itself is harmless to repeat
+* the log has a line for every create, expiry, suspension, break and permanent removal, naming
+  the grant's id, owner, recipient, path, mount name, rights and expiry. The states are worked
+  out again at every reload, so an expired, suspended or broken grant is logged at each reload
+  for as long as it stays that way, not only when it changes
 * the recipient browses and downloads over HTTP and WebDAV; others see nothing under `/shared`
 * each recipient has their own `/shared` tree, so alice can grant bob a `proj` and carol a
   different `proj`; both see `/shared/alice/proj`, each their own folder. The root's path lookups
