@@ -35,7 +35,7 @@ from .__init__ import ANYWIN, PY2, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
-from .fork_harden import http_refused
+from .fork_harden import http_refused, refuse_dot_name
 from .qrkode import qr2svg, qrgen
 from .star import StreamTar
 from .sutil import StreamArc, gfilter
@@ -3232,6 +3232,7 @@ class HttpCli(object):
 
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
         name = vfs.sanitize_fn(name, rem)
+        refuse_dot_name(self.args, vfs, self.uname, name)  # fork
         dbv, vrem = vfs.get_dbv(rem)
 
         if (

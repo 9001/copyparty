@@ -93,3 +93,12 @@ def refuse_dot_tree(
                 if _refused(vn, rem, uname, su):
                     t = "this folder holds dotfiles; moving or copying it needs the `.` permission"
                     raise Pebkac(403, t)
+
+
+def refuse_dot_name(args: Any, vn: "VFS", uname: str, name: str) -> None:
+    """up2k handshake: the new file's name comes in the request body, so
+    neither VFS.get nor http_refused saw it; 404 like every other way of
+    creating a dot name without the `.` permission"""
+    # the folder part was already checked by VFS.get; only the name is new
+    if _on(args) and _refused(vn, name, uname, _su()):
+        raise Pebkac(404)

@@ -5,6 +5,7 @@ from __future__ import division, print_function, unicode_literals
 # fork-only: with --harden, dotfiles inside a volume are 404 without the `.` permission
 
 import io
+import json
 import os
 import shutil
 import tarfile
@@ -52,9 +53,9 @@ class TestForkHarden(unittest.TestCase):
         self.asrv = AuthSrv(self.args, self.log)
         self.conn = tu.VHttpConn(self.args, self.asrv, self.log, b"", up2k)
 
-    def req(self, method, url, uname, extra=""):
+    def req(self, method, url, uname, extra="", body=b""):
         h = "%s /%s HTTP/1.1\r\nPW: %s\r\nConnection: close\r\n%s\r\n"
-        buf = (h % (method, url, uname, extra)).encode("utf-8")
+        buf = (h % (method, url, uname, extra)).encode("utf-8") + body
         HttpCli(self.conn.setbuf(buf)).run()
         h, b = self.conn.s._reply.split(b"\r\n\r\n", 1)
         return int(h.split(b" ", 2)[1]), b
@@ -213,6 +214,99 @@ class TestForkHarden(unittest.TestCase):
         self.cinit(harden=False, vcfg=[".::rwm,u1"], up2k=True)
         self.assertEqual(self.post("m?move=/m2", "u1")[0], 201)
         self.assertEqual(self.tree("m2"), ["m2/.DS_Store", "m2/a.txt", "m2/s/b.txt"])
+
+    # ticket 04: creating dot names
+
+    # an up2k file: (data, chunk hash, wark), from tests/test_dedup.py
+    UP2K_FILE = (
+        "one",
+        "BfcDQQeKz2oG1CPSFyD5ZD1flTYm2IoCY23DqeeVgq6w",
+        "XMbpLRqVdtGmgggqjUI6uSoNMTqZVX4K6zr74XA1BRKc",
+    )
+
+    def body(self, method, url, uname, buf, ctype, extra=""):
+        extra += "Content-Type: %s\r\nContent-Length: %d\r\n" % (ctype, len(buf))
+        return self.req(method, url, uname, extra, buf)
+
+    def put(self, url, uname):
+        return self.body("PUT", url, uname, b"put", "application/octet-stream")
+
+    def multipart(self, url, uname, act, name, fn=None):
+        parts = [("act", None, act)]
+        if fn:
+            parts.append(("f", fn, "mp"))
+        else:
+            parts.append(("name", None, name))
+        buf = ""
+        for field, fname, val in parts:
+            cd = 'form-data; name="%s"' % (field,)
+            if fname:
+                cd += '; filename="%s"' % (fname,)
+            buf += "--XD\r\nContent-Disposition: %s\r\n\r\n%s\r\n" % (cd, val)
+        buf += "--XD--\r\n"
+        ctype = "multipart/form-data; boundary=XD"
+        return self.body("POST", url, uname, buf.encode("utf-8"), ctype)
+
+    def up2k(self, dn, fn, uname):
+        """up2k handshake, then the one chunk if the server wants it"""
+        data, chash, wark = self.UP2K_FILE
+        msg = {"name": fn, "size": 3, "lmod": 1234567890, "life": 0, "hash": [chash]}
+        buf = json.dumps(msg).encode("utf-8")
+        st, b = self.body("POST", dn + "/", uname, buf, "text/plain")
+        if st != 200:
+            return st, b
+        if json.loads(b)["hash"]:
+            hdr = "X-Up2k-Hash: %s\r\nX-Up2k-Wark: %s\r\n" % (chash, wark)
+            ctype = "application/octet-stream"
+            st, b = self.body("POST", dn + "/", uname, data.encode(), ctype, hdr)
+        return st, b
+
+    def create_all(self, uname):
+        """every way of making a dot name; returns [(what, status, path it makes)]"""
+        os.mkdir(".dir")
+        mp = self.multipart
+        ways = [
+            ("put", lambda: self.put(".new", uname), ".new"),
+            ("put_in_dotdir", lambda: self.put(".dir/n.txt", uname), ".dir/n.txt"),
+            ("up2k", lambda: self.up2k("d", ".epilogue.html", uname), "d/.epilogue.html"),
+            ("up2k_in_dotdir", lambda: self.up2k(".dir", "u.txt", uname), ".dir/u.txt"),
+            ("bput", lambda: mp("d", uname, "bput", None, ".b.txt"), "d/.b.txt"),
+            ("bput_in_dotdir", lambda: mp(".dir", uname, "bput", None, "b.txt"), ".dir/b.txt"),
+            ("new_md", lambda: mp("d", uname, "new_md", ".prologue.html"), "d/.prologue.html"),
+            ("mkdir", lambda: mp("", uname, "mkdir", ".x"), ".x"),
+            ("mkdir_in_dotdir", lambda: mp(".dir", uname, "mkdir", "x"), ".dir/x"),
+            ("rename", lambda: self.post("f.txt?move=/.a.txt", uname), ".a.txt"),
+            ("move_into_dotdir", lambda: self.post("d/f.txt?move=/.dir/f.txt", uname), ".dir/f.txt"),
+        ]
+        return [(what, fn()[0], fp) for what, fn, fp in ways]
+
+    def test_create_dot_names_without_dot_refused(self):
+        self.cinit(vcfg=[".::rwmd,u1:rwmd.,u2"], up2k=True)
+        for what, st, fp in self.create_all("u1"):
+            self.assertGreaterEqual(st, 400, what)
+            self.assertFalse(os.path.exists(fp), fp)
+        self.assertTrue(os.path.exists("f.txt"))
+        self.assertTrue(os.path.exists("d/f.txt"))
+
+    def test_create_dot_names_with_dot(self):
+        self.cinit(vcfg=[".::rwmd,u1:rwmd.,u2"], up2k=True)
+        for what, st, fp in self.create_all("u2"):
+            self.assertLess(st, 400, what)
+            self.assertTrue(os.path.exists(fp), fp)
+
+    def test_create_dot_names_harden_off(self):
+        self.cinit(harden=False, vcfg=[".::rwmd,u1"], up2k=True)
+        for what, st, fp in self.create_all("u1"):
+            self.assertLess(st, 400, what)
+            self.assertTrue(os.path.exists(fp), fp)
+
+    def test_dotpart_upload(self):
+        # copyparty's own temporary .PARTIAL names are not the user's
+        self.cinit(vcfg=[".::rw,u1"], up2k=True, dotpart=True)
+        self.assertEqual(self.up2k("d", "n.txt", "u1")[0], 200)
+        with open("d/n.txt", "rb") as f:
+            self.assertEqual(f.read(), b"one")
+        self.assertEqual(self.get("d/n.txt", "u1"), (200, b"one"))
 
 
 if __name__ == "__main__":
