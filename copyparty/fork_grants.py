@@ -10,7 +10,7 @@ import time
 
 from .fork_harden import harden_nodes, has_dot_part, http_refused
 from .fork_util import grants_top
-from .util import Pebkac, vjoin
+from .util import Pebkac, undot, vjoin
 
 try:
     import sqlite3
@@ -125,7 +125,12 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
     Called at the end of AuthSrv._reload, once every volume and share link
     has its final flags. Each grant is resolved as its owner with exactly
     the granted rights (the check share links use), so it only works while
-    the owner still holds those rights"""
+    the owner still holds those rights.
+
+    alice can grant bob a "proj" and carol a different "proj", so each
+    recipient gets a tree of their own, and the root's path lookup sends
+    /<grants>/... to the asking account's tree (_route). The tree under the
+    root itself only has folders with no path on disk, for listings"""
     from .authsrv import AXS, VFS
 
     args = asrv.args
@@ -140,11 +145,25 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
         t = "invalid config: a volume is overlapping with the --grants global-option (/%s)"
         raise Exception(t % (top,))
 
+    def folder(parent: Optional["VFS"], name: str) -> "VFS":
+        """a grants folder with no path on disk (/<grants>, /<grants>/<owner>)"""
+        if parent and name in parent.nodes:
+            return parent.nodes[name]
+        vp = vjoin(parent.vpath, name) if parent else name
+        flags = parent.flags.copy() if parent else vfs._copy_flags(name)
+        vn = VFS(asrv.log_func, "", vp, vp, AXS(), flags)
+        vn.fork_grant_dir = True  # type: ignore
+        if parent:
+            parent.nodes[name] = vn
+        virt.append(vn)
+        return vn
+
     log = asrv.log
-    unames = ["*"] + sorted(acct)
-    topn = VFS(asrv.log_func, "", top, top, AXS(), vfs._copy_flags(top))
-    topn.fork_grant_dir = True  # type: ignore
+    virt: list["VFS"] = []
     grants: list["VFS"] = []
+    trees: dict[str, "VFS"] = {}  # recipient: their /<grants>
+    aread: dict[str, list[str]] = {}  # recipient: vpaths of their grants
+    pub = folder(None, top)
     for gid, un, rcpt, vp, name, pr in _store(args).live(time.time()):
         desc = "grant %d by [%s] to [%s] of [/%s] (%s)" % (gid, un, rcpt, vp, pr)
         if un not in acct or rcpt not in acct:
@@ -161,50 +180,33 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
             log("suspended %s; the owner lacks those rights: %r" % (desc, ex), 3)
             continue
 
-        ap = s_vfs.canonical(s_rem)
-        if not os.path.isdir(ap):
+        if not os.path.isdir(s_vfs.canonical(s_rem)):
             log("broken %s; the source folder is gone" % (desc,), 3)
             continue
 
-        ovn = topn.nodes.get(un)
-        if not ovn:
-            zs = vjoin(top, un)
-            ovn = VFS(asrv.log_func, "", zs, zs, AXS(), topn.flags.copy())
-            ovn.fork_grant_dir = True  # type: ignore
-            topn.nodes[un] = ovn
-
-        gvn = ovn.nodes.get(name)
-        if gvn:
-            if gvn.realpath == ap and gvn.fork_grant_pr == pr:  # type: ignore
-                _add_rcpt(gvn.axs, rcpt, pr)
-                continue
-            log("skipping %s; another grant is already at that name" % (desc,), 3)
+        if rcpt not in trees:
+            trees[rcpt] = folder(None, top)
+        ovn = folder(trees[rcpt], un)
+        if name in ovn.nodes:
+            log("skipping %s; the recipient already has a grant by that name" % (desc,), 3)
             continue
 
         gvn = _grant_vol(asrv, vfs, ovn, name, s_vfs, s_rem, un, pr)
         _add_rcpt(gvn.axs, rcpt, pr)
         ovn.nodes[name] = gvn
         grants.append(gvn)
+        aread.setdefault(rcpt, []).append(gvn.vpath)
+
+        # the folders above it, and the root's copy, list only for recipients
+        povn = folder(pub, un)
+        for vn in (trees[rcpt], ovn, pub, povn, folder(povn, name)):
+            vn.axs.uread.add(rcpt)
         log("mounted %s at [/%s]" % (desc, gvn.vpath))
 
     if not grants:
         return
 
-    # the folders above a grant list only for its recipients
-    aread: dict[str, list[str]] = {}
-    for ovn in topn.nodes.values():
-        for gvn in ovn.nodes.values():
-            ovn.axs.uread.update(gvn.axs.uread)
-            for un in gvn.axs.uread:
-                aread.setdefault(un, []).append(gvn.vpath)
-        topn.axs.uread.update(ovn.axs.uread)
-    vfs.fork_grant_aread = aread  # type: ignore
-
-    vfs.nodes[top] = topn
-    if vfs.lnodes is not None:
-        vfs.lnodes[top.casefold().encode("ascii", "ignore")] = topn
-
-    virt = [topn] + list(topn.nodes.values())
+    unames = ["*"] + sorted(acct)
     for vn in virt + grants:
         _uaxs(vn, unames)
         vn.root = vfs
@@ -213,10 +215,43 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
             vn.js_htm = vfs.js_htm
             vn.md_htm = vfs.md_htm
 
-    for gvn in grants:
-        vfs.all_nodes[gvn.vpath] = gvn
+    vfs.nodes[top] = pub
+    if vfs.lnodes is not None:
+        vfs.lnodes[top.casefold().encode("ascii", "ignore")] = pub
+
+    # by vpath, for tx_ls_vols and the active-downloads list: the root's
+    # copy, which is the same for every recipient
+    for povn in pub.nodes.values():
+        for vn in povn.nodes.values():
+            vfs.all_nodes[vn.vpath] = vn
+    vfs.fork_grant_aread = aread  # type: ignore
 
     harden_nodes(args, virt + grants, [])
+    _route(vfs, top, trees)
+
+
+def _route(vfs: "VFS", top: str, trees: dict[str, "VFS"]) -> None:
+    """make the root's path lookups (VFS.get, VFS._get which httpcli.run
+    uses, and VFS.can_access behind the rights passed to event hooks)
+    resolve /<top>/... in the asking account's own grants tree"""
+    pre = top + "/"
+
+    def routed(name: str) -> Any:
+        fallback = getattr(vfs, name)
+
+        def lookup(vpath: str, uname: str, *a: Any, **ka: Any) -> Any:
+            tree = trees.get(uname)
+            if tree:
+                cvp = undot(vpath)
+                if cvp == top or cvp.startswith(pre):
+                    return getattr(tree, name)(cvp[len(pre) :], uname, *a, **ka)
+            return fallback(vpath, uname, *a, **ka)
+
+        return lookup
+
+    vfs.get = routed("get")
+    vfs._get = routed("_get")  # type: ignore
+    vfs.can_access = routed("can_access")  # type: ignore
 
 
 def _add_rcpt(axs: Any, rcpt: str, pr: str) -> None:

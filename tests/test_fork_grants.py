@@ -133,6 +133,43 @@ class TestForkGrants(unittest.TestCase):
         st, b = self.req("PROPFIND", "shared/alice/proj/", "carol", hdr)
         self.assertIn(st, (401, 403, 404))
 
+    def test_same_name_to_two_recipients(self):
+        # alice -> bob "proj" is one folder, alice -> carol "proj" another
+        os.makedirs("a/other")
+        with open("a/other/o.txt", "wb") as f:
+            f.write(b"a/other/o.txt")
+        self.cinit()
+        self.assertEqual(self.grant()[0], 201)
+        self.assertEqual(self.grant(vp="/home/alice/other/", rcpt="carol")[0], 201)
+
+        self.assertEqual(self.ls("shared/alice/proj/", "bob"), ["f.txt", "s/"])
+        self.assertEqual(self.ls("shared/alice/proj/", "carol"), ["o.txt"])
+        url = "shared/alice/proj/"
+        self.assertEqual(self.get(url + "f.txt", "bob"), (200, b"a/proj/f.txt"))
+        self.assertEqual(self.get(url + "o.txt", "carol"), (200, b"a/other/o.txt"))
+        self.assertIn(self.get(url + "o.txt", "bob")[0], (403, 404))
+        self.assertIn(self.get(url + "f.txt", "carol")[0], (403, 404))
+        for un in ("bob", "carol"):
+            self.assertEqual(self.ls("shared/", un), ["alice/"], un)
+            self.assertEqual(self.ls("shared/alice/", un), ["proj/"], un)
+            self.assertIn("shared/", self.ls("", un), un)
+
+        hdr = "Depth: 1\r\n"
+        st, b = self.req("PROPFIND", url, "carol", hdr)
+        self.assertEqual(st, 207)
+        self.assertIn(b"o.txt", b)
+        self.assertNotIn(b"f.txt", b)
+
+        vfs = self.asrv.vfs
+        self.assertEqual(vfs.get(url + "f.txt", "bob", True, False)[1], "f.txt")
+        self.assertEqual(vfs.get(url + "o.txt", "carol", True, False)[1], "o.txt")
+        self.assertEqual(vfs.get(url, "carol", True, False)[0].realpath, os.path.abspath("a/other"))
+        with self.assertRaises(Exception):
+            vfs.get(url + "f.txt", "guest", True, False)
+        self.assertEqual(vfs.get_perms(url + "o.txt", "carol"), "rg")
+        self.assertEqual(vfs.get_perms(url, "bob"), "rg")
+        self.assertEqual(vfs.get_perms(url, "*"), "")
+
     def test_dotfiles_always_404(self):
         # harden off, and alice holds `.` (via A) on the source
         self.cinit()
