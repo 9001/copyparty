@@ -1025,9 +1025,24 @@ class TestForkGrants(unittest.TestCase):
         self.ginit("family:alice,bob", "friends:carol")
         st, jo = self.rcpts("alice")
         self.assertEqual(st, 200)
-        self.assertEqual(jo, {"accounts": ["bob", "carol"], "groups": ["@family", "@friends"]})
+        self.assertEqual(jo["accounts"], ["bob", "carol"])
+        self.assertEqual(jo["groups"], ["@family", "@friends"])
         self.assertEqual(self.rcpts("bob")[1]["accounts"], ["alice", "carol"])
         self.assertIn(self.rcpts("*")[0], (401, 403))
+
+    def test_recipient_list_names_the_grants_folder(self):
+        # the grant button hides itself inside it
+        self.cinit(grants="/shared/")
+        self.assertEqual(self.rcpts("alice")[1]["top"], "shared")
+
+    def test_grant_button_script_is_served(self):
+        # loaded with --js-browser /.cpr/w/grantbtn.js; harden refuses dot
+        # paths and no-html serves html as text, neither may touch it
+        self.cinit(harden=True, no_html=True)
+        for un in ("alice", "*"):
+            st, b = self.get(".cpr/w/grantbtn.js", un)
+            self.assertEqual(st, 200, un)
+            self.assertIn(b"?grants=rcpts", b, un)
 
     def test_recipient_list_without_share_link_passwords(self):
         self.cinit_shr()

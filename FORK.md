@@ -31,7 +31,7 @@ the Nextcloud features we want to keep:
 | manage users | ❌ **config file only** -- edit, then reload (`kill -USR1` / `[reload cfg]` button) |
 | own folder per user | ✅ `[/home/${u}]` volume, one block covers all users |
 | shared folders | ✅ admin-defined volume + `[groups]` |
-| **user shares a folder with another user** | 🚧 grants (`grants: /shared`), fork-only; read-only or read + upload, created by a JSON POST so far (no button yet); owners revoke and extend them on `?grants`, linked from the control panel |
+| **user shares a folder with another user** | ✅ grants (`grants: /shared` + `js-browser: /.cpr/w/grantbtn.js`), fork-only; a "grant" button beside "share" in the file browser, to an account or a config group, read-only or read + upload, optional expiry; owners revoke and extend them on `?grants`, linked from the control panel |
 | share links | ✅ `shr: /share`; password, expiry, optional upload; owner manages them in the control panel |
 | stream video | ✅ served as-is with range requests; no video transcoding (fine for the Pi) |
 | edit text | ✅ text viewer + two markdown editors |
@@ -193,6 +193,8 @@ docker):
   harden           # the rules above
   no-html          # uploaded .html/.htm/.xhtml/.svg/.md and the markdown viewer (?v) are served
                    # as text/plain with script-src 'none'; copyparty's own UI keeps working
+  grants: /shared  # grants, see below
+  js-browser: /.cpr/w/grantbtn.js   # the grant button in the file browser
 ```
 
 `harden` makes `/family` dotfiles 404 for members, since `rwmd` has no `.`. Give `@family`
@@ -206,7 +208,7 @@ every place this fork changes an upstream file. On a merge conflict, resolve eac
 | fix | upstream lines touched | fork files | on conflict |
 |---|---|---|---|
 | fork modules ship in the sfx build | `scripts/sfx.ls`: one line per new `copyparty/fork_*.py` (and per fork file in `copyparty/web/`) | -- | keep both sides |
-| grants (`--grants`, `--grants-db`) | `authsrv.py`: one import + `mount_grants(self, vfs, acct)` as the last line of `_reload` (marked `# fork`; it needs every volume's final flags, js and share links); `httpcli.py` `handle_post_json`: one import + `if "grant" in self.uparam: return handle_grant(self, body)` right after the `share` dispatch (marked `# fork`); `httpcli.py` `handle_get`: `if "grants" in self.uparam: return tx_grants(self)` right after the `shares` dispatch, and `handle_post`: `if "egrant" in self.uparam: return handle_egrant(self)` right after the `eshare` dispatch (both marked `# fork`, sharing the import); `web/splash.html`: an "edit grants" link (`id="yg"`) right after "edit shares"; `scripts/sfx.ls`: `web/grants.html` and `web/grants.js`; `httpcli.py` `run`: the `http_request` line (see `harden`); `__main__.py` `add_share`: the `--grants` and `--grants-db` options; `cfg.py` `flagcats["others"]`: one `grant_who=auth` line after `shr_who=auth` (registers the volflag, so copyparty doesn't warn that it's unrecognized) | `copyparty/fork_grants.py`, `copyparty/fork_harden.py` (dot rule and upload-name rule also on grant volumes, `harden_nodes`), `copyparty/fork_util.py` (`grants_top`), `copyparty/web/grants.html`, `copyparty/web/grants.js` (the page loads its own template through `httpsrv.load_jinja2_resource` and adds it to `hsrv.j2` as `fork_grants` on first use, so it renders through `HttpCli.j2s` while httpsrv's template list is untouched; `fork_grants.py` also adds both files to upstream's `RES` set at import, which is what lets `.cpr/w/grants.js` be served), `tests/test_fork_grants.py` | keep both sides; grant volumes mirror how `_reload` maps a share link (`shr_src`, `_get_share_src`, `shr_all_aps`, hidden `.hist` and subvolumes), so if upstream changes that block, port the change to `_grant_vol` and rerun `tests/test_fork_grants.py`. `_route` replaces `get`, `_get` and `can_access` on the root volume instance; if upstream adds another root-level lookup that walks `nodes` itself (`_find`), route it too, or it sees the root's listing-only copy (no path on disk, so no files leak, but wrong rights). The listing workaround in `http_request` relies on `tx_ls_vols` reading `self.rvol` and on `run` setting `can_*` before the hook. `share_pw_accounts` copies how the share loader in `_reload` names the made-up `s_...` account of a share link password (`"s_%s" % ub64enc(sha512(pw))[4:16]`); if upstream changes that, change it too, or grants could go to anyone holding a share link password (`test_refused_to_a_share_link_password` catches it). If upstream renames `hsrv.j2`, `j2s`, `load_jinja2_resource` or `RES`, the grants page breaks: `test_page_*` catch the template side; a 404 on `/.cpr/w/grants.js` (no test) means `RES` moved |
+| grants (`--grants`, `--grants-db`) | `authsrv.py`: one import + `mount_grants(self, vfs, acct)` as the last line of `_reload` (marked `# fork`; it needs every volume's final flags, js and share links); `httpcli.py` `handle_post_json`: one import + `if "grant" in self.uparam: return handle_grant(self, body)` right after the `share` dispatch (marked `# fork`); `httpcli.py` `handle_get`: `if "grants" in self.uparam: return tx_grants(self)` right after the `shares` dispatch, and `handle_post`: `if "egrant" in self.uparam: return handle_egrant(self)` right after the `eshare` dispatch (both marked `# fork`, sharing the import); `web/splash.html`: an "edit grants" link (`id="yg"`) right after "edit shares"; `scripts/sfx.ls`: `web/grantbtn.js`, `web/grants.html` and `web/grants.js`; `httpcli.py` `run`: the `http_request` line (see `harden`); `__main__.py` `add_share`: the `--grants` and `--grants-db` options; `cfg.py` `flagcats["others"]`: one `grant_who=auth` line after `shr_who=auth` (registers the volflag, so copyparty doesn't warn that it's unrecognized) | `copyparty/fork_grants.py`, `copyparty/fork_harden.py` (dot rule and upload-name rule also on grant volumes, `harden_nodes`), `copyparty/fork_util.py` (`grants_top`), `copyparty/web/grants.html`, `copyparty/web/grants.js`, `copyparty/web/grantbtn.js` (the page loads its own template through `httpsrv.load_jinja2_resource` and adds it to `hsrv.j2` as `fork_grants` on first use, so it renders through `HttpCli.j2s` while httpsrv's template list is untouched; `fork_grants.py` also adds those three files to upstream's `RES` set at import, which is what lets `.cpr/w/grants.js` be served), `tests/test_fork_grants.py` | keep both sides; grant volumes mirror how `_reload` maps a share link (`shr_src`, `_get_share_src`, `shr_all_aps`, hidden `.hist` and subvolumes), so if upstream changes that block, port the change to `_grant_vol` and rerun `tests/test_fork_grants.py`. `_route` replaces `get`, `_get` and `can_access` on the root volume instance; if upstream adds another root-level lookup that walks `nodes` itself (`_find`), route it too, or it sees the root's listing-only copy (no path on disk, so no files leak, but wrong rights). The listing workaround in `http_request` relies on `tx_ls_vols` reading `self.rvol` and on `run` setting `can_*` before the hook. `share_pw_accounts` copies how the share loader in `_reload` names the made-up `s_...` account of a share link password (`"s_%s" % ub64enc(sha512(pw))[4:16]`); if upstream changes that, change it too, or grants could go to anyone holding a share link password (`test_refused_to_a_share_link_password` catches it). If upstream renames `hsrv.j2`, `j2s`, `load_jinja2_resource` or `RES`, the grants page breaks: `test_page_*` catch the template side; `test_grant_button_script_is_served` catches `RES` moving. `web/grantbtn.js` leans on upstream's browser.js by name: `fileman.render`, `msel.getsel`, `#fshr`, `#wfm`, `#shui`, `perms`, `in_shr`, `acct`; after an upstream merge, open the file browser and check the grant button still shows and opens its dialog (no automated check) |
 | `--shr-adm` takes a real comma-separated list of exact names (upstream compared the whole string in `?shares` / `?eshare`, and used a substring test in the active-downloads list, so `adm` matched `admin`) | `svchub.py`: one import + `args.shr_adm = split_names(args.shr_adm)`; `httpcli.py` `tx_shares` / `handle_eshare`: `!=` -> `not in`; `authsrv.py` `cgen`: `shr_adm` added to the `csv` set so `--cgen` still prints it | `copyparty/fork_util.py` (`split_names`), `tests/test_fork_shr_adm.py` | **take theirs if upstream fixes it**, then remove all of the fork side: the `split_names` line + import in `svchub.py`, `shr_adm` in cgen's `csv` set (unless upstream keeps a list too), and `split_names` (and `fork_util.py` + its `sfx.ls` line, if nothing else uses them); keep the test if it still passes |
 | `harden`: dotfiles inside a volume are 404 without `.` | `authsrv.py`: one import + `harden_vfs(self.args, vfs)` in `_reload` right after the loop that ends with the `dots` volflag adding to `udot` (marked `# fork`; it wraps each volume's `get`, so it must come after the `xvd` block, and it clears `udot` on share links, so after the `dots` loop); `httpcli.py` `run`: one import + `if http_request(self): return self.tx_404() and False` right after `self.rem = rem` (the per-request lookup uses `VFS._get`, not `get`; `http_request` lives in `fork_grants.py` and calls `fork_harden.http_refused` first); `up2k.py`: one import + a `refuse_dot_tree(...)` walk before the folder walk in `handle_mv` and in `handle_cp` (2 lines each, marked `# fork`); `httpcli.py` `handle_post_json`: `refuse_dot_name(...)` right after `vfs.sanitize_fn(name, rem)` (marked `# fork`, import shared with the `fork_harden` one); `httpcli.py` `handle_share`: `refuse_short_key(self.args, skey)` right after the illegal-character check (marked `# fork`, same import); `authsrv.py` `_reload`, share loader: `purge_ownerless_shares(self.args, db, acct, self.log)` right before the first `for row in cur.execute("select * from sh")` loop (marked `# fork`, import shared with `harden_vfs`); `__main__.py` `add_safety`: the `--harden` option. Share link dotfiles and upload names need no extra edit: `harden_vfs` clears `udot` and wraps `sanitize_fn` on each share link volume, and the wrapped `get` refuses the listing names on write lookups into a share link | `copyparty/fork_harden.py`, `tests/test_fork_harden.py`, `tests/test_fork_harden_shr.py` | keep both sides; if upstream renames `VFS.get` / the `self.vn, self.rem` lookup in `run`, move the hook to the new spot and rerun `tests/test_fork_harden.py` and `tests/test_fork_harden_shr.py` (the share link rules set `VFS.sanitize_fn` / `axs.udot` by name, so a rename upstream would silently stop them; only the tests notice). `_refuse_dots` reads `err` by `VFS._get`'s argument order (6th after `uname`, default 403); recheck it if that signature changes. **If upstream adds a real dotfile block, take theirs** and remove the fork side |
 | a share link password equal to an account's password no longer breaks every reload (upstream loaded it as a made-up `s_...` account with the same password, which tripped the "same password" check; reload/restart then failed for everyone). The share is now granted to the account that owns that password, so the password logs in as that account and opens the share (that account may not be the share's owner: if bob sets alice's password on a share, alice's login also gets the share) | `authsrv.py` `_reload`, share loader: a `pw2u` password->account map before the loop, and an `if s_pw.strip() in pw2u: sun = pw2u[s_pw.strip()]` branch before the `s_` account is made | `tests/test_fork_shr_pw.py` | **take theirs if upstream fixes it**, then drop the `pw2u` line and the extra branch; keep the test if it still passes |
@@ -215,8 +217,8 @@ every place this fork changes an upstream file. On a merge conflict, resolve eac
 ## grants: fork-only folder sharing between accounts
 
 see `docs/adr/0001` and `.scratch/grants/spec.md`. Work in progress: tickets 06 (the tracer
-bullet), 07 (rights and refusals), 08 (groups), 09 (lifetime across reloads) and 10 (the grants
-page) are done; the button in the file browser is not.
+bullet), 07 (rights and refusals), 08 (groups), 09 (lifetime across reloads), 10 (the grants
+page) and 11 (the button in the file browser) are done.
 
 options (`[global]`):
 
@@ -235,6 +237,17 @@ volflag:
 
 what works so far:
 
+* the **grant button** (`web/grantbtn.js`), loaded with `js-browser: /.cpr/w/grantbtn.js`
+  (`--js-browser`; behind a reverse proxy with `--rp-loc`, prefix that path). It sits beside
+  "share" in the file browser and acts on the current folder, or on the one folder selected; it
+  hides when a file or several things are selected, for guests, without read access, inside
+  `/shared/` and share links, and when grants are off (it asks `?grants=rcpts` once per page load).
+  Its dialog picks the recipient from `?grants=rcpts`, read-only or read + upload, the name
+  (default: the folder's name) and an optional expiry in hours / days / weeks, then posts
+  `?grant` and shows where the recipient finds it, or the server's refusal word for word. It wraps
+  upstream's `fileman.render` to update itself and reuses the share dialog's `#shui` box (and its
+  css); upstream's `browser.js` is not edited. `--js-browser` takes one url, so another custom
+  script has to load this one itself. Checked by hand only (no JS test harness); see ticket 11
 * an owner creates a grant with `POST /?grant`, JSON body
   `{"vp": "/home/alice/proj/", "rcpt": "bob", "name": "proj", "perms": ["read"], "exp": 60}`;
   a reload follows. `exp` is an optional expiry in minutes, like share links; missing, empty or
@@ -315,8 +328,8 @@ what works so far:
     expired (a reload follows then, which brings it back). A grant with no expiry can't be
     extended. The owner may do both; a `--shr-adm` account may only revoke (spec story 32);
     others get a 403
-  * `GET /?grants=rcpts` returns `{"accounts": [...], "groups": ["@family", ...]}`: who a grant
-    can go to, without the caller, the all-accounts group (`--grp-all`) and share link password
+  * `GET /?grants=rcpts` returns `{"accounts": [...], "groups": ["@family", ...], "top": "shared"}`:
+    who a grant can go to (and the grants folder, where the button hides itself), without the caller, the all-accounts group (`--grp-all`) and share link password
     accounts. Every account holder sees every account and group name (accepted in the spec)
 * grants are not in an account's list of readable volumes (`aread`), so search, the upload list
   and FTP/SFTP volume lists never see them; listings of `/`, `/shared/` and `/shared/<owner>/`
@@ -328,6 +341,12 @@ known gaps:
   the config (another grant change, a share link change, `SIGUSR1`, a restart). Share links have
   a timer for this; grants don't yet. The grants page already shows such a grant as `expired`
 
+* opening `/shared/` or `/shared/<owner>/` directly as a page (typing the url, reload) is a 403;
+  the web UI gets there through JSON listings from `/` and the tree, which work. Upstream does
+  the same for its own folders with no path on disk (`/home/` with only `[/home/${u}]`)
+* the reply to a recipient's upload into a read + upload grant (`PUT`) names the file by the
+  owner's own path (`/home/alice/photos/up.txt`), which tells the recipient where the folder lives
+  in the owner's tree; the file itself is not reachable to them there
 * with a **readable root volume** (`[/]`), `/` doesn't list `shared/` (upstream leaves folders
   that have no path on disk out of a real folder's listing); `/shared/` itself works. Our config
   has no root volume

@@ -25,8 +25,8 @@ if True:  # pylint: disable=using-constant-test
     if TYPE_CHECKING:
         from .authsrv import VFS, AuthSrv
 
-# the grants page; registered here so upstream's list in __init__ stays as it is
-RES.update(("web/grants.html", "web/grants.js"))
+# the grants page and the grant button; registered here so upstream's list in __init__ stays as it is
+RES.update(("web/grants.html", "web/grants.js", "web/grantbtn.js"))
 
 GRANTS_DB_VER = 1
 
@@ -741,12 +741,13 @@ def _template(cli: Any) -> str:
 
 def _tx_rcpts(cli: Any) -> bool:
     """account names and config groups (as @name) a grant can go to,
-    minus the caller and the all-accounts group"""
+    minus the caller and the all-accounts group; and the grants folder,
+    where the grant button hides itself"""
     asrv = cli.asrv
     pseudo = share_pw_accounts(asrv.args)
     uns = [x for x in asrv.acct if x != cli.uname and is_account(asrv.acct, pseudo, x)]
     grps = ["@" + x for x in config_groups(asrv)]
-    jt = {"accounts": sorted(uns), "groups": sorted(grps)}
+    jt = {"accounts": sorted(uns), "groups": sorted(grps), "top": grants_top(cli.args)}
     cli.reply(json.dumps(jt).encode("utf-8"), mime="application/json")
     return True
 
