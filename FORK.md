@@ -147,6 +147,26 @@ gotchas found while testing:
 * volumes on tmpfs lose write access unless `wram` is set (safety check; irrelevant on a real disk)
 
 
+## `harden`: fork-only hardening switch
+
+`harden` (`--harden`, or `harden` under `[global]`) is off by default; with it off, behaviour is
+exactly upstream's. Our config turns it on. With it on (see `docs/adr/0002`):
+
+* any path with a part starting with `.` **inside** a volume is 404 for an account without the `.`
+  permission on that volume -- direct GET, WebDAV, `?zip`/`?tar`, thumbnails, and the
+  `VFS.get` lookup that FTP/SFTP/SMB/TFTP use. Accounts with `.` (e.g. `A`, or `rwmd.`) keep full access
+* a volume mounted at a dot-named path (e.g. `/.b`) stays reachable; the rule applies below its root
+* `GET`/`HEAD` of `/.cpr/...` is exempt: copyparty always answers it with its own web resources
+* every other request method on a dot path is 404 too (PUT, MKCOL, DELETE, OPTIONS, ...), and so is a
+  move/copy *to* a dot path; that's a start on ticket 04, which still has to cover names sent in an
+  upload's body (up2k/bup) and `.prologue.html` / `.epilogue.html`
+* moving/copying a folder that holds dotfiles the account can't see at the source or the destination
+  is refused (403) up front, so it never stops half-way
+* not covered: SMB with `--smba` (upstream maps every SMB user to its internal superuser, which
+  bypasses all permissions anyway); keep SMB off
+* code: `copyparty/fork_harden.py`, tests: `tests/test_fork_harden.py`
+
+
 ## upstream edits
 
 every place this fork changes an upstream file. On a merge conflict, resolve each one as noted.
@@ -155,6 +175,7 @@ every place this fork changes an upstream file. On a merge conflict, resolve eac
 |---|---|---|---|
 | fork modules ship in the sfx build | `scripts/sfx.ls`: one line per new `copyparty/fork_*.py` | -- | keep both sides |
 | `--shr-adm` takes a real comma-separated list of exact names (upstream compared the whole string in `?shares` / `?eshare`, and used a substring test in the active-downloads list, so `adm` matched `admin`) | `svchub.py`: one import + `args.shr_adm = split_names(args.shr_adm)`; `httpcli.py` `tx_shares` / `handle_eshare`: `!=` -> `not in`; `authsrv.py` `cgen`: `shr_adm` added to the `csv` set so `--cgen` still prints it | `copyparty/fork_util.py` (`split_names`), `tests/test_fork_shr_adm.py` | **take theirs if upstream fixes it**, then remove all of the fork side: the `split_names` line + import in `svchub.py`, `shr_adm` in cgen's `csv` set (unless upstream keeps a list too), and `split_names` (and `fork_util.py` + its `sfx.ls` line, if nothing else uses them); keep the test if it still passes |
+| `harden`: dotfiles inside a volume are 404 without `.` | `authsrv.py`: one import + `harden_vfs(self.args, vfs)` in `_reload` right after the `xvd` block (wraps each volume's `get`); `httpcli.py` `run`: one import + `if http_refused(self): return self.tx_404() and False` right after `self.rem = rem` (the per-request lookup uses `VFS._get`, not `get`); `up2k.py`: one import + a `refuse_dot_tree(...)` walk before the folder walk in `handle_mv` and in `handle_cp` (2 lines each, marked `# fork`); `__main__.py` `add_safety`: the `--harden` option | `copyparty/fork_harden.py`, `tests/test_fork_harden.py` | keep both sides; if upstream renames `VFS.get` / the `self.vn, self.rem` lookup in `run`, move the hook to the new spot and rerun `tests/test_fork_harden.py`. `_refuse_dots` reads `err` by `VFS._get`'s argument order (6th after `uname`, default 403); recheck it if that signature changes. **If upstream adds a real dotfile block, take theirs** and remove the fork side |
 | a share link password equal to an account's password no longer breaks every reload (upstream loaded it as a made-up `s_...` account with the same password, which tripped the "same password" check; reload/restart then failed for everyone). The share is now granted to the account that owns that password, so the password logs in as that account and opens the share (that account may not be the share's owner: if bob sets alice's password on a share, alice's login also gets the share) | `authsrv.py` `_reload`, share loader: a `pw2u` password->account map before the loop, and an `if s_pw.strip() in pw2u: sun = pw2u[s_pw.strip()]` branch before the `s_` account is made | `tests/test_fork_shr_pw.py` | **take theirs if upstream fixes it**, then drop the `pw2u` line and the extra branch; keep the test if it still passes |
 
 

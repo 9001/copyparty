@@ -16,6 +16,7 @@ from datetime import datetime
 from .__init__ import ANYWIN, CFG_DEF, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
+from .fork_harden import harden_vfs
 from .pwhash import PWHash
 from .util import (
     DEF_MTE,
@@ -3057,6 +3058,8 @@ class AuthSrv(object):
                     if vol.ls.__name__ == "_ls":
                         vol.ls = vol._ls_xvd
                 break
+
+        harden_vfs(self.args, vfs)
 
         have_daw = False
         for vol in vfs.all_nodes.values():

@@ -20,6 +20,7 @@ from .__init__ import ANYWIN, PY2, TYPE_CHECKING, UNIX, WINDOWS, E
 from .authsrv import LEELOO_DALLAS, REDUP_E2, SEESLOG, VFS, AuthSrv
 from .bos import bos
 from .cfg import vf_bmap, vf_cmap, vf_vmap
+from .fork_harden import refuse_dot_tree
 from .fsutil import Fstab, filefrag
 from .mtag import MParser, MTag
 from .util import (
@@ -4566,6 +4567,9 @@ class Up2k(object):
         # dots from source vols where user also has the dot perm
         dots = 1 if uname in dvn.axs.udot else 2
 
+        g = svn.walk("", srem, [], uname, permsets, dots, scandir, True)
+        refuse_dot_tree(self.args, self.vfs, uname, svp, dvp, g)  # fork
+
         # don't use svn_dbv; would skip subvols due to _ls `if not rem:`
         g = svn.walk("", srem, [], uname, permsets, dots, scandir, True)
         self.fika = "c"
@@ -4795,6 +4799,9 @@ class Up2k(object):
 
         permsets = [[True, False, True]]
         scandir = not self.args.no_scandir
+
+        g = svn.walk("", srem, [], uname, permsets, 2, scandir, True)
+        refuse_dot_tree(self.args, self.vfs, uname, svp, dvp, g)  # fork
 
         # following symlinks is too scary
         g = svn.walk("", srem, [], uname, permsets, 2, scandir, True)

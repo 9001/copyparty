@@ -35,6 +35,7 @@ from .__init__ import ANYWIN, PY2, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
+from .fork_harden import http_refused
 from .qrkode import qr2svg, qrgen
 from .star import StreamTar
 from .sutil import StreamArc, gfilter
@@ -913,6 +914,8 @@ class HttpCli(object):
         self.avn = avn
         self.vn = vn  # note: do not dbv due to walk/zipgen
         self.rem = rem
+        if http_refused(self):
+            return self.tx_404() and False
 
         self.s.settimeout(self.args.s_tbody or None)
 
