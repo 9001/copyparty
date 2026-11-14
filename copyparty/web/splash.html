@@ -168,6 +168,10 @@
 			<a id="y" href="{{ r }}/?shares">edit shares</a><br />
 			{%- endif %}
 
+			{%- if this.uname != '*' and this.args.grants.strip('/') %}
+			<a id="yg" href="{{ r }}/?grants">edit grants</a><br />
+			{%- endif %}
+
             {%- if this.uname in this.args.idp_adm_set %}
 			<a id="ag" href="{{ r }}/?idp">view idp cache</a><br />
 			{%- endif %}

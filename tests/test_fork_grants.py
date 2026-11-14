@@ -6,9 +6,11 @@ from __future__ import division, print_function, unicode_literals
 
 import json
 import os
+import re
 import shutil
 import sqlite3
 import tempfile
+import time
 import unittest
 
 from copyparty.authsrv import AuthSrv
@@ -562,9 +564,8 @@ class TestForkGrants(unittest.TestCase):
         self.regroup()
         self.assertFalse(self.can_read("bob"))
         self.assertNotIn("shared/", self.ls("", "bob"))
-        # the row is kept, for the owner to revoke; a stopgap peek at the db
-        # until ticket 10 adds the grants page and revoke to check it through
-        self.assertEqual(self.n_grants(), 1)
+        # still on the owner's page
+        self.assertEqual(self.states("alice"), {1: "no members"})
 
         # a group by that name later gets the grant, as the owner left it
         self.regroup("family:carol")
@@ -845,6 +846,212 @@ class TestForkGrants(unittest.TestCase):
         zsl = self.logged("deleted")
         self.assertEqual(len(zsl), 1)
         self.assertIn("for good", zsl[0])
+
+    # the grants page (ticket 10)
+
+    def page(self, uname):
+        """the rows on the grants page as {gid: {column: text}}"""
+        st, b = self.get("?grants", uname)
+        self.assertEqual(st, 200, b)
+        html = b.decode("utf-8")
+        ret = {}
+        for gid, tr in re.findall(r'<tr gid="([0-9]+)">(.*?)</tr>', html, re.DOTALL):
+            cells = re.findall(r'<td class="([a-z0-9]+)">(.*?)</td>', tr, re.DOTALL)
+            ret[int(gid)] = {k: re.sub(r"<[^>]*>", "", v).strip() for k, v in cells}
+        return ret
+
+    def gid(self, **ka):
+        st, b = self.grant(**ka)
+        self.assertEqual(st, 201, b)
+        return json.loads(b)["id"]
+
+    def states(self, uname):
+        return {k: v["state"] for k, v in self.page(uname).items()}
+
+    def test_page_lists_own_grants_with_state(self):
+        for dn in ("a/gone", "a/other", "a/later", "b/x"):
+            os.makedirs(dn)
+        v = ["a:home/alice:A,alice", "b:home/bob:A,bob", "fam:family:r,@family"]
+        os.makedirs("fam/pics")
+        self.ginit("family:alice,carol", v=v)
+        active = self.gid()
+        expired = self.gid(vp="/home/alice/other/", name="other", exp=60)
+        broken = self.gid(vp="/home/alice/gone/", name="gone")
+        susp = self.gid(vp="/family/pics/", name="pics")
+        later = self.gid(vp="/home/alice/later/", name="later", rcpt="carol", exp=60)
+        bobs = self.gid(vp="/home/bob/x/", name="x", uname="bob", rcpt="alice")
+        self.db_exec("update gr set t1 = 1 where id = ?", expired)
+        os.rmdir("a/gone")
+        self.regroup("family:carol")
+
+        rows = self.page("alice")
+        self.assertEqual(
+            {k: v["state"] for k, v in rows.items()},
+            {
+                active: "active",
+                expired: "expired",
+                broken: "broken",
+                susp: "suspended",
+                later: "active",
+            },
+        )
+        self.assertNotIn(bobs, rows)
+        zd = rows[active]
+        self.assertEqual(zd["rcpt"], "bob")
+        self.assertEqual(zd["src"], "/home/alice/proj/")
+        self.assertEqual(zd["name"], "proj")
+        self.assertEqual(zd["pr"], "read")
+        self.assertEqual(zd["exp"], "never")
+        self.assertEqual(rows[later]["rcpt"], "carol")
+        self.assertNotEqual(rows[later]["exp"], "never")
+        self.assertEqual(list(self.page("bob")), [bobs])
+        self.assertEqual(self.page("carol"), {})
+        self.assertIn(self.get("?grants", "*")[0], (401, 403))
+
+
+    def egrant(self, gid, act, uname):
+        st, b = self.req("POST", "?egrant=%s&gid=%s" % (act, gid), uname)
+        if st == 200:
+            self.reload()  # what the broker's reload does in a real server
+        return st, b
+
+    def test_revoke(self):
+        self.cinit()
+        gid = self.gid()
+        self.assertTrue(self.can_read("bob"))
+        self.assertEqual(self.egrant(gid, "rm", "alice")[0], 200)
+        self.assertFalse(self.can_read("bob"))
+        self.assertNotIn("shared/", self.ls("", "bob"))
+        self.assertEqual(self.page("alice"), {})
+        self.assertEqual(self.egrant(gid, "rm", "alice")[0], 400)
+
+    def test_revoke_refused_for_others(self):
+        self.cinit()
+        gid = self.gid()
+        for un in ("bob", "carol"):
+            st, b = self.egrant(gid, "rm", un)
+            self.assertEqual(st, 403, un)
+            self.assertIn(b"not yours", b)
+        self.assertIn(self.egrant(gid, "rm", "*")[0], (401, 403))
+        self.assertEqual(list(self.page("alice")), [gid])
+        self.assertTrue(self.can_read("bob"))
+
+    def test_share_admin_revokes_any(self):
+        self.cinit(shr_adm=["carol"])
+        gid = self.gid()
+        self.assertEqual(self.egrant(gid, "rm", "carol")[0], 200)
+        self.assertFalse(self.can_read("bob"))
+        self.assertEqual(self.page("alice"), {})
+
+    def test_revoke_a_grant_to_a_removed_group(self):
+        self.ginit()
+        gid = self.gid(rcpt="@family")
+        self.regroup()
+        self.assertEqual(self.page("alice")[gid]["rcpt"], "@family")
+        self.assertEqual(self.egrant(gid, "rm", "alice")[0], 200)
+        self.assertEqual(self.page("alice"), {})
+        # a group by that name later gets nothing
+        self.regroup("family:alice,bob")
+        self.assertFalse(self.can_read("bob"))
+
+    def t1(self, gid):
+        db = sqlite3.connect("g.db")
+        try:
+            return db.execute("select t1 from gr where id = ?", (gid,)).fetchall()[0][0]
+        finally:
+            db.close()
+
+    def test_extend_an_expired_grant(self):
+        self.cinit()
+        gid = self.gid(exp=60)
+        self.db_exec("update gr set t1 = 1")
+        self.reload()
+        self.assertFalse(self.can_read("bob"))
+        self.assertEqual(self.states("alice"), {gid: "expired"})
+
+        now = time.time()
+        self.assertEqual(self.egrant(gid, 60, "alice")[0], 200)
+        self.assertTrue(self.can_read("bob"))
+        self.assertEqual(self.states("alice"), {gid: "active"})
+        self.assertAlmostEqual(self.t1(gid), now + 3600, delta=5)
+
+    def test_extend_an_active_grant(self):
+        self.cinit()
+        gid = self.gid(exp=60)
+        t1 = self.t1(gid)
+        self.assertEqual(self.egrant(gid, 1440, "alice")[0], 200)
+        self.assertEqual(self.t1(gid), t1 + 86400)
+        self.assertTrue(self.can_read("bob"))
+        self.assertEqual(self.states("alice"), {gid: "active"})
+
+    def test_extend_refusals(self):
+        self.cinit(shr_adm=["carol"])
+        gid = self.gid(exp=60)
+        t1 = self.t1(gid)
+        for act in ("0", "-5", "x", "1.5", ""):
+            self.assertEqual(self.egrant(gid, act, "alice")[0], 400, act)
+        # a share admin revokes, but only the owner extends
+        for un in ("bob", "carol"):
+            self.assertEqual(self.egrant(gid, 60, un)[0], 403, un)
+        self.assertEqual(self.t1(gid), t1)
+        # one without expiry stays that way
+        gid = self.gid(rcpt="carol")
+        st, b = self.egrant(gid, 60, "alice")
+        self.assertEqual(st, 400)
+        self.assertIn(b"never expires", b)
+        self.assertEqual(self.page("alice")[gid]["exp"], "never")
+
+    def test_share_admins_see_every_grant(self):
+        from copyparty.fork_util import split_names
+
+        os.makedirs("b/x")
+        v = ["a:home/alice:A,alice", "b:home/bob:A,bob"]
+        self.cinit(v=v, shr_adm=split_names("alice, admin"))
+        self.reaccount(*(ACCS + ["admin:admin"]))
+        mine = self.gid()
+        bobs = self.gid(vp="/home/bob/x/", name="x", uname="bob", rcpt="carol")
+        for un in ("alice", "admin"):
+            rows = self.page(un)
+            self.assertEqual(sorted(rows), [mine, bobs], un)
+            self.assertEqual(rows[bobs]["owner"], "bob")
+        self.assertEqual(list(self.page("bob")), [bobs])
+        self.assertEqual(self.page("carol"), {})
+
+    def rcpts(self, uname):
+        st, b = self.get("?grants=rcpts", uname)
+        return st, (json.loads(b) if st == 200 else b)
+
+    def test_recipient_list(self):
+        self.ginit("family:alice,bob", "friends:carol")
+        st, jo = self.rcpts("alice")
+        self.assertEqual(st, 200)
+        self.assertEqual(jo, {"accounts": ["bob", "carol"], "groups": ["@family", "@friends"]})
+        self.assertEqual(self.rcpts("bob")[1]["accounts"], ["alice", "carol"])
+        self.assertIn(self.rcpts("*")[0], (401, 403))
+
+    def test_recipient_list_without_share_link_passwords(self):
+        self.cinit_shr()
+        self.assertEqual(self.share("/home/alice/proj/", pw="sharepw")[0], 201)
+        self.reload()
+        self.assertEqual(self.rcpts("alice")[1]["accounts"], ["bob", "carol"])
+
+    def test_page_and_list_need_grants_on(self):
+        self.cinit(grants="")
+        self.assertEqual(self.get("?grants", "alice")[0], 400)
+        self.assertEqual(self.rcpts("alice")[0], 400)
+
+    def test_page_escapes_names(self):
+        os.makedirs("a/p<q>")
+        self.cinit()
+        self.reaccount(*(ACCS + ["<b>:pw"]))
+        gid = self.gid(vp="/home/alice/p<q>/", rcpt="<b>", name="n<i>")
+        st, b = self.get("?grants", "alice")
+        self.assertEqual(st, 200)
+        for zs in (b"<b>", b"<q>", b"<i>"):
+            self.assertNotIn(zs, b)
+        for zs in (b"&lt;b&gt;", b"p&lt;q&gt;", b"n&lt;i&gt;", b"p%3Cq%3E"):
+            self.assertIn(zs, b)
+        self.assertEqual(self.page("alice")[gid]["rcpt"], "&lt;b&gt;")
 
 
 if __name__ == "__main__":

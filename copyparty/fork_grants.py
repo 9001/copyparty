@@ -9,10 +9,10 @@ import json
 import os
 import time
 
-from .__init__ import unicode
+from .__init__ import RES, unicode
 from .fork_harden import harden_nodes, has_dot_part, http_refused
 from .fork_util import grants_top
-from .util import Pebkac, ub64enc, undot, vjoin
+from .util import Pebkac, quotep, ub64enc, undot, vjoin
 
 try:
     import sqlite3
@@ -24,6 +24,9 @@ if True:  # pylint: disable=using-constant-test
 
     if TYPE_CHECKING:
         from .authsrv import VFS, AuthSrv
+
+# the grants page; registered here so upstream's list in __init__ stays as it is
+RES.update(("web/grants.html", "web/grants.js"))
 
 GRANTS_DB_VER = 1
 
@@ -107,6 +110,28 @@ class GrantStore(object):
         try:
             q = "select id, un, rcpt, vp, name, pr, t1 from gr order by id"
             return db.execute(q).fetchall()
+        finally:
+            db.close()
+
+    def row(self, gid: int) -> Optional[tuple[Any, ...]]:
+        """one grant, like rows()"""
+        db = self._open(False)
+        if not db:
+            return None
+        try:
+            q = "select id, un, rcpt, vp, name, pr, t1 from gr where id = ?"
+            zl = db.execute(q, (gid,)).fetchall()
+            return zl[0] if zl else None
+        finally:
+            db.close()
+
+    def set_expiry(self, gid: int, t1: int) -> None:
+        db = self._open(False)
+        if not db:
+            return
+        try:
+            db.execute("update gr set t1 = ? where id = ?", (t1, gid))
+            db.commit()
         finally:
             db.close()
 
@@ -270,31 +295,15 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
     # (a group gained a member after create checked), the grant naming the
     # account wins, then the oldest; rows come oldest first
     rows.sort(key=lambda x: is_group(x[0][2]))  # ((gid, un, rcpt, ...), ...)
-    for (gid, un, rcpt, vp, name, pr, t1), desc, uns in rows:
-        if t1 and t1 <= now:
-            log("expired %s" % (desc,), 3)
+    for row, desc, uns in rows:
+        _, un, _, _, name, pr, _ = row
+        state, why, src = grant_state(vfs, row, uns, now)
+        if state != "active":
+            verb = state if state in ("expired", "suspended", "broken") else "skipping"
+            log("%s %s%s" % (verb, desc, "; " + why if why else ""), 3)
             continue
 
-        # the owner, as a member of the group, already has the folder
-        uns = [x for x in uns if x != un]
-        if not uns:
-            log("skipping %s; nobody in that group" % (desc,), 3)
-            continue
-
-        if has_dot_part(vp):
-            log("skipping %s; a hidden folder is never granted" % (desc,), 3)
-            continue
-
-        try:
-            s_vfs, s_rem = vfs.get(vp, un, "r" in pr, "w" in pr)
-        except Exception as ex:
-            log("suspended %s; the owner lacks those rights: %r" % (desc, ex), 3)
-            continue
-
-        if not os.path.isdir(s_vfs.canonical(s_rem)):
-            log("broken %s; the source folder is gone" % (desc,), 3)
-            continue
-
+        s_vfs, s_rem, uns = src
         for ru in uns:
             if ru not in trees:
                 trees[ru] = folder(None, top)
@@ -342,6 +351,37 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
     # grants always refuse dot names and listing names, whatever --harden says
     harden_nodes(args, virt + grants, grants)
     _route(vfs, top, trees)
+
+
+def grant_state(
+    vfs: "VFS", row: tuple[Any, ...], uns: Optional[list[str]], now: float
+) -> tuple[str, str, Any]:
+    """(state, what the log says about it, (source volume, its remainder,
+    recipient accounts) if active); `uns` = reached_accounts.
+    States: active, expired, suspended (the owner lacks the rights),
+    broken (the source folder is gone), no members (nobody to mount it
+    for), hidden folder (never granted; create refuses these)"""
+    _, un, _, vp, _, pr, t1 = row
+    if t1 and t1 <= now:
+        return "expired", "", None
+
+    # the owner, as a member of the group, already has the folder
+    uns = [x for x in uns or [] if x != un]
+    if not uns:
+        return "no members", "nobody in that group", None
+
+    if has_dot_part(vp):
+        return "hidden folder", "a hidden folder is never granted", None
+
+    try:
+        s_vfs, s_rem = vfs.get(vp, un, "r" in pr, "w" in pr)
+    except Exception as ex:
+        return "suspended", "the owner lacks those rights: %r" % (ex,), None
+
+    if not os.path.isdir(s_vfs.canonical(s_rem)):
+        return "broken", "the source folder is gone", None
+
+    return "active", "", (s_vfs, s_rem, uns)
 
 
 def _prune_gone_accounts(
@@ -627,4 +667,127 @@ def handle_grant(cli: Any, req: dict[str, Any]) -> bool:
     cli.conn.hsrv.broker.ask("reload", False, True).get()
     zs = "/%s/%s/%s/" % (top, uname, name)
     cli.reply(json.dumps({"id": gid, "vp": zs}).encode("utf-8"), 201, mime="application/json")
+    return True
+
+
+def _page_user(cli: Any) -> str:
+    """the caller of the grants page and its actions; refuses guests"""
+    if not grants_top(cli.args):
+        raise Pebkac(400, "grants are disabled in the server config")
+    if cli.uname == "*":
+        raise Pebkac(401, "you must be logged in to manage grants")
+    return cli.uname
+
+
+def _is_admin(cli: Any) -> bool:
+    """--shr-adm also manages every grant"""
+    return cli.uname in (getattr(cli.args, "shr_adm", None) or [])
+
+
+_PR_TEXT = {"r": "read", "rw": "read + upload"}
+
+
+def tx_grants(cli: Any) -> bool:
+    """GET ?grants: the caller's grants (every grant for --shr-adm);
+    GET ?grants=rcpts: who a grant can go to, as json"""
+    uname = _page_user(cli)
+    if cli.uparam.get("grants") == "rcpts":
+        return _tx_rcpts(cli)
+
+    asrv = cli.asrv
+    now = time.time()
+    pseudo = share_pw_accounts(asrv.args)
+    rows = []
+    for row in _store(asrv.args).rows():
+        gid, un, rcpt, vp, name, pr, t1 = row
+        if un != uname and not _is_admin(cli):
+            continue
+        uns = reached_accounts(asrv, pseudo, rcpt)
+        state = grant_state(asrv.vfs, row, uns, now)[0]
+        href = "/%s/" % (quotep(vp),) if vp else "/"
+        rows.append(
+            {
+                "gid": gid,
+                "owner": un,
+                "rcpt": rcpt,
+                "src": "/%s/" % (vp,) if vp else "/",
+                "href": href,
+                "name": name,
+                "pr": _PR_TEXT.get(pr, pr),
+                "t1": t1,
+                "state": state,
+            }
+        )
+
+    html = cli.j2s(_template(cli), this=cli, rows=rows, now=int(now), adm=_is_admin(cli))
+    cli.reply(html.encode("utf-8"), status=200)
+    return True
+
+
+def _template(cli: Any) -> str:
+    """the grants page template, added to upstream's on first use, so
+    httpsrv's list of templates stays as it is"""
+    j2 = cli.conn.hsrv.j2
+    if "fork_grants" not in j2:
+        import jinja2
+
+        from .httpsrv import load_jinja2_resource
+
+        env = jinja2.Environment()
+        env.loader = jinja2.FunctionLoader(lambda f: load_jinja2_resource(cli.E, f))
+        j2["fork_grants"] = env.get_template("grants.html")
+    return "fork_grants"
+
+
+def _tx_rcpts(cli: Any) -> bool:
+    """account names and config groups (as @name) a grant can go to,
+    minus the caller and the all-accounts group"""
+    asrv = cli.asrv
+    pseudo = share_pw_accounts(asrv.args)
+    uns = [x for x in asrv.acct if x != cli.uname and is_account(asrv.acct, pseudo, x)]
+    grps = ["@" + x for x in config_groups(asrv)]
+    jt = {"accounts": sorted(uns), "groups": sorted(grps)}
+    cli.reply(json.dumps(jt).encode("utf-8"), mime="application/json")
+    return True
+
+
+def handle_egrant(cli: Any) -> bool:
+    """POST ?egrant=rm&gid=N revokes a grant; ?egrant=MIN&gid=N extends
+    its expiry by MIN minutes, counting from now if it already expired
+    (which brings it back). The owner may do both; --shr-adm only revokes"""
+    uname = _page_user(cli)
+    args = cli.args
+    store = _store(args)
+    try:
+        gid = int(cli.uparam.get("gid") or "")
+        row = store.row(gid)
+    except ValueError:
+        row = None
+    if not row:
+        raise Pebkac(400, "no such grant")
+    act = cli.uparam["egrant"]
+    if row[1] != uname and (act != "rm" or not _is_admin(cli)):
+        t = "that grant is not yours; a share admin can only revoke it"
+        raise Pebkac(403, t if _is_admin(cli) else "that grant is not yours")
+
+    desc = grant_desc(*row)
+    if act == "rm":
+        store.delete([gid])
+        cli.log("revoked %s, by [%s]" % (desc, uname))
+        reload = True
+    else:
+        if not act.isdigit() or not 0 < int(act) <= 10**9:
+            raise Pebkac(400, "extend by a whole number of minutes")
+        t1 = row[6]
+        if not t1:
+            raise Pebkac(400, "that grant never expires")
+        now = int(time.time())
+        reload = t1 <= now  # an expired grant comes back
+        t1 = max(t1, now) + int(act) * 60
+        store.set_expiry(gid, t1)
+        cli.log("extended %s, by [%s]" % (grant_desc(*(row[:6] + (t1,))), uname))
+
+    if reload:
+        cli.conn.hsrv.broker.ask("reload", False, True).get()
+    cli.reply(b"ok\n", mime="text/plain; charset=utf-8")
     return True

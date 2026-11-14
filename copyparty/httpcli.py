@@ -35,7 +35,7 @@ from .__init__ import ANYWIN, PY2, RES, RESM, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
 from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
-from .fork_grants import handle_grant, http_request
+from .fork_grants import handle_egrant, handle_grant, http_request, tx_grants
 from .fork_harden import refuse_dot_name, refuse_short_key
 from .qrkode import qr2svg, qrgen
 from .star import StreamTar
@@ -1572,6 +1572,9 @@ class HttpCli(object):
             if "shares" in self.uparam:
                 return self.tx_shares()
 
+            if "grants" in self.uparam:
+                return tx_grants(self)  # fork
+
             if "dls" in self.uparam:
                 return self.tx_dls()
 
@@ -2516,6 +2519,9 @@ class HttpCli(object):
 
         if "eshare" in self.uparam:
             return self.handle_eshare()
+
+        if "egrant" in self.uparam:
+            return handle_egrant(self)  # fork
 
         if "fs_abrt" in self.uparam:
             return self.handle_fs_abrt()

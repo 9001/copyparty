@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" id="ht_gr">
+<!-- fork-only: the grants page (?grants); see FORK.md -->
+
+<head>
+	<meta charset="utf-8">
+	<title>{{ s_doctitle }}</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<meta name="robots" content="noindex, nofollow">
+	<meta name="theme-color" content="#{{ tcolor }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/shares.css?_={{ ts }}">
+	<link rel="stylesheet" media="screen" href="{{ r }}/.cpr/w/ui.css?_={{ ts }}">
+{{ html_head }}
+</head>
+
+<body>
+	<div id="wrap">
+		<a href="{{ r }}/?grants">refresh</a>
+		<a href="{{ r }}/?h">control-panel</a>
+
+		<span>{{ "every grant on the server (you are a share admin)" if adm else "folders you granted to other accounts" }}</span>
+
+		<table id="tab"><thead><tr>
+			<th>owner</th>
+			<th>recipient</th>
+			<th>folder</th>
+			<th>appears as</th>
+			<th>rights</th>
+			<th>expires</th>
+			<th>state</th>
+			<th>revoke</th>
+			<th>extend</th>
+		</tr></thead><tbody>
+		{%- for g in rows %}
+		<tr gid="{{ g.gid }}">
+			<td class="owner">{{ g.owner|e }}</td>
+			<td class="rcpt">{{ g.rcpt|e }}</td>
+			<td class="src"><a href="{{ r }}{{ g.href|e }}">{{ g.src|e }}</a></td>
+			<td class="name">{{ g.name|e }}</td>
+			<td class="pr">{{ g.pr|e }}</td>
+			<td class="exp">{% if g.t1 %}<span t1="{{ g.t1 }}">{{ g.t1 }}</span>{% else %}never{% endif %}</td>
+			<td class="state">{{ g.state|e }}</td>
+			<td class="rm"><a href="#" class="rm">revoke</a></td>
+			<td class="ext">{% if g.t1 and g.owner == this.uname %}<button value="60">+1h</button> <button value="1440">+1d</button> <button value="10080">+1w</button>{% endif %}</td>
+		</tr>
+		{%- endfor %}
+		</tbody></table>
+		{%- if not rows %}
+		(you haven't granted any folders yet)
+		{%- endif %}
+	</div>
+	<a href="#" id="repl">π</a>
+	<script nonce="{{ js_nonce }}">
+
+var SR="{{ r }}",
+	JS_NONCE = "{{ js_nonce }}",
+	lang="{{ lang }}",
+	dutc={{ this.args.js_utc }},
+	dfavico="{{ favico }}";
+
+var STG = window.localStorage;
+document.documentElement.className = (STG && STG.cpp_thm) || "{{ this.args.theme }}";
+
+</script>
+<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/util.js?_={{ ts }}"></script>
+<script nonce="{{ js_nonce }}" src="{{ r }}/.cpr/w/grants.js?_={{ ts }}"></script>
+{%- if js %}
+<script nonce="{{ js_nonce }}" src="{{ js }}_={{ ts }}"></script>
+{%- endif %}
+<script nonce="{{ js_nonce }}">
+	Date.now();function jsldp(a,b){2!=window[a]&&alert("FATAL ERROR: cannot load "+b+".js due to unreliable network or broken reverse-proxy; try CTRL-SHIFT-R")}
+	jsldp("J_UTL","util");
+	jsldp("J_GR","grants");
+</script>
+</body>
+</html>
