@@ -9,6 +9,7 @@
 - [ ] The page is a new template; upstream's `?shares` page is unchanged
 - [ ] Test: alice's page lists only alice's grants, with the correct state for each (active, expired, suspended, broken)
 - [ ] Test: revoke → after reload, the recipient has no access and the row is gone; revoking someone else's grant is refused unless the caller is a share admin
+- [ ] Test: a grant to a group that was removed from the config is still listed and can be revoked (ticket 08 only checks the row is kept)
 - [ ] Test: extending an expired grant brings it back; extending an active one moves the expiry
 - [ ] Test: with `--shr-adm alice,admin`, both see all grants (uses the list parsing from 01)
 - [ ] Test: the recipient-list endpoint returns account names and config groups, without the caller and without the all-accounts group; guests are refused

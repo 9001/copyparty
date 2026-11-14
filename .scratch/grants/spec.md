@@ -139,7 +139,7 @@ Together with `no-html` in the config, uploaded pages can't run scripts.
   - the caller holds every requested right on the source
   - the recipient exists and isn't the caller or the all-accounts group
   - the name is a single safe path segment
-  - there's no clash with an existing grant from the same owner to the same recipient with the same name
+  - there's no clash with an existing grant from the same owner with the same name whose recipient reaches any of the same accounts (the same account, or a group sharing a member; ticket 08)
 
   A successful create, revoke, or extend-after-expiry triggers a reload, as share links do.
 - **Grants page template** (new template), linked from the control panel.

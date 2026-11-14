@@ -215,7 +215,8 @@ every place this fork changes an upstream file. On a merge conflict, resolve eac
 ## grants: fork-only folder sharing between accounts
 
 see `docs/adr/0001` and `.scratch/grants/spec.md`. Work in progress: tickets 06 (the tracer
-bullet) and 07 (rights and refusals) are done; groups, expiry, the grants page and button are not.
+bullet), 07 (rights and refusals) and 08 (groups) are done; expiry, the grants page and button
+are not.
 
 options (`[global]`):
 
@@ -236,7 +237,8 @@ what works so far:
 
 * an owner creates a grant with `POST /?grant`, JSON body
   `{"vp": "/home/alice/proj/", "rcpt": "bob", "name": "proj", "perms": ["read"]}`; a reload
-  follows. `perms` is `["read"]` (read-only) or `["read", "write"]` (read + upload); the
+  follows. `rcpt` is an account, or `@<group>` for a group from `[groups]` /
+  `--grp`. `perms` is `["read"]` (read-only) or `["read", "write"]` (read + upload); the
   recipient also gets `g`. Move, delete, admin and `.` are never possible through a grant.
   Refused, each with a 400:
   * grants off; not logged in
@@ -247,13 +249,28 @@ what works so far:
   * a hidden source (any path part starting with a dot; such a row is also never mounted)
   * rights the owner doesn't hold on the source (write included)
   * the volume's `grant_who` doesn't allow the caller
-  * the caller themselves; `*` or `@acct`; anything that isn't an account from the config,
+  * the caller themselves; `*` or `@acct` (the `--grp-all` group, whatever it is named); an
+    `@<group>` that isn't in the config; anything else that isn't an account from the config,
     including the made-up `s_...` account a share link password logs in as (anyone with that
     password could use it; such a row is also never mounted)
   * a name that isn't one path segment: empty, starting with a dot, a slash or backslash, a
     control character, leading or trailing spaces, over 255 characters
   * the same owner + recipient + name as an existing grant (expired ones too, since they can be
     extended); checked in the same SQL statement as the insert
+  * the same owner + name as an existing grant whose recipient reaches any of the same accounts
+    today: bob directly and `@family` (with bob in it), or two groups sharing a member other than
+    the owner. Pick another name
+* a group grant is worked out again at every reload from the group in the config: members
+  added there get it, members removed lose it. The owner, if a member, gets no mount of their own
+  folder. A group removed from the config gives nobody access, but the row stays (the owner can
+  revoke it; a group by that name later gets the grant back). If a group gains a member who
+  already has a grant by that name from the same owner, that member keeps one: the grant naming
+  them wins over a group grant, otherwise the oldest; the other is skipped for them and logged.
+  Only grants that mount compete, so if the winner expires or is suspended or broken, the other
+  one shows up at that path instead (a different folder, maybe with different rights)
+* groups are only the config's (`[groups]` / `--grp`), and members only config accounts: IdP
+  groups and IdP-only users get no group grants. A group whose only members are the owner, or
+  names that aren't accounts, is accepted but mounts for nobody (logged)
 * at every reload each grant is resolved through the volume tree as its owner with exactly the
   granted rights (like share links), and mounted with the source volume's settings, minus share
   links (`shr_who: no`) and indexing flags. A grant whose owner lost those rights (suspended), or
@@ -263,8 +280,7 @@ what works so far:
   different `proj`; both see `/shared/alice/proj`, each their own folder. The root's path lookups
   (`VFS.get`, `VFS._get`, `VFS.can_access`) are replaced on the root volume at reload so that
   `/shared/...` resolves in the asking account's tree. The `/shared` under the root only holds
-  folders with no path on disk, used for listings. Only a second grant with the same owner,
-  recipient *and* name is skipped (logged)
+  folders with no path on disk, used for listings
 * dotfiles inside a grant are always 404 for the recipient, even with `harden` off and even when
   the owner holds `.`
 * uploads through a grant refuse dot names and `README.md` / `PREADME.md` / `descript.ion` in any

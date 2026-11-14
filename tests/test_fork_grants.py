@@ -501,6 +501,111 @@ class TestForkGrants(unittest.TestCase):
         self.assertEqual(self.grant(vp="/home/alice/other/", name="other")[0], 201)
         self.assertEqual(self.ls("shared/alice/", "bob"), ["other/", "proj/"])
 
+    # group grants (ticket 08)
+
+    def ginit(self, *grp, **ka):
+        self.cinit(grp=list(grp or ["family:alice,bob"]), **ka)
+
+    def regroup(self, *grp):
+        """edit [groups] in the config, then reload"""
+        self.args.grp = list(grp)
+        self.reload()
+
+    def can_read(self, uname):
+        return self.get("shared/alice/proj/f.txt", uname) == (200, b"a/proj/f.txt")
+
+    def test_group_members_see_it(self):
+        self.ginit("family:alice,bob,dave")
+        self.assertEqual(self.grant(rcpt="@family")[0], 201)
+        self.assertEqual(self.ls("shared/alice/", "bob"), ["proj/"])
+        self.assertTrue(self.can_read("bob"))
+        for un in ("carol", "*"):
+            self.assertFalse(self.can_read(un), un)
+            self.assertNotIn("shared/", self.ls("", un) or [], un)
+        # the owner, though a member, gets no mount of their own folder
+        self.assertNotIn("shared/", self.ls("", "alice"))
+
+    def test_group_refusals(self):
+        self.ginit()
+        for rcpt in ("@nope", "@Family", "@", "@family ", "family"):
+            self.assertEqual(self.grant(rcpt=rcpt)[0], 400, rcpt)
+        self.refused(b"no such group", rcpt="@nope")
+        self.refused(b"every account", rcpt="@acct")
+
+    def test_renamed_all_accounts_group_refused(self):
+        self.ginit()
+        self.args.grp_all = "everyone"
+        self.reload()
+        self.refused(b"every account", rcpt="@everyone")
+        self.refused(b"no such group", rcpt="@acct")
+
+    def test_group_membership_follows_the_config(self):
+        self.ginit()
+        self.assertEqual(self.grant(rcpt="@family")[0], 201)
+        self.assertTrue(self.can_read("bob"))
+        self.assertFalse(self.can_read("carol"))
+
+        self.regroup("family:alice,bob,carol")
+        self.assertTrue(self.can_read("bob"))
+        self.assertTrue(self.can_read("carol"))
+        self.assertEqual(self.ls("shared/alice/", "carol"), ["proj/"])
+
+        self.regroup("family:alice,carol")
+        self.assertFalse(self.can_read("bob"))
+        self.assertNotIn("shared/", self.ls("", "bob"))
+        self.assertTrue(self.can_read("carol"))
+
+    def test_group_removed_from_the_config(self):
+        self.ginit()
+        self.assertEqual(self.grant(rcpt="@family")[0], 201)
+        self.regroup()
+        self.assertFalse(self.can_read("bob"))
+        self.assertNotIn("shared/", self.ls("", "bob"))
+        # the row is kept, for the owner to revoke; a stopgap peek at the db
+        # until ticket 10 adds the grants page and revoke to check it through
+        self.assertEqual(self.n_grants(), 1)
+
+        # a group by that name later gets the grant, as the owner left it
+        self.regroup("family:carol")
+        self.assertTrue(self.can_read("carol"))
+        self.assertFalse(self.can_read("bob"))
+
+    def test_overlap_with_a_direct_grant_refused(self):
+        # bob is in @family: a "proj" to both would be two folders in one place
+        os.makedirs("a/other")
+        self.ginit()
+        self.assertEqual(self.grant()[0], 201)
+        self.refused(b"already", vp="/home/alice/other/", rcpt="@family")
+        self.assertEqual(self.grant(vp="/home/alice/other/", rcpt="@family", name="other")[0], 201)
+        self.refused(b"already", rcpt="@family", name="other")
+        self.refused(b"already", vp="/home/alice/other/", rcpt="bob", name="other")
+        # carol is in no group with bob, so her "proj" is fine
+        self.assertEqual(self.grant(vp="/home/alice/other/", rcpt="carol")[0], 201)
+
+    def test_overlap_between_groups_refused(self):
+        self.ginit("family:alice,bob", "friends:bob,carol", "work:carol")
+        self.assertEqual(self.grant(rcpt="@family")[0], 201)
+        self.refused(b"already", rcpt="@friends")
+        self.assertEqual(self.grant(rcpt="@work")[0], 201)
+
+    def test_groups_sharing_only_the_owner_dont_overlap(self):
+        self.ginit("family:alice,bob", "work:alice,carol")
+        self.assertEqual(self.grant(rcpt="@family")[0], 201)
+        self.assertEqual(self.grant(rcpt="@work")[0], 201)
+
+    def test_overlap_after_a_group_change_keeps_the_oldest(self):
+        os.makedirs("a/other")
+        with open("a/other/o.txt", "wb") as f:
+            f.write(b"a/other/o.txt")
+        self.ginit()
+        self.assertEqual(self.grant(rcpt="@family")[0], 201)
+        self.assertEqual(self.grant(vp="/home/alice/other/", rcpt="carol")[0], 201)
+        self.regroup("family:alice,bob,carol")
+        # carol's own "proj", named for her, beats the group's
+        self.assertEqual(self.ls("shared/alice/", "carol"), ["proj/"])
+        self.assertEqual(self.ls("shared/alice/proj/", "carol"), ["o.txt"])
+        self.assertTrue(self.can_read("bob"))
+
     # upload rules inside a grant (ticket 07); the same ways in as
     # tests/test_fork_harden_shr.py, as bob
 

@@ -1,8 +1,8 @@
 # coding: utf-8
 from __future__ import division, print_function, unicode_literals
 
-# fork-only: grants, an owner gives a named account access to one of their
-# folders, mounted at /<grants>/<owner>/<name>; see FORK.md and docs/adr/0001
+# fork-only: grants, an owner gives a named account or a config group
+# access to one of their folders, mounted at /<grants>/<owner>/<name>; see FORK.md and docs/adr/0001
 
 import hashlib
 import json
@@ -88,6 +88,17 @@ class GrantStore(object):
         finally:
             db.close()
 
+    def rcpts(self, owner: str, name: str) -> list[str]:
+        """who the owner gave a grant by this name to, expired ones too"""
+        db = self._open(False)
+        if not db:
+            return []
+        try:
+            q = "select rcpt from gr where un = ? and name = ?"
+            return [x[0] for x in db.execute(q, (owner, name))]
+        finally:
+            db.close()
+
     def live(self, now: float) -> list[tuple[Any, ...]]:
         """grants that haven't expired, oldest first"""
         db = self._open(False)
@@ -124,6 +135,30 @@ def share_pw_accounts(args: Any) -> set[str]:
 def is_account(acct: dict[str, str], pseudo: set[str], un: str) -> bool:
     """True for an account from the config; `pseudo` = share_pw_accounts"""
     return un in acct and un not in pseudo
+
+
+def is_group(rcpt: str) -> bool:
+    """a recipient is an account, or a config group as @<name>"""
+    return rcpt.startswith("@")
+
+
+def config_groups(asrv: "AuthSrv") -> dict[str, list[str]]:
+    """the groups a grant can go to: [groups] / --grp from the config, by
+    name without the @, minus the built-in all-accounts group (--grp-all)"""
+    return {k: v for k, v in asrv.grps.items() if k != asrv.args.grp_all}
+
+
+def reached_accounts(
+    asrv: "AuthSrv", pseudo: set[str], rcpt: str
+) -> Optional[list[str]]:
+    """the accounts a grant's recipient means right now: one account, or
+    whoever is in the @group at this reload; None if the recipient account
+    doesn't exist, [] if the group doesn't (the grant then waits for it)"""
+    acct = asrv.acct
+    if not is_group(rcpt):
+        return [rcpt] if is_account(acct, pseudo, rcpt) else None
+    uns = config_groups(asrv).get(rcpt[1:]) or []
+    return sorted(set(x for x in uns if is_account(acct, pseudo, x)))
 
 
 def _safe_name(name: str) -> bool:
@@ -208,10 +243,22 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
     aread: dict[str, list[str]] = {}  # recipient: vpaths of their grants
     pub = folder(None, top)
     pseudo = share_pw_accounts(args)
-    for gid, un, rcpt, vp, name, pr in _store(args).live(time.time()):
+    # where one account gets two grants by the same name from one owner
+    # (a group gained a member after create checked), the grant naming the
+    # account wins, then the oldest; rows come oldest first
+    rows = _store(args).live(time.time())
+    rows.sort(key=lambda row: is_group(row[2]))  # (gid, un, rcpt, ...)
+    for gid, un, rcpt, vp, name, pr in rows:
         desc = "grant %d by [%s] to [%s] of [/%s] (%s)" % (gid, un, rcpt, vp, pr)
-        if not is_account(acct, pseudo, un) or not is_account(acct, pseudo, rcpt):
+        uns = reached_accounts(asrv, pseudo, rcpt)
+        if not is_account(acct, pseudo, un) or uns is None:
             log("skipping %s; not an account" % (desc,), 3)
+            continue
+
+        # the owner, as a member of the group, already has the folder
+        uns = [x for x in uns if x != un]
+        if not uns:
+            log("skipping %s; nobody in that group" % (desc,), 3)
             continue
 
         if has_dot_part(vp):
@@ -228,24 +275,26 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
             log("broken %s; the source folder is gone" % (desc,), 3)
             continue
 
-        if rcpt not in trees:
-            trees[rcpt] = folder(None, top)
-        ovn = folder(trees[rcpt], un)
-        if name in ovn.nodes:
-            log("skipping %s; the recipient already has a grant by that name" % (desc,), 3)
-            continue
+        for ru in uns:
+            if ru not in trees:
+                trees[ru] = folder(None, top)
+            ovn = folder(trees[ru], un)
+            if name in ovn.nodes:
+                t = "skipping %s for [%s]; they already have a grant by that name"
+                log(t % (desc, ru), 3)
+                continue
 
-        gvn = _grant_vol(asrv, vfs, ovn, name, s_vfs, s_rem, un, pr)
-        _add_rcpt(gvn.axs, rcpt, pr)
-        ovn.nodes[name] = gvn
-        grants.append(gvn)
-        aread.setdefault(rcpt, []).append(gvn.vpath)
+            gvn = _grant_vol(asrv, vfs, ovn, name, s_vfs, s_rem, un, pr)
+            _add_rcpt(gvn.axs, ru, pr)
+            ovn.nodes[name] = gvn
+            grants.append(gvn)
+            aread.setdefault(ru, []).append(gvn.vpath)
 
-        # the folders above it, and the root's copy, list only for recipients
-        povn = folder(pub, un)
-        for vn in (trees[rcpt], ovn, pub, povn, folder(povn, name)):
-            vn.axs.uread.add(rcpt)
-        log("mounted %s at [/%s]" % (desc, gvn.vpath))
+            # the folders above it, and the root's copy, list only for recipients
+            povn = folder(pub, un)
+            for vn in (trees[ru], ovn, pub, povn, folder(povn, name)):
+                vn.axs.uread.add(ru)
+            log("mounted %s for [%s] at [/%s]" % (desc, ru, gvn.vpath))
 
     if not grants:
         return
@@ -429,6 +478,20 @@ def _under(vp: str, top: str) -> bool:
     return bool(top) and (vp == top or vp.startswith(top + "/"))
 
 
+def _no_overlap(asrv: "AuthSrv", owner: str, rcpt: str, name: str) -> None:
+    """one owner's grants by one name never reach the same account twice:
+    not bob directly and through @family, nor through two groups"""
+    pseudo = share_pw_accounts(asrv.args)
+    uns = set(reached_accounts(asrv, pseudo, rcpt) or []) - set([owner])
+    for prev in _store(asrv.args).rcpts(owner, name):
+        both = uns & set(reached_accounts(asrv, pseudo, prev) or [])
+        if prev == rcpt or both:
+            t = "you already gave %r a grant named %r"
+            if prev != rcpt:
+                t += ", which reaches %s" % (", ".join(sorted(both)),)
+            raise Pebkac(400, (t + "; pick another name") % (prev, name))
+
+
 def handle_grant(cli: Any, req: dict[str, Any]) -> bool:
     """POST ?grant (json): {vp, rcpt, name, perms}; creates a grant and reloads"""
     args = cli.args
@@ -476,17 +539,22 @@ def handle_grant(cli: Any, req: dict[str, Any]) -> bool:
     if not os.path.isdir(vn.canonical(rem)):
         raise Pebkac(400, "only folders can be granted")
 
-    if rcpt in ("*", "@acct"):
-        raise Pebkac(400, "a grant cannot go to every account; pick an account")
+    asrv = cli.asrv
+    if rcpt in ("*", "@" + args.grp_all):
+        raise Pebkac(400, "a grant cannot go to every account; pick an account or a group")
     if rcpt == uname:
         raise Pebkac(400, "you cannot grant a folder to yourself")
-    if not is_account(cli.asrv.acct, share_pw_accounts(args), rcpt):
+    if is_group(rcpt):
+        if rcpt[1:] not in config_groups(asrv):
+            raise Pebkac(400, "no such group: %r" % (rcpt,))
+    elif not is_account(asrv.acct, share_pw_accounts(args), rcpt):
         raise Pebkac(400, "no such recipient: %r" % (rcpt,))
 
     if not _safe_name(name):
         t = "the name must be one folder name: not starting with a dot, no slashes or control characters, at most 255 characters"
         raise Pebkac(400, t)
 
+    _no_overlap(asrv, uname, rcpt, name)
     gid = _store(args).create(uname, rcpt, vp, name, pr, 0)
     if not gid:
         t = "you already gave %r a grant named %r; pick another name"
