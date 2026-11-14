@@ -7,12 +7,13 @@ from __future__ import division, print_function, unicode_literals
 import hashlib
 import json
 import os
+import threading
 import time
 
 from .__init__ import RES, unicode
 from .fork_harden import harden_nodes, has_dot_part, http_refused
 from .fork_util import grants_top
-from .util import Pebkac, quotep, ub64enc, undot, vjoin
+from .util import Daemon, Pebkac, quotep, ub64enc, undot, vjoin
 
 try:
     import sqlite3
@@ -24,6 +25,7 @@ if True:  # pylint: disable=using-constant-test
 
     if TYPE_CHECKING:
         from .authsrv import VFS, AuthSrv
+        from .svchub import SvcHub
 
 # the grants page and the grant button; registered here so upstream's list in __init__ stays as it is
 RES.update(("web/grants.html", "web/grants.js", "web/grantbtn.js"))
@@ -281,6 +283,10 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
         virt.append(vn)
         return vn
 
+    timer = getattr(asrv, "fork_grant_timer", None)
+    if timer:
+        timer.kick()  # the timer waits for the mutex this reload holds
+
     log = asrv.log
     now = time.time()
     virt: list["VFS"] = []
@@ -295,8 +301,10 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
     # (a group gained a member after create checked), the grant naming the
     # account wins, then the oldest; rows come oldest first
     rows.sort(key=lambda x: is_group(x[0][2]))  # ((gid, un, rcpt, ...), ...)
+    mounted: set[int] = set()  # for check_expiry
+    vfs.fork_grant_gids = mounted  # type: ignore
     for row, desc, uns in rows:
-        _, un, _, _, name, pr, _ = row
+        gid, un, _, _, name, pr, _ = row
         state, why, src = grant_state(vfs, row, uns, now)
         if state != "active":
             verb = state if state in ("expired", "suspended", "broken") else "skipping"
@@ -317,6 +325,7 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
             _add_rcpt(gvn.axs, ru, pr)
             ovn.nodes[name] = gvn
             grants.append(gvn)
+            mounted.add(gid)
             aread.setdefault(ru, []).append(gvn.vpath)
 
             # the folders above it, and the root's copy, list only for recipients
@@ -382,6 +391,78 @@ def grant_state(
         return "broken", "the source folder is gone", None
 
     return "active", "", (s_vfs, s_rem, uns)
+
+
+def check_expiry(asrv: "AuthSrv", now: float) -> tuple[bool, float]:
+    """the expiry timer's check: (True if a mounted grant has expired by
+    `now` and a reload must unmount it, when to check next; 0 = when the
+    next reload happens). Reads the expiry from the db, so a grant the
+    owner extended after it was mounted is not reloaded for early"""
+    mounted = getattr(asrv.vfs, "fork_grant_gids", None)
+    if not mounted:
+        return False, 0
+    reload = False
+    nxt = 0
+    for row in _store(asrv.args).rows():
+        gid, t1 = row[0], row[6]
+        if gid not in mounted or not t1:
+            continue
+        if t1 <= now:
+            reload = True
+        elif not nxt or t1 < nxt:
+            nxt = t1
+    return reload, nxt
+
+
+class ExpiryTimer(object):
+    """unmounts grants as they expire, with a reload, like up2k's
+    _check_shares does for share links. One per server, in the hub (with
+    -j, a reload there reaches every worker); mount_grants wakes it at
+    every reload of the hub's AuthSrv, since the next expiry may change"""
+
+    def __init__(self, hub: "SvcHub") -> None:
+        self.hub = hub
+        self.cond = threading.Condition()
+        self.dirty = True  # a reload happened since the last check
+
+    def kick(self) -> None:
+        with self.cond:
+            self.dirty = True
+            self.cond.notify()
+
+    def run(self) -> None:
+        hub = self.hub
+        asrv = hub.asrv
+        while not hub.stopping:
+            with self.cond:
+                self.dirty = False
+            try:
+                with asrv.mutex:
+                    reload, nxt = check_expiry(asrv, time.time())
+                if reload:
+                    hub.log("grants", "unmounting expired grants")
+                    hub.reload(False, False)
+                    continue
+            except Exception as ex:
+                t = "could not check for expiring grants: %r"
+                hub.log("grants", t % (ex,), 1)
+                nxt = time.time() + 60
+
+            # wait() counts elapsed time, so a wall clock that jumps ahead
+            # (a Pi has no RTC; NTP sets it after boot) is noticed in 5 min
+            with self.cond:
+                if not self.dirty:
+                    wait = nxt - time.time() if nxt else 300
+                    self.cond.wait(max(1, min(wait, 300)))
+
+
+def start_expiry_timer(hub: "SvcHub") -> None:
+    """SvcHub.run: the grants expiry timer, when grants are on"""
+    if not grants_top(hub.args):
+        return
+    timer = ExpiryTimer(hub)
+    hub.asrv.fork_grant_timer = timer  # type: ignore
+    Daemon(timer.run, "grant-expiry")
 
 
 def _prune_gone_accounts(

@@ -718,6 +718,47 @@ class TestForkGrants(unittest.TestCase):
         self.assertFalse(self.can_read("bob"))
         self.assertNotIn("shared/", self.ls("", "bob"))
 
+    def test_expiry_timer_ends_access_without_waiting(self):
+        # the hub's timer calls check_expiry and reloads when it says so (ticket 12)
+        from copyparty.fork_grants import check_expiry
+
+        self.cinit()
+        gid = self.gid(exp=60)
+        t1 = self.t1(gid)
+        self.assertEqual(check_expiry(self.asrv, t1 - 1), (False, t1))
+        self.assertTrue(self.can_read("bob"))
+
+        # an hour later, as the server sees it; nothing has reloaded
+        self.db_exec("update gr set t1 = t1 - 3600")
+        self.assertTrue(self.can_read("bob"))
+        self.assertTrue(check_expiry(self.asrv, time.time())[0])
+        self.reload()
+        self.assertFalse(self.can_read("bob"))
+        # nothing left to expire; the row stays for the owner to extend
+        self.assertEqual(check_expiry(self.asrv, time.time()), (False, 0))
+        self.assertEqual(self.states("alice"), {gid: "expired"})
+
+    def test_expiry_check_wakes_for_the_next_mounted_grant(self):
+        from copyparty.fork_grants import check_expiry
+
+        os.makedirs("a/later")
+        self.cinit()
+        first = self.gid(exp=60)
+        later = self.gid(vp="/home/alice/later/", name="later", exp=120)
+        self.gid(rcpt="carol")  # never expires
+        now = time.time()
+        self.assertEqual(check_expiry(self.asrv, now), (False, self.t1(first)))
+
+        # extending an active grant doesn't reload; the wakeup still moves
+        self.db_exec("update gr set t1 = t1 + 86400 where id = ?", first)
+        self.assertEqual(check_expiry(self.asrv, now), (False, self.t1(later)))
+
+        # an expired or suspended grant isn't mounted, so it never asks for a reload
+        self.db_exec("update gr set t1 = 1 where id = ?", later)
+        shutil.rmtree("a/proj")
+        self.reload()
+        self.assertEqual(check_expiry(self.asrv, now), (False, 0))
+
     def test_no_expiry_by_default(self):
         self.cinit()
         for exp in ({}, {"exp": None}, {"exp": ""}, {"exp": 0}, {"exp": "0"}):

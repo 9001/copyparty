@@ -42,6 +42,7 @@ from .__version__ import S_VERSION, VERSION
 from .authsrv import BAD_CFG, AuthSrv, derive_args, n_du_who, n_ver_who
 from .bos import bos
 from .cert import ensure_cert
+from .fork_grants import start_expiry_timer
 from .fork_util import split_names
 from .fsutil import ramdisk_chk
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, HAVE_MUTAGEN, TH_BWRAP
@@ -1551,6 +1552,7 @@ class SvcHub(object):
 
     def run(self) -> None:
         self.tcpsrv.run()
+        start_expiry_timer(self)  # fork
         if getattr(self.args, "z_chk", 0) and (
             getattr(self.args, "zm", False) or getattr(self.args, "zs", False)
         ):
