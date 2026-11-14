@@ -6621,7 +6621,7 @@ class HttpCli(object):
         rows = cur.execute("select * from sh").fetchall()
         rows = [list(x) for x in rows]
 
-        if self.uname != self.args.shr_adm:
+        if self.uname not in self.args.shr_adm:
             rows = [x for x in rows if x[5] == self.uname]
 
         q = "select vp from sf where k=? limit 99"
@@ -6675,7 +6675,7 @@ class HttpCli(object):
 
         expiry = rows[0][1]
 
-        if un != self.uname and self.uname != self.args.shr_adm:
+        if un != self.uname and self.uname not in self.args.shr_adm:
             t = "your username (%r) does not match the sharekey's owner (%r) and you're not admin"
             raise Pebkac(400, t % (self.uname, un))
 

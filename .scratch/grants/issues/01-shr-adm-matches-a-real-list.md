@@ -4,10 +4,14 @@
 
 **Blocked by:** None (can start immediately).
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Failing tests first (in a new fork test module, using the in-memory HTTP seam from `tests/test_shr.py`): with `--shr-adm alice,bob`, both alice and bob can list and delete another owner's share link
-- [ ] Failing test first: with `--shr-adm admin`, an account named `adm` gets no share-admin view in the active-downloads list
-- [ ] Fixed with the smallest possible edit to upstream lines; the option is parsed once into a list of names
-- [ ] Upstream `tests/test_shr.py` still passes unchanged
-- [ ] FORK.md lists the fix under upstream edits, noting "take theirs if upstream fixes it"
+- [x] Failing tests first (in a new fork test module, using the in-memory HTTP seam from `tests/test_shr.py`): with `--shr-adm alice,bob`, both alice and bob can list and delete another owner's share link
+- [x] Failing test first: with `--shr-adm admin`, an account named `adm` gets no share-admin view in the active-downloads list
+- [x] Fixed with the smallest possible edit to upstream lines; the option is parsed once into a list of names
+- [x] Upstream `tests/test_shr.py` still passes unchanged
+- [x] FORK.md lists the fix under upstream edits, noting "take theirs if upstream fixes it"
+
+## Answer
+
+`--shr-adm` is split once in `svchub.py` by `copyparty/fork_util.py:split_names`; `?shares` and `?eshare` now test membership, and the active-downloads check becomes exact because it now tests a list. `--cgen` still prints the option (`shr_adm` added to its `csv` set). Tests: `tests/test_fork_shr_adm.py` (both red before the fix). Upstream edits are recorded in FORK.md under "upstream edits".

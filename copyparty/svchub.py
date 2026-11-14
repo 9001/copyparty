@@ -42,6 +42,7 @@ from .__version__ import S_VERSION, VERSION
 from .authsrv import BAD_CFG, AuthSrv, derive_args, n_du_who, n_ver_who
 from .bos import bos
 from .cert import ensure_cert
+from .fork_util import split_names
 from .fsutil import ramdisk_chk
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, HAVE_MUTAGEN, TH_BWRAP
 from .pwhash import HAVE_ARGON2
@@ -299,6 +300,7 @@ class SvcHub(object):
             args.no_fpool = True
 
         args.p_nodav = [int(x.strip()) for x in args.p_nodav.split(",") if x]
+        args.shr_adm = split_names(args.shr_adm)
         if args.dav_port and args.dav_port not in args.p:
             args.p.append(args.dav_port)
 
