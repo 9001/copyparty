@@ -3,6 +3,7 @@ from __future__ import division, print_function, unicode_literals
 
 # fork-only: the `harden` global option; see FORK.md and docs/adr/0002
 
+from .fork_util import grants_on
 from .util import Pebkac
 
 if True:  # pylint: disable=using-constant-test
@@ -28,25 +29,45 @@ def _on(args: Any) -> bool:
     return bool(getattr(args, "harden", False))
 
 
-def _refused(vn: "VFS", rem: str, uname: str, su: str) -> bool:
-    return has_dot_part(rem) and uname not in vn.axs.udot and uname != su
+def is_grant(vn: "VFS") -> bool:
+    """True for the volume of one grant (/<grants>/<owner>/<name>)"""
+    return getattr(vn, "fork_grant", False)
+
+
+def _refused(args: Any, vn: "VFS", rem: str, uname: str, su: str) -> bool:
+    # grants always block dotfiles, whatever --harden says (docs/adr/0002)
+    return (
+        has_dot_part(rem)
+        and (_on(args) or is_grant(vn))
+        and uname not in vn.axs.udot
+        and uname != su
+    )
 
 
 def harden_vfs(args: Any, vfs: "VFS") -> None:
     """with --harden, make every volume's VFS.get (the path lookup used by
     ftp/sftp/smb/tftp and httpcli's handlers) refuse dot parts below the
     volume root with 404 for accounts without the `.` permission, and
-    harden share links (see _harden_share)"""
-    if not _on(args):
+    harden share links (see _harden_share). With grants on (and --harden
+    off), the same lookup refuses dot parts inside grants only"""
+    if not _on(args) and not grants_on(args):
         return
 
-    su = _su()
-    shares = [x for x in vfs.all_nodes.values() if _is_share(args, x)]
-    for vol in shares:
-        _harden_share(vol)
+    shares = []
+    if _on(args):
+        shares = [x for x in vfs.all_nodes.values() if _is_share(args, x)]
+        for vol in shares:
+            _harden_share(vol)
 
-    for vol in vfs.all_nodes.values():  # includes the root ("")
-        vol.get = _refuse_dots(vol.get, su, shares)
+    harden_nodes(args, list(vfs.all_nodes.values()), shares)  # includes the root
+
+
+def harden_nodes(args: Any, vols: list["VFS"], shares: list["VFS"]) -> None:
+    """wrap each volume's VFS.get with the dot rule; also called for grant
+    volumes, which are mounted after harden_vfs"""
+    su = _su()
+    for vol in vols:
+        vol.get = _refuse_dots(args, vol.get, su, shares)
 
 
 def _is_share(args: Any, vol: "VFS") -> bool:
@@ -83,7 +104,7 @@ def _harden_share(vol: "VFS") -> None:
 
 
 def _refuse_dots(
-    get: Callable[..., Any], su: str, shares: list["VFS"]
+    args: Any, get: Callable[..., Any], su: str, shares: list["VFS"]
 ) -> Callable[..., Any]:
     def hardened_get(vpath: str, uname: str, *a: Any, **ka: Any) -> Any:
         ret = get(vpath, uname, *a, **ka)
@@ -92,7 +113,7 @@ def _refuse_dots(
 
         # mirrors VFS._get(vpath, uname, will_read, will_write, will_move,
         # will_del, will_get, err=403); err=0 means "return None"
-        if not _refused(ret[0], ret[1], uname, su):
+        if not _refused(args, ret[0], ret[1], uname, su):
             will_write = ka["will_write"] if "will_write" in ka else a[1]
             if will_write and ret[0] in shares:
                 _refuse_listing_name(ret[1].split("/")[-1])
@@ -108,16 +129,14 @@ def _refuse_dots(
 
 def http_refused(cli: Any) -> bool:
     """httpcli.run resolves each request with VFS._get (no permission check,
-    so not VFS.get); True if --harden must 404 this request"""
-    if not _on(cli.args):
-        return False
-
+    so not VFS.get); True if the dot rule (--harden, or inside a grant)
+    must 404 this request"""
     if cli.mode in ("GET", "HEAD") and (
         cli.vpath == ".cpr" or cli.vpath.startswith(".cpr/")
     ):
         return False  # always copyparty's own web resources, never a volume
 
-    return _refused(cli.vn, cli.rem, cli.uname, _su())
+    return _refused(cli.args, cli.vn, cli.rem, cli.uname, _su())
 
 
 def refuse_dot_tree(
@@ -126,7 +145,7 @@ def refuse_dot_tree(
     """up2k folder move/copy: 403 before anything happens if any file in
     `walk` would hit the dot rule at its source or destination, since the
     per-file VFS.get would otherwise stop the move/copy half-way"""
-    if not _on(args):
+    if not _on(args) and not grants_on(args):
         return
 
     su = _su()
@@ -136,7 +155,7 @@ def refuse_dot_tree(
             dvpf = dvp + svpf[len(svp) :]
             for vpf in (svpf, dvpf):
                 vn, rem = vfs._get(vpf, uname, False, False)
-                if _refused(vn, rem, uname, su):
+                if _refused(args, vn, rem, uname, su):
                     t = "this folder holds dotfiles; moving or copying it needs the `.` permission"
                     raise Pebkac(403, t)
 
@@ -146,7 +165,7 @@ def refuse_dot_name(args: Any, vn: "VFS", uname: str, name: str) -> None:
     neither VFS.get nor http_refused saw it; 404 like every other way of
     creating a dot name without the `.` permission"""
     # the folder part was already checked by VFS.get; only the name is new
-    if _on(args) and _refused(vn, name, uname, _su()):
+    if _refused(args, vn, name, uname, _su()):
         raise Pebkac(404)
 
 

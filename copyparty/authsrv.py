@@ -16,6 +16,7 @@ from datetime import datetime
 from .__init__ import ANYWIN, CFG_DEF, MACOS, PY2, TYPE_CHECKING, WINDOWS, E
 from .bos import bos
 from .cfg import flagdescs, permdescs, vf_bmap, vf_cmap, vf_vmap
+from .fork_grants import mount_grants
 from .fork_harden import harden_vfs, purge_ownerless_shares
 from .pwhash import PWHash
 from .util import (
@@ -3574,6 +3575,8 @@ class AuthSrv(object):
 
             zs = str(vol.flags.get("tcolor") or self.args.tcolor)
             vol.flags["tcolor"] = zs.lstrip("#")
+
+        mount_grants(self, vfs, acct)  # fork: last, once all volumes are final
 
     def setup_auth_ord(self) -> None:
         ao = [x.strip() for x in self.args.auth_ord.split(",")]

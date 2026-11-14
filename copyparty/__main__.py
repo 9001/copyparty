@@ -1478,6 +1478,8 @@ def add_share(ap):
     ap2.add_argument("--shr-rt", metavar="MIN", type=int, default=1440, help="shares can be revived by their owner if they expired less than MIN minutes ago; [\033[32m60\033[0m]=hour, [\033[32m1440\033[0m]=day, [\033[32m10080\033[0m]=week")
     ap2.add_argument("--shr-site", metavar="URL", type=u, default="--site", help="public URL to assume when creating share-links; example: [\033[32mhttps://example.com/\033[0m]")
     ap2.add_argument("--shr-v", action="store_true", help="debug")
+    ap2.add_argument("--grants", metavar="DIR", type=u, default="", help="[fork] toplevel virtual folder where accounts find the folders other accounts granted them, for example [\033[32m/shared\033[0m]; empty = grants off")
+    ap2.add_argument("--grants-db", metavar="FILE", type=u, default=os.path.join(E.cfg, "grants.db"), help="[fork] database to store grants in")
 
 
 def add_upload(ap):

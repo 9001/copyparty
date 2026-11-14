@@ -31,7 +31,7 @@ the Nextcloud features we want to keep:
 | manage users | ❌ **config file only** -- edit, then reload (`kill -USR1` / `[reload cfg]` button) |
 | own folder per user | ✅ `[/home/${u}]` volume, one block covers all users |
 | shared folders | ✅ admin-defined volume + `[groups]` |
-| **user shares a folder with another user** | ❌ **missing** -- only share links (not tied to an account) or ask the admin |
+| **user shares a folder with another user** | 🚧 grants (`grants: /shared`), fork-only; read-only, created by a JSON POST so far (no button or page yet) |
 | share links | ✅ `shr: /share`; password, expiry, optional upload; owner manages them in the control panel |
 | stream video | ✅ served as-is with range requests; no video transcoding (fine for the Pi) |
 | edit text | ✅ text viewer + two markdown editors |
@@ -206,9 +206,58 @@ every place this fork changes an upstream file. On a merge conflict, resolve eac
 | fix | upstream lines touched | fork files | on conflict |
 |---|---|---|---|
 | fork modules ship in the sfx build | `scripts/sfx.ls`: one line per new `copyparty/fork_*.py` | -- | keep both sides |
+| grants (`--grants`, `--grants-db`) | `authsrv.py`: one import + `mount_grants(self, vfs, acct)` as the last line of `_reload` (marked `# fork`; it needs every volume's final flags, js and share links); `httpcli.py` `handle_post_json`: one import + `if "grant" in self.uparam: return handle_grant(self, body)` right after the `share` dispatch (marked `# fork`); `httpcli.py` `run`: the `http_request` line (see `harden`); `__main__.py` `add_share`: the `--grants` and `--grants-db` options | `copyparty/fork_grants.py`, `copyparty/fork_harden.py` (dot rule also on grant volumes, `harden_nodes`), `copyparty/fork_util.py` (`grants_top`), `tests/test_fork_grants.py` | keep both sides; grant volumes mirror how `_reload` maps a share link (`shr_src`, `_get_share_src`, `shr_all_aps`, hidden `.hist` and subvolumes), so if upstream changes that block, port the change to `_grant_vol` and rerun `tests/test_fork_grants.py`. The listing workaround in `http_request` relies on `tx_ls_vols` reading `self.rvol` and on `run` setting `can_*` before the hook |
 | `--shr-adm` takes a real comma-separated list of exact names (upstream compared the whole string in `?shares` / `?eshare`, and used a substring test in the active-downloads list, so `adm` matched `admin`) | `svchub.py`: one import + `args.shr_adm = split_names(args.shr_adm)`; `httpcli.py` `tx_shares` / `handle_eshare`: `!=` -> `not in`; `authsrv.py` `cgen`: `shr_adm` added to the `csv` set so `--cgen` still prints it | `copyparty/fork_util.py` (`split_names`), `tests/test_fork_shr_adm.py` | **take theirs if upstream fixes it**, then remove all of the fork side: the `split_names` line + import in `svchub.py`, `shr_adm` in cgen's `csv` set (unless upstream keeps a list too), and `split_names` (and `fork_util.py` + its `sfx.ls` line, if nothing else uses them); keep the test if it still passes |
-| `harden`: dotfiles inside a volume are 404 without `.` | `authsrv.py`: one import + `harden_vfs(self.args, vfs)` in `_reload` right after the loop that ends with the `dots` volflag adding to `udot` (marked `# fork`; it wraps each volume's `get`, so it must come after the `xvd` block, and it clears `udot` on share links, so after the `dots` loop); `httpcli.py` `run`: one import + `if http_refused(self): return self.tx_404() and False` right after `self.rem = rem` (the per-request lookup uses `VFS._get`, not `get`); `up2k.py`: one import + a `refuse_dot_tree(...)` walk before the folder walk in `handle_mv` and in `handle_cp` (2 lines each, marked `# fork`); `httpcli.py` `handle_post_json`: `refuse_dot_name(...)` right after `vfs.sanitize_fn(name, rem)` (marked `# fork`, import shared with `http_refused`); `httpcli.py` `handle_share`: `refuse_short_key(self.args, skey)` right after the illegal-character check (marked `# fork`, same import); `authsrv.py` `_reload`, share loader: `purge_ownerless_shares(self.args, db, acct, self.log)` right before the first `for row in cur.execute("select * from sh")` loop (marked `# fork`, import shared with `harden_vfs`); `__main__.py` `add_safety`: the `--harden` option. Share link dotfiles and upload names need no extra edit: `harden_vfs` clears `udot` and wraps `sanitize_fn` on each share link volume, and the wrapped `get` refuses the listing names on write lookups into a share link | `copyparty/fork_harden.py`, `tests/test_fork_harden.py`, `tests/test_fork_harden_shr.py` | keep both sides; if upstream renames `VFS.get` / the `self.vn, self.rem` lookup in `run`, move the hook to the new spot and rerun `tests/test_fork_harden.py` and `tests/test_fork_harden_shr.py` (the share link rules set `VFS.sanitize_fn` / `axs.udot` by name, so a rename upstream would silently stop them; only the tests notice). `_refuse_dots` reads `err` by `VFS._get`'s argument order (6th after `uname`, default 403); recheck it if that signature changes. **If upstream adds a real dotfile block, take theirs** and remove the fork side |
+| `harden`: dotfiles inside a volume are 404 without `.` | `authsrv.py`: one import + `harden_vfs(self.args, vfs)` in `_reload` right after the loop that ends with the `dots` volflag adding to `udot` (marked `# fork`; it wraps each volume's `get`, so it must come after the `xvd` block, and it clears `udot` on share links, so after the `dots` loop); `httpcli.py` `run`: one import + `if http_request(self): return self.tx_404() and False` right after `self.rem = rem` (the per-request lookup uses `VFS._get`, not `get`; `http_request` lives in `fork_grants.py` and calls `fork_harden.http_refused` first); `up2k.py`: one import + a `refuse_dot_tree(...)` walk before the folder walk in `handle_mv` and in `handle_cp` (2 lines each, marked `# fork`); `httpcli.py` `handle_post_json`: `refuse_dot_name(...)` right after `vfs.sanitize_fn(name, rem)` (marked `# fork`, import shared with the `fork_harden` one); `httpcli.py` `handle_share`: `refuse_short_key(self.args, skey)` right after the illegal-character check (marked `# fork`, same import); `authsrv.py` `_reload`, share loader: `purge_ownerless_shares(self.args, db, acct, self.log)` right before the first `for row in cur.execute("select * from sh")` loop (marked `# fork`, import shared with `harden_vfs`); `__main__.py` `add_safety`: the `--harden` option. Share link dotfiles and upload names need no extra edit: `harden_vfs` clears `udot` and wraps `sanitize_fn` on each share link volume, and the wrapped `get` refuses the listing names on write lookups into a share link | `copyparty/fork_harden.py`, `tests/test_fork_harden.py`, `tests/test_fork_harden_shr.py` | keep both sides; if upstream renames `VFS.get` / the `self.vn, self.rem` lookup in `run`, move the hook to the new spot and rerun `tests/test_fork_harden.py` and `tests/test_fork_harden_shr.py` (the share link rules set `VFS.sanitize_fn` / `axs.udot` by name, so a rename upstream would silently stop them; only the tests notice). `_refuse_dots` reads `err` by `VFS._get`'s argument order (6th after `uname`, default 403); recheck it if that signature changes. **If upstream adds a real dotfile block, take theirs** and remove the fork side |
 | a share link password equal to an account's password no longer breaks every reload (upstream loaded it as a made-up `s_...` account with the same password, which tripped the "same password" check; reload/restart then failed for everyone). The share is now granted to the account that owns that password, so the password logs in as that account and opens the share (that account may not be the share's owner: if bob sets alice's password on a share, alice's login also gets the share) | `authsrv.py` `_reload`, share loader: a `pw2u` password->account map before the loop, and an `if s_pw.strip() in pw2u: sun = pw2u[s_pw.strip()]` branch before the `s_` account is made | `tests/test_fork_shr_pw.py` | **take theirs if upstream fixes it**, then drop the `pw2u` line and the extra branch; keep the test if it still passes |
+
+
+## grants: fork-only folder sharing between accounts
+
+see `docs/adr/0001` and `.scratch/grants/spec.md`. Work in progress: ticket 06 (the tracer
+bullet) is done, the rest (rights, refusals, groups, expiry, the grants page and button) is not.
+
+options (`[global]`):
+
+* `grants: /shared` (`--grants`): the virtual folder where recipients find what was granted to
+  them, at `/shared/<owner>/<name>`; empty (the default) = grants off. Works with share links
+  (`shr`) off
+* `grants-db` (`--grants-db`, default `grants.db` next to `shares.db`): the grants database. It
+  has its own schema version (`kv` table, `sver`), is created on the first grant, and copyparty
+  refuses to start on a newer version
+
+what works so far:
+
+* an owner creates a read-only grant with `POST /?grant`, JSON body
+  `{"vp": "/home/alice/proj/", "rcpt": "bob", "name": "proj", "perms": ["read"]}`; a reload
+  follows. Refused: grants off, not logged in, a source under `/shared`, a hidden source (any
+  path part starting with a dot; such a row is also never mounted), no read on the source, not a
+  folder, unknown recipient or yourself, a name that isn't one folder name
+* at every reload each grant is resolved through the volume tree as its owner with exactly the
+  granted rights (like share links), and mounted with the source volume's settings, minus share
+  links (`shr_who: no`) and indexing flags. A grant whose owner lost those rights (suspended), or
+  whose source folder is gone (broken), is skipped and logged; its row stays
+* the recipient browses and downloads over HTTP and WebDAV; others see nothing under `/shared`
+* dotfiles inside a grant are always 404 for the recipient, even with `harden` off and even when
+  the owner holds `.`
+* grants are not in an account's list of readable volumes (`aread`), so search, the upload list
+  and FTP/SFTP volume lists never see them; listings of `/`, `/shared/` and `/shared/<owner>/`
+  add them for that one request
+
+known gaps:
+
+* with a **readable root volume** (`[/]`), `/` doesn't list `shared/` (upstream leaves folders
+  that have no path on disk out of a real folder's listing); `/shared/` itself works. Our config
+  has no root volume
+* a symlink inside the granted folder is followed, as in share links: a link to `../priv.txt`
+  serves that file to the recipient, even though it is outside the granted folder. `xvol` only
+  stops links that leave the *volume*, so it doesn't help within a home folder. Owners must not
+  keep links out of a folder they grant (not enforced yet)
+* two grants from one owner with the same name but a different source folder or rights: the
+  second is skipped (logged), since one name is one folder for everyone. Same folder and rights
+  to several recipients share one mount
+
+code: `copyparty/fork_grants.py`, tests: `tests/test_fork_grants.py`
 
 
 ## the user-management gap, upstream's position
