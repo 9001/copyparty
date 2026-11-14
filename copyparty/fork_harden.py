@@ -62,12 +62,15 @@ def harden_vfs(args: Any, vfs: "VFS") -> None:
     harden_nodes(args, list(vfs.all_nodes.values()), shares)  # includes the root
 
 
-def harden_nodes(args: Any, vols: list["VFS"], shares: list["VFS"]) -> None:
-    """wrap each volume's VFS.get with the dot rule; also called for grant
-    volumes, which are mounted after harden_vfs"""
+def harden_nodes(args: Any, vols: list["VFS"], guarded: list["VFS"]) -> None:
+    """wrap each volume's VFS.get with the dot rule, and the listing-name
+    rule for uploads into `guarded` (share links, grants, each also in
+    `vols`); also called for grant volumes, which are mounted after harden_vfs"""
     su = _su()
+    for vol in guarded:
+        _guard_upload_names(vol)
     for vol in vols:
-        vol.get = _refuse_dots(args, vol.get, su, shares)
+        vol.get = _refuse_dots(args, vol.get, su, guarded)
 
 
 def _is_share(args: Any, vol: "VFS") -> bool:
@@ -82,17 +85,21 @@ _LISTING_NAMES = ("readme.md", "preadme.md", "descript.ion")
 
 def _refuse_listing_name(fn: str) -> None:
     if fn.lower() in _LISTING_NAMES:
-        t = "%r cannot be uploaded through a share link" % (fn,)
+        t = "%r cannot be uploaded through a share link or a grant" % (fn,)
         raise Pebkac(403, t)
 
 
 def _harden_share(vol: "VFS") -> None:
     """a share link never shows dotfiles, whatever its owner gave it (`.`,
-    --ed, the dots volflag), and refuses uploads of names that would render
-    inside the owner's folder listings. Uploads that send the new name in
-    the request body (bput, up2k, new_md) name it with VFS.sanitize_fn; the
-    rest (PUT, tput, COPY, ?copy) are caught in _refuse_dots"""
+    --ed, the dots volflag)"""
     vol.axs.udot = set()
+
+
+def _guard_upload_names(vol: "VFS") -> None:
+    """refuse uploads of names that would render inside the owner's folder
+    listings. Uploads that send the new name in the request body (bput,
+    up2k, new_md) name it with VFS.sanitize_fn; the rest (PUT, tput, COPY,
+    ?copy) are caught in _refuse_dots, for the volumes harden_nodes guards"""
     sanitize_fn = vol.sanitize_fn
 
     def hardened_sanitize_fn(fn: str, rem: Any = None) -> str:
@@ -104,7 +111,7 @@ def _harden_share(vol: "VFS") -> None:
 
 
 def _refuse_dots(
-    args: Any, get: Callable[..., Any], su: str, shares: list["VFS"]
+    args: Any, get: Callable[..., Any], su: str, guarded: list["VFS"]
 ) -> Callable[..., Any]:
     def hardened_get(vpath: str, uname: str, *a: Any, **ka: Any) -> Any:
         ret = get(vpath, uname, *a, **ka)
@@ -115,7 +122,7 @@ def _refuse_dots(
         # will_del, will_get, err=403); err=0 means "return None"
         if not _refused(args, ret[0], ret[1], uname, su):
             will_write = ka["will_write"] if "will_write" in ka else a[1]
-            if will_write and ret[0] in shares:
+            if will_write and ret[0] in guarded:
                 _refuse_listing_name(ret[1].split("/")[-1])
             return ret
 

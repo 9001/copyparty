@@ -457,6 +457,7 @@ flagcats = {
         "dky": 'allow seeing files (not folders) inside a specific folder\nwith "g" perm, and does not require a valid dirkey to do so',
         "rmagic": "expensive analysis for mimetype accuracy",
         "shr_who=auth": "who can create shares? no/auth/a",
+        "grant_who=auth": "[fork] who can create grants? no/auth/a",
         "unp_who=2": "unpost only if same... 1=ip+name, 2=ip, 3=name",
         "ups_who=2": "restrict viewing the list of recent uploads",
         "zip_who=2": "restrict access to download-as-zip/tar",

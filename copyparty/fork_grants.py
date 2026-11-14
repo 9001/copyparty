@@ -4,13 +4,15 @@ from __future__ import division, print_function, unicode_literals
 # fork-only: grants, an owner gives a named account access to one of their
 # folders, mounted at /<grants>/<owner>/<name>; see FORK.md and docs/adr/0001
 
+import hashlib
 import json
 import os
 import time
 
+from .__init__ import unicode
 from .fork_harden import harden_nodes, has_dot_part, http_refused
 from .fork_util import grants_top
-from .util import Pebkac, undot, vjoin
+from .util import Pebkac, ub64enc, undot, vjoin
 
 try:
     import sqlite3
@@ -71,13 +73,18 @@ class GrantStore(object):
     def create(
         self, owner: str, rcpt: str, vp: str, name: str, pr: str, t1: int
     ) -> int:
+        """the new grant's id, or 0 if the owner already gave this
+        recipient a grant by that name (expired ones too, since an owner
+        can extend those back to life)"""
         db = self._open(True)
         assert db  # !rm
         try:
-            q = "insert into gr (un, rcpt, vp, name, pr, t0, t1) values (?,?,?,?,?,?,?)"
-            cur = db.execute(q, (owner, rcpt, vp, name, pr, int(time.time()), t1))
+            q = "insert into gr (un, rcpt, vp, name, pr, t0, t1) select ?,?,?,?,?,?,?"
+            q += " where not exists (select 1 from gr where un = ? and rcpt = ? and name = ?)"
+            zt = (owner, rcpt, vp, name, pr, int(time.time()), t1, owner, rcpt, name)
+            cur = db.execute(q, zt)
             db.commit()
-            return cur.lastrowid
+            return cur.lastrowid if cur.rowcount == 1 else 0
         finally:
             db.close()
 
@@ -91,6 +98,42 @@ class GrantStore(object):
             return db.execute(q, (now,)).fetchall()
         finally:
             db.close()
+
+
+def share_pw_accounts(args: Any) -> set[str]:
+    """the made-up accounts share link passwords log in as, which anyone
+    with that password can use; AuthSrv._reload puts them in `acct` named
+    from a hash of the stored password, before it strips every password,
+    so the names can only be worked out from the share link database"""
+    if not args.shr or not sqlite3 or not os.path.exists(args.shr_db):
+        return set()
+    db = sqlite3.connect(args.shr_db, timeout=2)
+    try:
+        rows = db.execute("select pw from sh where pw != ''").fetchall()
+    except:
+        return set()
+    finally:
+        db.close()
+    ret = set()
+    for (pw,) in rows:
+        zb = hashlib.sha512(pw.encode("utf-8")).digest()
+        ret.add("s_%s" % (ub64enc(zb)[4:16].decode("ascii"),))
+    return ret
+
+
+def is_account(acct: dict[str, str], pseudo: set[str], un: str) -> bool:
+    """True for an account from the config; `pseudo` = share_pw_accounts"""
+    return un in acct and un not in pseudo
+
+
+def _safe_name(name: str) -> bool:
+    """one path segment that is not hidden, nor . or .."""
+    return (
+        0 < len(name) <= 255
+        and not name.startswith(".")
+        and name == name.strip()
+        and not any(c in "/\\" or ord(c) < 32 or ord(c) == 127 for c in name)
+    )
 
 
 def _store(args: Any) -> GrantStore:
@@ -164,9 +207,10 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
     trees: dict[str, "VFS"] = {}  # recipient: their /<grants>
     aread: dict[str, list[str]] = {}  # recipient: vpaths of their grants
     pub = folder(None, top)
+    pseudo = share_pw_accounts(args)
     for gid, un, rcpt, vp, name, pr in _store(args).live(time.time()):
         desc = "grant %d by [%s] to [%s] of [/%s] (%s)" % (gid, un, rcpt, vp, pr)
-        if un not in acct or rcpt not in acct:
+        if not is_account(acct, pseudo, un) or not is_account(acct, pseudo, rcpt):
             log("skipping %s; not an account" % (desc,), 3)
             continue
 
@@ -226,7 +270,8 @@ def mount_grants(asrv: "AuthSrv", vfs: "VFS", acct: dict[str, str]) -> None:
             vfs.all_nodes[vn.vpath] = vn
     vfs.fork_grant_aread = aread  # type: ignore
 
-    harden_nodes(args, virt + grants, [])
+    # grants always refuse dot names and listing names, whatever --harden says
+    harden_nodes(args, virt + grants, grants)
     _route(vfs, top, trees)
 
 
@@ -299,6 +344,7 @@ def _grant_vol(
     for zs in _EMPTY_FLAGS.split():
         gvn.flags[zs] = []
     gvn.flags["shr_who"] = "no"  # no share links of a grant
+    gvn.flags["grant_who"] = "no"  # nor grants
 
     # the grant appears in every abspath it provides (for chk_ap / xvol)
     ap = gvn.realpath
@@ -355,6 +401,34 @@ def http_request(cli: Any) -> bool:
     return False
 
 
+# the rights a grant can give, by what the create request names them;
+# move, delete and admin are never possible through a grant
+_RIGHTS = {("read",): "r", ("read", "write"): "rw"}
+
+
+def _rights(perms: Any) -> str:
+    try:
+        assert isinstance(perms, list)
+        return _RIGHTS[tuple(sorted(set(perms)))]
+    except:
+        raise Pebkac(400, "a grant is either read-only (read) or read + upload (read, write)")
+
+
+def _may_grant(vn: "VFS", uname: str) -> bool:
+    """the grant_who volflag (no / a / auth, default auth); like shr_who,
+    but separate, so an admin can allow one and forbid the other"""
+    zs = vn.flags.get("grant_who", "auth")
+    if zs == "auth":
+        return uname != "*"
+    if zs == "a":
+        return uname in vn.axs.uadmin
+    return False  # "no", or a typo: fail closed
+
+
+def _under(vp: str, top: str) -> bool:
+    return bool(top) and (vp == top or vp.startswith(top + "/"))
+
+
 def handle_grant(cli: Any, req: dict[str, Any]) -> bool:
     """POST ?grant (json): {vp, rcpt, name, perms}; creates a grant and reloads"""
     args = cli.args
@@ -365,39 +439,58 @@ def handle_grant(cli: Any, req: dict[str, Any]) -> bool:
     if uname == "*":
         raise Pebkac(401, "you must be logged in to create a grant")
 
+    # one folder; share links take a list of paths and a "files" selection
+    vp = req.get("vp") or ""
+    if not isinstance(vp, (str, unicode)) or req.get("files"):
+        raise Pebkac(400, "only folders can be granted, one at a time")
+
     # "%s" % x, not str(x): a non-ascii name would fail str() on python2
-    vp = ("%s" % (req.get("vp") or "",)).strip("/")
+    vp = ("%s" % (vp,)).strip("/")
     rcpt = "%s" % (req.get("rcpt") or "",)
     name = "%s" % (req.get("name") or "",)
-    perms = req.get("perms") or []
-    if perms != ["read"]:
-        raise Pebkac(400, "only read-only grants are supported")
-    pr = "r"
+    pr = _rights(req.get("perms"))
 
     if cli.is_vproxied and (vp == args.R or vp.startswith(args.RS)):
         vp = vp[len(args.RS) :]
+    vp = undot(vp)
 
     top = grants_top(args)
-    if vp == top or vp.startswith(top + "/"):
+    if _under(vp, top):
         raise Pebkac(400, "a granted folder cannot be granted on")
+    if args.shr and _under(vp, args.shr1.strip("/")):
+        raise Pebkac(400, "a folder inside a share link cannot be granted")
     if has_dot_part(vp):
         raise Pebkac(400, "hidden folders (a name starting with a dot) cannot be granted")
 
     try:
-        vn, rem = cli.asrv.vfs.get(vp, uname, True, False)
+        vn, rem = cli.asrv.vfs.get(vp, uname, True, "w" in pr)
     except:
         raise Pebkac(400, "you dont have all the perms you tried to grant")
+
+    if vn.shr_src:  # any other path to a share link or grant volume
+        raise Pebkac(400, "a folder inside a share link or a granted folder cannot be granted")
+
+    if not _may_grant(vn, uname):
+        raise Pebkac(400, "you dont have perms to create grants from this volume")
 
     if not os.path.isdir(vn.canonical(rem)):
         raise Pebkac(400, "only folders can be granted")
 
-    if rcpt == uname or rcpt not in cli.asrv.acct:
+    if rcpt in ("*", "@acct"):
+        raise Pebkac(400, "a grant cannot go to every account; pick an account")
+    if rcpt == uname:
+        raise Pebkac(400, "you cannot grant a folder to yourself")
+    if not is_account(cli.asrv.acct, share_pw_accounts(args), rcpt):
         raise Pebkac(400, "no such recipient: %r" % (rcpt,))
 
-    if not name or "/" in name or "\\" in name or name.startswith("."):
-        raise Pebkac(400, "the name must be one folder name, not starting with a dot")
+    if not _safe_name(name):
+        t = "the name must be one folder name: not starting with a dot, no slashes or control characters, at most 255 characters"
+        raise Pebkac(400, t)
 
     gid = _store(args).create(uname, rcpt, vp, name, pr, 0)
+    if not gid:
+        t = "you already gave %r a grant named %r; pick another name"
+        raise Pebkac(400, t % (rcpt, name))
     cli.log("created grant %d by [%s] to [%s] of [/%s] (%s)" % (gid, uname, rcpt, vp, pr))
 
     cli.conn.hsrv.broker.ask("reload", False, True).get()

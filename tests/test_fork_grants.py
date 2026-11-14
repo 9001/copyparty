@@ -69,8 +69,11 @@ class TestForkGrants(unittest.TestCase):
     def get(self, url, uname):
         return self.req("GET", url, uname)
 
-    def grant(self, vp="/home/alice/proj/", rcpt="bob", name="proj", uname="alice"):
-        jt = {"vp": vp, "rcpt": rcpt, "name": name, "perms": ["read"]}
+    def grant(
+        self, vp="/home/alice/proj/", rcpt="bob", name="proj", uname="alice", perms=("read",), **ka
+    ):
+        jt = {"vp": vp, "rcpt": rcpt, "name": name, "perms": list(perms)}
+        jt.update(ka)
         buf = json.dumps(jt).encode("utf-8")
         hdr = "Content-Type: application/json\r\nContent-Length: %d\r\n" % (len(buf),)
         st, b = self.req("POST", "?grant", uname, hdr, buf)
@@ -231,7 +234,7 @@ class TestForkGrants(unittest.TestCase):
             self.get("shared/alice/proj/f.txt", "bob"), (200, b"a/proj/f.txt")
         )
 
-    def test_with_share_links(self):
+    def cinit_shr(self, **ka):
         db = sqlite3.connect("s.db")
         with db:
             db.execute(
@@ -239,7 +242,19 @@ class TestForkGrants(unittest.TestCase):
             )
             db.execute("create table sf (k text, vp text)")
         db.close()
-        self.cinit(shr="/shr/", shr1="shr/", shr_db="s.db", shr_v=False)
+        self.cinit(shr="/shr/", shr1="shr/", shr_db="s.db", shr_v=False, **ka)
+
+    def share(self, vp, uname="alice", key="abcdefghijkl", pw=""):
+        jt = {"k": key, "vp": [vp], "pw": pw, "exp": "99", "perms": ["read"]}
+        buf = json.dumps(jt).encode("utf-8")
+        hdr = "Content-Type: application/json\r\nContent-Length: %d\r\n" % (len(buf),)
+        st, b = self.req("POST", "?share", uname, hdr, buf)
+        if st == 201:
+            self.reload()
+        return st, b
+
+    def test_with_share_links(self):
+        self.cinit_shr()
         self.assertEqual(self.grant()[0], 201)
         self.assertEqual(
             self.get("shared/alice/proj/f.txt", "bob"), (200, b"a/proj/f.txt")
@@ -283,6 +298,293 @@ class TestForkGrants(unittest.TestCase):
         with self.assertRaises(Exception) as cm:
             self.reload()
         self.assertIn("grants-db v1 and older", str(cm.exception))
+
+    # rights (ticket 07)
+
+    def put(self, url, uname, buf=b"put"):
+        hdr = "Content-Type: application/octet-stream\r\nContent-Length: %d\r\n" % (len(buf),)
+        return self.req("PUT", url, uname, hdr, buf)
+
+    def test_read_upload_grant(self):
+        self.cinit()
+        self.assertEqual(self.grant(perms=("read", "write"))[0], 201)
+        self.assertEqual(self.put("shared/alice/proj/new.txt", "bob")[0], 201)
+        with open("a/proj/new.txt", "rb") as f:
+            self.assertEqual(f.read(), b"put")
+        self.assertEqual(self.get("shared/alice/proj/new.txt", "bob"), (200, b"put"))
+
+    def test_read_only_grant_refuses_uploads(self):
+        self.cinit()
+        self.assertEqual(self.grant()[0], 201)
+        self.assertIn(self.put("shared/alice/proj/new.txt", "bob")[0], (401, 403))
+        self.assertFalse(os.path.exists("a/proj/new.txt"))
+
+    def test_only_read_and_upload_can_be_granted(self):
+        self.cinit()
+        for perms in (
+            (),
+            ("write",),
+            ("read", "move"),
+            ("read", "delete"),
+            ("read", "admin"),
+            ("read", "write", "move", "delete"),
+            ("read", "get"),
+            ("read", "dot"),
+            "read",
+        ):
+            st, b = self.grant(perms=perms)
+            self.assertEqual(st, 400, perms)
+            self.assertIn(b"read-only", b, perms)
+        self.assertFalse(os.path.exists("g.db"))
+
+    def test_no_move_or_delete_through_a_grant(self):
+        self.cinit()
+        self.assertEqual(self.grant(perms=("read", "write"))[0], 201)
+        url = "shared/alice/proj/f.txt"
+        dst = "Destination: /shared/alice/proj/g.txt\r\n"
+        for method, u, hdr in [
+            ("DELETE", url, ""),
+            ("POST", url + "?delete", "Content-Length: 0\r\n"),
+            ("POST", url + "?move=/shared/alice/proj/g.txt", "Content-Length: 0\r\n"),
+            ("MOVE", url, dst),
+        ]:
+            st, b = self.req(method, u, "bob", hdr)
+            self.assertIn(st, (401, 403, 404), (method, u, b))
+            self.assertTrue(os.path.exists("a/proj/f.txt"), (method, u))
+            self.assertFalse(os.path.exists("a/proj/g.txt"), (method, u))
+
+        self.assertEqual(self.asrv.vfs.get_perms("shared/alice/proj/", "bob"), "rwg")
+        for ka in ({"will_move": True}, {"will_del": True}):
+            with self.assertRaises(Exception):
+                self.asrv.vfs.get("shared/alice/proj/f.txt", "bob", True, False, **ka)
+
+    # refusals at create (ticket 07)
+
+    def n_grants(self):
+        if not os.path.exists("g.db"):
+            return 0
+        db = sqlite3.connect("g.db")
+        try:
+            return db.execute("select count(*) from gr").fetchall()[0][0]
+        finally:
+            db.close()
+
+    def refused(self, msg, **ka):
+        n = self.n_grants()
+        st, b = self.grant(**ka)
+        self.assertEqual(st, 400, b)
+        self.assertIn(msg, b)
+        self.assertEqual(self.n_grants(), n)
+
+    def test_refused_rights_the_owner_lacks(self):
+        os.makedirs("ro/d")
+        self.cinit(v=["a:home/alice:A,alice", "ro:ro:r,alice"])
+        self.refused(b"you dont have all the perms", vp="/ro/d/", perms=("read", "write"))
+        self.refused(b"you dont have all the perms", vp="/home/alice/proj/", uname="carol")
+        self.assertEqual(self.grant(vp="/ro/d/", name="d")[0], 201)
+
+    def test_refused_under_shared(self):
+        self.cinit()
+        self.assertEqual(self.grant()[0], 201)
+        for vp in ("/shared/alice/proj/", "/shared/alice/proj/s/", "/shared/", "shared", "/x/../shared/alice/proj/"):
+            self.refused(b"granted folder", vp=vp, rcpt="carol", uname="bob", name="x")
+
+    def test_refused_under_share_links(self):
+        self.cinit_shr()
+        self.assertEqual(self.share("/home/alice/proj/")[0], 201)
+        self.assertEqual(self.get("shr/abcdefghijkl/f.txt", "*"), (200, b"a/proj/f.txt"))
+        for vp in ("/shr/abcdefghijkl/", "/shr/abcdefghijkl/s/", "/shr/", "/home/../shr/abcdefghijkl/"):
+            self.refused(b"share link", vp=vp, name="x")
+
+    def test_no_share_link_of_a_grant(self):
+        self.cinit_shr()
+        self.assertEqual(self.grant()[0], 201)
+        st, b = self.share("/shared/alice/proj/", uname="bob")
+        self.assertEqual(st, 400, b)
+        self.assertIn(self.get("shr/abcdefghijkl/f.txt", "*")[0], (401, 403, 404))
+
+    def test_grant_who_no(self):
+        # grants forbidden, share links allowed, on the same volume
+        self.cinit_shr(v=["a:home/alice:A,alice:c,grant_who=no"])
+        self.refused(b"perms to create grants from this volume")
+        self.assertEqual(self.share("/home/alice/proj/")[0], 201)
+
+    def test_grant_who_a(self):
+        os.makedirs("t/d")
+        self.cinit(v=["t:t:r,alice:A,carol:c,grant_who=a"])
+        self.refused(b"perms to create grants from this volume", vp="/t/d/", name="d")
+        self.assertEqual(self.grant(vp="/t/d/", name="d", uname="carol")[0], 201)
+        self.assertEqual(self.ls("shared/carol/d/", "bob"), [])
+
+    def test_grant_who_auth_is_the_default(self):
+        os.makedirs("t/d")
+        self.cinit(v=["t:t:r,alice:A,carol"])
+        self.assertEqual(self.grant(vp="/t/d/", name="d")[0], 201)
+
+    def test_grants_allowed_with_share_links_forbidden(self):
+        self.cinit_shr(v=["a:home/alice:A,alice:c,shr_who=no"])
+        st, b = self.share("/home/alice/proj/")
+        self.assertEqual(st, 400, b)
+        self.assertEqual(self.grant()[0], 201)
+        self.assertEqual(self.get("shared/alice/proj/f.txt", "bob"), (200, b"a/proj/f.txt"))
+
+    def test_grant_who_unknown_value_refuses(self):
+        self.cinit(v=["a:home/alice:A,alice:c,grant_who=yes"])
+        self.refused(b"perms to create grants from this volume")
+
+    def test_refused_unknown_recipient(self):
+        self.cinit()
+        for rcpt in ("dave", "Bob", "", "bob ", "s_abc"):
+            self.refused(b"no such recipient", rcpt=rcpt)
+
+    def test_refused_to_self(self):
+        self.cinit()
+        self.refused(b"yourself", rcpt="alice")
+
+    def test_refused_to_all_accounts(self):
+        self.cinit()
+        for rcpt in ("@acct", "*"):
+            self.refused(b"every account", rcpt=rcpt)
+
+    def test_refused_unsafe_name(self):
+        self.cinit()
+        for name in ("", ".", "..", ".x", "a/b", "/a", "a\\b", "a\x00b", "a\nb", " a", "a ", "x" * 256):
+            self.refused(b"the name must be", name=name)
+        for name in ("trip-2026", "a b", "\u00e6\u00f8\u00e5", "x" * 255):
+            self.assertEqual(self.grant(name=name)[0], 201, name)
+
+    def check_share_pw_refused(self, pw):
+        # a share link with a password logs in as a made-up s_... account;
+        # granting to it would hand the grant to everyone with that password
+        self.cinit_shr()
+        self.assertEqual(self.share("/home/alice/proj/s/", pw=pw)[0], 201)
+        sun = [x for x in self.asrv.acct if x.startswith("s_")]
+        self.assertEqual(len(sun), 1)
+        self.refused(b"no such recipient", rcpt=sun[0])
+
+        # nor is a row naming one mounted
+        self.assertEqual(self.grant()[0], 201)
+        db = sqlite3.connect("g.db")
+        db.execute("update gr set rcpt=?", (sun[0],))
+        db.commit()
+        db.close()
+        self.reload()
+        url = "shared/alice/proj/f.txt?pw=%s" % (pw.strip(),)
+        self.assertIn(self.get(url, "*")[0], (401, 403, 404))
+
+    def test_refused_to_a_share_link_password(self):
+        self.check_share_pw_refused("hunter2")
+
+    def test_refused_to_a_padded_share_link_password(self):
+        # the loader names the account from the raw password, then strips it
+        self.check_share_pw_refused(" hunter2 ")
+
+    def test_refused_single_file(self):
+        self.cinit()
+        self.refused(b"only folders", vp="/home/alice/priv.txt")
+        self.refused(b"only folders", vp="/home/alice/nope/")
+
+    def test_refused_file_selection(self):
+        self.cinit()
+        self.refused(b"only folders", files=["f.txt"])
+        self.refused(b"only folders", vp=["/home/alice/proj/f.txt", "/home/alice/proj/s/g.txt"])
+        self.refused(b"only folders", vp=["/home/alice/proj/"])
+
+    def test_refused_same_owner_recipient_name(self):
+        os.makedirs("a/other")
+        self.cinit()
+        self.assertEqual(self.grant()[0], 201)
+        self.refused(b"already", vp="/home/alice/other/")
+        self.refused(b"already", perms=("read", "write"))
+        # another recipient, or another name, is fine
+        self.assertEqual(self.grant(rcpt="carol")[0], 201)
+        self.assertEqual(self.grant(vp="/home/alice/other/", name="other")[0], 201)
+        self.assertEqual(self.ls("shared/alice/", "bob"), ["other/", "proj/"])
+
+    # upload rules inside a grant (ticket 07); the same ways in as
+    # tests/test_fork_harden_shr.py, as bob
+
+    UP2K_FILE = (
+        "one",
+        "BfcDQQeKz2oG1CPSFyD5ZD1flTYm2IoCY23DqeeVgq6w",
+        "XMbpLRqVdtGmgggqjUI6uSoNMTqZVX4K6zr74XA1BRKc",
+    )
+
+    def body(self, method, url, uname, buf, ctype, extra=""):
+        extra += "Content-Type: %s\r\nContent-Length: %d\r\n" % (ctype, len(buf))
+        return self.req(method, url, uname, extra, buf)
+
+    def form(self, url, uname, fields):
+        buf = ""
+        for name, fname, val in fields:
+            cd = 'form-data; name="%s"' % (name,)
+            if fname:
+                cd += '; filename="%s"' % (fname,)
+            buf += "--XD\r\nContent-Disposition: %s\r\n\r\n%s\r\n" % (cd, val)
+        buf += "--XD--\r\n"
+        return self.body("POST", url, uname, buf.encode("utf-8"), "multipart/form-data; boundary=XD")
+
+    def up_put(self, dn, fn, un):
+        return self.put(dn + "/" + fn, un)
+
+    def up_bput(self, dn, fn, un):
+        return self.form(dn + "/", un, [("act", None, "bput"), ("f", fn, "mp")])
+
+    def up_new_md(self, dn, fn, un):
+        return self.form(dn + "/", un, [("act", None, "new_md"), ("name", None, fn)])
+
+    def up_tput(self, dn, fn, un):
+        fields = [("act", None, "tput"), ("lastmod", None, "0"), ("body", None, "md")]
+        return self.form(dn + "/" + fn, un, fields)
+
+    def up_dav_copy(self, dn, fn, un):
+        hdr = "Destination: /%s/%s\r\nContent-Length: 0\r\n" % (dn, fn)
+        return self.req("COPY", dn + "/f.txt", un, hdr)
+
+    def up_copy(self, dn, fn, un):
+        url = "%s/f.txt?copy=/%s/%s" % (dn, dn, fn)
+        return self.req("POST", url, un, "Content-Length: 0\r\n")
+
+    def up_up2k(self, dn, fn, un):
+        data, chash, wark = self.UP2K_FILE
+        msg = {"name": fn, "size": 3, "lmod": 1234567890, "life": 0, "hash": [chash]}
+        buf = json.dumps(msg).encode("utf-8")
+        st, b = self.body("POST", dn + "/", un, buf, "text/plain")
+        if st != 200:
+            return st, b
+        if json.loads(b)["hash"]:
+            hdr = "X-Up2k-Hash: %s\r\nX-Up2k-Wark: %s\r\n" % (chash, wark)
+            st, b = self.body("POST", dn + "/", un, data.encode(), "application/octet-stream", hdr)
+        return st, b
+
+    UPLOADS = ("put", "bput", "up2k", "new_md", "tput", "dav_copy", "copy")
+    REFUSED = ("README.md", "readme.MD", "PREADME.md", "pReadMe.Md", "descript.ion", "DESCRIPT.ION", ".new", ".epilogue.html")
+
+    def check_upload_names(self, **ka):
+        self.cinit(**ka)
+        self.assertEqual(self.grant(perms=("read", "write"))[0], 201)
+        for way in self.UPLOADS:
+            up = getattr(self, "up_" + way)
+            for fn in self.REFUSED:
+                st, b = up("shared/alice/proj", fn, "bob")
+                self.assertGreaterEqual(st, 400, (way, fn, b))
+                self.assertFalse(os.path.exists("a/proj/" + fn), (way, fn))
+
+            fn = "ok-%s.md" % (way,)
+            st, b = up("shared/alice/proj", fn, "bob")
+            self.assertLess(st, 400, (way, b))
+            self.assertTrue(os.path.exists("a/proj/" + fn), way)
+
+        # alice, through her own volume, still can
+        for fn in ("README.md", "descript.ion", ".new"):
+            self.assertEqual(self.put("home/alice/proj/" + fn, "alice")[0], 201, fn)
+            self.assertTrue(os.path.exists("a/proj/" + fn), fn)
+
+    def test_upload_names_harden_off(self):
+        self.check_upload_names()
+
+    def test_upload_names_harden_on(self):
+        self.check_upload_names(harden=True)
 
 
 if __name__ == "__main__":
