@@ -56,7 +56,10 @@ Request path, set up in `svchub.py` (`SvcHub`):
   is where almost every HTTP feature lives: query params in `self.uparam` select the action
   (`?ls`, `?share`, `?shares`, `?reload=cfg`, `?th=`…), dispatched from `handle_get` / `handle_post*`.
 - FTP/SFTP/SMB/TFTP servers (`ftpd.py`, `sftpd.py`, `smbd.py`, `tftpd.py`) reuse `AuthSrv`/VFS
-  for permissions -- an auth change must hold for all protocols, not just HTTP.
+  for permissions -- an auth change must hold for all protocols, not just HTTP. FTP/SFTP use three
+  different lookups: login checks `vfs.aread`/`vfs.awrite`, the top-level listing reads
+  `vfs.all_vols`, every other path goes through `vfs.get`. Something mounted outside `aread`
+  (grants) therefore fails login yet works by full path.
 
 Accounts and permissions (`authsrv.py`):
 
