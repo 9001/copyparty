@@ -5714,10 +5714,13 @@ var thegrid = (function () {
 			qhref = this.getAttribute('href'),
 			href = qhref.split('?')[0],
 			fid = oth.getAttribute('id'),
+			fname = href.split('/').pop(),
+			ext = fname.split('.').pop(),
 			aplay = ebi('a' + fid),
 			atext = ebi('t' + fid),
 			is_img = img_re.test(href),
 			is_txt = atext && !is_img && !/\.ts$/.test(href) && showfile.getlang(href),
+			is_wopi = wopi_set && wopi_set.has(ext),
 			is_dir = href.endsWith('/'),
 			is_srch = !!ebi('unsearch'),
 			in_tree = is_dir && treectl.find(oth.textContent.slice(0, -1)),
@@ -5745,6 +5748,9 @@ var thegrid = (function () {
 
 		else if (is_txt && !has(['md', 'htm', 'html'], is_txt))
 			atext.click();
+
+		else if (is_wopi)
+			window.open('?wopi=' +fname,'_blank');
 
 		else if (!is_img && have_sel)
 			window.open(qhref, '_blank');
