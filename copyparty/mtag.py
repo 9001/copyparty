@@ -204,7 +204,7 @@ def au_unpk(
             zi = zip_fi(zf, "mergedimage.png", maxsz)
             fi = zf.open(zi)
 
-        elif pk == "odt" or pk == "ods" or pk == "odp" or pk == "odg":
+        elif pk in ("odt", "ods", "odp", "odg"):
             import zipfile
 
             zf = zipfile.ZipFile(abspath, "r")
