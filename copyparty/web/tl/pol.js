@@ -5,7 +5,7 @@ Ls.pol = {
 	"tt": "Polski",
 
 	"cols": {
-		"c": "przyciski akcji",
+		"!": "przyciski akcji",
 		"dur": "czas trwania",
 		"q": "jakość / bitrate",
 		"Ac": "kodek audio",
@@ -14,7 +14,7 @@ Ls.pol = {
 		"Ahash": "suma kontrolna audio",
 		"Vhash": "suma kontrolna wideo",
 		"Res": "rozdzielczość",
-		"T": "rodzaj pliku",
+		"Ext": "rodzaj pliku",
 		"aq": "jakość / bitrate audio",
 		"vq": "jakość / bitrate wideo",
 		"pixfmt": "podpróbkowanie / struktura pikseli",
@@ -33,7 +33,7 @@ Ls.pol = {
 			["G", "przełącz widok lista / siatka"],
 			["T", "przełącz miniaturki / ikony"],
 			["⇧ A/D", "wielkość miniaturki"],
-			["ctrl-K", "usuń zaznaczone"],
+			["ctrl-K/Del", "usuń zaznaczone"],
 			["ctrl-X", "wytnij zaznaczone do schowka"],
 			["ctrl-C", "skopiuj zaznaczone do schowka"],
 			["ctrl-V", "wklej (przenieś/skopiuj) tutaj"],
@@ -111,9 +111,9 @@ Ls.pol = {
 	"ht_and": " i ",
 
 	"goh": "panel sterowania",
-	"gop": 'poprzedni plik/folder">poprzedni',
-	"gou": 'nadrzędny folder">w górę',
-	"gon": 'następny folder">następny',
+	"gop": 'poprzedni plik/folder',
+	"gou": 'nadrzędny folder',
+	"gon": 'następny folder',
 	"logout": "Wyloguj ",
 	"login": "Zaloguj się", //m
 	"access": " dostęp",
@@ -161,7 +161,7 @@ Ls.pol = {
 	"ut_u2ts": "kopiuj znacznik ostatniej modyfikacji$Nz twojego systemu plików na serwer\">📅",
 	"ut_ow": "nadpisywać istniejące pliki na serwerzę?$N🛡️: nigdy (wygeneruje nową nazwę)$N🕒: nadpisz jeśli pliki na serwerze są starsze niż przesyłane$N♻️: zawsze nadpisuj jeśli zawartość plików się różni$N⏭️: bezwarunkowo pomiń wszystkie istniejące pliki", //m
 	"ut_mt": "hashuj inne pliki podczas przesyłania$N$Nmożna wyłączyć w przypadku wystąpienia wąskiego gardła na CPU lub HDD",
-	"ut_ask": 'pytaj o potwierdzenie rozpoczęcia przesyłania">💭',
+	"ut_ask": 'pytaj o potwierdzenie rozpoczęcia przesyłania',
 	"ut_pot": "przyspiesz przesyłanie na słabszych urządzeniach,$Nupraszczając interfejs",
 	"ut_srch": "nie przesyłaj plików, jedynie sprawdź czy istnieją$Njuż na serwerze (przeskanuje wszystkie foldery dostępne do odczytu)",
 	"ut_par": "zatrzymuje przesyłanie jeśli wynosi 0$N$Nzwiększ w przypadku jeśli twoja sieć jest wolna / ma duże opóźnienia$N$Nustaw wartość 1 w sieci lokalnej lub w przypadku wolnego dysku serwerowego",
@@ -229,7 +229,7 @@ Ls.pol = {
 
 	"ct_grid": '田 siatka',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ podpowiedzi',
-	"ct_thumb": 'w widoku siatki, przełącz ikony i miniaturki$NSkrót: T">🖼️ miniaturki',
+	"ct_thumb": 'przełącz ikony i miniaturki$NSkrót: T">🖼️ miniaturki',
 	"ct_csel": 'użyj CTRL i SHIFT do wybierania plików w widoku siatki">wybierz',
 	"ct_dsel": 'użyj zaznaczania przez przeciąganie w widoku siatki">przeciągnij', //m
 	"ct_dl": 'wymuś pobieranie (nie wyświetlaj inline) po kliknięciu pliku">dl', //m
@@ -292,9 +292,9 @@ Ls.pol = {
 	"ml_drc": "kompresor zasięgu dynamiki",
 	"ml_ss": "pomijaj ciszę", //m
 
-	"mt_loop": "pętla/powtarzaj jeden utwór\">🔁",
+	"mt_loop": "pętla/powtarzaj jeden utwór",
 	"mt_one": "zatrzymaj po jednym utworze\">1️⃣",
-	"mt_shuf": "odtwarzaj losowo w każdym folderze\">🔀",
+	"mt_shuf": "odtwarzaj losowo w każdym folderze",
 	"mt_aplay": "autoodtwarzanie po kliknięciu linku do tego serwera, zawierającego identyfikator utworu$N$Nwyłączenie tej opcji zapobiegnie aktualizowaniu adresu strony podczas odtwarzania muzyki, aby zapobiec autoodtwarzaniu przy utracie ustawień\">a▶",
 	"mt_preload": "rozpocznij ładowanie kolejnego utworu blisko końca aktualnego w celu uzyskania odtwarzania bez przerw\">preload",
 	"mt_prescan": "przechodzi do następnego folderu przed zakończeniem ostatniego utworu,$Naby udobruchać przeglądarkę,$Nżeby nie zatrzymała odtwarzania\">naw",
@@ -309,8 +309,8 @@ Ls.pol = {
 	"mt_follow": "podążaj za odtwarzanym utworem przewijając widok\">🎯",
 	"mt_compact": "kompaktowe sterowanie\">⟎",
 	"mt_uncache": "wyczyść pamięć podręczną &nbsp;(spróbuj jeśli przeglądarka$Nzachowała zepsutą kopię utworu, przez co nie odtwarza się ona)\">uncache",
-	"mt_mloop": "odtwarzaj utwory w folderze w pętli\">🔁 loop",
-	"mt_mnext": "wczytaj następny folder i kontynuuj\">📂 next",
+	"mt_mloop": "odtwarzaj utwory w folderze w pętli",
+	"mt_mnext": "wczytaj następny folder i kontynuuj",
 	"mt_mstop": "zatrzymaj odtwarzanie\">⏸ stop",
 	"mt_cflac": "przekonwertuj format flac / wav na {0}\">flac",
 	"mt_caac": "przekonwertuj format aac / m4a na {0}\">aac",
