@@ -820,6 +820,8 @@ class HttpCli(object):
                     idp_grp = ""
 
                 if idp_usr in self.asrv.vfs.aread:
+                    if self.pw == "x":
+                        self.get_pwd_cookie("x")
                     self.pw = ""
                     self.uname = idp_usr
                     if self.args.ao_have_pw or self.args.idp_logout:
