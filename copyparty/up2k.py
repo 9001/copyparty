@@ -4671,7 +4671,7 @@ class Up2k(object):
             if c2:
                 self.db_add(
                     c2,
-                    {},  # skip upload hooks
+                    dict(dvn.flags, xau=None, xiu=None),  # skip upload hooks
                     drd,
                     dfn,
                     ftime,
@@ -4995,7 +4995,7 @@ class Up2k(object):
             if c2:
                 self.db_add(
                     c2,
-                    {},  # skip upload hooks
+                    dict(dvn.flags, xau=None, xiu=None),  # skip upload hooks
                     drd,
                     dfn,
                     ftime,
