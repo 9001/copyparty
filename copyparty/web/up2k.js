@@ -1239,7 +1239,10 @@ function up2k_init(subtle) {
 			console.log("wrap.ondrop: " + currLink);
 			fileman.clip = currLink.split("\n");
 			
-			fileman.cut();
+            if(ctrl(e))
+			    fileman.cpy();
+            else
+                fileman.cut();
 			msel.evsel();
             fileman.paste(true);
             return
