@@ -1233,8 +1233,9 @@ function up2k_init(subtle) {
     function gotfile(e) {
         ev(e);
 
-        if (e.dataTransfer && e.dataTransfer.getData("text") && e.dataTransfer.getData("text").startsWith(window.location.origin)){
-			var currLink = e.dataTransfer.getData("text");
+        var currLink = e.dataTransfer.getData("text");
+        if (e.dataTransfer && currLink && currLink.startsWith(window.location.origin) && 
+            (ctrl(e) || currLink.split('\n')[0].replace(location.origin + location.pathname, '').match('/'))){
 			console.log("wrap.ondrop: " + currLink);
 			fileman.clip = currLink.split("\n");
 			
