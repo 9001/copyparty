@@ -408,7 +408,7 @@ class HttpCli(object):
             self.http_ver = "HTTP/1.1"
             # self.log("pebkac at httpcli.run #1: " + repr(ex))
             self.keepalive = False
-            h = {"WWW-Authenticate": 'Basic realm="a"'} if ex.code == 401 else {}
+            h = {"WWW-Authenticate": self.args.bauth_q} if ex.code == 401 else {}
             try:
                 self.loud_reply(unicode(ex), status=ex.code, headers=h, volsan=True)
             except:
@@ -820,7 +820,6 @@ class HttpCli(object):
                     idp_grp = ""
 
                 if idp_usr in self.asrv.vfs.aread:
-                    self.pw = ""
                     self.uname = idp_usr
                     if self.args.ao_have_pw or self.args.idp_logout:
                         self.html_head += (
@@ -833,6 +832,9 @@ class HttpCli(object):
                     zs = self.asrv.ases.get(idp_usr)
                     if zs:
                         self.set_idp_cookie(zs)
+                    elif self.pw == "x":
+                        self.drop_cppwds()
+                    self.pw = ""
                 else:
                     self.log("unknown username: %r" % (idp_usr,), 1)
 
@@ -1003,7 +1005,7 @@ class HttpCli(object):
                     msg += "hint: important info in the server log\r\n"
 
                 zb = b"<pre>" + html_escape(msg).encode("utf-8", "replace")
-                h = {"WWW-Authenticate": 'Basic realm="a"'} if pex.code == 401 else {}
+                h = {"WWW-Authenticate": self.args.bauth_q} if pex.code == 401 else {}
                 self.reply(zb, status=pex.code, headers=h, volsan=True)
                 if pex.log:
                     self.log("additional error context:\n" + pex.log, 6)
@@ -3154,12 +3156,10 @@ class HttpCli(object):
 
         v = self.uparam[k]
 
-        is_dk = self._use_dirkey(self.vn, "")
-        if is_dk:
-            vn = self.vn
-            rem = self.rem
-        else:
-            vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
+        if self._use_dirkey(self.vn, ""):
+            raise Pebkac(403, "dirkeys cannot zip/tar a selection of files/folders")
+
+        vn, rem = self.asrv.vfs.get(self.vpath, self.uname, True, False)
 
         zs = self.parser.require("files", 1024 * 1024)
         if not zs:
@@ -3167,9 +3167,6 @@ class HttpCli(object):
 
         items = zs.replace("\r", "").split("\n")
         items = [unquotep(x) for x in items if items]
-        if is_dk:
-            zss = set(vn_ls_regfile(self.args, vn, rem))
-            items = [x for x in items if x in zss]
 
         self.parser.drop()
         return self.tx_zip(k, v, "", vn, rem, items)
@@ -3396,7 +3393,7 @@ class HttpCli(object):
         x = broker.ask("up2k.handle_chunks", ptop, wark, chashes)
         response = x.get()
         chashes, chunksize, cstarts, path, lastmod, fsize, sprs = response
-        maxsize = chunksize * len(chashes)
+        maxsize = min(fsize, chunksize * len(chashes))
         cstart0 = cstarts[0]
         locked = chashes  # remaining chunks to be received in this request
         written = []  # chunks written to disk, but not yet released by up2k
@@ -3693,7 +3690,7 @@ class HttpCli(object):
         self.log("logout " + self.uname)
         if not self.uname.startswith("s_"):
             self.asrv.forget_session(self.conn.hsrv.broker, self.uname)
-        self.get_pwd_cookie("x")
+        self.drop_cppwds()
 
         dst = self.args.idp_logout or (self.args.SRS + "?h")
         h2 = '<a href="' + dst + '">continue</a>'
@@ -3733,12 +3730,7 @@ class HttpCli(object):
             dur = 0
 
         if pwd == "x":
-            # reset both plaintext and tls
-            # (only affects active tls cookies when tls)
-            for k in ("cppwd", "cppws") if self.is_https else ("cppwd",):
-                ck = gencookie(k, pwd, self.args.R, self.args.cookie_lax, False)
-                self.out_headerlist.append(("Set-Cookie", ck))
-            self.out_headers.pop("Set-Cookie", None)  # drop keepalive
+            self.drop_cppwds()
         else:
             k = "cppws" if self.is_https else "cppwd"
             ck = gencookie(
@@ -3751,8 +3743,18 @@ class HttpCli(object):
                 "; HttpOnly",
             )
             self.out_headers["Set-Cookie"] = ck
+            for zs, v in self.out_headerlist:
+                if zs == "Set-Cookie" and v.startswith(k):
+                    self.out_headerlist.remove((zs, v))
+                    break
 
         return dur > 0, msg
+
+    def drop_cppwds(self):
+        for k in ("cppwd", "cppws") if self.is_https else ("cppwd",):
+            ck = gencookie(k, "x", self.args.R, self.args.cookie_lax, False)
+            self.out_headerlist.append(("Set-Cookie", ck))
+        self.out_headers.pop("Set-Cookie", None)  # drop keepalive
 
     def set_idp_cookie(self, ases) -> None:
         k = "cppws" if self.is_https else "cppwd"
@@ -6026,7 +6028,7 @@ class HttpCli(object):
                 )
             ):
                 rc = 401
-                self.out_headers["WWW-Authenticate"] = 'Basic realm="a"'
+                self.out_headers["WWW-Authenticate"] = self.args.bauth_q
 
         t = t.format(self.args.SR)
         qv = quotep(self.vpaths) + self.ourlq()
@@ -7257,7 +7259,7 @@ class HttpCli(object):
                     or "edit" in self.uparam
                     or "edit2" in self.uparam
                 )
-                and "nohtml" not in vn.flags
+                and ("nohtml" not in vn.flags or "edit" in self.uparam)
                 and (
                     is_md
                     or self.can_delete
@@ -7445,7 +7447,8 @@ class HttpCli(object):
             if v is not None and (not add_og or not og_fn):
                 filt = []
                 if is_dk and "dks" not in vn.flags:
-                    filt = set(vn_ls_regfile(self.args, vn, rem))
+                    t = "server config does not allow download-as-zip/tar using dirkeys (need dks too)"
+                    raise Pebkac(403, t)
                 return self.tx_zip(k, v, self.vpath, vn, rem, filt)
 
         fsroot, vfs_ls, vfs_virt = vn.ls(

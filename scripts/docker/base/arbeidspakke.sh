@@ -1,5 +1,5 @@
 #!/bin/ash
-set -e
+set -ex
 
 AVER=3.24
 
@@ -8,8 +8,7 @@ ls -al arbeidspakke.sh
 stamp=$(date -u +%Y-%m-%d)-$(md5sum <arbeidspakke.sh | cut -c-16)-$1-$(date +%s)
 
 uname -a
-apk update
-apk upgrade -al
+apk upgrade -alU
 apk add alpine-sdk doas wget
 echo permit nopass root > /etc/doas.d/u.conf
 cp -pv /root/.abuild/*.pub /etc/apk/keys/ || abuild-keygen -ina
@@ -104,10 +103,10 @@ sed -ri 's/(--disable-vulkan)/\1 '"$(printf '--disable-demuxer=%s ' aa aax ace a
 [ $1 -gt 1 ] && sed -ri 's/(--disable-libxcb )/\1--disable-doc --disable-htmlpages --disable-manpages --disable-podpages --disable-txtpages /' APKBUILD
 
 p=/root/packages/$(abuild -A)
-rm -rf $p
+rm -rf $p/ffmpeg* $p/ex/ffmpeg*
 abuild -FrcK
 
-mkdir $p/ex
+mkdir -p $p/ex
 mv $p/ffmpeg-d* $p/ex  # dbg,dev,doc
 cp -pv src/ffmpeg-*/ffbuild/config.log $p/
 #tar -cz src > $p/.tar

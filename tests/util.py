@@ -186,6 +186,7 @@ class Cfg(Namespace):
             c=c,
             E=E,
             auth_ord="idp,ipu",
+            bauth_q='Basic realm="a"',
             bup_ck="sha512",
             casechk="a" if ANYWIN or MACOS else "n",
             chmod_d="755",

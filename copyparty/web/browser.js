@@ -7252,6 +7252,7 @@ var treectl = (function () {
 			m = /[?&](k=[^&#]+)/.exec(dst),
 			k = m ? '&' + m[1] : dk ? '&k=' + dk : '';
 
+		assert_vp(dst);
 		xhr.top = top;
 		xhr.dst = dst;
 		xhr.rst = rst;
@@ -7472,6 +7473,7 @@ var treectl = (function () {
 		if (rtt !== null)
 			uq += '&rtt=' + rtt;
 
+		assert_vp(url);
 		xhr.top = url.split('?')[0];
 		xhr.back = back
 		xhr.hpush = hpush;
@@ -9211,7 +9213,7 @@ function show_md(md, name, div, url, depth) {
 		return;
 
 	wfp_debounce.hide();
-	if (!marked) {
+	if (!marked && !nohtml) {
 		if (depth) {
 			clmod(div, 'raw', 1);
 			div.textContent = "--[ " + name + " ]---------\r\n" + md;
@@ -9240,9 +9242,14 @@ function show_md(md, name, div, url, depth) {
 	try {
 		clmod(div, 'mdo', 1);
 
-		var md_html = marked.parse(md, marked_opts);
-		if (!have_emp)
-			md_html = DOMPurify.sanitize(md_html);
+		if (nohtml) {
+			md_html = '<pre>' + esc(md) + '</pre>';
+		}
+		else {
+			var md_html = marked.parse(md, marked_opts);
+			if (!have_emp)
+				md_html = DOMPurify.sanitize(md_html);
+		}
 
 		if (sandbox(div, sb_md, sba_md, 'mdo', md_html))
 			return;
@@ -9338,6 +9345,8 @@ function sandbox(tgt, rules, allow, cls, html) {
 			env = js.split(/\blogues *=/)[0] + 'a;';
 	}
 
+	treectl.sb_msg = treectl.sb_msg || randstr(16);
+
 	html = '<html class="iframe ' + document.documentElement.className +
 		'"><head><style>html{background:#eee;color:#000}</style><style>' + globalcss() +
 		'</style><base target="_parent"></head><body id="b" class="logue ' + cls + '">' + html +
@@ -9345,7 +9354,7 @@ function sandbox(tgt, rules, allow, cls, html) {
 		'<script nonce="' + JS_NONCE + '">' +
 		'var d=document.documentElement,TS="' + TS + '",' +
 		'loc=new URL("' + location.href.split('?')[0] + '");' +
-		'function say(m){window.parent.postMessage(m,"*")};' +
+		'function say(m){window.parent.postMessage("' + treectl.sb_msg + ' "+m,"*")};' +
 		'setTimeout(function(){var its=0,pih=-1,f=function(){' +
 		'var ih=2+Math.min(parseInt(getComputedStyle(d).height),d.scrollHeight);' +
 		'if(ih!=pih&&!isNaN(ih)){pih=ih;say("iheight #' + tid + ' "+ih,"*")}' +
@@ -9370,7 +9379,6 @@ function sandbox(tgt, rules, allow, cls, html) {
 	fr.setAttribute('srcdoc', html);
 	tgt.innerHTML = '';
 	tgt.appendChild(fr);
-	treectl.sb_msg = true;
 	return true;
 }
 window.addEventListener("message", function (e) {
@@ -9380,6 +9388,9 @@ window.addEventListener("message", function (e) {
 	try {
 		console.log('msg:' + e.data);
 		var t = e.data.split(/ /g);
+		if (t.shift() !== treectl.sb_msg)
+			throw 1;
+
 		if (t[0] == 'iheight') {
 			var el = QSA(t[1] + '>iframe');
 			el = el[el.length - 1];

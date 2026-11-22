@@ -14,16 +14,19 @@ curl \
     -Lo1 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v/main/musl/APKBUILD \
     -Lo2 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v/main/python3/APKBUILD \
     -Lo3 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/$v/community/ffmpeg/APKBUILD \
+    -Lo4 https://raw.githubusercontent.com/alpinelinux/aports/refs/heads/master/community/py3-pillow/APKBUILD \
     ;
 
-zlib= ff=
+zlib= ff= pil=
 cmp 1 ../cver/1 || zlib=1
 cmp 2 ../cver/2 || zlib=1
 cmp 3 ../cver/3 || ff=1
-echo zlib=$zlib ff=$ff
+cmp 4 ../cver/4 || pil=1
+echo zlib=$zlib ff=$ff pil=$pil
 
 [ "$1" ] && exit
 
 [ $zlib ] && { make -C.. zlib; cp -pv 1 2 ../cver/; }
 [ $ff ] &&   { make -C.. ff;   cp -pv 3 ../cver/; }
+[ $pil ] &&  { make -C.. pil;  cp -pv 4 ../cver/; }
 rm -rf cver2

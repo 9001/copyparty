@@ -56,7 +56,6 @@ if TYPE_CHECKING:
 if PY2:
     range = xrange  # type: ignore
 
-HAVE_PIL = False
 HAVE_PILF = False
 H_PIL_HEIF = False
 H_PIL_AVIF = False
@@ -126,9 +125,14 @@ try:
     if os.environ.get("PRTY_NO_PIL"):
         raise Exception()
 
+    import PIL
     from PIL import ExifTags, Image, ImageFont, ImageOps
 
-    HAVE_PIL = True
+    try:
+        HAVE_PIL = tuple([int(x) for x in PIL.__version__.split(".")])
+    except:
+        HAVE_PIL = (1, 0)
+
     try:
         if os.environ.get("PRTY_NO_PILF"):
             raise Exception()
@@ -191,7 +195,7 @@ try:
 
     logging.getLogger("PIL").setLevel(logging.WARNING)
 except:
-    pass
+    HAVE_PIL = False
 
 try:
     if os.environ.get("PRTY_NO_VIPS"):
@@ -893,7 +897,11 @@ class ThumbSrv(object):
             self.conv_image_vips(_loader, tpath, fmt, vn)
         elif HAVE_PIL:
             if thumb.format == rawpy.ThumbFormat.BITMAP:
-                im = Image.fromarray(thumb.data, "RGB")
+                if HAVE_PIL < (13,):
+                    im = Image.fromarray(thumb.data, "RGB")
+                else:
+                    im = Image.fromarray(thumb.data)
+                    # untested, probably works (~deadcode)
             else:
                 im = Image.open(io.BytesIO(thumb.data))
             self.conv_image_pil(im, tpath, fmt, vn)

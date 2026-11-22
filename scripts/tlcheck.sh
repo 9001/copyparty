@@ -9,7 +9,8 @@ set -e
 cat "$1" "$2" | awk '
     /^\}/{fa=0;fb=0}
     /^Ls\./{if(nln++){fb=1}else{fa=1}}
-    !/":/{next}
+    !/["'\'']:/{next}
+    {$0=gensub(/^(\t*)'\''([^'\'']+)'\''/,"\\1\"\\2\"","1")}
     fa{a[ia++]=$0}
     fb{b[ib++]=$0}
     END{for (i=0;i<ia;i++) printf "%s\n%s\n\n",a[i],b[i]}

@@ -11,6 +11,11 @@ ff:
 	/usr/bin/time ./build-no265.sh pull img
 
 
+pil:
+# edgy
+	/usr/bin/time ./build-pile.sh pull img
+
+
 zlib:
 # 	build zlib-ng from source so we know how the sausage was made
 #	(still only doing the archs which are officially supported/tested)
@@ -18,8 +23,8 @@ zlib:
 	podman build --arch amd64 -t localhost/cpp-zlibng-amd64:latest -f Dockerfile.zlibng .
 	podman run --arch amd64 --rm --log-driver=none -i localhost/cpp-zlibng-amd64:latest tar -cC/z whl | tar -xv
 
-	podman build --arch arm64 -t localhost/cpp-zlibng-amd64:latest -f Dockerfile.zlibng .
-	podman run --arch arm64 --rm --log-driver=none -i localhost/cpp-zlibng-amd64:latest tar -cC/z whl | tar -xv
+	podman build --arch arm64 -t localhost/cpp-zlibng-arm64:latest -f Dockerfile.zlibng .
+	podman run --arch arm64 --rm --log-driver=none -i localhost/cpp-zlibng-arm64:latest tar -cC/z whl | tar -xv
 
 
 sh:

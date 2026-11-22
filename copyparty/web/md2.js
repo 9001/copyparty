@@ -108,9 +108,11 @@ var draw_md = (function () {
         for (var a = 0; a < lines.length; a++)
             html.push('<span data-ln="' + (a + 1) + '">' + lines[a] + "</span>");
 
-        dom_ref.innerHTML = html.join('\n');
-        map_src = genmap(dom_ref, map_src);
-        map_pre = genmap(dom_pre, map_pre);
+        if (!nohtml) {
+            dom_ref.innerHTML = html.join('\n');
+            map_src = genmap(dom_ref, map_src);
+            map_pre = genmap(dom_pre, map_pre);
+        }
 
         clmod(ebi('save'), 'disabled',
             src.replace(/\r/g, "") == server_md.replace(/\r/g, ""));
@@ -168,13 +170,16 @@ redraw = (function () {
     dom_sbs.onclick = setsbs;
     dom_nsbs.onclick = modetoggle;
 
-    (IE ? modetoggle : onresize)();
+    ((IE || nohtml) ? modetoggle : onresize)();
     return onresize;
 })();
 
 
 // scroll handlers
 (function () {
+    if (nohtml)
+        return;
+
     var skip_src = false, skip_pre = false;
 
     var scroll = function (src, srcmap, dst, dstmap) {

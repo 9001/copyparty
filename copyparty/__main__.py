@@ -679,7 +679,8 @@ def get_sects():
             dedent(
                 """
             \033[33m-i\033[0m takes a comma-separated list of interfaces to listen on;
-            IP-addresses, unix-sockets, and/or open file descriptors
+            IP-addresses, IP-subnets, NIC names,
+            unix-sockets, and/or open file descriptors
 
             the default (\033[32m-i ::\033[0m) means all IPv4 and IPv6 addresses
 
@@ -687,6 +688,8 @@ def get_sects():
             \033[32m-i 127.0.0.1\033[0m  listens on IPv4 localhost only
             \033[32m-i 127.1\033[0m      listens on IPv4 localhost only
             \033[32m-i 127.1,192.168.123.1\033[0m = IPv4 localhost and 192.168.123.1
+            \033[32m-i 192.168.0.0/16\033[0m = currently-known IPs in 192.168.*.*
+            \033[32m-i wlan0\033[0m      all IPs currently assigned to wlan0
             \033[32m-i no\033[0m         disable webserver
 
             \033[33m-p\033[0m takes a comma-separated list of tcp ports to listen on;
@@ -709,6 +712,9 @@ def get_sects():
             \033[32m-i fd:\033[33m3\033[0m uses the socket passed to copyparty on file descriptor 3
 
             \033[33m-p\033[0m (tcp ports) is ignored for unix-sockets and FDs
+
+            JANK: binding to a subnet (192.168.0.0/16) and/or a NIC-name
+            (wlan0) will only bind to the IPs which are known on startup
 
             \033[33m--list-nics\033[0m shows all network adapters (also offline ones);
             \033[33m--list-ips\033[0m shows all LAN IPs
@@ -1548,6 +1554,7 @@ def add_network(ap):
     ap2.add_argument("--cachectl", metavar="TXT", default="no-cache", help="default-value of the 'Cache-Control' response-header (controls caching in webbrowsers). Default prevents repeated downloading of the same file unless necessary (browser will ask copyparty if the file has changed). Examples: [\033[32mmax-age=604869\033[0m] will cache for 7 days, [\033[32mno-store, max-age=0\033[0m] will always redownload. (volflag=cachectl)")
     ap2.add_argument("--http-vary", metavar="TXT", type=u, default="Origin, PW, Cookie", help="value of the 'Vary' response-header; a hint for caching proxies")
     ap2.add_argument("--http-no-tcp", action="store_true", help="do not listen on TCP/IP for http/https; only listen on unix-domain-sockets")
+    ap2.add_argument("--scots", action="store_true", help="we at the slan go foill")
     if FULL_HELP or ANYWIN:
         ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets (windows-only); allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
     if FULL_HELP or (not ANYWIN and not MACOS):
@@ -1618,6 +1625,7 @@ def add_auth(ap):
     ap2.add_argument("--pw-urlp", metavar="NAME", type=u, default="pw", help="lowercase name of password url-param (?NAME=foo); \033[1;31mWARNING:\033[0m Changing this will break support for many clients")
     ap2.add_argument("--no-bauth", action="store_true", help="disable basic-authentication support; do not accept passwords from the 'Authenticate' header at all. NOTE: This breaks support for the android app")
     ap2.add_argument("--bauth-last", action="store_true", help="keeps basic-authentication enabled, but only as a last-resort; if a cookie is also provided then the cookie wins")
+    ap2.add_argument("--bauth-q", metavar="T", type=u, default='Basic realm="a"', help="challenge to send for basic-auth (use this to change realm)")
     ap2.add_argument("--ses-db", metavar="PATH", type=u, default=ses_db, help="where to store the sessions database (if you run multiple copyparty instances, make sure they use different DBs)")
     ap2.add_argument("--ses-len", metavar="CHARS", type=int, default=24, help="session key length; default is 144 bits ((24//4)*4*6)")
     ap2.add_argument("--no-ses", action="store_true", help="disable sessions; use plaintext passwords in cookies")
@@ -1895,7 +1903,7 @@ def add_safety(ap):
     ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to turn something into a dotfile")
     ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings (volflag=no_logues)")
     ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme/preadme.md into directory listings (volflag=no_readme)")
-    ap2.add_argument("--csp-ui", metavar="TXT", default="script-src 'unsafe-eval' 'nonce-{{ js_nonce }}'; worker-src 'self'", help="content-security-policy to apply for the web-UI; default helps prevent XSS by blocking <script> / onclick / ... (volflag=csp_ui)")
+    ap2.add_argument("--csp-ui", metavar="TXT", default="script-src 'unsafe-eval' 'nonce-{{ js_nonce }}'; worker-src 'self'; base-uri 'none'", help="content-security-policy to apply for the web-UI; default helps prevent XSS by blocking <script> / onclick / ... (volflag=csp_ui)")
     ap2.add_argument("--csp-dl", metavar="TXT", default="", help="content-security-policy to apply for static files (volflag=csp_dl)")
     ap2.add_argument("--no-script", action="store_true", help="disables javascript in html files; helps prevent XSS but kills interactive websites; this will override \033[33m--csp-dl\033[0m with [\033[32mscript-src 'none'\033[0m] (volflag=noscript)")
     ap2.add_argument("--no-html", action="store_true", help="show html-files as plain text; helps prevent XSS but kills websites/blogs, also enables \033[33m--no-script\033[0m (volflag=nohtml)")

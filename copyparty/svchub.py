@@ -68,8 +68,10 @@ from .util import (
     HAVE_PSUTIL,
     HAVE_SQLITE3,
     HAVE_ZMQ,
+    HTTPCODE,
     LOG,
     RE_ANSI,
+    SCOTS,
     URL_BUG,
     UTC,
     VERSIONS,
@@ -81,8 +83,10 @@ from .util import (
     alltrace,
     build_netmap,
     expat_ver,
+    get_adapters,
     gzip,
     html_escape,
+    iname2ips,
     load_ipr,
     load_ipu,
     lock_file,
@@ -297,6 +301,9 @@ class SvcHub(object):
             t = "WARNING: ignoring --use-fpool because multithreading (-j{}) is enabled"
             self.log("root", t.format(args.j), c=3)
             args.no_fpool = True
+
+        if args.scots:
+            HTTPCODE.update(SCOTS)
 
         args.p_nodav = [int(x.strip()) for x in args.p_nodav.split(",") if x]
         if args.dav_port and args.dav_port not in args.p:
@@ -565,7 +572,7 @@ class SvcHub(object):
 
         # create netmaps early to avoid firewall gaps,
         # but the mutex blocks multiprocessing startup
-        for zs in "ipu_nm ftp_ipa_nm tftp_ipa_nm".split():
+        for zs in "ipu_nm ftp_ipa_nm sftp_ipa_nm tftp_ipa_nm".split():
             try:
                 getattr(args, zs).mutex = threading.Lock()
             except:
@@ -1130,9 +1137,20 @@ class SvcHub(object):
                 self.log("root", "WARNING: ignoring --bauth-last due to --no-bauth", 3)
 
         have_tcp = False
+        have_iname = []
+        ptn = re.compile(r"^[0-9a-f]{0,4}:|^[0-9]{1,3}\.|^no$")
         for zs in al.i:
             if not zs.startswith(("unix:", "fd:")):
                 have_tcp = True
+                if "/" in zs or not ptn.search(zs):
+                    have_iname.append(zs)
+        if have_iname:
+            nics = get_adapters()
+            for iname in have_iname:
+                for zs in iname2ips(iname, nics):
+                    if zs not in al.i:
+                        al.i.append(zs)
+                al.i.remove(iname)
         if not have_tcp:
             zb = False
             zs = "z zm zm4 zm6 zmv zmvv zs zsv zv"
