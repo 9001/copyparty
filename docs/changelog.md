@@ -83,6 +83,36 @@
 
 
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2026-1014-2321  `v1.20.26`  one 20 26
+
+## 🧪 new features
+
+* xvol/xdev now usually doesn't list symlinks that can't be followed 7ce483e9
+
+## 🩹 bugfixes
+
+* generating jxl thumbnails of raw photos would fail in most environments ed0fcd60
+* fix some false-positive warnings regarding dangerous shadowing on casefolding filesystems 4bd64d74
+* GHSA-hg99-jqfp-rf76 another xvol/xdev joke, not a cause for concern in any realistic scenario 82eab3d2
+  * also see the new warning in the [xvol readme section](https://github.com/9001/copyparty#filesystem-guards)
+* btrfs: would only nocow same-fs histfolders fa8913c7
+
+## 🔧 other changes
+
+* openjpeg (jpeg2000 support in pillow) was removed from all docker images 0dc1cb32
+  * because openjpeg is unmaintained and there's some minor unfixed vulns
+  * no practical consequences since ffmpeg will handle thumbnailing of those
+
+## 🌠 fun facts
+
+* for the first time in 4 years, the music folder on the demo-server has a new album! [Sunnexo - Netpunk](https://a.ocv.me/pub/demo/music/Sunnexo%20-%20Netpunk/#af-90014daf,sorthref)
+  * it is really good, you should [buy it](https://sunnexo.bandcamp.com/album/netpunk)
+    * and if you ever get the chance to see Sunnexo live DO IT
+* faelnor made a [draw.io plugin](https://codeberg.org/anodal/copyparty-drawio) // [demo vid](https://a.ocv.me/pub/g/2026/10/cpp-drawio.mp4)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2026-1006-0035  `v1.20.25`  SECURITY: shadowing on windows/mac
 
 ## ⚠️ ATTN: this release mitigates a Windows/MacOS-specific issue with shadowing

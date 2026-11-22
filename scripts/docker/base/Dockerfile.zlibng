@@ -1,8 +1,9 @@
 FROM    alpine:latest
 WORKDIR /z
 
-RUN     apk add py3-pip make gcc musl-dev python3-dev
+RUN     apk upgrade -laU \
+        && apk add py3-pip git make cmake gcc g++ musl-dev python3-dev zlib-ng-dev
 
-RUN     pip wheel https://files.pythonhosted.org/packages/46/7d/901c6e333fb031b5bfbd1532099200cf859f12aa83689be494eade6685ec/zlib_ng-1.0.0.tar.gz \
+RUN     pip wheel -v https://files.pythonhosted.org/packages/25/c8/2914b13c7972dccf8774947ffe781b761b483aa190e55a4aa89886982daa/zlib_ng-1.1.0.tar.gz \
         && mkdir whl \
         && mv *.whl whl

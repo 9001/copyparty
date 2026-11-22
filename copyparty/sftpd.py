@@ -30,6 +30,7 @@ from .util import (
     Daemon,
     ODict,
     Pebkac,
+    bindtuple,
     exclude_dotfiles,
     exclude_dotfiles_ls,
     exclude_dothidden,
@@ -73,8 +74,7 @@ except:
 
 class SSH_Srv(paramiko.ServerInterface):
     def __init__(self, hub: "SvcHub", addr: Any):
-        self.hub = hub
-        self.args = args = hub.args
+        args = hub.args
         self.log_func = hub.log
         self.uname = "*"
 
@@ -82,6 +82,12 @@ class SSH_Srv(paramiko.ServerInterface):
         self.ip = addr[0]
         if self.ip.startswith("::ffff:"):
             self.ip = self.ip[7:]
+
+        if args.sftp_ipa_nm and not args.sftp_ipa_nm.map(self.ip):
+            raise Exception("client rejected (--sftp-ipa): %s" % self.ip)
+
+        self.hub = hub
+        self.args = args
 
         zsl = []
         if args.sftp_anon:
@@ -513,10 +519,13 @@ class SFTP_Srv(paramiko.SFTPServerInterface):
                 smode = "a+b"
             else:
                 smode = "r+b"
-        else:
+        elif iflag == os.O_RDONLY:
             rd = True
             wr = False
             smode = "rb"
+        else:
+            self.log("unsupported file-open-mode %r" % (iflag,), 3)
+            return SFTP_PERMISSION_DENIED
 
         try:
             ap, vn, rem = self.v2a(vp, rd, wr)
@@ -858,7 +867,7 @@ class Sftpd(object):
                 pass  # will create another ipv4 socket instead
             if getattr(self.args, "freebind", False):
                 srv.setsockopt(socket.SOL_IP, socket.IP_FREEBIND, 1)
-            srv.bind((ip, port))
+            srv.bind(bindtuple(ip, port))
             srv.listen(10)
             self.srv.append(srv)
             self.bound.append(ip)
@@ -890,8 +899,8 @@ class Sftpd(object):
         for hkey in self.hostkeys:
             tra.add_server_key(hkey)
         tra.set_subsystem_handler("sftp", paramiko.SFTPServer, SFTP_Srv)
-        psrv = SSH_Srv(self.hub, addr)
         try:
+            psrv = SSH_Srv(self.hub, addr)
             tra.start_server(server=psrv)
         except Exception as ex:
             if tra.addr:

@@ -39,10 +39,10 @@ fns=(
   markupsafe-3.0.3-cp314-cp314-win_amd64.whl
   mutagen-1.48.1-py3-none-any.whl
   packaging-26.3-py3-none-any.whl
-  pillow-12.3.0-cp314-cp314-win_amd64.whl
+  pillow-13.0.0-cp314-cp314-win_amd64.whl
   pyinstaller-6.21.0-py3-none-win_amd64.whl
   pyinstaller_hooks_contrib-2026.6-py3-none-any.whl
-  python-3.14.8-amd64.exe
+  python-3.14.10-amd64.exe
   setuptools-83.0.0-py3-none-any.whl
 )
 [ $w7 ] && fns+=(

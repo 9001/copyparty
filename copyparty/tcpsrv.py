@@ -21,6 +21,7 @@ from .util import (
     VF_CAREFUL,
     Netdev,
     atomic_move,
+    bindtuple,
     chkcmd,
     list_nics,
     min_ex,
@@ -308,7 +309,7 @@ class TcpSrv(object):
                 if self.args.http_no_tcp:
                     self.seen_eps.append((ip, port))
                     return
-                srv.bind((ip, port))
+                srv.bind(bindtuple(ip, port))
             else:
                 if ANYWIN or self.args.rm_sck:
                     if os.path.exists(ip):

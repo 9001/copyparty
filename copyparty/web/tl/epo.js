@@ -39,7 +39,7 @@ Ls.epo = {
 			["stir-V", "alglui (movi/kopii) ĉi tien"],
 			["Y", "elŝuti elektitajn"],
 			["F2", "alinomi elektitajn"],
-			["F4", "refreŝigi"], //m
+			["F4", "reŝarĝi"],
 
 			"file-list-sel",
 			["spacoklavo", "baskuli elektadon de dosieroj"],
@@ -576,7 +576,7 @@ Ls.epo = {
 	"u_ancient": 'via retumilo estas vere antikva -- eble vi devus <a href="#" id="u2nah">uzi alŝutilon bup anstataŭe</a>',
 	"u_nowork": "Firefox 53+ aŭ Chrome 57+ aŭ iOS 11+ necesas",
 	"tail_2old": "Firefox 105+ aŭ Chrome 71+ aŭ iOS 14.5+ necesas",
-	"b2old": 'via retumilo estas tro malnova', //m
+	"b2old": 'via retumilo estas tro malnova',
 	"u_nodrop": 'via retumilo estas tro malnova por ŝova-kaj-demeta alŝutado',
 	"u_notdir": "tio ne estas dosierujo!\n\nvia retumilo estas tro malnova,\nbonvolu ŝovu kaj demetu anstataŭe",
 	"u_uri": "por ŝovi-kaj-demeti bildon de aliaj fenestroj de retumiloj,\nbonvolu demeti ĝin sur la grandan alŝut-butonon",
@@ -660,7 +660,7 @@ Ls.epo = {
 	"rc_pla": "ludi kiel aŭdiaĵo",
 	"rc_txt": "malfermi per tekstovidilo",
 	"rc_md": "malfermi per tekstoredaktilo",
-	"rc_wopi": "malfermi per office-redaktilo", //m
+	"rc_wopi": "malfermi per ofica redaktilo",
 	"rc_dl": "elŝuti",
 	"rc_zip": "elŝuti kiel arkivo",
 	"rc_cpl": "kopii ligilon",

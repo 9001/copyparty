@@ -432,6 +432,37 @@ HTTPCODE = {
     999: "MissingNo",
 }
 
+# https://underwood.network/http/scots.html
+# awk <~/Documents/scots.txt /"$(awk <copyparty/util.py -F: 'o{printf"%d|",$1}/^HTTPCODE = /{o=1}/999/{print"aaa";exit}')"'/{v=$0;sub(/^[0-9]+./,"",v);printf"    %d: \"%s\",\n",$1,v}'
+SCOTS = {
+    200: "NAE BOTHER",
+    201: "THAT'S IT MADE",
+    202: "AYE AH'LL SEE TAE IT",
+    204: "HEHAW",
+    206: "HERE'S A WEE BIT",
+    207: "BIT O THIS BIT O THAT",
+    301: "WE'VE FLITTED",
+    302: "WE'RE OWER THERE THE NOO",
+    304: "SAME AULD SHITE",
+    400: "WHIT THE FUCK'S THIS",
+    401: "WHO THE FUCK ARE YOU",
+    403: "GET TAE FUCK",
+    404: "NO FUCKIN HERE PAL",
+    405: "YE CANNAE DAE THAT",
+    409: "PICK A FUCKIN LANE",
+    411: "HOW LANG IS IT THEN",
+    412: "THAT'S NO WHIT WE AGREED",
+    413: "THAT'S FUCKIN MASSIVE",
+    415: "NAE IDEA WHIT THAT IS",
+    416: "IT DISNAE GO THAT FAR",
+    422: "AH KEN WHIT YE MEAN BUT NAW",
+    423: "IT'S SNIBBED",
+    429: "SLOW DOON",
+    500: "AH'VE FUCKED IT",
+    501: "AH DINNAE DAE THAT",
+    503: "WE'RE FUCKIN SHUT",
+}
+
 
 IMPLICATIONS = [
     ["e2dsa", "e2ds"],
@@ -3310,6 +3341,49 @@ def list_nics(alll: bool = False) -> dict[str, Netdev]:
             eps[zs] = Netdev(zs, idx or 0, name, "")
 
     return eps
+
+
+def iname2ips(iname: str, nics: list[Any]) -> list[str]:
+    # iname = 192.168.0.0/16 | eth0
+    ret = []
+    if "/" in iname:
+        v6 = ":" in iname
+        Addr = IPv6Address if v6 else IPv4Address
+        Net = IPv6Network if v6 else IPv4Network
+        mask = Net(iname, True)
+        for nic in nics:
+            for nip in nic.ips:
+                if v6 != (":" in str(nip.ip)):
+                    continue
+                zs = nip.ip[0] if v6 else nip.ip
+                if Addr(zs) in mask:
+                    ret.append(zs)
+    else:
+        for nic in nics:
+            if iname not in (nic.name, nic.nice_name):
+                continue
+            for nip in nic.ips:
+                if ":" in str(nip.ip):
+                    ip, _, sco = nip.ip
+                    if sco:
+                        ip = "%s%%%s" % (ip, sco)
+                else:
+                    ip = nip.ip
+                ret.append(ip)
+    return ret
+
+
+def bindtuple(ip: str, port: int) -> Union[tuple[str, int], tuple[str, int, int, int]]:
+    if not ":" in ip:
+        return (ip, port)
+    if "%" in ip:
+        ip, sco = ip.split("%")
+        try:
+            isco = int(sco)
+        except:
+            isco = socket.if_nametoindex(sco)
+        return (ip, port, 0, isco)
+    return (ip, port, 0, 0)
 
 
 def build_netmap(csv: str, defer_mutex: bool = False):

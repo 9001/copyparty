@@ -14,6 +14,13 @@ ised() {
 	tmv "$2"
 }
 
+# use custom pillow if relevant
+echo $1 | grep -qE 'im|ac|iv|dj' && [ ! -e "/z/stock_pillow" ] && (
+  cp -pv /z/packages/*.pub /etc/apk/keys/
+  cd /z/packages/$(cat /etc/apk/arch)
+  apk add ./py3-pillow-*.apk
+)
+
 # use custom ffmpeg if relevant
 echo $1 | grep -qE 'ac|iv|dj' && [ ! -e "/z/stock_ffmpeg" ] && (
   cp -pv /z/packages/*.pub /etc/apk/keys/
@@ -29,7 +36,7 @@ echo $1 | grep -qE 'ac|iv|dj' && [ ! -e "/z/stock_ffmpeg" ] && (
 rm -rf /z/packages /z/test-aac
 
 # use zlib-ng if available
-f=/z/whl/zlib_ng-0.5.1-cp312-cp312-linux_$(cat /etc/apk/arch).whl
+f=/z/whl/zlib_ng-*-linux_$(cat /etc/apk/arch).whl
 [ "$1" != min ] && [ -e $f ] && {
   apk add -t .bd !pyc py3-pip
   rm -f /usr/lib/python3*/EXTERNALLY-MANAGED

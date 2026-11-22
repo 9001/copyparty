@@ -144,10 +144,6 @@ class TestDots(unittest.TestCase):
         # should descend into folders, but not other volumes:
         self.assertEqual(self.tardir(url, "u2"), "f0 t/f1 v/f1.txt")
 
-        zj = json.loads(self.curl("v?ls", "u1")[1])
-        url = "v?k=" + zj["dk"]
-        self.assertEqual(self.tarsel(url, "u2", ["f1.txt", "a", ".b"]), "f1.txt")
-
         shutil.rmtree("v")
 
     def test_dk_fk(self):

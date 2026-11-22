@@ -12,6 +12,8 @@ cd "$self"
 
 sarchs="386 amd64 arm/v7 arm64/v8 ppc64le s390x"
 archs="amd64 amd64 386 arm64 arm s390x ppc64le"
+#sarchs="amd64"
+#archs="amd64 amd64"
 
 err=
 for x in awk jq podman python3 tar wget ; do
@@ -68,16 +70,16 @@ wt() {
 	for a in $archs; do
 		n=$((n+1)); wt "$n/$a"
 		#[ $n -le 3 ] || continue
-		touch b/t.$n.$a.1.$(date +%s)
+		touch b/t1.$n.$a.1.$(date +%s)
 
 		tar -c arbeidspakke.sh patch/ffmpeg |
 		time nice podman run \
 			--rm -i --pull=never -v "$self/b:/root:z" localhost/alpine-$a \
 			/bin/ash -c "cd /opt;tar -x;/bin/ash ./arbeidspakke.sh $n $a" 2>&1 |
 		awk '{getline a<"/proc/uptime";close("/proc/uptime");sub(/ .*/,"",a);printf"%.2f %s\n",a-p,$0;p=a}' |
-		tee b/log.$n.$a
+		tee b/log1.$n.$a
 
-		touch b/t.$n.$a.2.$(date +%s)
+		touch b/t1.$n.$a.2.$(date +%s)
 	done
 	wt -;wt ""
 }

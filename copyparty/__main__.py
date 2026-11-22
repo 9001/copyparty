@@ -679,7 +679,8 @@ def get_sects():
             dedent(
                 """
             \033[33m-i\033[0m takes a comma-separated list of interfaces to listen on;
-            IP-addresses, unix-sockets, and/or open file descriptors
+            IP-addresses, IP-subnets, NIC names,
+            unix-sockets, and/or open file descriptors
 
             the default (\033[32m-i ::\033[0m) means all IPv4 and IPv6 addresses
 
@@ -687,6 +688,8 @@ def get_sects():
             \033[32m-i 127.0.0.1\033[0m  listens on IPv4 localhost only
             \033[32m-i 127.1\033[0m      listens on IPv4 localhost only
             \033[32m-i 127.1,192.168.123.1\033[0m = IPv4 localhost and 192.168.123.1
+            \033[32m-i 192.168.0.0/16\033[0m = currently-known IPs in 192.168.*.*
+            \033[32m-i wlan0\033[0m      all IPs currently assigned to wlan0
             \033[32m-i no\033[0m         disable webserver
 
             \033[33m-p\033[0m takes a comma-separated list of tcp ports to listen on;
@@ -709,6 +712,9 @@ def get_sects():
             \033[32m-i fd:\033[33m3\033[0m uses the socket passed to copyparty on file descriptor 3
 
             \033[33m-p\033[0m (tcp ports) is ignored for unix-sockets and FDs
+
+            JANK: binding to a subnet (192.168.0.0/16) and/or a NIC-name
+            (wlan0) will only bind to the IPs which are known on startup
 
             \033[33m--list-nics\033[0m shows all network adapters (also offline ones);
             \033[33m--list-ips\033[0m shows all LAN IPs
@@ -1548,6 +1554,7 @@ def add_network(ap):
     ap2.add_argument("--cachectl", metavar="TXT", default="no-cache", help="default-value of the 'Cache-Control' response-header (controls caching in webbrowsers). Default prevents repeated downloading of the same file unless necessary (browser will ask copyparty if the file has changed). Examples: [\033[32mmax-age=604869\033[0m] will cache for 7 days, [\033[32mno-store, max-age=0\033[0m] will always redownload. (volflag=cachectl)")
     ap2.add_argument("--http-vary", metavar="TXT", type=u, default="Origin, PW, Cookie", help="value of the 'Vary' response-header; a hint for caching proxies")
     ap2.add_argument("--http-no-tcp", action="store_true", help="do not listen on TCP/IP for http/https; only listen on unix-domain-sockets")
+    ap2.add_argument("--scots", action="store_true", help="we at the slan go foill")
     if FULL_HELP or ANYWIN:
         ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets (windows-only); allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
     if FULL_HELP or (not ANYWIN and not MACOS):
@@ -1618,6 +1625,7 @@ def add_auth(ap):
     ap2.add_argument("--pw-urlp", metavar="NAME", type=u, default="pw", help="lowercase name of password url-param (?NAME=foo); \033[1;31mWARNING:\033[0m Changing this will break support for many clients")
     ap2.add_argument("--no-bauth", action="store_true", help="disable basic-authentication support; do not accept passwords from the 'Authenticate' header at all. NOTE: This breaks support for the android app")
     ap2.add_argument("--bauth-last", action="store_true", help="keeps basic-authentication enabled, but only as a last-resort; if a cookie is also provided then the cookie wins")
+    ap2.add_argument("--bauth-q", metavar="T", type=u, default='Basic realm="a"', help="challenge to send for basic-auth (use this to change realm)")
     ap2.add_argument("--ses-db", metavar="PATH", type=u, default=ses_db, help="where to store the sessions database (if you run multiple copyparty instances, make sure they use different DBs)")
     ap2.add_argument("--ses-len", metavar="CHARS", type=int, default=24, help="session key length; default is 144 bits ((24//4)*4*6)")
     ap2.add_argument("--no-ses", action="store_true", help="disable sessions; use plaintext passwords in cookies")
@@ -1895,7 +1903,7 @@ def add_safety(ap):
     ap2.add_argument("--no-dot-ren", action="store_true", help="disallow renaming dotfiles; makes it impossible to turn something into a dotfile")
     ap2.add_argument("--no-logues", action="store_true", help="disable rendering .prologue/.epilogue.html into directory listings (volflag=no_logues)")
     ap2.add_argument("--no-readme", action="store_true", help="disable rendering readme/preadme.md into directory listings (volflag=no_readme)")
-    ap2.add_argument("--csp-ui", metavar="TXT", default="script-src 'unsafe-eval' 'nonce-{{ js_nonce }}'; worker-src 'self'", help="content-security-policy to apply for the web-UI; default helps prevent XSS by blocking <script> / onclick / ... (volflag=csp_ui)")
+    ap2.add_argument("--csp-ui", metavar="TXT", default="script-src 'unsafe-eval' 'nonce-{{ js_nonce }}'; worker-src 'self'; base-uri 'none'", help="content-security-policy to apply for the web-UI; default helps prevent XSS by blocking <script> / onclick / ... (volflag=csp_ui)")
     ap2.add_argument("--csp-dl", metavar="TXT", default="", help="content-security-policy to apply for static files (volflag=csp_dl)")
     ap2.add_argument("--no-script", action="store_true", help="disables javascript in html files; helps prevent XSS but kills interactive websites; this will override \033[33m--csp-dl\033[0m with [\033[32mscript-src 'none'\033[0m] (volflag=noscript)")
     ap2.add_argument("--no-html", action="store_true", help="show html-files as plain text; helps prevent XSS but kills websites/blogs, also enables \033[33m--no-script\033[0m (volflag=nohtml)")
@@ -2028,10 +2036,10 @@ def add_thumbnail(ap):
     # https://github.com/libvips/libvips
     # https://stackoverflow.com/a/47612661
     # ffmpeg -hide_banner -demuxers | awk '/^ D  /{print$2}' | while IFS= read -r x; do ffmpeg -hide_banner -h demuxer=$x; done | grep -E '^Demuxer |extensions:'
-    ap2.add_argument("--th-r-pil", metavar="T,T", type=u, default="avif,avifs,blp,bmp,cbz,dcx,dds,dib,emf,eps,epub,fits,flc,fli,fpx,gif,heic,heics,heif,heifs,icns,ico,im,j2p,j2k,jp2,jpeg,jpg,jpx,jxl,kra,ora,pbm,pcx,pgm,png,pnm,ppm,psd,qoi,sgi,spi,tga,tif,tiff,webp,wmf,xbm,xpm", help="image formats to decode using pillow")
+    ap2.add_argument("--th-r-pil", metavar="T,T", type=u, default="avif,avifs,blp,bmp,cbz,dcx,dds,dib,emf,eps,epub,fits,flc,fli,fpx,gif,heic,heics,heif,heifs,icns,ico,im,j2p,j2k,jp2,jpeg,jpg,jpx,jxl,kra,odg,odp,ods,odt,ora,pbm,pcx,pgm,png,pnm,ppm,psd,qoi,sgi,spi,tga,tif,tiff,webp,wmf,xbm,xpm", help="image formats to decode using pillow")
     ap2.add_argument("--th-r-vips", metavar="T,T", type=u, default="3fr,arw,avif,cr2,cr3,crw,dcr,dng,erf,exr,fit,fits,fts,gif,hdr,heic,heics,heif,heifs,jp2,jpeg,jpg,jpx,jxl,k25,kdc,mdc,mef,mrw,nef,nii,nrw,orf,pfm,pgm,png,ppm,raf,raw,rw2,sr2,srf,srw,svg,tif,tiff,webp,x3f", help="image formats to decode using pyvips")
     ap2.add_argument("--th-r-raw", metavar="T,T", type=u, default="3fr,arw,cr2,cr3,crw,dcr,dng,erf,k25,kdc,mdc,mef,mos,mrw,nef,nrw,orf,pef,raf,raw,rw2,sr2,srf,srw,x3f", help="image formats to decode using rawpy (if available) or libraw's dcraw_emu")
-    ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,cbz,dds,dib,epub,fit,fits,fts,gif,hdr,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,kra,ora,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,qoi,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
+    ap2.add_argument("--th-r-ffi", metavar="T,T", type=u, default="apng,avif,avifs,bmp,cbz,dds,dib,epub,fit,fits,fts,gif,hdr,heic,heics,heif,heifs,icns,ico,jp2,jpeg,jpg,jpx,jxl,kra,odg,odp,ods,odt,ora,pbm,pcx,pfm,pgm,png,pnm,ppm,psd,qoi,sgi,tga,tif,tiff,webp,xbm,xpm", help="image formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffv", metavar="T,T", type=u, default="3gp,asf,av1,avc,avi,flv,h264,h265,hevc,m4v,mjpeg,mjpg,mkv,mov,mp4,mpeg,mpeg2,mpegts,mpg,mpg2,mts,nut,ogm,ogv,rm,ts,vob,webm,wmv", help="video formats to decode using ffmpeg")
     ap2.add_argument("--th-r-ffa", metavar="T,T", type=u, default="aac,ac3,aif,aiff,alac,alaw,amr,apac,ape,au,bcstm,bfstm,brstm,bonk,dfpwm,dts,flac,gsm,ilbc,it,itgz,itxz,itz,m4a,m4b,m4r,mdgz,mdxz,mdz,mka,mo3,mod,mp2,mp3,mpc,mptm,mt2,mulaw,oga,ogg,okt,opus,ra,s3m,s3gz,s3xz,s3z,tak,tta,ulaw,wav,wma,wv,xm,xmgz,xmxz,xmz,xpk", help="audio formats to decode using ffmpeg")
 
@@ -2043,7 +2051,7 @@ def add_thumbnail(ap):
     ap2.add_argument("--th-ffa-add", metavar="T", type=u, default="", help="add or remove formats; same as \033[33m--th-pil-add\033[0m but for ffmpeg audio")
 
     ap2.add_argument("--th-spec-cnv", metavar="T", type=u, default="it,itgz,itxz,itz,mdgz,mdxz,mdz,mo3,mod,s3m,s3gz,s3xz,s3z,xm,xmgz,xmxz,xmz,xpk", help="audio formats which provoke https://trac.ffmpeg.org/ticket/10797 (huge ram usage for s3xmodit spectrograms)")
-    ap2.add_argument("--au-unpk", metavar="E=F.C", type=u, default="mdz=mod.zip, mdgz=mod.gz, mdxz=mod.xz, s3z=s3m.zip, s3gz=s3m.gz, s3xz=s3m.xz, xmz=xm.zip, xmgz=xm.gz, xmxz=xm.xz, itz=it.zip, itgz=it.gz, itxz=it.xz, cbz=jpg.cbz, epub=jpg.epub, kra=png.kra, ora=png.ora", help="audio/image formats to decompress before passing to ffmpeg")
+    ap2.add_argument("--au-unpk", metavar="E=F.C", type=u, default="mdz=mod.zip, mdgz=mod.gz, mdxz=mod.xz, s3z=s3m.zip, s3gz=s3m.gz, s3xz=s3m.xz, xmz=xm.zip, xmgz=xm.gz, xmxz=xm.xz, itz=it.zip, itgz=it.gz, itxz=it.xz, cbz=jpg.cbz, epub=jpg.epub, kra=png.kra, odg=png.odg, odp=png.odp, ods=png.ods, odt=png.odt, ora=png.ora", help="audio/image formats to decompress before passing to ffmpeg")
     ap2.add_argument("--th-extract", metavar="T", type=u, action="append", help="\033[34mREPEATABLE:\033[0m list of file extensions to thumbnail using a custom plugin (a python script); example: [\033[32mmdf,iso,dmg=/thumbs/diskimg.py\033[0m], see \033[33m--help-thumb-ex\033[0m")
     ap2.add_argument("--th-extr-sz", metavar="M", type=int, default=16, help="max num megabytes to allow \033[33m--th-extract\033[0m plugins to extract from each file")
     ap2.add_argument("--hot-th-extr", action="store_true", help="recompile extractors on each thumbnail extraction -- expensive but convenient when hacking on stuff")

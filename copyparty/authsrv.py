@@ -3500,6 +3500,7 @@ class AuthSrv(object):
                 "sb_md": vn.js_ls["sb_md"],
                 "sba_md": vf.get("md_sba") or "",
                 "sba_lg": vf.get("lg_sba") or "",
+                "nohtml": "nohtml" in vf,
                 "rw_edit": vf["rw_edit"],
                 "dtheme": vf["theme"],
                 "bg_img": vf["bg_img"],
@@ -3550,7 +3551,7 @@ class AuthSrv(object):
             if self.args.wopi:
                 js_htm["have_wopi"] = True
 
-            zs = "have_emp md_no_br"
+            zs = "have_emp md_no_br nohtml"
             md_htm = {x: js_htm[x] for x in zs.split(" ")}
             md_htm["modpoll_freq"] = self.args.mcr
 

@@ -194,6 +194,9 @@ md_plug_err = function (ex, js) {
 
 
 function convert_markdown(md_text, dest_dom) {
+    if (nohtml)
+        return;
+
     md_text = md_text.replace(/\r/g, '');
 
     md_plug_err(null);
@@ -305,8 +308,12 @@ function convert_markdown(md_text, dest_dom) {
 
     for (var a = 0; a < nodes.length; a++) {
         el = nodes[a];
-        var id = el.getAttribute('id'),
+        var aid = el.getAttribute('id'),
+            id = esc(aid.replace(/[?&"<>'=/ ]+/g, '_')),
             orig_id = id;
+
+        if (aid != id)
+            el.setAttribute('id', id);
 
         if (id_seen[id]) {
             for (var n = 1; n < 4096; n++) {

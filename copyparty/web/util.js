@@ -2236,7 +2236,7 @@ function load_md_plug(md_text, plug_type, defer) {
             toast.warn(30, '' + ex);
         }
 
-    if (!have_emp)
+    if (nohtml || !have_emp)
         return md_text;
 
     var find = '\n```copyparty_' + plug_type + '\n',
@@ -2277,7 +2277,7 @@ function load_md_plug(md_text, plug_type, defer) {
     return md;
 }
 function md_thumbs(md) {
-    if (!/(^|\n)<!-- th -->/.exec(md))
+    if (nohtml || !/(^|\n)<!-- th -->/.exec(md))
         return md;
 
     // `!th[flags](some.jpg)`
