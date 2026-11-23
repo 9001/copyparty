@@ -10339,6 +10339,7 @@ function fclick(e, dbl) {
 		aplay = ebi('a' + fid),
 		atext = ebi('t' + fid),
 		is_txt = atext && !/\.ts$/.test(href) && showfile.getlang(href),
+		is_wopi = wopi_set && wopi_set.has(ext),
 		is_img = img_re.test(href),
 		is_dir = href.endsWith('/'),
 		is_srch = !!ebi('unsearch'),
