@@ -5,7 +5,7 @@ Ls.deu = {
 	"tt": "Deutsch",
 
 	"cols": {
-		"c": "Aktionen",
+		"!": "Aktionen",
 		"dur": "Dauer",
 		"q": "Qualität / Bitrate",
 		"Ac": "Audiocodec",
@@ -14,7 +14,7 @@ Ls.deu = {
 		"Ahash": "Audio Checksumme",
 		"Vhash": "Video Checksumme",
 		"Res": "Auflösung",
-		"T": "Dateityp",
+		"Ext": "Dateityp",
 		"aq": "Audioqualität / Bitrate",
 		"vq": "Videoqualität / Bitrate",
 		"pixfmt": "Subsampling / Pixelstruktur",
@@ -108,9 +108,9 @@ Ls.deu = {
 	"ht_and": " und ",
 
 	"goh": "Einstellungen",
-	"gop": 'zum vorherigen Ordner springen">vorh.',
-	"gou": 'zum übergeordneter Ordner springen">hoch',
-	"gon": 'zum nächsten Ordner springen">nächst.',
+	"gop": 'zum vorherigen Ordner springen',
+	"gou": 'zum übergeordneter Ordner springen',
+	"gon": 'zum nächsten Ordner springen',
 	"logout": "Abmelden ",
 	"login": "Anmelden",
 	"access": " Zugriff",
@@ -158,7 +158,7 @@ Ls.deu = {
 	"ut_u2ts": "Zuletzt geändert-Zeitstempel von$Ndeinem Dateisystem auf den Server übertragen\">📅",
 	"ut_ow": "Existierende Dateien auf dem Server überschreiben?$N🛡️: Nie (generiert einen neuen Dateinamen)$N🕒: Überschreiben, wenn Server-Datei älter ist als meine$N♻️: Überschreiben, wenn der Dateiinhalt anders ist$N⏭️: Vorhandene Dateien immer überspringen",
 	"ut_mt": "Andere Dateien während des Uploads hashen$N$Nsolltest du deaktivieren, falls deine CPU oder Festplatte zum Flaschenhals werden könnte",
-	"ut_ask": 'Vor dem Upload nach Bestätigung fragen">💭',
+	"ut_ask": 'Vor dem Upload nach Bestätigung fragen',
 	"ut_pot": "Verbessert Upload-Geschwindigkeit$Nindem das UI weniger komplex gemacht wird",
 	"ut_srch": "nicht wirklich hochladen, stattdessen prüfen ob Datei bereits auf dem Server existiert (scannt alle Ordner, die du lesen kannst)",
 	"ut_par": "setze auf 0 zum Pausieren$N$Nerhöhe, wenn deine Verbindung langsam / instabil ist$N$lass auf 1 im LAN oder wenn die Festplatte auf dem Server ein Flaschenhals ist",
@@ -226,7 +226,7 @@ Ls.deu = {
 
 	"ct_grid": '田 Das Raster&trade;',
 	"ct_ttips": '◔ ◡ ◔">ℹ️ Tooltips',
-	"ct_thumb": 'In Raster-Ansicht, zwischen Icons und Vorschau wechseln$NHotkey: T">🖼️ Vorschaubilder',
+	"ct_thumb": 'Zwischen Icons und Vorschau wechseln$NHotkey: T">🖼️ Vorschaubilder',
 	"ct_csel": 'Benutze STRG und UMSCHALT für Dateiauswahl in Raster-Ansicht">sel',
 	"ct_dsel": 'Ziehauswahl in Raster-Ansicht verwenden">ziehen', //m
 	"ct_dl": 'Beim Klick auf Dateien sie immer herunterladen (nicht einbetten)">dl',
@@ -289,9 +289,9 @@ Ls.deu = {
 	"ml_drc": "Dynamic Range Compressor",
 	"ml_ss": "Stille Überspringen", //m
 
-	"mt_loop": "Song wiederholen\">🔁",
+	"mt_loop": "Song wiederholen",
 	"mt_one": "Wiedergabe nach diesem Song beenden\">1️⃣",
-	"mt_shuf": "Zufällige Wiedergabe im Ordner\">🔀",
+	"mt_shuf": "Zufällige Wiedergabe im Ordner",
 	"mt_aplay": "automatisch abspielen, wenn der Link, mit dem du auf den Server zugreifst, eine Titel-ID enthält$N$NDeaktivieren verhindert auch, dass die Seiten-URL bei Musikwiedergabe mit Titel-IDs aktualisiert wird, um Autoplay zu verhindern, falls diese Einstellungen verloren gehen, die URL aber bestehen bleibt\">a▶",
 	"mt_preload": "nächsten Titel gegen Ende vorladen für nahtlose Wiedergabe\">Vorladen",
 	"mt_prescan": "vor Ende des letzten Titels zum nächsten Ordner wechseln,$Ndamit der Browser die$NWiedergabe nicht stoppt\">Navigation",
@@ -306,8 +306,8 @@ Ls.deu = {
 	"mt_follow": "den spielenden Titel im Blick behalten\">🎯",
 	"mt_compact": "kompakte Steuerelemente\">⟎",
 	"mt_uncache": "Cache leeren &nbsp;(probier das, wenn dein Browser$Neine defekte Kopie eines Titels zwischenspeichert und sich weigert, ihn abzuspielen)\">Cache leeren",
-	"mt_mloop": "offenen Ordner wiederholen\">🔁 Schleife",
-	"mt_mnext": "nächsten Ordner laden und fortfahren\">📂 nächster",
+	"mt_mloop": "offenen Ordner wiederholen",
+	"mt_mnext": "nächsten Ordner laden und fortfahren",
 	"mt_mstop": "Wiedergabe beenden\">⏸ Stop",
 	"mt_cflac": "FLAC / WAV zu {0} konvertierebn\">flac",
 	"mt_caac": "AAC / M4A zu {0} konvertieren\">aac",
