@@ -2569,7 +2569,14 @@ class Up2k(object):
                         continue
 
                     q = "select rd, fn, ip, at, un from up where substr(w,1,16)=? limit 1"
-                    rd, fn, ip, at, un = cur.execute(q, (w,)).fetchone()
+                    hit = cur.execute(q, (w,)).fetchone()
+                    if not hit:
+                        # e2ts to e2t or smth
+                        to_delete[w] = True
+                        n_left -= 1
+                        continue
+
+                    rd, fn, ip, at, un = hit
                     rd, fn = s3dec(rd, fn)
                     abspath = djoin(ptop, rd, fn)
 

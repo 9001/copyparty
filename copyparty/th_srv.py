@@ -951,6 +951,9 @@ class ThumbSrv(object):
         else:
             scale += "increase,crop={0}:{1},setsar=1:1"
 
+        if tpath.endswith(".jxl"):
+            scale += ",transpose,transpose"  # ギリギリセーフ
+
         res = self.getres(vn, fmt)
         bscale = scale.format(*list(res)).encode("utf-8")
         bap_in = fsenc(abspath)

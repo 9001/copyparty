@@ -6681,23 +6681,23 @@ class HttpCli(object):
             t = "your username (%r) does not match the sharekey's owner (%r) and you're not admin"
             raise Pebkac(400, t % (self.uname, un))
 
-        reload = False
+        relod = False
         act = self.uparam["eshare"]
         if act == "rm":
             cur.execute("delete from sh where k = ?", (skey,))
             cur.execute("delete from sf where k = ?", (skey,))
             if skey in self.asrv.vfs.nodes[self.args.shr.strip("/")].nodes:
-                reload = True
+                relod = True
         else:
             now = time.time()
             if expiry < now:
                 expiry = now
-                reload = True
+                relod = True
             expiry += int(act) * 60
             cur.execute("update sh set t1 = ? where k = ?", (expiry, skey))
 
         cur.connection.commit()
-        if reload:
+        if relod:
             self.conn.hsrv.broker.ask("reload", False, True).get()
             self.conn.hsrv.broker.ask("up2k.wake_rescanner").get()
 
@@ -6809,7 +6809,15 @@ class HttpCli(object):
             cur.execute(q, (skey, fn))
 
         cur.connection.commit()
-        self.conn.hsrv.broker.ask("reload", False, True).get()
+        try:
+            self.conn.hsrv.broker.ask("reload", False, True).get()
+        except:
+            cur.execute("delete from sh where k=?", (skey,))
+            cur.execute("delete from sf where k=?", (skey,))
+            cur.connection.commit()
+            self.conn.hsrv.broker.ask("reload", False, True).get()
+            raise Pebkac(400, "bad password")
+
         self.conn.hsrv.broker.ask("up2k.wake_rescanner").get()
 
         fn = quotep(fns[0]) if len(fns) == 1 else ""
@@ -7497,7 +7505,15 @@ class HttpCli(object):
             else:
                 ls_names = exclude_dotfiles(ls_names)
 
-        add_dk = not use_filekey and vf.get("dk")
+        add_dk = (
+            "dk" in vf
+            and not use_filekey
+            and (
+                (self.can_read and self.uname in vn.axs.uread)
+                or ("dks" in vf and use_dirkey)
+            )
+            and vf.get("dk")
+        )
         add_fk = vf.get("fk")
         fk_alg = 2 if "fka" in vf else 1
         if add_dk:
