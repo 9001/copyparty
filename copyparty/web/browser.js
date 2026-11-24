@@ -5670,6 +5670,9 @@ var thegrid = (function () {
 				ni++;
 		if (nf)
 			thegrid.en = 100 * ni / nf >= r.gathr;
+        else
+            thegrid.en = false
+
 	};
 
 	function setln(v) {
