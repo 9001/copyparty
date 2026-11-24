@@ -36,6 +36,17 @@ body {
 
     <script nonce="{{ js_nonce }}">
         document.getElementById("submit-form").submit();
+
+        window.addEventListener("message", (event) => {
+          if (event.origin !== "https://docs.kalmenn.fr")
+            return;
+
+          const data = JSON.parse(event.data);
+
+          if(data.MessageId === "UI_Close")
+            window.location.href = window.location.pathname
+        })
+
     </script>
 </body>
 </html>
